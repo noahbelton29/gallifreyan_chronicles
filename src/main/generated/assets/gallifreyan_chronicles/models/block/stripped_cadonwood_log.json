@@ -1,0 +1,7 @@
+{
+  "parent": "minecraft:block/cube_column",
+  "textures": {
+    "end": "gallifreyan_chronicles:block/stripped_cadonwood_log_top",
+    "side": "gallifreyan_chronicles:block/stripped_cadonwood_log"
+  }
+}

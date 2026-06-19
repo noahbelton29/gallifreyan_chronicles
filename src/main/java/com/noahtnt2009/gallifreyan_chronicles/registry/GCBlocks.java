@@ -5,6 +5,7 @@ import com.noahtnt2009.gallifreyan_chronicles.GallifreyanChronicles;
 import com.noahtnt2009.gallifreyan_chronicles.block.GCSaplingBlock;
 import com.noahtnt2009.gallifreyan_chronicles.block.GallifreyanGravelBlock;
 import com.noahtnt2009.gallifreyan_chronicles.block.GallifreyanSandBlock;
+import com.noahtnt2009.gallifreyan_chronicles.block.TardisBlock;
 import com.noahtnt2009.gallifreyan_chronicles.world.tree.GCTreeGrowers;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Registry;
@@ -33,6 +34,10 @@ public class GCBlocks {
     public static final Block GALLIFREYAN_SAND = registerBlock("gallifreyan_sand",
             properties -> new GallifreyanSandBlock(properties.strength(1.25f)
                     .sound(SoundType.SAND)));
+
+    public static final Block TARDIS_BLOCK = registerBlock("tardis_block",
+            properties -> new TardisBlock(properties.strength(-1F)
+                    .sound(SoundType.STONE).noOcclusion()));
 
     public static final Block GALLIFREYAN_GRAVEL = registerBlock("gallifreyan_gravel",
             properties -> new GallifreyanGravelBlock(properties.strength(1.25f)

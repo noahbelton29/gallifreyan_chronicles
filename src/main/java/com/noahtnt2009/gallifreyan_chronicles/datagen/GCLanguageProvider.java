@@ -1,7 +1,9 @@
 package com.noahtnt2009.gallifreyan_chronicles.datagen;
 
+import com.noahtnt2009.gallifreyan_chronicles.GallifreyanChronicles;
 import com.noahtnt2009.gallifreyan_chronicles.registry.GCBlocks;
 import com.noahtnt2009.gallifreyan_chronicles.registry.GCCreativeModeTabs;
+import com.noahtnt2009.gallifreyan_chronicles.registry.GCSounds;
 import net.fabricmc.fabric.api.datagen.v1.FabricPackOutput;
 import net.fabricmc.fabric.api.datagen.v1.provider.FabricLanguageProvider;
 import net.minecraft.core.HolderLookup;
@@ -25,6 +27,10 @@ public class GCLanguageProvider extends FabricLanguageProvider {
                     .map(word -> Character.toUpperCase(word.charAt(0)) + word.substring(1))
                     .collect(Collectors.joining(" "));
             builder.add(block, displayName);
+        }
+
+        for (GCSounds.SoundEntry entry : GCSounds.ENTRIES) {
+            builder.add("subtitles." + GallifreyanChronicles.MOD_ID + "." + entry.event().location().getPath(), entry.subtitle());
         }
 
         builder.add(GCCreativeModeTabs.PLANET_ITEMS_TAB.getDisplayName().getString(), "GC: Planet Items");

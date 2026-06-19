@@ -20,6 +20,7 @@ public class GallifreyanChroniclesDataGenerator implements DataGeneratorEntrypoi
 		pack.addProvider(GCModelProvider::new);
 		pack.addProvider(GCBlockTagProvider::new);
 		pack.addProvider(GCBlockLootTableProvider::new);
+		pack.addProvider(GCSoundsProvider::new);
 	}
 
 	@Override

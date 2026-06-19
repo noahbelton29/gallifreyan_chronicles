@@ -1,5 +1,6 @@
 package com.noahtnt2009.gallifreyan_chronicles;
 
+import com.noahtnt2009.gallifreyan_chronicles.ecs.component.ComponentTypes;
 import com.noahtnt2009.gallifreyan_chronicles.registry.*;
 import com.noahtnt2009.gallifreyan_chronicles.world.biome.GCSurfaceRules;
 import net.fabricmc.api.ModInitializer;
@@ -19,10 +20,15 @@ public class GallifreyanChronicles implements ModInitializer, TerraBlenderApi {
 
 	@Override
 	public void onInitialize() {
+		ComponentTypes.init();
 		GCItems.init();
 		GCBlocks.init();
+		GCBlockEntities.init();
+		GCExteriors.init();
 		GCCreativeModeTabs.init();
 		GCWorldGeneration.init();
+		GCCommands.init();
+		GCSounds.init();
 	}
 
 	@Override

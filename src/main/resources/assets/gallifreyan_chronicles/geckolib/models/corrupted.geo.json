@@ -1,0 +1,56 @@
+{
+  "format_version": "1.12.0",
+  "minecraft:geometry": [
+    {
+      "description": {
+        "identifier": "geometry.1963_police_box",
+        "texture_width": 256,
+        "texture_height": 256,
+        "visible_bounds_width": 3,
+        "visible_bounds_height": 4.5,
+        "visible_bounds_offset": [0, 1.75, 0]
+      },
+      "bones": [
+        {
+          "name": "exterior",
+          "pivot": [0, 0, 0],
+          "cubes": [
+            {"origin": [-12, 0, -12], "size": [24, 1, 24], "uv": [0, 0]},
+            {"origin": [-10, 35, -12], "size": [20, 4, 24], "uv": [0, 25]},
+            {"origin": [-12, 35, -10], "size": [24, 4, 20], "uv": [0, 53]},
+            {"origin": [-10, 33, -10], "size": [20, 10, 20], "uv": [0, 77]},
+            {"origin": [-8.5, 43, -8.5], "size": [17, 1, 17], "uv": [80, 77]},
+            {"origin": [-2, 44, -2], "size": [4, 1, 4], "uv": [88, 59]},
+            {"origin": [-1, 45, -1], "size": [2, 5, 2], "uv": [88, 69]},
+            {"origin": [-2, 48, -2], "size": [4, 1, 4], "uv": [88, 64]},
+            {"origin": [-2.5, 45, 0], "size": [5, 3, 0], "pivot": [0, 0, 0], "rotation": [0, 45, 0], "uv": [96, 3]},
+            {"origin": [-2.5, 45, 0], "size": [5, 3, 0], "pivot": [0, 0, 0], "rotation": [0, -45, 0], "uv": [96, 0]},
+            {"origin": [8, 1, -11], "size": [3, 40, 3], "uv": [36, 107]},
+            {"origin": [-11, 1, -11], "size": [3, 40, 3], "uv": [48, 107]},
+            {"origin": [-11, 1, 8], "size": [3, 40, 3], "uv": [60, 107]},
+            {"origin": [8, 1, 8], "size": [3, 40, 3], "uv": [116, 95]},
+            {"origin": [-8, 1, 8], "size": [16, 32, 2], "pivot": [0, 0, 0], "rotation": [0, 90, 0], "uv": [0, 107]},
+            {"origin": [-8, 1, 8], "size": [16, 32, 2], "uv": [80, 95]},
+            {"origin": [-8, 1, 8], "size": [16, 32, 2], "pivot": [0, 0, 0], "rotation": [0, -90, 0], "uv": [88, 25]}
+          ]
+        },
+        {
+          "name": "leftdoor",
+          "parent": "exterior",
+          "pivot": [-8, 16, -10],
+          "cubes": [
+            {"origin": [-8, 1, -10], "size": [8, 32, 2], "uv": [124, 0]}
+          ]
+        },
+        {
+          "name": "rightdoor",
+          "parent": "exterior",
+          "pivot": [8, 16, -10],
+          "cubes": [
+            {"origin": [0, 1, -10], "size": [8, 32, 2], "uv": [124, 34]}
+          ]
+        }
+      ]
+    }
+  ]
+}

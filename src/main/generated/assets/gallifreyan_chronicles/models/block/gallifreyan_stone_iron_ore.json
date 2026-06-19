@@ -1,6 +1,0 @@
-{
-  "parent": "minecraft:block/cube_all",
-  "textures": {
-    "all": "gallifreyan_chronicles:block/gallifreyan_stone_iron_ore"
-  }
-}

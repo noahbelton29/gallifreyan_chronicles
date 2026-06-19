@@ -1,0 +1,56 @@
+{
+	"format_version": "1.12.0",
+	"minecraft:geometry": [
+		{
+			"description": {
+				"identifier": "geometry.1966_police_box",
+				"texture_width": 256,
+				"texture_height": 256,
+				"visible_bounds_width": 4,
+				"visible_bounds_height": 4.5,
+				"visible_bounds_offset": [0, 1.75, 0]
+			},
+			"bones": [
+				{
+					"name": "exterior",
+					"pivot": [0, 0, 0],
+					"cubes": [
+						{"origin": [-13, 0, -13], "size": [26, 1, 26], "uv": [0, 0]},
+						{"origin": [-10, 35, -12], "size": [20, 4, 24], "uv": [0, 27]},
+						{"origin": [-12, 35, -10], "size": [24, 4, 20], "uv": [0, 84]},
+						{"origin": [-10.5, 33, -10.5], "size": [21, 8, 21], "uv": [0, 55]},
+						{"origin": [-2.5, 41, -2.5], "size": [5, 1, 5], "uv": [104, 0]},
+						{"origin": [-1.5, 42, -1.5], "size": [3, 6, 3], "uv": [104, 12]},
+						{"origin": [-2.5, 46, -2.5], "size": [5, 1, 5], "uv": [104, 6]},
+						{"origin": [-3, 42, 0], "size": [6, 4, 0], "pivot": [0, 0, 0], "rotation": [0, 45, 0], "uv": [116, 12]},
+						{"origin": [-3, 42, 0], "size": [6, 4, 0], "pivot": [0, 0, 0], "rotation": [0, -45, 0], "uv": [104, 21]},
+						{"origin": [-1.5, 31, -10.25], "size": [3, 2, 0], "uv": [104, 25]},
+						{"origin": [8, 1, -11], "size": [3, 39, 3], "uv": [24, 108]},
+						{"origin": [-11, 1, -11], "size": [3, 39, 3], "uv": [12, 108]},
+						{"origin": [-11, 1, 8], "size": [3, 39, 3], "uv": [0, 108]},
+						{"origin": [8, 1, 8], "size": [3, 39, 3], "uv": [36, 108]},
+						{"origin": [-8, 1, 8], "size": [16, 32, 2], "pivot": [0, 0, 0], "rotation": [0, 90, 0], "uv": [88, 95]},
+						{"origin": [-8, 1, 8], "size": [16, 32, 2], "uv": [88, 27]},
+						{"origin": [-8, 1, 8], "size": [16, 32, 2], "pivot": [0, 0, 0], "rotation": [0, -90, 0], "uv": [88, 61]}
+					]
+				},
+				{
+					"name": "leftdoor",
+					"parent": "exterior",
+					"pivot": [-8, 16, -10],
+					"cubes": [
+						{"origin": [-8, 1, -10], "size": [8, 32, 2], "uv": [68, 108]}
+					]
+				},
+				{
+					"name": "rightdoor",
+					"parent": "exterior",
+					"pivot": [8, 16, -10],
+					"cubes": [
+						{"origin": [0, 1, -10], "size": [8, 32, 2], "uv": [48, 108]}
+					]
+				}
+			]
+		}
+	]
+}

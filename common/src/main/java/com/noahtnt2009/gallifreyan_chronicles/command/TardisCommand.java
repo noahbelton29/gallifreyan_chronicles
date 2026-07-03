@@ -1,5 +1,6 @@
 package com.noahtnt2009.gallifreyan_chronicles.command;
 
+import com.mojang.brigadier.arguments.BoolArgumentType;
 import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.context.CommandContext;
 import com.noahtnt2009.gallifreyan_chronicles.block.entity.TardisExteriorBlockEntity;
@@ -72,6 +73,64 @@ public class TardisCommand {
                         "command.gallifreyan_chronicles.set_exterior",
                         tardisIdStr,
                         exteriorId
+                ),
+                true
+        );
+
+        return 1;
+    }
+
+    public static int setGlowing(CommandContext<CommandSourceStack> ctx) {
+        String tardisIdStr = StringArgumentType.getString(ctx, "id");
+        boolean glowing = BoolArgumentType.getBool(ctx, "glowing");
+
+        UUID tardisId;
+        try {
+            tardisId = UUID.fromString(tardisIdStr);
+        } catch (IllegalArgumentException e) {
+            ctx.getSource().sendFailure(Component.translatable(
+                    "command.gallifreyan_chronicles.invalid_id",
+                    tardisIdStr
+            ));
+            return 0;
+        }
+
+        TardisManager manager = TardisManager.get(ctx.getSource().getServer());
+        Optional<TardisComponent> opt = manager.get(tardisId);
+
+        if (opt.isEmpty()) {
+            ctx.getSource().sendFailure(Component.translatable(
+                    "command.gallifreyan_chronicles.no_tardis_id",
+                    tardisIdStr
+            ));
+            return 0;
+        }
+
+        BlockPos pos = opt.get().getBlockPos();
+        boolean found = false;
+        if (pos != null) {
+            for (ServerLevel level : ctx.getSource().getServer().getAllLevels()) {
+                if (level.getBlockEntity(pos) instanceof TardisExteriorBlockEntity blockEntity) {
+                    blockEntity.setGlowing(glowing);
+                    found = true;
+                    break;
+                }
+            }
+        }
+
+        if (!found) {
+            ctx.getSource().sendFailure(Component.translatable(
+                    "command.gallifreyan_chronicles.no_tardis_id",
+                    tardisIdStr
+            ));
+            return 0;
+        }
+
+        ctx.getSource().sendSuccess(
+                () -> Component.translatable(
+                        "command.gallifreyan_chronicles.set_glow",
+                        tardisIdStr,
+                        glowing
                 ),
                 true
         );

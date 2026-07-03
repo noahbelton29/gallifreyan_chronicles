@@ -33,7 +33,8 @@ public class GCBlocks {
 
     public static final Block TARDIS_BLOCK = registerBlock("tardis_block",
             properties -> new TardisBlock(properties.strength(-1F)
-                    .sound(SoundType.STONE).noOcclusion()));
+                    .sound(SoundType.STONE).noOcclusion()
+                    .lightLevel(state -> state.getValue(TardisBlock.GLOWING) ? 12 : 0)));
 
     public static final Block GALLIFREYAN_SAND = registerBlock("gallifreyan_sand",
             properties -> new GCFallingBlock(properties.strength(1.25f)

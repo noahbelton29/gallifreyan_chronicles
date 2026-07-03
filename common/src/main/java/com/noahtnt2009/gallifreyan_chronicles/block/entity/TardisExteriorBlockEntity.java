@@ -12,9 +12,11 @@ import com.noahtnt2009.gallifreyan_chronicles.ecs.Entity;
 import com.noahtnt2009.gallifreyan_chronicles.ecs.component.ComponentTypes;
 import com.noahtnt2009.gallifreyan_chronicles.ecs.component.DoorComponent;
 import com.noahtnt2009.gallifreyan_chronicles.ecs.component.DoorState;
+import com.noahtnt2009.gallifreyan_chronicles.ecs.component.GlowComponent;
 import com.noahtnt2009.gallifreyan_chronicles.ecs.component.TransformComponent;
 import com.noahtnt2009.gallifreyan_chronicles.ecs.system.DoorSystem;
 import com.noahtnt2009.gallifreyan_chronicles.ecs.system.ExteriorSystem;
+import com.noahtnt2009.gallifreyan_chronicles.ecs.system.GlowSystem;
 import com.noahtnt2009.gallifreyan_chronicles.ecs.system.TardisLinkSystem;
 import com.noahtnt2009.gallifreyan_chronicles.init.GCSounds;
 import com.noahtnt2009.gallifreyan_chronicles.tardis.exterior.TardisExterior;
@@ -153,6 +155,33 @@ public class TardisExteriorBlockEntity extends BlockEntity implements GeoBlockEn
 
     public DoorState getDoorState() {
         return DoorSystem.stateOf(asEntity());
+    }
+
+    public boolean isGlowing() {
+        return asEntity().get(ComponentTypes.GLOW).glowing();
+    }
+
+    public void setGlowing(boolean glowing) {
+        asEntity().set(ComponentTypes.GLOW, new GlowComponent(glowing));
+        applyGlowToBlockState(glowing);
+        sync();
+    }
+
+    private void applyGlowToBlockState(boolean glowing) {
+        if (level == null || level.isClientSide()) return;
+        BlockState current = getBlockState();
+        if (current.getValue(com.noahtnt2009.gallifreyan_chronicles.block.TardisBlock.GLOWING) != glowing) {
+            level.setBlock(getBlockPos(), current.setValue(com.noahtnt2009.gallifreyan_chronicles.block.TardisBlock.GLOWING, glowing), 3);
+        }
+    }
+
+    public static void serverTick(Level level, BlockPos pos, BlockState state, TardisExteriorBlockEntity blockEntity) {
+        if (level.isClientSide()) return;
+
+        if (GlowSystem.tick(blockEntity.asEntity(), level.getDefaultClockTime())) {
+            blockEntity.applyGlowToBlockState(blockEntity.isGlowing());
+            blockEntity.sync();
+        }
     }
 
     public void setDoorState(DoorState newState) {

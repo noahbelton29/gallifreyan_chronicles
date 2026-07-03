@@ -1,0 +1,32 @@
+{
+  "parent": "minecraft:recipes/root",
+  "criteria": {
+    "has_arcadian_shale_taranium_ore": {
+      "conditions": {
+        "items": [
+          {
+            "items": "gallifreyan_chronicles:arcadian_shale_taranium_ore"
+          }
+        ]
+      },
+      "trigger": "minecraft:inventory_changed"
+    },
+    "has_the_recipe": {
+      "conditions": {
+        "recipe": "gallifreyan_chronicles:taranium_scrap_from_blasting_arcadian_shale_taranium_ore"
+      },
+      "trigger": "minecraft:recipe_unlocked"
+    }
+  },
+  "requirements": [
+    [
+      "has_the_recipe",
+      "has_arcadian_shale_taranium_ore"
+    ]
+  ],
+  "rewards": {
+    "recipes": [
+      "gallifreyan_chronicles:taranium_scrap_from_blasting_arcadian_shale_taranium_ore"
+    ]
+  }
+}

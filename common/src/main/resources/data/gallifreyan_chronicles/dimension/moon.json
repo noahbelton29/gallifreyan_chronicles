@@ -1,0 +1,42 @@
+{
+  "type": "gallifreyan_chronicles:moon_type",
+  "generator": {
+    "type": "minecraft:noise",
+    "biome_source": {
+      "type": "minecraft:multi_noise",
+      "biomes": [
+        {
+          "biome": "gallifreyan_chronicles:moon",
+          "parameters": {
+            "continentalness": [
+              -1.0,
+              -0.2
+            ],
+            "depth": [
+              -0.3,
+              0.3
+            ],
+            "erosion": [
+              -0.4,
+              0.4
+            ],
+            "humidity": [
+              0.2,
+              1.0
+            ],
+            "offset": 0.0,
+            "temperature": [
+              -0.9,
+              0.1
+            ],
+            "weirdness": [
+              -1.0,
+              1.0
+            ]
+          }
+        }
+      ]
+    },
+    "settings": "gallifreyan_chronicles:moon"
+  }
+}

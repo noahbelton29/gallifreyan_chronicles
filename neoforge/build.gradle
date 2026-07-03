@@ -1,0 +1,136 @@
+plugins {
+    id 'multiloader-loader'
+    id 'net.neoforged.moddev'
+}
+
+neoForge {
+    version = neoforge_version
+    // Automatically enable neoforge AccessTransformers if the file exists
+    def at = project(':common').file('src/main/resources/META-INF/accesstransformer.cfg')
+    if (at.exists()) {
+        accessTransformers.from(at.absolutePath)
+    }
+    runs {
+        configureEach {
+            systemProperty('neoforge.enabledGameTestNamespaces', mod_id)
+            ideName = "NeoForge ${it.name.capitalize()} (${project.path})" // Unify the run config names with fabric
+        }
+        client {
+            client()
+            gameDirectory = this.mkdir(this.file('runs/client'))
+        }
+        data {
+            clientData()
+            gameDirectory = this.mkdir(this.file('runs/data'))
+            // DataGen can be run by - "./gradlew :neoforge:runData" in Terminal.
+            // Specify the modid for data generation, where to output the resulting resource, and where to look for existing resources.
+            // IMPORTANT: --output must stay isolated to neoforge's own folder.
+            // NeoForge's datagen treats --output as territory it fully owns and
+            // will delete files there that it doesn't recognize as current
+            // output. Pointing --output at common's hand-authored resources
+            // caused it to wipe manually-placed files. The generated result is
+            // copied into common separately by copyGeneratedToCommon below.
+            programArguments.addAll '--mod', project.mod_id, '--all', '--output', file('src/generated/resources/').getAbsolutePath(), '--existing', new File(rootDir, 'common/src/main/resources').getAbsolutePath()
+        }
+        server {
+            server()
+            this.file('runs/server').createParentDirectories()
+            gameDirectory = this.mkdir(this.file('runs/server'))
+        }
+    }
+    mods {
+        "${mod_id}" {
+            sourceSet sourceSets.main
+        }
+    }
+}
+
+repositories {
+    maven {
+        url = uri("https://maven.minecraftforge.net/")
+    }
+    maven {
+        url = uri("https://dl.cloudsmith.io/public/geckolib3/geckolib/maven/")
+    }
+    maven {
+        url = uri("https://cursemaven.com")
+        content {
+            includeGroup("curse.maven")
+        }
+    }
+    maven {
+        name = "Modrinth"
+        url = uri("https://api.modrinth.com/maven")
+        content {
+            includeGroup("maven.modrinth")
+        }
+    }
+    exclusiveContent {
+        forRepository {
+            maven {
+                url = "https://maven.ryanhcode.dev/releases"
+                name = "RyanHCode Maven"
+            }
+        }
+        filter {
+            includeGroup("foundry.imguimc")
+        }
+    }
+}
+
+dependencies {
+    implementation("com.geckolib:geckolib-neoforge-${providers.gradleProperty("minecraft_version").get()}:${providers.gradleProperty("geckolib_version").get()}")
+    implementation("foundry.imguimc:imguimc-neoforge-${project.minecraft_version}:${project.imguimc_version}")
+    runtimeOnly("foundry.imguimc:imguimc-neoforge-${project.minecraft_version}:${project.imguimc_version}")
+//    runtimeOnly("maven.modrinth:sodium:${providers.gradleProperty("sodium_version").get()}")
+//    runtimeOnly("maven.modrinth:iris:${providers.gradleProperty("iris_version").get()}")
+}
+
+sourceSets.main.resources { srcDir 'src/generated/resources' }
+
+// NeoForge datagen writes to its own isolated folder (src/generated/resources)
+// because --output is territory NeoForge fully owns and will prune — pointing
+// it at common directly deletes hand-placed files. This task instead copies
+// the generated output into common afterward. Copy (not Sync) is used so
+// files already in common that aren't part of this run's output are left
+// alone — nothing in common gets deleted, only added/overwritten.
+tasks.register('copyGeneratedToCommon', Copy) {
+    from('src/generated/resources') {
+        exclude '.cache/**'
+    }
+    into(new File(rootDir, 'common/src/main/resources'))
+}
+
+// Once the generated output has been copied into common, the local
+// neoforge/src/generated/resources folder is no longer needed — delete it so
+// it doesn't linger around as a second, possibly-stale copy.
+tasks.register('deleteGeneratedFolder', Delete) {
+    delete 'src/generated/resources'
+}
+
+tasks.named('copyGeneratedToCommon') {
+    finalizedBy('deleteGeneratedFolder')
+}
+
+tasks.named('runData') {
+    finalizedBy('copyGeneratedToCommon')
+}
+
+// Implement mcgradleconventions loader attribute
+def loaderAttribute = Attribute.of('io.github.mcgradleconventions.loader', String)
+['apiElements', 'runtimeElements', 'sourcesElements', 'javadocElements'].each { variant ->
+    configurations.named(variant) {
+        attributes {
+            attribute(loaderAttribute, 'neoforge')
+        }
+    }
+}
+sourceSets.configureEach {
+    [it.compileClasspathConfigurationName, it.runtimeClasspathConfigurationName, it.getTaskName(null, 'jarJar')].each { variant ->
+        configurations.named(variant) {
+            attributes {
+                attribute(loaderAttribute, 'neoforge')
+            }
+        }
+    }
+}

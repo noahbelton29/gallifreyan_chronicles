@@ -1,0 +1,24 @@
+{
+  "layers": {
+    "horse_body": [
+      {
+        "texture": "gallifreyan_chronicles:taranium"
+      }
+    ],
+    "humanoid": [
+      {
+        "texture": "gallifreyan_chronicles:taranium"
+      }
+    ],
+    "humanoid_baby": [
+      {
+        "texture": "gallifreyan_chronicles:taranium"
+      }
+    ],
+    "humanoid_leggings": [
+      {
+        "texture": "gallifreyan_chronicles:taranium"
+      }
+    ]
+  }
+}

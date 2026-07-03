@@ -1,0 +1,14 @@
+accessWidener v1 official
+
+# Make TreeDecoratorType constructor public
+accessible method net/minecraft/world/level/levelgen/feature/treedecorators/TreeDecoratorType <init> (Lcom/mojang/serialization/MapCodec;)V
+
+# Your existing entries...
+accessible method net/minecraft/world/level/levelgen/NoiseRouterData overworld (Lnet/minecraft/core/HolderGetter;Lnet/minecraft/core/HolderGetter;ZZ)Lnet/minecraft/world/level/levelgen/NoiseRouter;
+
+# SaplingBlock constructor
+accessible method net/minecraft/world/level/block/SaplingBlock <init> (Lnet/minecraft/world/level/block/grower/TreeGrower;Lnet/minecraft/world/level/block/state/BlockBehaviour$Properties;)V
+
+# TreeDecorator constructor
+accessible method net/minecraft/world/level/levelgen/feature/treedecorators/TreeDecorator <init> ()V
+accessible field net/minecraft/client/gui/screens/Screen renderables Ljava/util/List;

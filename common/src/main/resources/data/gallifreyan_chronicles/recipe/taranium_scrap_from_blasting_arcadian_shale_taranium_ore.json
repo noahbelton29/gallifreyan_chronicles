@@ -1,0 +1,9 @@
+{
+  "type": "minecraft:blasting",
+  "experience": 0.25,
+  "group": "taranium",
+  "ingredient": "gallifreyan_chronicles:arcadian_shale_taranium_ore",
+  "result": {
+    "id": "gallifreyan_chronicles:taranium_scrap"
+  }
+}

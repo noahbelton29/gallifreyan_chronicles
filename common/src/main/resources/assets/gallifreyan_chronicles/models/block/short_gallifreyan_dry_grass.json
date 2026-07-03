@@ -1,0 +1,6 @@
+{
+  "parent": "minecraft:block/cross",
+  "textures": {
+    "cross": "gallifreyan_chronicles:block/short_gallifreyan_dry_grass"
+  }
+}

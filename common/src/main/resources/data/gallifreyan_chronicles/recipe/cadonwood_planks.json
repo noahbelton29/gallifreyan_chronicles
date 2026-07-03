@@ -1,0 +1,14 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "building",
+  "key": {
+    "L": "gallifreyan_chronicles:cadonwood_log"
+  },
+  "pattern": [
+    "L"
+  ],
+  "result": {
+    "count": 4,
+    "id": "gallifreyan_chronicles:cadonwood_planks"
+  }
+}

@@ -1,0 +1,86 @@
+{
+  "attributes": {
+    "minecraft:visual/ambient_light_color": "#ff9944",
+    "minecraft:visual/fog_color": "#ff9944",
+    "minecraft:visual/fog_end_distance": 100.0,
+    "minecraft:visual/fog_start_distance": 40.0,
+    "minecraft:visual/sky_color": "#ff8833"
+  },
+  "carvers": [],
+  "downfall": 0.0,
+  "effects": {
+    "water_color": "#bdb133"
+  },
+  "features": [
+    [],
+    [],
+    [
+      "minecraft:amethyst_geode"
+    ],
+    [
+      "minecraft:monster_room",
+      "minecraft:monster_room_deep"
+    ],
+    [],
+    [],
+    [
+      "minecraft:ore_dirt",
+      "minecraft:ore_gravel",
+      "minecraft:ore_granite_upper",
+      "minecraft:ore_granite_lower",
+      "minecraft:ore_diorite_upper",
+      "minecraft:ore_diorite_lower",
+      "minecraft:ore_andesite_upper",
+      "minecraft:ore_andesite_lower",
+      "minecraft:ore_tuff",
+      "minecraft:ore_coal_upper",
+      "minecraft:ore_coal_lower",
+      "minecraft:ore_iron_upper",
+      "minecraft:ore_iron_middle",
+      "minecraft:ore_iron_small",
+      "minecraft:ore_gold",
+      "minecraft:ore_gold_lower",
+      "minecraft:ore_redstone",
+      "minecraft:ore_redstone_lower",
+      "minecraft:ore_diamond",
+      "minecraft:ore_diamond_medium",
+      "minecraft:ore_diamond_large",
+      "minecraft:ore_diamond_buried",
+      "minecraft:ore_lapis",
+      "minecraft:ore_lapis_buried",
+      "minecraft:ore_copper",
+      "minecraft:underwater_magma",
+      "gallifreyan_chronicles:iron_gallifrey_ores_upper",
+      "gallifreyan_chronicles:iron_gallifrey_ores_middle",
+      "gallifreyan_chronicles:iron_gallifrey_ores_small",
+      "gallifreyan_chronicles:coal_gallifrey_ores_lower",
+      "gallifreyan_chronicles:coal_gallifrey_ores_upper",
+      "gallifreyan_chronicles:gravel_gallifrey_ores",
+      "gallifreyan_chronicles:cobbled_limestone_gallifrey_ores"
+    ],
+    [],
+    [],
+    [
+      "minecraft:glow_lichen",
+      "gallifreyan_chronicles:patch_gallifrey_dry_grass",
+      "gallifreyan_chronicles:patch_thorivine"
+    ],
+    [
+      "gallifreyan_chronicles:gallifreyan_stone_boulder",
+      "gallifreyan_chronicles:gallifreyan_stone_patch"
+    ]
+  ],
+  "has_precipitation": false,
+  "spawn_costs": {},
+  "spawners": {
+    "ambient": [],
+    "axolotls": [],
+    "creature": [],
+    "misc": [],
+    "monster": [],
+    "underground_water_creature": [],
+    "water_ambient": [],
+    "water_creature": []
+  },
+  "temperature": 4.0
+}

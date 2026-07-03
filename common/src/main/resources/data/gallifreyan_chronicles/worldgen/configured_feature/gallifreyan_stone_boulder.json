@@ -1,0 +1,9 @@
+{
+  "type": "gallifreyan_chronicles:boulder",
+  "config": {
+    "blocks": [
+      "gallifreyan_chronicles:gallifreyan_stone",
+      "gallifreyan_chronicles:gallifreyan_cobblestone"
+    ]
+  }
+}

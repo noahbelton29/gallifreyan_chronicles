@@ -1,0 +1,14 @@
+{
+  "tardis_door_open": {
+    "subtitle": "sounds.gallifreyan_chronicles.block_entity.tardis_door_open",
+    "sounds": [
+      "gallifreyan_chronicles:block_entity/tardis/door/door_open"
+    ]
+  },
+  "tardis_door_close": {
+    "subtitle": "sounds.gallifreyan_chronicles.block_entity.tardis_door_open",
+    "sounds": [
+      "gallifreyan_chronicles:block_entity/tardis/door/door_close"
+    ]
+  }
+}

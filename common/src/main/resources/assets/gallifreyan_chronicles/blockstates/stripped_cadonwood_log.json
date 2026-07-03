@@ -1,0 +1,16 @@
+{
+  "variants": {
+    "axis=x": {
+      "model": "gallifreyan_chronicles:block/stripped_cadonwood_log",
+      "x": 90,
+      "y": 90
+    },
+    "axis=y": {
+      "model": "gallifreyan_chronicles:block/stripped_cadonwood_log"
+    },
+    "axis=z": {
+      "model": "gallifreyan_chronicles:block/stripped_cadonwood_log",
+      "x": 90
+    }
+  }
+}

@@ -1,0 +1,32 @@
+{
+  "parent": "minecraft:recipes/root",
+  "criteria": {
+    "has_taranium_ingot": {
+      "conditions": {
+        "items": [
+          {
+            "items": "gallifreyan_chronicles:taranium_ingot"
+          }
+        ]
+      },
+      "trigger": "minecraft:inventory_changed"
+    },
+    "has_the_recipe": {
+      "conditions": {
+        "recipe": "gallifreyan_chronicles:taranium_leggings"
+      },
+      "trigger": "minecraft:recipe_unlocked"
+    }
+  },
+  "requirements": [
+    [
+      "has_the_recipe",
+      "has_taranium_ingot"
+    ]
+  ],
+  "rewards": {
+    "recipes": [
+      "gallifreyan_chronicles:taranium_leggings"
+    ]
+  }
+}

@@ -1,0 +1,16 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "equipment",
+  "key": {
+    "G": "gallifreyan_chronicles:gallifreyan_cobblestone",
+    "S": "minecraft:stick"
+  },
+  "pattern": [
+    "GGG",
+    " S ",
+    " S "
+  ],
+  "result": {
+    "id": "minecraft:stone_pickaxe"
+  }
+}

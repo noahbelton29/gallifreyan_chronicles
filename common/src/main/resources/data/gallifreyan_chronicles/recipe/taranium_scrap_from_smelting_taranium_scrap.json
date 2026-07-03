@@ -1,0 +1,9 @@
+{
+  "type": "minecraft:smelting",
+  "experience": 0.25,
+  "group": "taranium",
+  "ingredient": "gallifreyan_chronicles:taranium_scrap",
+  "result": {
+    "id": "gallifreyan_chronicles:taranium_scrap"
+  }
+}

@@ -1,0 +1,17 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "key": {
+    "D": "minecraft:diamond",
+    "K": "minecraft:sculk",
+    "R": "gallifreyan_chronicles:refined_taranium_crystal",
+    "S": "gallifreyan_chronicles:taranium_scrap"
+  },
+  "pattern": [
+    "SSS",
+    "SRR",
+    "DDK"
+  ],
+  "result": {
+    "id": "gallifreyan_chronicles:taranium_ingot"
+  }
+}

@@ -1,0 +1,16 @@
+{
+  "type": "minecraft:netherrack_replace_blobs",
+  "config": {
+    "radius": {
+      "type": "minecraft:uniform",
+      "max_inclusive": 8,
+      "min_inclusive": 5
+    },
+    "state": {
+      "Name": "gallifreyan_chronicles:gallifreyan_mudstone"
+    },
+    "target": {
+      "Name": "gallifreyan_chronicles:arcadian_shale"
+    }
+  }
+}

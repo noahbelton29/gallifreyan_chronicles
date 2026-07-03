@@ -1,0 +1,13 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "redstone",
+  "key": {
+    "#": "gallifreyan_chronicles:cadonwood_planks"
+  },
+  "pattern": [
+    "##"
+  ],
+  "result": {
+    "id": "gallifreyan_chronicles:cadonwood_pressure_plate"
+  }
+}

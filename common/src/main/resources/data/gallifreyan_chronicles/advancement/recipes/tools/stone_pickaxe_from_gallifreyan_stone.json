@@ -1,0 +1,32 @@
+{
+  "parent": "minecraft:recipes/root",
+  "criteria": {
+    "has_gallifreyan_cobblestone": {
+      "conditions": {
+        "items": [
+          {
+            "items": "minecraft:stick"
+          }
+        ]
+      },
+      "trigger": "minecraft:inventory_changed"
+    },
+    "has_the_recipe": {
+      "conditions": {
+        "recipe": "gallifreyan_chronicles:stone_pickaxe_from_gallifreyan_stone"
+      },
+      "trigger": "minecraft:recipe_unlocked"
+    }
+  },
+  "requirements": [
+    [
+      "has_the_recipe",
+      "has_gallifreyan_cobblestone"
+    ]
+  ],
+  "rewards": {
+    "recipes": [
+      "gallifreyan_chronicles:stone_pickaxe_from_gallifreyan_stone"
+    ]
+  }
+}

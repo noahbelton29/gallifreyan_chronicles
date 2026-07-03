@@ -1,0 +1,14 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "key": {
+    "P": "gallifreyan_chronicles:cadonwood_planks",
+    "S": "minecraft:stick"
+  },
+  "pattern": [
+    "SPS",
+    "SPS"
+  ],
+  "result": {
+    "id": "gallifreyan_chronicles:cadonwood_fence_gate"
+  }
+}

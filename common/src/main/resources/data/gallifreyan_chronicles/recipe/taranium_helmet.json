@@ -1,0 +1,14 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "equipment",
+  "key": {
+    "T": "gallifreyan_chronicles:taranium_ingot"
+  },
+  "pattern": [
+    "TTT",
+    "T T"
+  ],
+  "result": {
+    "id": "gallifreyan_chronicles:taranium_helmet"
+  }
+}

@@ -18,6 +18,15 @@ import java.util.Optional;
 import java.util.UUID;
 
 public class TardisCommand {
+    private static Optional<TardisExteriorBlockEntity> findBlockEntity(CommandContext<CommandSourceStack> ctx, BlockPos pos) {
+        if (pos == null) return Optional.empty();
+        for (ServerLevel level : ctx.getSource().getServer().getAllLevels()) {
+            if (level.getBlockEntity(pos) instanceof TardisExteriorBlockEntity blockEntity) {
+                return Optional.of(blockEntity);
+            }
+        }
+        return Optional.empty();
+    }
 
     public static int setExterior(CommandContext<CommandSourceStack> ctx) {
         String tardisIdStr = StringArgumentType.getString(ctx, "id");
@@ -53,20 +62,9 @@ public class TardisCommand {
             return 0;
         }
 
-        TardisComponent component = opt.get();
         TardisExterior exterior = TardisExteriorRegistry.get(exteriorId);
-        component.setExterior(exterior);
-        manager.setDirty();
-
-        BlockPos pos = component.getBlockPos();
-        if (pos != null) {
-            for (ServerLevel level : ctx.getSource().getServer().getAllLevels()) {
-                if (level.getBlockEntity(pos) instanceof TardisExteriorBlockEntity blockEntity) {
-                    blockEntity.setExterior(exterior);
-                    break;
-                }
-            }
-        }
+        BlockPos pos = manager.getBlockPos(tardisId);
+        findBlockEntity(ctx, pos).ifPresent(blockEntity -> blockEntity.setExterior(exterior));
 
         ctx.getSource().sendSuccess(
                 () -> Component.translatable(
@@ -106,19 +104,11 @@ public class TardisCommand {
             return 0;
         }
 
-        BlockPos pos = opt.get().getBlockPos();
-        boolean found = false;
-        if (pos != null) {
-            for (ServerLevel level : ctx.getSource().getServer().getAllLevels()) {
-                if (level.getBlockEntity(pos) instanceof TardisExteriorBlockEntity blockEntity) {
-                    blockEntity.setGlowing(glowing);
-                    found = true;
-                    break;
-                }
-            }
-        }
+        BlockPos pos = manager.getBlockPos(tardisId);
+        Optional<TardisExteriorBlockEntity> blockEntity = findBlockEntity(ctx, pos);
+        blockEntity.ifPresent(be -> be.setGlowing(glowing));
 
-        if (!found) {
+        if (blockEntity.isEmpty()) {
             ctx.getSource().sendFailure(Component.translatable(
                     "command.gallifreyan_chronicles.no_tardis_id",
                     tardisIdStr
@@ -163,7 +153,10 @@ public class TardisCommand {
             return 0;
         }
 
-        String exteriorId = component.get().getExterior().id();
+        BlockPos pos = manager.getBlockPos(tardisId);
+        String exteriorId = findBlockEntity(ctx, pos)
+                .map(be -> be.getExterior().id())
+                .orElse("unknown");
 
         ctx.getSource().sendSuccess(
                 () -> Component.translatable(
@@ -191,9 +184,11 @@ public class TardisCommand {
             return 0;
         }
 
-        ids.forEach(id -> manager.get(id).ifPresent(component -> {
-            String exterior = component.getExterior().id();
-            BlockPos pos = component.getBlockPos();
+        ids.forEach(id -> {
+            BlockPos pos = manager.getBlockPos(id);
+            String exterior = findBlockEntity(ctx, pos)
+                    .map(be -> be.getExterior().id())
+                    .orElse("unknown");
             String posStr = pos != null
                     ? pos.getX() + " " + pos.getY() + " " + pos.getZ()
                     : "unplaced";
@@ -207,7 +202,7 @@ public class TardisCommand {
                     ),
                     false
             );
-        }));
+        });
 
         return 1;
     }
@@ -238,10 +233,13 @@ public class TardisCommand {
         }
 
         TardisComponent component = opt.get();
-        BlockPos pos = component.getBlockPos();
+        BlockPos pos = manager.getBlockPos(tardisId);
         String posStr = pos != null
                 ? pos.getX() + " " + pos.getY() + " " + pos.getZ()
                 : "unplaced";
+        String exteriorId = findBlockEntity(ctx, pos)
+                .map(be -> be.getExterior().id())
+                .orElse("unknown");
 
         ctx.getSource().sendSuccess(
                 () -> Component.translatable(
@@ -264,7 +262,7 @@ public class TardisCommand {
         ctx.getSource().sendSuccess(
                 () -> Component.translatable(
                         "command.gallifreyan_chronicles.exterior",
-                        component.getExterior().id()
+                        exteriorId
                 ),
                 false
         );

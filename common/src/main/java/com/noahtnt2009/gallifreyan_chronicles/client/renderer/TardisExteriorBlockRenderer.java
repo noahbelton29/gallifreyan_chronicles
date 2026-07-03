@@ -3,6 +3,7 @@ package com.noahtnt2009.gallifreyan_chronicles.client.renderer;
 import com.geckolib.constant.dataticket.DataTicket;
 import com.geckolib.renderer.GeoBlockRenderer;
 import com.geckolib.renderer.base.RenderPassInfo;
+import com.geckolib.renderer.layer.builtin.AutoGlowingGeoLayer;
 import com.mojang.math.Axis;
 import com.noahtnt2009.gallifreyan_chronicles.block.TardisExteriorBlockModel;
 import com.noahtnt2009.gallifreyan_chronicles.block.entity.TardisExteriorBlockEntity;
@@ -19,6 +20,8 @@ public class TardisExteriorBlockRenderer extends GeoBlockRenderer<@NotNull Tardi
 
     public TardisExteriorBlockRenderer(BlockEntityRendererProvider.Context context) {
         super(context, new TardisExteriorBlockModel());
+
+        withRenderLayer(AutoGlowingGeoLayer::new);
     }
 
     @SuppressWarnings("UnstableApiUsage")
@@ -38,9 +41,15 @@ public class TardisExteriorBlockRenderer extends GeoBlockRenderer<@NotNull Tardi
     public void submitRenderTasks(RenderPassInfo<TardisExteriorBlockRenderState> renderPassInfo,
                                   @NonNull OrderedSubmitNodeCollector renderTasks,
                                   @Nullable RenderType renderType) {
+        renderPassInfo.poseStack().pushPose();
+
         Float yaw = renderPassInfo.renderState().getGeckolibData(YAW);
-        float actualYaw = yaw != null ? yaw : 0.0f;
-        renderPassInfo.poseStack().mulPose(Axis.YP.rotationDegrees(180.0f - actualYaw));
+        renderPassInfo.poseStack().mulPose(
+                Axis.YP.rotationDegrees(180f - (yaw != null ? yaw : 0f))
+        );
+
         super.submitRenderTasks(renderPassInfo, renderTasks, renderType);
+
+        renderPassInfo.poseStack().popPose();
     }
 }

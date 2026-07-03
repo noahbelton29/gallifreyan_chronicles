@@ -17,6 +17,7 @@ import java.util.Optional;
 import java.util.UUID;
 
 public class TardisCommand {
+
     public static int setExterior(CommandContext<CommandSourceStack> ctx) {
         String tardisIdStr = StringArgumentType.getString(ctx, "id");
         String exteriorId = StringArgumentType.getString(ctx, "exterior_id");
@@ -25,12 +26,18 @@ public class TardisCommand {
         try {
             tardisId = UUID.fromString(tardisIdStr);
         } catch (IllegalArgumentException e) {
-            ctx.getSource().sendFailure(Component.literal("Invalid TARDIS ID: " + tardisIdStr));
+            ctx.getSource().sendFailure(Component.translatable(
+                    "command.gallifreyan_chronicles.invalid_id",
+                    tardisIdStr
+            ));
             return 0;
         }
 
         if (!TardisExteriorRegistry.contains(exteriorId)) {
-            ctx.getSource().sendFailure(Component.literal("Unknown exterior: " + exteriorId));
+            ctx.getSource().sendFailure(Component.translatable(
+                    "command.gallifreyan_chronicles.unknown_exterior",
+                    exteriorId
+            ));
             return 0;
         }
 
@@ -38,7 +45,10 @@ public class TardisCommand {
         Optional<TardisComponent> opt = manager.get(tardisId);
 
         if (opt.isEmpty()) {
-            ctx.getSource().sendFailure(Component.literal("No TARDIS found with ID: " + tardisIdStr));
+            ctx.getSource().sendFailure(Component.translatable(
+                    "command.gallifreyan_chronicles.no_tardis_id",
+                    tardisIdStr
+            ));
             return 0;
         }
 
@@ -58,9 +68,14 @@ public class TardisCommand {
         }
 
         ctx.getSource().sendSuccess(
-                () -> Component.literal("Set exterior of " + tardisIdStr + " to " + exteriorId),
+                () -> Component.translatable(
+                        "command.gallifreyan_chronicles.set_exterior",
+                        tardisIdStr,
+                        exteriorId
+                ),
                 true
         );
+
         return 1;
     }
 
@@ -71,7 +86,10 @@ public class TardisCommand {
         try {
             tardisId = UUID.fromString(tardisIdStr);
         } catch (IllegalArgumentException e) {
-            ctx.getSource().sendFailure(Component.literal("Invalid TARDIS ID: " + tardisIdStr));
+            ctx.getSource().sendFailure(Component.translatable(
+                    "command.gallifreyan_chronicles.invalid_id",
+                    tardisIdStr
+            ));
             return 0;
         }
 
@@ -79,15 +97,24 @@ public class TardisCommand {
         Optional<TardisComponent> component = manager.get(tardisId);
 
         if (component.isEmpty()) {
-            ctx.getSource().sendFailure(Component.literal("No TARDIS found with ID: " + tardisIdStr));
+            ctx.getSource().sendFailure(Component.translatable(
+                    "command.gallifreyan_chronicles.no_tardis_id",
+                    tardisIdStr
+            ));
             return 0;
         }
 
         String exteriorId = component.get().getExterior().id();
+
         ctx.getSource().sendSuccess(
-                () -> Component.literal("Exterior of " + tardisIdStr + ": " + exteriorId),
+                () -> Component.translatable(
+                        "command.gallifreyan_chronicles.get_exterior",
+                        tardisIdStr,
+                        exteriorId
+                ),
                 false
         );
+
         return 1;
     }
 
@@ -96,50 +123,100 @@ public class TardisCommand {
         Collection<UUID> ids = manager.getAllIds();
 
         if (ids.isEmpty()) {
-            ctx.getSource().sendSuccess(() -> Component.literal("No TARDISes found."), false);
+            ctx.getSource().sendSuccess(
+                    () -> Component.translatable(
+                            "command.gallifreyan_chronicles.no_tardises"
+                    ),
+                    false
+            );
             return 0;
         }
 
-        ids.forEach(id -> {
-            manager.get(id).ifPresent(component -> {
-                String exterior = component.getExterior().id();
-                BlockPos pos = component.getBlockPos();
-                String posStr = pos != null ? pos.getX() + " " + pos.getY() + " " + pos.getZ() : "unplaced";
-                ctx.getSource().sendSuccess(
-                        () -> Component.literal(id + " | exterior: " + exterior + " | pos: " + posStr),
-                        false
-                );
-            });
-        });
+        ids.forEach(id -> manager.get(id).ifPresent(component -> {
+            String exterior = component.getExterior().id();
+            BlockPos pos = component.getBlockPos();
+            String posStr = pos != null
+                    ? pos.getX() + " " + pos.getY() + " " + pos.getZ()
+                    : "unplaced";
+
+            ctx.getSource().sendSuccess(
+                    () -> Component.translatable(
+                            "command.gallifreyan_chronicles.list_tardis",
+                            id,
+                            exterior,
+                            posStr
+                    ),
+                    false
+            );
+        }));
 
         return 1;
     }
 
     public static int debugTardis(CommandContext<CommandSourceStack> ctx) {
         String tardisIdStr = StringArgumentType.getString(ctx, "id");
+
         UUID tardisId;
         try {
             tardisId = UUID.fromString(tardisIdStr);
         } catch (IllegalArgumentException e) {
-            ctx.getSource().sendFailure(Component.literal("Invalid TARDIS ID: " + tardisIdStr));
+            ctx.getSource().sendFailure(Component.translatable(
+                    "command.gallifreyan_chronicles.invalid_id",
+                    tardisIdStr
+            ));
             return 0;
         }
 
         TardisManager manager = TardisManager.get(ctx.getSource().getServer());
         Optional<TardisComponent> opt = manager.get(tardisId);
+
         if (opt.isEmpty()) {
-            ctx.getSource().sendFailure(Component.literal("No TARDIS found with ID: " + tardisIdStr));
+            ctx.getSource().sendFailure(Component.translatable(
+                    "command.gallifreyan_chronicles.no_tardis_id",
+                    tardisIdStr
+            ));
             return 0;
         }
 
         TardisComponent component = opt.get();
         BlockPos pos = component.getBlockPos();
-        String posStr = pos != null ? pos.getX() + " " + pos.getY() + " " + pos.getZ() : "unplaced";
+        String posStr = pos != null
+                ? pos.getX() + " " + pos.getY() + " " + pos.getZ()
+                : "unplaced";
 
-        ctx.getSource().sendSuccess(() -> Component.literal("=== TARDIS Debug: " + tardisIdStr + " ==="), false);
-        ctx.getSource().sendSuccess(() -> Component.literal("Owner:    " + component.getOwnerId()), false);
-        ctx.getSource().sendSuccess(() -> Component.literal("Exterior: " + component.getExterior().id()), false);
-        ctx.getSource().sendSuccess(() -> Component.literal("Position: " + posStr), false);
+        ctx.getSource().sendSuccess(
+                () -> Component.translatable(
+                        "command.gallifreyan_chronicles.debug",
+                        tardisIdStr
+                ),
+                false
+        );
+
+        ctx.getSource().sendSuccess(
+                () -> Component.translatable(
+                        "command.gallifreyan_chronicles.owner",
+                        component.getOwnerId() != null
+                                ? component.getOwnerId().toString()
+                                : "None"
+                ),
+                false
+        );
+
+        ctx.getSource().sendSuccess(
+                () -> Component.translatable(
+                        "command.gallifreyan_chronicles.exterior",
+                        component.getExterior().id()
+                ),
+                false
+        );
+
+        ctx.getSource().sendSuccess(
+                () -> Component.translatable(
+                        "command.gallifreyan_chronicles.position",
+                        posStr
+                ),
+                false
+        );
 
         return 1;
     }

@@ -33,10 +33,31 @@ public class GCLanguageProvider extends LanguageProvider {
                     .collect(Collectors.joining(" "));
             add(item, displayName);
         }
+
+        // misc
+        // creative
         add("creativetab.gallifreyan_chronicles.natural_blocks", "GC: Natural Blocks");
         add("creativetab.gallifreyan_chronicles.building_blocks", "GC: Building Blocks");
         add("creativetab.gallifreyan_chronicles.flora", "GC: Flora");
         add("creativetab.gallifreyan_chronicles.tools_and_armor", "GC: Tools & Armor");
+
+        // menu
         add("menu.gallifreyan_chronicles.credits", "Credits");
+
+        // commands
+        add("command.gallifreyan_chronicles.invalid_id", "Invalid TARDIS ID: %s");
+        add("command.gallifreyan_chronicles.unknown_exterior", "Unknown exterior: %s");
+        add("command.gallifreyan_chronicles.no_tardis_id", "No TARDIS found with ID: %s");
+
+        add("command.gallifreyan_chronicles.set_exterior", "Set exterior of %s to %s");
+        add("command.gallifreyan_chronicles.get_exterior", "Exterior of %s: %s");
+
+        add("command.gallifreyan_chronicles.no_tardises", "No TARDISes found.");
+        add("command.gallifreyan_chronicles.list_tardis", "%s | exterior: %s | pos: %s");
+
+        add("command.gallifreyan_chronicles.debug", "=== TARDIS Debug: %s ===");
+        add("command.gallifreyan_chronicles.owner", "Owner: %s");
+        add("command.gallifreyan_chronicles.exterior", "Exterior: %s");
+        add("command.gallifreyan_chronicles.position", "Position: %s");
     }
 }

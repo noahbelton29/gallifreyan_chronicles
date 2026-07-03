@@ -118,7 +118,7 @@ public class GCGallifreyBiomes {
                 .setAttribute(EnvironmentAttributes.FOG_COLOR, 0xFF590a0a)
                 .setAttribute(EnvironmentAttributes.SKY_COLOR, 0xFF790d0d)
                 .setAttribute(EnvironmentAttributes.AMBIENT_LIGHT_COLOR, 0xFF590a0a)
-                .setAttribute(EnvironmentAttributes.FOG_START_DISTANCE, 40.0F)    // When fog starts appearing
+                .setAttribute(EnvironmentAttributes.FOG_START_DISTANCE, 40.0F)
                 .setAttribute(EnvironmentAttributes.FOG_END_DISTANCE, 60.0F)
                 .mobSpawnSettings(spawnBuilder.build())
                 .generationSettings(biomeBuilder.build())

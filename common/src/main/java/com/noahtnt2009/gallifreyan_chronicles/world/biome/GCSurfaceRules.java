@@ -56,7 +56,6 @@ public class GCSurfaceRules {
                                 SurfaceRules.ifTrue(
                                         SurfaceRules.isBiome(biomes, GCBiomes.GALLIFREYAN_BADLANDS),
                                         SurfaceRules.sequence(
-                                                // Top surface - arcadian shale
                                                 SurfaceRules.ifTrue(
                                                         SurfaceRules.ON_FLOOR,
                                                         SurfaceRules.state(GCBlocks.ARCADIAN_SHALE.defaultBlockState())
@@ -65,7 +64,6 @@ public class GCSurfaceRules {
                                                         SurfaceRules.stoneDepthCheck(1, false, CaveSurface.FLOOR),
                                                         SurfaceRules.state(GCBlocks.ARCADIAN_SHALE.defaultBlockState())
                                                 ),
-                                                // Banded layers from top down
                                                 SurfaceRules.ifTrue(
                                                         SurfaceRules.yBlockCheck(VerticalAnchor.absolute(120), 0),
                                                         SurfaceRules.state(GCBlocks.GALLIFREYAN_GRAVEL.defaultBlockState())

@@ -31,7 +31,6 @@ public class TardisComponent {
     public TardisComponent(UUID tardisId, UUID ownerId) {
         this.tardisId = tardisId;
         this.ownerId = ownerId;
-        // Delegate to registry so we always get the live default, even post-reload
         this.exterior = TardisExteriorRegistry.getDefault();
         this.blockPos = null;
     }

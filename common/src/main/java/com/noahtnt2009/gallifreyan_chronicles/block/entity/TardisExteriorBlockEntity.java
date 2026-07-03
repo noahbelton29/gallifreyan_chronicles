@@ -74,7 +74,7 @@ public class TardisExteriorBlockEntity extends BlockEntity implements GeoBlockEn
 
     private String getAnimationForDoorState(DoorState state) {
         return switch (state) {
-            case CLOSED    -> "close_all";
+            case CLOSED -> "close_all";
             case LEFT_OPEN -> "open_left";
             case RIGHT_OPEN -> "open_right";
             case BOTH_OPEN -> "open_all";

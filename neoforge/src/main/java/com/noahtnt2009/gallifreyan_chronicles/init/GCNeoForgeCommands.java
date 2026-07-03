@@ -1,5 +1,6 @@
 package com.noahtnt2009.gallifreyan_chronicles.init;
 
+import com.mojang.brigadier.arguments.BoolArgumentType;
 import com.mojang.brigadier.arguments.StringArgumentType;
 import com.noahtnt2009.gallifreyan_chronicles.Constants;
 import com.noahtnt2009.gallifreyan_chronicles.command.TardisCommand;
@@ -40,7 +41,10 @@ public class GCNeoForgeCommands {
                                                                             .forEach(e -> builder.suggest(e.id()));
                                                                     return builder.buildFuture();
                                                                 })
-                                                                .executes(TardisCommand::setExterior))))))
+                                                                .executes(TardisCommand::setExterior))))
+                                        .then(literal("glow")
+                                                .then(argument("glowing", BoolArgumentType.bool())
+                                                        .executes(TardisCommand::setGlowing)))))
                         .then(literal("debug")
                                 .then(literal("exteriors")
                                         .executes(ctx -> {

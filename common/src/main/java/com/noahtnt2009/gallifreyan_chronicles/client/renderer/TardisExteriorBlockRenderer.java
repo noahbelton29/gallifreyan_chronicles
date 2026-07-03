@@ -16,7 +16,7 @@ import org.jspecify.annotations.NonNull;
 
 public class TardisExteriorBlockRenderer extends GeoBlockRenderer<@NotNull TardisExteriorBlockEntity, @NotNull TardisExteriorBlockRenderState> {
     public static final DataTicket<String> EXTERIOR_ID = DataTicket.create("exterior_id", String.class);
-    public static final DataTicket<Float> YAW = DataTicket.create("tardis_yaw", Float.class);
+    public static final DataTicket<Float>  YAW = DataTicket.create("tardis_yaw", Float.class);
     public static final DataTicket<Boolean> GLOWING = DataTicket.create("tardis_glowing", Boolean.class);
 
     public TardisExteriorBlockRenderer(BlockEntityRendererProvider.Context context) {

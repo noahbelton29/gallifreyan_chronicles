@@ -39,10 +39,10 @@ public class GCCommands {
                                                                                 .forEach(e -> builder.suggest(e.id()));
                                                                         return builder.buildFuture();
                                                                     })
-                                                                            .executes(TardisCommand::setExterior))))
-                                                            .then(literal("glow")
-                                                                    .then(argument("glowing", BoolArgumentType.bool())
-                                                                            .executes(TardisCommand::setGlowing)))))
+                                                                    .executes(TardisCommand::setExterior))))
+                                            .then(literal("glow")
+                                                    .then(argument("glowing", BoolArgumentType.bool())
+                                                            .executes(TardisCommand::setGlowing)))))
                             .then(literal("debug")
                                     .then(literal("exteriors")
                                             .executes(ctx -> {

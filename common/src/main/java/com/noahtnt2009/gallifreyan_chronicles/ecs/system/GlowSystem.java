@@ -20,15 +20,33 @@ public final class GlowSystem {
         return entity.get(ComponentTypes.GLOW).glowing();
     }
 
-    public static boolean tick(Entity entity, long dayTime) {
-        boolean shouldGlow = isNight(dayTime);
-        boolean current = glowingOf(entity);
+    public static void setManual(Entity entity, boolean glowing) {
+        GlowComponent current = entity.get(ComponentTypes.GLOW);
+        entity.set(ComponentTypes.GLOW, current.manualSet(glowing));
+    }
 
-        if (current == shouldGlow) {
+    public static boolean tick(Entity entity, long dayTime, boolean daylightCycleAffectsGlow) {
+        GlowComponent glow = entity.get(ComponentTypes.GLOW);
+
+        if (!daylightCycleAffectsGlow) {
             return false;
         }
 
-        entity.set(ComponentTypes.GLOW, new GlowComponent(shouldGlow));
+        boolean naturalState = isNight(dayTime);
+
+        if (glow.manualOverride()) {
+            if (glow.glowing() == naturalState) {
+                entity.set(ComponentTypes.GLOW, glow.clearOverride());
+                return false;
+            }
+            return false;
+        }
+
+        if (glow.glowing() == naturalState) {
+            return false;
+        }
+
+        entity.set(ComponentTypes.GLOW, glow.withGlowing(naturalState));
         return true;
     }
 }

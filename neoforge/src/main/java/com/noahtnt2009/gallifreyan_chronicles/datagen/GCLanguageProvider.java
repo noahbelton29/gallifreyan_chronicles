@@ -35,6 +35,9 @@ public class GCLanguageProvider extends LanguageProvider {
         }
 
         // misc
+        add("gamerule.category.gallifreyan_chronicles.gallifreyan_chronicles", "Gallifreyan Chronicles");
+        add("gamerule.gallifreyan_chronicles.gc_daylight_cycle_affects_glow", "Daylight Cycle Affects Exterior Glow");
+
         // creative
         add("creativetab.gallifreyan_chronicles.natural_blocks", "GC: Natural Blocks");
         add("creativetab.gallifreyan_chronicles.building_blocks", "GC: Building Blocks");

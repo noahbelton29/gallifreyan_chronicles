@@ -18,6 +18,7 @@ import com.noahtnt2009.gallifreyan_chronicles.ecs.system.DoorSystem;
 import com.noahtnt2009.gallifreyan_chronicles.ecs.system.ExteriorSystem;
 import com.noahtnt2009.gallifreyan_chronicles.ecs.system.GlowSystem;
 import com.noahtnt2009.gallifreyan_chronicles.ecs.system.TardisLinkSystem;
+import com.noahtnt2009.gallifreyan_chronicles.init.GCGameRules;
 import com.noahtnt2009.gallifreyan_chronicles.init.GCSounds;
 import com.noahtnt2009.gallifreyan_chronicles.tardis.exterior.TardisExterior;
 import net.minecraft.client.Minecraft;
@@ -27,6 +28,7 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.protocol.Packet;
 import net.minecraft.network.protocol.game.ClientGamePacketListener;
 import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
+import net.minecraft.server.MinecraftServer;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
@@ -162,7 +164,7 @@ public class TardisExteriorBlockEntity extends BlockEntity implements GeoBlockEn
     }
 
     public void setGlowing(boolean glowing) {
-        asEntity().set(ComponentTypes.GLOW, new GlowComponent(glowing));
+        GlowSystem.setManual(asEntity(), glowing);
         applyGlowToBlockState(glowing);
         sync();
     }
@@ -178,7 +180,11 @@ public class TardisExteriorBlockEntity extends BlockEntity implements GeoBlockEn
     public static void serverTick(Level level, BlockPos pos, BlockState state, TardisExteriorBlockEntity blockEntity) {
         if (level.isClientSide()) return;
 
-        if (GlowSystem.tick(blockEntity.asEntity(), level.getDefaultClockTime())) {
+        MinecraftServer server = level.getServer();
+        boolean daylightAffectsGlow = server == null
+                || server.getGameRules().get(GCGameRules.DAYLIGHT_CYCLE_AFFECTS_GLOW);
+
+        if (GlowSystem.tick(blockEntity.asEntity(), level.getDefaultClockTime(), daylightAffectsGlow)) {
             blockEntity.applyGlowToBlockState(blockEntity.isGlowing());
             blockEntity.sync();
         }

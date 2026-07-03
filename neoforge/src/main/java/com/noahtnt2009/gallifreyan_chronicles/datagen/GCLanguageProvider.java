@@ -43,12 +43,15 @@ public class GCLanguageProvider extends LanguageProvider {
             //menu
         add("menu.gallifreyan_chronicles.credits", "Credits");
             //commands
-        add("command.gallifreyan_chronicles.invalid_id","Invalid TARDIS ID:");
-        add("command.gallifreyan_chronicles.no_tardis_id","No TARDIS found with ID:");
-        add("command.gallifreyan_chronicles.debug","=== TARDIS Debug:");
+        add("command.gallifreyan_chronicles.invalid_id","Invalid TARDIS ID: ");
+        add("command.gallifreyan_chronicles.no_tardis_id","No TARDIS found with ID: ");
+        add("command.gallifreyan_chronicles.debug","=== TARDIS Debug: ");
         add("command.gallifreyan_chronicles.owner","Owner:    ");
         add("command.gallifreyan_chronicles.exterior","Exterior:    ");
         add("command.gallifreyan_chronicles.position","Position:    ");
+        add("command.gallifreyan_chronicles.unknown_exterior","Unknown exterior: ");
+        add("command.gallifreyan_chronicles.set_exterior_of","Set exterior of ");
+        add("command.gallifreyan_chronicles.exterior_of","Exterior of ");
 
 
     }

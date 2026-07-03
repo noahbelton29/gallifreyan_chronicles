@@ -33,10 +33,23 @@ public class GCLanguageProvider extends LanguageProvider {
                     .collect(Collectors.joining(" "));
             add(item, displayName);
         }
+
+        // misc
+            //creative
         add("creativetab.gallifreyan_chronicles.natural_blocks", "GC: Natural Blocks");
         add("creativetab.gallifreyan_chronicles.building_blocks", "GC: Building Blocks");
         add("creativetab.gallifreyan_chronicles.flora", "GC: Flora");
         add("creativetab.gallifreyan_chronicles.tools_and_armor", "GC: Tools & Armor");
+            //menu
         add("menu.gallifreyan_chronicles.credits", "Credits");
+            //commands
+        add("command.gallifreyan_chronicles.invalid_id","Invalid TARDIS ID:");
+        add("command.gallifreyan_chronicles.no_tardis_id","No TARDIS found with ID:");
+        add("command.gallifreyan_chronicles.debug","=== TARDIS Debug:");
+        add("command.gallifreyan_chronicles.owner","Owner:    ");
+        add("command.gallifreyan_chronicles.exterior","Exterior:    ");
+        add("command.gallifreyan_chronicles.position","Position:    ");
+
+
     }
 }

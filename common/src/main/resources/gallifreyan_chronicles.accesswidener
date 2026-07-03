@@ -8,6 +8,10 @@ accessible method net/minecraft/world/level/levelgen/NoiseRouterData overworld (
 
 # SaplingBlock constructor
 accessible method net/minecraft/world/level/block/SaplingBlock <init> (Lnet/minecraft/world/level/block/grower/TreeGrower;Lnet/minecraft/world/level/block/state/BlockBehaviour$Properties;)V
+accessible method net/minecraft/world/level/block/TallDryGrassBlock <init> (Lnet/minecraft/world/level/block/state/BlockBehaviour$Properties;)V
+accessible method net/minecraft/world/level/block/ShortDryGrassBlock <init> (Lnet/minecraft/world/level/block/state/BlockBehaviour$Properties;)V
+accessible method net/minecraft/world/level/block/TallGrassBlock <init> (Lnet/minecraft/world/level/block/state/BlockBehaviour$Properties;)V
+
 
 # TreeDecorator constructor
 accessible method net/minecraft/world/level/levelgen/feature/treedecorators/TreeDecorator <init> ()V

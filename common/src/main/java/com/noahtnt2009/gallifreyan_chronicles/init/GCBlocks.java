@@ -87,12 +87,12 @@ public class GCBlocks {
                     .requiresCorrectToolForDrops().sound(SoundType.DRIPSTONE_BLOCK)));
 
     public static final Block SHORT_GALLIFREYAN_DRY_GRASS = registerBlock("short_gallifreyan_dry_grass",
-            properties -> new GCShortDryGrassBlock(properties.mapColor(MapColor.COLOR_ORANGE).replaceable()
+            properties -> new ShortDryGrassBlock(properties.mapColor(MapColor.COLOR_ORANGE).replaceable()
                     .noCollision().instabreak().sound(SoundType.GRASS).ignitedByLava().offsetType(BlockBehaviour.OffsetType.XYZ)
                     .pushReaction(PushReaction.DESTROY)));
 
     public static final Block SHORT_GALLIFREYAN_GRASS = registerBlock("short_gallifreyan_grass",
-            properties -> new GCTallDryGrassBlock(properties.mapColor(MapColor.COLOR_YELLOW).replaceable()
+            properties -> new TallGrassBlock(properties.mapColor(MapColor.COLOR_YELLOW).replaceable()
                     .noCollision().instabreak().sound(SoundType.GRASS).ignitedByLava().offsetType(BlockBehaviour.OffsetType.XYZ)
                     .pushReaction(PushReaction.DESTROY)));
 
@@ -102,7 +102,7 @@ public class GCBlocks {
                     .pushReaction(PushReaction.DESTROY)));
 
     public static final Block TALL_GALLIFREYAN_DRY_GRASS = registerBlock("tall_gallifreyan_dry_grass",
-            properties -> new GCTallDryGrassBlock(properties.mapColor(MapColor.COLOR_ORANGE).replaceable()
+            properties -> new TallDryGrassBlock(properties.mapColor(MapColor.COLOR_ORANGE).replaceable()
                     .noCollision().instabreak().sound(SoundType.GRASS).ignitedByLava().offsetType(BlockBehaviour.OffsetType.XYZ)
                     .pushReaction(PushReaction.DESTROY)));
 

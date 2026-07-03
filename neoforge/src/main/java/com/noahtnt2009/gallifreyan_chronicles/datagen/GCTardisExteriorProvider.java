@@ -28,16 +28,6 @@ public class GCTardisExteriorProvider implements DataProvider {
                 id("first_doctors_exterior"),
                 id("textures/block/first_doctors_exterior.png"),
                 id("tardis_door/first_doctors_exterior"));
-
-        addExterior("1966_police_box",
-                id("1966_police_box"),
-                id("textures/block/1966_police_box.png"),
-                id("tardis_door/1966_police_box"));
-
-        addExterior("corrupted",
-                id("corrupted"),
-                id("textures/block/corrupted.png"),
-                id("tardis_door/corrupted"));
     }
 
     private void addExterior(String path, Identifier model, Identifier texture, Identifier animation) {

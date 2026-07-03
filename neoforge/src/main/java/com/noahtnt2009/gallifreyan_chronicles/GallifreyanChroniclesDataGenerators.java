@@ -1,16 +1,13 @@
 package com.noahtnt2009.gallifreyan_chronicles;
 
 import com.noahtnt2009.gallifreyan_chronicles.datagen.*;
-import com.noahtnt2009.gallifreyan_chronicles.tardis.exterior.TardisExteriorLoader;
 import net.minecraft.data.DataGenerator;
 import net.minecraft.data.PackOutput;
 import net.minecraft.data.loot.LootTableProvider;
-import net.minecraft.resources.Identifier;
 import net.minecraft.world.level.storage.loot.parameters.LootContextParamSets;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.data.event.GatherDataEvent;
-import net.neoforged.neoforge.event.AddServerReloadListenersEvent;
 
 import java.util.Collections;
 import java.util.List;
@@ -35,5 +32,6 @@ public class GallifreyanChroniclesDataGenerators {
         generator.addProvider(true, new GCEquipmentAssetProvider(packOutput));
         generator.addProvider(true, new GCRecipeProvider.Runner(packOutput, lookupProvider));
         generator.addProvider(true, new GCTardisExteriorProvider(packOutput));
+        generator.addProvider(true, new GCDimensionSkyProvider(packOutput));
     }
 }

@@ -3,7 +3,6 @@ package com.noahtnt2009.gallifreyan_chronicles;
 import com.noahtnt2009.gallifreyan_chronicles.init.GCBlockEntities;
 import com.noahtnt2009.gallifreyan_chronicles.init.GCCreativeModeTabs;
 import com.noahtnt2009.gallifreyan_chronicles.init.GCEvents;
-import com.noahtnt2009.gallifreyan_chronicles.init.client.GCSkyRenderers;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.fml.common.Mod;
 import net.neoforged.fml.event.lifecycle.FMLClientSetupEvent;
@@ -23,7 +22,5 @@ public class GallifreyanChroniclesNeoForge {
         CommonClass.init();
     }
 
-    public void onClientSetup(FMLClientSetupEvent event) {
-        GCSkyRenderers.registerSkyRenderers();
-    }
+    public void onClientSetup(FMLClientSetupEvent event) {}
 }

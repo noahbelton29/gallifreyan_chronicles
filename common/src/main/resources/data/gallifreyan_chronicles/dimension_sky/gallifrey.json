@@ -1,0 +1,22 @@
+{
+  "bodies": [
+    {
+      "type": "sun",
+      "distance": 45.0,
+      "scale": 0.6,
+      "yaw": 25.0
+    },
+    {
+      "type": "moon",
+      "scale": 1.3
+    },
+    {
+      "type": "moon",
+      "distance": 70.0,
+      "scale": 0.7,
+      "yaw": 40.0
+    }
+  ],
+  "dimension": "gallifreyan_chronicles:gallifrey",
+  "render_dark_disc": false
+}

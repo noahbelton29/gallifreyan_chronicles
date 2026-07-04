@@ -17,7 +17,6 @@ import java.util.Optional;
 import java.util.UUID;
 
 public class TardisCommand {
-
     public static int setExterior(CommandContext<CommandSourceStack> ctx) {
         String tardisIdStr = StringArgumentType.getString(ctx, "id");
         String exteriorId = StringArgumentType.getString(ctx, "exterior_id");
@@ -155,7 +154,6 @@ public class TardisCommand {
 
     public static int debugTardis(CommandContext<CommandSourceStack> ctx) {
         String tardisIdStr = StringArgumentType.getString(ctx, "id");
-
         UUID tardisId;
         try {
             tardisId = UUID.fromString(tardisIdStr);
@@ -169,7 +167,6 @@ public class TardisCommand {
 
         TardisManager manager = TardisManager.get(ctx.getSource().getServer());
         Optional<TardisComponent> opt = manager.get(tardisId);
-
         if (opt.isEmpty()) {
             ctx.getSource().sendFailure(Component.translatable(
                     "command.gallifreyan_chronicles.no_tardis_id",

@@ -10,6 +10,8 @@ import com.noahtnt2009.gallifreyan_chronicles.tardis.exterior.TardisExteriorRegi
 import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
 import net.minecraft.network.chat.Component;
 
+import java.util.stream.Collectors;
+
 import static net.minecraft.commands.Commands.argument;
 import static net.minecraft.commands.Commands.literal;
 
@@ -47,9 +49,9 @@ public class GCCommands {
                                     .then(literal("exteriors")
                                             .executes(ctx -> {
                                                 ctx.getSource().sendSuccess(
-                                                        () -> Component.literal("Exteriors: " + TardisExteriorRegistry.getAll()
+                                                        () -> Component.translatable("command.gallifreyan_chronicles.list_exterior",TardisExteriorRegistry.getAll()
                                                                 .stream().map(TardisExterior::id)
-                                                                .collect(java.util.stream.Collectors.joining(", "))),
+                                                                .collect(Collectors.joining(", "))),
                                                         false
                                                 );
                                                 return 1;

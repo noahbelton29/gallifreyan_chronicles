@@ -15,6 +15,7 @@ import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.EntityTypes;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.Item;
+import net.minecraft.world.item.Rarity;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.block.*;
 import net.minecraft.world.level.block.state.BlockBehaviour;
@@ -31,10 +32,10 @@ import java.util.function.Function;
 public class GCBlocks {
     public static final List<Block> BLOCKS = new ArrayList<>();
 
-    public static final Block TARDIS_BLOCK = registerBlock("tardis_block",
+    public static final Block TARDIS = registerBlock("tardis",
             properties -> new TardisBlock(properties.strength(-1F)
                     .sound(SoundType.STONE).noOcclusion()
-                    .lightLevel(state -> state.getValue(TardisBlock.GLOWING) ? 12 : 0)));
+                    .lightLevel(state -> state.getValue(TardisBlock.GLOWING) ? 12 : 0)), Rarity.EPIC);
 
     public static final Block GALLIFREYAN_SAND = registerBlock("gallifreyan_sand",
             properties -> new GCFallingBlock(properties.strength(1.25f)
@@ -212,12 +213,16 @@ public class GCBlocks {
         return entityType == EntityTypes.OCELOT || entityType == EntityTypes.PARROT;
     }
 
-    private static Block registerBlock(String name, Function<BlockBehaviour.Properties, Block> function) {
+    private static Block registerBlock(String name, Function<BlockBehaviour.Properties, Block> function, Rarity rarity) {
         Block toRegister = function.apply(BlockBehaviour.Properties.of()
                 .setId(ResourceKey.create(Registries.BLOCK, Identifier.fromNamespaceAndPath(Constants.MOD_ID, name))));
-        registerBlockItem(name, toRegister);
+        registerBlockItem(name, toRegister, rarity);
         BLOCKS.add(toRegister);
         return Registry.register(BuiltInRegistries.BLOCK, Identifier.fromNamespaceAndPath(Constants.MOD_ID, name), toRegister);
+    }
+
+    private static Block registerBlock(String name, Function<BlockBehaviour.Properties, Block> function) {
+        return registerBlock(name, function, Rarity.COMMON);
     }
 
     private static Block registerBlockWithoutBlockItem(String name, Function<BlockBehaviour.Properties, Block> function) {
@@ -227,9 +232,10 @@ public class GCBlocks {
         return Registry.register(BuiltInRegistries.BLOCK, Identifier.fromNamespaceAndPath(Constants.MOD_ID, name), toRegister);
     }
 
-    private static void registerBlockItem(String name, Block block) {
+    private static void registerBlockItem(String name, Block block, Rarity rarity) {
         Registry.register(BuiltInRegistries.ITEM, Identifier.fromNamespaceAndPath(Constants.MOD_ID, name),
                 new BlockItem(block, new Item.Properties().useBlockDescriptionPrefix()
+                        .rarity(rarity)
                         .setId(ResourceKey.create(Registries.ITEM, Identifier.fromNamespaceAndPath(Constants.MOD_ID, name)))));
     }
 

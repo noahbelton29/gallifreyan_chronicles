@@ -10,6 +10,14 @@ import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.ItemStack;
 
 public class GCCreativeModeTabs {
+    public static final CreativeModeTab TARDIS_TAB = Registry.register(BuiltInRegistries.CREATIVE_MODE_TAB,
+            Identifier.fromNamespaceAndPath(Constants.MOD_ID, "tardis"),
+            FabricCreativeModeTab.builder().icon(() -> new ItemStack(GCBlocks.TARDIS))
+                    .title(Component.translatable("creativetab.gallifreyan_chronicles.tardis"))
+                    .displayItems((parameters, output) -> {
+                        output.accept(GCBlocks.TARDIS);
+                    }).build());
+
     public static final CreativeModeTab NATURAL_BLOCKS_TAB = Registry.register(BuiltInRegistries.CREATIVE_MODE_TAB,
             Identifier.fromNamespaceAndPath(Constants.MOD_ID, "natural_blocks"),
             FabricCreativeModeTab.builder().icon(() -> new ItemStack(GCBlocks.GALLIFREYAN_GRASS_BLOCK))

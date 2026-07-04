@@ -20,11 +20,15 @@ public class GCLanguageProvider extends LanguageProvider {
     @Override
     protected void addTranslations() {
         for (Block block : GCBlocks.BLOCKS) {
-            String path = BuiltInRegistries.BLOCK.getKey(block).getPath();
-            String displayName = Arrays.stream(path.split("_"))
-                    .map(word -> Character.toUpperCase(word.charAt(0)) + word.substring(1))
-                    .collect(Collectors.joining(" "));
-            add(block, displayName);
+            if (block ==  GCBlocks.TARDIS) {
+                add(block, "TARDIS");
+            } else {
+                String path = BuiltInRegistries.BLOCK.getKey(block).getPath();
+                String displayName = Arrays.stream(path.split("_"))
+                        .map(word -> Character.toUpperCase(word.charAt(0)) + word.substring(1))
+                        .collect(Collectors.joining(" "));
+                add(block, displayName);
+            }
         }
         for (Item item : GCItems.ITEMS) {
             String path = BuiltInRegistries.ITEM.getKey(item).getPath();
@@ -39,6 +43,7 @@ public class GCLanguageProvider extends LanguageProvider {
         add("gamerule.gallifreyan_chronicles.gc_daylight_cycle_affects_glow", "Daylight Cycle Affects Exterior Glow");
 
         // creative
+        add("creativetab.gallifreyan_chronicles.tardis", "GC: TARDIS");
         add("creativetab.gallifreyan_chronicles.natural_blocks", "GC: Natural Blocks");
         add("creativetab.gallifreyan_chronicles.building_blocks", "GC: Building Blocks");
         add("creativetab.gallifreyan_chronicles.flora", "GC: Flora");
@@ -57,6 +62,7 @@ public class GCLanguageProvider extends LanguageProvider {
 
         add("command.gallifreyan_chronicles.no_tardises", "No TARDISes found.");
         add("command.gallifreyan_chronicles.list_tardis", "%s | exterior: %s | pos: %s");
+        add("command.gallifreyan_chronicles.list_exterior", "Exterior: %s");
 
         add("command.gallifreyan_chronicles.debug", "=== TARDIS Debug: %s ===");
         add("command.gallifreyan_chronicles.owner", "Owner: %s");

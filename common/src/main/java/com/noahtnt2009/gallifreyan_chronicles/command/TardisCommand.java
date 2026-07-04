@@ -1,5 +1,6 @@
 package com.noahtnt2009.gallifreyan_chronicles.command;
 
+import com.mojang.brigadier.arguments.BoolArgumentType;
 import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.context.CommandContext;
 import com.noahtnt2009.gallifreyan_chronicles.block.entity.TardisExteriorBlockEntity;
@@ -61,7 +62,6 @@ public class TardisCommand {
             return 0;
         }
 
-        TardisComponent component = opt.get();
         TardisExterior exterior = TardisExteriorRegistry.get(exteriorId);
         BlockPos pos = manager.getBlockPos(tardisId);
         findBlockEntity(ctx, pos).ifPresent(blockEntity -> blockEntity.setExterior(exterior));

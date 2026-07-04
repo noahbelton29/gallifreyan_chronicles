@@ -30,6 +30,7 @@ public class GCDimensionSkyProvider implements DataProvider {
                 GCDimensions.GALLIFREY_LEVEL_KEY.identifier(),
                 false,
                 List.of(
+                        new SkyCelestialBody(SkyCelestialBody.BodyType.SUN, 0f, 0f, 1.0f, true),
                         new SkyCelestialBody(SkyCelestialBody.BodyType.SUN, 25.0f, 45.0f, 0.6f, true),
                         new SkyCelestialBody(SkyCelestialBody.BodyType.MOON, 0.0f, 0.0f, 1.3f, true),
                         new SkyCelestialBody(SkyCelestialBody.BodyType.MOON, 40.0f, 70.0f, 0.7f, true)

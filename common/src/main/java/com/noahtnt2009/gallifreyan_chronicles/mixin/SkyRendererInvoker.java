@@ -8,9 +8,6 @@ import org.spongepowered.asm.mixin.gen.Invoker;
 
 @Mixin(SkyRenderer.class)
 public interface SkyRendererInvoker {
-    @Invoker(value = "renderSun", remap = false)
-    void invokeRenderSun(float rainBrightness, PoseStack poseStack);
-
-    @Invoker(value = "renderMoon", remap = false)
-    void invokeRenderMoon(MoonPhase moonPhase, float rainBrightness, PoseStack poseStack);
+    @Invoker(value = "renderStars", remap = false)
+    void invokeRenderStars(float starBrightness, PoseStack poseStack);
 }

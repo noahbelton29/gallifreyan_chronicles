@@ -12,7 +12,7 @@ import com.noahtnt2009.gallifreyan_chronicles.ecs.ComponentStore;
 import com.noahtnt2009.gallifreyan_chronicles.ecs.Entity;
 import com.noahtnt2009.gallifreyan_chronicles.tardis.ecs.component.DoorComponent;
 import com.noahtnt2009.gallifreyan_chronicles.tardis.ecs.component.DoorState;
-import com.noahtnt2009.gallifreyan_chronicles.tardis.ecs.component.TardisComponentTypes;
+import com.noahtnt2009.gallifreyan_chronicles.tardis.ecs.TardisComponentTypes;
 import com.noahtnt2009.gallifreyan_chronicles.tardis.ecs.component.TransformComponent;
 import com.noahtnt2009.gallifreyan_chronicles.tardis.ecs.system.DoorSystem;
 import com.noahtnt2009.gallifreyan_chronicles.tardis.ecs.system.ExteriorSystem;

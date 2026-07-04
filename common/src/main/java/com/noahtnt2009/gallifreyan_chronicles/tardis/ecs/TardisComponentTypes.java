@@ -1,6 +1,7 @@
-package com.noahtnt2009.gallifreyan_chronicles.tardis.ecs.component;
+package com.noahtnt2009.gallifreyan_chronicles.tardis.ecs;
 
 import com.noahtnt2009.gallifreyan_chronicles.ecs.ComponentType;
+import com.noahtnt2009.gallifreyan_chronicles.tardis.ecs.component.*;
 
 import java.util.List;
 

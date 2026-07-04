@@ -7,17 +7,17 @@ import com.geckolib.animation.AnimationController;
 import com.geckolib.animation.RawAnimation;
 import com.geckolib.animation.object.PlayState;
 import com.geckolib.util.GeckoLibUtil;
+import com.noahtnt2009.gallifreyan_chronicles.ecs.ComponentHolder;
 import com.noahtnt2009.gallifreyan_chronicles.ecs.ComponentStore;
 import com.noahtnt2009.gallifreyan_chronicles.ecs.Entity;
-import com.noahtnt2009.gallifreyan_chronicles.ecs.component.ComponentTypes;
-import com.noahtnt2009.gallifreyan_chronicles.ecs.component.DoorComponent;
-import com.noahtnt2009.gallifreyan_chronicles.ecs.component.DoorState;
-import com.noahtnt2009.gallifreyan_chronicles.ecs.component.GlowComponent;
-import com.noahtnt2009.gallifreyan_chronicles.ecs.component.TransformComponent;
-import com.noahtnt2009.gallifreyan_chronicles.ecs.system.DoorSystem;
-import com.noahtnt2009.gallifreyan_chronicles.ecs.system.ExteriorSystem;
-import com.noahtnt2009.gallifreyan_chronicles.ecs.system.GlowSystem;
-import com.noahtnt2009.gallifreyan_chronicles.ecs.system.TardisLinkSystem;
+import com.noahtnt2009.gallifreyan_chronicles.tardis.ecs.component.TardisComponentTypes;
+import com.noahtnt2009.gallifreyan_chronicles.tardis.ecs.component.DoorComponent;
+import com.noahtnt2009.gallifreyan_chronicles.tardis.ecs.component.DoorState;
+import com.noahtnt2009.gallifreyan_chronicles.tardis.ecs.component.TransformComponent;
+import com.noahtnt2009.gallifreyan_chronicles.tardis.ecs.system.DoorSystem;
+import com.noahtnt2009.gallifreyan_chronicles.tardis.ecs.system.ExteriorSystem;
+import com.noahtnt2009.gallifreyan_chronicles.tardis.ecs.system.GlowSystem;
+import com.noahtnt2009.gallifreyan_chronicles.tardis.ecs.system.TardisLinkSystem;
 import com.noahtnt2009.gallifreyan_chronicles.init.GCGameRules;
 import com.noahtnt2009.gallifreyan_chronicles.init.GCSounds;
 import com.noahtnt2009.gallifreyan_chronicles.tardis.exterior.TardisExterior;
@@ -43,7 +43,7 @@ import org.jspecify.annotations.NonNull;
 import java.util.UUID;
 import java.util.function.Supplier;
 
-public class TardisExteriorBlockEntity extends BlockEntity implements GeoBlockEntity {
+public class TardisExteriorBlockEntity extends BlockEntity implements GeoBlockEntity, ComponentHolder {
     public static Supplier<BlockEntityType<TardisExteriorBlockEntity>> TYPE;
     private AnimationController<TardisExteriorBlockEntity> controller;
     private final ComponentStore components = new ComponentStore();
@@ -55,6 +55,7 @@ public class TardisExteriorBlockEntity extends BlockEntity implements GeoBlockEn
         super(TYPE.get(), pos, state);
     }
 
+    @Override
     public ComponentStore componentStore() {
         return components;
     }
@@ -145,10 +146,10 @@ public class TardisExteriorBlockEntity extends BlockEntity implements GeoBlockEn
     }
 
     public float getYaw() {
-        return asEntity().get(ComponentTypes.TRANSFORM).yaw();
+        return asEntity().get(TardisComponentTypes.TRANSFORM).yaw();
     }
     public void setYaw(float yaw) {
-        asEntity().set(ComponentTypes.TRANSFORM, new TransformComponent(yaw));
+        asEntity().set(TardisComponentTypes.TRANSFORM, new TransformComponent(yaw));
     }
 
     public @Nullable UUID getTardisId() {
@@ -160,7 +161,7 @@ public class TardisExteriorBlockEntity extends BlockEntity implements GeoBlockEn
     }
 
     public boolean isGlowing() {
-        return asEntity().get(ComponentTypes.GLOW).glowing();
+        return asEntity().get(TardisComponentTypes.GLOW).glowing();
     }
 
     public void setGlowing(boolean glowing) {
@@ -192,13 +193,13 @@ public class TardisExteriorBlockEntity extends BlockEntity implements GeoBlockEn
 
     public void setDoorState(DoorState newState) {
         if (level == null || level.isClientSide()) {
-            DoorComponent current = asEntity().get(ComponentTypes.DOOR);
-            asEntity().set(ComponentTypes.DOOR, current.withState(newState));
+            DoorComponent current = asEntity().get(TardisComponentTypes.DOOR);
+            asEntity().set(TardisComponentTypes.DOOR, current.withState(newState));
             resetAnimationState();
             sync();
             return;
         }
-        asEntity().set(ComponentTypes.DOOR, DoorComponent.closed().withState(newState)); // or proper
+        asEntity().set(TardisComponentTypes.DOOR, DoorComponent.closed().withState(newState)); // or proper
         sync();
     }
 
@@ -241,13 +242,13 @@ public class TardisExteriorBlockEntity extends BlockEntity implements GeoBlockEn
     @Override
     protected void saveAdditional(@NonNull ValueOutput output) {
         super.saveAdditional(output);
-        components.save(output, ComponentTypes.ALL);
+        components.save(output, TardisComponentTypes.ALL);
     }
 
     @Override
     public void loadAdditional(@NonNull ValueInput input) {
         super.loadAdditional(input);
-        components.load(input, ComponentTypes.ALL);
+        components.load(input, TardisComponentTypes.ALL);
     }
 
     public void sync() {

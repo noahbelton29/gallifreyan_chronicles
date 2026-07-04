@@ -1,7 +1,5 @@
 package com.noahtnt2009.gallifreyan_chronicles.ecs;
 
-import com.noahtnt2009.gallifreyan_chronicles.block.entity.TardisExteriorBlockEntity;
-
 public final class Entity {
     private final ComponentStore store;
     private final Runnable onDirty;
@@ -11,7 +9,7 @@ public final class Entity {
         this.onDirty = onDirty;
     }
 
-    public static Entity of(TardisExteriorBlockEntity target, Runnable onDirty) {
+    public static Entity of(ComponentHolder target, Runnable onDirty) {
         return new Entity(target.componentStore(), onDirty);
     }
 

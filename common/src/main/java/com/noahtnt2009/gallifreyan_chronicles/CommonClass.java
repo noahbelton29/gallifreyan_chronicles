@@ -5,6 +5,8 @@ import com.noahtnt2009.gallifreyan_chronicles.init.*;
 
 public class CommonClass {
     public static void init() {
+        GCGameRuleCategories.registerGameRuleCategories();
+        GCGameRules.registerGameRules();
         GCDataComponents.registerDataComponents();
         GCItems.registerItems();
         GCBlocks.registerBlocks();

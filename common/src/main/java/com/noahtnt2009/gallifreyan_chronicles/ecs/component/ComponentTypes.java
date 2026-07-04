@@ -17,7 +17,10 @@ public final class ComponentTypes {
     public static final ComponentType<TardisLinkComponent> TARDIS_LINK =
             ComponentType.persistent("tardis_link", TardisLinkComponent.CODEC);
 
-    public static final List<ComponentType<?>> ALL = List.of(EXTERIOR, DOOR, TRANSFORM, TARDIS_LINK);
+    public static final ComponentType<GlowComponent> GLOW =
+            ComponentType.persistentDefaulted("glow", GlowComponent.CODEC, GlowComponent::off);
+
+    public static final List<ComponentType<?>> ALL = List.of(EXTERIOR, DOOR, TRANSFORM, TARDIS_LINK, GLOW);
 
     private ComponentTypes() {
     }

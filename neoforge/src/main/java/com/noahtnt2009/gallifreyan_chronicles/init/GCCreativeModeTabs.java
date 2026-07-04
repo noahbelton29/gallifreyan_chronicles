@@ -14,6 +14,13 @@ public class GCCreativeModeTabs {
     public static final DeferredRegister<CreativeModeTab> CREATIVE_MODE_TABS =
             DeferredRegister.create(Registries.CREATIVE_MODE_TAB, Constants.MOD_ID);
 
+    public static final Supplier<CreativeModeTab> TARDIS_TAB = CREATIVE_MODE_TABS.register("tardis",
+            () -> CreativeModeTab.builder().icon(() -> new ItemStack(GCBlocks.TARDIS))
+                    .title(Component.translatable("creativetab.gallifreyan_chronicles.tardis"))
+                    .displayItems((params, output) -> {
+                        output.accept(GCBlocks.TARDIS);
+                    }).build());
+
     public static final Supplier<CreativeModeTab> NATURAL_BLOCKS_TAB = CREATIVE_MODE_TABS.register("natural_blocks",
             () -> CreativeModeTab.builder().icon(() -> new ItemStack(GCBlocks.GALLIFREYAN_GRASS_BLOCK))
                     .title(Component.translatable("creativetab.gallifreyan_chronicles.natural_blocks"))

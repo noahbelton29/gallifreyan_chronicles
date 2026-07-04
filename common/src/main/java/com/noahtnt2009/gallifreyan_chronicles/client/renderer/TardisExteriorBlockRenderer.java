@@ -6,6 +6,7 @@ import com.geckolib.renderer.base.RenderPassInfo;
 import com.mojang.math.Axis;
 import com.noahtnt2009.gallifreyan_chronicles.block.TardisExteriorBlockModel;
 import com.noahtnt2009.gallifreyan_chronicles.block.entity.TardisExteriorBlockEntity;
+import com.noahtnt2009.gallifreyan_chronicles.client.renderer.geo_layer.TardisExteriorGlowLayer;
 import net.minecraft.client.renderer.OrderedSubmitNodeCollector;
 import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
 import net.minecraft.client.renderer.rendertype.RenderType;
@@ -16,9 +17,12 @@ import org.jspecify.annotations.NonNull;
 public class TardisExteriorBlockRenderer extends GeoBlockRenderer<@NotNull TardisExteriorBlockEntity, @NotNull TardisExteriorBlockRenderState> {
     public static final DataTicket<String> EXTERIOR_ID = DataTicket.create("exterior_id", String.class);
     public static final DataTicket<Float>  YAW = DataTicket.create("tardis_yaw", Float.class);
+    public static final DataTicket<Boolean> GLOWING = DataTicket.create("tardis_glowing", Boolean.class);
 
     public TardisExteriorBlockRenderer(BlockEntityRendererProvider.Context context) {
         super(context, new TardisExteriorBlockModel());
+
+        withRenderLayer(TardisExteriorGlowLayer::new);
     }
 
     @SuppressWarnings("UnstableApiUsage")
@@ -32,15 +36,22 @@ public class TardisExteriorBlockRenderer extends GeoBlockRenderer<@NotNull Tardi
                               TardisExteriorBlockRenderState renderState, float partialTick) {
         renderState.addGeckolibData(EXTERIOR_ID, animatable.getExterior().id());
         renderState.addGeckolibData(YAW, animatable.getYaw());
+        renderState.addGeckolibData(GLOWING, animatable.isGlowing());
     }
 
     @Override
     public void submitRenderTasks(RenderPassInfo<TardisExteriorBlockRenderState> renderPassInfo,
                                   @NonNull OrderedSubmitNodeCollector renderTasks,
                                   @Nullable RenderType renderType) {
+        renderPassInfo.poseStack().pushPose();
+
         Float yaw = renderPassInfo.renderState().getGeckolibData(YAW);
-        float actualYaw = yaw != null ? yaw : 0.0f;
-        renderPassInfo.poseStack().mulPose(Axis.YP.rotationDegrees(180.0f - actualYaw));
+        renderPassInfo.poseStack().mulPose(
+                Axis.YP.rotationDegrees(180f - (yaw != null ? yaw : 0f))
+        );
+
         super.submitRenderTasks(renderPassInfo, renderTasks, renderType);
+
+        renderPassInfo.poseStack().popPose();
     }
 }

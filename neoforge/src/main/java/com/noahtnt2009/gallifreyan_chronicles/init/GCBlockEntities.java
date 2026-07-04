@@ -13,7 +13,7 @@ public class GCBlockEntities {
 
     public static void registerBlockEntities(IEventBus eventBus) {
         TardisExteriorBlockEntity.TYPE = BLOCK_ENTITIES.register("tardis_block_entity", () ->
-                new BlockEntityType<>(TardisExteriorBlockEntity::new, GCBlocks.TARDIS_BLOCK)); // DeferredHolder implements Supplier
+                new BlockEntityType<>(TardisExteriorBlockEntity::new, GCBlocks.TARDIS)); // DeferredHolder implements Supplier
         BLOCK_ENTITIES.register(eventBus);
     }
 }

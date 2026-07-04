@@ -86,7 +86,8 @@ public class GCModelProvider extends ModelProvider {
                 ItemModelUtils.constantTint(GALLIFREYAN_GRASS_TINT)
         );
 
-        blockModels.createParticleOnlyBlock(GCBlocks.TARDIS_BLOCK);
+        blockModels.createParticleOnlyBlock(GCBlocks.TARDIS);
+        itemModels.generateFlatItem(GCBlocks.TARDIS.asItem(), ModelTemplates.FLAT_ITEM);
 
         registerGrassBlock(blockModels);
         registerCadonwoodSet(blockModels);

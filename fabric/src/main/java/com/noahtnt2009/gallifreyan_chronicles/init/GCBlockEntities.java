@@ -19,7 +19,7 @@ public class GCBlockEntities {
                 Identifier.fromNamespaceAndPath(Constants.MOD_ID, "tardis_block_entity"),
                 FabricBlockEntityTypeBuilder.create(
                         TardisExteriorBlockEntity::new,
-                        GCBlocks.TARDIS_BLOCK
+                        GCBlocks.TARDIS
                 ).build()
         );
 

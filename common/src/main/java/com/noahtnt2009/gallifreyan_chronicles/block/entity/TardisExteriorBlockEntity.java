@@ -12,10 +12,13 @@ import com.noahtnt2009.gallifreyan_chronicles.ecs.Entity;
 import com.noahtnt2009.gallifreyan_chronicles.ecs.component.ComponentTypes;
 import com.noahtnt2009.gallifreyan_chronicles.ecs.component.DoorComponent;
 import com.noahtnt2009.gallifreyan_chronicles.ecs.component.DoorState;
+import com.noahtnt2009.gallifreyan_chronicles.ecs.component.GlowComponent;
 import com.noahtnt2009.gallifreyan_chronicles.ecs.component.TransformComponent;
 import com.noahtnt2009.gallifreyan_chronicles.ecs.system.DoorSystem;
 import com.noahtnt2009.gallifreyan_chronicles.ecs.system.ExteriorSystem;
+import com.noahtnt2009.gallifreyan_chronicles.ecs.system.GlowSystem;
 import com.noahtnt2009.gallifreyan_chronicles.ecs.system.TardisLinkSystem;
+import com.noahtnt2009.gallifreyan_chronicles.init.GCGameRules;
 import com.noahtnt2009.gallifreyan_chronicles.init.GCSounds;
 import com.noahtnt2009.gallifreyan_chronicles.tardis.exterior.TardisExterior;
 import net.minecraft.client.Minecraft;
@@ -25,6 +28,7 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.protocol.Packet;
 import net.minecraft.network.protocol.game.ClientGamePacketListener;
 import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
+import net.minecraft.server.MinecraftServer;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
@@ -153,6 +157,37 @@ public class TardisExteriorBlockEntity extends BlockEntity implements GeoBlockEn
 
     public DoorState getDoorState() {
         return DoorSystem.stateOf(asEntity());
+    }
+
+    public boolean isGlowing() {
+        return asEntity().get(ComponentTypes.GLOW).glowing();
+    }
+
+    public void setGlowing(boolean glowing) {
+        GlowSystem.setManual(asEntity(), glowing);
+        applyGlowToBlockState(glowing);
+        sync();
+    }
+
+    private void applyGlowToBlockState(boolean glowing) {
+        if (level == null || level.isClientSide()) return;
+        BlockState current = getBlockState();
+        if (current.getValue(com.noahtnt2009.gallifreyan_chronicles.block.TardisBlock.GLOWING) != glowing) {
+            level.setBlock(getBlockPos(), current.setValue(com.noahtnt2009.gallifreyan_chronicles.block.TardisBlock.GLOWING, glowing), 3);
+        }
+    }
+
+    public static void serverTick(Level level, BlockPos pos, BlockState state, TardisExteriorBlockEntity blockEntity) {
+        if (level.isClientSide()) return;
+
+        MinecraftServer server = level.getServer();
+        boolean daylightAffectsGlow = server == null
+                || server.getGameRules().get(GCGameRules.DAYLIGHT_CYCLE_AFFECTS_GLOW);
+
+        if (GlowSystem.tick(blockEntity.asEntity(), level.getDefaultClockTime(), daylightAffectsGlow)) {
+            blockEntity.applyGlowToBlockState(blockEntity.isGlowing());
+            blockEntity.sync();
+        }
     }
 
     public void setDoorState(DoorState newState) {

@@ -1,8 +1,11 @@
 package com.noahtnt2009.gallifreyan_chronicles.tardis.exterior;
 
 import com.noahtnt2009.gallifreyan_chronicles.Constants;
+import com.noahtnt2009.gallifreyan_chronicles.network.TardisExteriorSyncFactory;
+import com.noahtnt2009.gallifreyan_chronicles.platform.Services;
 import net.minecraft.resources.FileToIdConverter;
 import net.minecraft.resources.Identifier;
+import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.packs.resources.ResourceManager;
 import net.minecraft.server.packs.resources.SimpleJsonResourceReloadListener;
 import net.minecraft.util.profiling.ProfilerFiller;
@@ -10,8 +13,14 @@ import net.minecraft.util.profiling.ProfilerFiller;
 import java.util.Map;
 
 public class TardisExteriorLoader extends SimpleJsonResourceReloadListener<TardisExterior> {
+    private static volatile MinecraftServer currentServer;
+
     public TardisExteriorLoader() {
         super(TardisExterior.CODEC, FileToIdConverter.json("tardis_exteriors"));
+    }
+
+    public static void setCurrentServer(MinecraftServer server) {
+        currentServer = server;
     }
 
     @Override
@@ -27,5 +36,10 @@ public class TardisExteriorLoader extends SimpleJsonResourceReloadListener<Tardi
         }
         TardisExteriorRegistry.setDefault(TardisExteriorRegistry.get(TardisExteriorRegistry.DEFAULT_ID));
         Constants.LOG.info("Loaded {} TARDIS exterior(s)", TardisExteriorRegistry.size());
+
+        MinecraftServer server = currentServer;
+        if (server != null) {
+            Services.NETWORK.broadcastTardisExteriorSync(server, TardisExteriorSyncFactory.create());
+        }
     }
 }

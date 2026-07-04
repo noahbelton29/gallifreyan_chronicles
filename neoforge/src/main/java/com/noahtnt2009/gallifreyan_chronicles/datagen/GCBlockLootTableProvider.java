@@ -38,7 +38,7 @@ public class GCBlockLootTableProvider extends BlockLootSubProvider {
         dropSelf(GCBlocks.LUNAR_REGOLITH);
         dropSelf(GCBlocks.MOONSLATE);
         dropSelf(GCBlocks.MOON_DUST);
-        dropSelf(GCBlocks.TARDIS_BLOCK);
+        dropSelf(GCBlocks.TARDIS);
 
         add(GCBlocks.POTTED_CADONWOOD_SAPLING, createPotFlowerItemTable(GCBlocks.CADONWOOD_SAPLING));
         add(GCBlocks.GALLIFREYAN_STONE, createSingleItemTable(GCBlocks.GALLIFREYAN_COBBLESTONE));

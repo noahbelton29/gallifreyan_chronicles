@@ -14,6 +14,10 @@ public class NeoForgeTardisExteriorLoader {
 
     @SubscribeEvent
     public static void onAddReloadListeners(AddServerReloadListenersEvent event) {
+        // NeoForge doesn't hand this event a MinecraftServer reference; TardisExteriorLoader.currentServer
+        // is (re)captured in GCNeoForgeNetworking on player join instead, which covers both the initial
+        // load-before-any-players case (nothing to sync to yet) and every subsequent /reload done while
+        // players are connected.
         event.addListener(ID, new TardisExteriorLoader());
     }
 }

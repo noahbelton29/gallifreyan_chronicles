@@ -1,5 +1,6 @@
 package com.noahtnt2009.gallifreyan_chronicles.init;
 
+import com.mojang.brigadier.arguments.BoolArgumentType;
 import com.mojang.brigadier.arguments.StringArgumentType;
 import com.noahtnt2009.gallifreyan_chronicles.Constants;
 import com.noahtnt2009.gallifreyan_chronicles.command.TardisCommand;
@@ -8,6 +9,8 @@ import com.noahtnt2009.gallifreyan_chronicles.tardis.exterior.TardisExterior;
 import com.noahtnt2009.gallifreyan_chronicles.tardis.exterior.TardisExteriorRegistry;
 import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
 import net.minecraft.network.chat.Component;
+
+import java.util.stream.Collectors;
 
 import static net.minecraft.commands.Commands.argument;
 import static net.minecraft.commands.Commands.literal;
@@ -38,14 +41,17 @@ public class GCCommands {
                                                                                 .forEach(e -> builder.suggest(e.id()));
                                                                         return builder.buildFuture();
                                                                     })
-                                                                    .executes(TardisCommand::setExterior))))))
+                                                                    .executes(TardisCommand::setExterior))))
+                                            .then(literal("glow")
+                                                    .then(argument("glowing", BoolArgumentType.bool())
+                                                            .executes(TardisCommand::setGlowing)))))
                             .then(literal("debug")
                                     .then(literal("exteriors")
                                             .executes(ctx -> {
                                                 ctx.getSource().sendSuccess(
-                                                        () -> Component.literal("Exteriors: " + TardisExteriorRegistry.getAll()
+                                                        () -> Component.translatable("command.gallifreyan_chronicles.list_exterior",TardisExteriorRegistry.getAll()
                                                                 .stream().map(TardisExterior::id)
-                                                                .collect(java.util.stream.Collectors.joining(", "))),
+                                                                .collect(Collectors.joining(", "))),
                                                         false
                                                 );
                                                 return 1;

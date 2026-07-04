@@ -59,6 +59,7 @@ public class GCLanguageProvider extends LanguageProvider {
 
         add("command.gallifreyan_chronicles.set_exterior", "Set exterior of %s to %s");
         add("command.gallifreyan_chronicles.get_exterior", "Exterior of %s: %s");
+        add("command.gallifreyan_chronicles.set_glow", "Set glow of %s to %s");
 
         add("command.gallifreyan_chronicles.no_tardises", "No TARDISes found.");
         add("command.gallifreyan_chronicles.list_tardis", "%s | exterior: %s | pos: %s");

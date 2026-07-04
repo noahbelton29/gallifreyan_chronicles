@@ -120,7 +120,7 @@ public class TardisCommand {
                 () -> Component.translatable(
                         "command.gallifreyan_chronicles.set_glow",
                         tardisIdStr,
-                        glowing
+                        String.valueOf(glowing)
                 ),
                 true
         );
@@ -196,7 +196,7 @@ public class TardisCommand {
             ctx.getSource().sendSuccess(
                     () -> Component.translatable(
                             "command.gallifreyan_chronicles.list_tardis",
-                            id,
+                            id.toString(),
                             exterior,
                             posStr
                     ),

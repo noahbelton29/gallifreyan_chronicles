@@ -1,8 +1,8 @@
 package com.noahtnt2009.gallifreyan_chronicles.tardis.ecs.system;
 
 import com.noahtnt2009.gallifreyan_chronicles.ecs.Entity;
-import com.noahtnt2009.gallifreyan_chronicles.tardis.ecs.component.TardisComponentTypes;
 import com.noahtnt2009.gallifreyan_chronicles.tardis.ecs.component.GlowComponent;
+import com.noahtnt2009.gallifreyan_chronicles.tardis.ecs.component.TardisComponentTypes;
 
 public final class GlowSystem {
     private static final long NIGHT_START = 13000L;

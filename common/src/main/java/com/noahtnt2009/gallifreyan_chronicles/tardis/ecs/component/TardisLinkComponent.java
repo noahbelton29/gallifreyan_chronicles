@@ -2,7 +2,6 @@ package com.noahtnt2009.gallifreyan_chronicles.tardis.ecs.component;
 
 import com.mojang.serialization.Codec;
 import com.noahtnt2009.gallifreyan_chronicles.ecs.Component;
-import com.noahtnt2009.gallifreyan_chronicles.tardis.TardisComponent;
 
 import java.util.UUID;
 

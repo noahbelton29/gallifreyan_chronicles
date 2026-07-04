@@ -1,4 +1,4 @@
-package com.noahtnt2009.gallifreyan_chronicles.tardis;
+package com.noahtnt2009.gallifreyan_chronicles.tardis.ecs.component;
 
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;

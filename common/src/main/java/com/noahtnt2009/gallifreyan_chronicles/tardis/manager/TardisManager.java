@@ -1,8 +1,9 @@
-package com.noahtnt2009.gallifreyan_chronicles.tardis;
+package com.noahtnt2009.gallifreyan_chronicles.tardis.manager;
 
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import com.noahtnt2009.gallifreyan_chronicles.Constants;
+import com.noahtnt2009.gallifreyan_chronicles.tardis.ecs.component.TardisComponent;
 import net.minecraft.core.BlockPos;
 import net.minecraft.resources.Identifier;
 import net.minecraft.server.MinecraftServer;

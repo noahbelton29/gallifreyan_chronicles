@@ -2,6 +2,7 @@ package com.noahtnt2009.gallifreyan_chronicles.client.sky.data;
 
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
+import com.noahtnt2009.gallifreyan_chronicles.data.IdentifiableData;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
@@ -14,7 +15,7 @@ public record DimensionSky(
         Identifier dimension,
         boolean renderDarkDisc,
         List<SkyCelestialBody> bodies
-) {
+) implements IdentifiableData<DimensionSky> {
     public static final Codec<DimensionSky> CODEC = RecordCodecBuilder.create(inst -> inst.group(
             Identifier.CODEC.fieldOf("dimension").forGetter(DimensionSky::dimension),
             Codec.BOOL.optionalFieldOf("render_dark_disc", true).forGetter(DimensionSky::renderDarkDisc),
@@ -30,6 +31,7 @@ public record DimensionSky(
             DimensionSky::new
     );
 
+    @Override
     public DimensionSky withId(String id) {
         return new DimensionSky(id, dimension, renderDarkDisc, bodies);
     }

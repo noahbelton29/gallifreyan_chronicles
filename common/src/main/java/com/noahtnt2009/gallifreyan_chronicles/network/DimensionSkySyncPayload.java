@@ -2,6 +2,7 @@ package com.noahtnt2009.gallifreyan_chronicles.network;
 
 import com.noahtnt2009.gallifreyan_chronicles.Constants;
 import com.noahtnt2009.gallifreyan_chronicles.client.sky.data.DimensionSky;
+import com.noahtnt2009.gallifreyan_chronicles.client.sky.data.DimensionSkyRegistry;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
@@ -15,10 +16,17 @@ public record DimensionSkySyncPayload(List<DimensionSky> skies) implements Custo
             new Type<>(Identifier.fromNamespaceAndPath(Constants.MOD_ID, "dimension_sky_sync"));
 
     public static final StreamCodec<FriendlyByteBuf, DimensionSkySyncPayload> STREAM_CODEC = StreamCodec.composite(
-            DimensionSky.STREAM_CODEC.apply(ByteBufCodecs.list()),
-            DimensionSkySyncPayload::skies,
+            DimensionSky.STREAM_CODEC.apply(ByteBufCodecs.list()), DimensionSkySyncPayload::skies,
             DimensionSkySyncPayload::new
     );
+
+    public static DimensionSkySyncPayload create() {
+        return new DimensionSkySyncPayload(List.copyOf(DimensionSkyRegistry.getAll()));
+    }
+
+    public void apply() {
+        GCSyncPayload.apply(skies, DimensionSkyRegistry::clear, DimensionSkyRegistry::register, "Dimension Sky");
+    }
 
     @Override
     public Type<? extends CustomPacketPayload> type() {

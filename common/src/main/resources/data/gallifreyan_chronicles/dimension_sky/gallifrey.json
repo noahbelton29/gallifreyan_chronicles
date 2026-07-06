@@ -1,9 +1,6 @@
 {
   "bodies": [
     {
-      "type": "sun"
-    },
-    {
       "type": "sun",
       "distance": 45.0,
       "scale": 0.6,

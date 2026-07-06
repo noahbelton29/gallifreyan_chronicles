@@ -2,12 +2,14 @@ package com.noahtnt2009.gallifreyan_chronicles.tardis.exterior;
 
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
+import com.noahtnt2009.gallifreyan_chronicles.data.IdentifiableData;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.resources.Identifier;
 
-public record TardisExterior(String id, Identifier model, Identifier texture, Identifier animation) {
+public record TardisExterior(String id, Identifier model, Identifier texture, Identifier animation)
+        implements IdentifiableData<TardisExterior> {
     public static final Codec<TardisExterior> CODEC = RecordCodecBuilder.create(inst -> inst.group(
             Identifier.CODEC.fieldOf("model").forGetter(TardisExterior::model),
             Identifier.CODEC.fieldOf("texture").forGetter(TardisExterior::texture),
@@ -24,6 +26,7 @@ public record TardisExterior(String id, Identifier model, Identifier texture, Id
             TardisExterior::new
     );
 
+    @Override
     public TardisExterior withId(String id) {
         return new TardisExterior(id, model, texture, animation);
     }

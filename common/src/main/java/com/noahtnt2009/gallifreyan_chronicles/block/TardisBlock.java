@@ -4,6 +4,7 @@ import com.mojang.serialization.MapCodec;
 import com.noahtnt2009.gallifreyan_chronicles.Constants;
 import com.noahtnt2009.gallifreyan_chronicles.block.entity.TardisExteriorBlockEntity;
 import com.noahtnt2009.gallifreyan_chronicles.ecs.Entity;
+import com.noahtnt2009.gallifreyan_chronicles.tardis.ecs.system.ConsoleLinkSystem;
 import com.noahtnt2009.gallifreyan_chronicles.tardis.ecs.system.TardisLinkSystem;
 import com.noahtnt2009.gallifreyan_chronicles.tardis.ecs.component.TardisComponent;
 import net.minecraft.core.BlockPos;
@@ -55,6 +56,8 @@ public class TardisBlock extends BaseEntityBlock {
             Entity entity = blockEntity.asEntity();
             TardisComponent record = TardisLinkSystem.registerNewTardis(entity, serverLevel, player.getUUID(), pos);
             blockEntity.sync();
+
+            ConsoleLinkSystem.spawnAndLink(serverLevel, record.getTardisId(), pos);
 
             Constants.LOG.debug(
                     "Registered TARDIS {} for player {}",

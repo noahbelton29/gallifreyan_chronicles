@@ -29,6 +29,11 @@ public final class Entity {
         onDirty.run();
     }
 
+    public void remove(ComponentType<?> type) {
+        store.remove(type);
+        onDirty.run();
+    }
+
     public void markChanged() {
         onDirty.run();
     }

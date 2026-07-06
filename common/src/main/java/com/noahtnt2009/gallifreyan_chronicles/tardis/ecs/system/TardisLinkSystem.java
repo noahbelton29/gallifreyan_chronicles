@@ -20,12 +20,20 @@ public final class TardisLinkSystem {
         return Optional.ofNullable(link).map(TardisLinkComponent::tardisId);
     }
 
+    public static void link(Entity entity, UUID tardisId) {
+        entity.set(TardisComponentTypes.TARDIS_LINK, new TardisLinkComponent(tardisId));
+    }
+
+    public static void unlink(Entity entity) {
+        entity.remove(TardisComponentTypes.TARDIS_LINK);
+    }
+
     public static TardisComponent registerNewTardis(Entity entity, ServerLevel level, UUID ownerId, BlockPos pos) {
         TardisManager manager = TardisManager.get(level.getServer());
         TardisComponent record = manager.create(ownerId);
         manager.setBlockPos(record.getTardisId(), pos);
 
-        entity.set(TardisComponentTypes.TARDIS_LINK, new TardisLinkComponent(record.getTardisId()));
+        link(entity, record.getTardisId());
         return record;
     }
 

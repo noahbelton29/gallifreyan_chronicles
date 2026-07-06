@@ -32,6 +32,10 @@ public final class ComponentStore {
         data.put(type, value);
     }
 
+    public void remove(ComponentType<?> type) {
+        data.remove(type);
+    }
+
     @SuppressWarnings({"unchecked", "rawtypes"})
     public void save(ValueOutput output, Iterable<ComponentType<?>> knownTypes) {
         for (ComponentType<?> type : knownTypes) {

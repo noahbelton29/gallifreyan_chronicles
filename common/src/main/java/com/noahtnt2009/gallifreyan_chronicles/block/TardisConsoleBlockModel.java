@@ -22,8 +22,8 @@ public class TardisConsoleBlockModel extends GeoModel<TardisConsoleBlockEntity> 
     }
 
     @Override
-    public @Nullable Identifier getAnimationResource(@NonNull TardisConsoleBlockEntity tardisConsoleBlockEntity) {
-        return null;
+    public @Nullable Identifier getAnimationResource(@NonNull TardisConsoleBlockEntity animatable) {
+        return animatable.getConsole().animation();
     }
 
     private TardisConsole getConsole(GeoRenderState renderState) {

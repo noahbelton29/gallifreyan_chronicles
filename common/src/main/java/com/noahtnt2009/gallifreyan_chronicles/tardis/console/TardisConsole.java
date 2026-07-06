@@ -9,26 +9,28 @@ import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.resources.Identifier;
 
-public record TardisConsole(String id, Identifier model, Identifier texture)
+public record TardisConsole(String id, Identifier model, Identifier texture, Identifier animation)
         implements IdentifiableData<TardisConsole> {
 
     public static final Codec<TardisConsole> CODEC = RecordCodecBuilder.create(tardisConsoleInstance
             -> tardisConsoleInstance.group(
                     Identifier.CODEC.fieldOf("model").forGetter(TardisConsole::model),
-                    Identifier.CODEC.fieldOf("texture").forGetter(TardisConsole::texture)
-    ).apply(tardisConsoleInstance, (model, texture) ->
-            new TardisConsole("__unset__", model, texture)
+                    Identifier.CODEC.fieldOf("texture").forGetter(TardisConsole::texture),
+                    Identifier.CODEC.fieldOf("animation").forGetter(TardisConsole::animation)
+    ).apply(tardisConsoleInstance, (model, texture, animation) ->
+            new TardisConsole("__unset__", model, texture, animation)
     ));
 
     public static final StreamCodec<FriendlyByteBuf, TardisConsole> STREAM_CODEC = StreamCodec.composite(
             ByteBufCodecs.STRING_UTF8, TardisConsole::id,
             Identifier.STREAM_CODEC, TardisConsole::model,
             Identifier.STREAM_CODEC, TardisConsole::texture,
+            Identifier.STREAM_CODEC, TardisConsole::animation,
             TardisConsole::new
     );
 
     @Override
     public TardisConsole withId(String id) {
-        return new TardisConsole(id, model, texture);
+        return new TardisConsole(id, model, texture, animation);
     }
 }

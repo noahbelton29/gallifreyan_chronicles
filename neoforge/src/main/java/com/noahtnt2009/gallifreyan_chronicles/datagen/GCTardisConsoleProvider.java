@@ -27,11 +27,12 @@ public class GCTardisConsoleProvider implements DataProvider {
     private void registerDefaults() {
         addConsole("first_doctors_console",
                 GCUtils.of("first_doctors_console"),
-                GCUtils.of("textures/block/first_doctors_console.png"));
+                GCUtils.of("textures/block/first_doctors_console.png"),
+                GCUtils.of("console/first_doctors_console"));
     }
 
-    private void addConsole(String path, Identifier model, Identifier texture) {
-        consoles.add(new TardisConsole(GCUtils.ofNamespace(path), model, texture));
+    private void addConsole(String path, Identifier model, Identifier texture, Identifier animation) {
+        consoles.add(new TardisConsole(GCUtils.ofNamespace(path), model, texture, animation));
     }
 
     @Override

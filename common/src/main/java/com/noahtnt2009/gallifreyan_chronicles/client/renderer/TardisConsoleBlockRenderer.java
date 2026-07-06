@@ -2,6 +2,7 @@ package com.noahtnt2009.gallifreyan_chronicles.client.renderer;
 
 import com.geckolib.constant.dataticket.DataTicket;
 import com.geckolib.renderer.GeoBlockRenderer;
+import com.geckolib.renderer.layer.builtin.AutoGlowingGeoLayer;
 import com.noahtnt2009.gallifreyan_chronicles.block.TardisConsoleBlockModel;
 import com.noahtnt2009.gallifreyan_chronicles.block.entity.TardisConsoleBlockEntity;
 import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
@@ -13,6 +14,8 @@ public class TardisConsoleBlockRenderer extends GeoBlockRenderer<@NotNull Tardis
 
     public TardisConsoleBlockRenderer(BlockEntityRendererProvider.Context context) {
         super(context, new TardisConsoleBlockModel());
+
+        withRenderLayer(AutoGlowingGeoLayer::new);
     }
 
     @Override

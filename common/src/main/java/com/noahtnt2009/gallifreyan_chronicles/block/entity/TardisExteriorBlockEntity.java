@@ -10,6 +10,7 @@ import com.geckolib.util.GeckoLibUtil;
 import com.noahtnt2009.gallifreyan_chronicles.ecs.ComponentHolder;
 import com.noahtnt2009.gallifreyan_chronicles.ecs.ComponentStore;
 import com.noahtnt2009.gallifreyan_chronicles.ecs.Entity;
+import com.noahtnt2009.gallifreyan_chronicles.tardis.ecs.TardisLinkable;
 import com.noahtnt2009.gallifreyan_chronicles.tardis.ecs.component.DoorComponent;
 import com.noahtnt2009.gallifreyan_chronicles.tardis.ecs.component.DoorState;
 import com.noahtnt2009.gallifreyan_chronicles.tardis.ecs.TardisComponentTypes;
@@ -17,7 +18,6 @@ import com.noahtnt2009.gallifreyan_chronicles.tardis.ecs.component.TransformComp
 import com.noahtnt2009.gallifreyan_chronicles.tardis.ecs.system.DoorSystem;
 import com.noahtnt2009.gallifreyan_chronicles.tardis.ecs.system.ExteriorSystem;
 import com.noahtnt2009.gallifreyan_chronicles.tardis.ecs.system.GlowSystem;
-import com.noahtnt2009.gallifreyan_chronicles.tardis.ecs.system.TardisLinkSystem;
 import com.noahtnt2009.gallifreyan_chronicles.init.GCGameRules;
 import com.noahtnt2009.gallifreyan_chronicles.init.GCSounds;
 import com.noahtnt2009.gallifreyan_chronicles.tardis.exterior.TardisExterior;
@@ -43,7 +43,7 @@ import org.jspecify.annotations.NonNull;
 import java.util.UUID;
 import java.util.function.Supplier;
 
-public class TardisExteriorBlockEntity extends BlockEntity implements GeoBlockEntity, ComponentHolder {
+public class TardisExteriorBlockEntity extends BlockEntity implements GeoBlockEntity, ComponentHolder, TardisLinkable {
     public static Supplier<BlockEntityType<TardisExteriorBlockEntity>> TYPE;
     private AnimationController<TardisExteriorBlockEntity> controller;
     private final ComponentStore components = new ComponentStore();
@@ -153,7 +153,7 @@ public class TardisExteriorBlockEntity extends BlockEntity implements GeoBlockEn
     }
 
     public @Nullable UUID getTardisId() {
-        return TardisLinkSystem.linkedTardisId(asEntity()).orElse(null);
+        return getLinkedTardisId().orElse(null);
     }
 
     public DoorState getDoorState() {

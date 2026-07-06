@@ -4,6 +4,7 @@ import com.mojang.brigadier.arguments.BoolArgumentType;
 import com.mojang.brigadier.arguments.StringArgumentType;
 import com.noahtnt2009.gallifreyan_chronicles.Constants;
 import com.noahtnt2009.gallifreyan_chronicles.command.TardisCommand;
+import com.noahtnt2009.gallifreyan_chronicles.tardis.console.TardisConsoleRegistry;
 import com.noahtnt2009.gallifreyan_chronicles.tardis.manager.TardisManager;
 import com.noahtnt2009.gallifreyan_chronicles.tardis.exterior.TardisExterior;
 import com.noahtnt2009.gallifreyan_chronicles.tardis.exterior.TardisExteriorRegistry;
@@ -43,10 +44,29 @@ public class GCNeoForgeCommands {
                                                                             .forEach(e -> builder.suggest(e.id()));
                                                                     return builder.buildFuture();
                                                                 })
-                                                                .executes(TardisCommand::setExterior))))
+                                                                .executes(TardisCommand::setExterior)))
+                                                .then(literal("link")
+                                                        .executes(TardisCommand::linkExterior))
+                                                .then(literal("unlink")
+                                                        .executes(TardisCommand::unlinkExterior)))
+                                        .then(literal("console")
+                                                .then(literal("get")
+                                                        .executes(TardisCommand::getConsole))
+                                                .then(literal("set")
+                                                        .then(argument("console_id", StringArgumentType.greedyString())
+                                                                .suggests((ctx, builder) -> {
+                                                                    TardisConsoleRegistry.getAll()
+                                                                            .forEach(e -> builder.suggest(e.id()));
+                                                                    return builder.buildFuture();
+                                                                })
+                                                                .executes(TardisCommand::setConsole)))
+                                                .then(literal("link")
+                                                        .executes(TardisCommand::linkConsole))
+                                                .then(literal("unlink")
+                                                        .executes(TardisCommand::unlinkConsole)))
                                         .then(literal("glow")
                                                 .then(argument("glowing", BoolArgumentType.bool())
-                                                        .executes(TardisCommand::setGlowing)))))
+                                                        .executes(TardisCommand::setGlowing))))
                         .then(literal("debug")
                                 .then(literal("exteriors")
                                         .executes(ctx -> {
@@ -67,6 +87,6 @@ public class GCNeoForgeCommands {
                                                     return builder.buildFuture();
                                                 })
                                                 .executes(TardisCommand::debugTardis))))
-        );
+        ));
     }
 }

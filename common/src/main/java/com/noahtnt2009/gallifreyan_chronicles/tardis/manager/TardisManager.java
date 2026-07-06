@@ -14,17 +14,24 @@ import org.jspecify.annotations.Nullable;
 import java.util.*;
 
 public class TardisManager extends SavedData {
-    private record Entry(TardisComponent component, BlockPos blockPos) {
+    private record Entry(TardisComponent component, BlockPos blockPos, BlockPos consoleBlockPos, BlockPos exteriorBlockPos) {
     }
 
     private static final Codec<Entry> ENTRY_CODEC = RecordCodecBuilder.create(inst -> inst.group(
             TardisComponent.CODEC.fieldOf("tardis").forGetter(Entry::component),
-            BlockPos.CODEC.optionalFieldOf("block_pos", null).forGetter(Entry::blockPos)
+            BlockPos.CODEC.optionalFieldOf("block_pos", null).forGetter(Entry::blockPos),
+            BlockPos.CODEC.optionalFieldOf("console_block_pos", null).forGetter(Entry::consoleBlockPos),
+            BlockPos.CODEC.optionalFieldOf("exterior_block_pos", null).forGetter(Entry::exteriorBlockPos)
     ).apply(inst, Entry::new));
 
     public static final Codec<TardisManager> CODEC = RecordCodecBuilder.create(inst -> inst.group(
             ENTRY_CODEC.listOf().fieldOf("tardises").forGetter(m -> m.byTardisId.values().stream()
-                    .map(c -> new Entry(c, m.blockPosById.get(c.getTardisId())))
+                    .map(c -> new Entry(
+                            c,
+                            m.blockPosById.get(c.getTardisId()),
+                            m.consoleBlockPosById.get(c.getTardisId()),
+                            m.exteriorBlockPosById.get(c.getTardisId())
+                    ))
                     .toList())
     ).apply(inst, entries -> {
         TardisManager manager = new TardisManager();
@@ -36,6 +43,12 @@ public class TardisManager extends SavedData {
                     .add(component.getTardisId());
             if (entry.blockPos() != null) {
                 manager.blockPosById.put(component.getTardisId(), entry.blockPos());
+            }
+            if (entry.consoleBlockPos() != null) {
+                manager.consoleBlockPosById.put(component.getTardisId(), entry.consoleBlockPos());
+            }
+            if (entry.exteriorBlockPos() != null) {
+                manager.exteriorBlockPosById.put(component.getTardisId(), entry.exteriorBlockPos());
             }
         }
         return manager;
@@ -51,6 +64,8 @@ public class TardisManager extends SavedData {
     private final Map<UUID, TardisComponent> byTardisId = new HashMap<>();
     private final Map<UUID, List<UUID>> byOwnerId = new HashMap<>();
     private final Map<UUID, BlockPos> blockPosById = new HashMap<>();
+    private final Map<UUID, BlockPos> consoleBlockPosById = new HashMap<>();
+    private final Map<UUID, BlockPos> exteriorBlockPosById = new HashMap<>();
 
     public Optional<TardisComponent> get(UUID tardisId) {
         return Optional.ofNullable(byTardisId.get(tardisId));
@@ -84,6 +99,8 @@ public class TardisManager extends SavedData {
             if (owned != null) owned.remove(tardisId);
         }
         blockPosById.remove(tardisId);
+        consoleBlockPosById.remove(tardisId);
+        exteriorBlockPosById.remove(tardisId);
         setDirty();
     }
 
@@ -98,6 +115,64 @@ public class TardisManager extends SavedData {
 
     public @Nullable BlockPos getBlockPos(UUID tardisId) {
         return blockPosById.get(tardisId);
+    }
+
+    /**
+     * Links (or unlinks, if pos is null) a console block position to a TARDIS.
+     */
+    public void setConsoleBlockPos(UUID tardisId, BlockPos pos) {
+        if (pos == null) {
+            consoleBlockPosById.remove(tardisId);
+        } else {
+            consoleBlockPosById.put(tardisId, pos);
+        }
+        setDirty();
+    }
+
+    public @Nullable BlockPos getConsoleBlockPos(UUID tardisId) {
+        return consoleBlockPosById.get(tardisId);
+    }
+
+    /**
+     * Unlinks the console currently linked to this TARDIS, if any.
+     */
+    public void unlinkConsole(UUID tardisId) {
+        setConsoleBlockPos(tardisId, null);
+    }
+
+    /**
+     * Links (or unlinks, if pos is null) an exterior block position to a TARDIS.
+     * This is separate from the TARDIS's original placement position (blockPosById),
+     * so re-linking to a new exterior doesn't require moving the TARDIS itself.
+     */
+    public void setExteriorBlockPos(UUID tardisId, BlockPos pos) {
+        if (pos == null) {
+            exteriorBlockPosById.remove(tardisId);
+        } else {
+            exteriorBlockPosById.put(tardisId, pos);
+        }
+        setDirty();
+    }
+
+    public @Nullable BlockPos getExteriorBlockPos(UUID tardisId) {
+        return exteriorBlockPosById.get(tardisId);
+    }
+
+    /**
+     * Unlinks the exterior currently linked to this TARDIS, if any.
+     */
+    public void unlinkExterior(UUID tardisId) {
+        setExteriorBlockPos(tardisId, null);
+    }
+
+    /**
+     * Resolves the position of the exterior that should currently be treated as
+     * "the" exterior for this TARDIS: the explicitly linked exterior if one has
+     * been set, otherwise the TARDIS's original placement position.
+     */
+    public @Nullable BlockPos resolveExteriorBlockPos(UUID tardisId) {
+        BlockPos linked = exteriorBlockPosById.get(tardisId);
+        return linked != null ? linked : blockPosById.get(tardisId);
     }
 
     public static TardisManager get(MinecraftServer server) {

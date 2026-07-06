@@ -1,11 +1,11 @@
 package com.noahtnt2009.gallifreyan_chronicles.datagen;
 
-import com.google.gson.JsonElement;
 import com.mojang.serialization.JsonOps;
 import com.noahtnt2009.gallifreyan_chronicles.Constants;
 import com.noahtnt2009.gallifreyan_chronicles.client.sky.data.DimensionSky;
 import com.noahtnt2009.gallifreyan_chronicles.client.sky.data.SkyCelestialBody;
 import com.noahtnt2009.gallifreyan_chronicles.init.GCDimensions;
+import com.noahtnt2009.gallifreyan_chronicles.util.GCUtils;
 import net.minecraft.data.CachedOutput;
 import net.minecraft.data.DataProvider;
 import net.minecraft.data.PackOutput;
@@ -30,7 +30,6 @@ public class GCDimensionSkyProvider implements DataProvider {
                 GCDimensions.GALLIFREY_LEVEL_KEY.identifier(),
                 false,
                 List.of(
-                        new SkyCelestialBody(SkyCelestialBody.BodyType.SUN, 0f, 0f, 1.0f, true),
                         new SkyCelestialBody(SkyCelestialBody.BodyType.SUN, 25.0f, 45.0f, 0.6f, true),
                         new SkyCelestialBody(SkyCelestialBody.BodyType.MOON, 0.0f, 0.0f, 1.3f, true),
                         new SkyCelestialBody(SkyCelestialBody.BodyType.MOON, 40.0f, 70.0f, 0.7f, true)
@@ -56,7 +55,7 @@ public class GCDimensionSkyProvider implements DataProvider {
                     ? sky.id().substring(sky.id().indexOf(':') + 1)
                     : sky.id();
 
-            Identifier fileId = Identifier.fromNamespaceAndPath(Constants.MOD_ID, filePath);
+            Identifier fileId = GCUtils.of(filePath);
 
             var encodeResult = DimensionSky.CODEC.encodeStart(JsonOps.INSTANCE, sky);
             encodeResult.ifSuccess(json -> {

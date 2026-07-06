@@ -1,17 +1,17 @@
 package com.noahtnt2009.gallifreyan_chronicles.init;
 
 import com.noahtnt2009.gallifreyan_chronicles.Constants;
+import com.noahtnt2009.gallifreyan_chronicles.util.GCUtils;
 import net.fabricmc.fabric.api.creativetab.v1.FabricCreativeModeTab;
 import net.minecraft.core.Registry;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.ItemStack;
 
 public class GCCreativeModeTabs {
     public static final CreativeModeTab TARDIS_TAB = Registry.register(BuiltInRegistries.CREATIVE_MODE_TAB,
-            Identifier.fromNamespaceAndPath(Constants.MOD_ID, "tardis"),
+            GCUtils.of("tardis"),
             FabricCreativeModeTab.builder().icon(() -> new ItemStack(GCBlocks.TARDIS))
                     .title(Component.translatable("creativetab.gallifreyan_chronicles.tardis"))
                     .displayItems((parameters, output) -> {
@@ -19,7 +19,7 @@ public class GCCreativeModeTabs {
                     }).build());
 
     public static final CreativeModeTab NATURAL_BLOCKS_TAB = Registry.register(BuiltInRegistries.CREATIVE_MODE_TAB,
-            Identifier.fromNamespaceAndPath(Constants.MOD_ID, "natural_blocks"),
+            GCUtils.of("natural_blocks"),
             FabricCreativeModeTab.builder().icon(() -> new ItemStack(GCBlocks.GALLIFREYAN_GRASS_BLOCK))
                     .title(Component.translatable("creativetab.gallifreyan_chronicles.natural_blocks"))
                     .displayItems((parameters, output) -> {
@@ -41,7 +41,7 @@ public class GCCreativeModeTabs {
                     }).build());
 
     public static final CreativeModeTab BUILDING_BLOCKS_TAB = Registry.register(BuiltInRegistries.CREATIVE_MODE_TAB,
-            Identifier.fromNamespaceAndPath(Constants.MOD_ID, "building_blocks"),
+            GCUtils.of("building_bloccks"),
             FabricCreativeModeTab.builder().icon(() -> new ItemStack(GCBlocks.CADONWOOD_PLANKS))
                     .title(Component.translatable("creativetab.gallifreyan_chronicles.building_blocks"))
                     .displayItems((parameters, output) -> {
@@ -60,7 +60,7 @@ public class GCCreativeModeTabs {
                     }).build());
 
     public static final CreativeModeTab FLORA_TAB = Registry.register(BuiltInRegistries.CREATIVE_MODE_TAB,
-            Identifier.fromNamespaceAndPath(Constants.MOD_ID, "flora"),
+            GCUtils.of("flora"),
             FabricCreativeModeTab.builder().icon(() -> new ItemStack(GCBlocks.CADONWOOD_LEAVES))
                     .title(Component.translatable("creativetab.gallifreyan_chronicles.flora"))
                     .displayItems((parameters, output) -> {
@@ -76,7 +76,7 @@ public class GCCreativeModeTabs {
                     }).build());
 
     public static final CreativeModeTab TOOLS_AND_ARMOR_TAB = Registry.register(BuiltInRegistries.CREATIVE_MODE_TAB,
-            Identifier.fromNamespaceAndPath(Constants.MOD_ID, "tools_and_armor"),
+            GCUtils.of("tools_and_armor"),
             FabricCreativeModeTab.builder().icon(() -> new ItemStack(GCItems.TARANIUM_PICKAXE))
                     .title(Component.translatable("creativetab.gallifreyan_chronicles.tools_and_armor"))
                     .displayItems((parameters, output) -> {

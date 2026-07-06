@@ -1,6 +1,6 @@
 package com.noahtnt2009.gallifreyan_chronicles.init;
 
-import com.noahtnt2009.gallifreyan_chronicles.Constants;
+import com.noahtnt2009.gallifreyan_chronicles.util.GCUtils;
 import net.minecraft.core.Registry;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.Identifier;
@@ -11,7 +11,7 @@ public class GCSounds {
     public static final SoundEvent TARDIS_DOOR_CLOSE = register("tardis_door_close");
 
     private static SoundEvent register(String name) {
-        Identifier id = Identifier.fromNamespaceAndPath(Constants.MOD_ID, name);
+        Identifier id = GCUtils.of(name);
         return Registry.register(BuiltInRegistries.SOUND_EVENT, id, SoundEvent.createVariableRangeEvent(id));
     }
 

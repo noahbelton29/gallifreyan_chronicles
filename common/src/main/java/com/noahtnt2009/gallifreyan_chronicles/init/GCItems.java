@@ -1,10 +1,10 @@
 package com.noahtnt2009.gallifreyan_chronicles.init;
 
 import com.noahtnt2009.gallifreyan_chronicles.Constants;
+import com.noahtnt2009.gallifreyan_chronicles.util.GCUtils;
 import net.minecraft.core.Registry;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
-import net.minecraft.resources.Identifier;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.item.*;
 import net.minecraft.world.item.equipment.ArmorType;
@@ -62,10 +62,10 @@ public class GCItems {
     private static <T extends Item> T registerItem(String name, Function<Item.Properties, T> factory) {
         T item = Registry.register(
                 BuiltInRegistries.ITEM,
-                Identifier.fromNamespaceAndPath(Constants.MOD_ID, name),
+                GCUtils.of(name),
                 factory.apply(new Item.Properties().setId(
                         ResourceKey.create(Registries.ITEM,
-                                Identifier.fromNamespaceAndPath(Constants.MOD_ID, name)
+                                GCUtils.of(name)
                         )
                 ))
         );

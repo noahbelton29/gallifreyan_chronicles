@@ -1,12 +1,10 @@
 package com.noahtnt2009.gallifreyan_chronicles.init;
 
 import com.mojang.datafixers.util.Pair;
-import com.noahtnt2009.gallifreyan_chronicles.Constants;
+import com.noahtnt2009.gallifreyan_chronicles.util.GCUtils;
 import com.noahtnt2009.gallifreyan_chronicles.world.biome.GCSurfaceRules;
-import net.minecraft.core.HolderGetter;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.data.worldgen.BootstrapContext;
-import net.minecraft.resources.Identifier;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.tags.BlockTags;
 import net.minecraft.tags.TimelineTags;
@@ -24,30 +22,28 @@ import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.dimension.DimensionType;
 import net.minecraft.world.level.dimension.LevelStem;
 import net.minecraft.world.level.levelgen.*;
-import net.minecraft.world.level.levelgen.synth.NormalNoise;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Stream;
 
 public class GCDimensions {
     public static final ResourceKey<LevelStem> GALLIFREY_KEY = ResourceKey.create(Registries.LEVEL_STEM,
-            Identifier.fromNamespaceAndPath(Constants.MOD_ID, "gallifrey"));
+            GCUtils.of("gallifrey"));
     public static final ResourceKey<Level> GALLIFREY_LEVEL_KEY = ResourceKey.create(Registries.DIMENSION,
-            Identifier.fromNamespaceAndPath(Constants.MOD_ID, "gallifrey"));
+            GCUtils.of("gallifrey"));
     public static final ResourceKey<DimensionType> GALLIFREY_TYPE_KEY = ResourceKey.create(Registries.DIMENSION_TYPE,
-            Identifier.fromNamespaceAndPath(Constants.MOD_ID, "gallifrey_type"));
+            GCUtils.of("gallifrey_type"));
     public static final ResourceKey<NoiseGeneratorSettings> GALLIFREY_NOISE_SETTINGS = ResourceKey.create(Registries.NOISE_SETTINGS,
-            Identifier.fromNamespaceAndPath(Constants.MOD_ID, "gallifrey"));
+            GCUtils.of("gallifrey"));
 
     public static final ResourceKey<LevelStem> MOON_KEY = ResourceKey.create(Registries.LEVEL_STEM,
-            Identifier.fromNamespaceAndPath(Constants.MOD_ID, "moon"));
+            GCUtils.of("moon"));
     public static final ResourceKey<Level> MOON_LEVEL_KEY = ResourceKey.create(Registries.DIMENSION,
-            Identifier.fromNamespaceAndPath(Constants.MOD_ID, "moon"));
+            GCUtils.of("moon"));
     public static final ResourceKey<DimensionType> MOON_TYPE_KEY = ResourceKey.create(Registries.DIMENSION_TYPE,
-            Identifier.fromNamespaceAndPath(Constants.MOD_ID, "moon_type"));
+            GCUtils.of("moon_type"));
     public static final ResourceKey<NoiseGeneratorSettings> MOON_NOISE_SETTINGS = ResourceKey.create(Registries.NOISE_SETTINGS,
-            Identifier.fromNamespaceAndPath(Constants.MOD_ID, "moon"));
+            GCUtils.of("moon"));
 
     public static void bootstrapType(BootstrapContext<DimensionType> context) {
         var timelines = context.lookup(Registries.TIMELINE);

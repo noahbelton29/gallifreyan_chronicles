@@ -1,8 +1,6 @@
 package com.noahtnt2009.gallifreyan_chronicles;
 
 import com.noahtnt2009.gallifreyan_chronicles.init.*;
-import com.noahtnt2009.gallifreyan_chronicles.loader.GCFabricDimensionSkyLoader;
-import com.noahtnt2009.gallifreyan_chronicles.loader.GCFabricTardisExteriorLoader;
 import com.noahtnt2009.gallifreyan_chronicles.network.GCFabricNetworking;
 import net.fabricmc.api.ModInitializer;
 
@@ -16,8 +14,7 @@ public class GallifreyanChroniclesFabric implements ModInitializer {
         GCCreativeModeTabs.registerFabricCreativeModeTabs();
         GCFabricWorldGeneration.registerWorldGeneration();
         GCFabricNetworking.registerNetworking();
-        GCFabricTardisExteriorLoader.registerTardisExteriorLoader();
-        GCFabricDimensionSkyLoader.registerDimensionSkyLoader();
+        GCResourceLoaders.registerResourceLoaders();
         CommonClass.init();
     }
 }

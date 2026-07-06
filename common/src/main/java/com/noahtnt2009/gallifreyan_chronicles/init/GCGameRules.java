@@ -3,6 +3,7 @@ package com.noahtnt2009.gallifreyan_chronicles.init;
 import com.mojang.brigadier.arguments.BoolArgumentType;
 import com.mojang.serialization.Codec;
 import com.noahtnt2009.gallifreyan_chronicles.Constants;
+import com.noahtnt2009.gallifreyan_chronicles.util.GCUtils;
 import net.minecraft.core.Registry;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.Identifier;
@@ -20,7 +21,7 @@ public class GCGameRules {
     );
 
     private static GameRule<Boolean> register(String id, GameRuleCategory category, boolean defaultValue) {
-        Identifier identifier = Identifier.fromNamespaceAndPath(Constants.MOD_ID, id);
+        Identifier identifier = GCUtils.of(id);
 
         GameRule<Boolean> rule = new GameRule<>(
                 category,

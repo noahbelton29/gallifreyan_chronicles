@@ -2,13 +2,13 @@ package com.noahtnt2009.gallifreyan_chronicles.init;
 
 import com.noahtnt2009.gallifreyan_chronicles.Constants;
 import com.noahtnt2009.gallifreyan_chronicles.block.*;
+import com.noahtnt2009.gallifreyan_chronicles.util.GCUtils;
 import com.noahtnt2009.gallifreyan_chronicles.world.tree.GCTreeGrowers;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Registry;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
-import net.minecraft.resources.Identifier;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.util.valueproviders.UniformInt;
 import net.minecraft.world.entity.EntityType;
@@ -215,10 +215,10 @@ public class GCBlocks {
 
     private static Block registerBlock(String name, Function<BlockBehaviour.Properties, Block> function, Rarity rarity) {
         Block toRegister = function.apply(BlockBehaviour.Properties.of()
-                .setId(ResourceKey.create(Registries.BLOCK, Identifier.fromNamespaceAndPath(Constants.MOD_ID, name))));
+                .setId(ResourceKey.create(Registries.BLOCK, GCUtils.of(name))));
         registerBlockItem(name, toRegister, rarity);
         BLOCKS.add(toRegister);
-        return Registry.register(BuiltInRegistries.BLOCK, Identifier.fromNamespaceAndPath(Constants.MOD_ID, name), toRegister);
+        return Registry.register(BuiltInRegistries.BLOCK, GCUtils.of(name), toRegister);
     }
 
     private static Block registerBlock(String name, Function<BlockBehaviour.Properties, Block> function) {
@@ -227,16 +227,16 @@ public class GCBlocks {
 
     private static Block registerBlockWithoutBlockItem(String name, Function<BlockBehaviour.Properties, Block> function) {
         Block toRegister = function.apply(BlockBehaviour.Properties.of()
-                .setId(ResourceKey.create(Registries.BLOCK, Identifier.fromNamespaceAndPath(Constants.MOD_ID, name))));
+                .setId(ResourceKey.create(Registries.BLOCK, GCUtils.of(name))));
         BLOCKS.add(toRegister);
-        return Registry.register(BuiltInRegistries.BLOCK, Identifier.fromNamespaceAndPath(Constants.MOD_ID, name), toRegister);
+        return Registry.register(BuiltInRegistries.BLOCK, GCUtils.of(name), toRegister);
     }
 
     private static void registerBlockItem(String name, Block block, Rarity rarity) {
-        Registry.register(BuiltInRegistries.ITEM, Identifier.fromNamespaceAndPath(Constants.MOD_ID, name),
+        Registry.register(BuiltInRegistries.ITEM, GCUtils.of(name),
                 new BlockItem(block, new Item.Properties().useBlockDescriptionPrefix()
                         .rarity(rarity)
-                        .setId(ResourceKey.create(Registries.ITEM, Identifier.fromNamespaceAndPath(Constants.MOD_ID, name)))));
+                        .setId(ResourceKey.create(Registries.ITEM, GCUtils.of(name)))));
     }
 
     public static void registerBlocks() {

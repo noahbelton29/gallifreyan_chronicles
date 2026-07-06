@@ -1,8 +1,7 @@
 package com.noahtnt2009.gallifreyan_chronicles.ecs;
 
 import com.mojang.serialization.Codec;
-import com.noahtnt2009.gallifreyan_chronicles.Constants;
-import net.minecraft.resources.Identifier;
+import com.noahtnt2009.gallifreyan_chronicles.util.GCUtils;
 
 import java.util.function.Supplier;
 
@@ -12,7 +11,7 @@ public final class ComponentType<T extends Component> {
     private final Supplier<T> initializer;
 
     private ComponentType(String id, Codec<T> codec, Supplier<T> initializer) {
-        this.id = Identifier.fromNamespaceAndPath(Constants.MOD_ID, id).toString();
+        this.id = GCUtils.of(id).toString();
         this.codec = codec;
         this.initializer = initializer;
     }

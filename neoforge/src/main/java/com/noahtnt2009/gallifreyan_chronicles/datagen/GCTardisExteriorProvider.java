@@ -4,6 +4,7 @@ import com.google.gson.JsonElement;
 import com.mojang.serialization.JsonOps;
 import com.noahtnt2009.gallifreyan_chronicles.Constants;
 import com.noahtnt2009.gallifreyan_chronicles.tardis.exterior.TardisExterior;
+import com.noahtnt2009.gallifreyan_chronicles.util.GCUtils;
 import net.minecraft.data.CachedOutput;
 import net.minecraft.data.DataProvider;
 import net.minecraft.data.PackOutput;
@@ -25,18 +26,13 @@ public class GCTardisExteriorProvider implements DataProvider {
 
     private void registerDefaults() {
         addExterior("first_doctors_exterior",
-                id("first_doctors_exterior"),
-                id("textures/block/first_doctors_exterior.png"),
-                id("tardis_door/first_doctors_exterior"));
+                GCUtils.of("first_doctors_exterior"),
+                GCUtils.of("textures/block/first_doctors_exterior.png"),
+                GCUtils.of("tardis_door/first_doctors_exterior"));
     }
 
     private void addExterior(String path, Identifier model, Identifier texture, Identifier animation) {
-        String qualifiedId = Constants.MOD_ID + ":" + path;
-        exteriors.add(new TardisExterior(qualifiedId, model, texture, animation));
-    }
-
-    private static Identifier id(String path) {
-        return Identifier.fromNamespaceAndPath(Constants.MOD_ID, path);
+        exteriors.add(new TardisExterior(GCUtils.ofNamespace(path), model, texture, animation));
     }
 
     @Override
@@ -48,7 +44,7 @@ public class GCTardisExteriorProvider implements DataProvider {
                     ? exterior.id().substring(exterior.id().indexOf(':') + 1)
                     : exterior.id();
 
-            Identifier fileId = Identifier.fromNamespaceAndPath(Constants.MOD_ID, filePath);
+            Identifier fileId = GCUtils.of(filePath);
 
             var encodeResult = TardisExterior.CODEC.encodeStart(JsonOps.INSTANCE, exterior);
             encodeResult.ifSuccess(json -> {

@@ -1,14 +1,13 @@
 package com.noahtnt2009.gallifreyan_chronicles.datagen;
 
-import com.mojang.datafixers.kinds.Const;
 import com.noahtnt2009.gallifreyan_chronicles.Constants;
 import com.noahtnt2009.gallifreyan_chronicles.init.GCBlocks;
 import com.noahtnt2009.gallifreyan_chronicles.init.GCItems;
+import com.noahtnt2009.gallifreyan_chronicles.util.GCUtils;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.data.PackOutput;
 import net.minecraft.data.recipes.*;
-import net.minecraft.resources.Identifier;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.crafting.AbstractCookingRecipe;
@@ -165,7 +164,7 @@ public class GCRecipeProvider extends RecipeProvider {
                 .unlockedBy(getHasName(GCBlocks.GALLIFREYAN_COBBLESTONE), has(Items.STICK))
                 .save(this.output, ResourceKey.create(
                         Registries.RECIPE,
-                        Identifier.fromNamespaceAndPath(Constants.MOD_ID, "stone_pickaxe_from_gallifreyan_stone")));
+                        GCUtils.of("stone_pickaxe_from_gallifreyan_stone")));
 
         shaped(RecipeCategory.COMBAT, GCItems.TARANIUM_HELMET)
                 .pattern("TTT")

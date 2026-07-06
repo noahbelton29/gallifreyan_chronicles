@@ -1,7 +1,7 @@
 package com.noahtnt2009.gallifreyan_chronicles.init;
 
 import com.google.common.collect.Maps;
-import com.noahtnt2009.gallifreyan_chronicles.Constants;
+import com.noahtnt2009.gallifreyan_chronicles.util.GCUtils;
 import net.minecraft.core.Registry;
 import net.minecraft.resources.Identifier;
 import net.minecraft.resources.ResourceKey;
@@ -18,7 +18,7 @@ public class GCArmorMaterials {
 
     public static final ResourceKey<EquipmentAsset> TARANIUM_KEY =
             ResourceKey.create(REGISTRY_KEY,
-                    Identifier.fromNamespaceAndPath(Constants.MOD_ID, "taranium"));
+                    GCUtils.of("taranium"));
 
     public static final ArmorMaterial TARANIUM_ARMOR_MATERIAL =
             new ArmorMaterial(

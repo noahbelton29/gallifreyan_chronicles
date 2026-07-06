@@ -1,6 +1,6 @@
 package com.noahtnt2009.gallifreyan_chronicles.mixin;
 
-import com.noahtnt2009.gallifreyan_chronicles.Constants;
+import com.noahtnt2009.gallifreyan_chronicles.util.GCUtils;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.LogoRenderer;
 import net.minecraft.client.renderer.RenderPipelines;
@@ -10,14 +10,12 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.ModifyArg;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(LogoRenderer.class)
 public class LogoRendererMixin {
     @Unique
-    private static final Identifier TITLE_LOGO =
-            Identifier.fromNamespaceAndPath(Constants.MOD_ID, "textures/gui/title/logo.png");
+    private static final Identifier TITLE_LOGO = GCUtils.of("textures/gui/title/logo.png");
 
     @Unique
     private static final int gallifreyan_chronicles_26_1_2$WIDTH = (int)(256 * 0.9f);

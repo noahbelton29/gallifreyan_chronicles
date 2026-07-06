@@ -1,12 +1,11 @@
 package com.noahtnt2009.gallifreyan_chronicles.datagen;
 
-import com.noahtnt2009.gallifreyan_chronicles.Constants;
 import com.noahtnt2009.gallifreyan_chronicles.init.GCArmorMaterials;
+import com.noahtnt2009.gallifreyan_chronicles.util.GCUtils;
 import net.minecraft.client.resources.model.EquipmentClientInfo;
 import net.minecraft.data.CachedOutput;
 import net.minecraft.data.DataProvider;
 import net.minecraft.data.PackOutput;
-import net.minecraft.resources.Identifier;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.item.equipment.EquipmentAsset;
 import org.jspecify.annotations.NonNull;
@@ -26,9 +25,9 @@ public class GCEquipmentAssetProvider implements DataProvider {
     private static void bootstrap(BiConsumer<ResourceKey<EquipmentAsset>, EquipmentClientInfo> consumer) {
         consumer.accept(GCArmorMaterials.TARANIUM_KEY,
                 EquipmentClientInfo.builder()
-                        .addHumanoidLayers(Identifier.fromNamespaceAndPath(Constants.MOD_ID, "taranium"))
+                        .addHumanoidLayers(GCUtils.of("taranium"))
                         .addLayers(EquipmentClientInfo.LayerType.HORSE_BODY,
-                                new EquipmentClientInfo.Layer(Identifier.fromNamespaceAndPath(Constants.MOD_ID, "taranium")))
+                                new EquipmentClientInfo.Layer(GCUtils.of("taranium")))
                         .build());
     }
 

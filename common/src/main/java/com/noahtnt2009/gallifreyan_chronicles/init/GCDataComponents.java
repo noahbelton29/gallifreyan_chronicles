@@ -1,10 +1,10 @@
 package com.noahtnt2009.gallifreyan_chronicles.init;
 
 import com.mojang.serialization.Codec;
+import com.noahtnt2009.gallifreyan_chronicles.util.GCUtils;
 import net.minecraft.core.Registry;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.component.DataComponentType;
-import net.minecraft.resources.Identifier;
 import com.noahtnt2009.gallifreyan_chronicles.Constants;
 import java.util.function.Supplier;
 
@@ -17,7 +17,7 @@ public class GCDataComponents {
     private static <T> DataComponentType<T> register(String name, Supplier<DataComponentType<T>> supplier) {
         return Registry.register(
                 BuiltInRegistries.DATA_COMPONENT_TYPE,
-                Identifier.fromNamespaceAndPath(Constants.MOD_ID, name),
+                GCUtils.of(name),
                 supplier.get()
         );
     }

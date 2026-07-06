@@ -1,11 +1,10 @@
 package com.noahtnt2009.gallifreyan_chronicles.init;
 
-import com.noahtnt2009.gallifreyan_chronicles.Constants;
+import com.noahtnt2009.gallifreyan_chronicles.util.GCUtils;
 import com.noahtnt2009.gallifreyan_chronicles.world.biome.GCGallifreyBiomes;
 import com.noahtnt2009.gallifreyan_chronicles.world.biome.GCMoonBiomes;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.data.worldgen.BootstrapContext;
-import net.minecraft.resources.Identifier;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.level.biome.Biome;
 
@@ -30,6 +29,6 @@ public class GCBiomes {
     }
 
     private static ResourceKey<Biome> registerBiomeKey(String name) {
-        return ResourceKey.create(Registries.BIOME, Identifier.fromNamespaceAndPath(Constants.MOD_ID, name));
+        return ResourceKey.create(Registries.BIOME, GCUtils.of(name));
     }
 }

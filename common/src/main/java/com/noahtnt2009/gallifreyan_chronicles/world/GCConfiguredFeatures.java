@@ -1,16 +1,15 @@
 package com.noahtnt2009.gallifreyan_chronicles.world;
 
 import com.google.common.collect.ImmutableList;
-import com.noahtnt2009.gallifreyan_chronicles.Constants;
 import com.noahtnt2009.gallifreyan_chronicles.init.GCBlocks;
 import com.noahtnt2009.gallifreyan_chronicles.init.GCFeatures;
 import com.noahtnt2009.gallifreyan_chronicles.init.GCTags;
+import com.noahtnt2009.gallifreyan_chronicles.util.GCUtils;
 import com.noahtnt2009.gallifreyan_chronicles.world.feature.config.BoulderFeatureConfig;
 import com.noahtnt2009.gallifreyan_chronicles.world.feature.tree_decorators.CadonwoodTrunkVineDecorator;
 import net.minecraft.core.Direction;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.data.worldgen.BootstrapContext;
-import net.minecraft.resources.Identifier;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.util.random.WeightedList;
 import net.minecraft.util.valueproviders.*;
@@ -159,7 +158,7 @@ public class GCConfiguredFeatures {
     }
 
     public static ResourceKey<ConfiguredFeature<?, ?>> registerKey(String name) {
-        return ResourceKey.create(Registries.CONFIGURED_FEATURE, Identifier.fromNamespaceAndPath(Constants.MOD_ID, name));
+        return ResourceKey.create(Registries.CONFIGURED_FEATURE, GCUtils.of(name));
     }
 
     private static <FC extends FeatureConfiguration, F extends Feature<FC>> void register(BootstrapContext<ConfiguredFeature<?, ?>> context,

@@ -1,8 +1,7 @@
 package com.noahtnt2009.gallifreyan_chronicles.init;
 
-import com.noahtnt2009.gallifreyan_chronicles.Constants;
+import com.noahtnt2009.gallifreyan_chronicles.util.GCUtils;
 import net.minecraft.core.registries.Registries;
-import net.minecraft.resources.Identifier;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.block.Block;
@@ -15,7 +14,7 @@ public class GCTags {
         public static final TagKey<Block> NEEDS_NETHERITE_TOOL = createTag("needs_netherite_tool");
 
         private static TagKey<Block> createTag(String name) {
-            return TagKey.create(Registries.BLOCK, Identifier.fromNamespaceAndPath(Constants.MOD_ID, name));
+            return TagKey.create(Registries.BLOCK, GCUtils.of(name));
         }
     }
 
@@ -23,7 +22,7 @@ public class GCTags {
         public static final TagKey<Item> TARANIUM_REPAIRABLE = createTag("taranium_repairable");
 
         private static TagKey<Item> createTag(String name) {
-            return TagKey.create(Registries.ITEM, Identifier.fromNamespaceAndPath(Constants.MOD_ID, name));
+            return TagKey.create(Registries.ITEM, GCUtils.of(name));
         }
     }
 }

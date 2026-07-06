@@ -2,10 +2,9 @@ package com.noahtnt2009.gallifreyan_chronicles.tardis.manager;
 
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
-import com.noahtnt2009.gallifreyan_chronicles.Constants;
 import com.noahtnt2009.gallifreyan_chronicles.tardis.ecs.component.TardisComponent;
+import com.noahtnt2009.gallifreyan_chronicles.util.GCUtils;
 import net.minecraft.core.BlockPos;
-import net.minecraft.resources.Identifier;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.datafix.DataFixTypes;
 import net.minecraft.world.level.saveddata.SavedData;
@@ -43,7 +42,7 @@ public class TardisManager extends SavedData {
     }));
 
     public static final SavedDataType<TardisManager> TYPE = new SavedDataType<>(
-            Identifier.fromNamespaceAndPath(Constants.MOD_ID, "tardises"),
+            GCUtils.of("tardises"),
             TardisManager::new,
             CODEC,
             DataFixTypes.SAVED_DATA_COMMAND_STORAGE

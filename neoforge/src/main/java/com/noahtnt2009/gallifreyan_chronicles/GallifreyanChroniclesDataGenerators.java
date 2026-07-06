@@ -32,6 +32,7 @@ public class GallifreyanChroniclesDataGenerators {
         generator.addProvider(true, new GCEquipmentAssetProvider(packOutput));
         generator.addProvider(true, new GCRecipeProvider.Runner(packOutput, lookupProvider));
         generator.addProvider(true, new GCTardisExteriorProvider(packOutput));
+        generator.addProvider(true, new GCTardisConsoleProvider(packOutput));
         generator.addProvider(true, new GCDimensionSkyProvider(packOutput));
     }
 }

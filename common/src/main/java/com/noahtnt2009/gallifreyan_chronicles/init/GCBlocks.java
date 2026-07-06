@@ -37,6 +37,10 @@ public class GCBlocks {
                     .sound(SoundType.STONE).noOcclusion()
                     .lightLevel(state -> state.getValue(TardisBlock.GLOWING) ? 12 : 0)), Rarity.EPIC);
 
+    public static final Block TARDIS_CONSOLE = registerBlock("tardis_console",
+            properties -> new ConsoleBlock(properties.strength(-1F)
+                    .sound(SoundType.STONE).noOcclusion()));
+
     public static final Block GALLIFREYAN_SAND = registerBlock("gallifreyan_sand",
             properties -> new GCFallingBlock(properties.strength(1.25f)
                     .sound(SoundType.SAND)));

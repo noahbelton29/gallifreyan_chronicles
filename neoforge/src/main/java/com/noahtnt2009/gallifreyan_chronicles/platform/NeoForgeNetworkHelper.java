@@ -1,6 +1,7 @@
 package com.noahtnt2009.gallifreyan_chronicles.platform;
 
 import com.noahtnt2009.gallifreyan_chronicles.network.DimensionSkySyncPayload;
+import com.noahtnt2009.gallifreyan_chronicles.network.TardisConsoleSyncPayload;
 import com.noahtnt2009.gallifreyan_chronicles.network.TardisExteriorSyncPayload;
 import com.noahtnt2009.gallifreyan_chronicles.platform.services.INetworkHelper;
 import net.minecraft.server.MinecraftServer;
@@ -29,6 +30,18 @@ public class NeoForgeNetworkHelper implements INetworkHelper {
     public void broadcastDimensionSkySync(MinecraftServer server, DimensionSkySyncPayload payload) {
         for (ServerPlayer player : server.getPlayerList().getPlayers()) {
             sendDimensionSkySync(player, payload);
+        }
+    }
+
+    @Override
+    public void sendTardisConsoleSync(ServerPlayer player, TardisConsoleSyncPayload payload) {
+        PacketDistributor.sendToPlayer(player, payload);
+    }
+
+    @Override
+    public void broadcastTardisConsoleSync(MinecraftServer server, TardisConsoleSyncPayload payload) {
+        for (ServerPlayer player : server.getPlayerList().getPlayers()) {
+            sendTardisConsoleSync(player, payload);
         }
     }
 }

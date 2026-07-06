@@ -1,5 +1,6 @@
 package com.noahtnt2009.gallifreyan_chronicles;
 
+import com.noahtnt2009.gallifreyan_chronicles.client.renderer.TardisConsoleBlockRenderer;
 import com.noahtnt2009.gallifreyan_chronicles.client.renderer.TardisExteriorBlockRenderer;
 import com.noahtnt2009.gallifreyan_chronicles.init.GCBlockEntities;
 import com.noahtnt2009.gallifreyan_chronicles.init.GCBlocks;
@@ -20,6 +21,7 @@ public class GallifreyanChroniclesFabricClient implements ClientModInitializer {
 
         StrippableBlockRegistry.register(GCBlocks.CADONWOOD_LOG, GCBlocks.STRIPPED_CADONWOOD_LOG);
         BlockEntityRenderers.register(GCBlockEntities.TARDIS_EXTERIOR_BLOCK_ENTITY_TYPE, TardisExteriorBlockRenderer::new);
+        BlockEntityRenderers.register(GCBlockEntities.TARDIS_CONSOLE_BLOCK_ENTITY_TYPE, TardisConsoleBlockRenderer::new);
         GCFabricClientNetworking.registerClientNetworking();
 
 //        ImGuiMCEvents.INSTANCE.imGuiLoadPre(() -> {

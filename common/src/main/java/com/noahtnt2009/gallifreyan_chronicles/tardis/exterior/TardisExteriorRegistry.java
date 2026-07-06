@@ -38,15 +38,12 @@ public class TardisExteriorRegistry {
     public static boolean contains(String id) {
         return REGISTRY.contains(id);
     }
-
     public static Collection<TardisExterior> getAll() {
         return REGISTRY.getAll();
     }
-
     public static TardisExterior getDefault() {
         return defaultExterior;
     }
-
     public static int size() {
         return REGISTRY.size();
     }

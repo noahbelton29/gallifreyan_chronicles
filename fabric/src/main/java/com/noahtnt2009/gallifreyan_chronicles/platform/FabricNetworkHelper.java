@@ -1,6 +1,7 @@
 package com.noahtnt2009.gallifreyan_chronicles.platform;
 
 import com.noahtnt2009.gallifreyan_chronicles.network.DimensionSkySyncPayload;
+import com.noahtnt2009.gallifreyan_chronicles.network.TardisConsoleSyncPayload;
 import com.noahtnt2009.gallifreyan_chronicles.network.TardisExteriorSyncPayload;
 import com.noahtnt2009.gallifreyan_chronicles.platform.services.INetworkHelper;
 import net.fabricmc.fabric.api.networking.v1.PlayerLookup;
@@ -30,6 +31,18 @@ public class FabricNetworkHelper implements INetworkHelper {
     public void broadcastDimensionSkySync(MinecraftServer server, DimensionSkySyncPayload payload) {
         for (ServerPlayer player : PlayerLookup.all(server)) {
             sendDimensionSkySync(player, payload);
+        }
+    }
+
+    @Override
+    public void sendTardisConsoleSync(ServerPlayer player, TardisConsoleSyncPayload payload) {
+        ServerPlayNetworking.send(player, payload);
+    }
+
+    @Override
+    public void broadcastTardisConsoleSync(MinecraftServer server, TardisConsoleSyncPayload payload) {
+        for (ServerPlayer player : PlayerLookup.all(server)) {
+            sendTardisConsoleSync(player, payload);
         }
     }
 }

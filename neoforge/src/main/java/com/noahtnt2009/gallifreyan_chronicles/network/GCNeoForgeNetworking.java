@@ -29,6 +29,11 @@ public final class GCNeoForgeNetworking {
                 DimensionSkySyncPayload.STREAM_CODEC,
                 (payload, context) -> context.enqueueWork(payload::apply)
         );
+        registrar.playToClient(
+                TardisConsoleSyncPayload.TYPE,
+                TardisConsoleSyncPayload.STREAM_CODEC,
+                (payload, context) -> context.enqueueWork(payload::apply)
+        );
         Constants.LOG.info("Registered GC Networking");
     }
 
@@ -41,6 +46,7 @@ public final class GCNeoForgeNetworking {
     public static void onPlayerLoggedIn(PlayerEvent.PlayerLoggedInEvent event) {
         if (!(event.getEntity() instanceof ServerPlayer player)) return;
         Services.NETWORK.sendTardisExteriorSync(player, TardisExteriorSyncPayload.create());
+        Services.NETWORK.sendTardisConsoleSync(player, TardisConsoleSyncPayload.create());
         Services.NETWORK.sendDimensionSkySync(player, DimensionSkySyncPayload.create());
     }
 }

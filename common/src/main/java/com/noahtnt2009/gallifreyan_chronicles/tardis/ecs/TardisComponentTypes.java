@@ -9,6 +9,9 @@ public final class TardisComponentTypes {
     public static final ComponentType<ExteriorComponent> EXTERIOR =
             ComponentType.persistentDefaulted("exterior", ExteriorComponent.CODEC, ExteriorComponent::ofDefault);
 
+    public static final ComponentType<ConsoleComponent> CONSOLE =
+            ComponentType.persistentDefaulted("console", ConsoleComponent.CODEC, ConsoleComponent::ofDefault);
+
     public static final ComponentType<DoorComponent> DOOR =
             ComponentType.persistentDefaulted("door", DoorComponent.CODEC, DoorComponent::closed);
 
@@ -21,7 +24,7 @@ public final class TardisComponentTypes {
     public static final ComponentType<GlowComponent> GLOW =
             ComponentType.persistentDefaulted("glow", GlowComponent.CODEC, GlowComponent::off);
 
-    public static final List<ComponentType<?>> ALL = List.of(EXTERIOR, DOOR, TRANSFORM, TARDIS_LINK, GLOW);
+    public static final List<ComponentType<?>> ALL = List.of(EXTERIOR, CONSOLE, DOOR, TRANSFORM, TARDIS_LINK, GLOW);
 
     private TardisComponentTypes() {
     }

@@ -1,6 +1,7 @@
 package com.noahtnt2009.gallifreyan_chronicles.init;
 
 import com.noahtnt2009.gallifreyan_chronicles.Constants;
+import com.noahtnt2009.gallifreyan_chronicles.block.entity.TardisConsoleBlockEntity;
 import com.noahtnt2009.gallifreyan_chronicles.block.entity.TardisExteriorBlockEntity;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.world.level.block.entity.BlockEntityType;
@@ -13,7 +14,9 @@ public class GCBlockEntities {
 
     public static void registerBlockEntities(IEventBus eventBus) {
         TardisExteriorBlockEntity.TYPE = BLOCK_ENTITIES.register("tardis_block_entity", () ->
-                new BlockEntityType<>(TardisExteriorBlockEntity::new, GCBlocks.TARDIS)); // DeferredHolder implements Supplier
+                new BlockEntityType<>(TardisExteriorBlockEntity::new, GCBlocks.TARDIS));
+        TardisConsoleBlockEntity.TYPE = BLOCK_ENTITIES.register("tardis_console_entity", () ->
+                new BlockEntityType<>(TardisConsoleBlockEntity::new, GCBlocks.TARDIS_CONSOLE));
         BLOCK_ENTITIES.register(eventBus);
     }
 }

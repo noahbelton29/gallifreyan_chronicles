@@ -16,6 +16,7 @@ public class GCCreativeModeTabs {
                     .title(Component.translatable("creativetab.gallifreyan_chronicles.tardis"))
                     .displayItems((parameters, output) -> {
                         output.accept(GCBlocks.TARDIS);
+                        output.accept(GCBlocks.TARDIS_CONSOLE);
                     }).build());
 
     public static final CreativeModeTab NATURAL_BLOCKS_TAB = Registry.register(BuiltInRegistries.CREATIVE_MODE_TAB,

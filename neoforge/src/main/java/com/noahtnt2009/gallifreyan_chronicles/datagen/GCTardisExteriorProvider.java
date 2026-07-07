@@ -25,14 +25,11 @@ public class GCTardisExteriorProvider implements DataProvider {
     }
 
     private void registerDefaults() {
-        addExterior("first_doctors_exterior",
-                GCUtils.of("first_doctors_exterior"),
-                GCUtils.of("textures/block/first_doctors_exterior.png"),
-                GCUtils.of("tardis_door/first_doctors_exterior"));
+        addExterior("first_doctors_exterior");
     }
 
-    private void addExterior(String path, Identifier model, Identifier texture, Identifier animation) {
-        exteriors.add(new TardisExterior(GCUtils.ofNamespace(path), model, texture, animation));
+    private void addExterior(String path) {
+        exteriors.add(new TardisExterior(GCUtils.ofNamespace(path)));
     }
 
     @Override

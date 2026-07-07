@@ -1,5 +1,3 @@
 {
-  "animation": "gallifreyan_chronicles:tardis_door/first_doctors_exterior",
-  "model": "gallifreyan_chronicles:first_doctors_exterior",
-  "texture": "gallifreyan_chronicles:textures/block/first_doctors_exterior.png"
+  "id": "gallifreyan_chronicles:first_doctors_exterior"
 }

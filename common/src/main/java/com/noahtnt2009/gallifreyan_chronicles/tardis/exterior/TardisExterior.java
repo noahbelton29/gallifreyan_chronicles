@@ -6,28 +6,19 @@ import com.noahtnt2009.gallifreyan_chronicles.data.IdentifiableData;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
-import net.minecraft.resources.Identifier;
 
-public record TardisExterior(String id, Identifier model, Identifier texture, Identifier animation)
-        implements IdentifiableData<TardisExterior> {
+public record TardisExterior(String id) implements IdentifiableData<TardisExterior> {
     public static final Codec<TardisExterior> CODEC = RecordCodecBuilder.create(inst -> inst.group(
-            Identifier.CODEC.fieldOf("model").forGetter(TardisExterior::model),
-            Identifier.CODEC.fieldOf("texture").forGetter(TardisExterior::texture),
-            Identifier.CODEC.fieldOf("animation").forGetter(TardisExterior::animation)
-    ).apply(inst, (model, texture, animation) ->
-            new TardisExterior("__unset__", model, texture, animation)
-    ));
+            Codec.STRING.fieldOf("id").forGetter(TardisExterior::id)
+    ).apply(inst, TardisExterior::new));
 
     public static final StreamCodec<FriendlyByteBuf, TardisExterior> STREAM_CODEC = StreamCodec.composite(
             ByteBufCodecs.STRING_UTF8, TardisExterior::id,
-            Identifier.STREAM_CODEC, TardisExterior::model,
-            Identifier.STREAM_CODEC, TardisExterior::texture,
-            Identifier.STREAM_CODEC, TardisExterior::animation,
             TardisExterior::new
     );
 
     @Override
     public TardisExterior withId(String id) {
-        return new TardisExterior(id, model, texture, animation);
+        return new TardisExterior(id);
     }
 }

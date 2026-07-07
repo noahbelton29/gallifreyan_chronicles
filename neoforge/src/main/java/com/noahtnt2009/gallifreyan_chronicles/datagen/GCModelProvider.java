@@ -89,6 +89,7 @@ public class GCModelProvider extends ModelProvider {
         blockModels.createParticleOnlyBlock(GCBlocks.TARDIS);
         blockModels.createParticleOnlyBlock(GCBlocks.TARDIS_CONSOLE);
         itemModels.generateFlatItem(GCBlocks.TARDIS.asItem(), ModelTemplates.FLAT_ITEM);
+        itemModels.generateFlatItem(GCBlocks.TARDIS_CONSOLE.asItem(), ModelTemplates.FLAT_ITEM);
 
         registerGrassBlock(blockModels);
         registerCadonwoodSet(blockModels);

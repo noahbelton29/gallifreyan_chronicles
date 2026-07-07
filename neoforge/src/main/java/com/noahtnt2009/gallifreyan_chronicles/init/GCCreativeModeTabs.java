@@ -19,6 +19,7 @@ public class GCCreativeModeTabs {
                     .title(Component.translatable("creativetab.gallifreyan_chronicles.tardis"))
                     .displayItems((params, output) -> {
                         output.accept(GCBlocks.TARDIS);
+                        output.accept(GCBlocks.TARDIS_CONSOLE);
                     }).build());
 
     public static final Supplier<CreativeModeTab> NATURAL_BLOCKS_TAB = CREATIVE_MODE_TABS.register("natural_blocks",

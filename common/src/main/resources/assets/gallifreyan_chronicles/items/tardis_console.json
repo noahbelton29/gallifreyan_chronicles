@@ -1,6 +1,6 @@
 {
   "model": {
     "type": "minecraft:model",
-    "model": "gallifreyan_chronicles:block/tardis_console"
+    "model": "gallifreyan_chronicles:item/tardis_console"
   }
 }

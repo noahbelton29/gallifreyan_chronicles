@@ -20,7 +20,7 @@ public class GCTardisExteriorProvider implements DataProvider {
     private final List<TardisExterior> exteriors = new ArrayList<>();
 
     public GCTardisExteriorProvider(PackOutput output) {
-        this.pathProvider = output.createPathProvider(PackOutput.Target.DATA_PACK, "tardis_exteriors");
+        this.pathProvider = output.createPathProvider(PackOutput.Target.DATA_PACK, "tardis_exterior");
         registerDefaults();
     }
 

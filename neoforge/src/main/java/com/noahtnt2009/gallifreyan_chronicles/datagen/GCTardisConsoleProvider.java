@@ -20,7 +20,7 @@ public class GCTardisConsoleProvider implements DataProvider {
     private final List<TardisConsole> consoles = new ArrayList<>();
 
     public GCTardisConsoleProvider(PackOutput output) {
-        this.pathProvider = output.createPathProvider(PackOutput.Target.DATA_PACK, "tardis_consoles");
+        this.pathProvider = output.createPathProvider(PackOutput.Target.DATA_PACK, "tardis_console");
         registerDefaults();
     }
 

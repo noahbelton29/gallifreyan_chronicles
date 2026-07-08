@@ -7,7 +7,7 @@ import net.minecraft.server.MinecraftServer;
 
 public class TardisConsoleLoader extends GCJsonReloadListener<TardisConsole> {
     public TardisConsoleLoader() {
-        super(TardisConsole.CODEC, "tardis_consoles", "TARDIS Console");
+        super(TardisConsole.CODEC, "tardis_console", "TARDIS Console");
     }
 
     @Override

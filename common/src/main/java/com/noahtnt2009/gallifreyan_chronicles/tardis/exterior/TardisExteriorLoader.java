@@ -7,7 +7,7 @@ import net.minecraft.server.MinecraftServer;
 
 public class TardisExteriorLoader extends GCJsonReloadListener<TardisExterior> {
     public TardisExteriorLoader() {
-        super(TardisExterior.CODEC, "tardis_exteriors", "TARDIS Exterior");
+        super(TardisExterior.CODEC, "tardis_exterior", "TARDIS Exterior");
     }
 
     @Override

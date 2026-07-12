@@ -35,9 +35,9 @@ public class FlightLeverControl implements TardisControl {
         Constants.LOG.info("Flight lever state changed to: {}", activated);
 
         if (activated) {
-            console.triggerRotorAnimation("flight");
+            console.triggerRotorAnimation("rotor_flight");
         } else {
-            console.triggerRotorAnimation("ideal");
+            console.triggerRotorAnimation("rotor_idle");
         }
     }
 }

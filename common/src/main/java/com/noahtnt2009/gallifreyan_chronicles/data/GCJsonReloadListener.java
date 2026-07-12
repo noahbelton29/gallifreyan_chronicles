@@ -27,10 +27,10 @@ public abstract class GCJsonReloadListener<T extends IdentifiableData<T>>
     public static void setCurrentServer(MinecraftServer server) {
         currentServer = server;
     }
-//
-//    public static MinecraftServer getCurrentServer() {
-//        return currentServer;
-//    }
+
+    public static MinecraftServer getCurrentServer() {
+        return currentServer;
+    }
 
     @Override
     protected final void apply(Map<Identifier, T> resources, @NonNull ResourceManager manager,

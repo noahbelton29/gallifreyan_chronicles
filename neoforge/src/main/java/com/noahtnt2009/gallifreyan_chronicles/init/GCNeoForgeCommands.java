@@ -39,7 +39,7 @@ public class GCNeoForgeCommands {
                                                         .executes(TardisCommand::getExterior))
                                                 .then(literal("set")
                                                         .then(argument("exterior_id", StringArgumentType.greedyString())
-                                                                .suggests((ctx, builder) -> {
+                                                                .suggests((_, builder) -> {
                                                                     TardisExteriorRegistry.getAll()
                                                                             .forEach(e -> builder.suggest(e.id()));
                                                                     return builder.buildFuture();
@@ -54,7 +54,7 @@ public class GCNeoForgeCommands {
                                                         .executes(TardisCommand::getConsole))
                                                 .then(literal("set")
                                                         .then(argument("console_id", StringArgumentType.greedyString())
-                                                                .suggests((ctx, builder) -> {
+                                                                .suggests((_, builder) -> {
                                                                     TardisConsoleRegistry.getAll()
                                                                             .forEach(e -> builder.suggest(e.id()));
                                                                     return builder.buildFuture();
@@ -86,7 +86,8 @@ public class GCNeoForgeCommands {
                                                             .forEach(id -> builder.suggest(id.toString()));
                                                     return builder.buildFuture();
                                                 })
-                                                .executes(TardisCommand::debugTardis))))
-        ));
+                                                .executes(TardisCommand::debugTardis)))
+                                .then(literal("controls")
+                                        .executes(TardisCommand::listControls)))));
     }
 }

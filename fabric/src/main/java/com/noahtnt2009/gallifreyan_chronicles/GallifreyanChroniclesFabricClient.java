@@ -1,13 +1,16 @@
 package com.noahtnt2009.gallifreyan_chronicles;
 
 import com.noahtnt2009.gallifreyan_chronicles.client.renderer.TardisConsoleBlockRenderer;
+import com.noahtnt2009.gallifreyan_chronicles.client.renderer.TardisControlEntityRenderer;
 import com.noahtnt2009.gallifreyan_chronicles.client.renderer.TardisExteriorBlockRenderer;
 import com.noahtnt2009.gallifreyan_chronicles.init.GCBlockEntities;
 import com.noahtnt2009.gallifreyan_chronicles.init.GCBlocks;
+import com.noahtnt2009.gallifreyan_chronicles.init.GCEntityTypes;
 import com.noahtnt2009.gallifreyan_chronicles.network.client.GCFabricClientNetworking;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.registry.StrippableBlockRegistry;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderers;
+import net.minecraft.client.renderer.entity.EntityRenderers;
 
 public class GallifreyanChroniclesFabricClient implements ClientModInitializer {
     @Override
@@ -22,6 +25,7 @@ public class GallifreyanChroniclesFabricClient implements ClientModInitializer {
         StrippableBlockRegistry.register(GCBlocks.CADONWOOD_LOG, GCBlocks.STRIPPED_CADONWOOD_LOG);
         BlockEntityRenderers.register(GCBlockEntities.TARDIS_EXTERIOR_BLOCK_ENTITY_TYPE, TardisExteriorBlockRenderer::new);
         BlockEntityRenderers.register(GCBlockEntities.TARDIS_CONSOLE_BLOCK_ENTITY_TYPE, TardisConsoleBlockRenderer::new);
+        EntityRenderers.register(GCEntityTypes.TARDIS_CONTROL_ENTITY_TYPE, TardisControlEntityRenderer::new);
         GCFabricClientNetworking.registerClientNetworking();
 
 //        ImGuiMCEvents.INSTANCE.imGuiLoadPre(() -> {

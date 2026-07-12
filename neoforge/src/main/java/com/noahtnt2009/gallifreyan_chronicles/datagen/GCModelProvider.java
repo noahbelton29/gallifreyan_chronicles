@@ -99,6 +99,7 @@ public class GCModelProvider extends ModelProvider {
         itemModels.generateFlatItem(GCItems.TARANIUM_CRYSTAL, ModelTemplates.FLAT_ITEM);
         itemModels.generateFlatItem(GCItems.REFINED_TARANIUM_CRYSTAL, ModelTemplates.FLAT_ITEM);
         itemModels.generateFlatItem(GCItems.TARANIUM_INGOT, ModelTemplates.FLAT_ITEM);
+        itemModels.generateFlatItem(GCItems.RAW_TIN, ModelTemplates.FLAT_ITEM);
         itemModels.generateFlatItem(GCItems.TARANIUM_SWORD, ModelTemplates.FLAT_HANDHELD_ITEM);
         itemModels.generateFlatItem(GCItems.TARANIUM_PICKAXE, ModelTemplates.FLAT_HANDHELD_ITEM);
         itemModels.generateFlatItem(GCItems.TARANIUM_SHOVEL, ModelTemplates.FLAT_HANDHELD_ITEM);

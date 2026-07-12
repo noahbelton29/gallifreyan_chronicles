@@ -4,7 +4,9 @@ import com.noahtnt2009.gallifreyan_chronicles.Constants;
 import com.noahtnt2009.gallifreyan_chronicles.block.entity.TardisConsoleBlockEntity;
 import com.noahtnt2009.gallifreyan_chronicles.block.entity.TardisExteriorBlockEntity;
 import com.noahtnt2009.gallifreyan_chronicles.client.renderer.TardisConsoleBlockRenderer;
+import com.noahtnt2009.gallifreyan_chronicles.client.renderer.TardisControlEntityRenderer;
 import com.noahtnt2009.gallifreyan_chronicles.client.renderer.TardisExteriorBlockRenderer;
+import com.noahtnt2009.gallifreyan_chronicles.init.GCEntityTypes;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
@@ -17,5 +19,6 @@ public class NeoForgeClientRenderers {
     public static void registerRenderers(EntityRenderersEvent.RegisterRenderers event) {
         event.registerBlockEntityRenderer(TardisExteriorBlockEntity.TYPE.get(), TardisExteriorBlockRenderer::new);
         event.registerBlockEntityRenderer(TardisConsoleBlockEntity.TYPE.get(), TardisConsoleBlockRenderer::new);
+        event.registerEntityRenderer(GCEntityTypes.TARDIS_CONTROL_ENTITY_TYPE.get(), TardisControlEntityRenderer::new);
     }
 }

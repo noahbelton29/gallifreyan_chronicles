@@ -8,6 +8,7 @@
     "LogoRendererMixin",
     "MinecraftAtlasManagerAccessor",
     "SkyRendererInvoker",
+    "client.DebugRendererMixin",
     "client.SkyRendererMixin"
   ],
   "server": [],

@@ -9,6 +9,7 @@ public class GallifreyanChroniclesFabric implements ModInitializer {
     public void onInitialize() {
         Constants.LOG.info("Hello Fabric world!");
         GCCommands.registerCommands();
+        GCEntityTypes.registerEntityTypes();
         GCBlockEntities.registerBlockEntities();
         GCEvents.registerEvents();
         GCCreativeModeTabs.registerFabricCreativeModeTabs();

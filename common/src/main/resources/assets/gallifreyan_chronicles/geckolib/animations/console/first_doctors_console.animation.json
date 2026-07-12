@@ -81,7 +81,7 @@
 			"loop": "hold_on_last_frame",
 			"animation_length": 0.25
 		},
-		"flight": {
+		"rotor_flight": {
 			"loop": true,
 			"animation_length": 4.24,
 			"bones": {
@@ -162,7 +162,7 @@
 				}
 			}
 		},
-		"ideal": {
+		"rotor_idle": {
 			"loop": true,
 			"animation_length": 4.24,
 			"bones": {

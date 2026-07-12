@@ -5,6 +5,8 @@ import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.context.CommandContext;
 import com.noahtnt2009.gallifreyan_chronicles.block.entity.TardisConsoleBlockEntity;
 import com.noahtnt2009.gallifreyan_chronicles.block.entity.TardisExteriorBlockEntity;
+import com.noahtnt2009.gallifreyan_chronicles.network.TardisConsoleSyncPayload;
+import com.noahtnt2009.gallifreyan_chronicles.platform.Services;
 import com.noahtnt2009.gallifreyan_chronicles.tardis.console.TardisConsole;
 import com.noahtnt2009.gallifreyan_chronicles.tardis.console.TardisConsoleRegistry;
 import com.noahtnt2009.gallifreyan_chronicles.tardis.ecs.component.TardisComponent;
@@ -185,6 +187,15 @@ public class TardisCommand {
                     tardisIdStr
             ));
             return 0;
+        }
+
+        ServerPlayer sourcePlayer = ctx.getSource().getPlayer();
+        if (sourcePlayer != null) {
+            // setConsole only mutates the block entity's ECS state; it never sends a
+            // TardisConsoleSyncPayload the way /reload does. Without this, the client's
+            // GeckoLib model cache never gets told to reload, so a newly added console's
+            // model/texture/animation won't render until the next /reload or a rejoin.
+            Services.NETWORK.sendTardisConsoleSync(sourcePlayer, TardisConsoleSyncPayload.create());
         }
 
         ctx.getSource().sendSuccess(

@@ -58,8 +58,18 @@ public class GCLanguageProvider extends LanguageProvider {
         add("command.gallifreyan_chronicles.no_tardis_id", "No TARDIS found with ID: %s");
 
         add("command.gallifreyan_chronicles.set_exterior", "Set exterior of %s to %s");
+        add("command.gallifreyan_chronicles.set_console", "Set exterior of %s to %s");
         add("command.gallifreyan_chronicles.get_exterior", "Exterior of %s: %s");
+        add("command.gallifreyan_chronicles.get_console", "Exterior of %s: %s");
+        add("command.gallifreyan_chronicles.unlink_console", "Console unlinked from TARDIS ID: %s");
+        add("command.gallifreyan_chronicles.link_console", "Console linked to TARDIS ID: %s");
+        add("command.gallifreyan_chronicles.unlink_exterior", "Exterior unlinked from TARDIS ID: %s");
+        add("command.gallifreyan_chronicles.link_exterior", "Exterior linked to TARDIS ID: %s");
         add("command.gallifreyan_chronicles.set_glow", "Set glow of %s to %s");
+        add("command.gallifreyan_chronicles.no_console", "No Console found for Console ID: %s.");
+
+        add("command.gallifreyan_chronicles.not_looking_at_exterior", "No Exterior found in viewport.");
+        add("command.gallifreyan_chronicles.not_looking_at_console", "No Console found in viewport.");
 
         add("command.gallifreyan_chronicles.no_tardises", "No TARDISes found.");
         add("command.gallifreyan_chronicles.list_tardis", "%s | exterior: %s | pos: %s");

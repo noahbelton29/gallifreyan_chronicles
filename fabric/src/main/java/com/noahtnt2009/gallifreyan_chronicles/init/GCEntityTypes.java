@@ -14,8 +14,6 @@ public class GCEntityTypes {
     public static EntityType<TardisControlEntity> TARDIS_CONTROL_ENTITY_TYPE;
 
     public static void registerEntityTypes() {
-        Constants.LOG.info("Registered GC Entity Types");
-
         ResourceKey<EntityType<?>> key = ResourceKey.create(Registries.ENTITY_TYPE, GCUtils.of("tardis_control"));
 
         TARDIS_CONTROL_ENTITY_TYPE = Registry.register(
@@ -29,5 +27,7 @@ public class GCEntityTypes {
         );
 
         TardisControlEntity.TYPE = () -> TARDIS_CONTROL_ENTITY_TYPE;
+
+        Constants.LOG.info("Registered GC Entity Types");
     }
 }

@@ -1,5 +1,6 @@
 package com.noahtnt2009.gallifreyan_chronicles.init;
 
+import com.noahtnt2009.gallifreyan_chronicles.Constants;
 import com.noahtnt2009.gallifreyan_chronicles.client.sky.data.DimensionSkyLoader;
 import com.noahtnt2009.gallifreyan_chronicles.loader.GCFabricLoaders;
 import com.noahtnt2009.gallifreyan_chronicles.tardis.console.TardisConsoleLoader;
@@ -19,5 +20,7 @@ public class GCResourceLoaders {
         GCFabricLoaders.register(
                 GCUtils.of("dimension_sky"),
                 new DimensionSkyLoader());
+
+        Constants.LOG.info("Registered GC Resource Loaders (Fabric)");
     }
 }

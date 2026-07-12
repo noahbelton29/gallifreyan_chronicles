@@ -25,6 +25,6 @@ public final class GCFabricNetworking {
             sender.sendPacket(DimensionSkySyncPayload.create());
         });
 
-        Constants.LOG.info("Registered GC networking (Fabric)");
+        Constants.LOG.info("Registered GC Networking (Fabric)");
     }
 }

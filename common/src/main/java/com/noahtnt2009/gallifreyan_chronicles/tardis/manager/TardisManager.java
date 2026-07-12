@@ -14,42 +14,45 @@ import org.jspecify.annotations.Nullable;
 import java.util.*;
 
 public class TardisManager extends SavedData {
-    private record Entry(TardisComponent component, BlockPos blockPos, BlockPos consoleBlockPos, BlockPos exteriorBlockPos) {
+    private record Entry(TardisComponent component, Optional<BlockPos> blockPos,
+                         Optional<BlockPos> consoleBlockPos, Optional<BlockPos> exteriorBlockPos) {
     }
 
     private static final Codec<Entry> ENTRY_CODEC = RecordCodecBuilder.create(inst -> inst.group(
             TardisComponent.CODEC.fieldOf("tardis").forGetter(Entry::component),
-            BlockPos.CODEC.optionalFieldOf("block_pos", null).forGetter(Entry::blockPos),
-            BlockPos.CODEC.optionalFieldOf("console_block_pos", null).forGetter(Entry::consoleBlockPos),
-            BlockPos.CODEC.optionalFieldOf("exterior_block_pos", null).forGetter(Entry::exteriorBlockPos)
+            BlockPos.CODEC.optionalFieldOf("block_pos").forGetter(Entry::blockPos),
+            BlockPos.CODEC.optionalFieldOf("console_block_pos").forGetter(Entry::consoleBlockPos),
+            BlockPos.CODEC.optionalFieldOf("exterior_block_pos").forGetter(Entry::exteriorBlockPos)
     ).apply(inst, Entry::new));
 
     public static final Codec<TardisManager> CODEC = RecordCodecBuilder.create(inst -> inst.group(
-            ENTRY_CODEC.listOf().fieldOf("tardises").forGetter(m -> m.byTardisId.values().stream()
-                    .map(c -> new Entry(
-                            c,
-                            m.blockPosById.get(c.getTardisId()),
-                            m.consoleBlockPosById.get(c.getTardisId()),
-                            m.exteriorBlockPosById.get(c.getTardisId())
-                    ))
-                    .toList())
+            ENTRY_CODEC.listOf().fieldOf("tardises").forGetter(manager -> {
+                List<Entry> entries = new ArrayList<>();
+                for (TardisComponent component : manager.byTardisId.values()) {
+                    UUID id = component.getTardisId();
+                    entries.add(new Entry(
+                            component,
+                            Optional.ofNullable(manager.blockPosById.get(id)),
+                            Optional.ofNullable(manager.consoleBlockPosById.get(id)),
+                            Optional.ofNullable(manager.exteriorBlockPosById.get(id))
+                    ));
+                }
+                return entries;
+            })
     ).apply(inst, entries -> {
         TardisManager manager = new TardisManager();
         for (Entry entry : entries) {
             TardisComponent component = entry.component();
-            manager.byTardisId.put(component.getTardisId(), component);
+            UUID id = component.getTardisId();
+
+            manager.byTardisId.put(id, component);
             manager.byOwnerId
                     .computeIfAbsent(component.getOwnerId(), ignored -> new ArrayList<>())
-                    .add(component.getTardisId());
-            if (entry.blockPos() != null) {
-                manager.blockPosById.put(component.getTardisId(), entry.blockPos());
-            }
-            if (entry.consoleBlockPos() != null) {
-                manager.consoleBlockPosById.put(component.getTardisId(), entry.consoleBlockPos());
-            }
-            if (entry.exteriorBlockPos() != null) {
-                manager.exteriorBlockPosById.put(component.getTardisId(), entry.exteriorBlockPos());
-            }
+                    .add(id);
+
+            entry.blockPos().ifPresent(pos -> manager.blockPosById.put(id, pos));
+            entry.consoleBlockPos().ifPresent(pos -> manager.consoleBlockPosById.put(id, pos));
+            entry.exteriorBlockPos().ifPresent(pos -> manager.exteriorBlockPosById.put(id, pos));
         }
         return manager;
     }));
@@ -68,6 +71,9 @@ public class TardisManager extends SavedData {
     private final Map<UUID, BlockPos> exteriorBlockPosById = new HashMap<>();
 
     public Optional<TardisComponent> get(UUID tardisId) {
+        if (tardisId == null) {
+            return Optional.empty();
+        }
         return Optional.ofNullable(byTardisId.get(tardisId));
     }
 

@@ -47,7 +47,7 @@ public final class ConsoleLinkSystem {
     public static void spawnAndLink(ServerLevel level, UUID tardisId, BlockPos exteriorPos) {
         TardisManager manager = TardisManager.get(level.getServer());
         if (manager.getConsoleBlockPos(tardisId) != null) {
-            resolve(level, tardisId);
+            resolve(level, tardisId).ifPresent(console -> console.linkToTardis(tardisId));
             return;
         }
 
@@ -88,4 +88,3 @@ public final class ConsoleLinkSystem {
         return exteriorPos.offset(CONSOLE_OFFSET_DISTANCE, 0, 0);
     }
 }
-

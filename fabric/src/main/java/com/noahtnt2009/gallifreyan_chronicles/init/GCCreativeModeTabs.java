@@ -101,6 +101,6 @@ public class GCCreativeModeTabs {
                     }).build());
 
     public static void registerFabricCreativeModeTabs() {
-        Constants.LOG.info("Registering GC Creative Mode Tabs");
+        Constants.LOG.info("Registering GC Creative Mode Tabs (Fabric)");
     }
 }

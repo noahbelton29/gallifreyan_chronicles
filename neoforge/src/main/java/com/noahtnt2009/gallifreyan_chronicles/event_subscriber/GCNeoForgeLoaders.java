@@ -21,15 +21,9 @@ public final class GCNeoForgeLoaders {
     private static final Map<Identifier, Supplier<GCJsonReloadListener<?>>> LOADERS =
             new LinkedHashMap<>();
 
-    static {
-        register("tardis_exteriors", TardisExteriorLoader::new);
-        register("tardis_consoles", TardisConsoleLoader::new);
-        register("dimension_sky", DimensionSkyLoader::new);
-    }
-
     private GCNeoForgeLoaders() {}
 
-    private static void register(String path, Supplier<GCJsonReloadListener<?>> factory) {
+    public static void register(String path, Supplier<GCJsonReloadListener<?>> factory) {
         LOADERS.put(GCUtils.of(path), factory);
     }
 
@@ -37,7 +31,7 @@ public final class GCNeoForgeLoaders {
     public static void onAddReloadListeners(AddServerReloadListenersEvent event) {
         for (Map.Entry<Identifier, Supplier<GCJsonReloadListener<?>>> entry : LOADERS.entrySet()) {
             event.addListener(entry.getKey(), entry.getValue().get());
-            Constants.LOG.info("Registered GC NeoForge reload listener: {}", entry.getKey());
+            Constants.LOG.info("Registered GC NeoForge Reload Listener: {}", entry.getKey());
         }
     }
 }

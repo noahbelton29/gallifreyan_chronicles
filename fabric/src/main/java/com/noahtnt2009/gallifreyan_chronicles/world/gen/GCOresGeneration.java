@@ -1,5 +1,6 @@
 package com.noahtnt2009.gallifreyan_chronicles.world.gen;
 
+import com.noahtnt2009.gallifreyan_chronicles.Constants;
 import com.noahtnt2009.gallifreyan_chronicles.init.GCDimensions;
 import com.noahtnt2009.gallifreyan_chronicles.world.GCPlacedFeatures;
 import net.fabricmc.fabric.api.biome.v1.BiomeModifications;
@@ -37,5 +38,7 @@ public class GCOresGeneration {
                 GenerationStep.Decoration.UNDERGROUND_ORES,
                 GCPlacedFeatures.GRAVEL_GALLIFREY_ORES_KEY
         );
+
+        Constants.LOG.info("Registered GC Ore Generation (Fabric)");
     }
 }

@@ -14,6 +14,6 @@ public class GCGameRuleCategories {
     }
 
     public static void registerGameRuleCategories() {
-        Constants.LOG.info("GC Registered Game Rule Categories");
+        Constants.LOG.info("Registered GC Game Rule Categories");
     }
 }

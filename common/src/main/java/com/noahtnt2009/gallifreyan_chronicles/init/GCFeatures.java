@@ -15,6 +15,6 @@ public class GCFeatures {
                     new GCBoulderFeature());
 
     public static void registerFeatures() {
-        Constants.LOG.info("GC Features registered");
+        Constants.LOG.info("Registered GC Features");
     }
 }

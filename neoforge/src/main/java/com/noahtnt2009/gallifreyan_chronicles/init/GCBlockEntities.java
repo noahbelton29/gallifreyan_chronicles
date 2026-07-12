@@ -18,5 +18,7 @@ public class GCBlockEntities {
         TardisConsoleBlockEntity.TYPE = BLOCK_ENTITIES.register("tardis_console_entity", () ->
                 new BlockEntityType<>(TardisConsoleBlockEntity::new, GCBlocks.TARDIS_CONSOLE));
         BLOCK_ENTITIES.register(eventBus);
+
+        Constants.LOG.info("Registered GC Block Entities (NeoForge)");
     }
 }

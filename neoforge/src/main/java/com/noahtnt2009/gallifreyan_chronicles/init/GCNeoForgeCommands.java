@@ -2,6 +2,7 @@ package com.noahtnt2009.gallifreyan_chronicles.init;
 
 import com.mojang.brigadier.arguments.BoolArgumentType;
 import com.mojang.brigadier.arguments.StringArgumentType;
+import com.mojang.datafixers.kinds.Const;
 import com.noahtnt2009.gallifreyan_chronicles.Constants;
 import com.noahtnt2009.gallifreyan_chronicles.command.TardisCommand;
 import com.noahtnt2009.gallifreyan_chronicles.tardis.console.TardisConsoleRegistry;
@@ -89,5 +90,7 @@ public class GCNeoForgeCommands {
                                                 .executes(TardisCommand::debugTardis)))
                                 .then(literal("controls")
                                         .executes(TardisCommand::listControls)))));
+
+        Constants.LOG.info("Registered GC Commands (NeoForge)");
     }
 }

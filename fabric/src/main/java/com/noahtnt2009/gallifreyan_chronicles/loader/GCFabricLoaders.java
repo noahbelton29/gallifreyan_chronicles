@@ -11,6 +11,6 @@ public final class GCFabricLoaders {
 
     public static void register(Identifier id, GCJsonReloadListener<?> loader) {
         ResourceLoader.get(PackType.SERVER_DATA).registerReloadListener(id, loader);
-        Constants.LOG.info("Registered GC Fabric reload listener: {}", id);
+        Constants.LOG.info("Registered GC Fabric Reload Listener: {}", id);
     }
 }

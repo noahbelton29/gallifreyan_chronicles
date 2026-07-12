@@ -18,7 +18,6 @@ import static net.minecraft.commands.Commands.literal;
 
 public class GCCommands {
     public static void registerCommands() {
-        Constants.LOG.info("Registered GC Commands");
         CommandRegistrationCallback.EVENT.register((dispatcher, _, _) -> {
             dispatcher.register(
                     literal("gc")
@@ -89,5 +88,7 @@ public class GCCommands {
                                             .executes(TardisCommand::listControls)))
             ));
         });
+
+        Constants.LOG.info("Registered GC Commands (Fabric)");
     }
 }

@@ -20,5 +20,7 @@ public class NeoForgeClientRenderers {
         event.registerBlockEntityRenderer(TardisExteriorBlockEntity.TYPE.get(), TardisExteriorBlockRenderer::new);
         event.registerBlockEntityRenderer(TardisConsoleBlockEntity.TYPE.get(), TardisConsoleBlockRenderer::new);
         event.registerEntityRenderer(GCEntityTypes.TARDIS_CONTROL_ENTITY_TYPE.get(), TardisControlEntityRenderer::new);
+
+        Constants.LOG.info("Registered GC Client Renderers (NeoForge)");
     }
 }

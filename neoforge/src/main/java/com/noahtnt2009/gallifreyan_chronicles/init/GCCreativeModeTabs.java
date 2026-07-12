@@ -101,6 +101,6 @@ public class GCCreativeModeTabs {
 
     public static void registerNeoForgeCreativeModeTabs(IEventBus eventBus) {
         CREATIVE_MODE_TABS.register(eventBus);
-        Constants.LOG.info("Registering GC Creative Mode Tabs");
+        Constants.LOG.info("Registering GC Creative Mode Tabs (NeoForge)");
     }
 }

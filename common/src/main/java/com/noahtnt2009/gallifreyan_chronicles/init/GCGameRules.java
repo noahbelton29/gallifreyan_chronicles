@@ -38,6 +38,6 @@ public class GCGameRules {
     }
 
     public static void registerGameRules() {
-        Constants.LOG.info("GC Registered Game Rules");
+        Constants.LOG.info("Registered GC Game Rules");
     }
 }

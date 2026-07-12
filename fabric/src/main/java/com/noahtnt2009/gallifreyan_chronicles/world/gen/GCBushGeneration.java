@@ -1,5 +1,6 @@
 package com.noahtnt2009.gallifreyan_chronicles.world.gen;
 
+import com.noahtnt2009.gallifreyan_chronicles.Constants;
 import com.noahtnt2009.gallifreyan_chronicles.init.GCBiomes;
 import com.noahtnt2009.gallifreyan_chronicles.world.GCPlacedFeatures;
 import net.fabricmc.fabric.api.biome.v1.BiomeModifications;
@@ -17,5 +18,7 @@ public class GCBushGeneration {
         BiomeModifications.addFeature(BiomeSelectors.includeByKey(GCBiomes.GALLIFREYAN_PLAINS), GenerationStep.Decoration.VEGETAL_DECORATION, GCPlacedFeatures.PATCH_GALLIFREY_GRASS_PLAIN);
         BiomeModifications.addFeature(BiomeSelectors.includeByKey(GCBiomes.GALLIFREYAN_PLAINS), GenerationStep.Decoration.VEGETAL_DECORATION, GCPlacedFeatures.PATCH_GALLIFREY_TALL_GRASS_PLAIN);
         BiomeModifications.addFeature(BiomeSelectors.includeByKey(GCBiomes.GALLIFREYAN_PLAINS), GenerationStep.Decoration.VEGETAL_DECORATION, GCPlacedFeatures.PATCH_GALLIFREY_TALL_GRASS_PLAIN_2);
+
+        Constants.LOG.info("Registered GC Bush Generation (Fabric)");
     }
 }

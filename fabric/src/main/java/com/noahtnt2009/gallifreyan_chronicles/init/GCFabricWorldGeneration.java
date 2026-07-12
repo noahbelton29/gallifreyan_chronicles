@@ -8,10 +8,10 @@ import com.noahtnt2009.gallifreyan_chronicles.world.gen.GCTreeGeneration;
 
 public class GCFabricWorldGeneration {
     public static void registerWorldGeneration() {
-        Constants.LOG.info("Registered GC World Generation");
         GCTreeGeneration.generateTrees();
         GCBushGeneration.generateBushes();
         GCOresGeneration.generateOres();
         GCSurfaceGeneration.generateSurface();
+        Constants.LOG.info("Registered GC World Generation");
     }
 }

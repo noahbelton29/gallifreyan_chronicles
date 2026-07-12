@@ -1,8 +1,10 @@
 package com.noahtnt2009.gallifreyan_chronicles.network;
 
+import com.noahtnt2009.gallifreyan_chronicles.tardis.console.TardisConsole;
 import com.noahtnt2009.gallifreyan_chronicles.tardis.exterior.TardisExterior;
 import com.noahtnt2009.gallifreyan_chronicles.tardis.exterior.TardisExteriorRegistry;
 import com.noahtnt2009.gallifreyan_chronicles.util.GCUtils;
+import net.minecraft.client.Minecraft;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
@@ -10,6 +12,8 @@ import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import org.jspecify.annotations.NonNull;
 
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 public record TardisExteriorSyncPayload(List<TardisExterior> exteriors, String defaultId) implements CustomPacketPayload {
     public static final Type<TardisExteriorSyncPayload> TYPE =
@@ -32,9 +36,22 @@ public record TardisExteriorSyncPayload(List<TardisExterior> exteriors, String d
     }
 
     public void apply() {
+        Set<String> previousIds = TardisExteriorRegistry.getAll().stream()
+                .map(TardisExterior::id)
+                .collect(Collectors.toSet());
+
         GCSyncPayload.apply(exteriors, TardisExteriorRegistry::clear, TardisExteriorRegistry::register, "TARDIS Exterior");
         if (defaultId != null && TardisExteriorRegistry.contains(defaultId)) {
             TardisExteriorRegistry.setDefault(TardisExteriorRegistry.get(defaultId));
+        }
+
+        Set<String> newIds = exteriors.stream()
+                .map(TardisExterior::id)
+                .collect(Collectors.toSet());
+
+        if (!newIds.equals(previousIds)) {
+            Minecraft mc = Minecraft.getInstance();
+            mc.execute(mc::reloadResourcePacks);
         }
     }
 

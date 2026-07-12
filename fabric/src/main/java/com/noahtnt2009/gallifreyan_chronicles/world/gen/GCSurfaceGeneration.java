@@ -1,5 +1,6 @@
 package com.noahtnt2009.gallifreyan_chronicles.world.gen;
 
+import com.noahtnt2009.gallifreyan_chronicles.Constants;
 import com.noahtnt2009.gallifreyan_chronicles.init.GCBiomes;
 import com.noahtnt2009.gallifreyan_chronicles.world.GCPlacedFeatures;
 import net.fabricmc.fabric.api.biome.v1.BiomeModifications;
@@ -19,5 +20,7 @@ public class GCSurfaceGeneration {
 
         BiomeModifications.addFeature(BiomeSelectors.includeByKey(GCBiomes.MOON),
                 GenerationStep.Decoration.TOP_LAYER_MODIFICATION, GCPlacedFeatures.MOON_BOULDER);
+
+        Constants.LOG.info("Registered GC Surface Generation (Fabric)");
     }
 }

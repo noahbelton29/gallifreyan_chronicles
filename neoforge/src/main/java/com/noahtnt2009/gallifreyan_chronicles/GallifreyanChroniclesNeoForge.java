@@ -1,9 +1,6 @@
 package com.noahtnt2009.gallifreyan_chronicles;
 
-import com.noahtnt2009.gallifreyan_chronicles.init.GCBlockEntities;
-import com.noahtnt2009.gallifreyan_chronicles.init.GCCreativeModeTabs;
-import com.noahtnt2009.gallifreyan_chronicles.init.GCEntityTypes;
-import com.noahtnt2009.gallifreyan_chronicles.init.GCEvents;
+import com.noahtnt2009.gallifreyan_chronicles.init.*;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.fml.common.Mod;
 import net.neoforged.fml.event.lifecycle.FMLClientSetupEvent;
@@ -16,6 +13,7 @@ public class GallifreyanChroniclesNeoForge {
         GCBlockEntities.registerBlockEntities(eventBus);
         GCEvents.registerEvents();
         GCCreativeModeTabs.registerNeoForgeCreativeModeTabs(eventBus);
+        GCResourceLoaders.registerResourceLoaders();
         eventBus.addListener(this::onRegister);
         eventBus.addListener(this::onClientSetup);
     }

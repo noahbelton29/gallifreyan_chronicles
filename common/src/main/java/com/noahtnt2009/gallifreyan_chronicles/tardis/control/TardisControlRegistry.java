@@ -8,11 +8,6 @@ import java.util.Map;
 
 public class TardisControlRegistry {
     private static final Map<String, TardisControl> CONTROLS = new HashMap<>();
-    
-    static {
-        register("flight_lever", new FlightLeverControl());
-        register("handbrake", new HandbrakeControl());
-    }
 
     public static void register(String id, TardisControl control) {
         CONTROLS.put(id, control);

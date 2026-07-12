@@ -27,7 +27,7 @@ public class GCEntityTypes {
                                     GCUtils.of("tardis_control"))));
 
     public static void registerEntityTypes(IEventBus eventBus) {
-        Constants.LOG.info("Registered GC Entity Types");
+        Constants.LOG.info("Registered GC Entity Types (NeoForge)");
         ENTITY_TYPES.register(eventBus);
         TardisControlEntity.TYPE = TARDIS_CONTROL_ENTITY_TYPE;
     }

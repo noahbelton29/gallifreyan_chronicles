@@ -1,7 +1,10 @@
 package com.noahtnt2009.gallifreyan_chronicles.tardis.ecs.system;
 
+import com.noahtnt2009.gallifreyan_chronicles.Constants;
 import com.noahtnt2009.gallifreyan_chronicles.block.entity.TardisConsoleBlockEntity;
 import com.noahtnt2009.gallifreyan_chronicles.init.GCBlocks;
+import com.noahtnt2009.gallifreyan_chronicles.tardis.console.TardisConsole;
+import com.noahtnt2009.gallifreyan_chronicles.tardis.console.TardisConsoleRegistry;
 import com.noahtnt2009.gallifreyan_chronicles.tardis.manager.TardisManager;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
@@ -13,6 +16,8 @@ import java.util.UUID;
 public final class ConsoleLinkSystem {
     private ConsoleLinkSystem() {
     }
+
+    private static final int CONSOLE_OFFSET_DISTANCE = 3;
 
     public static Optional<BlockPos> linkedConsolePos(ServerLevel level, UUID tardisId) {
         return Optional.ofNullable(TardisManager.get(level.getServer()).getConsoleBlockPos(tardisId));
@@ -39,10 +44,11 @@ public final class ConsoleLinkSystem {
         TardisManager.get(level.getServer()).unlinkConsole(tardisId);
     }
 
-    public static Optional<TardisConsoleBlockEntity> spawnAndLink(ServerLevel level, UUID tardisId, BlockPos exteriorPos) {
+    public static void spawnAndLink(ServerLevel level, UUID tardisId, BlockPos exteriorPos) {
         TardisManager manager = TardisManager.get(level.getServer());
         if (manager.getConsoleBlockPos(tardisId) != null) {
-            return resolve(level, tardisId);
+            resolve(level, tardisId);
+            return;
         }
 
         BlockPos consolePos = findConsolePlacementPos(level, exteriorPos);
@@ -50,18 +56,36 @@ public final class ConsoleLinkSystem {
         level.setBlock(consolePos, state, 3);
 
         if (!(level.getBlockEntity(consolePos) instanceof TardisConsoleBlockEntity console)) {
-            return Optional.empty();
+            return;
         }
 
         console.linkToTardis(tardisId);
         manager.setConsoleBlockPos(tardisId, consolePos);
-        console.sync();
+        console.setConsole(TardisConsoleRegistry.get(TardisConsoleRegistry.DEFAULT_ID));
 
-        return Optional.of(console);
+        spawnDefaultControls(console);
+
+        console.sync();
     }
 
+    public static void spawnDefaultControls(TardisConsoleBlockEntity console) {
+        TardisConsole model = console.getConsole();
+        if (model == null) {
+            Constants.LOG.info("spawnDefaultControls: no console model set");
+            return;
+        }
+
+        var entries = model.controls();
+        Constants.LOG.info("spawnDefaultControls: consoleId={}, {} control entries", model.id(), entries.size());
+
+        for (TardisConsole.ControlEntry entry : entries) {
+            console.addControl(entry.id(), entry.offset(), entry.width(), entry.height(), entry.depth());
+        }
+    }
+
+
     private static BlockPos findConsolePlacementPos(ServerLevel level, BlockPos exteriorPos) {
-        return exteriorPos.above();
+        return exteriorPos.offset(CONSOLE_OFFSET_DISTANCE, 0, 0);
     }
 }
 

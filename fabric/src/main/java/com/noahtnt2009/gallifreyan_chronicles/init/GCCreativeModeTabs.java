@@ -81,6 +81,8 @@ public class GCCreativeModeTabs {
             FabricCreativeModeTab.builder().icon(() -> new ItemStack(GCItems.TARANIUM_PICKAXE))
                     .title(Component.translatable("creativetab.gallifreyan_chronicles.tools_and_armor"))
                     .displayItems((parameters, output) -> {
+                        output.accept(GCItems.RAW_TIN);
+
                         output.accept(GCItems.TARANIUM_SCRAP);
                         output.accept(GCItems.TARANIUM_CRYSTAL);
                         output.accept(GCItems.REFINED_TARANIUM_CRYSTAL);

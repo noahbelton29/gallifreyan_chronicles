@@ -1,6 +1,5 @@
 package com.noahtnt2009.gallifreyan_chronicles;
 
-import com.mojang.datafixers.kinds.Const;
 import com.noahtnt2009.gallifreyan_chronicles.init.*;
 
 public class CommonClass {
@@ -8,6 +7,7 @@ public class CommonClass {
         GCGameRuleCategories.registerGameRuleCategories();
         GCGameRules.registerGameRules();
         GCDataComponents.registerDataComponents();
+        GCTardisControls.registerTardisControls();
         GCItems.registerItems();
         GCBlocks.registerBlocks();
         GCFeatures.registerFeatures();

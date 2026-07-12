@@ -1,3 +1,19 @@
 {
-  "id": "gallifreyan_chronicles:first_doctors_console"
+  "id": "gallifreyan_chronicles:first_doctors_console",
+  "controls": [
+    {
+      "id": "flight_lever",
+      "offset": { "x": 0.3106, "y": 0.5195, "z": -0.9609 },
+      "width": 0.125,
+      "height": 0.25,
+      "depth": 0.225
+    },
+    {
+      "id": "handbrake",
+      "offset": { "x": 0.0625, "y": 0.5195, "z": -0.9609 },
+      "width": 0.125,
+      "height": 0.25,
+      "depth": 0.225
+    }
+  ]
 }

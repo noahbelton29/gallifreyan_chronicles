@@ -13,6 +13,7 @@ import net.minecraft.tags.BlockTags;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.level.block.Block;
 import net.neoforged.neoforge.common.data.BlockTagsProvider;
+import org.jspecify.annotations.NonNull;
 
 import java.util.concurrent.CompletableFuture;
 
@@ -38,11 +39,10 @@ public class GCBlockTagProvider extends BlockTagsProvider {
 
     private void tagAddBlockItem(BlockItemTagId pair, Block... blocks) {
         tagAdd(pair.block(), blocks);
-        // item side is handled by ItemTagsProvider via copy()
     }
 
     @Override
-    protected void addTags(HolderLookup.Provider provider) {
+    protected void addTags(HolderLookup.@NonNull Provider provider) {
         tagAdd(BlockTags.CLIMBABLE,
                 GCBlocks.GALLIFREYAN_VINE);
 

@@ -48,10 +48,6 @@ public class TardisCommand {
 
     private static final double LOOK_DISTANCE = 8.0;
 
-    /**
-     * Resolves the block position the command's executor is currently looking at,
-     * within LOOK_DISTANCE blocks. Requires the source to be a player.
-     */
     private static Optional<BlockPos> getLookedAtBlockPos(CommandContext<CommandSourceStack> ctx) {
         ServerPlayer player;
         try {
@@ -178,7 +174,10 @@ public class TardisCommand {
         TardisConsole console = TardisConsoleRegistry.get(consoleId);
         BlockPos pos = manager.getConsoleBlockPos(tardisId);
         Optional<TardisConsoleBlockEntity> blockEntity = findBlockEntity(ctx, pos, TardisConsoleBlockEntity.class);
-        blockEntity.ifPresent(be -> be.setConsole(console));
+        blockEntity.ifPresent(be -> {
+            be.setConsole(console);
+            ConsoleLinkSystem.spawnDefaultControls(be);
+        });
 
         if (blockEntity.isEmpty()) {
             ctx.getSource().sendFailure(Component.translatable(
@@ -556,6 +555,47 @@ public class TardisCommand {
         });
 
         return 1;
+    }
+
+    public static int listControls(CommandContext<CommandSourceStack> ctx) {
+        Optional<BlockPos> lookedAt = getLookedAtBlockPos(ctx);
+        if (lookedAt.isEmpty()) {
+            ctx.getSource().sendFailure(Component.translatable(
+                    "command.gallifreyan_chronicles.not_looking_at_console"
+            ));
+            return 0;
+        }
+
+        Optional<TardisConsoleBlockEntity> console = findBlockEntity(ctx, lookedAt.get(), TardisConsoleBlockEntity.class);
+        if (console.isEmpty()) {
+            ctx.getSource().sendFailure(Component.translatable(
+                    "command.gallifreyan_chronicles.not_looking_at_console"
+            ));
+            return 0;
+        }
+
+        var controls = console.get().getControlEntities();
+        if (controls.isEmpty()) {
+            ctx.getSource().sendSuccess(
+                    () -> Component.literal("This console has no control entities."),
+                    false
+            );
+            return 0;
+        }
+
+        ServerPlayer player;
+        try {
+            player = ctx.getSource().getPlayerOrException();
+        } catch (com.mojang.brigadier.exceptions.CommandSyntaxException e) {
+            ctx.getSource().sendFailure(Component.literal("This command must be run by a player."));
+            return 0;
+        }
+
+        for (var control : controls) {
+            control.printPosition(player);
+        }
+
+        return controls.size();
     }
 
     public static int debugTardis(CommandContext<CommandSourceStack> ctx) {

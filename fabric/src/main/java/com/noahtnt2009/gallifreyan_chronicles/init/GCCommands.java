@@ -19,7 +19,7 @@ import static net.minecraft.commands.Commands.literal;
 public class GCCommands {
     public static void registerCommands() {
         Constants.LOG.info("Registered GC Commands");
-        CommandRegistrationCallback.EVENT.register((dispatcher, registryAccess, environment) -> {
+        CommandRegistrationCallback.EVENT.register((dispatcher, _, _) -> {
             dispatcher.register(
                     literal("gc")
                             .then(literal("tardis")
@@ -37,7 +37,7 @@ public class GCCommands {
                                                             .executes(TardisCommand::getExterior))
                                                     .then(literal("set")
                                                             .then(argument("exterior_id", StringArgumentType.greedyString())
-                                                                    .suggests((ctx, builder) -> {
+                                                                    .suggests((_, builder) -> {
                                                                         TardisExteriorRegistry.getAll()
                                                                                 .forEach(e -> builder.suggest(e.id()));
                                                                         return builder.buildFuture();
@@ -52,7 +52,7 @@ public class GCCommands {
                                                             .executes(TardisCommand::getConsole))
                                                     .then(literal("set")
                                                             .then(argument("console_id", StringArgumentType.greedyString())
-                                                                    .suggests((ctx, builder) -> {
+                                                                    .suggests((_, builder) -> {
                                                                         TardisConsoleRegistry.getAll()
                                                                                 .forEach(e -> builder.suggest(e.id()));
                                                                         return builder.buildFuture();
@@ -84,7 +84,9 @@ public class GCCommands {
                                                                 .forEach(id -> builder.suggest(id.toString()));
                                                         return builder.buildFuture();
                                                     })
-                                                    .executes(TardisCommand::debugTardis))))
+                                                    .executes(TardisCommand::debugTardis)))
+                                    .then(literal("controls")
+                                            .executes(TardisCommand::listControls)))
             ));
         });
     }

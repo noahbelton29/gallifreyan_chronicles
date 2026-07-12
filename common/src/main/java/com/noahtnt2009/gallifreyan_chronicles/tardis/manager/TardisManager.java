@@ -117,9 +117,6 @@ public class TardisManager extends SavedData {
         return blockPosById.get(tardisId);
     }
 
-    /**
-     * Links (or unlinks, if pos is null) a console block position to a TARDIS.
-     */
     public void setConsoleBlockPos(UUID tardisId, BlockPos pos) {
         if (pos == null) {
             consoleBlockPosById.remove(tardisId);
@@ -133,18 +130,10 @@ public class TardisManager extends SavedData {
         return consoleBlockPosById.get(tardisId);
     }
 
-    /**
-     * Unlinks the console currently linked to this TARDIS, if any.
-     */
     public void unlinkConsole(UUID tardisId) {
         setConsoleBlockPos(tardisId, null);
     }
 
-    /**
-     * Links (or unlinks, if pos is null) an exterior block position to a TARDIS.
-     * This is separate from the TARDIS's original placement position (blockPosById),
-     * so re-linking to a new exterior doesn't require moving the TARDIS itself.
-     */
     public void setExteriorBlockPos(UUID tardisId, BlockPos pos) {
         if (pos == null) {
             exteriorBlockPosById.remove(tardisId);
@@ -158,18 +147,10 @@ public class TardisManager extends SavedData {
         return exteriorBlockPosById.get(tardisId);
     }
 
-    /**
-     * Unlinks the exterior currently linked to this TARDIS, if any.
-     */
     public void unlinkExterior(UUID tardisId) {
         setExteriorBlockPos(tardisId, null);
     }
 
-    /**
-     * Resolves the position of the exterior that should currently be treated as
-     * "the" exterior for this TARDIS: the explicitly linked exterior if one has
-     * been set, otherwise the TARDIS's original placement position.
-     */
     public @Nullable BlockPos resolveExteriorBlockPos(UUID tardisId) {
         BlockPos linked = exteriorBlockPosById.get(tardisId);
         return linked != null ? linked : blockPosById.get(tardisId);

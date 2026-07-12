@@ -5,11 +5,6 @@
 			"loop": "hold_on_last_frame",
 			"animation_length": 0.5,
 			"bones": {
-				"rotor": {
-					"position": {
-						"vector": [0, 0, 0]
-					}
-				},
 				"flight_lever": {
 					"rotation": {
 						"0.0": {
@@ -21,11 +16,6 @@
 					},
 					"position": {
 						"vector": [0, 0, 0]
-					}
-				},
-				"power_lever": {
-					"rotation": {
-						"vector": [90, -60, 0]
 					}
 				}
 			}
@@ -93,36 +83,37 @@
 		},
 		"rotor_flight": {
 			"loop": true,
-			"animation_length": 4.25,
-			"start_delay": 0,
-			"loop_delay": 0,
+			"animation_length": 4.24,
 			"bones": {
 				"rotor": {
+					"rotation": {
+						"0.0": {
+							"vector": [0, 0, 0]
+						},
+						"4.24": {
+							"vector": [0, 0, 0]
+						}
+					},
 					"position": {
 						"0.0": {
 							"vector": [0, 0, 0]
 						},
-						"1.75": {
+						"1.76": {
 							"vector": [0, 7, 0],
 							"easing": "easeInOutBack",
 							"easingArgs": [0.5]
 						},
-						"2.25": {
+						"2.24": {
 							"vector": [0, 7, 0]
 						},
-						"3.75": {
+						"3.76": {
 							"vector": [0, 0, 0],
 							"easing": "easeInOutBack",
 							"easingArgs": [0.5]
 						},
-						"4.25": {
+						"4.24": {
 							"vector": [0, 0, 0]
 						}
-					}
-				},
-				"lever": {
-					"rotation": {
-						"vector": [0, 0, 0]
 					}
 				},
 				"inside": {
@@ -130,12 +121,9 @@
 						"0.0": {
 							"vector": [0, 0, 0]
 						},
-						"4.25": {
+						"4.24": {
 							"vector": [0, -360, 0]
 						}
-					},
-					"position": {
-						"vector": [0, 0, 0]
 					}
 				}
 			}
@@ -176,19 +164,16 @@
 		},
 		"rotor_idle": {
 			"loop": true,
-			"animation_length": 4.25,
+			"animation_length": 4.24,
 			"bones": {
 				"inside": {
 					"rotation": {
 						"0.0": {
 							"vector": [0, 0, 0]
 						},
-						"4.25": {
+						"4.24": {
 							"vector": [0, -360, 0]
 						}
-					},
-					"position": {
-						"vector": [0, 0, 0]
 					}
 				}
 			}

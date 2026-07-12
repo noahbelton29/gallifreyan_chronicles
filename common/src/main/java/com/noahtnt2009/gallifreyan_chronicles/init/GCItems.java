@@ -22,6 +22,8 @@ public class GCItems {
     public static final Item REFINED_TARANIUM_CRYSTAL = registerItem("refined_taranium_crystal", Item::new);
     public static final Item TARANIUM_INGOT = registerItem("taranium_ingot", Item::new);
 
+    public static final Item RAW_TIN = registerItem("raw_tin", Item::new);
+
     // TOOLS
     public static final Item TARANIUM_SWORD = registerItem("taranium_sword",
             properties -> new Item(properties.sword(GCToolMaterials.TARANIUM, 3, -2.4f).fireResistant()));

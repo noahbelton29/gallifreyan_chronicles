@@ -30,9 +30,10 @@ import net.minecraft.world.phys.Vec3;
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 
-public class TardisControlEntity extends Entity {
+import java.util.function.Supplier;
 
-    public static java.util.function.Supplier<EntityType<TardisControlEntity>> TYPE;
+public class TardisControlEntity extends Entity {
+    public static Supplier<EntityType<TardisControlEntity>> TYPE;
 
     private static final EntityDataAccessor<Float> CONTROL_WIDTH =
             SynchedEntityData.defineId(TardisControlEntity.class, EntityDataSerializers.FLOAT);

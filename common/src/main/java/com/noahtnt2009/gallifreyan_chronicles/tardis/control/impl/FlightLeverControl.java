@@ -3,20 +3,35 @@ package com.noahtnt2009.gallifreyan_chronicles.tardis.control.impl;
 import com.noahtnt2009.gallifreyan_chronicles.Constants;
 import com.noahtnt2009.gallifreyan_chronicles.block.entity.TardisConsoleBlockEntity;
 import com.noahtnt2009.gallifreyan_chronicles.entity.TardisControlEntity;
+import com.noahtnt2009.gallifreyan_chronicles.init.GCSounds;
 import com.noahtnt2009.gallifreyan_chronicles.tardis.control.TardisControl;
-import net.minecraft.sounds.SoundEvents;
+import net.minecraft.sounds.SoundEvent;
+import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
 
 public class FlightLeverControl implements TardisControl {
+    private boolean STATE = false;
 
     @Override
     public InteractionResult onRightClick(TardisControlEntity entity, Player player, InteractionHand hand) {
         var console = entity.getConsole();
-        if (console == null) return InteractionResult.FAIL;
+        if (console == null) {
+            return InteractionResult.FAIL;
+        }
 
-        entity.playSound(SoundEvents.UI_BUTTON_CLICK.value(), 0.6f, 1.0f);
+        SoundEvent sound = GCSounds.SLIDER;
+
+        entity.level().playSound(
+                null,
+                entity.blockPosition(),
+                sound,
+                SoundSource.BLOCKS,
+                1.0F,
+                STATE ? 1.0f : 0.9f
+        );
+
         Constants.LOG.info("clicked flight control");
         return InteractionResult.SUCCESS;
     }
@@ -34,6 +49,8 @@ public class FlightLeverControl implements TardisControl {
     @Override
     public void onStateChanged(TardisConsoleBlockEntity console, boolean activated) {
         Constants.LOG.info("Flight lever state changed to: {}", activated);
+
+        STATE = activated;
 
         if (activated) {
             console.triggerRotorAnimation("rotor_flight");

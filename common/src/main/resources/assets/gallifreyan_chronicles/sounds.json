@@ -10,5 +10,11 @@
     "sounds": [
       "gallifreyan_chronicles:block_entity/tardis/door/door_close"
     ]
+  },
+  "slider_sound": {
+    "subtitle": "sounds.gallifreyan_chronicles.block_entity.slider_sound",
+    "sounds": [
+      "gallifreyan_chronicles:block_entity/tardis/control/slider_sound"
+    ]
   }
 }

@@ -9,6 +9,7 @@ import net.minecraft.data.CachedOutput;
 import net.minecraft.data.DataProvider;
 import net.minecraft.data.PackOutput;
 import net.minecraft.resources.Identifier;
+import net.minecraft.world.phys.Vec3;
 import org.jspecify.annotations.NonNull;
 
 import java.util.ArrayList;
@@ -25,11 +26,30 @@ public class GCTardisConsoleProvider implements DataProvider {
     }
 
     private void registerDefaults() {
-        addConsole("first_doctors_console");
+        addConsole("first_doctors_console", List.of(
+                new TardisConsole.ControlEntry(
+                        "flight_lever",
+                        new Vec3(0.3106, 0.5195, -0.9609),
+                        0.125f,
+                        0.25f,
+                        0.225f
+                ),
+                new TardisConsole.ControlEntry(
+                        "handbrake",
+                        new Vec3(0.0625, 0.5195, -0.9609),
+                        0.125f,
+                        0.25f,
+                        0.225f
+                )
+        ));
+    }
+
+    private void addConsole(String path, List<TardisConsole.ControlEntry> controls) {
+        consoles.add(new TardisConsole(GCUtils.ofNamespace(path), controls));
     }
 
     private void addConsole(String path) {
-        consoles.add(new TardisConsole(GCUtils.ofNamespace(path)));
+        addConsole(path, List.of());
     }
 
     @Override

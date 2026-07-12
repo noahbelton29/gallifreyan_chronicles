@@ -14,6 +14,11 @@ public class GCDataComponents {
             () -> DataComponentType.<String>builder().persistent(Codec.STRING).build()
     );
 
+    public static final DataComponentType<String> CONSOLE_ID = register(
+            "console_id",
+            () -> DataComponentType.<String>builder().persistent(Codec.STRING).build()
+    );
+
     private static <T> DataComponentType<T> register(String name, Supplier<DataComponentType<T>> supplier) {
         return Registry.register(
                 BuiltInRegistries.DATA_COMPONENT_TYPE,

@@ -1,4 +1,4 @@
-package com.noahtnt2009.gallifreyan_chronicles.tardis.console;
+package com.noahtnt2009.gallifreyan_chronicles.tardis.console.animation;
 
 import net.minecraft.world.entity.player.Player;
 import org.jspecify.annotations.Nullable;

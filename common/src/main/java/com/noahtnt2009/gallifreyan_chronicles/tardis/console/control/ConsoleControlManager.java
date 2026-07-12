@@ -1,8 +1,9 @@
-package com.noahtnt2009.gallifreyan_chronicles.tardis.console;
+package com.noahtnt2009.gallifreyan_chronicles.tardis.console.control;
 
 import com.noahtnt2009.gallifreyan_chronicles.Constants;
 import com.noahtnt2009.gallifreyan_chronicles.block.entity.TardisConsoleBlockEntity;
 import com.noahtnt2009.gallifreyan_chronicles.entity.TardisControlEntity;
+import com.noahtnt2009.gallifreyan_chronicles.tardis.console.animation.ConsoleAnimatable;
 import com.noahtnt2009.gallifreyan_chronicles.tardis.control.ControlSpec;
 import com.noahtnt2009.gallifreyan_chronicles.tardis.control.TardisControl;
 import com.noahtnt2009.gallifreyan_chronicles.tardis.control.TardisControlRegistry;

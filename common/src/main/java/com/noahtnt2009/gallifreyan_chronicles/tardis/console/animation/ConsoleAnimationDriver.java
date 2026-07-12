@@ -1,4 +1,4 @@
-package com.noahtnt2009.gallifreyan_chronicles.tardis.console;
+package com.noahtnt2009.gallifreyan_chronicles.tardis.console.animation;
 
 import com.geckolib.animation.AnimationController;
 import com.geckolib.animation.RawAnimation;

@@ -3,6 +3,7 @@ package com.noahtnt2009.gallifreyan_chronicles.network;
 import com.noahtnt2009.gallifreyan_chronicles.Constants;
 import com.noahtnt2009.gallifreyan_chronicles.data.GCJsonReloadListener;
 import com.noahtnt2009.gallifreyan_chronicles.platform.Services;
+import net.minecraft.client.Minecraft;
 import net.minecraft.server.level.ServerPlayer;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
@@ -22,17 +23,23 @@ public final class GCNeoForgeNetworking {
         registrar.playToClient(
                 TardisExteriorSyncPayload.TYPE,
                 TardisExteriorSyncPayload.STREAM_CODEC,
-                (payload, context) -> context.enqueueWork(payload::apply)
+                (payload, context) -> context.enqueueWork(() ->
+                        Minecraft.getInstance().execute(payload::apply)
+                )
         );
         registrar.playToClient(
                 DimensionSkySyncPayload.TYPE,
                 DimensionSkySyncPayload.STREAM_CODEC,
-                (payload, context) -> context.enqueueWork(payload::apply)
+                (payload, context) -> context.enqueueWork(() ->
+                        Minecraft.getInstance().execute(payload::apply)
+                )
         );
         registrar.playToClient(
                 TardisConsoleSyncPayload.TYPE,
                 TardisConsoleSyncPayload.STREAM_CODEC,
-                (payload, context) -> context.enqueueWork(payload::apply)
+                (payload, context) -> context.enqueueWork(() ->
+                        Minecraft.getInstance().execute(payload::apply)
+                )
         );
         registrar.playToClient(
                 TardisConsoleAnimationPayload.TYPE,

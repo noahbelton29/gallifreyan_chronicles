@@ -8,11 +8,6 @@ import net.minecraft.sounds.SoundSource;
 
 import java.util.function.BooleanSupplier;
 
-/**
- * Looping ambient hum tied to a single TardisConsoleBlockEntity's lifetime.
- * Client-only. Started once from TardisConsoleBlockEntity#setLevel and
- * self-stops via #isStillValid once the block entity is removed/unloaded.
- */
 public class TardisConsoleHumSoundInstance extends AbstractTickableSoundInstance {
     private final BooleanSupplier stillValid;
     private int tickCount = 0;

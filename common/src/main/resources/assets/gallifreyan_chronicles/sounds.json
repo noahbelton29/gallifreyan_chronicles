@@ -16,5 +16,14 @@
     "sounds": [
       "gallifreyan_chronicles:block_entity/tardis/control/slider_sound"
     ]
+  },
+  "first_doctors_hum": {
+    "subtitle": "sounds.gallifreyan_chronicles.block_entity.first_doctors_hum",
+    "sounds": [
+      {
+        "name": "gallifreyan_chronicles:block_entity/tardis/rotor/first_doctors_hum",
+        "stream": true
+      }
+    ]
   }
 }

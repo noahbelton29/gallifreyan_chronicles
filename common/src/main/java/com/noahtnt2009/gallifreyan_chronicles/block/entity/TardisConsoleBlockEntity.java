@@ -7,6 +7,8 @@ import com.geckolib.animation.AnimationController;
 import com.geckolib.animation.RawAnimation;
 import com.geckolib.animation.object.PlayState;
 import com.geckolib.util.GeckoLibUtil;
+import com.noahtnt2009.gallifreyan_chronicles.Constants;
+import com.noahtnt2009.gallifreyan_chronicles.client.sound.TardisConsoleHumSoundInstance;
 import com.noahtnt2009.gallifreyan_chronicles.ecs.ComponentHolder;
 import com.noahtnt2009.gallifreyan_chronicles.ecs.ComponentStore;
 import com.noahtnt2009.gallifreyan_chronicles.ecs.Entity;
@@ -22,6 +24,7 @@ import com.noahtnt2009.gallifreyan_chronicles.tardis.control.TardisControlRegist
 import com.noahtnt2009.gallifreyan_chronicles.tardis.ecs.TardisComponentTypes;
 import com.noahtnt2009.gallifreyan_chronicles.tardis.ecs.TardisLinkable;
 import com.noahtnt2009.gallifreyan_chronicles.tardis.ecs.system.ConsoleSystem;
+import net.minecraft.client.Minecraft;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
@@ -63,6 +66,7 @@ public class TardisConsoleBlockEntity extends BlockEntity implements GeoBlockEnt
 
     private final ConsoleAnimationDriver animationDriver;
     private final ConsoleControlManager controls;
+    private boolean humStarted = false;
 
     public TardisConsoleBlockEntity(BlockPos pos, BlockState state) {
         super(TYPE.get(), pos, state);
@@ -232,6 +236,21 @@ public class TardisConsoleBlockEntity extends BlockEntity implements GeoBlockEnt
         getAnimatableInstanceCache().getManagerForId(0);
         animationDriver.bind(() -> this.level, () -> this.currentRotorState, idleController, flightController, controlControllers);
         this.respawnControls();
+
+        if (level.isClientSide() && !humStarted) {
+            humStarted = true;
+            Constants.LOG.info("TardisConsoleBlockEntity: attempting to start hum at {}", getBlockPos());
+            Minecraft.getInstance().execute(() -> {
+                Constants.LOG.info("TardisConsoleBlockEntity: executing play() for hum at {}", getBlockPos());
+                Minecraft.getInstance().getSoundManager().play(
+                        new TardisConsoleHumSoundInstance(getBlockPos(), this::isHumStillValid)
+                );
+            });
+        }
+    }
+
+    private boolean isHumStillValid() {
+        return !isRemoved() && level != null && level.isClientSide();
     }
 
     @Override

@@ -191,10 +191,6 @@ public class TardisCommand {
 
         ServerPlayer sourcePlayer = ctx.getSource().getPlayer();
         if (sourcePlayer != null) {
-            // setConsole only mutates the block entity's ECS state; it never sends a
-            // TardisConsoleSyncPayload the way /reload does. Without this, the client's
-            // GeckoLib model cache never gets told to reload, so a newly added console's
-            // model/texture/animation won't render until the next /reload or a rejoin.
             Services.NETWORK.sendTardisConsoleSync(sourcePlayer, TardisConsoleSyncPayload.create());
         }
 

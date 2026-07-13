@@ -3,14 +3,14 @@ package com.noahtnt2009.gallifreyan_chronicles.entity;
 import com.noahtnt2009.gallifreyan_chronicles.Constants;
 import com.noahtnt2009.gallifreyan_chronicles.block.entity.TardisExteriorBlockEntity;
 import com.noahtnt2009.gallifreyan_chronicles.init.GCDataComponents;
+import com.noahtnt2009.gallifreyan_chronicles.tardis.ecs.component.TardisComponent;
+import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
-import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.server.level.ServerLevel;
-import net.minecraft.sounds.SoundEvents;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.damagesource.DamageSource;
@@ -19,7 +19,6 @@ import net.minecraft.world.entity.EntityDimensions;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.Pose;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.item.Items;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
@@ -30,6 +29,7 @@ import net.minecraft.world.phys.Vec3;
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 
+import java.util.Optional;
 import java.util.UUID;
 import java.util.function.Supplier;
 
@@ -109,17 +109,11 @@ public class TardisKeyEntity extends Entity {
     public float getKeyWidth() {
         return this.entityData.get(KEY_WIDTH);
     }
-
     public float getKeyHeight() {
         return this.entityData.get(KEY_HEIGHT);
     }
-
     public float getKeyDepth() {
         return this.entityData.get(KEY_DEPTH);
-    }
-
-    public void setKeySize(float width, float height) {
-        this.setKeySize(width, height, width);
     }
 
     public void setKeySize(float width, float height, float depth) {
@@ -159,10 +153,6 @@ public class TardisKeyEntity extends Entity {
     @Override
     public @NonNull InteractionResult interact(@NonNull Player player, @NonNull InteractionHand hand,
                                                @NonNull Vec3 location) {
-        if (this.keyEditorHandler(player)) {
-            return this.level().isClientSide() ? InteractionResult.SUCCESS : InteractionResult.CONSUME;
-        }
-
         if (!player.isShiftKeyDown()) {
             return InteractionResult.PASS;
         }
@@ -176,11 +166,41 @@ public class TardisKeyEntity extends Entity {
             return InteractionResult.FAIL;
         }
 
-        if (exterior.hasKeyRendered()) {
-            return this.tryRemoveKey(exterior, player);
+        if (exterior.isLocked() && !exterior.hasKeyRendered()) {
+            this.announceLocked(exterior, player);
+            return InteractionResult.FAIL;
         }
 
-        return this.tryInsertKey(exterior, player, hand);
+        return exterior.hasKeyRendered()
+                ? this.tryRemoveKey(exterior, player)
+                : this.tryInsertKey(exterior, player, hand);
+    }
+
+    private void announceLocked(TardisExteriorBlockEntity exterior, Player player) {
+        exterior.interact(false);
+
+        Component overlay = Component.literal("Locked").withStyle(ChatFormatting.RED)
+                .append(Component.literal(" - ").withStyle(ChatFormatting.GRAY))
+                .append(this.ownerDisplayName(exterior));
+        player.sendOverlayMessage(overlay);
+    }
+
+    private Component ownerDisplayName(TardisExteriorBlockEntity exterior) {
+        if (!(this.level() instanceof ServerLevel serverLevel)) {
+            return Component.literal("this TARDIS");
+        }
+
+        Optional<TardisComponent> tardis = exterior.resolveTardis(serverLevel);
+        if (tardis.isEmpty()) {
+            return Component.literal("this TARDIS");
+        }
+
+        UUID ownerId = tardis.get().getOwnerId();
+        Player owner = serverLevel.getServer().getPlayerList().getPlayer(ownerId);
+        String ownerName = owner != null ? owner.getGameProfile().name() : "an unknown Player";
+
+        return Component.literal("this TARDIS belongs to ").append(Component.literal(ownerName)
+                .withStyle(ChatFormatting.AQUA));
     }
 
     private InteractionResult tryInsertKey(TardisExteriorBlockEntity exterior, Player player, InteractionHand hand) {
@@ -222,74 +242,6 @@ public class TardisKeyEntity extends Entity {
         }
 
         return InteractionResult.CONSUME;
-    }
-
-    public boolean keyEditorHandler(Player player) {
-        if (!player.hasInfiniteMaterials()) {
-            return false;
-        }
-
-        final float increment = 0.0125f;
-        var heldItem = player.getMainHandItem().getItem();
-
-        if (heldItem == Items.PAPER) {
-            this.printPosition(player);
-            return true;
-        }
-
-        boolean sneaking = player.isShiftKeyDown();
-        boolean handled = true;
-
-        if (heldItem == Items.EMERALD_BLOCK) {
-            this.setPos(this.position().add(sneaking ? -increment : increment, 0, 0));
-        } else if (heldItem == Items.DIAMOND_BLOCK) {
-            this.setPos(this.position().add(0, sneaking ? -increment : increment, 0));
-        } else if (heldItem == Items.REDSTONE_BLOCK) {
-            this.setPos(this.position().add(0, 0, sneaking ? -increment : increment));
-        } else if (heldItem == Items.COD) {
-            float newWidth = Math.max(0.0625f, this.getKeyWidth() + (sneaking ? -increment : increment));
-            this.setKeySize(newWidth, this.getKeyHeight(), this.getKeyDepth());
-        } else if (heldItem == Items.COOKED_COD) {
-            float newHeight = Math.max(0.0625f, this.getKeyHeight() + (sneaking ? -increment : increment));
-            this.setKeySize(this.getKeyWidth(), newHeight, this.getKeyDepth());
-        } else if (heldItem == Items.SALMON) {
-            float newDepth = Math.max(0.0625f, this.getKeyDepth() + (sneaking ? -increment : increment));
-            this.setKeySize(this.getKeyWidth(), this.getKeyHeight(), newDepth);
-        } else {
-            handled = false;
-        }
-
-        if (handled) {
-            if (!(heldItem == Items.COD || heldItem == Items.COOKED_COD || heldItem == Items.SALMON)) {
-                this.playSound(SoundEvents.UI_BUTTON_CLICK.value(), 0.4f, 1.6f);
-            }
-            this.printPosition(player);
-        }
-
-        return handled;
-    }
-
-    public void printPosition(Player player) {
-        Vec3 pos = this.position();
-        Vec3 offset = this.getOffset();
-
-        String chatLine = String.format(
-                "[tardis_key] pos=(%.4f, %.4f, %.4f) offset=(%.4f, %.4f, %.4f) size=(%.4f, %.4f, %.4f)",
-                pos.x, pos.y, pos.z, offset.x, offset.y, offset.z,
-                this.getKeyWidth(), this.getKeyHeight(), this.getKeyDepth());
-
-        String pasteLine = String.format(
-                "new Vector3f(%.4ff, %.4ff, %.4ff) // width=%.4ff height=%.4ff depth=%.4ff",
-                offset.x, offset.y, offset.z, this.getKeyWidth(), this.getKeyHeight(), this.getKeyDepth());
-
-        player.sendSystemMessage(Component.literal(chatLine));
-        player.sendSystemMessage(Component.literal(pasteLine));
-        Constants.LOG.info("TardisKeyEntity -> {}", chatLine);
-
-        if (this.level() instanceof ServerLevel serverLevel) {
-            serverLevel.sendParticles(ParticleTypes.END_ROD,
-                    pos.x, pos.y, pos.z, 3, 0.02, 0.02, 0.02, 0.0);
-        }
     }
 
     @Override

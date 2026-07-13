@@ -11,6 +11,10 @@ public class GCSounds {
     public static final SoundEvent TARDIS_DOOR_CLOSE = register("tardis_door_close");
     public static final SoundEvent SLIDER = register("slider_sound");
     public static final SoundEvent FIRST_DOCTORS_HUM = register("first_doctors_hum");
+    public static final SoundEvent TARDIS_DOOR_LOCK = register("tardis_door_lock");
+    public static final SoundEvent TARDIS_DOOR_UNLOCK = register("tardis_door_unlock");
+    public static final SoundEvent TARDIS_IS_LOCKED = register("tardis_is_locked");
+
 
     private static SoundEvent register(String name) {
         Identifier id = GCUtils.of(name);

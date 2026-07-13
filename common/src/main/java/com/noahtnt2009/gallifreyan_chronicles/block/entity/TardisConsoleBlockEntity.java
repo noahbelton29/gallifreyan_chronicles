@@ -32,6 +32,7 @@ import net.minecraft.network.protocol.Packet;
 import net.minecraft.network.protocol.game.ClientGamePacketListener;
 import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
@@ -127,15 +128,7 @@ public class TardisConsoleBlockEntity extends BlockEntity implements GeoBlockEnt
         return controls.getControlState(controlId);
     }
 
-    public void setControlState(String controlId, boolean state) {
-        controls.setControlState(controlId, state);
-    }
-
-    public void triggerControl(String id, boolean activated) {
-        controls.triggerControl(this, id, activated, null);
-    }
-
-    public void triggerControl(String id, boolean activated, net.minecraft.world.entity.player.@org.jspecify.annotations.Nullable Player triggeringPlayer) {
+    public void triggerControl(String id, boolean activated, @Nullable Player triggeringPlayer) {
         controls.triggerControl(this, id, activated, triggeringPlayer);
     }
 
@@ -147,18 +140,15 @@ public class TardisConsoleBlockEntity extends BlockEntity implements GeoBlockEnt
         return controls.getControlEntities();
     }
 
-    public TardisControlEntity addControl(String id, Vec3 offset, float width, float height) {
-        return addControl(id, offset, width, height, width);
-    }
-
-    public TardisControlEntity addControl(String id, Vec3 offset, float width, float height, float depth) {
-        return controls.addControl(id, offset, width, height, depth);
+    public void addControl(String id, Vec3 offset, float width, float height, float depth) {
+        controls.addControl(id, offset, width, height, depth);
     }
 
     public void respawnControls() {
         controls.respawnControls();
     }
 
+    @SuppressWarnings("unused")
     public void removeControl(String id) {
         controls.removeControl(id);
     }

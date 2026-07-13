@@ -5,13 +5,11 @@ import com.noahtnt2009.gallifreyan_chronicles.block.entity.TardisConsoleBlockEnt
 import com.noahtnt2009.gallifreyan_chronicles.tardis.control.TardisControl;
 import com.noahtnt2009.gallifreyan_chronicles.tardis.control.TardisControlRegistry;
 import net.minecraft.core.BlockPos;
-import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.server.level.ServerLevel;
-import net.minecraft.sounds.SoundEvents;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.damagesource.DamageSource;
@@ -20,7 +18,6 @@ import net.minecraft.world.entity.EntityDimensions;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.Pose;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.item.Items;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.storage.ValueInput;
@@ -49,6 +46,8 @@ public class TardisControlEntity extends Entity {
     public static final float DEFAULT_WIDTH = .1f;
     public static final float DEFAULT_HEIGHT = 0.25f;
     public static final float DEFAULT_DEPTH = DEFAULT_WIDTH;
+    private static final long INTERACT_COOLDOWN_MS = 1000L;
+    private long lastInteractTime = 0L;
 
     public TardisControlEntity(EntityType<? extends TardisControlEntity> type, Level level) {
         super(type, level);
@@ -120,10 +119,6 @@ public class TardisControlEntity extends Entity {
         return this.entityData.get(CONTROL_DEPTH);
     }
 
-    public void setControlSize(float width, float height) {
-        this.setControlSize(width, height, width);
-    }
-
     public void setControlSize(float width, float height, float depth) {
         this.entityData.set(CONTROL_WIDTH, width);
         this.entityData.set(CONTROL_HEIGHT, height);
@@ -173,9 +168,11 @@ public class TardisControlEntity extends Entity {
             return InteractionResult.SUCCESS;
         }
 
-        if (this.controlEditorHandler(player)) {
-            return InteractionResult.CONSUME;
+        long now = System.currentTimeMillis();
+        if (now - this.lastInteractTime < INTERACT_COOLDOWN_MS) {
+            return InteractionResult.FAIL;
         }
+        this.lastInteractTime = now;
 
         TardisControl control = TardisControlRegistry.get(this.getControlId());
         InteractionResult result = control.onRightClick(this, player, hand);
@@ -193,51 +190,6 @@ public class TardisControlEntity extends Entity {
         return result;
     }
 
-    public boolean controlEditorHandler(Player player) {
-        if (!player.hasInfiniteMaterials()) {
-            return false;
-        }
-
-        final float increment = 0.0125f;
-        var heldItem = player.getMainHandItem().getItem();
-
-        if (heldItem == Items.PAPER) {
-            this.printPosition(player);
-            return true;
-        }
-
-        boolean sneaking = player.isShiftKeyDown();
-        boolean handled = true;
-
-        if (heldItem == Items.EMERALD_BLOCK) {
-            this.setPos(this.position().add(sneaking ? -increment : increment, 0, 0));
-        } else if (heldItem == Items.DIAMOND_BLOCK) {
-            this.setPos(this.position().add(0, sneaking ? -increment : increment, 0));
-        } else if (heldItem == Items.REDSTONE_BLOCK) {
-            this.setPos(this.position().add(0, 0, sneaking ? -increment : increment));
-        } else if (heldItem == Items.COD) {
-            float newWidth = Math.max(0.0625f, this.getControlWidth() + (sneaking ? -increment : increment));
-            this.setControlSize(newWidth, this.getControlHeight(), this.getControlDepth());
-        } else if (heldItem == Items.COOKED_COD) {
-            float newHeight = Math.max(0.0625f, this.getControlHeight() + (sneaking ? -increment : increment));
-            this.setControlSize(this.getControlWidth(), newHeight, this.getControlDepth());
-        } else if (heldItem == Items.SALMON) {
-            float newDepth = Math.max(0.0625f, this.getControlDepth() + (sneaking ? -increment : increment));
-            this.setControlSize(this.getControlWidth(), this.getControlHeight(), newDepth);
-        } else {
-            handled = false;
-        }
-
-        if (handled) {
-            if (!(heldItem == Items.COD || heldItem == Items.COOKED_COD || heldItem == Items.SALMON)) {
-                this.playSound(SoundEvents.UI_BUTTON_CLICK.value(), 0.4f, 1.6f);
-            }
-            this.printPosition(player);
-        }
-
-        return handled;
-    }
-
     public void printPosition(Player player) {
         Vec3 pos = this.position();
         Vec3 offset = this.getOffset();
@@ -249,19 +201,8 @@ public class TardisControlEntity extends Entity {
                 idPart, pos.x, pos.y, pos.z, offset.x, offset.y, offset.z,
                 this.getControlWidth(), this.getControlHeight(), this.getControlDepth());
 
-        String pasteLine = String.format(
-                "new Vector3f(%.4ff, %.4ff, %.4ff) // width=%.4ff height=%.4ff depth=%.4ff id=\"%s\"",
-                offset.x, offset.y, offset.z, this.getControlWidth(), this.getControlHeight(),
-                this.getControlDepth(), idPart);
-
         player.sendSystemMessage(Component.literal(chatLine));
-        player.sendSystemMessage(Component.literal(pasteLine));
         Constants.LOG.info("TardisControlEntity {} -> {}", idPart, chatLine);
-
-        if (this.level() instanceof ServerLevel serverLevel) {
-            serverLevel.sendParticles(ParticleTypes.END_ROD,
-                    pos.x, pos.y, pos.z, 3, 0.02, 0.02, 0.02, 0.0);
-        }
     }
 
     @Override

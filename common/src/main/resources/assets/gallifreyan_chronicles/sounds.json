@@ -25,5 +25,23 @@
         "stream": true
       }
     ]
+  },
+  "tardis_door_lock": {
+    "subtitle": "sounds.gallifreyan_chronicles.block_entity.door_lock",
+    "sounds": [
+        "gallifreyan_chronicles:block_entity/tardis/door/door_lock"
+    ]
+  },
+  "tardis_door_unlock": {
+    "subtitle": "sounds.gallifreyan_chronicles.block_entity.door_unlock",
+    "sounds": [
+        "gallifreyan_chronicles:block_entity/tardis/door/door_unlock"
+    ]
+  },
+  "tardis_is_locked": {
+    "subtitle": "sounds.gallifreyan_chronicles.block_entity.is_locked",
+    "sounds": [
+        "gallifreyan_chronicles:block_entity/tardis/door/is_locked"
+    ]
   }
 }

@@ -103,11 +103,18 @@ public class TardisBlock extends BaseEntityBlock {
                     player.sendOverlayMessage(Component.literal("Close the doors before removing the key!"));
                     return InteractionResult.FAIL;
                 }
-            } else if (!player.isShiftKeyDown() && isOwner) {
+            }
+            else if (!player.isShiftKeyDown() && isOwner) {
                 tardis.toggleKeyLockAnimation();
                 return InteractionResult.CONSUME;
             }
 
+            return InteractionResult.CONSUME;
+        }
+
+        if (tardis.isLocked()) {
+            if (level.isClientSide()) return InteractionResult.SUCCESS;
+            tardis.announceLocked(player);
             return InteractionResult.CONSUME;
         }
 
@@ -136,7 +143,7 @@ public class TardisBlock extends BaseEntityBlock {
             @NotNull Level level, @NotNull BlockState state, @NotNull BlockEntityType<T> type) {
         if (level.isClientSide()) return null;
         return type == TardisExteriorBlockEntity.TYPE.get()
-                ? (lvl, pos, st, be) -> TardisExteriorBlockEntity.serverTick(lvl, pos, st, (TardisExteriorBlockEntity) be)
+                ? (lvl, pos, st, be) -> TardisExteriorBlockEntity.serverTick(lvl, (TardisExteriorBlockEntity) be)
                 : null;
     }
 }

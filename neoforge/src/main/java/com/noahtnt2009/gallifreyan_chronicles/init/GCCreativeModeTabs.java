@@ -20,6 +20,8 @@ public class GCCreativeModeTabs {
                     .displayItems((params, output) -> {
                         output.accept(GCBlocks.TARDIS);
                         output.accept(GCBlocks.TARDIS_CONSOLE);
+                        output.accept(GCItems.TARDIS_KEY);
+                        output.accept(GCItems.MASTER_TARDIS_KEY);
                     }).build());
 
     public static final Supplier<CreativeModeTab> NATURAL_BLOCKS_TAB = CREATIVE_MODE_TABS.register("natural_blocks",

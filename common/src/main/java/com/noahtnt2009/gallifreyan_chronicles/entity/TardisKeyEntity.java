@@ -3,10 +3,9 @@ package com.noahtnt2009.gallifreyan_chronicles.entity;
 import com.noahtnt2009.gallifreyan_chronicles.Constants;
 import com.noahtnt2009.gallifreyan_chronicles.block.entity.TardisExteriorBlockEntity;
 import com.noahtnt2009.gallifreyan_chronicles.init.GCDataComponents;
-import com.noahtnt2009.gallifreyan_chronicles.tardis.ecs.component.TardisComponent;
-import net.minecraft.ChatFormatting;
+import com.noahtnt2009.gallifreyan_chronicles.item.MasterTardisKeyItem;
+import com.noahtnt2009.gallifreyan_chronicles.item.TardisKeyItem;
 import net.minecraft.core.BlockPos;
-import net.minecraft.network.chat.Component;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
@@ -29,7 +28,6 @@ import net.minecraft.world.phys.Vec3;
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 
-import java.util.Optional;
 import java.util.UUID;
 import java.util.function.Supplier;
 
@@ -162,84 +160,41 @@ public class TardisKeyEntity extends Entity {
         }
 
         TardisExteriorBlockEntity exterior = this.getExterior();
-        if (exterior == null) {
-            return InteractionResult.FAIL;
+        if (exterior == null || exterior.hasKeyRendered()) {
+            return InteractionResult.PASS;
         }
 
-        if (exterior.isLocked() && !exterior.hasKeyRendered()) {
-            this.announceLocked(exterior, player);
-            return InteractionResult.FAIL;
-        }
-
-        return exterior.hasKeyRendered()
-                ? this.tryRemoveKey(exterior, player)
-                : this.tryInsertKey(exterior, player, hand);
-    }
-
-    private void announceLocked(TardisExteriorBlockEntity exterior, Player player) {
-        exterior.interact(false);
-
-        Component overlay = Component.literal("Locked").withStyle(ChatFormatting.RED)
-                .append(Component.literal(" - ").withStyle(ChatFormatting.GRAY))
-                .append(this.ownerDisplayName(exterior));
-        player.sendOverlayMessage(overlay);
-    }
-
-    private Component ownerDisplayName(TardisExteriorBlockEntity exterior) {
-        if (!(this.level() instanceof ServerLevel serverLevel)) {
-            return Component.literal("this TARDIS");
-        }
-
-        Optional<TardisComponent> tardis = exterior.resolveTardis(serverLevel);
-        if (tardis.isEmpty()) {
-            return Component.literal("this TARDIS");
-        }
-
-        UUID ownerId = tardis.get().getOwnerId();
-        Player owner = serverLevel.getServer().getPlayerList().getPlayer(ownerId);
-        String ownerName = owner != null ? owner.getGameProfile().name() : "an unknown Player";
-
-        return Component.literal("this TARDIS belongs to ").append(Component.literal(ownerName)
-                .withStyle(ChatFormatting.AQUA));
+        return this.tryInsertKey(exterior, player, hand);
     }
 
     private InteractionResult tryInsertKey(TardisExteriorBlockEntity exterior, Player player, InteractionHand hand) {
         ItemStack held = player.getItemInHand(hand);
 
-        if (!(held.getItem() instanceof com.noahtnt2009.gallifreyan_chronicles.item.TardisKeyItem)) {
+        boolean isMasterKey = held.getItem() instanceof MasterTardisKeyItem;
+        boolean isRegularKey = held.getItem() instanceof TardisKeyItem;
+
+        if (!isMasterKey && !isRegularKey) {
             return InteractionResult.FAIL;
         }
 
-        UUID keyTardisId = held.get(GCDataComponents.TARDIS_ID);
-        UUID exteriorTardisId = exterior.getTardisId();
+        if (!isMasterKey) {
+            UUID keyTardisId = held.get(GCDataComponents.TARDIS_ID);
+            UUID exteriorTardisId = exterior.getTardisId();
 
-        if (keyTardisId == null || !keyTardisId.equals(exteriorTardisId)) {
-            return InteractionResult.FAIL;
-        }
+            if (keyTardisId == null || !keyTardisId.equals(exteriorTardisId)) {
+                return InteractionResult.FAIL;
+            }
 
-        boolean alreadyInserted = Boolean.TRUE.equals(held.get(GCDataComponents.KEY_INSERTED));
-        if (alreadyInserted) {
-            return InteractionResult.FAIL;
+            boolean alreadyInserted = Boolean.TRUE.equals(held.get(GCDataComponents.KEY_INSERTED));
+            if (alreadyInserted) {
+                return InteractionResult.FAIL;
+            }
         }
 
         ItemStack toStore = held.copyWithCount(1);
         toStore.set(GCDataComponents.KEY_INSERTED, true);
         exterior.setHeldKey(player.getUUID(), toStore);
         held.shrink(1);
-
-        return InteractionResult.CONSUME;
-    }
-
-    private InteractionResult tryRemoveKey(TardisExteriorBlockEntity exterior, Player player) {
-        if (!player.getUUID().equals(exterior.getRenderedKeyOwner())) {
-            return InteractionResult.FAIL;
-        }
-
-        ItemStack returned = exterior.clearHeldKey();
-        returned.set(GCDataComponents.KEY_INSERTED, false);
-        if (!player.getInventory().add(returned)) {
-            player.drop(returned, false);
-        }
 
         return InteractionResult.CONSUME;
     }

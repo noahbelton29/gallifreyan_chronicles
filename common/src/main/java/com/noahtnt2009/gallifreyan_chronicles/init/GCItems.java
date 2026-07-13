@@ -2,8 +2,10 @@ package com.noahtnt2009.gallifreyan_chronicles.init;
 
 import com.noahtnt2009.gallifreyan_chronicles.Constants;
 import com.noahtnt2009.gallifreyan_chronicles.item.TardisKeyItem;
+import com.noahtnt2009.gallifreyan_chronicles.item.MasterTardisKeyItem;
 import com.noahtnt2009.gallifreyan_chronicles.util.GCUtils;
 import net.minecraft.core.Registry;
+import net.minecraft.core.component.DataComponents;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceKey;
@@ -24,7 +26,11 @@ public class GCItems {
     public static final Item TARANIUM_INGOT = registerItem("taranium_ingot", Item::new);
 
     public static final Item RAW_TIN = registerItem("raw_tin", Item::new);
-    public static final Item TARDIS_KEY = registerItem("tardis_key", TardisKeyItem::new);
+    public static final Item TARDIS_KEY = registerItem("tardis_key", properties
+            -> new TardisKeyItem(properties.fireResistant()));
+    public static final Item MASTER_TARDIS_KEY = registerItem("master_tardis_key",
+            properties -> new MasterTardisKeyItem(properties.component(
+                    DataComponents.ENCHANTMENT_GLINT_OVERRIDE, true).fireResistant()));
 
     // TOOLS
     public static final Item TARANIUM_SWORD = registerItem("taranium_sword",

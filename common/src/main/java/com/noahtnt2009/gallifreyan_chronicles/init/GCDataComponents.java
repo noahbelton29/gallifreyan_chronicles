@@ -29,6 +29,11 @@ public class GCDataComponents {
             () -> DataComponentType.<Boolean>builder().persistent(Codec.BOOL).build()
     );
 
+    public static final DataComponentType<Boolean> MASTER_KEY = register(
+            "master_key",
+            () -> DataComponentType.<Boolean>builder().persistent(Codec.BOOL).build()
+    );
+
     private static <T> DataComponentType<T> register(String name, Supplier<DataComponentType<T>> supplier) {
         return Registry.register(
                 BuiltInRegistries.DATA_COMPONENT_TYPE,

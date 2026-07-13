@@ -96,6 +96,7 @@ public class GCModelProvider extends ModelProvider {
         createCustomVine(blockModels, GCBlocks.GALLIFREYAN_VINE, GCBlocks.GALLIFREYAN_VINE.asItem());
 
         itemModels.generateFlatItem(GCItems.TARDIS_KEY, ModelTemplates.FLAT_ITEM);
+        itemModels.generateFlatItem(GCItems.MASTER_TARDIS_KEY, ModelTemplates.FLAT_ITEM);
         itemModels.generateFlatItem(GCItems.TARANIUM_SCRAP, ModelTemplates.FLAT_ITEM);
         itemModels.generateFlatItem(GCItems.TARANIUM_CRYSTAL, ModelTemplates.FLAT_ITEM);
         itemModels.generateFlatItem(GCItems.REFINED_TARANIUM_CRYSTAL, ModelTemplates.FLAT_ITEM);

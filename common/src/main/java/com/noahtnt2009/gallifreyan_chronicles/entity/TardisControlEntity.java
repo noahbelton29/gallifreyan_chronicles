@@ -46,7 +46,7 @@ public class TardisControlEntity extends Entity {
     public static final float DEFAULT_WIDTH = .1f;
     public static final float DEFAULT_HEIGHT = 0.25f;
     public static final float DEFAULT_DEPTH = DEFAULT_WIDTH;
-    private static final long INTERACT_COOLDOWN_MS = 1000L;
+    private static final long INTERACT_COOLDOWN_MS = 1500L;
     private long lastInteractTime = 0L;
 
     public TardisControlEntity(EntityType<? extends TardisControlEntity> type, Level level) {

@@ -141,7 +141,6 @@ public class TardisExteriorBlockEntity extends BlockEntity implements GeoBlockEn
         ItemStack returned = this.heldKeyStack.copy();
         this.renderedKeyOwner = null;
         this.heldKeyStack = ItemStack.EMPTY;
-        this.locked = true;
         sync();
         return returned;
     }

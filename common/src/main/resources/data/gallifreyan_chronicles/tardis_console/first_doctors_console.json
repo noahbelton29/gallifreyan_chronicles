@@ -1,4 +1,5 @@
 {
+  "id": "gallifreyan_chronicles:first_doctors_console",
   "controls": [
     {
       "depth": 0.1875,
@@ -7,11 +8,6 @@
         "x": 0.3125,
         "y": 0.5597,
         "z": -0.9512
-      },
-      "rotation": {
-        "x": -25,
-        "y": 0,
-        "z": 0
       },
       "width": 0.125,
       "height": 0.1875
@@ -24,11 +20,6 @@
         "y": 0.5597,
         "z": -0.9512
       },
-      "rotation": {
-        "x": -25,
-        "y": 0,
-        "z": 0
-      },
       "width": 0.125,
       "height": 0.1875
     },
@@ -40,14 +31,8 @@
         "y": 0.5847,
         "z": -0.4624
       },
-      "rotation": {
-        "x": -25,
-        "y": 60,
-        "z": 0
-      },
       "width": 0.125,
       "height": 0.1875
     }
-  ],
-  "id": "gallifreyan_chronicles:first_doctors_console"
+  ]
 }

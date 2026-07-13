@@ -45,8 +45,8 @@ public class TardisKeyEntity extends Entity {
     private static final EntityDataAccessor<BlockPos> EXTERIOR_POS =
             SynchedEntityData.defineId(TardisKeyEntity.class, EntityDataSerializers.BLOCK_POS);
 
-    public static final float DEFAULT_WIDTH = 0.25f;
-    public static final float DEFAULT_HEIGHT = 0.25f;
+    public static final float DEFAULT_WIDTH = 0.1f;
+    public static final float DEFAULT_HEIGHT = 0.1f;
     public static final float DEFAULT_DEPTH = DEFAULT_WIDTH;
     public static final Vec3 DEFAULT_OFFSET = new Vec3(0.0, -0.925, 1.0);
 
@@ -57,9 +57,13 @@ public class TardisKeyEntity extends Entity {
     }
 
     public static TardisKeyEntity create(Level level, BlockPos exteriorPos, Vec3 worldPos) {
+        return create(level, exteriorPos, worldPos, DEFAULT_OFFSET);
+    }
+
+    public static TardisKeyEntity create(Level level, BlockPos exteriorPos, Vec3 worldPos, Vec3 keyOffset) {
         TardisKeyEntity entity = new TardisKeyEntity(TYPE.get(), level);
         entity.setExteriorPos(exteriorPos);
-        entity.setPos(worldPos.add(DEFAULT_OFFSET));
+        entity.setPos(worldPos.add(keyOffset));
         return entity;
     }
 
@@ -72,7 +76,7 @@ public class TardisKeyEntity extends Entity {
     }
 
     @Override
-    public boolean hurtServer(@NonNull ServerLevel serverLevel, DamageSource damageSource, float v) {
+    public boolean hurtServer(@NonNull ServerLevel serverLevel, @NonNull DamageSource damageSource, float v) {
         return false;
     }
 
@@ -85,10 +89,10 @@ public class TardisKeyEntity extends Entity {
         Vec3 pos = this.position();
         double halfWidth = this.getKeyWidth() / 2.0;
         double halfDepth = this.getKeyDepth() / 2.0;
-        double height = this.getKeyHeight();
+        double halfHeight = this.getKeyHeight() / 2.0;
         return new AABB(
-                pos.x - halfWidth, pos.y, pos.z - halfDepth,
-                pos.x + halfWidth, pos.y + height, pos.z + halfDepth
+                pos.x - halfWidth, pos.y - halfHeight, pos.z - halfDepth,
+                pos.x + halfWidth, pos.y + halfHeight, pos.z + halfDepth
         );
     }
 

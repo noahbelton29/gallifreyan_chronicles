@@ -7,9 +7,12 @@ import com.geckolib.animation.AnimationController;
 import com.geckolib.animation.RawAnimation;
 import com.geckolib.animation.object.PlayState;
 import com.geckolib.util.GeckoLibUtil;
+import com.noahtnt2009.gallifreyan_chronicles.Constants;
+import com.noahtnt2009.gallifreyan_chronicles.client.renderer.geo_layer.TardisExteriorKeyLayer;
 import com.noahtnt2009.gallifreyan_chronicles.ecs.ComponentHolder;
 import com.noahtnt2009.gallifreyan_chronicles.ecs.ComponentStore;
 import com.noahtnt2009.gallifreyan_chronicles.ecs.Entity;
+import com.noahtnt2009.gallifreyan_chronicles.entity.TardisKeyEntity;
 import com.noahtnt2009.gallifreyan_chronicles.tardis.ecs.TardisLinkable;
 import com.noahtnt2009.gallifreyan_chronicles.tardis.ecs.component.DoorComponent;
 import com.noahtnt2009.gallifreyan_chronicles.tardis.ecs.component.DoorState;
@@ -29,13 +32,17 @@ import net.minecraft.network.protocol.Packet;
 import net.minecraft.network.protocol.game.ClientGamePacketListener;
 import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
 import net.minecraft.server.MinecraftServer;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvent;
+import net.minecraft.sounds.SoundSource;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.storage.ValueInput;
 import net.minecraft.world.level.storage.ValueOutput;
+import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.jspecify.annotations.NonNull;
@@ -44,50 +51,57 @@ import java.util.UUID;
 import java.util.function.Supplier;
 
 public class TardisExteriorBlockEntity extends BlockEntity implements GeoBlockEntity, ComponentHolder, TardisLinkable,
-        com.noahtnt2009.gallifreyan_chronicles.client.renderer.geo_layer.TardisExteriorKeyLayer.TardisExteriorRenderable {
+        TardisExteriorKeyLayer.TardisExteriorRenderable {
     public static Supplier<BlockEntityType<TardisExteriorBlockEntity>> TYPE;
     private AnimationController<TardisExteriorBlockEntity> controller;
+    private AnimationController<TardisExteriorBlockEntity> keyController;
+    private boolean keyLocked = true;
     private final ComponentStore components = new ComponentStore();
     private AnimatableInstanceCache cache = GeckoLibUtil.createInstanceCache(this);
 
     private boolean needsStateSync = false;
 
     private UUID renderedKeyOwner = null;
-    private net.minecraft.world.item.ItemStack heldKeyStack = net.minecraft.world.item.ItemStack.EMPTY;
-    private com.noahtnt2009.gallifreyan_chronicles.entity.TardisKeyEntity keyEntity = null;
-    private volatile net.minecraft.world.phys.Vec3 cachedKeyBoneWorldPos = null;
+    private ItemStack heldKeyStack = ItemStack.EMPTY;
+    private TardisKeyEntity keyEntity = null;
+    private volatile Vec3 cachedKeyBoneWorldPos = null;
 
-    public void setCachedKeyBoneWorldPos(net.minecraft.world.phys.Vec3 pos) {
+    public void setCachedKeyBoneWorldPos(Vec3 pos) {
         this.cachedKeyBoneWorldPos = pos;
     }
 
-    public @Nullable net.minecraft.world.phys.Vec3 getCachedKeyBoneWorldPos() {
+    public @Nullable Vec3 getCachedKeyBoneWorldPos() {
         return cachedKeyBoneWorldPos;
     }
 
-    public @Nullable com.noahtnt2009.gallifreyan_chronicles.entity.TardisKeyEntity getKeyEntity() {
+    public @Nullable TardisKeyEntity getKeyEntity() {
         return keyEntity;
     }
 
-    public void setKeyEntity(com.noahtnt2009.gallifreyan_chronicles.entity.TardisKeyEntity keyEntity) {
+    public void setKeyEntity(TardisKeyEntity keyEntity) {
         this.keyEntity = keyEntity;
     }
 
-    public com.noahtnt2009.gallifreyan_chronicles.entity.TardisKeyEntity spawnKeyEntity() {
-        if (level == null || level.isClientSide() || !(level instanceof net.minecraft.server.level.ServerLevel serverLevel)) {
-            return keyEntity;
+    public void spawnKeyEntity() {
+        if (level == null || level.isClientSide() || !(level instanceof ServerLevel serverLevel)) {
+            return;
         }
 
         if (keyEntity != null && keyEntity.isAlive()) {
             keyEntity.discard();
         }
 
-        net.minecraft.world.phys.Vec3 worldPos = net.minecraft.world.phys.Vec3.atCenterOf(getBlockPos());
-        com.noahtnt2009.gallifreyan_chronicles.entity.TardisKeyEntity entity =
-                com.noahtnt2009.gallifreyan_chronicles.entity.TardisKeyEntity.create(serverLevel, getBlockPos(), worldPos);
+        Vec3 worldPos = Vec3.atCenterOf(getBlockPos());
+
+        TardisExterior exterior = getExterior();
+        Vec3 keyOffset = exterior != null
+                ? exterior.worldKeyOffset(getYaw())
+                : TardisKeyEntity.DEFAULT_OFFSET;
+
+        TardisKeyEntity entity =
+                TardisKeyEntity.create(serverLevel, getBlockPos(), worldPos, keyOffset);
         serverLevel.addFreshEntity(entity);
         this.keyEntity = entity;
-        return entity;
     }
 
     public void discardKeyEntity() {
@@ -105,29 +119,58 @@ public class TardisExteriorBlockEntity extends BlockEntity implements GeoBlockEn
         return renderedKeyOwner != null;
     }
 
+    public boolean isKeyLocked() {
+        return keyLocked;
+    }
+
+    public void setKeyLocked(boolean locked) {
+        this.keyLocked = locked;
+        sync();
+    }
+
+    public boolean toggleKeyLockAnimation() {
+        Constants.LOG.info("[tardis_key] toggleKeyLockAnimation called, hasKeyRendered={}", hasKeyRendered());
+
+        if (!hasKeyRendered()) {
+            return false;
+        }
+
+        boolean nowLocked = !keyLocked;
+        String animName = nowLocked ? "key_lock" : "key_unlock";
+
+        Constants.LOG.info("[tardis_key] triggering anim '{}' (nowLocked={})", animName, nowLocked);
+
+        keyLocked = nowLocked;
+        triggerAnim("key_controller", animName);
+        sync();
+        return true;
+    }
+
     public @Nullable UUID getRenderedKeyOwner() {
         return renderedKeyOwner;
     }
 
-    public net.minecraft.world.item.ItemStack getHeldKeyStack() {
+    public ItemStack getHeldKeyStack() {
         return heldKeyStack;
     }
 
     @Override
-    public net.minecraft.world.item.@Nullable ItemStack gc$getHeldKeyStack() {
+    public @Nullable ItemStack gc$getHeldKeyStack() {
         return heldKeyStack;
     }
 
-    public void setHeldKey(UUID owner, net.minecraft.world.item.ItemStack stack) {
+    public void setHeldKey(UUID owner, ItemStack stack) {
         this.renderedKeyOwner = owner;
         this.heldKeyStack = stack.copy();
+        this.keyLocked = true;
         sync();
     }
 
-    public net.minecraft.world.item.ItemStack clearHeldKey() {
-        net.minecraft.world.item.ItemStack returned = this.heldKeyStack.copy();
+    public ItemStack clearHeldKey() {
+        ItemStack returned = this.heldKeyStack.copy();
         this.renderedKeyOwner = null;
-        this.heldKeyStack = net.minecraft.world.item.ItemStack.EMPTY;
+        this.heldKeyStack = ItemStack.EMPTY;
+        this.keyLocked = true;
         sync();
         return returned;
     }
@@ -178,8 +221,6 @@ public class TardisExteriorBlockEntity extends BlockEntity implements GeoBlockEn
         DoorState state = getDoorState();
         String animName = getAnimationForDoorState(state);
 
-        System.out.println("Snapping to: " + state + " -> " + animName);
-
         controller.setAnimation(RawAnimation.begin().thenPlay(animName));
         controller.setAnimationSpeed(999999);
         scheduleSpeedReset();
@@ -193,7 +234,6 @@ public class TardisExteriorBlockEntity extends BlockEntity implements GeoBlockEn
                         Thread.sleep(50);
                         if (controller != null) {
                             controller.setAnimationSpeed(1.0);
-                            System.out.println("Reset animation speed to normal");
                         }
                     } catch (InterruptedException ignored) {}
                 }).start();
@@ -216,8 +256,6 @@ public class TardisExteriorBlockEntity extends BlockEntity implements GeoBlockEn
 
         DoorState state = getDoorState();
         String animName = getAnimationForDoorState(state);
-
-        System.out.println("Reapplying door state: " + state + " -> " + animName);
 
         playAnimation(animName);
     }
@@ -276,11 +314,16 @@ public class TardisExteriorBlockEntity extends BlockEntity implements GeoBlockEn
             sync();
             return;
         }
-        asEntity().set(TardisComponentTypes.DOOR, DoorComponent.closed().withState(newState)); // or proper
+        asEntity().set(TardisComponentTypes.DOOR, DoorComponent.closed().withState(newState));
         sync();
     }
 
     public void interact(boolean sneaking) {
+        if (isKeyLocked()) {
+            Constants.LOG.debug("[tardis] Door interaction blocked, key is locked");
+            return;
+        }
+
         DoorSystem.InteractionResult result =
                 DoorSystem.interact(asEntity(), sneaking, System.currentTimeMillis());
 
@@ -306,7 +349,7 @@ public class TardisExteriorBlockEntity extends BlockEntity implements GeoBlockEn
                 null,
                 getBlockPos(),
                 sound,
-                net.minecraft.sounds.SoundSource.BLOCKS,
+                SoundSource.BLOCKS,
                 1.0f,
                 1.0f
         );
@@ -323,8 +366,9 @@ public class TardisExteriorBlockEntity extends BlockEntity implements GeoBlockEn
 
         if (renderedKeyOwner != null) {
             output.putString("RenderedKeyOwner", renderedKeyOwner.toString());
-            output.store("HeldKeyStack", net.minecraft.world.item.ItemStack.OPTIONAL_CODEC, heldKeyStack);
+            output.store("HeldKeyStack", ItemStack.OPTIONAL_CODEC, heldKeyStack);
         }
+        output.putBoolean("KeyLocked", keyLocked);
     }
 
     @Override
@@ -333,8 +377,9 @@ public class TardisExteriorBlockEntity extends BlockEntity implements GeoBlockEn
         components.load(input, TardisComponentTypes.ALL);
 
         input.getString("RenderedKeyOwner").ifPresent(s -> renderedKeyOwner = UUID.fromString(s));
-        heldKeyStack = input.read("HeldKeyStack", net.minecraft.world.item.ItemStack.OPTIONAL_CODEC)
-                .orElse(net.minecraft.world.item.ItemStack.EMPTY);
+        heldKeyStack = input.read("HeldKeyStack", ItemStack.OPTIONAL_CODEC)
+                .orElse(ItemStack.EMPTY);
+        keyLocked = input.getBooleanOr("KeyLocked", true);
     }
 
     @Override
@@ -380,7 +425,6 @@ public class TardisExteriorBlockEntity extends BlockEntity implements GeoBlockEn
                                 Thread.sleep(50);
                                 if (controller != null) {
                                     controller.setAnimationSpeed(1.0);
-                                    System.out.println("Reset animation speed to normal");
                                 }
                             } catch (InterruptedException ignored) {}
                         }).start();
@@ -401,6 +445,11 @@ public class TardisExteriorBlockEntity extends BlockEntity implements GeoBlockEn
                 .triggerableAnim("close_all", RawAnimation.begin().thenPlay("close_all"));
 
         registrar.add(controller);
+
+        keyController = new AnimationController<>("key_controller", 0, state -> PlayState.CONTINUE);
+        keyController.triggerableAnim("key_lock", RawAnimation.begin().thenPlay("key_lock"))
+                .triggerableAnim("key_unlock", RawAnimation.begin().thenPlay("key_unlock"));
+        registrar.add(keyController);
 
         if (level != null && level.isClientSide()) {
             snapToState();

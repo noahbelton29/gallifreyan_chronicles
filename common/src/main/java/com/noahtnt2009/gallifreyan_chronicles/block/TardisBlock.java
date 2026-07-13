@@ -9,7 +9,9 @@ import com.noahtnt2009.gallifreyan_chronicles.init.GCItems;
 import com.noahtnt2009.gallifreyan_chronicles.tardis.ecs.system.ConsoleLinkSystem;
 import com.noahtnt2009.gallifreyan_chronicles.tardis.ecs.system.TardisLinkSystem;
 import com.noahtnt2009.gallifreyan_chronicles.tardis.ecs.component.TardisComponent;
+import com.noahtnt2009.gallifreyan_chronicles.tardis.ecs.component.DoorState;
 import net.minecraft.core.BlockPos;
+import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.LivingEntity;
@@ -87,12 +89,23 @@ public class TardisBlock extends BaseEntityBlock {
         if (tardis.hasKeyRendered()) {
             if (level.isClientSide()) return InteractionResult.SUCCESS;
 
-            if (player.isShiftKeyDown() && player.getUUID().equals(tardis.getRenderedKeyOwner())) {
-                ItemStack returned = tardis.clearHeldKey();
-                returned.set(GCDataComponents.KEY_INSERTED, false);
-                if (!player.getInventory().add(returned)) {
-                    player.drop(returned, false);
+            boolean isOwner = player.getUUID().equals(tardis.getRenderedKeyOwner());
+
+            if (player.isShiftKeyDown() && isOwner) {
+                if (tardis.getDoorState() == DoorState.CLOSED) {
+                    ItemStack returned = tardis.clearHeldKey();
+                    returned.set(GCDataComponents.KEY_INSERTED, false);
+                    if (!player.getInventory().add(returned)) {
+                        player.drop(returned, false);
+                    }
+                    return InteractionResult.CONSUME;
+                } else {
+                    player.sendOverlayMessage(Component.literal("Close the doors before removing the key!"));
+                    return InteractionResult.FAIL;
                 }
+            } else if (!player.isShiftKeyDown() && isOwner) {
+                tardis.toggleKeyLockAnimation();
+                return InteractionResult.CONSUME;
             }
 
             return InteractionResult.CONSUME;

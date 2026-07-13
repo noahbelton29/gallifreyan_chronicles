@@ -19,6 +19,16 @@ public class GCDataComponents {
             () -> DataComponentType.<String>builder().persistent(Codec.STRING).build()
     );
 
+    public static final DataComponentType<java.util.UUID> TARDIS_ID = register(
+            "tardis_id",
+            () -> DataComponentType.<java.util.UUID>builder().persistent(net.minecraft.core.UUIDUtil.CODEC).build()
+    );
+
+    public static final DataComponentType<Boolean> KEY_INSERTED = register(
+            "key_inserted",
+            () -> DataComponentType.<Boolean>builder().persistent(Codec.BOOL).build()
+    );
+
     private static <T> DataComponentType<T> register(String name, Supplier<DataComponentType<T>> supplier) {
         return Registry.register(
                 BuiltInRegistries.DATA_COMPONENT_TYPE,

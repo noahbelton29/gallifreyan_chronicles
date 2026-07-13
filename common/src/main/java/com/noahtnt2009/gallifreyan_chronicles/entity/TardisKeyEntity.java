@@ -1,0 +1,323 @@
+package com.noahtnt2009.gallifreyan_chronicles.entity;
+
+import com.noahtnt2009.gallifreyan_chronicles.Constants;
+import com.noahtnt2009.gallifreyan_chronicles.block.entity.TardisExteriorBlockEntity;
+import com.noahtnt2009.gallifreyan_chronicles.init.GCDataComponents;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.particles.ParticleTypes;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.syncher.EntityDataAccessor;
+import net.minecraft.network.syncher.EntityDataSerializers;
+import net.minecraft.network.syncher.SynchedEntityData;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.sounds.SoundEvents;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.world.damagesource.DamageSource;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.EntityDimensions;
+import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.Pose;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.Items;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
+import net.minecraft.world.phys.AABB;
+import net.minecraft.world.phys.Vec3;
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
+
+import java.util.UUID;
+import java.util.function.Supplier;
+
+public class TardisKeyEntity extends Entity {
+    public static Supplier<EntityType<TardisKeyEntity>> TYPE;
+
+    private static final EntityDataAccessor<Float> KEY_WIDTH =
+            SynchedEntityData.defineId(TardisKeyEntity.class, EntityDataSerializers.FLOAT);
+    private static final EntityDataAccessor<Float> KEY_HEIGHT =
+            SynchedEntityData.defineId(TardisKeyEntity.class, EntityDataSerializers.FLOAT);
+    private static final EntityDataAccessor<Float> KEY_DEPTH =
+            SynchedEntityData.defineId(TardisKeyEntity.class, EntityDataSerializers.FLOAT);
+    private static final EntityDataAccessor<BlockPos> EXTERIOR_POS =
+            SynchedEntityData.defineId(TardisKeyEntity.class, EntityDataSerializers.BLOCK_POS);
+
+    public static final float DEFAULT_WIDTH = 0.25f;
+    public static final float DEFAULT_HEIGHT = 0.25f;
+    public static final float DEFAULT_DEPTH = DEFAULT_WIDTH;
+    public static final Vec3 DEFAULT_OFFSET = new Vec3(0.0, -0.925, 1.0);
+
+    public TardisKeyEntity(EntityType<? extends TardisKeyEntity> type, Level level) {
+        super(type, level);
+        this.noPhysics = true;
+        this.setInvisible(true);
+    }
+
+    public static TardisKeyEntity create(Level level, BlockPos exteriorPos, Vec3 worldPos) {
+        TardisKeyEntity entity = new TardisKeyEntity(TYPE.get(), level);
+        entity.setExteriorPos(exteriorPos);
+        entity.setPos(worldPos.add(DEFAULT_OFFSET));
+        return entity;
+    }
+
+    @Override
+    protected void defineSynchedData(SynchedEntityData.Builder builder) {
+        builder.define(KEY_WIDTH, DEFAULT_WIDTH);
+        builder.define(KEY_HEIGHT, DEFAULT_HEIGHT);
+        builder.define(KEY_DEPTH, DEFAULT_DEPTH);
+        builder.define(EXTERIOR_POS, BlockPos.ZERO);
+    }
+
+    @Override
+    public boolean hurtServer(@NonNull ServerLevel serverLevel, DamageSource damageSource, float v) {
+        return false;
+    }
+
+    @Override
+    public @NonNull EntityDimensions getDimensions(@NonNull Pose pose) {
+        return EntityDimensions.scalable(this.getKeyWidth(), this.getKeyHeight());
+    }
+
+    private AABB computeKeyBoundingBox() {
+        Vec3 pos = this.position();
+        double halfWidth = this.getKeyWidth() / 2.0;
+        double halfDepth = this.getKeyDepth() / 2.0;
+        double height = this.getKeyHeight();
+        return new AABB(
+                pos.x - halfWidth, pos.y, pos.z - halfDepth,
+                pos.x + halfWidth, pos.y + height, pos.z + halfDepth
+        );
+    }
+
+    private void refreshKeyBoundingBox() {
+        this.setBoundingBox(this.computeKeyBoundingBox());
+    }
+
+    @Override
+    public void setPos(double x, double y, double z) {
+        super.setPos(x, y, z);
+        this.refreshKeyBoundingBox();
+    }
+
+    public float getKeyWidth() {
+        return this.entityData.get(KEY_WIDTH);
+    }
+
+    public float getKeyHeight() {
+        return this.entityData.get(KEY_HEIGHT);
+    }
+
+    public float getKeyDepth() {
+        return this.entityData.get(KEY_DEPTH);
+    }
+
+    public void setKeySize(float width, float height) {
+        this.setKeySize(width, height, width);
+    }
+
+    public void setKeySize(float width, float height, float depth) {
+        this.entityData.set(KEY_WIDTH, width);
+        this.entityData.set(KEY_HEIGHT, height);
+        this.entityData.set(KEY_DEPTH, depth);
+        this.refreshDimensions();
+        this.refreshKeyBoundingBox();
+    }
+
+    public BlockPos getExteriorPos() {
+        return this.entityData.get(EXTERIOR_POS);
+    }
+
+    public void setExteriorPos(BlockPos pos) {
+        this.entityData.set(EXTERIOR_POS, pos);
+    }
+
+    public Vec3 getOffset() {
+        return this.position().subtract(Vec3.atCenterOf(this.getExteriorPos()));
+    }
+
+    public void setOffset(Vec3 offset) {
+        this.setPos(Vec3.atCenterOf(this.getExteriorPos()).add(offset));
+    }
+
+    @Nullable
+    public TardisExteriorBlockEntity getExterior() {
+        BlockPos pos = this.getExteriorPos();
+        if (pos == null) return null;
+        BlockEntity be = this.level().getBlockEntity(pos);
+        if (be instanceof TardisExteriorBlockEntity exterior) return exterior;
+        Constants.LOG.warn("Key entity at {} has no exterior block entity at {}", this.position(), pos);
+        return null;
+    }
+
+    @Override
+    public @NonNull InteractionResult interact(@NonNull Player player, @NonNull InteractionHand hand,
+                                               @NonNull Vec3 location) {
+        if (this.keyEditorHandler(player)) {
+            return this.level().isClientSide() ? InteractionResult.SUCCESS : InteractionResult.CONSUME;
+        }
+
+        if (!player.isShiftKeyDown()) {
+            return InteractionResult.PASS;
+        }
+
+        if (this.level().isClientSide()) {
+            return InteractionResult.SUCCESS;
+        }
+
+        TardisExteriorBlockEntity exterior = this.getExterior();
+        if (exterior == null) {
+            return InteractionResult.FAIL;
+        }
+
+        if (exterior.hasKeyRendered()) {
+            return this.tryRemoveKey(exterior, player);
+        }
+
+        return this.tryInsertKey(exterior, player, hand);
+    }
+
+    private InteractionResult tryInsertKey(TardisExteriorBlockEntity exterior, Player player, InteractionHand hand) {
+        ItemStack held = player.getItemInHand(hand);
+
+        if (!(held.getItem() instanceof com.noahtnt2009.gallifreyan_chronicles.item.TardisKeyItem)) {
+            return InteractionResult.FAIL;
+        }
+
+        UUID keyTardisId = held.get(GCDataComponents.TARDIS_ID);
+        UUID exteriorTardisId = exterior.getTardisId();
+
+        if (keyTardisId == null || !keyTardisId.equals(exteriorTardisId)) {
+            return InteractionResult.FAIL;
+        }
+
+        boolean alreadyInserted = Boolean.TRUE.equals(held.get(GCDataComponents.KEY_INSERTED));
+        if (alreadyInserted) {
+            return InteractionResult.FAIL;
+        }
+
+        ItemStack toStore = held.copyWithCount(1);
+        toStore.set(GCDataComponents.KEY_INSERTED, true);
+        exterior.setHeldKey(player.getUUID(), toStore);
+        held.shrink(1);
+
+        return InteractionResult.CONSUME;
+    }
+
+    private InteractionResult tryRemoveKey(TardisExteriorBlockEntity exterior, Player player) {
+        if (!player.getUUID().equals(exterior.getRenderedKeyOwner())) {
+            return InteractionResult.FAIL;
+        }
+
+        ItemStack returned = exterior.clearHeldKey();
+        returned.set(GCDataComponents.KEY_INSERTED, false);
+        if (!player.getInventory().add(returned)) {
+            player.drop(returned, false);
+        }
+
+        return InteractionResult.CONSUME;
+    }
+
+    public boolean keyEditorHandler(Player player) {
+        if (!player.hasInfiniteMaterials()) {
+            return false;
+        }
+
+        final float increment = 0.0125f;
+        var heldItem = player.getMainHandItem().getItem();
+
+        if (heldItem == Items.PAPER) {
+            this.printPosition(player);
+            return true;
+        }
+
+        boolean sneaking = player.isShiftKeyDown();
+        boolean handled = true;
+
+        if (heldItem == Items.EMERALD_BLOCK) {
+            this.setPos(this.position().add(sneaking ? -increment : increment, 0, 0));
+        } else if (heldItem == Items.DIAMOND_BLOCK) {
+            this.setPos(this.position().add(0, sneaking ? -increment : increment, 0));
+        } else if (heldItem == Items.REDSTONE_BLOCK) {
+            this.setPos(this.position().add(0, 0, sneaking ? -increment : increment));
+        } else if (heldItem == Items.COD) {
+            float newWidth = Math.max(0.0625f, this.getKeyWidth() + (sneaking ? -increment : increment));
+            this.setKeySize(newWidth, this.getKeyHeight(), this.getKeyDepth());
+        } else if (heldItem == Items.COOKED_COD) {
+            float newHeight = Math.max(0.0625f, this.getKeyHeight() + (sneaking ? -increment : increment));
+            this.setKeySize(this.getKeyWidth(), newHeight, this.getKeyDepth());
+        } else if (heldItem == Items.SALMON) {
+            float newDepth = Math.max(0.0625f, this.getKeyDepth() + (sneaking ? -increment : increment));
+            this.setKeySize(this.getKeyWidth(), this.getKeyHeight(), newDepth);
+        } else {
+            handled = false;
+        }
+
+        if (handled) {
+            if (!(heldItem == Items.COD || heldItem == Items.COOKED_COD || heldItem == Items.SALMON)) {
+                this.playSound(SoundEvents.UI_BUTTON_CLICK.value(), 0.4f, 1.6f);
+            }
+            this.printPosition(player);
+        }
+
+        return handled;
+    }
+
+    public void printPosition(Player player) {
+        Vec3 pos = this.position();
+        Vec3 offset = this.getOffset();
+
+        String chatLine = String.format(
+                "[tardis_key] pos=(%.4f, %.4f, %.4f) offset=(%.4f, %.4f, %.4f) size=(%.4f, %.4f, %.4f)",
+                pos.x, pos.y, pos.z, offset.x, offset.y, offset.z,
+                this.getKeyWidth(), this.getKeyHeight(), this.getKeyDepth());
+
+        String pasteLine = String.format(
+                "new Vector3f(%.4ff, %.4ff, %.4ff) // width=%.4ff height=%.4ff depth=%.4ff",
+                offset.x, offset.y, offset.z, this.getKeyWidth(), this.getKeyHeight(), this.getKeyDepth());
+
+        player.sendSystemMessage(Component.literal(chatLine));
+        player.sendSystemMessage(Component.literal(pasteLine));
+        Constants.LOG.info("TardisKeyEntity -> {}", chatLine);
+
+        if (this.level() instanceof ServerLevel serverLevel) {
+            serverLevel.sendParticles(ParticleTypes.END_ROD,
+                    pos.x, pos.y, pos.z, 3, 0.02, 0.02, 0.02, 0.0);
+        }
+    }
+
+    @Override
+    protected void readAdditionalSaveData(ValueInput input) {
+        input.read("ExteriorPos", BlockPos.CODEC).ifPresent(this::setExteriorPos);
+
+        float width = input.getFloatOr("KeyWidth", DEFAULT_WIDTH);
+        float height = input.getFloatOr("KeyHeight", DEFAULT_HEIGHT);
+        float depth = input.getFloatOr("KeyDepth", width);
+        this.setKeySize(width, height, depth);
+    }
+
+    @Override
+    protected void addAdditionalSaveData(ValueOutput output) {
+        output.store("ExteriorPos", BlockPos.CODEC, this.getExteriorPos());
+        output.putFloat("KeyWidth", this.getKeyWidth());
+        output.putFloat("KeyHeight", this.getKeyHeight());
+        output.putFloat("KeyDepth", this.getKeyDepth());
+    }
+
+    @Override
+    public boolean isPickable() {
+        return true;
+    }
+
+    @Override
+    public boolean isPushable() {
+        return false;
+    }
+
+    @Override
+    public boolean skipAttackInteraction(@NonNull Entity attacker) {
+        return true;
+    }
+}

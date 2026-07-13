@@ -43,7 +43,8 @@ import org.jspecify.annotations.NonNull;
 import java.util.UUID;
 import java.util.function.Supplier;
 
-public class TardisExteriorBlockEntity extends BlockEntity implements GeoBlockEntity, ComponentHolder, TardisLinkable {
+public class TardisExteriorBlockEntity extends BlockEntity implements GeoBlockEntity, ComponentHolder, TardisLinkable,
+        com.noahtnt2009.gallifreyan_chronicles.client.renderer.geo_layer.TardisExteriorKeyLayer.TardisExteriorRenderable {
     public static Supplier<BlockEntityType<TardisExteriorBlockEntity>> TYPE;
     private AnimationController<TardisExteriorBlockEntity> controller;
     private final ComponentStore components = new ComponentStore();
@@ -51,8 +52,84 @@ public class TardisExteriorBlockEntity extends BlockEntity implements GeoBlockEn
 
     private boolean needsStateSync = false;
 
+    private UUID renderedKeyOwner = null;
+    private net.minecraft.world.item.ItemStack heldKeyStack = net.minecraft.world.item.ItemStack.EMPTY;
+    private com.noahtnt2009.gallifreyan_chronicles.entity.TardisKeyEntity keyEntity = null;
+    private volatile net.minecraft.world.phys.Vec3 cachedKeyBoneWorldPos = null;
+
+    public void setCachedKeyBoneWorldPos(net.minecraft.world.phys.Vec3 pos) {
+        this.cachedKeyBoneWorldPos = pos;
+    }
+
+    public @Nullable net.minecraft.world.phys.Vec3 getCachedKeyBoneWorldPos() {
+        return cachedKeyBoneWorldPos;
+    }
+
+    public @Nullable com.noahtnt2009.gallifreyan_chronicles.entity.TardisKeyEntity getKeyEntity() {
+        return keyEntity;
+    }
+
+    public void setKeyEntity(com.noahtnt2009.gallifreyan_chronicles.entity.TardisKeyEntity keyEntity) {
+        this.keyEntity = keyEntity;
+    }
+
+    public com.noahtnt2009.gallifreyan_chronicles.entity.TardisKeyEntity spawnKeyEntity() {
+        if (level == null || level.isClientSide() || !(level instanceof net.minecraft.server.level.ServerLevel serverLevel)) {
+            return keyEntity;
+        }
+
+        if (keyEntity != null && keyEntity.isAlive()) {
+            keyEntity.discard();
+        }
+
+        net.minecraft.world.phys.Vec3 worldPos = net.minecraft.world.phys.Vec3.atCenterOf(getBlockPos());
+        com.noahtnt2009.gallifreyan_chronicles.entity.TardisKeyEntity entity =
+                com.noahtnt2009.gallifreyan_chronicles.entity.TardisKeyEntity.create(serverLevel, getBlockPos(), worldPos);
+        serverLevel.addFreshEntity(entity);
+        this.keyEntity = entity;
+        return entity;
+    }
+
+    public void discardKeyEntity() {
+        if (keyEntity != null) {
+            keyEntity.discard();
+            keyEntity = null;
+        }
+    }
+
     public TardisExteriorBlockEntity(BlockPos pos, BlockState state) {
         super(TYPE.get(), pos, state);
+    }
+
+    public boolean hasKeyRendered() {
+        return renderedKeyOwner != null;
+    }
+
+    public @Nullable UUID getRenderedKeyOwner() {
+        return renderedKeyOwner;
+    }
+
+    public net.minecraft.world.item.ItemStack getHeldKeyStack() {
+        return heldKeyStack;
+    }
+
+    @Override
+    public net.minecraft.world.item.@Nullable ItemStack gc$getHeldKeyStack() {
+        return heldKeyStack;
+    }
+
+    public void setHeldKey(UUID owner, net.minecraft.world.item.ItemStack stack) {
+        this.renderedKeyOwner = owner;
+        this.heldKeyStack = stack.copy();
+        sync();
+    }
+
+    public net.minecraft.world.item.ItemStack clearHeldKey() {
+        net.minecraft.world.item.ItemStack returned = this.heldKeyStack.copy();
+        this.renderedKeyOwner = null;
+        this.heldKeyStack = net.minecraft.world.item.ItemStack.EMPTY;
+        sync();
+        return returned;
     }
 
     @Override
@@ -243,12 +320,27 @@ public class TardisExteriorBlockEntity extends BlockEntity implements GeoBlockEn
     protected void saveAdditional(@NonNull ValueOutput output) {
         super.saveAdditional(output);
         components.save(output, TardisComponentTypes.ALL);
+
+        if (renderedKeyOwner != null) {
+            output.putString("RenderedKeyOwner", renderedKeyOwner.toString());
+            output.store("HeldKeyStack", net.minecraft.world.item.ItemStack.OPTIONAL_CODEC, heldKeyStack);
+        }
     }
 
     @Override
     public void loadAdditional(@NonNull ValueInput input) {
         super.loadAdditional(input);
         components.load(input, TardisComponentTypes.ALL);
+
+        input.getString("RenderedKeyOwner").ifPresent(s -> renderedKeyOwner = UUID.fromString(s));
+        heldKeyStack = input.read("HeldKeyStack", net.minecraft.world.item.ItemStack.OPTIONAL_CODEC)
+                .orElse(net.minecraft.world.item.ItemStack.EMPTY);
+    }
+
+    @Override
+    public void setRemoved() {
+        super.setRemoved();
+        discardKeyEntity();
     }
 
     public void sync() {

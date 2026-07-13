@@ -1,6 +1,7 @@
 package com.noahtnt2009.gallifreyan_chronicles.client.renderer;
 
 import com.noahtnt2009.gallifreyan_chronicles.entity.TardisControlEntity;
+import com.noahtnt2009.gallifreyan_chronicles.entity.TardisKeyEntity;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.components.debug.DebugScreenEntries;
 import net.minecraft.client.renderer.culling.Frustum;
@@ -32,20 +33,31 @@ public class TardisControlHitboxDebugRenderer implements DebugRenderer.SimpleDeb
         }
 
         for (Entity entity : this.minecraft.level.entitiesForRendering()) {
-            if (!(entity instanceof TardisControlEntity control)) {
-                continue;
-            }
-            if (!frustum.isVisible(entity.getBoundingBox())) {
-                continue;
-            }
+            if (entity instanceof TardisControlEntity control) {
+                if (!frustum.isVisible(entity.getBoundingBox())) {
+                    continue;
+                }
 
-            Vec3 latestPosition = entity.position();
-            Vec3 currentPosition = entity.getPosition(partialTicks);
-            Vec3 offset = currentPosition.subtract(latestPosition);
+                Vec3 latestPosition = entity.position();
+                Vec3 currentPosition = entity.getPosition(partialTicks);
+                Vec3 offset = currentPosition.subtract(latestPosition);
 
-            int color = colorFor(control.getControlId());
-            Gizmos.cuboid(entity.getBoundingBox().move(offset), GizmoStyle.stroke(color));
-            Gizmos.point(currentPosition, color, 2.0F);
+                int color = colorFor(control.getControlId());
+                Gizmos.cuboid(entity.getBoundingBox().move(offset), GizmoStyle.stroke(color));
+                Gizmos.point(currentPosition, color, 2.0F);
+            } else if (entity instanceof TardisKeyEntity keyEntity) {
+                if (!frustum.isVisible(entity.getBoundingBox())) {
+                    continue;
+                }
+
+                Vec3 latestPosition = entity.position();
+                Vec3 currentPosition = entity.getPosition(partialTicks);
+                Vec3 offset = currentPosition.subtract(latestPosition);
+
+                int color = colorFor("tardis_key");
+                Gizmos.cuboid(entity.getBoundingBox().move(offset), GizmoStyle.stroke(color));
+                Gizmos.point(currentPosition, color, 2.0F);
+            }
         }
     }
 

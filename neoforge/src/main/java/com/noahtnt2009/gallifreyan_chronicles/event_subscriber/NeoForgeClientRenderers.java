@@ -5,7 +5,10 @@ import com.noahtnt2009.gallifreyan_chronicles.block.entity.TardisConsoleBlockEnt
 import com.noahtnt2009.gallifreyan_chronicles.block.entity.TardisExteriorBlockEntity;
 import com.noahtnt2009.gallifreyan_chronicles.client.renderer.TardisConsoleBlockRenderer;
 import com.noahtnt2009.gallifreyan_chronicles.client.renderer.TardisControlEntityRenderer;
+import com.noahtnt2009.gallifreyan_chronicles.client.renderer.TardisKeyEntityRenderer;
 import com.noahtnt2009.gallifreyan_chronicles.client.renderer.TardisExteriorBlockRenderer;
+import net.minecraft.client.Minecraft;
+import net.neoforged.neoforge.client.event.ClientTickEvent;
 import com.noahtnt2009.gallifreyan_chronicles.init.GCEntityTypes;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.SubscribeEvent;
@@ -20,6 +23,7 @@ public class NeoForgeClientRenderers {
         event.registerBlockEntityRenderer(TardisExteriorBlockEntity.TYPE.get(), TardisExteriorBlockRenderer::new);
         event.registerBlockEntityRenderer(TardisConsoleBlockEntity.TYPE.get(), TardisConsoleBlockRenderer::new);
         event.registerEntityRenderer(GCEntityTypes.TARDIS_CONTROL_ENTITY_TYPE.get(), TardisControlEntityRenderer::new);
+        event.registerEntityRenderer(GCEntityTypes.TARDIS_KEY_ENTITY_TYPE.get(), TardisKeyEntityRenderer::new);
 
         Constants.LOG.info("Registered GC Client Renderers (NeoForge)");
     }

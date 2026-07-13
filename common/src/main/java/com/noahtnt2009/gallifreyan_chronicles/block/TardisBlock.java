@@ -4,6 +4,8 @@ import com.mojang.serialization.MapCodec;
 import com.noahtnt2009.gallifreyan_chronicles.Constants;
 import com.noahtnt2009.gallifreyan_chronicles.block.entity.TardisExteriorBlockEntity;
 import com.noahtnt2009.gallifreyan_chronicles.ecs.Entity;
+import com.noahtnt2009.gallifreyan_chronicles.init.GCDataComponents;
+import com.noahtnt2009.gallifreyan_chronicles.init.GCItems;
 import com.noahtnt2009.gallifreyan_chronicles.tardis.ecs.system.ConsoleLinkSystem;
 import com.noahtnt2009.gallifreyan_chronicles.tardis.ecs.system.TardisLinkSystem;
 import com.noahtnt2009.gallifreyan_chronicles.tardis.ecs.component.TardisComponent;
@@ -58,6 +60,14 @@ public class TardisBlock extends BaseEntityBlock {
             blockEntity.sync();
 
             ConsoleLinkSystem.spawnAndLink(serverLevel, record.getTardisId(), pos);
+            blockEntity.spawnKeyEntity();
+
+            ItemStack key = new ItemStack(GCItems.TARDIS_KEY);
+            key.set(GCDataComponents.TARDIS_ID, record.getTardisId());
+            key.set(GCDataComponents.KEY_INSERTED, false);
+            if (!player.getInventory().add(key)) {
+                player.drop(key, false);
+            }
 
             Constants.LOG.debug(
                     "Registered TARDIS {} for player {}",
@@ -70,10 +80,26 @@ public class TardisBlock extends BaseEntityBlock {
     @Override
     protected @NonNull InteractionResult useWithoutItem(@NonNull BlockState state, Level level, @NonNull BlockPos pos,
                                                         @NonNull Player player, @NonNull BlockHitResult hitResult) {
-        if (level.isClientSide()) return InteractionResult.SUCCESS;
-        if (level.getBlockEntity(pos) instanceof TardisExteriorBlockEntity tardis) {
-            tardis.interact(player.isShiftKeyDown());
+        if (!(level.getBlockEntity(pos) instanceof TardisExteriorBlockEntity tardis)) {
+            return InteractionResult.CONSUME;
         }
+
+        if (tardis.hasKeyRendered()) {
+            if (level.isClientSide()) return InteractionResult.SUCCESS;
+
+            if (player.isShiftKeyDown() && player.getUUID().equals(tardis.getRenderedKeyOwner())) {
+                ItemStack returned = tardis.clearHeldKey();
+                returned.set(GCDataComponents.KEY_INSERTED, false);
+                if (!player.getInventory().add(returned)) {
+                    player.drop(returned, false);
+                }
+            }
+
+            return InteractionResult.CONSUME;
+        }
+
+        if (level.isClientSide()) return InteractionResult.SUCCESS;
+        tardis.interact(player.isShiftKeyDown());
         return InteractionResult.CONSUME;
     }
 

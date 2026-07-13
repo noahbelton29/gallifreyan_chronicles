@@ -2,6 +2,7 @@ package com.noahtnt2009.gallifreyan_chronicles.init;
 
 import com.noahtnt2009.gallifreyan_chronicles.Constants;
 import com.noahtnt2009.gallifreyan_chronicles.entity.TardisControlEntity;
+import com.noahtnt2009.gallifreyan_chronicles.entity.TardisKeyEntity;
 import com.noahtnt2009.gallifreyan_chronicles.util.GCUtils;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
@@ -26,9 +27,19 @@ public class GCEntityTypes {
                             .build(ResourceKey.create(Registries.ENTITY_TYPE,
                                     GCUtils.of("tardis_control"))));
 
+    public static final Supplier<EntityType<TardisKeyEntity>> TARDIS_KEY_ENTITY_TYPE =
+            ENTITY_TYPES.register("tardis_key", () ->
+                    EntityType.Builder.of(TardisKeyEntity::new, MobCategory.MISC)
+                            .sized(TardisKeyEntity.DEFAULT_WIDTH, TardisKeyEntity.DEFAULT_HEIGHT)
+                            .noSummon()
+                            .noSave()
+                            .build(ResourceKey.create(Registries.ENTITY_TYPE,
+                                    GCUtils.of("tardis_key"))));
+
     public static void registerEntityTypes(IEventBus eventBus) {
         Constants.LOG.info("Registered GC Entity Types (NeoForge)");
         ENTITY_TYPES.register(eventBus);
         TardisControlEntity.TYPE = TARDIS_CONTROL_ENTITY_TYPE;
+        TardisKeyEntity.TYPE = TARDIS_KEY_ENTITY_TYPE;
     }
 }

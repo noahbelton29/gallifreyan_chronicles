@@ -7,6 +7,7 @@ import com.mojang.math.Axis;
 import com.noahtnt2009.gallifreyan_chronicles.block.TardisExteriorBlockModel;
 import com.noahtnt2009.gallifreyan_chronicles.block.entity.TardisExteriorBlockEntity;
 import com.noahtnt2009.gallifreyan_chronicles.client.renderer.geo_layer.TardisExteriorGlowLayer;
+import com.noahtnt2009.gallifreyan_chronicles.client.renderer.geo_layer.TardisExteriorKeyLayer;
 import net.minecraft.client.renderer.OrderedSubmitNodeCollector;
 import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
 import net.minecraft.client.renderer.rendertype.RenderType;
@@ -23,6 +24,7 @@ public class TardisExteriorBlockRenderer extends GeoBlockRenderer<@NotNull Tardi
         super(context, new TardisExteriorBlockModel());
 
         withRenderLayer(TardisExteriorGlowLayer::new);
+        withRenderLayer(renderer -> new TardisExteriorKeyLayer<>(renderer, context));
     }
 
     @SuppressWarnings("UnstableApiUsage")

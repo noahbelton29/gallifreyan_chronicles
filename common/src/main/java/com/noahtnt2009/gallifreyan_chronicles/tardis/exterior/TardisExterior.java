@@ -10,18 +10,7 @@ import net.minecraft.world.phys.Vec3;
 
 import java.util.Optional;
 
-/**
- * @param keyOffset North-facing (yaw 0) offset from the block center to the
- *                  {@code key_to_render} bone, as authored in the model/JSON.
- *                  Exactly one is supported per exterior — it positions the
- *                  {@code TardisKeyEntity} hitbox to match where the key
- *                  visually renders. Since it's authored assuming north,
- *                  it must be rotated by the exterior's current yaw before
- *                  use (see {@link TardisExterior#worldKeyOffset(float)}).
- */
 public record TardisExterior(String id, Vec3 keyOffset) implements IdentifiableData<TardisExterior> {
-
-    /** Matches {@link com.noahtnt2009.gallifreyan_chronicles.entity.TardisKeyEntity#DEFAULT_OFFSET}. */
     public static final Vec3 DEFAULT_KEY_OFFSET = new Vec3(0.0, -0.925, 1.0);
 
     private static final Codec<Vec3> VEC3_CODEC = RecordCodecBuilder.create(inst -> inst.group(
@@ -53,14 +42,6 @@ public record TardisExterior(String id, Vec3 keyOffset) implements IdentifiableD
         this(id, DEFAULT_KEY_OFFSET);
     }
 
-    /**
-     * Rotates the authored (north-facing) {@link #keyOffset} by the exterior's
-     * current yaw so the key hitbox tracks the model automatically regardless
-     * of which way the police box is facing. Mirrors the exact rotation the
-     * renderer applies to the model itself (see TardisExteriorBlockRenderer,
-     * {@code Axis.YP.rotationDegrees(180f - yaw)}), so the hitbox always lines
-     * up with where the key visually renders.
-     */
     public Vec3 worldKeyOffset(float yawDegrees) {
         double radians = Math.toRadians(180.0 - yawDegrees);
         double sin = Math.sin(radians);

@@ -1,0 +1,38 @@
+{
+  "id": "gallifreyan_chronicles:ambassadors_of_death_console",
+  "controls": [
+    {
+      "depth": 0.1875,
+      "id": "flight_lever",
+      "offset": {
+        "x": 0.3125,
+        "y": 0.5597,
+        "z": -0.9512
+      },
+      "width": 0.125,
+      "height": 0.1875
+    },
+    {
+      "depth": 0.1875,
+      "id": "handbrake",
+      "offset": {
+        "x": 0.0625,
+        "y": 0.5597,
+        "z": -0.9512
+      },
+      "width": 0.125,
+      "height": 0.1875
+    },
+    {
+      "depth": 0.1875,
+      "id": "power_lever",
+      "offset": {
+        "x": -0.7994,
+        "y": 0.5847,
+        "z": -0.4624
+      },
+      "width": 0.125,
+      "height": 0.1875
+    }
+  ]
+}

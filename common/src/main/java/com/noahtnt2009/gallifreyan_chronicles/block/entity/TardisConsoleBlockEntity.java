@@ -170,8 +170,20 @@ public class TardisConsoleBlockEntity extends BlockEntity implements GeoBlockEnt
         ConsoleSystem.setConsole(asEntity(), console);
     }
 
+    public void setConsole(TardisConsole console, String variantId) {
+        ConsoleSystem.setConsole(asEntity(), console, variantId);
+    }
+
     public TardisConsole getConsole() {
         return ConsoleSystem.consoleOf(asEntity());
+    }
+
+    public String getVariant() {
+        return ConsoleSystem.variantOf(asEntity());
+    }
+
+    public void setVariant(String variantId) {
+        ConsoleSystem.setVariant(asEntity(), variantId);
     }
 
     public @Nullable UUID getTardisId() {

@@ -79,6 +79,11 @@ public class ConsoleBlock extends BaseEntityBlock {
                 ? TardisConsoleRegistry.get(consoleId)
                 : TardisConsoleRegistry.get(TardisConsoleRegistry.DEFAULT_ID);
 
-        console.setConsole(selected);
+        String variantId = stack.get(GCDataComponents.CONSOLE_VARIANT);
+        if (variantId != null && selected.hasVariant(variantId)) {
+            console.setConsole(selected, variantId);
+        } else {
+            console.setConsole(selected);
+        }
     }
 }

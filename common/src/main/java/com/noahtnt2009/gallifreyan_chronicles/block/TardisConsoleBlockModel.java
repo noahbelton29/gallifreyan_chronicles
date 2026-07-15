@@ -18,7 +18,7 @@ public class TardisConsoleBlockModel extends GeoModel<TardisConsoleBlockEntity> 
 
     @Override
     public @NonNull Identifier getTextureResource(@NonNull GeoRenderState renderState) {
-        return TardisConsoleAssets.texture(getConsoleId(renderState));
+        return TardisConsoleAssets.texture(getTextureId(renderState));
     }
 
     @Override
@@ -34,5 +34,15 @@ public class TardisConsoleBlockModel extends GeoModel<TardisConsoleBlockEntity> 
             }
         }
         return TardisConsoleRegistry.getDefault().id();
+    }
+
+    private String getTextureId(GeoRenderState renderState) {
+        if (renderState.hasGeckolibData(TardisConsoleBlockRenderer.CONSOLE_TEXTURE_ID)) {
+            String textureId = renderState.getGeckolibData(TardisConsoleBlockRenderer.CONSOLE_TEXTURE_ID);
+            if (textureId != null && !textureId.isEmpty()) {
+                return textureId;
+            }
+        }
+        return getConsoleId(renderState);
     }
 }

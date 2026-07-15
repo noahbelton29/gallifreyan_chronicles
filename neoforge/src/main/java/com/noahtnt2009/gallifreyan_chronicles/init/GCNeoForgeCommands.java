@@ -61,6 +61,11 @@ public class GCNeoForgeCommands {
                                                                     return builder.buildFuture();
                                                                 })
                                                                 .executes(TardisCommand::setConsole)))
+                                                .then(literal("variant")
+                                                        .then(literal("set")
+                                                                .then(argument("variant_id", StringArgumentType.greedyString())
+                                                                        .suggests(TardisCommand::suggestConsoleVariants)
+                                                                        .executes(TardisCommand::setConsoleVariant))))
                                                 .then(literal("link")
                                                         .executes(TardisCommand::linkConsole))
                                                 .then(literal("unlink")
@@ -68,28 +73,28 @@ public class GCNeoForgeCommands {
                                         .then(literal("glow")
                                                 .then(argument("glowing", BoolArgumentType.bool())
                                                         .executes(TardisCommand::setGlowing))))
-                        .then(literal("debug")
-                                .then(literal("exteriors")
-                                        .executes(ctx -> {
-                                            ctx.getSource().sendSuccess(
-                                                    () -> Component.translatable("command.gallifreyan_chronicles.list_exterior", TardisExteriorRegistry.getAll()
-                                                            .stream().map(TardisExterior::id)
-                                                            .collect(Collectors.joining(", "))),
-                                                    false
-                                            );
-                                            return 1;
-                                        }))
-                                .then(literal("tardis")
-                                        .then(argument("id", StringArgumentType.string())
-                                                .suggests((ctx, builder) -> {
-                                                    TardisManager.get(ctx.getSource().getServer())
-                                                            .getAllIds()
-                                                            .forEach(id -> builder.suggest(id.toString()));
-                                                    return builder.buildFuture();
-                                                })
-                                                .executes(TardisCommand::debugTardis)))
-                                .then(literal("controls")
-                                        .executes(TardisCommand::listControls)))));
+                                .then(literal("debug")
+                                        .then(literal("exteriors")
+                                                .executes(ctx -> {
+                                                    ctx.getSource().sendSuccess(
+                                                            () -> Component.translatable("command.gallifreyan_chronicles.list_exterior", TardisExteriorRegistry.getAll()
+                                                                    .stream().map(TardisExterior::id)
+                                                                    .collect(Collectors.joining(", "))),
+                                                            false
+                                                    );
+                                                    return 1;
+                                                }))
+                                        .then(literal("tardis")
+                                                .then(argument("id", StringArgumentType.string())
+                                                        .suggests((ctx, builder) -> {
+                                                            TardisManager.get(ctx.getSource().getServer())
+                                                                    .getAllIds()
+                                                                    .forEach(id -> builder.suggest(id.toString()));
+                                                            return builder.buildFuture();
+                                                        })
+                                                        .executes(TardisCommand::debugTardis)))
+                                        .then(literal("controls")
+                                                .executes(TardisCommand::listControls)))));
 
         Constants.LOG.info("Registered GC Commands (NeoForge)");
     }

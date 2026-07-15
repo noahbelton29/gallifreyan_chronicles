@@ -19,6 +19,11 @@ public class GCDataComponents {
             () -> DataComponentType.<String>builder().persistent(Codec.STRING).build()
     );
 
+    public static final DataComponentType<String> CONSOLE_VARIANT = register(
+            "console_variant",
+            () -> DataComponentType.<String>builder().persistent(Codec.STRING).build()
+    );
+
     public static final DataComponentType<java.util.UUID> TARDIS_ID = register(
             "tardis_id",
             () -> DataComponentType.<java.util.UUID>builder().persistent(net.minecraft.core.UUIDUtil.CODEC).build()

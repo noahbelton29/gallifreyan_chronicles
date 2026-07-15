@@ -16,4 +16,17 @@ public final class ConsoleSystem {
     public static void setConsole(Entity entity, TardisConsole console) {
         entity.set(TardisComponentTypes.CONSOLE, ConsoleComponent.of(console));
     }
+
+    public static void setConsole(Entity entity, TardisConsole console, String variantId) {
+        entity.set(TardisComponentTypes.CONSOLE, ConsoleComponent.of(console, variantId));
+    }
+
+    public static String variantOf(Entity entity) {
+        return entity.get(TardisComponentTypes.CONSOLE).variantId();
+    }
+
+    public static void setVariant(Entity entity, String variantId) {
+        ConsoleComponent current = entity.get(TardisComponentTypes.CONSOLE);
+        entity.set(TardisComponentTypes.CONSOLE, current.withVariant(variantId));
+    }
 }

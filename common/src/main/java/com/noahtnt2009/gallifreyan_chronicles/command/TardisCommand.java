@@ -206,6 +206,100 @@ public class TardisCommand {
         return 1;
     }
 
+    public static java.util.concurrent.CompletableFuture<com.mojang.brigadier.suggestion.Suggestions> suggestConsoleVariants(
+            CommandContext<CommandSourceStack> ctx,
+            com.mojang.brigadier.suggestion.SuggestionsBuilder builder
+    ) {
+        String tardisIdStr;
+        try {
+            tardisIdStr = StringArgumentType.getString(ctx, "id");
+        } catch (IllegalArgumentException e) {
+            return builder.buildFuture();
+        }
+
+        UUID tardisId;
+        try {
+            tardisId = UUID.fromString(tardisIdStr);
+        } catch (IllegalArgumentException e) {
+            return builder.buildFuture();
+        }
+
+        TardisManager manager = TardisManager.get(ctx.getSource().getServer());
+        BlockPos pos = manager.getConsoleBlockPos(tardisId);
+        findBlockEntity(ctx, pos, TardisConsoleBlockEntity.class)
+                .map(TardisConsoleBlockEntity::getConsole)
+                .ifPresent(console -> console.variants().keySet().forEach(builder::suggest));
+
+        return builder.buildFuture();
+    }
+
+    public static int setConsoleVariant(CommandContext<CommandSourceStack> ctx) {
+        String tardisIdStr = StringArgumentType.getString(ctx, "id");
+        String variantId = StringArgumentType.getString(ctx, "variant_id");
+
+        UUID tardisId;
+        try {
+            tardisId = UUID.fromString(tardisIdStr);
+        } catch (IllegalArgumentException e) {
+            ctx.getSource().sendFailure(Component.translatable(
+                    "command.gallifreyan_chronicles.invalid_id",
+                    tardisIdStr
+            ));
+            return 0;
+        }
+
+        TardisManager manager = TardisManager.get(ctx.getSource().getServer());
+        Optional<TardisComponent> opt = manager.get(tardisId);
+
+        if (opt.isEmpty()) {
+            ctx.getSource().sendFailure(Component.translatable(
+                    "command.gallifreyan_chronicles.no_tardis_id",
+                    tardisIdStr
+            ));
+            return 0;
+        }
+
+        BlockPos pos = manager.getConsoleBlockPos(tardisId);
+        Optional<TardisConsoleBlockEntity> blockEntity = findBlockEntity(ctx, pos, TardisConsoleBlockEntity.class);
+
+        if (blockEntity.isEmpty()) {
+            ctx.getSource().sendFailure(Component.translatable(
+                    "command.gallifreyan_chronicles.no_console",
+                    tardisIdStr
+            ));
+            return 0;
+        }
+
+        TardisConsoleBlockEntity be = blockEntity.get();
+        TardisConsole console = be.getConsole();
+        if (!console.hasVariant(variantId)) {
+            ctx.getSource().sendFailure(Component.translatable(
+                    "command.gallifreyan_chronicles.unknown_console_variant",
+                    variantId,
+                    console.id()
+            ));
+            return 0;
+        }
+
+        be.setVariant(variantId);
+
+        ServerPlayer sourcePlayer = ctx.getSource().getPlayer();
+        if (sourcePlayer != null) {
+            Services.NETWORK.sendTardisConsoleSync(sourcePlayer, TardisConsoleSyncPayload.create());
+        }
+
+        ctx.getSource().sendSuccess(
+                () -> Component.translatable(
+                        "command.gallifreyan_chronicles.set_console_variant",
+                        tardisIdStr,
+                        variantId
+                ),
+                true
+        );
+
+        return 1;
+    }
+
     public static int getConsole(CommandContext<CommandSourceStack> ctx) {
         String tardisIdStr = StringArgumentType.getString(ctx, "id");
 

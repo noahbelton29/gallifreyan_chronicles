@@ -1,0 +1,17 @@
+{
+  "type": "gallifreyan_chronicles:tardis_interior_type",
+  "generator": {
+    "type": "minecraft:flat",
+    "settings": {
+      "biome": "gallifreyan_chronicles:tardis_interior",
+      "features": true,
+      "lakes": false,
+      "layers": [
+        {
+          "block": "minecraft:void_air",
+          "height": 1
+        }
+      ]
+    }
+  }
+}

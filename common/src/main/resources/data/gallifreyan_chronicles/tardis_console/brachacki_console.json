@@ -1,5 +1,11 @@
 {
-  "id": "gallifreyan_chronicles:first_doctors_console",
+  "id": "gallifreyan_chronicles:brachacki_console",
+  "default_variant": "brachacki_console/first_doctors_console",
+  "variants": {
+    "first_doctors_console": "gallifreyan_chronicles:brachacki_console/first_doctors_console",
+    "tuat_console": "gallifreyan_chronicles:brachacki_console/tuat_console",
+    "second_doctors_console": "gallifreyan_chronicles:brachacki_console/second_doctors_console"
+  },
   "controls": [
     {
       "depth": 0.1875,

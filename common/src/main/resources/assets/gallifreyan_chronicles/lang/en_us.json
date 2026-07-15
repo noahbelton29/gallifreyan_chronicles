@@ -56,6 +56,8 @@
   "command.gallifreyan_chronicles.owner": "Owner: %s",
   "command.gallifreyan_chronicles.position": "Position: %s",
   "command.gallifreyan_chronicles.set_console": "Set exterior of %s to %s",
+  "command.gallifreyan_chronicles.set_console_variant": "Set console variant of %s to %s",
+  "command.gallifreyan_chronicles.unknown_console_variant": "Unknown variant '%s' for console %s",
   "command.gallifreyan_chronicles.set_exterior": "Set exterior of %s to %s",
   "command.gallifreyan_chronicles.set_glow": "Set glow of %s to %s",
   "command.gallifreyan_chronicles.unknown_exterior": "Unknown exterior: %s",

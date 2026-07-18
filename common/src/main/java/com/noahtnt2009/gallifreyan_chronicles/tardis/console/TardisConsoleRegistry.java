@@ -6,7 +6,7 @@ import com.noahtnt2009.gallifreyan_chronicles.util.GCUtils;
 import java.util.Collection;
 
 public class TardisConsoleRegistry {
-    public static final String DEFAULT_ID = GCUtils.ofNamespace("brachacki");
+    public static final String DEFAULT_ID = GCUtils.ofNamespace("brachacki_console");
 
     private static final GCJsonDataRegistry<TardisConsole> REGISTRY = new GCJsonDataRegistry<>();
     private static TardisConsole defaultConsole;

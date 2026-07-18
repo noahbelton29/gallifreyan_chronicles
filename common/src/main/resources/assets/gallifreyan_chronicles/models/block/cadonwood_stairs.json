@@ -1,8 +1,0 @@
-{
-  "parent": "minecraft:block/stairs",
-  "textures": {
-    "bottom": "gallifreyan_chronicles:block/cadonwood_planks",
-    "side": "gallifreyan_chronicles:block/cadonwood_planks",
-    "top": "gallifreyan_chronicles:block/cadonwood_planks"
-  }
-}

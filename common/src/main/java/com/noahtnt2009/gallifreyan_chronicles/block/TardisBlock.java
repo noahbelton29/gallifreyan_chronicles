@@ -51,7 +51,7 @@ public class TardisBlock extends BaseEntityBlock {
         super.setPlacedBy(level, pos, state, placer, stack);
         if (!(level.getBlockEntity(pos) instanceof TardisExteriorBlockEntity blockEntity)) return;
 
-        blockEntity.setYaw(placer.getYRot() + 180);
+        blockEntity.setYaw(snapYawTo45(placer.getYRot() + 180));
 
         if (!level.isClientSide()) {
             if (!(level instanceof ServerLevel serverLevel)) return;
@@ -77,6 +77,13 @@ public class TardisBlock extends BaseEntityBlock {
                     player.getName().getString()
             );
         }
+    }
+
+    // wraps into [0, 360) then rounds to the nearest 45 degree increment
+    private static float snapYawTo45(float yaw) {
+        float wrapped = yaw % 360.0f;
+        if (wrapped < 0) wrapped += 360.0f;
+        return Math.round(wrapped / 45.0f) * 45.0f % 360.0f;
     }
 
     @Override

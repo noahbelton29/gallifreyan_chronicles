@@ -1,7 +1,0 @@
-{
-  "parent": "minecraft:item/generated",
-  "textures": {
-    "layer0": "gallifreyan_chronicles:item/taranium_boots",
-    "layer1": "minecraft:trims/items/boots_trim_redstone"
-  }
-}

@@ -129,24 +129,30 @@ public class GCBlockTagProvider extends BlockTagsProvider {
                 GCBlocks.STRIPPED_CADONWOOD_LOG);
 
         tagAdd(BlockTags.STAIRS,
-                GCBlocks.CADONWOOD_STAIRS);
+                GCBlocks.CADONWOOD_STAIRS,
+                GCBlocks.BRACHACKI_SLAB);
 
         tagAdd(BlockTags.SLABS,
-                GCBlocks.CADONWOOD_SLAB);
+                GCBlocks.CADONWOOD_SLAB,
+                GCBlocks.BRACHACKI_SLAB);
 
         tagAdd(BlockTags.PRESSURE_PLATES,
-                GCBlocks.CADONWOOD_PRESSURE_PLATE);
+                GCBlocks.CADONWOOD_PRESSURE_PLATE,
+                GCBlocks.BRACHACKI_PRESSURE_PLATE);
 
         tagAdd(BlockTags.BUTTONS,
                 GCBlocks.CADONWOOD_BUTTON);
 
         tagAdd(BlockTags.FENCES,
-                GCBlocks.CADONWOOD_FENCE);
+                GCBlocks.CADONWOOD_FENCE,
+                GCBlocks.BRACHACKI_FENCE);
 
         tagAdd(BlockTags.FENCE_GATES,
-                GCBlocks.CADONWOOD_FENCE_GATE);
+                GCBlocks.CADONWOOD_FENCE_GATE,
+                GCBlocks.BRACHACKI_FENCE_GATE);
 
         tagAdd(BlockTags.WALLS,
-                GCBlocks.CADONWOOD_WALL);
+                GCBlocks.CADONWOOD_WALL,
+                GCBlocks.BRACHACKI_WALL);
     }
 }

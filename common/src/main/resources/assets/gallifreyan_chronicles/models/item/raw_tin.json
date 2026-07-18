@@ -1,6 +1,0 @@
-{
-  "parent": "minecraft:item/generated",
-  "textures": {
-    "layer0": "gallifreyan_chronicles:item/raw_tin"
-  }
-}

@@ -1,6 +1,0 @@
-{
-  "parent": "minecraft:block/cross",
-  "textures": {
-    "cross": "gallifreyan_chronicles:block/thorivine_flower"
-  }
-}

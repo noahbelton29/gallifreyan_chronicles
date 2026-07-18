@@ -25,6 +25,14 @@ public class GCBlockLootTableProvider extends BlockLootSubProvider {
         dropSelf(GCBlocks.STRIPPED_CADONWOOD_WOOD);
         dropSelf(GCBlocks.GALLIFREYAN_GRAVEL);
         dropSelf(GCBlocks.ARCADIAN_SHALE);
+        dropSelf(GCBlocks.BRACHACKI_WALL_BLOCK);
+        dropSelf(GCBlocks.BRACHACKI_FLOOR_BLOCK);
+        dropSelf(GCBlocks.BRACHACKI_STAIRS);
+        add(GCBlocks.BRACHACKI_SLAB, this::createSlabItemTable);
+        dropSelf(GCBlocks.BRACHACKI_PRESSURE_PLATE);
+        dropSelf(GCBlocks.BRACHACKI_WALL);
+        dropSelf(GCBlocks.BRACHACKI_FENCE);
+        dropSelf(GCBlocks.BRACHACKI_FENCE_GATE);
         dropSelf(GCBlocks.GALLIFREYAN_SAND);
         dropSelf(GCBlocks.GALLIFREYAN_MUD);
         dropSelf(GCBlocks.CADONWOOD_LOG);

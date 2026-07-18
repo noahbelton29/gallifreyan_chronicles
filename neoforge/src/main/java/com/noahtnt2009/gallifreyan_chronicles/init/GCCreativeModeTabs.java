@@ -22,6 +22,14 @@ public class GCCreativeModeTabs {
                         output.accept(GCBlocks.TARDIS_CONSOLE);
                         output.accept(GCItems.TARDIS_KEY);
                         output.accept(GCItems.MASTER_TARDIS_KEY);
+                        output.accept(GCBlocks.BRACHACKI_FLOOR_BLOCK);
+                        output.accept(GCBlocks.BRACHACKI_WALL_BLOCK);
+                        output.accept(GCBlocks.BRACHACKI_STAIRS);
+                        output.accept(GCBlocks.BRACHACKI_SLAB);
+                        output.accept(GCBlocks.BRACHACKI_PRESSURE_PLATE);
+                        output.accept(GCBlocks.BRACHACKI_WALL);
+                        output.accept(GCBlocks.BRACHACKI_FENCE);
+                        output.accept(GCBlocks.BRACHACKI_FENCE_GATE);
                     }).build());
 
     public static final Supplier<CreativeModeTab> NATURAL_BLOCKS_TAB = CREATIVE_MODE_TABS.register("natural_blocks",

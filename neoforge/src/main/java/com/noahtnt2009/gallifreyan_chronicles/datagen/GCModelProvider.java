@@ -28,6 +28,9 @@ public class GCModelProvider extends ModelProvider {
         blockModels.createTrivialCube(GCBlocks.MOON_DUST);
         blockModels.createTrivialCube(GCBlocks.LUNAR_REGOLITH);
 
+
+        registerBrachackiSet(blockModels);
+
         blockModels.createTrivialCube(GCBlocks.GALLIFREYAN_DIRT);
         blockModels.createTrivialCube(GCBlocks.GALLIFREYAN_SAND);
         blockModels.createTrivialCube(GCBlocks.GALLIFREYAN_STONE);
@@ -117,6 +120,19 @@ public class GCModelProvider extends ModelProvider {
         blockModelGenerators.createMultifaceBlockStates(vineBlock);
         blockModelGenerators.createFlatItemModelWithBlockTexture(vineItem, vineBlock);
     }
+
+    private void registerBrachackiSet(BlockModelGenerators generators) {
+        generators.createTrivialCube(GCBlocks.BRACHACKI_FLOOR_BLOCK);
+
+        generators.family(GCBlocks.BRACHACKI_WALL_BLOCK)
+                .stairs(GCBlocks.BRACHACKI_STAIRS)
+                .slab(GCBlocks.BRACHACKI_SLAB)
+                .pressurePlate(GCBlocks.BRACHACKI_PRESSURE_PLATE)
+                .wall(GCBlocks.BRACHACKI_WALL)
+                .fence(GCBlocks.BRACHACKI_FENCE)
+                .fenceGate(GCBlocks.BRACHACKI_FENCE_GATE);
+    }
+
 
     private void registerGrassBlock(BlockModelGenerators generators) {
         TextureMapping normalMapping = new TextureMapping()

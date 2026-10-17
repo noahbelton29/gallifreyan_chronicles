@@ -1,0 +1,13 @@
+{
+  "variants": {
+    "type=bottom": {
+      "model": "gallifreyan_chronicles:block/cadonwood_slab"
+    },
+    "type=double": {
+      "model": "gallifreyan_chronicles:block/cadonwood_planks"
+    },
+    "type=top": {
+      "model": "gallifreyan_chronicles:block/cadonwood_slab_top"
+    }
+  }
+}

@@ -1,0 +1,12 @@
+{
+  "model": {
+    "type": "minecraft:model",
+    "model": "gallifreyan_chronicles:block/tall_gallifreyan_grass_top",
+    "tints": [
+      {
+        "type": "minecraft:constant",
+        "value": -2039584
+      }
+    ]
+  }
+}

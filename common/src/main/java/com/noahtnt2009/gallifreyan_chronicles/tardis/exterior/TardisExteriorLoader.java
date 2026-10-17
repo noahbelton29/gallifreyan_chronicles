@@ -1,5 +1,6 @@
 package com.noahtnt2009.gallifreyan_chronicles.tardis.exterior;
 
+import com.noahtnt2009.gallifreyan_chronicles.Constants;
 import com.noahtnt2009.gallifreyan_chronicles.data.GCJsonReloadListener;
 import com.noahtnt2009.gallifreyan_chronicles.network.TardisExteriorSyncPayload;
 import com.noahtnt2009.gallifreyan_chronicles.platform.Services;
@@ -27,7 +28,12 @@ public class TardisExteriorLoader extends GCJsonReloadListener<TardisExterior> {
 
     @Override
     protected void onReloadComplete() {
-        TardisExteriorRegistry.setDefault(TardisExteriorRegistry.get(TardisExteriorRegistry.DEFAULT_ID));
+        TardisExterior def = TardisExteriorRegistry.get(TardisExteriorRegistry.DEFAULT_ID);
+        if (def == null) {
+            Constants.LOG.warn("No TARDIS exteriors loaded! Expected e.g. data/{}/tardis_exterior/first_doctors_exterior.json", Constants.MOD_ID);
+            return;
+        }
+        TardisExteriorRegistry.setDefault(def);
     }
 
     @Override

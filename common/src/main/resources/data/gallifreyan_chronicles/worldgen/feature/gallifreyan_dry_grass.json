@@ -1,0 +1,16 @@
+{
+  "type": "minecraft:simple_block",
+  "to_place": {
+    "type": "minecraft:weighted",
+    "entries": [
+      {
+        "data": "gallifreyan_chronicles:short_gallifreyan_dry_grass",
+        "weight": 1
+      },
+      {
+        "data": "gallifreyan_chronicles:tall_gallifreyan_dry_grass",
+        "weight": 1
+      }
+    ]
+  }
+}

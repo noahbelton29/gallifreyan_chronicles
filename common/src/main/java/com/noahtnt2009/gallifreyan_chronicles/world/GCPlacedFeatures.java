@@ -2,7 +2,6 @@ package com.noahtnt2009.gallifreyan_chronicles.world;
 
 import com.noahtnt2009.gallifreyan_chronicles.init.GCBlocks;
 import com.noahtnt2009.gallifreyan_chronicles.util.GCUtils;
-import net.minecraft.core.BlockPos;
 import net.minecraft.core.Holder;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.data.worldgen.BootstrapContext;
@@ -11,8 +10,7 @@ import net.minecraft.data.worldgen.placement.VegetationPlacements;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.level.levelgen.VerticalAnchor;
 import net.minecraft.world.level.levelgen.blockpredicates.BlockPredicate;
-import net.minecraft.world.level.levelgen.feature.ConfiguredFeature;
-import net.minecraft.world.level.levelgen.feature.configurations.FeatureConfiguration;
+import net.minecraft.world.level.levelgen.feature.Feature;
 import net.minecraft.world.level.levelgen.placement.*;
 
 import java.util.List;
@@ -39,7 +37,7 @@ public class GCPlacedFeatures {
     public static final ResourceKey<PlacedFeature> PATCH_THORIVINE = registerKey("patch_thorivine");
 
     public static void bootstrap(BootstrapContext<PlacedFeature> context) {
-        var configuredFeatures = context.lookup(Registries.CONFIGURED_FEATURE);
+        var configuredFeatures = context.lookup(Registries.FEATURE);
         var oreIron = configuredFeatures.getOrThrow(GCConfiguredFeatures.IRON_GALLIFREY_ORES_KEY);
         var oreIronSmall = configuredFeatures.getOrThrow(GCConfiguredFeatures.IRON_GALLIFREY_ORES_SMALL_KEY);
         var oreCoal = configuredFeatures.getOrThrow(GCConfiguredFeatures.COAL_GALLIFREY_ORES_KEY);
@@ -62,10 +60,10 @@ public class GCPlacedFeatures {
                 PlacementUtils.HEIGHTMAP,
                 BiomeFilter.biome(),
                 CountPlacement.of(10),
-                RandomOffsetPlacement.ofTriangle(7, 3),
+                triangleOffset(7, 3),
                 BlockPredicateFilter.forPredicate(BlockPredicate.allOf(
                         BlockPredicate.ONLY_IN_AIR_PREDICATE,
-                        BlockPredicate.wouldSurvive(GCBlocks.THORIVINE.defaultBlockState(), BlockPos.ZERO)
+                        BlockPredicate.wouldSurvive(GCBlocks.THORIVINE)
                 ))
         );
 
@@ -110,7 +108,7 @@ public class GCPlacedFeatures {
                 PlacementUtils.HEIGHTMAP_WORLD_SURFACE,
                 BiomeFilter.biome(),
                 CountPlacement.of(32),
-                RandomOffsetPlacement.ofTriangle(7, 3),
+                triangleOffset(7, 3),
                 BlockPredicateFilter.forPredicate(BlockPredicate.ONLY_IN_AIR_PREDICATE)
         );
 
@@ -138,7 +136,7 @@ public class GCPlacedFeatures {
                 PlacementUtils.HEIGHTMAP,
                 BiomeFilter.biome(),
                 CountPlacement.of(48),
-                RandomOffsetPlacement.ofTriangle(5, 2),
+                triangleOffset(5, 2),
                 BlockPredicateFilter.forPredicate(BlockPredicate.ONLY_IN_AIR_PREDICATE));
 
         register(context, PATCH_GALLIFREY_TALL_GRASS_PLAIN, tallGrass,
@@ -147,7 +145,7 @@ public class GCPlacedFeatures {
                 PlacementUtils.HEIGHTMAP,
                 BiomeFilter.biome(),
                 CountPlacement.of(96),
-                RandomOffsetPlacement.ofTriangle(7, 3),
+                triangleOffset(7, 3),
                 BlockPredicateFilter.forPredicate(BlockPredicate.ONLY_IN_AIR_PREDICATE));
 
         register(context, PATCH_GALLIFREY_TALL_GRASS_PLAIN_2, tallGrass,
@@ -157,7 +155,7 @@ public class GCPlacedFeatures {
                 PlacementUtils.HEIGHTMAP,
                 BiomeFilter.biome(),
                 CountPlacement.of(96),
-                RandomOffsetPlacement.ofTriangle(7, 3),
+                triangleOffset(7, 3),
                 BlockPredicateFilter.forPredicate(BlockPredicate.ONLY_IN_AIR_PREDICATE));
 
         register(context, CADONWOOD_TREE_PLACED, configuredFeatures.getOrThrow(GCConfiguredFeatures.CADONWOOD_TREE),
@@ -177,13 +175,17 @@ public class GCPlacedFeatures {
         return ResourceKey.create(Registries.PLACED_FEATURE, GCUtils.of(name));
     }
 
-    private static <FC extends FeatureConfiguration> void register(BootstrapContext<PlacedFeature> context, ResourceKey<PlacedFeature> key,
-                                                                   Holder<ConfiguredFeature<?, ?>> configuration, PlacementModifier... modifiers) {
-        register(context, key, configuration, List.of(modifiers));
+    private static PlacementModifier triangleOffset(int xzSpread, int ySpread) {
+        return OffsetPlacement.ofTriangle(xzSpread, ySpread);
     }
 
-    private static void register(BootstrapContext<PlacedFeature> context, ResourceKey<PlacedFeature> key, Holder<ConfiguredFeature<?, ?>> configuration,
-                                 List<PlacementModifier> modifiers) {
-        context.register(key, new PlacedFeature(configuration, List.copyOf(modifiers)));
+    private static void register(BootstrapContext<PlacedFeature> context, ResourceKey<PlacedFeature> key,
+                                 Holder<Feature> feature, PlacementModifier... modifiers) {
+        register(context, key, feature, List.of(modifiers));
+    }
+
+    private static void register(BootstrapContext<PlacedFeature> context, ResourceKey<PlacedFeature> key,
+                                 Holder<Feature> feature, List<PlacementModifier> modifiers) {
+        context.register(key, new PlacedFeature(feature, List.copyOf(modifiers)));
     }
 }

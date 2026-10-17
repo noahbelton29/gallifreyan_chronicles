@@ -16,7 +16,7 @@ public class GCBiomes {
     public static final ResourceKey<Biome> MOON = registerBiomeKey("moon");
 
     public static void bootstrap(BootstrapContext<Biome> context) {
-        var carvers = context.lookup(Registries.CONFIGURED_CARVER);
+        var carvers = context.lookup(Registries.CARVER);
         var placedFeatures = context.lookup(Registries.PLACED_FEATURE);
         register(context, GALLIFREYAN_DESERT, GCGallifreyBiomes.gallifreyanDesert(placedFeatures, carvers));
         register(context, GALLIFREYAN_PLAINS, GCGallifreyBiomes.gallifreyanPlains(placedFeatures, carvers));

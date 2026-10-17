@@ -40,13 +40,13 @@ public class GCItems {
             properties -> new Item(properties.pickaxe(GCToolMaterials.TARANIUM, 1, -2.8f).fireResistant()));
 
     public static final Item TARANIUM_SHOVEL = registerItem("taranium_shovel",
-            properties -> new ShovelItem(GCToolMaterials.TARANIUM, 1.5f, -3.0f, properties.fireResistant()));
+            properties -> new Item(properties.shovel(GCToolMaterials.TARANIUM, 1.5f, -3.0f).fireResistant()));
 
     public static final Item TARANIUM_AXE = registerItem("taranium_axe",
-            properties -> new AxeItem(GCToolMaterials.TARANIUM, 6, -3.2f, properties.fireResistant()));
+            properties -> new Item(properties.axe(GCToolMaterials.TARANIUM, 6, -3.2f).fireResistant()));
 
     public static final Item TARANIUM_HOE = registerItem("taranium_hoe",
-            properties -> new HoeItem(GCToolMaterials.TARANIUM, 0, -3f, properties.fireResistant()));
+            properties -> new Item(properties.hoe(GCToolMaterials.TARANIUM, 0, -3f).fireResistant()));
 
     // ARMOR
     public static final Item TARANIUM_HELMET = registerItem("taranium_helmet",

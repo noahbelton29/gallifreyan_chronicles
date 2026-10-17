@@ -1,0 +1,8 @@
+{
+  "type": "gallifreyan_chronicles:boulder",
+  "blocks": [
+    "gallifreyan_chronicles:arcadian_shale",
+    "gallifreyan_chronicles:gallifreyan_mud",
+    "gallifreyan_chronicles:gallifreyan_mudstone"
+  ]
+}

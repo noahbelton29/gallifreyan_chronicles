@@ -1,0 +1,43 @@
+{
+  "type": "minecraft:fallen_tree",
+  "log_decorators": [
+    {
+      "type": "minecraft:attached_to_logs",
+      "block_provider": {
+        "type": "minecraft:weighted",
+        "entries": [
+          {
+            "data": "minecraft:red_mushroom",
+            "weight": 2
+          },
+          {
+            "data": "minecraft:brown_mushroom",
+            "weight": 1
+          }
+        ]
+      },
+      "directions": [
+        "up"
+      ],
+      "probability": 0.1
+    }
+  ],
+  "log_length": {
+    "type": "minecraft:uniform",
+    "max_inclusive": 7,
+    "min_inclusive": 4
+  },
+  "stump_decorators": [
+    {
+      "type": "gallifreyan_chronicles:cadonwood_trunk_vine",
+      "probability": 0.5,
+      "vine_state": "gallifreyan_chronicles:gallifreyan_vine"
+    }
+  ],
+  "trunk_provider": {
+    "id": "gallifreyan_chronicles:cadonwood_log",
+    "properties": {
+      "axis": "y"
+    }
+  }
+}

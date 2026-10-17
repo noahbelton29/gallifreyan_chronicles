@@ -1,0 +1,14 @@
+{
+  "type": "minecraft:ore",
+  "discard_chance_on_air_exposure": 0.0,
+  "size": 26,
+  "targets": [
+    {
+      "state": "gallifreyan_chronicles:cobbled_limestone",
+      "target": {
+        "predicate_type": "minecraft:tag_match",
+        "tag": "gallifreyan_chronicles:base_stone_gallifrey"
+      }
+    }
+  ]
+}

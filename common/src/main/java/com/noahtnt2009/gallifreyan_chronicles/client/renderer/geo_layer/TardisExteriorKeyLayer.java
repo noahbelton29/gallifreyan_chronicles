@@ -12,6 +12,7 @@ import com.geckolib.renderer.base.RenderPassInfo;
 import com.geckolib.renderer.layer.GeoRenderLayer;
 import com.geckolib.util.RenderUtil;
 import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.math.Axis;
 import com.noahtnt2009.gallifreyan_chronicles.block.entity.TardisExteriorBlockEntity;
 import net.minecraft.client.renderer.SubmitNodeCollector;
 import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
@@ -98,9 +99,9 @@ public class TardisExteriorKeyLayer<T extends GeoAnimatable & TardisExteriorKeyL
 
         poseStack.pushPose();
         poseStack.scale(0.2f, 0.2f, 0.2f);
-        poseStack.mulPose(com.mojang.math.Axis.XP.rotationDegrees(90f));
-        poseStack.mulPose(com.mojang.math.Axis.ZP.rotationDegrees(90f));
-        poseStack.mulPose(com.mojang.math.Axis.XP.rotationDegrees(90f));
+        poseStack.rotate(Axis.YP.rotationDegrees(90f));
+        poseStack.rotate(Axis.XP.rotationDegrees(90f));
+        poseStack.rotate(Axis.ZP.rotationDegrees(90f));
 
         itemRenderState.submit(
                 poseStack,

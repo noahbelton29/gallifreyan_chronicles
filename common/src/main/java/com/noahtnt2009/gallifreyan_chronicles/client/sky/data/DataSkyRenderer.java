@@ -1,18 +1,16 @@
 package com.noahtnt2009.gallifreyan_chronicles.client.sky.data;
 
-import com.mojang.blaze3d.PrimitiveTopology;
-import com.mojang.blaze3d.systems.RenderPass;
 import com.mojang.blaze3d.systems.RenderSystem;
-import com.mojang.blaze3d.textures.GpuTextureView;
-import com.mojang.blaze3d.vertex.ByteBufferBuilder;
 import com.mojang.blaze3d.vertex.BufferBuilder;
+import com.mojang.blaze3d.vertex.ByteBufferBuilder;
 import com.mojang.blaze3d.vertex.DefaultVertexFormat;
 import com.mojang.blaze3d.vertex.MeshData;
 import com.mojang.blaze3d.vertex.PoseStack;
-import com.mojang.blaze3d.pipeline.RenderTarget;
-import com.mojang.blaze3d.buffers.GpuBuffer;
-import com.mojang.blaze3d.buffers.GpuBufferSlice;
 import com.mojang.math.Axis;
+import com.mojang.renderpearl.api.buffers.GpuBuffer;
+import com.mojang.renderpearl.api.buffers.GpuBufferSlice;
+import com.mojang.renderpearl.api.commands.RenderPass;
+import com.mojang.renderpearl.api.pipeline.PrimitiveTopology;
 import com.noahtnt2009.gallifreyan_chronicles.client.sky.DimensionSkyRenderer;
 import com.noahtnt2009.gallifreyan_chronicles.mixin.MinecraftAtlasManagerAccessor;
 import com.noahtnt2009.gallifreyan_chronicles.mixin.SkyRendererInvoker;
@@ -28,14 +26,18 @@ import org.joml.Matrix4f;
 import org.joml.Matrix4fStack;
 import org.joml.Vector4f;
 
-import java.util.Optional;
-import java.util.OptionalDouble;
+import java.util.ArrayList;
+import java.util.List;
 
 public class DataSkyRenderer implements DimensionSkyRenderer {
     private static final Identifier SUN_SPRITE = Identifier.withDefaultNamespace("sun");
 
     private static final float SUN_BASE_SCALE = 30.0F;
     private static final float MOON_BASE_SCALE = 20.0F;
+
+    // Buffers used in a frame stay alive until the next frame, because they are
+    // still referenced by vanilla's open render pass when renderQuad returns.
+    private static final List<GpuBuffer> PENDING_BUFFERS = new ArrayList<>();
 
     private final DimensionSky sky;
 
@@ -46,6 +48,7 @@ public class DataSkyRenderer implements DimensionSkyRenderer {
     @Override
     public void renderSunMoonAndStars(
             SkyRendererInvoker invoker,
+            RenderPass renderPass,
             PoseStack poseStack,
             float sunAngle,
             float moonAngle,
@@ -54,24 +57,27 @@ public class DataSkyRenderer implements DimensionSkyRenderer {
             float rainBrightness,
             float starBrightness
     ) {
+        PENDING_BUFFERS.forEach(GpuBuffer::close);
+        PENDING_BUFFERS.clear();
+
         for (SkyCelestialBody body : sky.bodies()) {
             poseStack.pushPose();
-            poseStack.mulPose(Axis.YP.rotationDegrees(-89.0F));
+            poseStack.rotateDegrees(Axis.YP, -89.0F);
             poseStack.pushPose();
 
             switch (body.type()) {
                 case SUN -> {
-                    poseStack.mulPose(Axis.XP.rotation(sunAngle));
-                    if (body.yaw() != 0.0f) poseStack.mulPose(Axis.YP.rotationDegrees(body.yaw()));
+                    poseStack.rotate(Axis.XP, sunAngle);
+                    if (body.yaw() != 0.0f) poseStack.rotateDegrees(Axis.YP, body.yaw());
                     if (body.distance() != 0.0f) poseStack.translate(body.distance(), 0.0F, 0.0F);
-                    renderCustomSun(poseStack, body.scale(), rainBrightness);
+                    renderCustomSun(renderPass, poseStack, body.scale(), rainBrightness);
                 }
                 case MOON -> {
-                    poseStack.mulPose(Axis.XP.rotation(moonAngle));
-                    if (body.yaw() != 0.0f) poseStack.mulPose(Axis.YP.rotationDegrees(body.yaw()));
+                    poseStack.rotate(Axis.XP, moonAngle);
+                    if (body.yaw() != 0.0f) poseStack.rotateDegrees(Axis.YP, body.yaw());
                     if (body.distance() != 0.0f) poseStack.translate(body.distance(), 0.0F, 0.0F);
                     MoonPhase phase = body.useMoonPhase() ? moonPhase : MoonPhase.FULL_MOON;
-                    renderCustomMoon(poseStack, phase, body.scale(), rainBrightness);
+                    renderCustomMoon(renderPass, poseStack, phase, body.scale(), rainBrightness);
                 }
             }
 
@@ -81,25 +87,26 @@ public class DataSkyRenderer implements DimensionSkyRenderer {
 
         if (starBrightness > 0.0F) {
             poseStack.pushPose();
-            poseStack.mulPose(Axis.YP.rotationDegrees(-90.0F));
-            poseStack.mulPose(Axis.XP.rotation(starAngle));
-            invoker.invokeRenderStars(starBrightness, poseStack);
+            poseStack.rotateDegrees(Axis.YP, -90.0F);
+            poseStack.rotate(Axis.XP, starAngle);
+            invoker.invokeRenderStars(renderPass, starBrightness, poseStack);
             poseStack.popPose();
         }
     }
 
-    private void renderCustomSun(PoseStack poseStack, float scale, float rainBrightness) {
+    private void renderCustomSun(RenderPass renderPass, PoseStack poseStack, float scale, float rainBrightness) {
         TextureAtlas atlas = getCelestialsAtlas();
         TextureAtlasSprite sprite = atlas.getSprite(SUN_SPRITE);
-        renderQuad(poseStack, atlas, sprite, scale * SUN_BASE_SCALE, rainBrightness, false);
+        renderQuad(renderPass, poseStack, atlas, sprite, scale * SUN_BASE_SCALE, rainBrightness, false);
     }
 
-    private void renderCustomMoon(PoseStack poseStack, MoonPhase phase, float scale, float rainBrightness) {
+    private void renderCustomMoon(RenderPass renderPass, PoseStack poseStack, MoonPhase phase, float scale, float rainBrightness) {
         TextureAtlas atlas = getCelestialsAtlas();
         TextureAtlasSprite sprite = atlas.getSprite(Identifier.withDefaultNamespace("moon/" + phase.getSerializedName()));
-        renderQuad(poseStack, atlas, sprite, scale * MOON_BASE_SCALE, rainBrightness, true);
+        renderQuad(renderPass, poseStack, atlas, sprite, scale * MOON_BASE_SCALE, rainBrightness, true);
     }
 
+    @SuppressWarnings("resource")
     private TextureAtlas getCelestialsAtlas() {
         AtlasManager atlasManager = ((MinecraftAtlasManagerAccessor) Minecraft.getInstance())
                 .gallifreyan_chronicles$getAtlasManager();
@@ -107,6 +114,7 @@ public class DataSkyRenderer implements DimensionSkyRenderer {
     }
 
     private void renderQuad(
+            RenderPass renderPass,
             PoseStack poseStack,
             TextureAtlas atlas,
             TextureAtlasSprite sprite,
@@ -119,7 +127,10 @@ public class DataSkyRenderer implements DimensionSkyRenderer {
         modelViewStack.mul(poseStack.last().pose());
         modelViewStack.translate(0.0F, 100.0F, 0.0F);
         modelViewStack.scale(effectiveScale, 1.0F, effectiveScale);
+        Matrix4f modelViewMatrix = new Matrix4f(modelViewStack);
+        modelViewStack.popMatrix();
 
+        GpuBuffer buffer;
         try (ByteBufferBuilder byteBufferBuilder = ByteBufferBuilder.exactlySized(
                 4 * DefaultVertexFormat.POSITION_TEX.getVertexSize())) {
             BufferBuilder bufferBuilder = new BufferBuilder(
@@ -140,36 +151,27 @@ public class DataSkyRenderer implements DimensionSkyRenderer {
                 bufferBuilder.addVertex(-1.0F, 0.0F, 1.0F).setUv(sprite.getU1(), sprite.getV0());
             }
 
-            try (MeshData mesh = bufferBuilder.buildOrThrow();
-                 GpuBuffer buffer = RenderSystem.getDevice().createBuffer(() -> "GC celestial quad", 32, mesh.vertexBuffer())) {
-
-                RenderTarget target = Minecraft.getInstance().gameRenderer.mainRenderTarget();
-                GpuTextureView colorView = target.getColorTextureView();
-                GpuTextureView depthView = target.getDepthTextureView();
-
-                GpuBufferSlice dynamicTransforms = RenderSystem.getDynamicUniforms().writeTransform(
-                        new Matrix4f(modelViewStack),
-                        new Vector4f(1.0F, 1.0F, 1.0F, rainBrightness)
-                );
-
-                RenderSystem.AutoStorageIndexBuffer quadIndices = RenderSystem.getSequentialBuffer(PrimitiveTopology.QUADS);
-                GpuBuffer indexBuffer = quadIndices.getBuffer(6);
-
-                assert colorView != null;
-                try (RenderPass renderPass = RenderSystem.getDevice().createCommandEncoder().createRenderPass(
-                        () -> "GC celestial", colorView, Optional.empty(), depthView, OptionalDouble.empty())) {
-                    renderPass.setPipeline(RenderPipelines.CELESTIAL);
-                    RenderSystem.bindDefaultUniforms(renderPass);
-                    renderPass.setUniform("DynamicTransforms", dynamicTransforms);
-                    renderPass.bindTexture("Sampler0", atlas.getTextureView(), atlas.getSampler());
-                    renderPass.setVertexBuffer(0, buffer.slice());
-                    renderPass.setIndexBuffer(indexBuffer, quadIndices.type());
-                    renderPass.drawIndexed(6, 1, 0, 0, 0);
-                }
+            try (MeshData mesh = bufferBuilder.buildOrThrow()) {
+                buffer = RenderSystem.getDevice().createBuffer(() -> "GC celestial quad", 32, mesh.vertexBuffer());
             }
         }
+        PENDING_BUFFERS.add(buffer);
 
-        modelViewStack.popMatrix();
+        GpuBufferSlice dynamicTransforms = RenderSystem.getDynamicUniforms().writeTransform(
+                modelViewMatrix,
+                new Vector4f(1.0F, 1.0F, 1.0F, rainBrightness)
+        );
+
+        RenderSystem.AutoStorageIndexBuffer quadIndices = RenderSystem.getSequentialBuffer(PrimitiveTopology.QUADS);
+        GpuBuffer indexBuffer = quadIndices.getBuffer(6);
+
+        renderPass.setPipeline(RenderSystem.getCompiledPipeline(RenderPipelines.CELESTIAL));
+        RenderSystem.bindDefaultUniforms(renderPass);
+        renderPass.setUniform("DynamicTransforms", dynamicTransforms);
+        renderPass.setUniform("Sampler0", atlas.getTextureView(), atlas.getSampler());
+        renderPass.setVertexBuffer(0, buffer.slice());
+        renderPass.setIndexBuffer(indexBuffer, quadIndices.type());
+        renderPass.drawIndexed(6, 1, 0, 0, 0);
     }
 
     @Override

@@ -13,7 +13,7 @@
     },
     "has_the_recipe": {
       "conditions": {
-        "recipe": "gallifreyan_chronicles:cadonwood_button"
+        "recipes": "gallifreyan_chronicles:cadonwood_button"
       },
       "trigger": "minecraft:recipe_unlocked"
     }

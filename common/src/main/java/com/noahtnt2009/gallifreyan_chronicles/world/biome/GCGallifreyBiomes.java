@@ -1,6 +1,5 @@
 package com.noahtnt2009.gallifreyan_chronicles.world.biome;
 
-import com.noahtnt2009.gallifreyan_chronicles.init.GCDimensions;
 import com.noahtnt2009.gallifreyan_chronicles.world.GCPlacedFeatures;
 import net.minecraft.core.HolderGetter;
 import net.minecraft.data.worldgen.BiomeDefaultFeatures;
@@ -10,8 +9,11 @@ import net.minecraft.world.level.biome.BiomeGenerationSettings;
 import net.minecraft.world.level.biome.BiomeSpecialEffects;
 import net.minecraft.world.level.biome.MobSpawnSettings;
 import net.minecraft.world.level.levelgen.GenerationStep;
-import net.minecraft.world.level.levelgen.carver.ConfiguredWorldCarver;
+import net.minecraft.world.level.levelgen.carver.WorldCarver;
 import net.minecraft.world.level.levelgen.placement.PlacedFeature;
+import org.joml.Vector3f;
+
+import static com.noahtnt2009.gallifreyan_chronicles.util.GCUtils.rgb;
 
 public class GCGallifreyBiomes {
     public static void addOres(BiomeGenerationSettings.Builder  biomeBuilder) {
@@ -28,7 +30,7 @@ public class GCGallifreyBiomes {
 
     public static Biome gallifreyanDesert(
             HolderGetter<PlacedFeature> placedFeatureGetter,
-            HolderGetter<ConfiguredWorldCarver<?>> carverGetter
+            HolderGetter<WorldCarver> carverGetter
     ) {
         MobSpawnSettings.Builder spawnBuilder = new MobSpawnSettings.Builder();
         BiomeGenerationSettings.Builder biomeBuilder =
@@ -60,9 +62,9 @@ public class GCGallifreyBiomes {
                 .specialEffects(new BiomeSpecialEffects.Builder()
                         .waterColor(0xBDB133)
                         .build())
-                .setAttribute(EnvironmentAttributes.SKY_COLOR, 0xFF8833)
-                .setAttribute(EnvironmentAttributes.AMBIENT_LIGHT_COLOR, 0xFF9944)
-                .setAttribute(EnvironmentAttributes.FOG_COLOR, 0xFF9944)
+                .setAttribute(EnvironmentAttributes.SKY_COLOR, rgb(0xFF8833))
+                .setAttribute(EnvironmentAttributes.AMBIENT_LIGHT_COLOR, rgb(0xFF9944))
+                .setAttribute(EnvironmentAttributes.FOG_COLOR, rgb(0xFF9944))
                 .setAttribute(EnvironmentAttributes.FOG_START_DISTANCE, 40.0F)
                 .setAttribute(EnvironmentAttributes.FOG_END_DISTANCE, 100.0F)
                 .mobSpawnSettings(spawnBuilder.build())
@@ -72,7 +74,7 @@ public class GCGallifreyBiomes {
 
     public static Biome gallifreyanPlains(
             HolderGetter<PlacedFeature> placedFeatureGetter,
-            HolderGetter<ConfiguredWorldCarver<?>> carverGetter
+            HolderGetter<WorldCarver> carverGetter
     ) {
         MobSpawnSettings.Builder spawnBuilder = new MobSpawnSettings.Builder();
         BiomeGenerationSettings.Builder biomeBuilder =
@@ -115,9 +117,9 @@ public class GCGallifreyBiomes {
                         .waterColor(0xBDB133)
                         .grassColorOverride(0xE0E0E0)
                         .build())
-                .setAttribute(EnvironmentAttributes.FOG_COLOR, 0xFF590a0a)
-                .setAttribute(EnvironmentAttributes.SKY_COLOR, 0xFF790d0d)
-                .setAttribute(EnvironmentAttributes.AMBIENT_LIGHT_COLOR, 0xFF590a0a)
+                .setAttribute(EnvironmentAttributes.FOG_COLOR, rgb(0xFF590a0a))
+                .setAttribute(EnvironmentAttributes.SKY_COLOR, rgb(0xFF790d0d))
+                .setAttribute(EnvironmentAttributes.AMBIENT_LIGHT_COLOR, rgb(0xFF590a0a))
                 .setAttribute(EnvironmentAttributes.FOG_START_DISTANCE, 40.0F)
                 .setAttribute(EnvironmentAttributes.FOG_END_DISTANCE, 60.0F)
                 .mobSpawnSettings(spawnBuilder.build())
@@ -127,7 +129,7 @@ public class GCGallifreyBiomes {
 
     public static Biome gallifreyanBadlands(
             HolderGetter<PlacedFeature> placedFeatureGetter,
-            HolderGetter<ConfiguredWorldCarver<?>> carverGetter
+            HolderGetter<WorldCarver> carverGetter
     ) {
         MobSpawnSettings.Builder spawnBuilder = new MobSpawnSettings.Builder();
         BiomeGenerationSettings.Builder biomeBuilder =
@@ -149,9 +151,9 @@ public class GCGallifreyBiomes {
                 .specialEffects(new BiomeSpecialEffects.Builder()
                         .waterColor(0xBDB133)
                         .build())
-                .setAttribute(EnvironmentAttributes.SKY_COLOR, 0xFF6622)
-                .setAttribute(EnvironmentAttributes.AMBIENT_LIGHT_COLOR, 0xFF7733)
-                .setAttribute(EnvironmentAttributes.FOG_COLOR, 0xFF7733)
+                .setAttribute(EnvironmentAttributes.SKY_COLOR, rgb(0xFF6622))
+                .setAttribute(EnvironmentAttributes.AMBIENT_LIGHT_COLOR, rgb(0xFF7733))
+                .setAttribute(EnvironmentAttributes.FOG_COLOR, rgb(0xFF7733))
                 .setAttribute(EnvironmentAttributes.FOG_START_DISTANCE, 30.0F)
                 .setAttribute(EnvironmentAttributes.FOG_END_DISTANCE, 80.0F)
                 .mobSpawnSettings(spawnBuilder.build())

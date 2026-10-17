@@ -1,30 +1,34 @@
 package com.noahtnt2009.gallifreyan_chronicles.world.feature;
 
-import com.noahtnt2009.gallifreyan_chronicles.world.feature.config.BoulderFeatureConfig;
+import com.mojang.serialization.MapCodec;
+import com.mojang.serialization.codecs.RecordCodecBuilder;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.level.WorldGenLevel;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.chunk.ChunkGenerator;
 import net.minecraft.world.level.levelgen.feature.Feature;
-import net.minecraft.world.level.levelgen.feature.FeaturePlaceContext;
 
 import java.util.List;
 
-public class GCBoulderFeature extends Feature<BoulderFeatureConfig> {
-    public GCBoulderFeature() {
-        super(BoulderFeatureConfig.CODEC);
+public record GCBoulderFeature(List<Block> blocks) implements Feature {
+    public static final MapCodec<GCBoulderFeature> CODEC = RecordCodecBuilder.mapCodec(instance -> instance.group(
+            BuiltInRegistries.BLOCK.byNameCodec()
+                    .listOf()
+                    .fieldOf("blocks")
+                    .forGetter(GCBoulderFeature::blocks)
+    ).apply(instance, GCBoulderFeature::new));
+
+    @Override
+    public MapCodec<GCBoulderFeature> codec() {
+        return CODEC;
     }
 
     @Override
-    public boolean place(FeaturePlaceContext<BoulderFeatureConfig> context) {
-        WorldGenLevel level = context.level();
-        RandomSource random = context.random();
-        BlockPos origin = context.origin();
-        BoulderFeatureConfig config = context.config();
-
-        List<Block> blocks = config.blocks();
-        if (blocks.isEmpty()) {
+    public boolean place(WorldGenLevel level, ChunkGenerator chunkGenerator, RandomSource random, BlockPos origin) {
+        if (this.blocks.isEmpty()) {
             return false;
         }
 
@@ -49,8 +53,8 @@ public class GCBoulderFeature extends Feature<BoulderFeatureConfig> {
                     if (distSq <= 1.0 + jitter) {
                         BlockPos pos = center.offset(dx, dy, dz);
 
-                        BlockState state = blocks
-                                .get(random.nextInt(blocks.size()))
+                        BlockState state = this.blocks
+                                .get(random.nextInt(this.blocks.size()))
                                 .defaultBlockState();
 
                         level.setBlock(pos, state, 2);

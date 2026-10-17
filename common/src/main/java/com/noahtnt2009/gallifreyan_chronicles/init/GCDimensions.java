@@ -2,12 +2,15 @@ package com.noahtnt2009.gallifreyan_chronicles.init;
 
 import com.mojang.datafixers.util.Pair;
 import com.noahtnt2009.gallifreyan_chronicles.util.GCUtils;
-import com.noahtnt2009.gallifreyan_chronicles.world.biome.GCSurfaceRules;
+import com.noahtnt2009.gallifreyan_chronicles.world.biome.GCMaterialRules;
+import net.minecraft.core.Holder;
+import net.minecraft.core.HolderGetter;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.data.worldgen.BootstrapContext;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.tags.BlockTags;
 import net.minecraft.tags.TimelineTags;
+import net.minecraft.util.ARGB;
 import net.minecraft.util.valueproviders.ConstantInt;
 import net.minecraft.world.attribute.AmbientSounds;
 import net.minecraft.world.attribute.BackgroundMusic;
@@ -22,9 +25,12 @@ import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.dimension.DimensionType;
 import net.minecraft.world.level.dimension.LevelStem;
 import net.minecraft.world.level.levelgen.*;
+import net.minecraft.world.level.levelgen.densityfunction.DensityFunction;
 
 import java.util.List;
 import java.util.Optional;
+
+import static com.noahtnt2009.gallifreyan_chronicles.util.GCUtils.rgb;
 
 public class GCDimensions {
     public static final ResourceKey<LevelStem> GALLIFREY_KEY = ResourceKey.create(Registries.LEVEL_STEM,
@@ -66,15 +72,15 @@ public class GCDimensions {
                 CardinalLighting.Type.DEFAULT,
                 EnvironmentAttributeMap.builder()
                         .set(EnvironmentAttributes.STAR_BRIGHTNESS, 0.0f)
-                        .set(EnvironmentAttributes.FOG_COLOR, 0xFF9944)
-                        .set(EnvironmentAttributes.SKY_COLOR, 0xFF6600)
-                        .set(EnvironmentAttributes.SKY_LIGHT_COLOR, 0xFFDDBB)
-                        .set(EnvironmentAttributes.SUNRISE_SUNSET_COLOR, 0xFFFFAA33)
-                        .set(EnvironmentAttributes.CLOUD_COLOR, 0xFFFFC2A6)
+                        .set(EnvironmentAttributes.FOG_COLOR, rgb(0xFF9944))
+                        .set(EnvironmentAttributes.SKY_COLOR, rgb(0xFF6600))
+                        .set(EnvironmentAttributes.SKY_LIGHT_COLOR, rgb(0xFFDDBB))
+                        .set(EnvironmentAttributes.SUNRISE_SUNSET_COLOR, ARGB.vector4fFromARGB32(0xFFFFAA33))
+                        .set(EnvironmentAttributes.CLOUD_COLOR, ARGB.vector4fFromARGB32(0xFFFFC2A6))
                         .set(EnvironmentAttributes.CLOUD_HEIGHT, 192.0f)
                         .set(EnvironmentAttributes.BACKGROUND_MUSIC, BackgroundMusic.OVERWORLD)
                         .set(EnvironmentAttributes.AMBIENT_SOUNDS, AmbientSounds.LEGACY_CAVE_SETTINGS)
-                        .set(EnvironmentAttributes.AMBIENT_LIGHT_COLOR, 0xFFD4A0)
+                        .set(EnvironmentAttributes.AMBIENT_LIGHT_COLOR, rgb(0xFFD4A0))
                         .set(EnvironmentAttributes.SKY_FOG_END_DISTANCE, 256.0f)
                         .build(),
                 timelines.getOrThrow(TimelineTags.IN_OVERWORLD),
@@ -96,14 +102,14 @@ public class GCDimensions {
                 CardinalLighting.Type.DEFAULT,
                 EnvironmentAttributeMap.builder()
                         .set(EnvironmentAttributes.STAR_BRIGHTNESS, 1.0f)
-                        .set(EnvironmentAttributes.SKY_COLOR, 0xFF6600)
-                        .set(EnvironmentAttributes.SKY_LIGHT_COLOR, 0xFFcccccc)
-                        .set(EnvironmentAttributes.SUNRISE_SUNSET_COLOR, 0xFFcccccc)
-                        .set(EnvironmentAttributes.CLOUD_COLOR, 0xcccccc)
+                        .set(EnvironmentAttributes.SKY_COLOR, rgb(0xFF6600))
+                        .set(EnvironmentAttributes.SKY_LIGHT_COLOR, rgb(0xCCCCCC))
+                        .set(EnvironmentAttributes.SUNRISE_SUNSET_COLOR, ARGB.vector4fFromARGB32(0xFFCCCCCC))
+                        .set(EnvironmentAttributes.CLOUD_COLOR, ARGB.vector4fFromARGB32(0xFFCCCCCC))
                         .set(EnvironmentAttributes.CLOUD_HEIGHT, 192.0f)
                         .set(EnvironmentAttributes.BACKGROUND_MUSIC, BackgroundMusic.OVERWORLD)
                         .set(EnvironmentAttributes.AMBIENT_SOUNDS, AmbientSounds.LEGACY_CAVE_SETTINGS)
-                        .set(EnvironmentAttributes.AMBIENT_LIGHT_COLOR, 0xFFcccccc)
+                        .set(EnvironmentAttributes.AMBIENT_LIGHT_COLOR, rgb(0xCCCCCC))
                         .build(),
                 timelines.getOrThrow(TimelineTags.IN_OVERWORLD),
                 Optional.of(clocks.getOrThrow(WorldClocks.OVERWORLD))));
@@ -111,33 +117,46 @@ public class GCDimensions {
 
     public static void bootstrapNoise(BootstrapContext<NoiseGeneratorSettings> context) {
         var biomes = context.lookup(Registries.BIOME);
+        HolderGetter<DensityFunction> functions = context.lookup(Registries.DENSITY_FUNCTION);
+        var names = NoiseRouterData.OVERWORLD_FUNCTIONS;
+
+        NoiseRouter overworldRouter = new NoiseRouter(
+                NoiseRouterData.getFunction(functions, names.temperature()),
+                NoiseRouterData.getFunction(functions, names.vegetation()),
+                NoiseRouterData.getFunction(functions, names.continents()),
+                NoiseRouterData.getFunction(functions, names.erosion()),
+                NoiseRouterData.getFunction(functions, names.depth()),
+                NoiseRouterData.getFunction(functions, NoiseRouterData.RIDGES),
+                NoiseRouterData.getFunction(functions, names.chunkSurfaceLevel()),
+                NoiseRouterData.getFunction(functions, names.finalDensity())
+        );
 
         context.register(GALLIFREY_NOISE_SETTINGS, new NoiseGeneratorSettings(
-                new NoiseSettings(-64, 384, 1, 2),
+                NoiseSettings.create(-64, 384),
                 GCBlocks.GALLIFREYAN_STONE.defaultBlockState(),
                 Blocks.AIR.defaultBlockState(),
-                NoiseRouterData.overworld(context.lookup(Registries.DENSITY_FUNCTION), context.lookup(Registries.NOISE), true, false),
-                GCSurfaceRules.gallifrey(biomes),
+                overworldRouter,
+                Holder.direct(GCMaterialRules.gallifrey(biomes)),
                 List.of(),
                 0,
                 false,
+                Optional.empty(),
                 false,
-                false,
-                false
+                NoiseGeneratorSettings.DebugFunctions.EMPTY
         ));
 
         context.register(MOON_NOISE_SETTINGS, new NoiseGeneratorSettings(
-                new NoiseSettings(-64, 384, 1, 2),
+                NoiseSettings.create(-64, 384),
                 GCBlocks.LUNAR_REGOLITH.defaultBlockState(),
                 Blocks.AIR.defaultBlockState(),
-                NoiseRouterData.overworld(context.lookup(Registries.DENSITY_FUNCTION), context.lookup(Registries.NOISE), true, false),
-                GCSurfaceRules.moon(biomes),
+                overworldRouter,
+                Holder.direct(GCMaterialRules.moon(biomes)),
                 List.of(),
                 0,
                 false,
+                Optional.empty(),
                 false,
-                false,
-                false
+                NoiseGeneratorSettings.DebugFunctions.EMPTY
         ));
     }
 

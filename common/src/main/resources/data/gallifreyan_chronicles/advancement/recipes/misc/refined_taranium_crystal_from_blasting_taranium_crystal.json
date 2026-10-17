@@ -13,7 +13,7 @@
     },
     "has_the_recipe": {
       "conditions": {
-        "recipe": "gallifreyan_chronicles:refined_taranium_crystal_from_blasting_taranium_crystal"
+        "recipes": "gallifreyan_chronicles:refined_taranium_crystal_from_blasting_taranium_crystal"
       },
       "trigger": "minecraft:recipe_unlocked"
     }

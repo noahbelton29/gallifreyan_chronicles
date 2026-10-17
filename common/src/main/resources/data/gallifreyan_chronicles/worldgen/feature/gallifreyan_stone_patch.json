@@ -1,0 +1,10 @@
+{
+  "type": "minecraft:netherrack_replace_blobs",
+  "radius": {
+    "type": "minecraft:uniform",
+    "max_inclusive": 5,
+    "min_inclusive": 3
+  },
+  "state": "gallifreyan_chronicles:gallifreyan_stone",
+  "target": "gallifreyan_chronicles:gallifreyan_sand"
+}

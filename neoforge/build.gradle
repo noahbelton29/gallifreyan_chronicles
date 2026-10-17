@@ -80,8 +80,8 @@ repositories {
 
 dependencies {
     implementation("com.geckolib:geckolib-neoforge-${providers.gradleProperty("minecraft_version").get()}:${providers.gradleProperty("geckolib_version").get()}")
-    implementation("foundry.imguimc:imguimc-neoforge-${project.minecraft_version}:${project.imguimc_version}")
-    runtimeOnly("foundry.imguimc:imguimc-neoforge-${project.minecraft_version}:${project.imguimc_version}")
+//    implementation("foundry.imguimc:imguimc-neoforge-${project.minecraft_version}:${project.imguimc_version}")
+//    runtimeOnly("foundry.imguimc:imguimc-neoforge-${project.minecraft_version}:${project.imguimc_version}")
 //    runtimeOnly("maven.modrinth:sodium:${providers.gradleProperty("sodium_version").get()}")
 //    runtimeOnly("maven.modrinth:iris:${providers.gradleProperty("iris_version").get()}")
 }

@@ -4,15 +4,19 @@ import com.noahtnt2009.gallifreyan_chronicles.Constants;
 import com.noahtnt2009.gallifreyan_chronicles.init.GCBlocks;
 import com.noahtnt2009.gallifreyan_chronicles.init.GCItems;
 import com.noahtnt2009.gallifreyan_chronicles.util.GCUtils;
+import net.minecraft.advancements.Advancement;
 import net.minecraft.core.HolderLookup;
+import net.minecraft.core.registries.MultiRegistryBootstrap;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.data.PackOutput;
 import net.minecraft.data.recipes.*;
+import net.minecraft.data.worldgen.BootstrapContext;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.crafting.AbstractCookingRecipe;
 import net.minecraft.world.item.crafting.CookingBookCategory;
 import net.minecraft.world.item.crafting.Ingredient;
+import net.minecraft.world.item.crafting.Recipe;
 import net.minecraft.world.level.ItemLike;
 import net.minecraft.world.level.block.Blocks;
 import org.jspecify.annotations.NonNull;
@@ -21,8 +25,12 @@ import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
 public class GCRecipeProvider extends RecipeProvider {
-    public GCRecipeProvider(HolderLookup.Provider registries, RecipeOutput output) {
-        super(registries, output);
+    public GCRecipeProvider(BootstrapContext<Recipe<?>> recipes, BootstrapContext<Advancement> advancements) {
+        super(recipes, advancements);
+    }
+
+    public static MultiRegistryBootstrap bootstrap() {
+        return RecipeProvider.asBootstrap(GCRecipeProvider::new);
     }
 
     @Override
@@ -206,22 +214,6 @@ public class GCRecipeProvider extends RecipeProvider {
                     .group(group)
                     .unlockedBy(getHasName(item), this.has(item))
                     .save(this.output, Constants.MOD_ID + ":" + getItemName(result) + fromDesc + "_" + getItemName(item));
-        }
-    }
-
-    public static class Runner extends RecipeProvider.Runner {
-        public Runner(PackOutput packOutput, CompletableFuture<HolderLookup.Provider> registries) {
-            super(packOutput, registries);
-        }
-
-        @Override
-        protected @NonNull RecipeProvider createRecipeProvider(HolderLookup.@NonNull Provider registries, @NonNull RecipeOutput output) {
-            return new GCRecipeProvider(registries, output);
-        }
-
-        @Override
-        public @NonNull String getName() {
-            return "Gallifreyan Chronicles Recipes";
         }
     }
 }

@@ -9,13 +9,17 @@ import net.minecraft.world.level.biome.BiomeGenerationSettings;
 import net.minecraft.world.level.biome.BiomeSpecialEffects;
 import net.minecraft.world.level.biome.MobSpawnSettings;
 import net.minecraft.world.level.levelgen.GenerationStep;
-import net.minecraft.world.level.levelgen.carver.ConfiguredWorldCarver;
+import net.minecraft.world.level.levelgen.carver.WorldCarver;
 import net.minecraft.world.level.levelgen.placement.PlacedFeature;
+import org.joml.Vector3f;
+
+import static com.noahtnt2009.gallifreyan_chronicles.util.GCUtils.rgb;
 
 public class GCMoonBiomes {
+
     public static Biome moon(
             HolderGetter<PlacedFeature> placedFeatureGetter,
-            HolderGetter<ConfiguredWorldCarver<?>> carverGetter
+            HolderGetter<WorldCarver> carverGetter
     ) {
         MobSpawnSettings.Builder spawnBuilder = new MobSpawnSettings.Builder();
         BiomeGenerationSettings.Builder biomeBuilder =
@@ -32,8 +36,8 @@ public class GCMoonBiomes {
                 .specialEffects(new BiomeSpecialEffects.Builder()
                         .waterColor(0xBDB133)
                         .build())
-                .setAttribute(EnvironmentAttributes.SKY_COLOR, 0xFF000000)
-                .setAttribute(EnvironmentAttributes.AMBIENT_LIGHT_COLOR, 0xFFcccccc)
+                .setAttribute(EnvironmentAttributes.SKY_COLOR, rgb(0x000000))
+                .setAttribute(EnvironmentAttributes.AMBIENT_LIGHT_COLOR, rgb(0xCCCCCC))
                 .mobSpawnSettings(spawnBuilder.build())
                 .generationSettings(biomeBuilder.build())
                 .build();

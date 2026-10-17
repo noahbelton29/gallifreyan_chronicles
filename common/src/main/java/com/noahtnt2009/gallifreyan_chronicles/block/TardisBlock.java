@@ -1,6 +1,5 @@
 package com.noahtnt2009.gallifreyan_chronicles.block;
 
-import com.mojang.serialization.MapCodec;
 import com.noahtnt2009.gallifreyan_chronicles.Constants;
 import com.noahtnt2009.gallifreyan_chronicles.block.entity.TardisExteriorBlockEntity;
 import com.noahtnt2009.gallifreyan_chronicles.ecs.Entity;
@@ -13,6 +12,7 @@ import com.noahtnt2009.gallifreyan_chronicles.tardis.ecs.component.DoorState;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.util.Prediction;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
@@ -68,7 +68,7 @@ public class TardisBlock extends BaseEntityBlock {
             key.set(GCDataComponents.TARDIS_ID, record.getTardisId());
             key.set(GCDataComponents.KEY_INSERTED, false);
             if (!player.getInventory().add(key)) {
-                player.drop(key, false);
+                player.drop(key, false, Prediction.SERVER_ONLY);
             }
 
             Constants.LOG.debug(
@@ -103,7 +103,7 @@ public class TardisBlock extends BaseEntityBlock {
                     ItemStack returned = tardis.clearHeldKey();
                     returned.set(GCDataComponents.KEY_INSERTED, false);
                     if (!player.getInventory().add(returned)) {
-                        player.drop(returned, false);
+                        player.drop(returned, false, Prediction.SERVER_ONLY);
                     }
                     return InteractionResult.CONSUME;
                 } else {
@@ -128,11 +128,6 @@ public class TardisBlock extends BaseEntityBlock {
         if (level.isClientSide()) return InteractionResult.SUCCESS;
         tardis.interact(player.isShiftKeyDown());
         return InteractionResult.CONSUME;
-    }
-
-    @Override
-    protected @NonNull MapCodec<? extends BaseEntityBlock> codec() {
-        return simpleCodec(TardisBlock::new);
     }
 
     @Override

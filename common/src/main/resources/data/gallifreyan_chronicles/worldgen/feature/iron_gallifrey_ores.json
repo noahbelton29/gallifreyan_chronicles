@@ -1,0 +1,14 @@
+{
+  "type": "minecraft:ore",
+  "discard_chance_on_air_exposure": 0.0,
+  "size": 9,
+  "targets": [
+    {
+      "state": "gallifreyan_chronicles:gallifreyan_stone_iron_ore",
+      "target": {
+        "predicate_type": "minecraft:tag_match",
+        "tag": "gallifreyan_chronicles:gallifreyan_stone_replaceables"
+      }
+    }
+  ]
+}

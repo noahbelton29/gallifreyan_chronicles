@@ -48,8 +48,9 @@ public class TardisExteriorBlockRenderer extends GeoBlockRenderer<@NotNull Tardi
         renderPassInfo.poseStack().pushPose();
 
         Float yaw = renderPassInfo.renderState().getGeckolibData(YAW);
-        renderPassInfo.poseStack().mulPose(
-                Axis.YP.rotationDegrees(180f - (yaw != null ? yaw : 0f))
+        renderPassInfo.poseStack().rotateDegrees(
+                Axis.YP,
+                180f - (yaw != null ? yaw : 0f)
         );
 
         super.submitRenderTasks(renderPassInfo, renderTasks, renderType);

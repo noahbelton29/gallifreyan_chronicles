@@ -13,7 +13,7 @@
     },
     "has_the_recipe": {
       "conditions": {
-        "recipe": "gallifreyan_chronicles:taranium_scrap_from_blasting_arcadian_shale_taranium_ore"
+        "recipes": "gallifreyan_chronicles:taranium_scrap_from_blasting_arcadian_shale_taranium_ore"
       },
       "trigger": "minecraft:recipe_unlocked"
     }

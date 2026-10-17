@@ -1,0 +1,6 @@
+{
+  "parent": "minecraft:block/button_inventory",
+  "textures": {
+    "texture": "gallifreyan_chronicles:block/cadonwood_planks"
+  }
+}

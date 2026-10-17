@@ -13,7 +13,7 @@
     },
     "has_the_recipe": {
       "conditions": {
-        "recipe": "gallifreyan_chronicles:taranium_chestplate"
+        "recipes": "gallifreyan_chronicles:taranium_chestplate"
       },
       "trigger": "minecraft:recipe_unlocked"
     }

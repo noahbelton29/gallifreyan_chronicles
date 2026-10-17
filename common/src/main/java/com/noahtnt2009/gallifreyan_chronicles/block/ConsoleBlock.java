@@ -1,6 +1,5 @@
 package com.noahtnt2009.gallifreyan_chronicles.block;
 
-import com.mojang.serialization.MapCodec;
 import com.noahtnt2009.gallifreyan_chronicles.block.entity.TardisConsoleBlockEntity;
 import com.noahtnt2009.gallifreyan_chronicles.init.GCDataComponents;
 import com.noahtnt2009.gallifreyan_chronicles.tardis.console.TardisConsole;
@@ -33,11 +32,6 @@ public class ConsoleBlock extends BaseEntityBlock {
         this.registerDefaultState(
                 this.stateDefinition.any().setValue(FACING, Direction.NORTH)
         );
-    }
-
-    @Override
-    protected @NonNull MapCodec<? extends BaseEntityBlock> codec() {
-        return simpleCodec(ConsoleBlock::new);
     }
 
     @Override

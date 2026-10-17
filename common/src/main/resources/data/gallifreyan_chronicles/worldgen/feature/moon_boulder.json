@@ -1,0 +1,7 @@
+{
+  "type": "gallifreyan_chronicles:boulder",
+  "blocks": [
+    "gallifreyan_chronicles:lunar_regolith",
+    "gallifreyan_chronicles:moonslate"
+  ]
+}

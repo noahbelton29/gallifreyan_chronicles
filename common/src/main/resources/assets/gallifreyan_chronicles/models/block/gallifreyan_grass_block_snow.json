@@ -1,0 +1,9 @@
+{
+  "parent": "minecraft:block/cube_bottom_top",
+  "textures": {
+    "bottom": "gallifreyan_chronicles:block/gallifreyan_dirt",
+    "particle": "gallifreyan_chronicles:block/gallifreyan_dirt",
+    "side": "gallifreyan_chronicles:block/gallifreyan_grass_block_snow",
+    "top": "gallifreyan_chronicles:block/gallifreyan_grass_block_top"
+  }
+}

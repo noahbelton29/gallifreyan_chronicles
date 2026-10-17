@@ -32,7 +32,7 @@ public class TardisExteriorRegistry {
         TardisExterior result = REGISTRY.getById(id);
         if (result != null) return result;
         if (defaultExterior != null) return defaultExterior;
-        return REGISTRY.getAll().iterator().next();
+        return REGISTRY.getAll().stream().findFirst().orElse(null);
     }
 
     public static boolean contains(String id) {

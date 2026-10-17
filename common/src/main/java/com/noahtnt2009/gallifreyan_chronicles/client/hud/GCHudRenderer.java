@@ -34,7 +34,7 @@ public final class GCHudRenderer {
 
         String titleLine = "Gallifreyan Chronicles " + MOD_VERSION_LABEL;
         String minecraftText = "Minecraft ";
-        String versionText = "26.2 ";
+        String versionText = "26.3 ";
         String devLine = "Development Build";
 
         int y = MARGIN_Y;

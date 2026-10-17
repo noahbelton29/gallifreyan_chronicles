@@ -13,7 +13,7 @@
     },
     "has_the_recipe": {
       "conditions": {
-        "recipe": "gallifreyan_chronicles:stripped_cadonwood_wood"
+        "recipes": "gallifreyan_chronicles:stripped_cadonwood_wood"
       },
       "trigger": "minecraft:recipe_unlocked"
     }

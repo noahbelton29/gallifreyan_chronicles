@@ -1,0 +1,10 @@
+{
+  "variants": {
+    "half=lower": {
+      "model": "gallifreyan_chronicles:block/tall_gallifreyan_grass_bottom"
+    },
+    "half=upper": {
+      "model": "gallifreyan_chronicles:block/tall_gallifreyan_grass_top"
+    }
+  }
+}

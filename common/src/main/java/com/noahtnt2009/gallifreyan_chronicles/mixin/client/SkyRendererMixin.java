@@ -16,6 +16,7 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
+import com.mojang.renderpearl.api.commands.RenderPass;
 
 import java.util.Optional;
 
@@ -30,6 +31,7 @@ public class SkyRendererMixin {
 
     @Inject(method = "renderSunMoonAndStars", at = @At("HEAD"))
     private void gcRenderSky(
+            RenderPass renderPass,
             PoseStack poseStack,
             float sunAngle,
             float moonAngle,
@@ -47,7 +49,7 @@ public class SkyRendererMixin {
 
         renderer.get().renderSunMoonAndStars(
                 (SkyRendererInvoker) this,
-                poseStack, sunAngle, moonAngle, starAngle,
+                renderPass, poseStack, sunAngle, moonAngle, starAngle,
                 moonPhase, rainBrightness, starBrightness
         );
     }

@@ -13,7 +13,7 @@
     },
     "has_the_recipe": {
       "conditions": {
-        "recipe": "gallifreyan_chronicles:taranium_axe"
+        "recipes": "gallifreyan_chronicles:taranium_axe"
       },
       "trigger": "minecraft:recipe_unlocked"
     }

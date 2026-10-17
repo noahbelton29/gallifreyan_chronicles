@@ -13,13 +13,17 @@ import net.minecraft.client.renderer.block.dispatch.Variant;
 import net.minecraft.data.PackOutput;
 import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.Item;
+import net.minecraft.world.item.Items;
 import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.Blocks;
+
+import java.util.Map;
 
 public class GCModelProvider extends ModelProvider {
     private static final int GALLIFREYAN_GRASS_TINT = 0xFFE0E0E0;
 
     public GCModelProvider(PackOutput output) {
-        super(output, Constants.MOD_ID);
+        super(output, String.valueOf(Constants.MOD_ID));
     }
 
     @Override
@@ -96,7 +100,7 @@ public class GCModelProvider extends ModelProvider {
 
         registerGrassBlock(blockModels);
         registerCadonwoodSet(blockModels);
-        createCustomVine(blockModels, GCBlocks.GALLIFREYAN_VINE, GCBlocks.GALLIFREYAN_VINE.asItem());
+        createCustomVine(blockModels, itemModels, GCBlocks.GALLIFREYAN_VINE, GCBlocks.GALLIFREYAN_VINE.asItem());
 
         itemModels.generateFlatItem(GCItems.TARDIS_KEY, ModelTemplates.FLAT_ITEM);
         itemModels.generateFlatItem(GCItems.MASTER_TARDIS_KEY, ModelTemplates.FLAT_ITEM);
@@ -110,15 +114,20 @@ public class GCModelProvider extends ModelProvider {
         itemModels.generateFlatItem(GCItems.TARANIUM_SHOVEL, ModelTemplates.FLAT_HANDHELD_ITEM);
         itemModels.generateFlatItem(GCItems.TARANIUM_AXE, ModelTemplates.FLAT_HANDHELD_ITEM);
         itemModels.generateFlatItem(GCItems.TARANIUM_HOE, ModelTemplates.FLAT_HANDHELD_ITEM);
-        itemModels.generateTrimmableItem(GCItems.TARANIUM_HELMET, GCArmorMaterials.TARANIUM_KEY, ItemModelGenerators.TRIM_PREFIX_HELMET, false);
-        itemModels.generateTrimmableItem(GCItems.TARANIUM_CHESTPLATE, GCArmorMaterials.TARANIUM_KEY, ItemModelGenerators.TRIM_PREFIX_CHESTPLATE, false);
-        itemModels.generateTrimmableItem(GCItems.TARANIUM_LEGGINGS, GCArmorMaterials.TARANIUM_KEY, ItemModelGenerators.TRIM_PREFIX_LEGGINGS, false);
-        itemModels.generateTrimmableItem(GCItems.TARANIUM_BOOTS, GCArmorMaterials.TARANIUM_KEY, ItemModelGenerators.TRIM_PREFIX_BOOTS, false);
+        itemModels.generateTrimmableArmorSet(
+                GCItems.TARANIUM_HELMET,
+                GCItems.TARANIUM_CHESTPLATE,
+                GCItems.TARANIUM_LEGGINGS,
+                GCItems.TARANIUM_BOOTS,
+                false,
+                Map.of()
+        );
     }
 
-    public void createCustomVine(BlockModelGenerators blockModelGenerators, Block vineBlock, Item vineItem) {
+    public void createCustomVine(BlockModelGenerators blockModelGenerators, ItemModelGenerators itemModelGenerators, Block vineBlock, Item vineItem) {
         blockModelGenerators.createMultifaceBlockStates(vineBlock);
-        blockModelGenerators.createFlatItemModelWithBlockTexture(vineItem, vineBlock);
+        Identifier itemModel = blockModelGenerators.createFlatItemModelWithBlockTexture(vineItem, vineBlock);
+//        this.registerSimpleTintedItemModel(Blocks.VINE, itemModel, ItemModelUtils.constantTint(-12012264));
     }
 
     private void registerBrachackiSet(BlockModelGenerators generators) {

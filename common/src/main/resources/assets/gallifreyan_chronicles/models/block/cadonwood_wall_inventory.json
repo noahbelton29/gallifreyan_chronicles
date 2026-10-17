@@ -1,0 +1,6 @@
+{
+  "parent": "minecraft:block/wall_inventory",
+  "textures": {
+    "wall": "gallifreyan_chronicles:block/cadonwood_planks"
+  }
+}

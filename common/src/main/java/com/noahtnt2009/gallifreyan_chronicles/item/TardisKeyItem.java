@@ -2,6 +2,7 @@ package com.noahtnt2009.gallifreyan_chronicles.item;
 
 import com.noahtnt2009.gallifreyan_chronicles.block.entity.TardisExteriorBlockEntity;
 import com.noahtnt2009.gallifreyan_chronicles.init.GCDataComponents;
+import net.minecraft.util.Prediction;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
@@ -52,7 +53,7 @@ public class TardisKeyItem extends Item {
             ItemStack returned = exterior.clearHeldKey();
             returned.set(GCDataComponents.KEY_INSERTED, false);
             if (!player.getInventory().add(returned)) {
-                player.drop(returned, false);
+                player.drop(returned, false, Prediction.SERVER_ONLY);
             }
         }
 

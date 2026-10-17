@@ -1,5 +1,6 @@
 {
   "type": "minecraft:blasting",
+  "cookingtime": 100,
   "experience": 0.25,
   "group": "taranium",
   "ingredient": "gallifreyan_chronicles:arcadian_shale_taranium_ore",

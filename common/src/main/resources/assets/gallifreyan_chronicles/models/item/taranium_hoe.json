@@ -1,0 +1,6 @@
+{
+  "parent": "minecraft:item/handheld",
+  "textures": {
+    "layer0": "gallifreyan_chronicles:item/taranium_hoe"
+  }
+}

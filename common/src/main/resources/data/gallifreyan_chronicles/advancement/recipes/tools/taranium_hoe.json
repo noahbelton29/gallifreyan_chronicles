@@ -13,7 +13,7 @@
     },
     "has_the_recipe": {
       "conditions": {
-        "recipe": "gallifreyan_chronicles:taranium_hoe"
+        "recipes": "gallifreyan_chronicles:taranium_hoe"
       },
       "trigger": "minecraft:recipe_unlocked"
     }

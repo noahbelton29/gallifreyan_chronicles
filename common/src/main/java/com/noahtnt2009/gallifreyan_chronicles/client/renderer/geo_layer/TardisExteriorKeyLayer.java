@@ -99,9 +99,9 @@ public class TardisExteriorKeyLayer<T extends GeoAnimatable & TardisExteriorKeyL
 
         poseStack.pushPose();
         poseStack.scale(0.2f, 0.2f, 0.2f);
-        poseStack.rotate(Axis.YP.rotationDegrees(90f));
         poseStack.rotate(Axis.XP.rotationDegrees(90f));
         poseStack.rotate(Axis.ZP.rotationDegrees(90f));
+        poseStack.rotate(Axis.XP.rotationDegrees(90f));
 
         itemRenderState.submit(
                 poseStack,

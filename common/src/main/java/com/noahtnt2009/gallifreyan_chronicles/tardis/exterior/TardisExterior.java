@@ -42,8 +42,12 @@ public record TardisExterior(String id, Vec3 keyOffset) implements IdentifiableD
         this(id, DEFAULT_KEY_OFFSET);
     }
 
+    public static float modelRotationDegrees(float yawDegrees) {
+        return 180.0f - yawDegrees;
+    }
+
     public Vec3 worldKeyOffset(float yawDegrees) {
-        double radians = Math.toRadians(180.0 - yawDegrees);
+        double radians = Math.toRadians(modelRotationDegrees(yawDegrees));
         double sin = Math.sin(radians);
         double cos = Math.cos(radians);
 

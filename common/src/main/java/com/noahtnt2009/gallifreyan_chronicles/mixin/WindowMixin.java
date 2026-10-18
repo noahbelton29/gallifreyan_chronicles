@@ -2,6 +2,7 @@ package com.noahtnt2009.gallifreyan_chronicles.mixin;
 
 import com.mojang.blaze3d.platform.IconSet;
 import com.mojang.blaze3d.platform.Window;
+import com.mojang.logging.LogUtils;
 import net.minecraft.server.packs.PackMetadataResources;
 import net.minecraft.server.packs.resources.IoSupplier;
 import org.slf4j.Logger;
@@ -31,7 +32,7 @@ public abstract class WindowMixin {
     }
 
     @Unique
-    private static final Logger GC_LOG = com.mojang.logging.LogUtils.getLogger();
+    private static final Logger GC_LOG = LogUtils.getLogger();
 
     @ModifyVariable(method = "createWindow", at = @At("HEAD"), argsOnly = true)
     private String gc$initialTitle(String title) {
@@ -45,7 +46,6 @@ public abstract class WindowMixin {
 
     @Unique
     private static String gc$rename(String title) {
-        // keeps the suffix: "Minecraft* 26.3 - Singleplayer" -> "Gallifreyan Chronicles* 26.3 - Singleplayer"
         return title.replaceFirst("^Minecraft", "Gallifreyan Chronicles");
     }
 

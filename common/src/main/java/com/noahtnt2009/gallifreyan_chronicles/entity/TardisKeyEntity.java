@@ -6,6 +6,7 @@ import com.noahtnt2009.gallifreyan_chronicles.init.GCDataComponents;
 import com.noahtnt2009.gallifreyan_chronicles.item.MasterTardisKeyItem;
 import com.noahtnt2009.gallifreyan_chronicles.item.TardisKeyItem;
 import net.minecraft.core.BlockPos;
+import net.minecraft.network.chat.Component;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
@@ -46,7 +47,6 @@ public class TardisKeyEntity extends Entity {
     public static final float DEFAULT_WIDTH = 0.1f;
     public static final float DEFAULT_HEIGHT = 0.1f;
     public static final float DEFAULT_DEPTH = DEFAULT_WIDTH;
-    public static final Vec3 DEFAULT_OFFSET = new Vec3(0.0, -0.925, 1.0);
 
     public TardisKeyEntity(EntityType<? extends TardisKeyEntity> type, Level level) {
         super(type, level);
@@ -55,7 +55,22 @@ public class TardisKeyEntity extends Entity {
     }
 
     public static TardisKeyEntity create(Level level, BlockPos exteriorPos, Vec3 worldPos) {
-        return create(level, exteriorPos, worldPos, DEFAULT_OFFSET);
+        return create(level, exteriorPos, worldPos, Vec3.ZERO);
+    }
+
+    @Override
+    public void tick() {
+        super.tick();
+        if (this.level().isClientSide()) {
+            return;
+        }
+        if (!(this.level().getBlockEntity(this.getExteriorPos()) instanceof TardisExteriorBlockEntity exterior)) {
+            return;
+        }
+        Vec3 target = exterior.getKeyWorldPos();
+        if (this.position().distanceToSqr(target) > 1.0E-6) {
+            this.setPos(target);
+        }
     }
 
     public static TardisKeyEntity create(Level level, BlockPos exteriorPos, Vec3 worldPos, Vec3 keyOffset) {
@@ -155,19 +170,31 @@ public class TardisKeyEntity extends Entity {
             return InteractionResult.PASS;
         }
 
-        if (this.level().isClientSide()) {
-            return InteractionResult.SUCCESS;
-        }
-
         TardisExteriorBlockEntity exterior = this.getExterior();
         if (exterior == null || exterior.hasKeyRendered()) {
             return InteractionResult.PASS;
+        }
+
+        // The key can only go in while BOTH doors are closed.
+        if (!exterior.areDoorsFullyClosed()) {
+            if (!this.level().isClientSide()) {
+                player.sendOverlayMessage(Component.literal("Close both doors before inserting the key!"));
+            }
+            return InteractionResult.FAIL;
+        }
+
+        if (this.level().isClientSide()) {
+            return InteractionResult.SUCCESS;
         }
 
         return this.tryInsertKey(exterior, player, hand);
     }
 
     private InteractionResult tryInsertKey(TardisExteriorBlockEntity exterior, Player player, InteractionHand hand) {
+        if (!exterior.areDoorsFullyClosed()) {
+            return InteractionResult.FAIL;
+        }
+
         ItemStack held = player.getItemInHand(hand);
 
         boolean isMasterKey = held.getItem() instanceof MasterTardisKeyItem;

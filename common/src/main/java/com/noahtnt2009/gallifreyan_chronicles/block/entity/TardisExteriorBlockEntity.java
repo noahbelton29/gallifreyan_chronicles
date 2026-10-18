@@ -80,15 +80,14 @@ public class TardisExteriorBlockEntity extends BlockEntity implements GeoBlockEn
         if (keyEntity != null && keyEntity.isAlive()) {
             keyEntity.discard();
         }
-        Vec3 worldPos = Vec3.atCenterOf(getBlockPos());
-        TardisExterior exterior = getExterior();
-        Vec3 keyOffset = exterior != null
-                ? exterior.worldKeyOffset(getYaw())
-                : TardisKeyEntity.DEFAULT_OFFSET;
         TardisKeyEntity entity =
-                TardisKeyEntity.create(serverLevel, getBlockPos(), worldPos, keyOffset);
+                TardisKeyEntity.create(serverLevel, getBlockPos(), getKeyWorldPos());
         serverLevel.addFreshEntity(entity);
         this.keyEntity = entity;
+    }
+
+    public Vec3 getKeyWorldPos() {
+        return Vec3.atCenterOf(getBlockPos()).add(getExterior().worldKeyOffset(getYaw()));
     }
 
     public void discardKeyEntity() {
@@ -104,6 +103,14 @@ public class TardisExteriorBlockEntity extends BlockEntity implements GeoBlockEn
 
     public boolean hasKeyRendered() {
         return renderedKeyOwner != null;
+    }
+
+    /**
+     * True only when BOTH doors are closed and no open/close animation is still playing.
+     */
+    public boolean areDoorsFullyClosed() {
+        return getDoorState().isClosed()
+                && !DoorSystem.isAnimating(asEntity(), System.currentTimeMillis());
     }
 
     public boolean isLocked() {

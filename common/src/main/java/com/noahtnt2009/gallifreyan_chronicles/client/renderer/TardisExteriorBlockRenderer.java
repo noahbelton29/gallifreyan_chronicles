@@ -8,11 +8,9 @@ import com.noahtnt2009.gallifreyan_chronicles.block.TardisExteriorBlockModel;
 import com.noahtnt2009.gallifreyan_chronicles.block.entity.TardisExteriorBlockEntity;
 import com.noahtnt2009.gallifreyan_chronicles.client.renderer.geo_layer.TardisExteriorGlowLayer;
 import com.noahtnt2009.gallifreyan_chronicles.client.renderer.geo_layer.TardisExteriorKeyLayer;
-import net.minecraft.client.renderer.OrderedSubmitNodeCollector;
+import com.noahtnt2009.gallifreyan_chronicles.tardis.exterior.TardisExterior;
 import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
-import net.minecraft.client.renderer.rendertype.RenderType;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 import org.jspecify.annotations.NonNull;
 
 public class TardisExteriorBlockRenderer extends GeoBlockRenderer<@NotNull TardisExteriorBlockEntity, @NotNull TardisExteriorBlockRenderState> {
@@ -42,19 +40,13 @@ public class TardisExteriorBlockRenderer extends GeoBlockRenderer<@NotNull Tardi
     }
 
     @Override
-    public void submitRenderTasks(RenderPassInfo<TardisExteriorBlockRenderState> renderPassInfo,
-                                  @NonNull OrderedSubmitNodeCollector renderTasks,
-                                  @Nullable RenderType renderType) {
-        renderPassInfo.poseStack().pushPose();
+    public void adjustRenderPose(RenderPassInfo<TardisExteriorBlockRenderState> renderPassInfo) {
+        super.adjustRenderPose(renderPassInfo);
 
         Float yaw = renderPassInfo.renderState().getGeckolibData(YAW);
         renderPassInfo.poseStack().rotateDegrees(
                 Axis.YP,
-                180f - (yaw != null ? yaw : 0f)
+                TardisExterior.modelRotationDegrees(yaw != null ? yaw : 0f)
         );
-
-        super.submitRenderTasks(renderPassInfo, renderTasks, renderType);
-
-        renderPassInfo.poseStack().popPose();
     }
 }

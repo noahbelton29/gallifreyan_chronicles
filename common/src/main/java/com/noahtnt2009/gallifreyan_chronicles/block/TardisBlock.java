@@ -99,7 +99,7 @@ public class TardisBlock extends BaseEntityBlock {
             boolean isOwner = player.getUUID().equals(tardis.getRenderedKeyOwner());
 
             if (player.isShiftKeyDown() && isOwner) {
-                if (tardis.getDoorState() == DoorState.CLOSED) {
+                if (tardis.areDoorsFullyClosed()) {
                     ItemStack returned = tardis.clearHeldKey();
                     returned.set(GCDataComponents.KEY_INSERTED, false);
                     if (!player.getInventory().add(returned)) {

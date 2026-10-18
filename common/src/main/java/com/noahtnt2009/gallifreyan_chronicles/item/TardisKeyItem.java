@@ -2,6 +2,7 @@ package com.noahtnt2009.gallifreyan_chronicles.item;
 
 import com.noahtnt2009.gallifreyan_chronicles.block.entity.TardisExteriorBlockEntity;
 import com.noahtnt2009.gallifreyan_chronicles.init.GCDataComponents;
+import net.minecraft.network.chat.Component;
 import net.minecraft.util.Prediction;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
@@ -42,6 +43,11 @@ public class TardisKeyItem extends Item {
 
         if (!inserted) {
             if (exterior.hasKeyRendered()) return InteractionResult.FAIL;
+
+            if (!exterior.areDoorsFullyClosed()) {
+                player.sendOverlayMessage(Component.literal("Close both doors before inserting the key!"));
+                return InteractionResult.FAIL;
+            }
 
             ItemStack toStore = stack.copyWithCount(1);
             toStore.set(GCDataComponents.KEY_INSERTED, true);

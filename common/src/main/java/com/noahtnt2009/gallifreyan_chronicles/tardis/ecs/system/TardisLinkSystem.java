@@ -32,6 +32,7 @@ public final class TardisLinkSystem {
         TardisManager manager = TardisManager.get(level.getServer());
         TardisComponent record = manager.create(ownerId);
         manager.setBlockPos(record.getTardisId(), pos);
+        manager.setExteriorDimension(record.getTardisId(), level.dimension());
 
         link(entity, record.getTardisId());
         return record;

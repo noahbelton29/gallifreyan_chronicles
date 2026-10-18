@@ -23,6 +23,7 @@ import com.noahtnt2009.gallifreyan_chronicles.tardis.ecs.system.GlowSystem;
 import com.noahtnt2009.gallifreyan_chronicles.init.GCGameRules;
 import com.noahtnt2009.gallifreyan_chronicles.init.GCSounds;
 import com.noahtnt2009.gallifreyan_chronicles.tardis.exterior.TardisExterior;
+import com.noahtnt2009.gallifreyan_chronicles.tardis.interior.TardisInteriorSystem;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.HolderLookup;
@@ -266,6 +267,7 @@ public class TardisExteriorBlockEntity extends BlockEntity implements GeoBlockEn
             blockEntity.applyGlowToBlockState(blockEntity.isGlowing());
             blockEntity.sync();
         }
+        TardisInteriorSystem.tickEntry(level, blockEntity);
     }
 
     public void interact(boolean sneaking) {

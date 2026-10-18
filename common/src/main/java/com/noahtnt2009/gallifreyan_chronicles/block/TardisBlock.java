@@ -5,7 +5,6 @@ import com.noahtnt2009.gallifreyan_chronicles.block.entity.TardisExteriorBlockEn
 import com.noahtnt2009.gallifreyan_chronicles.ecs.Entity;
 import com.noahtnt2009.gallifreyan_chronicles.init.GCDataComponents;
 import com.noahtnt2009.gallifreyan_chronicles.init.GCItems;
-import com.noahtnt2009.gallifreyan_chronicles.tardis.ecs.system.ConsoleLinkSystem;
 import com.noahtnt2009.gallifreyan_chronicles.tardis.ecs.system.TardisLinkSystem;
 import com.noahtnt2009.gallifreyan_chronicles.tardis.ecs.component.TardisComponent;
 import com.noahtnt2009.gallifreyan_chronicles.tardis.ecs.component.DoorState;
@@ -17,6 +16,7 @@ import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.BaseEntityBlock;
 import net.minecraft.world.level.block.Block;
@@ -28,6 +28,9 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.BooleanProperty;
 import net.minecraft.world.phys.BlockHitResult;
+import net.minecraft.world.phys.shapes.CollisionContext;
+import net.minecraft.world.phys.shapes.Shapes;
+import net.minecraft.world.phys.shapes.VoxelShape;
 import org.jetbrains.annotations.NotNull;
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
@@ -61,7 +64,6 @@ public class TardisBlock extends BaseEntityBlock {
             TardisComponent record = TardisLinkSystem.registerNewTardis(entity, serverLevel, player.getUUID(), pos);
             blockEntity.sync();
 
-            ConsoleLinkSystem.spawnAndLink(serverLevel, record.getTardisId(), pos);
             blockEntity.spawnKeyEntity();
 
             ItemStack key = new ItemStack(GCItems.TARDIS_KEY);
@@ -128,6 +130,16 @@ public class TardisBlock extends BaseEntityBlock {
         if (level.isClientSide()) return InteractionResult.SUCCESS;
         tardis.interact(player.isShiftKeyDown());
         return InteractionResult.CONSUME;
+    }
+
+    // open doors can be walked through, otherwise the player could never reach the entry zone
+    @Override
+    protected @NonNull VoxelShape getCollisionShape(@NonNull BlockState state, @NonNull BlockGetter level,
+                                                    @NonNull BlockPos pos, @NonNull CollisionContext context) {
+        if (level.getBlockEntity(pos) instanceof TardisExteriorBlockEntity tardis && !tardis.getDoorState().isClosed()) {
+            return Shapes.empty();
+        }
+        return super.getCollisionShape(state, level, pos, context);
     }
 
     @Override

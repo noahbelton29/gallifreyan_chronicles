@@ -28,7 +28,9 @@ public final class ExteriorLinkSystem {
 
     public static void link(ServerLevel level, UUID tardisId, BlockPos pos) {
         findExterior(level, pos).ifPresent(exterior -> exterior.linkToTardis(tardisId));
-        TardisManager.get(level.getServer()).setExteriorBlockPos(tardisId, pos);
+        TardisManager manager = TardisManager.get(level.getServer());
+        manager.setExteriorBlockPos(tardisId, pos);
+        manager.setExteriorDimension(tardisId, level.dimension());
     }
 
     public static void unlink(ServerLevel level, UUID tardisId) {

@@ -51,6 +51,13 @@ public class GCDimensions {
     public static final ResourceKey<NoiseGeneratorSettings> MOON_NOISE_SETTINGS = ResourceKey.create(Registries.NOISE_SETTINGS,
             GCUtils.of("moon"));
 
+    public static final ResourceKey<LevelStem> TARDIS_INTERIOR_KEY = ResourceKey.create(Registries.LEVEL_STEM,
+            GCUtils.of("tardis_interior"));
+    public static final ResourceKey<Level> TARDIS_INTERIOR_LEVEL_KEY = ResourceKey.create(Registries.DIMENSION,
+            GCUtils.of("tardis_interior"));
+    public static final ResourceKey<DimensionType> TARDIS_INTERIOR_TYPE_KEY = ResourceKey.create(Registries.DIMENSION_TYPE,
+            GCUtils.of("tardis_interior_type"));
+
     public static void bootstrapType(BootstrapContext<DimensionType> context) {
         var timelines = context.lookup(Registries.TIMELINE);
         var clocks = context.lookup(Registries.WORLD_CLOCK);

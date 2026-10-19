@@ -1,7 +1,7 @@
 {
   "variants": {
     "": {
-      "model": "gallifreyan_chronicles:block/tardis"
+      "model": "gallifreyan_chronicles:block/tardis_top"
     }
   }
 }

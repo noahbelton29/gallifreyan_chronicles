@@ -95,6 +95,7 @@ public class GCModelProvider extends ModelProvider {
 
         blockModels.createParticleOnlyBlock(GCBlocks.TARDIS);
         blockModels.createParticleOnlyBlock(GCBlocks.TARDIS_CONSOLE);
+        blockModels.createParticleOnlyBlock(GCBlocks.TARDIS_TOP);
         itemModels.generateFlatItem(GCBlocks.TARDIS.asItem(), ModelTemplates.FLAT_ITEM);
         itemModels.generateFlatItem(GCBlocks.TARDIS_CONSOLE.asItem(), ModelTemplates.FLAT_ITEM);
 
@@ -132,6 +133,8 @@ public class GCModelProvider extends ModelProvider {
 
     private void registerBrachackiSet(BlockModelGenerators generators) {
         generators.createTrivialCube(GCBlocks.BRACHACKI_FLOOR_BLOCK);
+        generators.createTrivialCube(GCBlocks.BRACHACKI_ROUNDEL_BLOCK);
+        generators.createTrivialCube(GCBlocks.BRACHACKI_HALF_ROUNDEL_BLOCK);
 
         generators.family(GCBlocks.BRACHACKI_WALL_BLOCK)
                 .stairs(GCBlocks.BRACHACKI_STAIRS)

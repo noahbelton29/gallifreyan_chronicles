@@ -53,8 +53,7 @@ public class GCBlocks {
     public static final Block TARDIS_TOP = registerBlockWithoutBlockItem("tardis_top",
             properties -> new TardisTopBlock(properties.strength(-1F)
                     .sound(SoundType.STONE)
-                    .noOcclusion()
-                    .noLootTable()));
+                    .noOcclusion()));
 
     public static final Block TARDIS_CONSOLE = registerBlock("tardis_console",
             properties -> new ConsoleBlock(properties.strength(-1F)
@@ -85,6 +84,16 @@ public class GCBlocks {
                     .sound(SoundType.STONE)));
 
     public static final Block BRACHACKI_WALL_BLOCK = registerBlock("brachacki_wall_block",
+            properties -> new Block(properties.strength(3F, 3F)
+                    .requiresCorrectToolForDrops()
+                    .sound(SoundType.STONE)));
+
+    public static final Block BRACHACKI_ROUNDEL_BLOCK = registerBlock("brachacki_roundel_block",
+            properties -> new Block(properties.strength(3F, 3F)
+                    .requiresCorrectToolForDrops()
+                    .sound(SoundType.STONE)));
+
+    public static final Block BRACHACKI_HALF_ROUNDEL_BLOCK = registerBlock("brachacki_half_roundel_block",
             properties -> new Block(properties.strength(3F, 3F)
                     .requiresCorrectToolForDrops()
                     .sound(SoundType.STONE)));

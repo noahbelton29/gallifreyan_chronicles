@@ -19,6 +19,16 @@ public class GCCreativeModeTabs {
                         output.accept(GCBlocks.TARDIS_CONSOLE);
                         output.accept(GCItems.TARDIS_KEY);
                         output.accept(GCItems.MASTER_TARDIS_KEY);
+                        output.accept(GCBlocks.BRACHACKI_FLOOR_BLOCK);
+                        output.accept(GCBlocks.BRACHACKI_WALL_BLOCK);
+                        output.accept(GCBlocks.BRACHACKI_ROUNDEL_BLOCK);
+                        output.accept(GCBlocks.BRACHACKI_HALF_ROUNDEL_BLOCK);
+                        output.accept(GCBlocks.BRACHACKI_STAIRS);
+                        output.accept(GCBlocks.BRACHACKI_SLAB);
+                        output.accept(GCBlocks.BRACHACKI_PRESSURE_PLATE);
+                        output.accept(GCBlocks.BRACHACKI_WALL);
+                        output.accept(GCBlocks.BRACHACKI_FENCE);
+                        output.accept(GCBlocks.BRACHACKI_FENCE_GATE);
                     }).build());
 
     public static final CreativeModeTab NATURAL_BLOCKS_TAB = Registry.register(BuiltInRegistries.CREATIVE_MODE_TAB,
@@ -44,7 +54,7 @@ public class GCCreativeModeTabs {
                     }).build());
 
     public static final CreativeModeTab BUILDING_BLOCKS_TAB = Registry.register(BuiltInRegistries.CREATIVE_MODE_TAB,
-            GCUtils.of("building_bloccks"),
+            GCUtils.of("building_blocks"),
             FabricCreativeModeTab.builder().icon(() -> new ItemStack(GCBlocks.CADONWOOD_PLANKS))
                     .title(Component.translatable("creativetab.gallifreyan_chronicles.building_blocks"))
                     .displayItems((parameters, output) -> {

@@ -24,6 +24,8 @@ public class GCCreativeModeTabs {
                         output.accept(GCItems.MASTER_TARDIS_KEY);
                         output.accept(GCBlocks.BRACHACKI_FLOOR_BLOCK);
                         output.accept(GCBlocks.BRACHACKI_WALL_BLOCK);
+                        output.accept(GCBlocks.BRACHACKI_ROUNDEL_BLOCK);
+                        output.accept(GCBlocks.BRACHACKI_HALF_ROUNDEL_BLOCK);
                         output.accept(GCBlocks.BRACHACKI_STAIRS);
                         output.accept(GCBlocks.BRACHACKI_SLAB);
                         output.accept(GCBlocks.BRACHACKI_PRESSURE_PLATE);

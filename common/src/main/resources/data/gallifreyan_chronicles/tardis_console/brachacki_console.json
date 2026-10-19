@@ -6,6 +6,29 @@
     "tuat_console": "gallifreyan_chronicles:brachacki_console/tuat_console",
     "second_doctors_console": "gallifreyan_chronicles:brachacki_console/second_doctors_console"
   },
+  "glow_groups": [
+    {
+      "name": "lights",
+      "prefix": "glowmask_lights_",
+      "frames": 4,
+      "hold_ticks": 30,
+      "fade_ticks": 8
+    },
+    {
+      "name": "buttons",
+      "prefix": "glowmask_buttons_",
+      "frames": 4,
+      "hold_ticks": 60,
+      "fade_ticks": 8
+    },
+    {
+      "name": "rotor",
+      "prefix": "glowmask_rotor_",
+      "frames": 4,
+      "hold_ticks": 50,
+      "fade_ticks": 8
+    }
+  ],
   "controls": [
     {
       "depth": 0.1875,

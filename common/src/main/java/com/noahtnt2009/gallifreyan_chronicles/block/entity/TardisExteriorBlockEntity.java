@@ -1,6 +1,5 @@
 package com.noahtnt2009.gallifreyan_chronicles.block.entity;
 
-import com.noahtnt2009.gallifreyan_chronicles.block.TardisTopBlock;
 import com.geckolib.animatable.GeoBlockEntity;
 import com.geckolib.animatable.instance.AnimatableInstanceCache;
 import com.geckolib.animatable.manager.AnimatableManager;
@@ -17,10 +16,12 @@ import com.noahtnt2009.gallifreyan_chronicles.entity.TardisKeyEntity;
 import com.noahtnt2009.gallifreyan_chronicles.tardis.ecs.TardisLinkable;
 import com.noahtnt2009.gallifreyan_chronicles.tardis.ecs.component.DoorState;
 import com.noahtnt2009.gallifreyan_chronicles.tardis.ecs.TardisComponentTypes;
+import com.noahtnt2009.gallifreyan_chronicles.tardis.ecs.component.TardisSubsystem;
 import com.noahtnt2009.gallifreyan_chronicles.tardis.ecs.component.TransformComponent;
 import com.noahtnt2009.gallifreyan_chronicles.tardis.ecs.system.DoorSystem;
 import com.noahtnt2009.gallifreyan_chronicles.tardis.ecs.system.ExteriorSystem;
 import com.noahtnt2009.gallifreyan_chronicles.tardis.ecs.system.GlowSystem;
+import com.noahtnt2009.gallifreyan_chronicles.tardis.ecs.system.SubsystemSystem;
 import com.noahtnt2009.gallifreyan_chronicles.init.GCGameRules;
 import com.noahtnt2009.gallifreyan_chronicles.init.GCSounds;
 import com.noahtnt2009.gallifreyan_chronicles.tardis.exterior.TardisExterior;
@@ -28,6 +29,7 @@ import com.noahtnt2009.gallifreyan_chronicles.tardis.interior.TardisInteriorSyst
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.HolderLookup;
+import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.protocol.Packet;
@@ -55,7 +57,10 @@ import java.util.function.Supplier;
 public class TardisExteriorBlockEntity extends BlockEntity implements GeoBlockEntity, ComponentHolder, TardisLinkable,
         TardisExteriorKeyLayer.TardisExteriorRenderable {
     public static Supplier<BlockEntityType<TardisExteriorBlockEntity>> TYPE;
+    private static final long KEY_JAM_COOLDOWN_TICKS = 40L;  // 2 seconds after a jam
+    private static final long KEY_TURN_COOLDOWN_TICKS = 20L; // 1 second after a normal lock/unlock
     private long lastLockedFeedbackAt = 0L;
+    private long keyCooldownUntil = 0L; // game time, intentionally not saved
     private AnimationController<TardisExteriorBlockEntity> controller;
     private boolean locked = true;
     private final ComponentStore components = new ComponentStore();
@@ -107,6 +112,9 @@ public class TardisExteriorBlockEntity extends BlockEntity implements GeoBlockEn
         return renderedKeyOwner != null;
     }
 
+    /**
+     * True only when BOTH doors are closed and no open/close animation is still playing.
+     */
     public boolean areDoorsFullyClosed() {
         return getDoorState().isClosed()
                 && !DoorSystem.isAnimating(asEntity(), System.currentTimeMillis());
@@ -117,8 +125,29 @@ public class TardisExteriorBlockEntity extends BlockEntity implements GeoBlockEn
     }
 
     public void toggleKeyLockAnimation() {
+        toggleKeyLockAnimation(null);
+    }
+
+    /**
+     * Turns the key in the lock. If the door lock subsystem is damaged enough the key jams instead,
+     * and the lock state does not change.
+     */
+    public void toggleKeyLockAnimation(@Nullable Player player) {
         if (!hasKeyRendered()) {
             return;
+        }
+        if (level != null && !level.isClientSide()) {
+            long now = level.getGameTime();
+            // the lock ignores the key for a moment after every turn (and longer after a jam), so it can't be spam clicked
+            if (now < keyCooldownUntil) {
+                return;
+            }
+            if (SubsystemSystem.rollJam(asEntity(), TardisSubsystem.DOOR_LOCK, level.getRandom())) {
+                keyCooldownUntil = now + KEY_JAM_COOLDOWN_TICKS;
+                announceKeyJammed(player);
+                return;
+            }
+            keyCooldownUntil = now + KEY_TURN_COOLDOWN_TICKS;
         }
         boolean nowLocked = !locked;
         String animName = nowLocked ? "key_lock" : "key_unlock";
@@ -266,10 +295,62 @@ public class TardisExteriorBlockEntity extends BlockEntity implements GeoBlockEn
             blockEntity.sync();
         }
         TardisInteriorSystem.tickEntry(level, blockEntity);
-
-        if (level.getGameTime() % 40L == 0L) {
-            TardisTopBlock.placeAbove(level, blockEntity.getBlockPos());
+        if (level instanceof ServerLevel serverLevel) {
+            blockEntity.tickLockDamageEffects(serverLevel);
         }
+    }
+
+    // damage effects coming out of the lock: a little smoke at low health, a little fire at really low
+    // health, and a lot of fire and smoke at 0
+    private void tickLockDamageEffects(ServerLevel serverLevel) {
+        float health = SubsystemSystem.healthOf(asEntity(), TardisSubsystem.DOOR_LOCK);
+        if (health >= SubsystemSystem.SMOKE_THRESHOLD) {
+            return;
+        }
+
+        var random = serverLevel.getRandom();
+        Vec3 pos = getKeyWorldPos();
+
+        // 0 at the smoke threshold, 1 at 0 health
+        float smoke = (SubsystemSystem.SMOKE_THRESHOLD - health) / SubsystemSystem.SMOKE_THRESHOLD;
+        if (random.nextFloat() < 0.04f + 0.40f * smoke) {
+            serverLevel.sendParticles(ParticleTypes.SMOKE,
+                    pos.x, pos.y, pos.z, 1, 0.06, 0.06, 0.06, 0.01);
+        }
+
+        if (health <= 0f) {
+            serverLevel.sendParticles(ParticleTypes.FLAME,
+                    pos.x, pos.y, pos.z, 3, 0.12, 0.12, 0.12, 0.02);
+            if (random.nextFloat() < 0.35f) {
+                serverLevel.sendParticles(ParticleTypes.LARGE_SMOKE,
+                        pos.x, pos.y + 0.1, pos.z, 1, 0.08, 0.08, 0.08, 0.03);
+            }
+        } else if (health < SubsystemSystem.FIRE_THRESHOLD) {
+            // 0 at the fire threshold, 1 at 0 health
+            float fire = (SubsystemSystem.FIRE_THRESHOLD - health) / SubsystemSystem.FIRE_THRESHOLD;
+            if (random.nextFloat() < 0.03f + 0.15f * fire) {
+                serverLevel.sendParticles(ParticleTypes.FLAME,
+                        pos.x, pos.y, pos.z, 1, 0.05, 0.05, 0.05, 0.01);
+            }
+        }
+    }
+
+    /**
+     * Returns true (and tells the player) if the lock is too damaged to take a key.
+     * Call this before inserting a key.
+     */
+    public boolean rejectKeyIfLockBroken(@Nullable Player player) {
+        if (SubsystemSystem.acceptsKey(asEntity(), TardisSubsystem.DOOR_LOCK)) {
+            return false;
+        }
+        if (level != null) {
+            level.playSound(null, getBlockPos(), GCSounds.TARDIS_KEY_JAMMED, SoundSource.BLOCKS, 1.0f, 1.0f);
+        }
+        if (player != null) {
+            player.sendOverlayMessage(
+                    Component.literal("The lock is too damaged to take the key!").withStyle(ChatFormatting.RED));
+        }
+        return true;
     }
 
     public void interact(boolean sneaking) {
@@ -285,6 +366,24 @@ public class TardisExteriorBlockEntity extends BlockEntity implements GeoBlockEn
         playAnimation(result.animationName());
         playDoorSound(result.opening());
         sync();
+    }
+
+    private void announceKeyJammed(@Nullable Player player) {
+        triggerAnim("key_controller", "key_jammed");
+        if (level != null) {
+            level.playSound(null, getBlockPos(), GCSounds.TARDIS_KEY_JAMMED, SoundSource.BLOCKS, 1.0f, 1.0f);
+        }
+        if (player != null) {
+            player.sendOverlayMessage(Component.literal("The lock is jammed!").withStyle(ChatFormatting.RED));
+        }
+    }
+
+    public float getSubsystemHealth(TardisSubsystem subsystem) {
+        return SubsystemSystem.healthOf(asEntity(), subsystem);
+    }
+
+    public void setSubsystemHealth(TardisSubsystem subsystem, float health) {
+        SubsystemSystem.setHealth(asEntity(), subsystem, health);
     }
 
     public void announceLocked(Player player) {
@@ -444,7 +543,8 @@ public class TardisExteriorBlockEntity extends BlockEntity implements GeoBlockEn
                 _ -> PlayState.CONTINUE);
         keyController.triggerableAnim("key_lock", RawAnimation.begin().thenPlay("key_lock"))
                 .triggerableAnim("key_unlock", RawAnimation.begin().thenPlay("key_unlock"))
-                .triggerableAnim("is_locked", RawAnimation.begin().thenPlay("is_locked"));
+                .triggerableAnim("is_locked", RawAnimation.begin().thenPlay("is_locked"))
+                .triggerableAnim("key_jammed", RawAnimation.begin().thenPlay("key_jammed"));
         registrar.add(keyController);
 
         if (level != null && level.isClientSide()) {

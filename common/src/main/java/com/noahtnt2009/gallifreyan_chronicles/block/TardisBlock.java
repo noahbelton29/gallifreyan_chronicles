@@ -4,7 +4,6 @@ import com.noahtnt2009.gallifreyan_chronicles.Constants;
 import com.noahtnt2009.gallifreyan_chronicles.block.entity.TardisExteriorBlockEntity;
 import com.noahtnt2009.gallifreyan_chronicles.ecs.Entity;
 import com.noahtnt2009.gallifreyan_chronicles.init.GCDataComponents;
-import com.noahtnt2009.gallifreyan_chronicles.init.GCBlocks;
 import com.noahtnt2009.gallifreyan_chronicles.init.GCItems;
 import com.noahtnt2009.gallifreyan_chronicles.tardis.ecs.system.TardisLinkSystem;
 import com.noahtnt2009.gallifreyan_chronicles.tardis.ecs.component.TardisComponent;
@@ -18,7 +17,6 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.BlockGetter;
-import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.BaseEntityBlock;
 import net.minecraft.world.level.block.Block;
@@ -50,27 +48,6 @@ public class TardisBlock extends BaseEntityBlock {
         builder.add(GLOWING);
     }
 
-    // needs one free block above for the top half
-    @Override
-    public @Nullable BlockState getStateForPlacement(@NonNull BlockPlaceContext context) {
-        BlockPos above = context.getClickedPos().above();
-        Level level = context.getLevel();
-        if (level.isOutsideBuildHeight(above) || !level.getBlockState(above).canBeReplaced(context)) {
-            return null;
-        }
-        return super.getStateForPlacement(context);
-    }
-
-    @Override
-    public @NotNull BlockState playerWillDestroy(@NotNull Level level, @NotNull BlockPos pos,
-                                                 @NotNull BlockState state, @NotNull Player player) {
-        BlockPos above = pos.above();
-        if (!level.isClientSide() && level.getBlockState(above).is(GCBlocks.TARDIS_TOP)) {
-            level.removeBlock(above, false);
-        }
-        return super.playerWillDestroy(level, pos, state, player);
-    }
-
     @Override
     public void setPlacedBy(@NonNull Level level, @NonNull BlockPos pos, @NonNull BlockState state, LivingEntity placer,
                             @NonNull ItemStack stack) {
@@ -80,8 +57,6 @@ public class TardisBlock extends BaseEntityBlock {
         blockEntity.setYaw(snapYawTo45(placer.getYRot() + 180));
 
         if (!level.isClientSide()) {
-            TardisTopBlock.placeAbove(level, pos);
-
             if (!(level instanceof ServerLevel serverLevel)) return;
             if (!(placer instanceof Player player)) return;
 
@@ -139,7 +114,7 @@ public class TardisBlock extends BaseEntityBlock {
                 }
             }
             else if (!player.isShiftKeyDown() && isOwner) {
-                tardis.toggleKeyLockAnimation();
+                tardis.toggleKeyLockAnimation(player);
                 return InteractionResult.CONSUME;
             }
 

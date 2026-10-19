@@ -1,6 +1,7 @@
 package com.noahtnt2009.gallifreyan_chronicles.command;
 
 import com.mojang.brigadier.arguments.BoolArgumentType;
+import com.mojang.brigadier.arguments.FloatArgumentType;
 import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.context.CommandContext;
 import com.noahtnt2009.gallifreyan_chronicles.block.entity.TardisConsoleBlockEntity;
@@ -10,6 +11,7 @@ import com.noahtnt2009.gallifreyan_chronicles.platform.Services;
 import com.noahtnt2009.gallifreyan_chronicles.tardis.console.TardisConsole;
 import com.noahtnt2009.gallifreyan_chronicles.tardis.console.TardisConsoleRegistry;
 import com.noahtnt2009.gallifreyan_chronicles.tardis.ecs.component.TardisComponent;
+import com.noahtnt2009.gallifreyan_chronicles.tardis.ecs.component.TardisSubsystem;
 import com.noahtnt2009.gallifreyan_chronicles.tardis.ecs.system.ConsoleLinkSystem;
 import com.noahtnt2009.gallifreyan_chronicles.tardis.ecs.system.ExteriorLinkSystem;
 import com.noahtnt2009.gallifreyan_chronicles.tardis.manager.TardisManager;
@@ -428,6 +430,111 @@ public class TardisCommand {
         );
 
         return 1;
+    }
+
+    public static java.util.concurrent.CompletableFuture<com.mojang.brigadier.suggestion.Suggestions> suggestSubsystems(
+            CommandContext<CommandSourceStack> ctx,
+            com.mojang.brigadier.suggestion.SuggestionsBuilder builder
+    ) {
+        for (TardisSubsystem subsystem : TardisSubsystem.values()) {
+            builder.suggest(subsystem.id());
+        }
+        return builder.buildFuture();
+    }
+
+    /** Resolves the exterior block entity for the command's "id" argument, or sends a failure and returns empty. */
+    private static Optional<TardisExteriorBlockEntity> resolveExteriorForSubsystem(
+            CommandContext<CommandSourceStack> ctx, String tardisIdStr) {
+        UUID tardisId;
+        try {
+            tardisId = UUID.fromString(tardisIdStr);
+        } catch (IllegalArgumentException e) {
+            ctx.getSource().sendFailure(Component.translatable(
+                    "command.gallifreyan_chronicles.invalid_id",
+                    tardisIdStr
+            ));
+            return Optional.empty();
+        }
+
+        TardisManager manager = TardisManager.get(ctx.getSource().getServer());
+        if (manager.get(tardisId).isEmpty()) {
+            ctx.getSource().sendFailure(Component.translatable(
+                    "command.gallifreyan_chronicles.no_tardis_id",
+                    tardisIdStr
+            ));
+            return Optional.empty();
+        }
+
+        BlockPos pos = manager.resolveExteriorBlockPos(tardisId);
+        Optional<TardisExteriorBlockEntity> blockEntity = findBlockEntity(ctx, pos, TardisExteriorBlockEntity.class);
+        if (blockEntity.isEmpty()) {
+            ctx.getSource().sendFailure(Component.translatable(
+                    "command.gallifreyan_chronicles.no_exterior",
+                    tardisIdStr
+            ));
+        }
+        return blockEntity;
+    }
+
+    private static Optional<TardisSubsystem> parseSubsystem(CommandContext<CommandSourceStack> ctx) {
+        String id = StringArgumentType.getString(ctx, "subsystem");
+        Optional<TardisSubsystem> subsystem = TardisSubsystem.byId(id);
+        if (subsystem.isEmpty()) {
+            ctx.getSource().sendFailure(Component.translatable(
+                    "command.gallifreyan_chronicles.unknown_subsystem",
+                    id
+            ));
+        }
+        return subsystem;
+    }
+
+    public static int setSubsystemHealth(CommandContext<CommandSourceStack> ctx) {
+        String tardisIdStr = StringArgumentType.getString(ctx, "id");
+        float health = FloatArgumentType.getFloat(ctx, "health");
+
+        Optional<TardisSubsystem> subsystem = parseSubsystem(ctx);
+        if (subsystem.isEmpty()) return 0;
+
+        Optional<TardisExteriorBlockEntity> blockEntity = resolveExteriorForSubsystem(ctx, tardisIdStr);
+        if (blockEntity.isEmpty()) return 0;
+
+        blockEntity.get().setSubsystemHealth(subsystem.get(), health);
+
+        ctx.getSource().sendSuccess(
+                () -> Component.translatable(
+                        "command.gallifreyan_chronicles.set_subsystem_health",
+                        subsystem.get().id(),
+                        tardisIdStr,
+                        String.valueOf(health)
+                ),
+                true
+        );
+
+        return 1;
+    }
+
+    public static int getSubsystemHealth(CommandContext<CommandSourceStack> ctx) {
+        String tardisIdStr = StringArgumentType.getString(ctx, "id");
+
+        Optional<TardisSubsystem> subsystem = parseSubsystem(ctx);
+        if (subsystem.isEmpty()) return 0;
+
+        Optional<TardisExteriorBlockEntity> blockEntity = resolveExteriorForSubsystem(ctx, tardisIdStr);
+        if (blockEntity.isEmpty()) return 0;
+
+        float health = blockEntity.get().getSubsystemHealth(subsystem.get());
+
+        ctx.getSource().sendSuccess(
+                () -> Component.translatable(
+                        "command.gallifreyan_chronicles.get_subsystem_health",
+                        subsystem.get().id(),
+                        tardisIdStr,
+                        String.valueOf(health)
+                ),
+                false
+        );
+
+        return Math.round(health);
     }
 
     public static int getExterior(CommandContext<CommandSourceStack> ctx) {

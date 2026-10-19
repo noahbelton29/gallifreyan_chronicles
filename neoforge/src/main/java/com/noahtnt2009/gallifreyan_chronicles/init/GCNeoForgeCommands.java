@@ -1,8 +1,9 @@
+
 package com.noahtnt2009.gallifreyan_chronicles.init;
 
 import com.mojang.brigadier.arguments.BoolArgumentType;
+import com.mojang.brigadier.arguments.FloatArgumentType;
 import com.mojang.brigadier.arguments.StringArgumentType;
-import com.mojang.datafixers.kinds.Const;
 import com.noahtnt2009.gallifreyan_chronicles.Constants;
 import com.noahtnt2009.gallifreyan_chronicles.command.TardisCommand;
 import com.noahtnt2009.gallifreyan_chronicles.tardis.console.TardisConsoleRegistry;
@@ -21,6 +22,7 @@ import static net.minecraft.commands.Commands.literal;
 
 @EventBusSubscriber(modid = Constants.MOD_ID)
 public class GCNeoForgeCommands {
+
     @SubscribeEvent
     public static void onRegisterCommands(RegisterCommandsEvent event) {
         event.getDispatcher().register(
@@ -33,16 +35,19 @@ public class GCNeoForgeCommands {
                                             TardisManager.get(ctx.getSource().getServer())
                                                     .getAllIds()
                                                     .forEach(id -> builder.suggest(id.toString()));
+
                                             return builder.buildFuture();
                                         })
                                         .then(literal("exterior")
                                                 .then(literal("get")
                                                         .executes(TardisCommand::getExterior))
                                                 .then(literal("set")
-                                                        .then(argument("exterior_id", StringArgumentType.greedyString())
-                                                                .suggests((_, builder) -> {
+                                                        .then(argument("exterior_id",
+                                                                StringArgumentType.greedyString())
+                                                                .suggests((ctx, builder) -> {
                                                                     TardisExteriorRegistry.getAll()
                                                                             .forEach(e -> builder.suggest(e.id()));
+
                                                                     return builder.buildFuture();
                                                                 })
                                                                 .executes(TardisCommand::setExterior)))
@@ -54,16 +59,19 @@ public class GCNeoForgeCommands {
                                                 .then(literal("get")
                                                         .executes(TardisCommand::getConsole))
                                                 .then(literal("set")
-                                                        .then(argument("console_id", StringArgumentType.greedyString())
-                                                                .suggests((_, builder) -> {
+                                                        .then(argument("console_id",
+                                                                StringArgumentType.greedyString())
+                                                                .suggests((ctx, builder) -> {
                                                                     TardisConsoleRegistry.getAll()
                                                                             .forEach(e -> builder.suggest(e.id()));
+
                                                                     return builder.buildFuture();
                                                                 })
                                                                 .executes(TardisCommand::setConsole)))
                                                 .then(literal("variant")
                                                         .then(literal("set")
-                                                                .then(argument("variant_id", StringArgumentType.greedyString())
+                                                                .then(argument("variant_id",
+                                                                        StringArgumentType.greedyString())
                                                                         .suggests(TardisCommand::suggestConsoleVariants)
                                                                         .executes(TardisCommand::setConsoleVariant))))
                                                 .then(literal("link")
@@ -72,29 +80,46 @@ public class GCNeoForgeCommands {
                                                         .executes(TardisCommand::unlinkConsole)))
                                         .then(literal("glow")
                                                 .then(argument("glowing", BoolArgumentType.bool())
-                                                        .executes(TardisCommand::setGlowing))))
-                                .then(literal("debug")
-                                        .then(literal("exteriors")
-                                                .executes(ctx -> {
-                                                    ctx.getSource().sendSuccess(
-                                                            () -> Component.translatable("command.gallifreyan_chronicles.list_exterior", TardisExteriorRegistry.getAll()
-                                                                    .stream().map(TardisExterior::id)
-                                                                    .collect(Collectors.joining(", "))),
-                                                            false
-                                                    );
-                                                    return 1;
-                                                }))
-                                        .then(literal("tardis")
-                                                .then(argument("id", StringArgumentType.string())
-                                                        .suggests((ctx, builder) -> {
-                                                            TardisManager.get(ctx.getSource().getServer())
-                                                                    .getAllIds()
-                                                                    .forEach(id -> builder.suggest(id.toString()));
-                                                            return builder.buildFuture();
-                                                        })
-                                                        .executes(TardisCommand::debugTardis)))
-                                        .then(literal("controls")
-                                                .executes(TardisCommand::listControls)))));
+                                                        .executes(TardisCommand::setGlowing)))
+                                        .then(literal("subsystem")
+                                                .then(argument("subsystem", StringArgumentType.word())
+                                                        .suggests(TardisCommand::suggestSubsystems)
+                                                        .then(literal("health")
+                                                                .then(literal("get")
+                                                                        .executes(TardisCommand::getSubsystemHealth))
+                                                                .then(literal("set")
+                                                                        .then(argument("health",
+                                                                                FloatArgumentType.floatArg(0f, 100f))
+                                                                                .executes(TardisCommand::setSubsystemHealth))))))))
+                        .then(literal("debug")
+                                .then(literal("exteriors")
+                                        .executes(ctx -> {
+                                            ctx.getSource().sendSuccess(
+                                                    () -> Component.translatable(
+                                                            "command.gallifreyan_chronicles.list_exterior",
+                                                            TardisExteriorRegistry.getAll()
+                                                                    .stream()
+                                                                    .map(TardisExterior::id)
+                                                                    .collect(Collectors.joining(", "))
+                                                    ),
+                                                    false
+                                            );
+
+                                            return 1;
+                                        }))
+                                .then(literal("tardis")
+                                        .then(argument("id", StringArgumentType.string())
+                                                .suggests((ctx, builder) -> {
+                                                    TardisManager.get(ctx.getSource().getServer())
+                                                            .getAllIds()
+                                                            .forEach(id -> builder.suggest(id.toString()));
+
+                                                    return builder.buildFuture();
+                                                })
+                                                .executes(TardisCommand::debugTardis)))
+                                .then(literal("controls")
+                                        .executes(TardisCommand::listControls)))
+        );
 
         Constants.LOG.info("Registered GC Commands (NeoForge)");
     }

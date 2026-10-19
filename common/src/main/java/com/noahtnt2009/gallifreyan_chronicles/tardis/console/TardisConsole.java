@@ -14,7 +14,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
-public record TardisConsole(String id, List<ControlEntry> controls, Map<String, String> variants, String defaultVariant) implements IdentifiableData<TardisConsole> {
+public record TardisConsole(String id, List<ControlEntry> controls, Map<String, String> variants, String defaultVariant,
+                            List<GlowGroup> glowGroups) implements IdentifiableData<TardisConsole> {
     public record ControlEntry(String id, Vec3 offset, float width, float height, float depth) {
         private static final Codec<Vec3> VEC3_CODEC = RecordCodecBuilder.create(inst -> inst.group(
                 Codec.DOUBLE.fieldOf("x").forGetter(Vec3::x),
@@ -44,11 +45,11 @@ public record TardisConsole(String id, List<ControlEntry> controls, Map<String, 
     }
 
     public TardisConsole(String id) {
-        this(id, List.of(), Map.of(), "");
+        this(id, List.of(), Map.of(), "", List.of());
     }
 
     public TardisConsole(String id, List<ControlEntry> controls) {
-        this(id, controls, Map.of(), "");
+        this(id, controls, Map.of(), "", List.of());
     }
 
 
@@ -59,7 +60,8 @@ public record TardisConsole(String id, List<ControlEntry> controls, Map<String, 
             Codec.STRING.fieldOf("id").forGetter(TardisConsole::id),
             ControlEntry.CODEC.listOf().optionalFieldOf("controls", List.of()).forGetter(TardisConsole::controls),
             VARIANTS_CODEC.optionalFieldOf("variants", Map.of()).forGetter(TardisConsole::variants),
-            Codec.STRING.optionalFieldOf("default_variant", "").forGetter(TardisConsole::defaultVariant)
+            Codec.STRING.optionalFieldOf("default_variant", "").forGetter(TardisConsole::defaultVariant),
+            GlowGroup.CODEC.listOf().optionalFieldOf("glow_groups", List.of()).forGetter(TardisConsole::glowGroups)
     ).apply(inst, TardisConsole::new));
 
     public static final StreamCodec<FriendlyByteBuf, TardisConsole> STREAM_CODEC = StreamCodec.composite(
@@ -67,6 +69,7 @@ public record TardisConsole(String id, List<ControlEntry> controls, Map<String, 
             ControlEntry.STREAM_CODEC.apply(ByteBufCodecs.list()), TardisConsole::controls,
             ByteBufCodecs.map(LinkedHashMap::new, ByteBufCodecs.STRING_UTF8, ByteBufCodecs.STRING_UTF8), TardisConsole::variants,
             ByteBufCodecs.STRING_UTF8, TardisConsole::defaultVariant,
+            GlowGroup.STREAM_CODEC.apply(ByteBufCodecs.list()), TardisConsole::glowGroups,
             TardisConsole::new
     );
 
@@ -91,6 +94,6 @@ public record TardisConsole(String id, List<ControlEntry> controls, Map<String, 
 
     @Override
     public TardisConsole withId(String id) {
-        return new TardisConsole(id, controls, variants, defaultVariant);
+        return new TardisConsole(id, controls, variants, defaultVariant, glowGroups);
     }
 }

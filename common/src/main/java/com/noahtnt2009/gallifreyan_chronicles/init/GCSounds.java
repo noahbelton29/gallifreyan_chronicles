@@ -14,6 +14,7 @@ public class GCSounds {
     public static final SoundEvent TARDIS_DOOR_LOCK = register("tardis_door_lock");
     public static final SoundEvent TARDIS_DOOR_UNLOCK = register("tardis_door_unlock");
     public static final SoundEvent TARDIS_IS_LOCKED = register("tardis_is_locked");
+    public static final SoundEvent TARDIS_KEY_JAMMED = register("tardis_key_jammed");
 
 
     private static SoundEvent register(String name) {

@@ -43,5 +43,11 @@
     "sounds": [
         "gallifreyan_chronicles:block_entity/tardis/door/is_locked"
     ]
+  },
+  "tardis_key_jammed": {
+    "subtitle": "sounds.gallifreyan_chronicles.block_entity.key_jammed",
+    "sounds": [
+        "gallifreyan_chronicles:block_entity/tardis/door/key_jammed"
+    ]
   }
 }

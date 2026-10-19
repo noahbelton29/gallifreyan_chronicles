@@ -1,6 +1,5 @@
 package com.noahtnt2009.gallifreyan_chronicles.item;
 
-import com.noahtnt2009.gallifreyan_chronicles.block.TardisTopBlock;
 import com.noahtnt2009.gallifreyan_chronicles.block.entity.TardisExteriorBlockEntity;
 import com.noahtnt2009.gallifreyan_chronicles.init.GCDataComponents;
 import net.minecraft.network.chat.Component;
@@ -24,7 +23,7 @@ public class MasterTardisKeyItem extends Item {
         if (player == null || !player.isShiftKeyDown()) return InteractionResult.PASS;
 
         Level level = context.getLevel();
-        if (!(level.getBlockEntity(TardisTopBlock.baseOf(level, context.getClickedPos())) instanceof TardisExteriorBlockEntity exterior)) {
+        if (!(level.getBlockEntity(context.getClickedPos()) instanceof TardisExteriorBlockEntity exterior)) {
             return InteractionResult.PASS;
         }
 
@@ -39,6 +38,8 @@ public class MasterTardisKeyItem extends Item {
             return InteractionResult.CONSUME;
         }
 
+        if (exterior.rejectKeyIfLockBroken(player)) return InteractionResult.FAIL;
+
         if (!exterior.areDoorsFullyClosed()) {
             player.sendOverlayMessage(Component.literal("Close both doors before inserting the key!"));
             return InteractionResult.FAIL;
@@ -49,7 +50,7 @@ public class MasterTardisKeyItem extends Item {
         toStore.set(GCDataComponents.KEY_INSERTED, true);
         exterior.setHeldKey(player.getUUID(), toStore);
         stack.shrink(1);
-        exterior.toggleKeyLockAnimation();
+        exterior.toggleKeyLockAnimation(player);
 
         return InteractionResult.CONSUME;
     }

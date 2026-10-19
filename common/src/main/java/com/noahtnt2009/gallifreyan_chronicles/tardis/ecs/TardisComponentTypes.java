@@ -24,7 +24,11 @@ public final class TardisComponentTypes {
     public static final ComponentType<GlowComponent> GLOW =
             ComponentType.persistentDefaulted("glow", GlowComponent.CODEC, GlowComponent::off);
 
-    public static final List<ComponentType<?>> ALL = List.of(EXTERIOR, CONSOLE, DOOR, TRANSFORM, TARDIS_LINK, GLOW);
+    public static final ComponentType<SubsystemsComponent> SUBSYSTEMS =
+            ComponentType.persistentDefaulted("subsystems", SubsystemsComponent.CODEC, SubsystemsComponent::fresh);
+
+    public static final List<ComponentType<?>> ALL =
+            List.of(EXTERIOR, CONSOLE, DOOR, TRANSFORM, TARDIS_LINK, GLOW, SUBSYSTEMS);
 
     private TardisComponentTypes() {
     }

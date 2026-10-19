@@ -1,6 +1,7 @@
 package com.noahtnt2009.gallifreyan_chronicles.init;
 
 import com.mojang.brigadier.arguments.BoolArgumentType;
+import com.mojang.brigadier.arguments.FloatArgumentType;
 import com.mojang.brigadier.arguments.StringArgumentType;
 import com.noahtnt2009.gallifreyan_chronicles.Constants;
 import com.noahtnt2009.gallifreyan_chronicles.command.TardisCommand;
@@ -68,7 +69,16 @@ public class GCCommands {
                                                             .executes(TardisCommand::unlinkConsole)))
                                             .then(literal("glow")
                                                     .then(argument("glowing", BoolArgumentType.bool())
-                                                            .executes(TardisCommand::setGlowing))))
+                                                            .executes(TardisCommand::setGlowing)))
+                                            .then(literal("subsystem")
+                                                    .then(argument("subsystem", StringArgumentType.word())
+                                                            .suggests(TardisCommand::suggestSubsystems)
+                                                            .then(literal("health")
+                                                                    .then(literal("get")
+                                                                            .executes(TardisCommand::getSubsystemHealth))
+                                                                    .then(literal("set")
+                                                                            .then(argument("health", FloatArgumentType.floatArg(0f, 100f))
+                                                                                    .executes(TardisCommand::setSubsystemHealth)))))))
                                     .then(literal("debug")
                                             .then(literal("exteriors")
                                                     .executes(ctx -> {

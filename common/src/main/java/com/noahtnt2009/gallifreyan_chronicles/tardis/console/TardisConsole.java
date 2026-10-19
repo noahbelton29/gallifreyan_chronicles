@@ -51,7 +51,7 @@ public record TardisConsole(String id, List<ControlEntry> controls, String defau
     }
 
     public static final Codec<TardisConsole> CODEC = RecordCodecBuilder.create(inst -> inst.group(
-            Codec.STRING.fieldOf("id").forGetter(TardisConsole::id),
+            Codec.STRING.optionalFieldOf("id", "").forGetter(TardisConsole::id),
             ControlEntry.CODEC.listOf().optionalFieldOf("controls", List.of()).forGetter(TardisConsole::controls),
             Codec.STRING.optionalFieldOf("default_variant", "").forGetter(TardisConsole::defaultVariant),
             GlowGroup.CODEC.listOf().optionalFieldOf("glow_groups", List.of()).forGetter(TardisConsole::glowGroups)

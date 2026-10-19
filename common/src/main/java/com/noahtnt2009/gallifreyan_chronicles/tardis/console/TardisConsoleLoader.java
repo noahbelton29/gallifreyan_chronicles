@@ -1,5 +1,6 @@
 package com.noahtnt2009.gallifreyan_chronicles.tardis.console;
 
+import com.noahtnt2009.gallifreyan_chronicles.Constants;
 import com.noahtnt2009.gallifreyan_chronicles.data.GCJsonReloadListener;
 import com.noahtnt2009.gallifreyan_chronicles.network.TardisConsoleSyncPayload;
 import com.noahtnt2009.gallifreyan_chronicles.platform.Services;
@@ -30,6 +31,12 @@ public class TardisConsoleLoader extends GCJsonReloadListener<TardisConsole> {
 
     @Override
     protected void onReloadComplete() {
+        if (TardisConsoleRegistry.size() == 0) {
+            Constants.LOG.error("No TARDIS consoles loaded; console features are disabled until the data errors are fixed");
+            TardisConsoleRegistry.setDefault(null);
+            return;
+        }
+
         TardisConsoleRegistry.setDefault(TardisConsoleRegistry.get(TardisConsoleRegistry.DEFAULT_ID));
         TardisConsoleRegistry.validateVariants();
         respawnAllLiveConsoles();

@@ -20,7 +20,7 @@ public record TardisExterior(String id, Vec3 keyOffset) implements IdentifiableD
     ).apply(inst, Vec3::new));
 
     public static final Codec<TardisExterior> CODEC = RecordCodecBuilder.create(inst -> inst.group(
-            Codec.STRING.fieldOf("id").forGetter(TardisExterior::id),
+            Codec.STRING.optionalFieldOf("id", "").forGetter(TardisExterior::id),
             VEC3_CODEC.optionalFieldOf("key_offset").forGetter(exterior -> Optional.of(exterior.keyOffset()))
     ).apply(inst, (id, keyOffset) -> new TardisExterior(id, keyOffset.orElse(DEFAULT_KEY_OFFSET))));
 

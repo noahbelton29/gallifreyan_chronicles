@@ -31,6 +31,6 @@ public abstract class TitleScreenMixin extends Screen {
             index = 1
     )
     public String modifyVersionString(String original) {
-        return "Gallifreyan Chronicles v0.0.1-26.3";
+        return "Gallifreyan Chronicles v0.1.0-26.3";
     }
 }

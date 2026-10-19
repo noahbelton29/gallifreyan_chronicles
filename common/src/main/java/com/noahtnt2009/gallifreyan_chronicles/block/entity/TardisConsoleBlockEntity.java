@@ -69,6 +69,11 @@ public class TardisConsoleBlockEntity extends BlockEntity implements GeoBlockEnt
     private final ConsoleControlManager controls;
     private boolean humStarted = false;
 
+    private static final double SNAP_TO_END = 10_000.0;
+    private final Map<String, Integer> snapFrames = new HashMap<>();
+    private boolean controlStatesLoaded = false;
+    private boolean controlAnimationsSettled = false;
+
     public TardisConsoleBlockEntity(BlockPos pos, BlockState state) {
         super(TYPE.get(), pos, state);
         this.animationDriver = new ConsoleAnimationDriver(pos);
@@ -88,8 +93,18 @@ public class TardisConsoleBlockEntity extends BlockEntity implements GeoBlockEnt
 
         Map<String, AnimationController<TardisConsoleBlockEntity>> builtControlControllers = new HashMap<>();
         for (String controlId : TardisControlRegistry.allIds()) {
-            AnimationController<TardisConsoleBlockEntity> controller = new AnimationController<>(controlId, 0, test ->
-                    test.controller().getCurrentRawAnimation() != null ? PlayState.CONTINUE : PlayState.STOP);
+            AnimationController<TardisConsoleBlockEntity> controller = new AnimationController<>(controlId, 0, test -> {
+                if (test.controller().getCurrentRawAnimation() == null) {
+                    return PlayState.STOP;
+                }
+                Integer framesLeft = snapFrames.get(controlId);
+                if (framesLeft != null) {
+                    test.controller().setAnimationTime(SNAP_TO_END);
+                    if (framesLeft <= 1) snapFrames.remove(controlId);
+                    else snapFrames.put(controlId, framesLeft - 1);
+                }
+                return PlayState.CONTINUE;
+            });
             builtControlControllers.put(controlId, controller);
         }
         this.controlControllers = Collections.unmodifiableMap(builtControlControllers);
@@ -110,6 +125,22 @@ public class TardisConsoleBlockEntity extends BlockEntity implements GeoBlockEnt
                     new TardisConsoleRotorStatePayload(getBlockPos(), currentRotorState)
             );
         }
+    }
+
+    private void settleControlAnimations() {
+        if (controlAnimationsSettled || !controlStatesLoaded) return;
+        if (level == null || !level.isClientSide()) return;
+
+        for (String controlId : TardisControlRegistry.allIds()) {
+            if (!controls.getControlState(controlId)) continue;
+
+            String animation = TardisControlRegistry.get(controlId).getAnimation(true);
+            if (animation == null) continue;
+
+            snapFrames.put(controlId, 2);
+            animationDriver.applyAnimationLocally(controlId, animation);
+        }
+        controlAnimationsSettled = true;
     }
 
     public void applyRotorStateClient(String rotorState) {
@@ -229,7 +260,12 @@ public class TardisConsoleBlockEntity extends BlockEntity implements GeoBlockEnt
         components.load(input, TardisComponentTypes.ALL);
         input.read("Controls", ControlSpec.CODEC.listOf())
                 .ifPresent(controls::replaceControlSpecs);
-        input.read("ControlStates", CompoundTag.CODEC).ifPresent(controls::mergeControlStates);
+        input.read("ControlStates", CompoundTag.CODEC).ifPresent(tag -> {
+            controls.mergeControlStates(tag);
+            controlStatesLoaded = true;
+        });
+        this.currentRotorState = controls.getControlState("flight_lever") ? FLIGHT_STATE : IDLE_STATE;
+        settleControlAnimations();
     }
 
     @Override
@@ -238,12 +274,11 @@ public class TardisConsoleBlockEntity extends BlockEntity implements GeoBlockEnt
         getAnimatableInstanceCache().getManagerForId(0);
         animationDriver.bind(() -> this.level, () -> this.currentRotorState, idleController, flightController, controlControllers);
         this.respawnControls();
+        settleControlAnimations();
 
         if (level.isClientSide() && !humStarted) {
             humStarted = true;
-            Constants.LOG.info("TardisConsoleBlockEntity: attempting to start hum at {}", getBlockPos());
             Minecraft.getInstance().execute(() -> {
-                Constants.LOG.info("TardisConsoleBlockEntity: executing play() for hum at {}", getBlockPos());
                 Minecraft.getInstance().getSoundManager().play(
                         new TardisConsoleHumSoundInstance(getBlockPos(), this::isHumStillValid)
                 );

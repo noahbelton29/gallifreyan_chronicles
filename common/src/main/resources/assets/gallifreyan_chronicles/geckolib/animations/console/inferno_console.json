@@ -180,7 +180,7 @@
 		},
 		"power_lever_down": {
 			"loop": "hold_on_last_frame",
-			"animation_length": 279.7917,
+			"animation_length": 0.5,
 			"bones": {
 				"power_lever": {
 					"rotation": {
@@ -189,9 +189,6 @@
 						},
 						"0.5": {
 							"vector": [90, 0, 0]
-						},
-						"279.7917": {
-							"vector": [0, 0, 0]
 						}
 					},
 					"position": {

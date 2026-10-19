@@ -57,10 +57,10 @@ import java.util.function.Supplier;
 public class TardisExteriorBlockEntity extends BlockEntity implements GeoBlockEntity, ComponentHolder, TardisLinkable,
         TardisExteriorKeyLayer.TardisExteriorRenderable {
     public static Supplier<BlockEntityType<TardisExteriorBlockEntity>> TYPE;
-    private static final long KEY_JAM_COOLDOWN_TICKS = 40L;  // 2 seconds after a jam
-    private static final long KEY_TURN_COOLDOWN_TICKS = 20L; // 1 second after a normal lock/unlock
+    private static final long KEY_JAM_COOLDOWN_TICKS = 40L;
+    private static final long KEY_TURN_COOLDOWN_TICKS = 20L;
     private long lastLockedFeedbackAt = 0L;
-    private long keyCooldownUntil = 0L; // game time, intentionally not saved
+    private long keyCooldownUntil = 0L;
     private AnimationController<TardisExteriorBlockEntity> controller;
     private boolean locked = true;
     private final ComponentStore components = new ComponentStore();
@@ -112,9 +112,6 @@ public class TardisExteriorBlockEntity extends BlockEntity implements GeoBlockEn
         return renderedKeyOwner != null;
     }
 
-    /**
-     * True only when BOTH doors are closed and no open/close animation is still playing.
-     */
     public boolean areDoorsFullyClosed() {
         return getDoorState().isClosed()
                 && !DoorSystem.isAnimating(asEntity(), System.currentTimeMillis());
@@ -128,17 +125,12 @@ public class TardisExteriorBlockEntity extends BlockEntity implements GeoBlockEn
         toggleKeyLockAnimation(null);
     }
 
-    /**
-     * Turns the key in the lock. If the door lock subsystem is damaged enough the key jams instead,
-     * and the lock state does not change.
-     */
     public void toggleKeyLockAnimation(@Nullable Player player) {
         if (!hasKeyRendered()) {
             return;
         }
         if (level != null && !level.isClientSide()) {
             long now = level.getGameTime();
-            // the lock ignores the key for a moment after every turn (and longer after a jam), so it can't be spam clicked
             if (now < keyCooldownUntil) {
                 return;
             }
@@ -300,8 +292,6 @@ public class TardisExteriorBlockEntity extends BlockEntity implements GeoBlockEn
         }
     }
 
-    // damage effects coming out of the lock: a little smoke at low health, a little fire at really low
-    // health, and a lot of fire and smoke at 0
     private void tickLockDamageEffects(ServerLevel serverLevel) {
         float health = SubsystemSystem.healthOf(asEntity(), TardisSubsystem.DOOR_LOCK);
         if (health >= SubsystemSystem.SMOKE_THRESHOLD) {
@@ -311,7 +301,6 @@ public class TardisExteriorBlockEntity extends BlockEntity implements GeoBlockEn
         var random = serverLevel.getRandom();
         Vec3 pos = getKeyWorldPos();
 
-        // 0 at the smoke threshold, 1 at 0 health
         float smoke = (SubsystemSystem.SMOKE_THRESHOLD - health) / SubsystemSystem.SMOKE_THRESHOLD;
         if (random.nextFloat() < 0.04f + 0.40f * smoke) {
             serverLevel.sendParticles(ParticleTypes.SMOKE,
@@ -326,7 +315,6 @@ public class TardisExteriorBlockEntity extends BlockEntity implements GeoBlockEn
                         pos.x, pos.y + 0.1, pos.z, 1, 0.08, 0.08, 0.08, 0.03);
             }
         } else if (health < SubsystemSystem.FIRE_THRESHOLD) {
-            // 0 at the fire threshold, 1 at 0 health
             float fire = (SubsystemSystem.FIRE_THRESHOLD - health) / SubsystemSystem.FIRE_THRESHOLD;
             if (random.nextFloat() < 0.03f + 0.15f * fire) {
                 serverLevel.sendParticles(ParticleTypes.FLAME,
@@ -335,10 +323,6 @@ public class TardisExteriorBlockEntity extends BlockEntity implements GeoBlockEn
         }
     }
 
-    /**
-     * Returns true (and tells the player) if the lock is too damaged to take a key.
-     * Call this before inserting a key.
-     */
     public boolean rejectKeyIfLockBroken(@Nullable Player player) {
         if (SubsystemSystem.acceptsKey(asEntity(), TardisSubsystem.DOOR_LOCK)) {
             return false;

@@ -1,0 +1,7 @@
+{
+  "parent": "gallifreyan_chronicles:ambassadors_of_death_console",
+  "texture": "gallifreyan_chronicles:ambassadors_of_death_console",
+  "glow_textures": {
+    "buttons": "gallifreyan_chronicles:console_shared/standard"
+  }
+}

@@ -3,18 +3,14 @@ package com.noahtnt2009.gallifreyan_chronicles.tardis.ecs.component;
 import com.mojang.serialization.Codec;
 import com.noahtnt2009.gallifreyan_chronicles.ecs.Component;
 
-/**
- * Health of a damageable thing (currently a {@link TardisSubsystem}), clamped to 0 - 100.
- */
 public record HealthComponent(float value) implements Component {
     public static final float MAX = 100f;
 
-    // stored as a plain float so it stays compatible with saves from before this component existed
     public static final Codec<HealthComponent> CODEC =
             Codec.FLOAT.xmap(HealthComponent::new, HealthComponent::value);
 
     public HealthComponent {
-        value = Math.max(0f, Math.min(MAX, value));
+        value = Math.clamp(value, 0f, MAX);
     }
 
     public static HealthComponent full() {

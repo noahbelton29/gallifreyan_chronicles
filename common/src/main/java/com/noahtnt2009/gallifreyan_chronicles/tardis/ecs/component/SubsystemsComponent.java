@@ -8,10 +8,6 @@ import java.util.EnumMap;
 import java.util.HashMap;
 import java.util.Map;
 
-/**
- * Holds the {@link HealthComponent} of every {@link TardisSubsystem}.
- * A subsystem with no stored health is at full health.
- */
 public record SubsystemsComponent(Map<TardisSubsystem, HealthComponent> healths) implements Component {
     public static final Codec<SubsystemsComponent> CODEC =
             Codec.unboundedMap(Codec.STRING, HealthComponent.CODEC).xmap(

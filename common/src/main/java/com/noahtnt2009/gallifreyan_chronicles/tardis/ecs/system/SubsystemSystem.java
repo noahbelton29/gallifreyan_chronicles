@@ -8,25 +8,15 @@ import com.noahtnt2009.gallifreyan_chronicles.tardis.ecs.component.TardisSubsyst
 import net.minecraft.util.RandomSource;
 
 public final class SubsystemSystem {
-    /** At or above this health a subsystem never jams. Below it, it occasionally jams. */
     public static final float JAM_THRESHOLD = 80f;
-    /** Below this health the jam chance stops ramping slowly and sits at LIGHT_JAM_CHANCE. */
     public static final float LIGHT_JAM_THRESHOLD = 40f;
-    /** Below this health a subsystem jams "quite a lot". */
     public static final float HEAVY_JAM_THRESHOLD = 30f;
-
-    /** Below this health a subsystem gives off a little smoke, getting heavier as health drops. */
     public static final float SMOKE_THRESHOLD = 30f;
-    /** Below this health it also gives off a little fire. At 0 health it is on fire properly. */
     public static final float FIRE_THRESHOLD = 15f;
-    /** Below this health the key can no longer be put into the lock. */
     public static final float KEY_BLOCK_THRESHOLD = 15f;
-
-    // Jam chances, tweak these to taste.
-    private static final float OCCASIONAL_JAM_CHANCE_START = 0.03f; // health just under 80
-    private static final float LIGHT_JAM_CHANCE = 0.15f;            // health in [30, 40), also the end of the ramp from 80
-    private static final float HEAVY_JAM_CHANCE_START = 0.50f;      // health just under 30
-    // health 0 is always 100%, and the chance ramps linearly from HEAVY_JAM_CHANCE_START down to there
+    private static final float OCCASIONAL_JAM_CHANCE_START = 0.03f;
+    private static final float LIGHT_JAM_CHANCE = 0.15f;
+    private static final float HEAVY_JAM_CHANCE_START = 0.50f;
 
     private SubsystemSystem() {
     }
@@ -64,17 +54,15 @@ public final class SubsystemSystem {
         return healthOf(entity, subsystem) < JAM_THRESHOLD;
     }
 
-    /** Probability (0 - 1) that an action on a subsystem with this health jams. */
     public static float jamChance(float health) {
         if (health >= JAM_THRESHOLD) return 0f;
         if (health <= 0f) return 1f;
         if (health >= LIGHT_JAM_THRESHOLD) {
-            // 0 at 80 health, 1 at 40 health
             float t = (JAM_THRESHOLD - health) / (JAM_THRESHOLD - LIGHT_JAM_THRESHOLD);
             return OCCASIONAL_JAM_CHANCE_START + (LIGHT_JAM_CHANCE - OCCASIONAL_JAM_CHANCE_START) * t;
         }
         if (health >= HEAVY_JAM_THRESHOLD) return LIGHT_JAM_CHANCE;
-        float t = (HEAVY_JAM_THRESHOLD - health) / HEAVY_JAM_THRESHOLD; // 0 at 30 health, 1 at 0 health
+        float t = (HEAVY_JAM_THRESHOLD - health) / HEAVY_JAM_THRESHOLD;
         return HEAVY_JAM_CHANCE_START + (1f - HEAVY_JAM_CHANCE_START) * t;
     }
 

@@ -1,0 +1,8 @@
+{
+  "parent": "gallifreyan_chronicles:inferno_console",
+  "texture": "gallifreyan_chronicles:inferno_console",
+  "glow_textures": {
+    "buttons": "gallifreyan_chronicles:console_shared/standard",
+    "rotor": "gallifreyan_chronicles:console_shared/standard"
+  }
+}

@@ -2,6 +2,7 @@ package com.noahtnt2009.gallifreyan_chronicles.network;
 
 import com.noahtnt2009.gallifreyan_chronicles.tardis.console.TardisConsole;
 import com.noahtnt2009.gallifreyan_chronicles.tardis.console.TardisConsoleRegistry;
+import com.noahtnt2009.gallifreyan_chronicles.tardis.console.TardisConsoleVariant;
 import com.noahtnt2009.gallifreyan_chronicles.util.GCUtils;
 import net.minecraft.client.Minecraft;
 import net.minecraft.network.RegistryFriendlyByteBuf;
@@ -14,13 +15,15 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-public record TardisConsoleSyncPayload(List<TardisConsole> consoles, String defaultId) implements CustomPacketPayload {
+public record TardisConsoleSyncPayload(List<TardisConsole> consoles, List<TardisConsoleVariant> variants, String defaultId) implements CustomPacketPayload {
     public static final Type<TardisConsoleSyncPayload> TYPE =
             new Type<>(GCUtils.of("tardis_console_sync"));
 
     public static final StreamCodec<RegistryFriendlyByteBuf, TardisConsoleSyncPayload> STREAM_CODEC = StreamCodec.composite(
             TardisConsole.STREAM_CODEC.apply(ByteBufCodecs.list()),
             TardisConsoleSyncPayload::consoles,
+            TardisConsoleVariant.STREAM_CODEC.apply(ByteBufCodecs.list()),
+            TardisConsoleSyncPayload::variants,
             ByteBufCodecs.STRING_UTF8,
             TardisConsoleSyncPayload::defaultId,
             TardisConsoleSyncPayload::new
@@ -30,6 +33,7 @@ public record TardisConsoleSyncPayload(List<TardisConsole> consoles, String defa
         TardisConsole defaultConsole = TardisConsoleRegistry.getDefault();
         return new TardisConsoleSyncPayload(
                 List.copyOf(TardisConsoleRegistry.getAll()),
+                List.copyOf(TardisConsoleRegistry.getAllVariants()),
                 defaultConsole != null ? defaultConsole.id() : ""
         );
     }
@@ -40,6 +44,7 @@ public record TardisConsoleSyncPayload(List<TardisConsole> consoles, String defa
                 .collect(Collectors.toSet());
 
         GCSyncPayload.apply(consoles, TardisConsoleRegistry::clear, TardisConsoleRegistry::register, "TARDIS Console");
+        GCSyncPayload.apply(variants, TardisConsoleRegistry::clearVariants, TardisConsoleRegistry::registerVariant, "TARDIS Console Variant");
         if (defaultId != null && TardisConsoleRegistry.contains(defaultId)) {
             TardisConsoleRegistry.setDefault(TardisConsoleRegistry.get(defaultId));
         }

@@ -230,7 +230,7 @@ public class TardisCommand {
         BlockPos pos = manager.getConsoleBlockPos(tardisId);
         findBlockEntity(ctx, pos, TardisConsoleBlockEntity.class)
                 .map(TardisConsoleBlockEntity::getConsole)
-                .ifPresent(console -> console.variants().keySet().forEach(builder::suggest));
+                .ifPresent(console -> console.variantIds().forEach(builder::suggest));
 
         return builder.buildFuture();
     }
@@ -442,7 +442,6 @@ public class TardisCommand {
         return builder.buildFuture();
     }
 
-    /** Resolves the exterior block entity for the command's "id" argument, or sends a failure and returns empty. */
     private static Optional<TardisExteriorBlockEntity> resolveExteriorForSubsystem(
             CommandContext<CommandSourceStack> ctx, String tardisIdStr) {
         UUID tardisId;

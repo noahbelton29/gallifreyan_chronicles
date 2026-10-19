@@ -1,0 +1,9 @@
+{
+  "parent": "gallifreyan_chronicles:brachacki_console",
+  "texture": "gallifreyan_chronicles:brachacki_console/second_doctors_console",
+  "glow_textures": {
+    "buttons": "gallifreyan_chronicles:console_shared/standard",
+    "lights": "gallifreyan_chronicles:console_shared/standard",
+    "rotor": "gallifreyan_chronicles:console_shared/standard"
+  }
+}

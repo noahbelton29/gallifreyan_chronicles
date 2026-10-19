@@ -1,11 +1,6 @@
 {
   "id": "gallifreyan_chronicles:brachacki_console",
-  "default_variant": "brachacki_console/first_doctors_console",
-  "variants": {
-    "first_doctors_console": "gallifreyan_chronicles:brachacki_console/first_doctors_console",
-    "tuat_console": "gallifreyan_chronicles:brachacki_console/tuat_console",
-    "second_doctors_console": "gallifreyan_chronicles:brachacki_console/second_doctors_console"
-  },
+  "default_variant": "first_doctors_console",
   "glow_groups": [
     {
       "name": "lights",

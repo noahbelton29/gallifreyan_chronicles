@@ -1,5 +1,6 @@
 package com.noahtnt2009.gallifreyan_chronicles.block.entity;
 
+import com.noahtnt2009.gallifreyan_chronicles.block.TardisTopBlock;
 import com.geckolib.animatable.GeoBlockEntity;
 import com.geckolib.animatable.instance.AnimatableInstanceCache;
 import com.geckolib.animatable.manager.AnimatableManager;
@@ -106,9 +107,6 @@ public class TardisExteriorBlockEntity extends BlockEntity implements GeoBlockEn
         return renderedKeyOwner != null;
     }
 
-    /**
-     * True only when BOTH doors are closed and no open/close animation is still playing.
-     */
     public boolean areDoorsFullyClosed() {
         return getDoorState().isClosed()
                 && !DoorSystem.isAnimating(asEntity(), System.currentTimeMillis());
@@ -268,6 +266,10 @@ public class TardisExteriorBlockEntity extends BlockEntity implements GeoBlockEn
             blockEntity.sync();
         }
         TardisInteriorSystem.tickEntry(level, blockEntity);
+
+        if (level.getGameTime() % 40L == 0L) {
+            TardisTopBlock.placeAbove(level, blockEntity.getBlockPos());
+        }
     }
 
     public void interact(boolean sneaking) {

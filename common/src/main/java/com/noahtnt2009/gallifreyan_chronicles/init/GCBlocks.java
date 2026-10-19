@@ -50,6 +50,12 @@ public class GCBlocks {
                     .lightLevel(state -> state.getValue(TardisBlock.GLOWING) ? 12 : 0)),
             Rarity.EPIC);
 
+    public static final Block TARDIS_TOP = registerBlockWithoutBlockItem("tardis_top",
+            properties -> new TardisTopBlock(properties.strength(-1F)
+                    .sound(SoundType.STONE)
+                    .noOcclusion()
+                    .noLootTable()));
+
     public static final Block TARDIS_CONSOLE = registerBlock("tardis_console",
             properties -> new ConsoleBlock(properties.strength(-1F)
                     .sound(SoundType.STONE)

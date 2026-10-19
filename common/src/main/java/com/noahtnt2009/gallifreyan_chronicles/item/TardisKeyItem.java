@@ -1,5 +1,6 @@
 package com.noahtnt2009.gallifreyan_chronicles.item;
 
+import com.noahtnt2009.gallifreyan_chronicles.block.TardisTopBlock;
 import com.noahtnt2009.gallifreyan_chronicles.block.entity.TardisExteriorBlockEntity;
 import com.noahtnt2009.gallifreyan_chronicles.init.GCDataComponents;
 import net.minecraft.network.chat.Component;
@@ -25,7 +26,7 @@ public class TardisKeyItem extends Item {
         if (player == null || !player.isShiftKeyDown()) return InteractionResult.PASS;
 
         Level level = context.getLevel();
-        if (!(level.getBlockEntity(context.getClickedPos()) instanceof TardisExteriorBlockEntity exterior)) {
+        if (!(level.getBlockEntity(TardisTopBlock.baseOf(level, context.getClickedPos())) instanceof TardisExteriorBlockEntity exterior)) {
             return InteractionResult.PASS;
         }
 

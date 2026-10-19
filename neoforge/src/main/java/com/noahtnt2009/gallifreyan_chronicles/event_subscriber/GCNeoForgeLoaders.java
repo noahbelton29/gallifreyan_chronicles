@@ -1,10 +1,7 @@
 package com.noahtnt2009.gallifreyan_chronicles.event_subscriber;
 
 import com.noahtnt2009.gallifreyan_chronicles.Constants;
-import com.noahtnt2009.gallifreyan_chronicles.client.sky.data.DimensionSkyLoader;
 import com.noahtnt2009.gallifreyan_chronicles.data.GCJsonReloadListener;
-import com.noahtnt2009.gallifreyan_chronicles.tardis.console.TardisConsoleLoader;
-import com.noahtnt2009.gallifreyan_chronicles.tardis.exterior.TardisExteriorLoader;
 import com.noahtnt2009.gallifreyan_chronicles.util.GCUtils;
 import net.minecraft.resources.Identifier;
 import net.neoforged.bus.api.SubscribeEvent;

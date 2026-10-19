@@ -17,7 +17,6 @@ public abstract class MinecraftServerMixin {
         TardisDimensionManager.restoreAll((MinecraftServer) (Object) this);
     }
 
-    // runs before the level loop so adding levels never modifies the map mid-iteration
     @Inject(method = "tickChildren", at = @At("HEAD"))
     private void gallifreyan_chronicles$processEntries(BooleanSupplier haveTime, CallbackInfo ci) {
         TardisDimensionManager.processQueue((MinecraftServer) (Object) this);

@@ -175,7 +175,6 @@ public class TardisKeyEntity extends Entity {
             return InteractionResult.PASS;
         }
 
-        // The key can only go in while BOTH doors are closed.
         if (!exterior.areDoorsFullyClosed()) {
             if (!this.level().isClientSide()) {
                 player.sendOverlayMessage(Component.literal("Close both doors before inserting the key!"));

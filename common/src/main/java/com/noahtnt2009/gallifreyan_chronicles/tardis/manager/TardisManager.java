@@ -191,7 +191,6 @@ public class TardisManager extends SavedData {
         setDirty();
     }
 
-    // falls back to the overworld for tardises saved before the dimension was tracked
     public ResourceKey<Level> getExteriorDimension(UUID tardisId) {
         Identifier id = exteriorDimensionById.get(tardisId);
         return id == null ? Level.OVERWORLD : ResourceKey.create(Registries.DIMENSION, id);

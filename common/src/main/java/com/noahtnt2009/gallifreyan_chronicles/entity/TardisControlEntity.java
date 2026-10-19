@@ -102,6 +102,15 @@ public class TardisControlEntity extends Entity {
     }
 
     @Override
+    public void onSyncedDataUpdated(@NonNull EntityDataAccessor<?> accessor) {
+        super.onSyncedDataUpdated(accessor);
+        if (CONTROL_WIDTH.equals(accessor) || CONTROL_HEIGHT.equals(accessor) || CONTROL_DEPTH.equals(accessor)) {
+            this.refreshDimensions();
+            this.refreshControlBoundingBox();
+        }
+    }
+
+    @Override
     public void setPos(double x, double y, double z) {
         super.setPos(x, y, z);
         this.refreshControlBoundingBox();

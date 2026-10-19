@@ -35,8 +35,6 @@ public class DataSkyRenderer implements DimensionSkyRenderer {
     private static final float SUN_BASE_SCALE = 30.0F;
     private static final float MOON_BASE_SCALE = 20.0F;
 
-    // Buffers used in a frame stay alive until the next frame, because they are
-    // still referenced by vanilla's open render pass when renderQuad returns.
     private static final List<GpuBuffer> PENDING_BUFFERS = new ArrayList<>();
 
     private final DimensionSky sky;

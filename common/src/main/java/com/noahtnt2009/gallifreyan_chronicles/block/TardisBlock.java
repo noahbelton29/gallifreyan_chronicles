@@ -81,7 +81,6 @@ public class TardisBlock extends BaseEntityBlock {
         }
     }
 
-    // wraps into [0, 360) then rounds to the nearest 45 degree increment
     private static float snapYawTo45(float yaw) {
         float wrapped = yaw % 360.0f;
         if (wrapped < 0) wrapped += 360.0f;
@@ -112,8 +111,7 @@ public class TardisBlock extends BaseEntityBlock {
                     player.sendOverlayMessage(Component.literal("Close the doors before removing the key!"));
                     return InteractionResult.FAIL;
                 }
-            }
-            else if (!player.isShiftKeyDown() && isOwner) {
+            } else if (!player.isShiftKeyDown() && isOwner) {
                 tardis.toggleKeyLockAnimation();
                 return InteractionResult.CONSUME;
             }
@@ -132,7 +130,6 @@ public class TardisBlock extends BaseEntityBlock {
         return InteractionResult.CONSUME;
     }
 
-    // open doors can be walked through, otherwise the player could never reach the entry zone
     @Override
     protected @NonNull VoxelShape getCollisionShape(@NonNull BlockState state, @NonNull BlockGetter level,
                                                     @NonNull BlockPos pos, @NonNull CollisionContext context) {

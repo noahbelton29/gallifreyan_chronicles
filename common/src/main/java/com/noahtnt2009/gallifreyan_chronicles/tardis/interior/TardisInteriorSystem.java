@@ -31,22 +31,17 @@ import java.util.UUID;
 public final class TardisInteriorSystem {
     private static final Identifier TEMPLATE_ID = GCUtils.of("template_interior");
 
-    // entry zone in the exterior's local frame, measured from the block center along the door facing
-    // negative values are inside the block, so the player has to walk into the open exterior
     private static final double ZONE_NEAR = -0.5;
     private static final double ZONE_FAR = 0.3;
     private static final double ZONE_HALF_WIDTH = 0.5;
     private static final double ZONE_BOTTOM = -0.5;
     private static final double ZONE_TOP = 2.0;
 
-    // every tardis has its own dimension so the interior always sits at the same origin
     public static final BlockPos ORIGIN = new BlockPos(0, 64, 0);
 
-    // arrival point relative to the interior origin, facing the console
     private static final Vec3 ARRIVAL_OFFSET = new Vec3(3.5, 1.0, 5.5);
     public static final float ARRIVAL_YAW = 180.0f;
 
-    // exit zone: the last row of the platform, one step behind the arrival point
     private static final double EXIT_MIN_X = 2.5;
     private static final double EXIT_MAX_X = 4.5;
     private static final double EXIT_MIN_Z = 6.0;
@@ -54,7 +49,6 @@ public final class TardisInteriorSystem {
     private static final double EXIT_MIN_Y = 0.5;
     private static final double EXIT_MAX_Y = 3.0;
 
-    // how far in front of the exterior door the player is placed, outside the entry zone
     private static final double EXIT_DISTANCE = 2.0;
 
     private static final String INTERIOR_PREFIX = "tardis/";
@@ -146,14 +140,14 @@ public final class TardisInteriorSystem {
         return Vec3.atLowerCornerOf(ORIGIN).add(ARRIVAL_OFFSET);
     }
 
-    public static void ensureBuilt(ServerLevel interior, UUID tardisId) {
+    public static boolean ensureBuilt(ServerLevel interior, UUID tardisId) {
         TardisManager manager = TardisManager.get(interior.getServer());
-        if (manager.getInteriorOrigin(tardisId) != null) return;
+        if (manager.getInteriorOrigin(tardisId) != null) return false;
 
         Optional<StructureTemplate> template = interior.getServer().getStructureTemplateManager().get(TEMPLATE_ID);
         if (template.isEmpty()) {
             Constants.LOG.error("missing interior template {}", TEMPLATE_ID);
-            return;
+            return false;
         }
 
         BlockPos origin = ORIGIN;
@@ -181,6 +175,7 @@ public final class TardisInteriorSystem {
         }
 
         manager.setInteriorOrigin(tardisId, origin);
+        return true;
     }
 
     private static void loadChunks(ServerLevel level, BlockPos origin, Vec3i size) {

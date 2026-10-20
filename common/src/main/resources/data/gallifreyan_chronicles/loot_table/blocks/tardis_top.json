@@ -1,4 +1,5 @@
 {
   "type": "minecraft:block",
+  "pools": [],
   "random_sequence": "gallifreyan_chronicles:blocks/tardis_top"
 }

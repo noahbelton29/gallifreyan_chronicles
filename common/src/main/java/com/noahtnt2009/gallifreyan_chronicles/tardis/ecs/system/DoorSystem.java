@@ -39,16 +39,31 @@ public final class DoorSystem {
         boolean opening;
 
         if (sneaking) {
-            if (current.isClosed()) {
-                next = DoorState.BOTH_OPEN;
-                animation = "open_all";
-                duration = OPEN_DURATION_MS;
-                opening = true;
-            } else {
-                next = DoorState.CLOSED;
-                animation = "close_all";
-                duration = CLOSE_DURATION_MS;
-                opening = false;
+            switch (current) {
+                case CLOSED -> {
+                    next = DoorState.BOTH_OPEN;
+                    animation = "open_all";
+                    duration = OPEN_DURATION_MS;
+                    opening = true;
+                }
+                case LEFT_OPEN -> {
+                    next = DoorState.CLOSED;
+                    animation = "close_left";
+                    duration = CLOSE_DURATION_MS;
+                    opening = false;
+                }
+                case RIGHT_OPEN -> {
+                    next = DoorState.CLOSED;
+                    animation = "close_right";
+                    duration = CLOSE_DURATION_MS;
+                    opening = false;
+                }
+                default -> {
+                    next = DoorState.CLOSED;
+                    animation = "close_all";
+                    duration = CLOSE_DURATION_MS;
+                    opening = false;
+                }
             }
         } else {
             switch (current) {

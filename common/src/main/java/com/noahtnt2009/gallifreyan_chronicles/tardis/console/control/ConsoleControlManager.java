@@ -7,6 +7,7 @@ import com.noahtnt2009.gallifreyan_chronicles.tardis.console.animation.ConsoleAn
 import com.noahtnt2009.gallifreyan_chronicles.tardis.control.ControlSpec;
 import com.noahtnt2009.gallifreyan_chronicles.tardis.control.TardisControl;
 import com.noahtnt2009.gallifreyan_chronicles.tardis.control.TardisControlRegistry;
+import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.player.Player;
@@ -44,6 +45,28 @@ public class ConsoleControlManager {
         return spawnControl(controlSpec);
     }
 
+    /**
+     * Rotates an offset authored for a NORTH-facing console into the given facing. This matches the model
+     * rotation applied by the block renderer (180 - facing yaw about Y), like TardisExterior#worldKeyOffset.
+     */
+    public static Vec3 rotateOffset(Vec3 o, Direction facing) {
+        return switch (facing) {
+            case WEST -> new Vec3(o.z, o.y, -o.x);
+            case SOUTH -> new Vec3(-o.x, o.y, -o.z);
+            case EAST -> new Vec3(-o.z, o.y, o.x);
+            default -> o;
+        };
+    }
+
+    /** Inverse of {@link #rotateOffset}: world-frame offset back to the NORTH-facing authoring frame. */
+    public static Vec3 unrotateOffset(Vec3 o, Direction facing) {
+        return rotateOffset(o, switch (facing) {
+            case WEST -> Direction.EAST;
+            case EAST -> Direction.WEST;
+            default -> facing;
+        });
+    }
+
     @Nullable
     private TardisControlEntity spawnControl(ControlSpec spec) {
         if (!(host.getHostLevel() instanceof ServerLevel serverLevel)) return null;
@@ -56,9 +79,13 @@ public class ConsoleControlManager {
             return stale;
         });
 
-        Vec3 worldPos = Vec3.atCenterOf(host.getHostPos()).add(spec.offset());
+        Direction facing = host.getHostFacing();
+        Vec3 worldPos = Vec3.atCenterOf(host.getHostPos()).add(rotateOffset(spec.offset(), facing));
         TardisControlEntity entity = TardisControlEntity.create(serverLevel, host.getHostPos(), spec.id(), worldPos);
-        entity.setControlSize(spec.width(), spec.height(), spec.depth());
+        // Hitboxes are axis-aligned, so a quarter-turn swaps width and depth.
+        boolean quarterTurn = facing.getAxis() == Direction.Axis.X;
+        entity.setControlSize(quarterTurn ? spec.depth() : spec.width(), spec.height(),
+                quarterTurn ? spec.width() : spec.depth());
         serverLevel.addFreshEntity(entity);
         controlEntities.add(entity);
 

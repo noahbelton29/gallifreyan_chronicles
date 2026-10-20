@@ -1,0 +1,13 @@
+{
+  "structure": "gallifreyan_chronicles:first_doctors",
+  "spawn": { "x": 8.6, "y": 1.0, "z": 3.8 },
+  "facing": "south",
+  "exit": {
+    "min": { "x": 6.4, "y": 0.5, "z": 2.0 },
+    "max": { "x": 8.4, "y": 3.0, "z": 3.0 }
+  },
+  "exteriors": [
+    "gallifreyan_chronicles:first_doctors_exterior",
+    "gallifreyan_chronicles:second_doctors_exterior"
+  ]
+}

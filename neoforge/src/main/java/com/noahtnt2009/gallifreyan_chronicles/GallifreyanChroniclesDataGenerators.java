@@ -21,10 +21,10 @@ public class GallifreyanChroniclesDataGenerators {
         CompletableFuture<HolderLookup.Provider> reloadableLookup =
                 event.getReloadableLookupProvider();
 
-        event.addProvider(new GCModelProvider(packOutput));
-        event.addProvider(new GCLanguageProvider(packOutput));
         event.addProvider(GCModpackDataProvider.create(packOutput, worldLookup));
         event.addProvider(GCModpackDataProvider.createReloadable(packOutput, worldLookup, reloadableLookup));
+        event.addProvider(new GCModelProvider(packOutput));
+        event.addProvider(new GCLanguageProvider(packOutput));
         event.addProvider(new GCBlockTagProvider(packOutput, reloadableLookup));
         event.addProvider(new GCItemTagProvider(packOutput, reloadableLookup));
         event.addProvider(new GCEquipmentAssetProvider(packOutput));

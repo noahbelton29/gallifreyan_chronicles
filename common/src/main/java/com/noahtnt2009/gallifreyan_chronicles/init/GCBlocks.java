@@ -53,7 +53,8 @@ public class GCBlocks {
     public static final Block TARDIS_TOP = registerBlockWithoutBlockItem("tardis_top",
             properties -> new TardisTopBlock(properties.strength(-1F)
                     .sound(SoundType.STONE)
-                    .noOcclusion()));
+                    .noOcclusion()
+                    .noLootTable()));
 
     public static final Block TARDIS_CONSOLE = registerBlock("tardis_console",
             properties -> new ConsoleBlock(properties.strength(-1F)

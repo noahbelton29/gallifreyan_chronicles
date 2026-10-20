@@ -20,7 +20,8 @@ import java.util.*;
 public class TardisManager extends SavedData {
     private record Entry(TardisComponent component, Optional<BlockPos> blockPos,
                          Optional<BlockPos> consoleBlockPos, Optional<BlockPos> exteriorBlockPos,
-                         Optional<BlockPos> interiorOrigin, Optional<Identifier> exteriorDimension) {
+                         Optional<BlockPos> interiorOrigin, Optional<Identifier> exteriorDimension,
+                         Optional<String> interiorId) {
     }
 
     private static final Codec<Entry> ENTRY_CODEC = RecordCodecBuilder.create(inst -> inst.group(
@@ -29,7 +30,8 @@ public class TardisManager extends SavedData {
             BlockPos.CODEC.optionalFieldOf("console_block_pos").forGetter(Entry::consoleBlockPos),
             BlockPos.CODEC.optionalFieldOf("exterior_block_pos").forGetter(Entry::exteriorBlockPos),
             BlockPos.CODEC.optionalFieldOf("interior_origin").forGetter(Entry::interiorOrigin),
-            Identifier.CODEC.optionalFieldOf("exterior_dimension").forGetter(Entry::exteriorDimension)
+            Identifier.CODEC.optionalFieldOf("exterior_dimension").forGetter(Entry::exteriorDimension),
+            Codec.STRING.optionalFieldOf("interior_id").forGetter(Entry::interiorId)
     ).apply(inst, Entry::new));
 
     public static final Codec<TardisManager> CODEC = RecordCodecBuilder.create(inst -> inst.group(
@@ -43,7 +45,8 @@ public class TardisManager extends SavedData {
                             Optional.ofNullable(manager.consoleBlockPosById.get(id)),
                             Optional.ofNullable(manager.exteriorBlockPosById.get(id)),
                             Optional.ofNullable(manager.interiorOriginById.get(id)),
-                            Optional.ofNullable(manager.exteriorDimensionById.get(id))
+                            Optional.ofNullable(manager.exteriorDimensionById.get(id)),
+                            Optional.ofNullable(manager.interiorIdById.get(id))
                     ));
                 }
                 return entries;
@@ -64,6 +67,7 @@ public class TardisManager extends SavedData {
             entry.exteriorBlockPos().ifPresent(pos -> manager.exteriorBlockPosById.put(id, pos));
             entry.interiorOrigin().ifPresent(pos -> manager.interiorOriginById.put(id, pos));
             entry.exteriorDimension().ifPresent(dim -> manager.exteriorDimensionById.put(id, dim));
+            entry.interiorId().ifPresent(interior -> manager.interiorIdById.put(id, interior));
         }
         return manager;
     }));
@@ -82,6 +86,7 @@ public class TardisManager extends SavedData {
     private final Map<UUID, BlockPos> exteriorBlockPosById = new HashMap<>();
     private final Map<UUID, BlockPos> interiorOriginById = new HashMap<>();
     private final Map<UUID, Identifier> exteriorDimensionById = new HashMap<>();
+    private final Map<UUID, String> interiorIdById = new HashMap<>();
 
     public Optional<TardisComponent> get(UUID tardisId) {
         if (tardisId == null) {
@@ -122,6 +127,7 @@ public class TardisManager extends SavedData {
         exteriorBlockPosById.remove(tardisId);
         interiorOriginById.remove(tardisId);
         exteriorDimensionById.remove(tardisId);
+        interiorIdById.remove(tardisId);
         setDirty();
     }
 
@@ -175,6 +181,15 @@ public class TardisManager extends SavedData {
     public @Nullable BlockPos resolveExteriorBlockPos(UUID tardisId) {
         BlockPos linked = exteriorBlockPosById.get(tardisId);
         return linked != null ? linked : blockPosById.get(tardisId);
+    }
+
+    public @Nullable String getInteriorId(UUID tardisId) {
+        return interiorIdById.get(tardisId);
+    }
+
+    public void setInteriorId(UUID tardisId, String interiorId) {
+        interiorIdById.put(tardisId, interiorId);
+        setDirty();
     }
 
     public @Nullable BlockPos getInteriorOrigin(UUID tardisId) {

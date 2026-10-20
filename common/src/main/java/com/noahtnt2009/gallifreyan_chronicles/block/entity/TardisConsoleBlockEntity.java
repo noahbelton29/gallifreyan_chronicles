@@ -237,6 +237,14 @@ public class TardisConsoleBlockEntity extends BlockEntity implements GeoBlockEnt
     }
 
     @Override
+    public net.minecraft.core.Direction getHostFacing() {
+        BlockState state = getBlockState();
+        return state.hasProperty(com.noahtnt2009.gallifreyan_chronicles.block.ConsoleBlock.FACING)
+                ? state.getValue(com.noahtnt2009.gallifreyan_chronicles.block.ConsoleBlock.FACING)
+                : net.minecraft.core.Direction.NORTH;
+    }
+
+    @Override
     public BlockPos getHostPos() {
         return getBlockPos();
     }

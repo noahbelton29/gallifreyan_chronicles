@@ -2,6 +2,7 @@ package com.noahtnt2009.gallifreyan_chronicles.entity;
 
 import com.noahtnt2009.gallifreyan_chronicles.Constants;
 import com.noahtnt2009.gallifreyan_chronicles.block.entity.TardisConsoleBlockEntity;
+import com.noahtnt2009.gallifreyan_chronicles.tardis.console.control.ConsoleControlManager;
 import com.noahtnt2009.gallifreyan_chronicles.tardis.control.TardisControl;
 import com.noahtnt2009.gallifreyan_chronicles.tardis.control.TardisControlRegistry;
 import net.minecraft.core.BlockPos;
@@ -201,7 +202,10 @@ public class TardisControlEntity extends Entity {
 
     public void printPosition(Player player) {
         Vec3 pos = this.position();
-        Vec3 offset = this.getOffset();
+        TardisConsoleBlockEntity console = this.getConsole();
+        // Print in the NORTH-facing authoring frame so the values can go straight into console JSON.
+        Vec3 offset = console == null ? this.getOffset()
+                : ConsoleControlManager.unrotateOffset(this.getOffset(), console.getHostFacing());
 
         String idPart = this.getControlId().isEmpty() ? "<unset>" : this.getControlId();
 

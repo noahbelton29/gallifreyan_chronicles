@@ -19,7 +19,7 @@ public class GCBlockLootTableProvider extends BlockLootSubProvider {
 
     @Override
     protected void generate() {
-        add(GCBlocks.TARDIS_TOP, noDrop());
+        dropSelf(GCBlocks.TARDIS_TOP);
         dropSelf(GCBlocks.CADONWOOD_PLANKS);
         dropSelf(GCBlocks.GALLIFREYAN_DIRT);
         dropSelf(GCBlocks.CADONWOOD_WOOD);

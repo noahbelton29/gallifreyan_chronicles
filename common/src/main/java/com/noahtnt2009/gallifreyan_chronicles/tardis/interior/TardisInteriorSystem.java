@@ -9,7 +9,6 @@ import com.noahtnt2009.gallifreyan_chronicles.tardis.console.TardisConsoleRegist
 import com.noahtnt2009.gallifreyan_chronicles.tardis.ecs.system.ConsoleLinkSystem;
 import com.noahtnt2009.gallifreyan_chronicles.tardis.ecs.system.ExteriorLinkSystem;
 import com.noahtnt2009.gallifreyan_chronicles.tardis.manager.TardisManager;
-import com.noahtnt2009.gallifreyan_chronicles.util.GCUtils;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Vec3i;
 import net.minecraft.resources.Identifier;
@@ -29,8 +28,6 @@ import java.util.Set;
 import java.util.UUID;
 
 public final class TardisInteriorSystem {
-    private static final Identifier TEMPLATE_ID = GCUtils.of("template_interior");
-
     private static final double ZONE_NEAR = -0.5;
     private static final double ZONE_FAR = 0.3;
     private static final double ZONE_HALF_WIDTH = 0.5;
@@ -38,16 +35,6 @@ public final class TardisInteriorSystem {
     private static final double ZONE_TOP = 2.0;
 
     public static final BlockPos ORIGIN = new BlockPos(0, 64, 0);
-
-    private static final Vec3 ARRIVAL_OFFSET = new Vec3(3.5, 1.0, 5.5);
-    public static final float ARRIVAL_YAW = 180.0f;
-
-    private static final double EXIT_MIN_X = 2.5;
-    private static final double EXIT_MAX_X = 4.5;
-    private static final double EXIT_MIN_Z = 6.0;
-    private static final double EXIT_MAX_Z = 7.0;
-    private static final double EXIT_MIN_Y = 0.5;
-    private static final double EXIT_MAX_Y = 3.0;
 
     private static final double EXIT_DISTANCE = 2.0;
 
@@ -97,19 +84,20 @@ public final class TardisInteriorSystem {
             if (!path.startsWith(INTERIOR_PREFIX)) continue;
             if (player.isSpectator()) continue;
 
-            double dx = player.getX() - ORIGIN.getX();
-            double dy = player.getY() - ORIGIN.getY();
-            double dz = player.getZ() - ORIGIN.getZ();
-            if (dx < EXIT_MIN_X || dx > EXIT_MAX_X) continue;
-            if (dz < EXIT_MIN_Z || dz > EXIT_MAX_Z) continue;
-            if (dy < EXIT_MIN_Y || dy > EXIT_MAX_Y) continue;
-
             UUID tardisId;
             try {
                 tardisId = UUID.fromString(path.substring(INTERIOR_PREFIX.length()));
             } catch (IllegalArgumentException e) {
                 continue;
             }
+
+            AABB exitBox = interiorFor(server, tardisId).exitBox();
+            double dx = player.getX() - ORIGIN.getX();
+            double dy = player.getY() - ORIGIN.getY();
+            double dz = player.getZ() - ORIGIN.getZ();
+            if (dx < exitBox.minX || dx > exitBox.maxX) continue;
+            if (dy < exitBox.minY || dy > exitBox.maxY) continue;
+            if (dz < exitBox.minZ || dz > exitBox.maxZ) continue;
             exit(server, player, tardisId);
         }
     }
@@ -136,17 +124,40 @@ public final class TardisInteriorSystem {
         player.teleportTo(target, spot.x, spot.y, spot.z, Set.of(), yaw, 0.0f, true);
     }
 
-    public static Vec3 arrivalPoint() {
-        return Vec3.atLowerCornerOf(ORIGIN).add(ARRIVAL_OFFSET);
+    public static Vec3 arrivalPoint(TardisInterior definition) {
+        return Vec3.atLowerCornerOf(ORIGIN).add(definition.spawn());
+    }
+
+    /**
+     * The interior definition for a tardis. Chosen from its exterior the first time it is needed, then
+     * remembered so later registry changes don't move an already built interior's exit.
+     */
+    public static TardisInterior interiorFor(MinecraftServer server, UUID tardisId) {
+        TardisManager manager = TardisManager.get(server);
+        String stored = manager.getInteriorId(tardisId);
+        if (stored != null) return TardisInteriorRegistry.get(stored);
+
+        String exteriorId = null;
+        ServerLevel exteriorLevel = server.getLevel(manager.getExteriorDimension(tardisId));
+        if (exteriorLevel != null) {
+            exteriorId = ExteriorLinkSystem.resolve(exteriorLevel, tardisId)
+                    .map(e -> e.getExterior().id()).orElse(null);
+        }
+        TardisInterior chosen = exteriorId != null
+                ? TardisInteriorRegistry.forExterior(exteriorId)
+                : TardisInteriorRegistry.get(TardisInteriorRegistry.DEFAULT_ID);
+        manager.setInteriorId(tardisId, chosen.id());
+        return chosen;
     }
 
     public static boolean ensureBuilt(ServerLevel interior, UUID tardisId) {
         TardisManager manager = TardisManager.get(interior.getServer());
         if (manager.getInteriorOrigin(tardisId) != null) return false;
 
-        Optional<StructureTemplate> template = interior.getServer().getStructureTemplateManager().get(TEMPLATE_ID);
+        Identifier templateId = interiorFor(interior.getServer(), tardisId).structure();
+        Optional<StructureTemplate> template = interior.getServer().getStructureTemplateManager().get(templateId);
         if (template.isEmpty()) {
-            Constants.LOG.error("missing interior template {}", TEMPLATE_ID);
+            Constants.LOG.error("missing interior template {}", templateId);
             return false;
         }
 

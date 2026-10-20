@@ -112,9 +112,10 @@ public final class TardisDimensionManager {
 
     private static void enterNow(ServerPlayer player, ServerLevel interior, UUID tardisId) {
         boolean firstEntry = TardisInteriorSystem.ensureBuilt(interior, tardisId);
-        Vec3 target = TardisInteriorSystem.arrivalPoint();
+        TardisInterior definition = TardisInteriorSystem.interiorFor(interior.getServer(), tardisId);
+        Vec3 target = TardisInteriorSystem.arrivalPoint(definition);
         player.teleportTo(interior, target.x, target.y, target.z, Set.of(),
-                TardisInteriorSystem.ARRIVAL_YAW, 0.0f, true);
+                definition.spawnYaw(), 0.0f, true);
 
         if (firstEntry) {
             PLACE_CONTROLS.put(tardisId, CONTROL_PLACE_DELAY_TICKS);

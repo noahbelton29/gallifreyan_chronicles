@@ -12,7 +12,7 @@ public final class DoorSystem {
     private DoorSystem() {
     }
 
-    public record InteractionResult(String animationName, boolean opening) {
+    public record InteractionResult(String animationName, boolean opening, DoorState state) {
         public boolean playedNothing() {
             return animationName == null;
         }
@@ -26,10 +26,19 @@ public final class DoorSystem {
         return entity.get(TardisComponentTypes.DOOR).isAnimating(now);
     }
 
+    public static void applyRemote(Entity entity, DoorState next, boolean opening, long now) {
+        long duration = opening ? OPEN_DURATION_MS : CLOSE_DURATION_MS;
+        entity.set(TardisComponentTypes.DOOR, entity.get(TardisComponentTypes.DOOR).animatingUntil(next, now + duration));
+    }
+
+    public static void snap(Entity entity, DoorState state) {
+        entity.set(TardisComponentTypes.DOOR, entity.get(TardisComponentTypes.DOOR).animatingUntil(state, 0L));
+    }
+
     public static InteractionResult interact(Entity entity, boolean sneaking, long now) {
         DoorComponent door = entity.get(TardisComponentTypes.DOOR);
         if (door.isAnimating(now)) {
-            return new InteractionResult(null, false);
+            return new InteractionResult(null, false, door.state());
         }
 
         DoorState current = door.state();
@@ -89,6 +98,6 @@ public final class DoorSystem {
         }
 
         entity.set(TardisComponentTypes.DOOR, door.animatingUntil(next, now + duration));
-        return new InteractionResult(animation, opening);
+        return new InteractionResult(animation, opening, next);
     }
 }

@@ -6,7 +6,6 @@ import com.noahtnt2009.gallifreyan_chronicles.data.GCJsonDataRegistry;
 import java.util.Collection;
 
 public class TardisExteriorRegistry {
-    /** The default exterior id, from the mod config. */
     public static String defaultId() {
         return GCConfig.defaultExterior();
     }

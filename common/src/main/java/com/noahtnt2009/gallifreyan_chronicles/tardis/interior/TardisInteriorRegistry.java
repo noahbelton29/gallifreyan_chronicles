@@ -6,7 +6,6 @@ import com.noahtnt2009.gallifreyan_chronicles.data.GCJsonDataRegistry;
 import java.util.Collection;
 
 public final class TardisInteriorRegistry {
-    /** The default interior id, from the mod config. */
     public static String defaultId() {
         return GCConfig.defaultInterior();
     }
@@ -36,7 +35,6 @@ public final class TardisInteriorRegistry {
         return REGISTRY.size();
     }
 
-    /** Looks up by id, falling back to the default interior, then any interior, then the built-in fallback. */
     public static TardisInterior get(String id) {
         TardisInterior found = id == null ? null : REGISTRY.getById(id);
         if (found != null) return found;

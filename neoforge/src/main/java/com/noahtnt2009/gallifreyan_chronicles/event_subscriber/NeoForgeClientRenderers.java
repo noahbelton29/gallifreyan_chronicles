@@ -6,6 +6,8 @@ import com.noahtnt2009.gallifreyan_chronicles.block.entity.TardisExteriorBlockEn
 import com.noahtnt2009.gallifreyan_chronicles.client.renderer.TardisConsoleBlockRenderer;
 import com.noahtnt2009.gallifreyan_chronicles.client.renderer.TardisControlEntityRenderer;
 import com.noahtnt2009.gallifreyan_chronicles.client.renderer.TardisKeyEntityRenderer;
+import com.noahtnt2009.gallifreyan_chronicles.block.entity.InteriorDoorBlockEntity;
+import com.noahtnt2009.gallifreyan_chronicles.client.renderer.InteriorDoorBlockRenderer;
 import com.noahtnt2009.gallifreyan_chronicles.client.renderer.TardisExteriorBlockRenderer;
 import net.minecraft.client.Minecraft;
 import net.neoforged.neoforge.client.event.ClientTickEvent;
@@ -22,6 +24,7 @@ public class NeoForgeClientRenderers {
     public static void registerRenderers(EntityRenderersEvent.RegisterRenderers event) {
         event.registerBlockEntityRenderer(TardisExteriorBlockEntity.TYPE.get(), TardisExteriorBlockRenderer::new);
         event.registerBlockEntityRenderer(TardisConsoleBlockEntity.TYPE.get(), TardisConsoleBlockRenderer::new);
+        event.registerBlockEntityRenderer(InteriorDoorBlockEntity.TYPE.get(), InteriorDoorBlockRenderer::new);
         event.registerEntityRenderer(GCEntityTypes.TARDIS_CONTROL_ENTITY_TYPE.get(), TardisControlEntityRenderer::new);
         event.registerEntityRenderer(GCEntityTypes.TARDIS_KEY_ENTITY_TYPE.get(), TardisKeyEntityRenderer::new);
 

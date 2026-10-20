@@ -1,6 +1,7 @@
 {
   "block.gallifreyan_chronicles.arcadian_shale": "Arcadian Shale",
   "block.gallifreyan_chronicles.arcadian_shale_taranium_ore": "Arcadian Shale Taranium Ore",
+  "block.gallifreyan_chronicles.brachacki_doors": "Brachacki Doors",
   "block.gallifreyan_chronicles.brachacki_fence": "Brachacki Fence",
   "block.gallifreyan_chronicles.brachacki_fence_gate": "Brachacki Fence Gate",
   "block.gallifreyan_chronicles.brachacki_floor_block": "Brachacki Floor Block",
@@ -95,10 +96,10 @@
   "item.gallifreyan_chronicles.taranium_shovel": "Taranium Shovel",
   "item.gallifreyan_chronicles.taranium_sword": "Taranium Sword",
   "item.gallifreyan_chronicles.tardis_key": "Tardis Key",
-  "menu.gallifreyan_chronicles.credits": "Credits",
   "menu.gallifreyan_chronicles.config": "Gallifreyan Chronicles Settings",
-  "menu.gallifreyan_chronicles.config.exterior": "Default Exterior",
   "menu.gallifreyan_chronicles.config.console": "Default Console",
+  "menu.gallifreyan_chronicles.config.exterior": "Default Exterior",
+  "menu.gallifreyan_chronicles.config.hint": "Enter ids like gallifreyan_chronicles:first_doctors_exterior. Applies to newly created TARDISes.",
   "menu.gallifreyan_chronicles.config.interior": "Default Interior",
-  "menu.gallifreyan_chronicles.config.hint": "Enter ids like gallifreyan_chronicles:first_doctors_exterior. Applies to newly created TARDISes."
+  "menu.gallifreyan_chronicles.credits": "Credits"
 }

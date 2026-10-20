@@ -96,6 +96,8 @@ public class GCModelProvider extends ModelProvider {
         blockModels.createParticleOnlyBlock(GCBlocks.TARDIS);
         blockModels.createParticleOnlyBlock(GCBlocks.TARDIS_CONSOLE);
         blockModels.createParticleOnlyBlock(GCBlocks.TARDIS_TOP);
+        blockModels.createParticleOnlyBlock(GCBlocks.BRACHACKI_DOORS, GCBlocks.BRACHACKI_WALL_BLOCK);
+        itemModels.generateFlatItem(GCBlocks.BRACHACKI_DOORS.asItem(), ModelTemplates.FLAT_ITEM);
         itemModels.generateFlatItem(GCBlocks.TARDIS.asItem(), ModelTemplates.FLAT_ITEM);
         itemModels.generateFlatItem(GCBlocks.TARDIS_CONSOLE.asItem(), ModelTemplates.FLAT_ITEM);
 

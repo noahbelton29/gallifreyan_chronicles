@@ -1,6 +1,7 @@
 package com.noahtnt2009.gallifreyan_chronicles.init;
 
 import com.noahtnt2009.gallifreyan_chronicles.Constants;
+import com.noahtnt2009.gallifreyan_chronicles.block.entity.InteriorDoorBlockEntity;
 import com.noahtnt2009.gallifreyan_chronicles.block.entity.TardisConsoleBlockEntity;
 import com.noahtnt2009.gallifreyan_chronicles.block.entity.TardisExteriorBlockEntity;
 import com.noahtnt2009.gallifreyan_chronicles.util.GCUtils;
@@ -12,6 +13,7 @@ import net.minecraft.world.level.block.entity.BlockEntityType;
 public class GCBlockEntities {
     public static BlockEntityType<TardisExteriorBlockEntity> TARDIS_EXTERIOR_BLOCK_ENTITY_TYPE;
     public static BlockEntityType<TardisConsoleBlockEntity> TARDIS_CONSOLE_BLOCK_ENTITY_TYPE;
+    public static BlockEntityType<InteriorDoorBlockEntity> INTERIOR_DOOR_BLOCK_ENTITY_TYPE;
 
     public static void registerBlockEntities() {
         TARDIS_EXTERIOR_BLOCK_ENTITY_TYPE = Registry.register(
@@ -32,8 +34,18 @@ public class GCBlockEntities {
                 ).build()
         );
 
+        INTERIOR_DOOR_BLOCK_ENTITY_TYPE = Registry.register(
+                BuiltInRegistries.BLOCK_ENTITY_TYPE,
+                GCUtils.of("interior_door_block_entity"),
+                FabricBlockEntityTypeBuilder.create(
+                        InteriorDoorBlockEntity::new,
+                        GCBlocks.BRACHACKI_DOORS
+                ).build()
+        );
+
         TardisExteriorBlockEntity.TYPE = () -> TARDIS_EXTERIOR_BLOCK_ENTITY_TYPE;
         TardisConsoleBlockEntity.TYPE = () -> TARDIS_CONSOLE_BLOCK_ENTITY_TYPE;
+        InteriorDoorBlockEntity.TYPE = () -> INTERIOR_DOOR_BLOCK_ENTITY_TYPE;
 
         Constants.LOG.info("Registered GC Block Entities (Fabric)");
     }

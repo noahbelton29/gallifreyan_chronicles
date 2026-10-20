@@ -45,10 +45,6 @@ public class ConsoleControlManager {
         return spawnControl(controlSpec);
     }
 
-    /**
-     * Rotates an offset authored for a NORTH-facing console into the given facing. This matches the model
-     * rotation applied by the block renderer (180 - facing yaw about Y), like TardisExterior#worldKeyOffset.
-     */
     public static Vec3 rotateOffset(Vec3 o, Direction facing) {
         return switch (facing) {
             case WEST -> new Vec3(o.z, o.y, -o.x);
@@ -58,7 +54,6 @@ public class ConsoleControlManager {
         };
     }
 
-    /** Inverse of {@link #rotateOffset}: world-frame offset back to the NORTH-facing authoring frame. */
     public static Vec3 unrotateOffset(Vec3 o, Direction facing) {
         return rotateOffset(o, switch (facing) {
             case WEST -> Direction.EAST;
@@ -82,7 +77,7 @@ public class ConsoleControlManager {
         Direction facing = host.getHostFacing();
         Vec3 worldPos = Vec3.atCenterOf(host.getHostPos()).add(rotateOffset(spec.offset(), facing));
         TardisControlEntity entity = TardisControlEntity.create(serverLevel, host.getHostPos(), spec.id(), worldPos);
-        // Hitboxes are axis-aligned, so a quarter-turn swaps width and depth.
+
         boolean quarterTurn = facing.getAxis() == Direction.Axis.X;
         entity.setControlSize(quarterTurn ? spec.depth() : spec.width(), spec.height(),
                 quarterTurn ? spec.width() : spec.depth());

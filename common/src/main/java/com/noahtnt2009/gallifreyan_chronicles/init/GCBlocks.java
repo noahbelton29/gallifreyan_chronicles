@@ -61,6 +61,13 @@ public class GCBlocks {
                     .sound(SoundType.STONE)
                     .noOcclusion()));
 
+    public static final Block BRACHACKI_DOORS = registerBlock("brachacki_doors",
+            properties -> new InteriorDoorBlock("brachacki_doors", properties.strength(3F, 3F)
+                    .sound(SoundType.STONE)
+                    .noOcclusion()
+                    .noLootTable()
+                    .pushReaction(PushReaction.POPPED)));
+
     public static final Block GALLIFREYAN_SAND = registerBlock("gallifreyan_sand",
             properties -> new GCFallingBlock(properties.strength(1.25F)
                     .sound(SoundType.SAND)));

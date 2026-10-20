@@ -9,7 +9,6 @@ public interface ConsoleControlHost {
     BlockPos getHostPos();
     void markHostChanged();
 
-    /** Horizontal facing of the host; control offsets are authored for {@link Direction#NORTH}. */
     default Direction getHostFacing() {
         return Direction.NORTH;
     }

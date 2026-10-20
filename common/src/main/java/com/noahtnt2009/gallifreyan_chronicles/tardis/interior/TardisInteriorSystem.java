@@ -128,10 +128,6 @@ public final class TardisInteriorSystem {
         return Vec3.atLowerCornerOf(ORIGIN).add(definition.spawn());
     }
 
-    /**
-     * The interior definition for a tardis. The default interior, remembered on first use so later
-     * registry changes don't move an already built interior's exit.
-     */
     public static TardisInterior interiorFor(MinecraftServer server, UUID tardisId) {
         TardisManager manager = TardisManager.get(server);
         String stored = manager.getInteriorId(tardisId);

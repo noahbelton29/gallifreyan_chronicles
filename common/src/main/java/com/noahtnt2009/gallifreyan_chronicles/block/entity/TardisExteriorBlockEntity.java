@@ -18,6 +18,7 @@ import com.noahtnt2009.gallifreyan_chronicles.tardis.ecs.component.DoorState;
 import com.noahtnt2009.gallifreyan_chronicles.tardis.ecs.TardisComponentTypes;
 import com.noahtnt2009.gallifreyan_chronicles.tardis.ecs.component.TardisSubsystem;
 import com.noahtnt2009.gallifreyan_chronicles.tardis.ecs.component.TransformComponent;
+import com.noahtnt2009.gallifreyan_chronicles.tardis.ecs.system.DoorSyncSystem;
 import com.noahtnt2009.gallifreyan_chronicles.tardis.ecs.system.DoorSystem;
 import com.noahtnt2009.gallifreyan_chronicles.tardis.ecs.system.ExteriorSystem;
 import com.noahtnt2009.gallifreyan_chronicles.tardis.ecs.system.GlowSystem;
@@ -349,6 +350,23 @@ public class TardisExteriorBlockEntity extends BlockEntity implements GeoBlockEn
         }
         playAnimation(result.animationName());
         playDoorSound(result.opening());
+        sync();
+        if (level instanceof ServerLevel serverLevel) {
+            UUID id = getTardisId();
+            if (id != null) {
+                DoorSyncSystem.exteriorChanged(serverLevel.getServer(), id, result.state(),
+                        result.animationName(), result.opening());
+            }
+        }
+    }
+
+    public void applySyncedDoor(DoorState state, String animation, boolean opening) {
+        DoorSystem.applyRemote(asEntity(), state, opening, System.currentTimeMillis());
+        if (controller != null) {
+            controller.setAnimationSpeed(1.0);
+        }
+        playAnimation(animation);
+        playDoorSound(opening);
         sync();
     }
 

@@ -4,6 +4,7 @@ import com.noahtnt2009.gallifreyan_chronicles.client.hud.GCHudRenderer;
 import com.noahtnt2009.gallifreyan_chronicles.client.renderer.TardisConsoleBlockRenderer;
 import com.noahtnt2009.gallifreyan_chronicles.client.renderer.TardisControlEntityRenderer;
 import com.noahtnt2009.gallifreyan_chronicles.client.renderer.TardisKeyEntityRenderer;
+import com.noahtnt2009.gallifreyan_chronicles.client.renderer.InteriorDoorBlockRenderer;
 import com.noahtnt2009.gallifreyan_chronicles.client.renderer.TardisExteriorBlockRenderer;
 import com.noahtnt2009.gallifreyan_chronicles.init.GCBlockEntities;
 import com.noahtnt2009.gallifreyan_chronicles.init.GCBlocks;
@@ -30,6 +31,7 @@ public class GallifreyanChroniclesFabricClient implements ClientModInitializer {
         BlockTransformerHelper.registerStripping(GCBlocks.CADONWOOD_LOG, GCBlocks.STRIPPED_CADONWOOD_LOG);
         BlockEntityRenderers.register(GCBlockEntities.TARDIS_EXTERIOR_BLOCK_ENTITY_TYPE, TardisExteriorBlockRenderer::new);
         BlockEntityRenderers.register(GCBlockEntities.TARDIS_CONSOLE_BLOCK_ENTITY_TYPE, TardisConsoleBlockRenderer::new);
+        BlockEntityRenderers.register(GCBlockEntities.INTERIOR_DOOR_BLOCK_ENTITY_TYPE, InteriorDoorBlockRenderer::new);
         EntityRenderers.register(GCEntityTypes.TARDIS_CONTROL_ENTITY_TYPE, TardisControlEntityRenderer::new);
         EntityRenderers.register(GCEntityTypes.TARDIS_KEY_ENTITY_TYPE, TardisKeyEntityRenderer::new);
         GCFabricClientNetworking.registerClientNetworking();

@@ -1,6 +1,6 @@
 {
   "structure": "gallifreyan_chronicles:first_doctors",
-  "spawn": { "x": 8.6, "y": 1.0, "z": 3.8 },
+  "spawn": { "x": 8, "y": 1.0, "z": 5.5 },
   "facing": "south",
   "exit": {
     "min": { "x": 6.4, "y": 0.5, "z": 2.0 },

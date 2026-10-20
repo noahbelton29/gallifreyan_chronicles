@@ -89,7 +89,6 @@ public class GCConfigScreen extends Screen {
         this.minecraft.gui.setScreen(parent);
     }
 
-    /** If data is already loaded (a world is open), switch the live defaults too. */
     private static void applyToLoadedRegistries() {
         if (TardisExteriorRegistry.contains(GCConfig.defaultExterior())) {
             TardisExteriorRegistry.setDefault(TardisExteriorRegistry.get(GCConfig.defaultExterior()));

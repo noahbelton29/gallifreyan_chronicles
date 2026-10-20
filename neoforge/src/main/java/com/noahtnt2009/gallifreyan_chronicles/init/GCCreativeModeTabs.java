@@ -32,6 +32,7 @@ public class GCCreativeModeTabs {
                         output.accept(GCBlocks.BRACHACKI_WALL);
                         output.accept(GCBlocks.BRACHACKI_FENCE);
                         output.accept(GCBlocks.BRACHACKI_FENCE_GATE);
+                        output.accept(GCBlocks.BRACHACKI_DOORS);
                     }).build());
 
     public static final Supplier<CreativeModeTab> NATURAL_BLOCKS_TAB = CREATIVE_MODE_TABS.register("natural_blocks",

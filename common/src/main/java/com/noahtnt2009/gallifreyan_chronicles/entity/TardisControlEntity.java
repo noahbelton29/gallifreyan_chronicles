@@ -203,7 +203,6 @@ public class TardisControlEntity extends Entity {
     public void printPosition(Player player) {
         Vec3 pos = this.position();
         TardisConsoleBlockEntity console = this.getConsole();
-        // Print in the NORTH-facing authoring frame so the values can go straight into console JSON.
         Vec3 offset = console == null ? this.getOffset()
                 : ConsoleControlManager.unrotateOffset(this.getOffset(), console.getHostFacing());
 

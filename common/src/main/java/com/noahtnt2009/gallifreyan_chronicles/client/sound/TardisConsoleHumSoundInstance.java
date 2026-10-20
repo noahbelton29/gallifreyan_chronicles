@@ -50,7 +50,6 @@ public class TardisConsoleHumSoundInstance extends AbstractTickableSoundInstance
         if (distance >= HEARING_RANGE) {
             this.volume = 0.0F;
         } else {
-            // Gradually decrease volume with distance.
             float attenuation = (float) (1.0 - distance / HEARING_RANGE);
             this.volume = IN_RANGE_VOLUME * attenuation;
         }

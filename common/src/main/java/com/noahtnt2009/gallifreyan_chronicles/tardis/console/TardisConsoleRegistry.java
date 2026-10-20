@@ -11,7 +11,6 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentSkipListMap;
 
 public class TardisConsoleRegistry {
-    /** The default console id, from the mod config. */
     public static String defaultId() {
         return GCConfig.defaultConsole();
     }

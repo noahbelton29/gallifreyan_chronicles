@@ -20,6 +20,9 @@
         ],
         "client": [
             "com.noahtnt2009.gallifreyan_chronicles.GallifreyanChroniclesFabricClient"
+        ],
+        "modmenu": [
+            "com.noahtnt2009.gallifreyan_chronicles.compat.GCModMenuIntegration"
         ]
     },
     "mixins": [

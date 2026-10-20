@@ -61,7 +61,7 @@ public final class ConsoleLinkSystem {
 
         console.linkToTardis(tardisId);
         manager.setConsoleBlockPos(tardisId, consolePos);
-        console.setConsole(TardisConsoleRegistry.get(TardisConsoleRegistry.DEFAULT_ID));
+        console.setConsole(TardisConsoleRegistry.get(TardisConsoleRegistry.defaultId()));
 
         spawnDefaultControls(console);
 

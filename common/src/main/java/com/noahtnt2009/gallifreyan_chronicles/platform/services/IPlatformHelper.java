@@ -2,6 +2,9 @@ package com.noahtnt2009.gallifreyan_chronicles.platform.services;
 
 public interface IPlatformHelper {
 
+    /** The loader's config directory. */
+    java.nio.file.Path getConfigDir();
+
     /**
      * Gets the name of the current platform
      *

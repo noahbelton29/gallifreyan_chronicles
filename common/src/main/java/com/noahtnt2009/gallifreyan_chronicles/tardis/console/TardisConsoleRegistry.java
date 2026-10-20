@@ -2,7 +2,7 @@ package com.noahtnt2009.gallifreyan_chronicles.tardis.console;
 
 import com.noahtnt2009.gallifreyan_chronicles.Constants;
 import com.noahtnt2009.gallifreyan_chronicles.data.GCJsonDataRegistry;
-import com.noahtnt2009.gallifreyan_chronicles.util.GCUtils;
+import com.noahtnt2009.gallifreyan_chronicles.config.GCConfig;
 import org.jspecify.annotations.Nullable;
 
 import java.util.Collection;
@@ -11,7 +11,10 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentSkipListMap;
 
 public class TardisConsoleRegistry {
-    public static final String DEFAULT_ID = GCUtils.ofNamespace("brachacki_console");
+    /** The default console id, from the mod config. */
+    public static String defaultId() {
+        return GCConfig.defaultConsole();
+    }
 
     private static final GCJsonDataRegistry<TardisConsole> REGISTRY = new GCJsonDataRegistry<>();
     private static TardisConsole defaultConsole;

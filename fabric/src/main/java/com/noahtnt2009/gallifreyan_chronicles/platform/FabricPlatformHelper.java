@@ -6,6 +6,11 @@ import net.fabricmc.loader.api.FabricLoader;
 public class FabricPlatformHelper implements IPlatformHelper {
 
     @Override
+    public java.nio.file.Path getConfigDir() {
+        return FabricLoader.getInstance().getConfigDir();
+    }
+
+    @Override
     public String getPlatformName() {
         return "Fabric";
     }

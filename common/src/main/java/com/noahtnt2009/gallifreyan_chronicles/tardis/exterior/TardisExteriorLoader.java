@@ -28,7 +28,7 @@ public class TardisExteriorLoader extends GCJsonReloadListener<TardisExterior> {
 
     @Override
     protected void onReloadComplete() {
-        TardisExterior def = TardisExteriorRegistry.get(TardisExteriorRegistry.DEFAULT_ID);
+        TardisExterior def = TardisExteriorRegistry.get(TardisExteriorRegistry.defaultId());
         if (def == null) {
             Constants.LOG.warn("No TARDIS exteriors loaded! Expected e.g. data/{}/tardis_exterior/first_doctors_exterior.json", Constants.MOD_ID);
             return;

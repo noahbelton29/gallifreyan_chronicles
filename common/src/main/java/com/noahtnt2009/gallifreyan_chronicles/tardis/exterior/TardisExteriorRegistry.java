@@ -1,13 +1,15 @@
 package com.noahtnt2009.gallifreyan_chronicles.tardis.exterior;
 
-import com.noahtnt2009.gallifreyan_chronicles.Constants;
+import com.noahtnt2009.gallifreyan_chronicles.config.GCConfig;
 import com.noahtnt2009.gallifreyan_chronicles.data.GCJsonDataRegistry;
 
 import java.util.Collection;
 
 public class TardisExteriorRegistry {
-    public static final String DEFAULT_ID =
-            Constants.MOD_ID + ":first_doctors_exterior";
+    /** The default exterior id, from the mod config. */
+    public static String defaultId() {
+        return GCConfig.defaultExterior();
+    }
 
     private static final GCJsonDataRegistry<TardisExterior> REGISTRY = new GCJsonDataRegistry<>();
     private static TardisExterior defaultExterior;

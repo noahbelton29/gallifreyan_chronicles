@@ -7,6 +7,11 @@ import net.neoforged.fml.loading.FMLLoader;
 public class NeoForgePlatformHelper implements IPlatformHelper {
 
     @Override
+    public java.nio.file.Path getConfigDir() {
+        return net.neoforged.fml.loading.FMLPaths.CONFIGDIR.get();
+    }
+
+    @Override
     public String getPlatformName() {
 
         return "NeoForge";

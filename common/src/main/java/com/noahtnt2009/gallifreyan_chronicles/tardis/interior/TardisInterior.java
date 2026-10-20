@@ -9,22 +9,10 @@ import net.minecraft.resources.Identifier;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 
-import java.util.List;
 import java.util.Optional;
 
-/**
- * A registered TARDIS interior, loaded from {@code data/<ns>/tardis_interior/<name>.json}.
- * <p>
- * All positions are relative to the origin the structure is placed at.
- *
- * @param structure structure NBT template id (data/&lt;ns&gt;/structure/&lt;path&gt;.nbt)
- * @param spawn     where a player is teleported to when entering
- * @param facing    horizontal direction the player faces on arrival
- * @param exit      optional exit trigger volume; derived from spawn + facing when absent
- * @param exteriors exterior ids that use this interior
- */
 public record TardisInterior(String id, Identifier structure, Vec3 spawn, Direction facing,
-                             Optional<Exit> exit, List<String> exteriors)
+                             Optional<Exit> exit)
         implements IdentifiableData<TardisInterior> {
 
     public record Exit(Vec3 min, Vec3 max) {
@@ -45,14 +33,12 @@ public record TardisInterior(String id, Identifier structure, Vec3 spawn, Direct
             Identifier.CODEC.fieldOf("structure").forGetter(TardisInterior::structure),
             VEC3_CODEC.fieldOf("spawn").forGetter(TardisInterior::spawn),
             Direction.CODEC.optionalFieldOf("facing", Direction.SOUTH).forGetter(TardisInterior::facing),
-            Exit.CODEC.optionalFieldOf("exit").forGetter(TardisInterior::exit),
-            Codec.STRING.listOf().optionalFieldOf("exteriors", List.of()).forGetter(TardisInterior::exteriors)
+            Exit.CODEC.optionalFieldOf("exit").forGetter(TardisInterior::exit)
     ).apply(inst, TardisInterior::new));
 
-    /** Used only if no interior JSON has been loaded at all. */
     public static final TardisInterior FALLBACK = new TardisInterior(
             "fallback", GCUtils.of("template_interior"), new Vec3(7.4, 1.0, 3.5), Direction.SOUTH,
-            Optional.empty(), List.of());
+            Optional.empty());
 
     public TardisInterior {
         if (facing.getAxis().isVertical()) {
@@ -64,7 +50,6 @@ public record TardisInterior(String id, Identifier structure, Vec3 spawn, Direct
         return facing.toYRot();
     }
 
-    /** Exit trigger volume relative to the origin. By default a 2x1 box 0.5-1.5 blocks behind the spawn. */
     public AABB exitBox() {
         if (exit.isPresent()) {
             Vec3 a = exit.get().min();
@@ -75,7 +60,6 @@ public record TardisInterior(String id, Identifier structure, Vec3 spawn, Direct
         double fz = facing.getStepZ();
         double cx = spawn.x - fx;
         double cz = spawn.z - fz;
-        // half extents: 0.5 along facing, 1.0 across it
         double hx = fx != 0 ? 0.5 : 1.0;
         double hz = fz != 0 ? 0.5 : 1.0;
         return new AABB(cx - hx, spawn.y - 0.5, cz - hz, cx + hx, spawn.y + 2.0, cz + hz);
@@ -83,6 +67,6 @@ public record TardisInterior(String id, Identifier structure, Vec3 spawn, Direct
 
     @Override
     public TardisInterior withId(String id) {
-        return new TardisInterior(id, structure, spawn, facing, exit, exteriors);
+        return new TardisInterior(id, structure, spawn, facing, exit);
     }
 }

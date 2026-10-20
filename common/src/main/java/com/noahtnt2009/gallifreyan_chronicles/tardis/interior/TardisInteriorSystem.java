@@ -129,23 +129,15 @@ public final class TardisInteriorSystem {
     }
 
     /**
-     * The interior definition for a tardis. Chosen from its exterior the first time it is needed, then
-     * remembered so later registry changes don't move an already built interior's exit.
+     * The interior definition for a tardis. The default interior, remembered on first use so later
+     * registry changes don't move an already built interior's exit.
      */
     public static TardisInterior interiorFor(MinecraftServer server, UUID tardisId) {
         TardisManager manager = TardisManager.get(server);
         String stored = manager.getInteriorId(tardisId);
         if (stored != null) return TardisInteriorRegistry.get(stored);
 
-        String exteriorId = null;
-        ServerLevel exteriorLevel = server.getLevel(manager.getExteriorDimension(tardisId));
-        if (exteriorLevel != null) {
-            exteriorId = ExteriorLinkSystem.resolve(exteriorLevel, tardisId)
-                    .map(e -> e.getExterior().id()).orElse(null);
-        }
-        TardisInterior chosen = exteriorId != null
-                ? TardisInteriorRegistry.forExterior(exteriorId)
-                : TardisInteriorRegistry.get(TardisInteriorRegistry.DEFAULT_ID);
+        TardisInterior chosen = TardisInteriorRegistry.get(TardisInteriorRegistry.defaultId());
         manager.setInteriorId(tardisId, chosen.id());
         return chosen;
     }
@@ -177,7 +169,7 @@ public final class TardisInteriorSystem {
         if (interior.getBlockEntity(consolePos) instanceof TardisConsoleBlockEntity console) {
             ConsoleLinkSystem.link(interior, tardisId, consolePos);
             if (console.getConsole() == null) {
-                console.setConsole(TardisConsoleRegistry.get(TardisConsoleRegistry.DEFAULT_ID));
+                console.setConsole(TardisConsoleRegistry.get(TardisConsoleRegistry.defaultId()));
             }
             ConsoleLinkSystem.spawnDefaultControls(console);
             console.sync();

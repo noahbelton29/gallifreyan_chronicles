@@ -26,9 +26,9 @@ public class TardisInteriorLoader extends GCJsonReloadListener<TardisInterior> {
 
     @Override
     protected void onReloadComplete() {
-        if (!TardisInteriorRegistry.contains(TardisInteriorRegistry.DEFAULT_ID)) {
+        if (!TardisInteriorRegistry.contains(TardisInteriorRegistry.defaultId())) {
             Constants.LOG.warn("Default TARDIS interior {} not found; expected data/{}/tardis_interior/first_doctors_interior.json",
-                    TardisInteriorRegistry.DEFAULT_ID, Constants.MOD_ID);
+                    TardisInteriorRegistry.defaultId(), Constants.MOD_ID);
         }
     }
 

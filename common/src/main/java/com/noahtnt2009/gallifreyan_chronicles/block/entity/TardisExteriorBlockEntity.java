@@ -339,7 +339,11 @@ public class TardisExteriorBlockEntity extends BlockEntity implements GeoBlockEn
     }
 
     public void interact(boolean sneaking) {
-        if (isLocked()) {
+        interact(sneaking, false);
+    }
+
+    public void interact(boolean sneaking, boolean ignoreLock) {
+        if (!ignoreLock && isLocked()) {
             return;
         }
         DoorSystem.InteractionResult result =

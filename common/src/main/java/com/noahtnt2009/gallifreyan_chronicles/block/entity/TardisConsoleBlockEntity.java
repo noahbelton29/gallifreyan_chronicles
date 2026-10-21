@@ -72,7 +72,7 @@ public class TardisConsoleBlockEntity extends BlockEntity implements GeoBlockEnt
     private static final double SNAP_TO_END = 10_000.0;
     private final Map<String, Integer> snapFrames = new HashMap<>();
     private boolean controlStatesLoaded = false;
-    private boolean controlAnimationsSettled = false;
+    private final Map<String, Boolean> clientAppliedStates = new HashMap<>();
 
     public TardisConsoleBlockEntity(BlockPos pos, BlockState state) {
         super(TYPE.get(), pos, state);
@@ -128,19 +128,22 @@ public class TardisConsoleBlockEntity extends BlockEntity implements GeoBlockEnt
     }
 
     private void settleControlAnimations() {
-        if (controlAnimationsSettled || !controlStatesLoaded) return;
+        if (!controlStatesLoaded) return;
         if (level == null || !level.isClientSide()) return;
 
         for (String controlId : TardisControlRegistry.allIds()) {
-            if (!controls.getControlState(controlId)) continue;
+            boolean state = controls.getControlState(controlId);
+            Boolean applied = clientAppliedStates.get(controlId);
+            if (applied != null && applied == state) continue;
+            clientAppliedStates.put(controlId, state);
+            if (applied == null && !state) continue;
 
-            String animation = TardisControlRegistry.get(controlId).getAnimation(true);
+            String animation = TardisControlRegistry.get(controlId).getAnimation(state);
             if (animation == null) continue;
 
             snapFrames.put(controlId, 2);
             animationDriver.applyAnimationLocally(controlId, animation);
         }
-        controlAnimationsSettled = true;
     }
 
     public void applyRotorStateClient(String rotorState) {
@@ -150,6 +153,13 @@ public class TardisConsoleBlockEntity extends BlockEntity implements GeoBlockEnt
     public void triggerAnimationClient(String animationName, String controllerName) {
         if ("rotor".equals(controllerName)) {
             this.currentRotorState = animationName;
+        } else {
+            var control = TardisControlRegistry.get(controllerName);
+            if (animationName.equals(control.getAnimation(true))) {
+                clientAppliedStates.put(controllerName, true);
+            } else if (animationName.equals(control.getAnimation(false))) {
+                clientAppliedStates.put(controllerName, false);
+            }
         }
 
         animationDriver.applyAnimationLocally(controllerName, animationName);
@@ -161,6 +171,18 @@ public class TardisConsoleBlockEntity extends BlockEntity implements GeoBlockEnt
 
     public void triggerControl(String id, boolean activated, @Nullable Player triggeringPlayer) {
         controls.triggerControl(this, id, activated, triggeringPlayer);
+    }
+
+    public void setControlActivated(String id, boolean activated) {
+        if (controls.getControlState(id) == activated) return;
+        controls.setControlState(id, activated);
+        controls.playControlAnimation(id, activated, null);
+    }
+
+    public void reconcileControl(String id, boolean activated) {
+        if (controls.getControlState(id) == activated) return;
+        controls.setControlState(id, activated);
+        sync();
     }
 
     public Entity asEntity() {

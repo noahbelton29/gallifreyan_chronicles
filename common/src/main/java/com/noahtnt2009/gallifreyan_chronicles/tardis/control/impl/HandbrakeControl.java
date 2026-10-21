@@ -5,12 +5,16 @@ import com.noahtnt2009.gallifreyan_chronicles.block.entity.TardisConsoleBlockEnt
 import com.noahtnt2009.gallifreyan_chronicles.entity.TardisControlEntity;
 import com.noahtnt2009.gallifreyan_chronicles.init.GCSounds;
 import com.noahtnt2009.gallifreyan_chronicles.tardis.control.TardisControl;
+import com.noahtnt2009.gallifreyan_chronicles.tardis.ecs.system.DoorSyncSystem;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
+
+import java.util.UUID;
 
 public class HandbrakeControl implements TardisControl {
     private boolean STATE = false;
@@ -52,5 +56,20 @@ public class HandbrakeControl implements TardisControl {
         Constants.LOG.info("Handbrake state changed to: {}", activated);
 
         STATE = activated;
+
+        if (!(console.getLevel() instanceof ServerLevel serverLevel)) {
+            return;
+        }
+
+        UUID tardisId = console.getTardisId();
+        if (tardisId == null) {
+            tardisId = DoorSyncSystem.tardisIdOf(serverLevel);
+        }
+        if (tardisId == null) {
+            Constants.LOG.warn("Handbrake at {} has no linked TARDIS, doors not toggled", console.getBlockPos());
+            return;
+        }
+
+        DoorSyncSystem.toggleAll(serverLevel.getServer(), tardisId);
     }
 }

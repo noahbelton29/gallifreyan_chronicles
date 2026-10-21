@@ -40,7 +40,14 @@ public class TardisCommand {
     ) {
         if (pos == null) return Optional.empty();
 
+        ServerLevel sourceLevel = ctx.getSource().getLevel();
+        BlockEntity local = sourceLevel.getBlockEntity(pos);
+        if (entityClass.isInstance(local)) {
+            return Optional.of(entityClass.cast(local));
+        }
+
         for (ServerLevel level : ctx.getSource().getServer().getAllLevels()) {
+            if (level == sourceLevel) continue;
             BlockEntity blockEntity = level.getBlockEntity(pos);
             if (entityClass.isInstance(blockEntity)) {
                 return Optional.of(entityClass.cast(blockEntity));

@@ -25,7 +25,6 @@ import java.util.WeakHashMap;
 
 public final class DoorSyncSystem {
     private static final String INTERIOR_PREFIX = "tardis/";
-    private static final String HANDBRAKE_ID = "handbrake";
     private static final Map<UUID, Set<InteriorDoorBlockEntity>> INTERIOR_DOORS = new HashMap<>();
 
     private DoorSyncSystem() {
@@ -79,7 +78,7 @@ public final class DoorSyncSystem {
         for (InteriorDoorBlockEntity door : doorsOf(tardisId)) {
             door.applySyncedDoor(state, animation, opening);
         }
-        syncHandbrake(server, tardisId, state);
+        syncDoorControl(server, tardisId, state);
     }
 
     public static void interiorChanged(MinecraftServer server, UUID tardisId, InteriorDoorBlockEntity source,
@@ -91,14 +90,14 @@ public final class DoorSyncSystem {
         for (InteriorDoorBlockEntity door : doorsOf(tardisId)) {
             if (door != source) door.applySyncedDoor(state, animation, opening);
         }
-        syncHandbrake(server, tardisId, state);
+        syncDoorControl(server, tardisId, state);
     }
 
-    public static void syncHandbrake(MinecraftServer server, UUID tardisId, DoorState state) {
-        applyHandbrake(server, tardisId, state, false);
+    public static void syncDoorControl(MinecraftServer server, UUID tardisId, DoorState state) {
+        applyDoorControl(server, tardisId, state, false);
     }
 
-    private static void applyHandbrake(MinecraftServer server, UUID tardisId, DoorState state, boolean silent) {
+    private static void applyDoorControl(MinecraftServer server, UUID tardisId, DoorState state, boolean silent) {
         ServerLevel interior = TardisDimensionManager.get(server, tardisId);
         if (interior == null) return;
         BlockPos pos = TardisManager.get(server).getConsoleBlockPos(tardisId);
@@ -107,9 +106,9 @@ public final class DoorSyncSystem {
         if (interior.getBlockEntity(pos) instanceof TardisConsoleBlockEntity console) {
             boolean activated = !state.isClosed();
             if (silent) {
-                console.reconcileControl(HANDBRAKE_ID, activated);
+                console.reconcileControl("door_control", activated);
             } else {
-                console.setControlActivated(HANDBRAKE_ID, activated);
+                console.setControlActivated("door_control", activated);
             }
         }
     }
@@ -118,20 +117,20 @@ public final class DoorSyncSystem {
         TardisExteriorBlockEntity exterior = findExterior(server, tardisId);
         if (exterior != null) {
             exterior.interact(true, true);
-            syncHandbrake(server, tardisId, exterior.getDoorState());
+            syncDoorControl(server, tardisId, exterior.getDoorState());
             return;
         }
         List<InteriorDoorBlockEntity> doors = doorsOf(tardisId);
         if (doors.isEmpty()) return;
         doors.getFirst().interact(true);
-        syncHandbrake(server, tardisId, doors.getFirst().getDoorState());
+        syncDoorControl(server, tardisId, doors.getFirst().getDoorState());
     }
 
     public static void pullFromExterior(MinecraftServer server, UUID tardisId, InteriorDoorBlockEntity door) {
         TardisExteriorBlockEntity exterior = findExterior(server, tardisId);
         if (exterior != null) {
             door.snapTo(exterior.getDoorState());
-            applyHandbrake(server, tardisId, exterior.getDoorState(), true);
+            applyDoorControl(server, tardisId, exterior.getDoorState(), true);
         }
     }
 }

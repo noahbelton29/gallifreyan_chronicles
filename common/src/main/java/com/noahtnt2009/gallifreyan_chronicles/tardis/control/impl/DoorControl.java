@@ -1,0 +1,74 @@
+package com.noahtnt2009.gallifreyan_chronicles.tardis.control.impl;
+
+import com.noahtnt2009.gallifreyan_chronicles.Constants;
+import com.noahtnt2009.gallifreyan_chronicles.block.entity.TardisConsoleBlockEntity;
+import com.noahtnt2009.gallifreyan_chronicles.entity.TardisControlEntity;
+import com.noahtnt2009.gallifreyan_chronicles.init.GCSounds;
+import com.noahtnt2009.gallifreyan_chronicles.tardis.control.TardisControl;
+import com.noahtnt2009.gallifreyan_chronicles.tardis.ecs.system.DoorSyncSystem;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.sounds.SoundEvent;
+import net.minecraft.sounds.SoundSource;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.world.entity.player.Player;
+
+import java.util.UUID;
+
+public class DoorControl implements TardisControl {
+    private boolean STATE = false;
+
+    @Override
+    public InteractionResult onRightClick(TardisControlEntity entity, Player player, InteractionHand hand) {
+        var console = entity.getConsole();
+        if (console == null) {
+            return InteractionResult.FAIL;
+        }
+
+        SoundEvent sound = GCSounds.SLIDER;
+
+        entity.level().playSound(
+                null,
+                entity.blockPosition(),
+                sound,
+                SoundSource.BLOCKS,
+                1.0F,
+                STATE ? 1.0f : 0.9f
+        );
+
+        Constants.LOG.info("clicked door control");
+        return InteractionResult.SUCCESS;
+    }
+
+    @Override
+    public boolean onLeftClick(TardisControlEntity entity, Player player) {
+        return true;
+    }
+
+    @Override
+    public String getAnimation(boolean activated) {
+        return activated ? "door_control_off" : "door_control_on";
+    }
+
+    @Override
+    public void onStateChanged(TardisConsoleBlockEntity console, boolean activated) {
+        Constants.LOG.info("Door Control state changed to: {}", activated);
+
+        STATE = activated;
+
+        if (!(console.getLevel() instanceof ServerLevel serverLevel)) {
+            return;
+        }
+
+        UUID tardisId = console.getTardisId();
+        if (tardisId == null) {
+            tardisId = DoorSyncSystem.tardisIdOf(serverLevel);
+        }
+        if (tardisId == null) {
+            Constants.LOG.warn("Door Control at {} has no linked TARDIS, doors not toggled", console.getBlockPos());
+            return;
+        }
+
+        DoorSyncSystem.toggleAll(serverLevel.getServer(), tardisId);
+    }
+}

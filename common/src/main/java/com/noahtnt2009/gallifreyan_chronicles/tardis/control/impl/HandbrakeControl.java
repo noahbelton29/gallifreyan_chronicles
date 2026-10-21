@@ -56,20 +56,5 @@ public class HandbrakeControl implements TardisControl {
         Constants.LOG.info("Handbrake state changed to: {}", activated);
 
         STATE = activated;
-
-        if (!(console.getLevel() instanceof ServerLevel serverLevel)) {
-            return;
-        }
-
-        UUID tardisId = console.getTardisId();
-        if (tardisId == null) {
-            tardisId = DoorSyncSystem.tardisIdOf(serverLevel);
-        }
-        if (tardisId == null) {
-            Constants.LOG.warn("Handbrake at {} has no linked TARDIS, doors not toggled", console.getBlockPos());
-            return;
-        }
-
-        DoorSyncSystem.toggleAll(serverLevel.getServer(), tardisId);
     }
 }

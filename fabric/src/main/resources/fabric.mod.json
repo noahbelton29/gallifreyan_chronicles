@@ -5,11 +5,14 @@
     "name": "${mod_name}",
     "description": "${description}",
     "authors": [
-        "${mod_author}"
+        "NoahTNT2009"
+    ],
+    "contributors": [
+        "Fredbear1983"
     ],
     "contact": {
-        "homepage": "https://fabricmc.net/",
-        "sources": "https://github.com/FabricMC/fabric-example-mod"
+        "homepage": "https://nbforge.dev/",
+        "sources": "https://github.com/noahbelton29/gallifreyan_chronicles"
     },
     "license": "${license}",
     "icon": "${mod_id}.png",
@@ -33,11 +36,11 @@
         "fabricloader": ">=${fabric_loader_version}",
         "fabric-api": "*",
         "minecraft": "~${minecraft_version}",
-        "java": ">=${java_version}"
+        "java": ">=${java_version}",
+        "geckolib": ">=5.5.7"
     },
     "suggests": {
         "another-mod": "*"
     },
     "accessWidener": "${mod_id}.accesswidener"
 }
-  

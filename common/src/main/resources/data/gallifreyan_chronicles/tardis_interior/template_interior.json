@@ -1,0 +1,11 @@
+{
+  "structure": "gallifreyan_chronicles:template_interior",
+  "spawn": { "x": 3.587, "y": 1.0, "z": 5.618 },
+  "facing": "north",
+  "console": "brachacki_console",
+  "console_variant": "tuat_console",
+  "exit": {
+    "min": { "x": 3.0, "y": 0.5, "z": 7.0 },
+    "max": { "x": 4.0, "y": 2.0, "z": 8.0 }
+  }
+}

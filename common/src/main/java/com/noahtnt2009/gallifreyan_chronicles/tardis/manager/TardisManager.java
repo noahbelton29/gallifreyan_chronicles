@@ -196,6 +196,11 @@ public class TardisManager extends SavedData {
         return interiorOriginById.get(tardisId);
     }
 
+    public void clearInteriorOrigin(UUID tardisId) {
+        interiorOriginById.remove(tardisId);
+        setDirty();
+    }
+
     public void setInteriorOrigin(UUID tardisId, BlockPos origin) {
         interiorOriginById.put(tardisId, origin);
         setDirty();

@@ -8,6 +8,7 @@ import com.geckolib.animation.RawAnimation;
 import com.geckolib.animation.object.PlayState;
 import com.geckolib.util.GeckoLibUtil;
 import com.noahtnt2009.gallifreyan_chronicles.Constants;
+import com.noahtnt2009.gallifreyan_chronicles.block.ConsoleBlock;
 import com.noahtnt2009.gallifreyan_chronicles.client.sound.TardisConsoleHumSoundInstance;
 import com.noahtnt2009.gallifreyan_chronicles.ecs.ComponentHolder;
 import com.noahtnt2009.gallifreyan_chronicles.ecs.ComponentStore;
@@ -26,6 +27,7 @@ import com.noahtnt2009.gallifreyan_chronicles.tardis.ecs.TardisLinkable;
 import com.noahtnt2009.gallifreyan_chronicles.tardis.ecs.system.ConsoleSystem;
 import net.minecraft.client.Minecraft;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.protocol.Packet;
@@ -136,7 +138,7 @@ public class TardisConsoleBlockEntity extends BlockEntity implements GeoBlockEnt
             Boolean applied = clientAppliedStates.get(controlId);
             if (applied != null && applied == state) continue;
             clientAppliedStates.put(controlId, state);
-            if (applied == null && !state) continue;
+            if (applied == null && !state && !TardisControlRegistry.get(controlId).snapsWhenInactive()) continue;
 
             String animation = TardisControlRegistry.get(controlId).getAnimation(state);
             if (animation == null) continue;
@@ -212,6 +214,16 @@ public class TardisConsoleBlockEntity extends BlockEntity implements GeoBlockEnt
         controls.discardAll();
     }
 
+    public CompoundTag copyControlStates() {
+        return controls.getControlStates().copy();
+    }
+
+    public void applyCarriedControlStates(CompoundTag states) {
+        controls.mergeControlStates(states);
+        this.currentRotorState = controls.getControlState("flight_lever") ? FLIGHT_STATE : IDLE_STATE;
+        sync();
+    }
+
     public void sync() {
         if (level != null) {
             setChanged();
@@ -259,11 +271,11 @@ public class TardisConsoleBlockEntity extends BlockEntity implements GeoBlockEnt
     }
 
     @Override
-    public net.minecraft.core.Direction getHostFacing() {
+    public Direction getHostFacing() {
         BlockState state = getBlockState();
-        return state.hasProperty(com.noahtnt2009.gallifreyan_chronicles.block.ConsoleBlock.FACING)
-                ? state.getValue(com.noahtnt2009.gallifreyan_chronicles.block.ConsoleBlock.FACING)
-                : net.minecraft.core.Direction.NORTH;
+        return state.hasProperty(ConsoleBlock.FACING)
+                ? state.getValue(ConsoleBlock.FACING)
+                : Direction.NORTH;
     }
 
     @Override

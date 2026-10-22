@@ -68,6 +68,11 @@ public class DoorControl implements TardisControl {
     }
 
     @Override
+    public boolean snapsWhenInactive() {
+        return true;
+    }
+
+    @Override
     public void onStateChanged(TardisConsoleBlockEntity console, boolean activated) {
         Constants.LOG.info("Door Control state changed to: {}", activated);
 

@@ -2,6 +2,8 @@
   "structure": "gallifreyan_chronicles:first_doctors",
   "spawn": { "x": 8, "y": 1.0, "z": 5.5 },
   "facing": "south",
+  "console": "brachacki_console",
+  "console_variant": "first_doctors_console",
   "exit": {
     "min": { "x": 6.4, "y": 0.5, "z": 2.0 },
     "max": { "x": 8.4, "y": 3.0, "z": 3.0 }

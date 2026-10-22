@@ -19,6 +19,10 @@ public interface TardisControl {
         return null;
     }
 
+    default boolean snapsWhenInactive() {
+        return false;
+    }
+
     default void onStateChanged(TardisConsoleBlockEntity console, boolean activated) {
     }
 }

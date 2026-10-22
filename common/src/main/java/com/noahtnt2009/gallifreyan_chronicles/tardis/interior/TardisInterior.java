@@ -12,7 +12,7 @@ import net.minecraft.world.phys.Vec3;
 import java.util.Optional;
 
 public record TardisInterior(String id, Identifier structure, Vec3 spawn, Direction facing,
-                             Optional<Exit> exit)
+                             Optional<Exit> exit, Optional<String> console, Optional<String> consoleVariant)
         implements IdentifiableData<TardisInterior> {
 
     public record Exit(Vec3 min, Vec3 max) {
@@ -33,12 +33,14 @@ public record TardisInterior(String id, Identifier structure, Vec3 spawn, Direct
             Identifier.CODEC.fieldOf("structure").forGetter(TardisInterior::structure),
             VEC3_CODEC.fieldOf("spawn").forGetter(TardisInterior::spawn),
             Direction.CODEC.optionalFieldOf("facing", Direction.SOUTH).forGetter(TardisInterior::facing),
-            Exit.CODEC.optionalFieldOf("exit").forGetter(TardisInterior::exit)
+            Exit.CODEC.optionalFieldOf("exit").forGetter(TardisInterior::exit),
+            Codec.STRING.optionalFieldOf("console").forGetter(TardisInterior::console),
+            Codec.STRING.optionalFieldOf("console_variant").forGetter(TardisInterior::consoleVariant)
     ).apply(inst, TardisInterior::new));
 
     public static final TardisInterior FALLBACK = new TardisInterior(
             "fallback", GCUtils.of("template_interior"), new Vec3(7.4, 1.0, 3.5), Direction.SOUTH,
-            Optional.empty());
+            Optional.empty(), Optional.empty(), Optional.empty());
 
     public TardisInterior {
         if (facing.getAxis().isVertical()) {
@@ -67,6 +69,6 @@ public record TardisInterior(String id, Identifier structure, Vec3 spawn, Direct
 
     @Override
     public TardisInterior withId(String id) {
-        return new TardisInterior(id, structure, spawn, facing, exit);
+        return new TardisInterior(id, structure, spawn, facing, exit, console, consoleVariant);
     }
 }

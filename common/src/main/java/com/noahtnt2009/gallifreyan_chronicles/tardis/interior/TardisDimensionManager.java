@@ -110,6 +110,10 @@ public final class TardisDimensionManager {
         }
     }
 
+    public static void scheduleControlPlacement(UUID tardisId) {
+        PLACE_CONTROLS.put(tardisId, CONTROL_PLACE_DELAY_TICKS);
+    }
+
     private static void enterNow(ServerPlayer player, ServerLevel interior, UUID tardisId) {
         boolean firstEntry = TardisInteriorSystem.ensureBuilt(interior, tardisId);
         TardisInterior definition = TardisInteriorSystem.interiorFor(interior.getServer(), tardisId);

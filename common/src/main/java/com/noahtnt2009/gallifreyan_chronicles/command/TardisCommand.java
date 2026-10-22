@@ -4,6 +4,8 @@ import com.mojang.brigadier.arguments.BoolArgumentType;
 import com.mojang.brigadier.arguments.FloatArgumentType;
 import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.context.CommandContext;
+import com.mojang.brigadier.suggestion.Suggestions;
+import com.mojang.brigadier.suggestion.SuggestionsBuilder;
 import com.noahtnt2009.gallifreyan_chronicles.block.entity.TardisConsoleBlockEntity;
 import com.noahtnt2009.gallifreyan_chronicles.block.entity.TardisExteriorBlockEntity;
 import com.noahtnt2009.gallifreyan_chronicles.network.TardisConsoleSyncPayload;
@@ -14,6 +16,8 @@ import com.noahtnt2009.gallifreyan_chronicles.tardis.ecs.component.TardisCompone
 import com.noahtnt2009.gallifreyan_chronicles.tardis.ecs.component.TardisSubsystem;
 import com.noahtnt2009.gallifreyan_chronicles.tardis.ecs.system.ConsoleLinkSystem;
 import com.noahtnt2009.gallifreyan_chronicles.tardis.ecs.system.ExteriorLinkSystem;
+import com.noahtnt2009.gallifreyan_chronicles.tardis.interior.TardisInteriorRegistry;
+import com.noahtnt2009.gallifreyan_chronicles.tardis.interior.TardisInteriorSystem;
 import com.noahtnt2009.gallifreyan_chronicles.tardis.manager.TardisManager;
 import com.noahtnt2009.gallifreyan_chronicles.tardis.exterior.TardisExterior;
 import com.noahtnt2009.gallifreyan_chronicles.tardis.exterior.TardisExteriorRegistry;
@@ -31,6 +35,7 @@ import net.minecraft.world.phys.Vec3;
 import java.util.Collection;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.concurrent.CompletableFuture;
 
 public class TardisCommand {
     private static <T extends BlockEntity> Optional<T> findBlockEntity(
@@ -148,6 +153,80 @@ public class TardisCommand {
         return 1;
     }
 
+    public static CompletableFuture<Suggestions> suggestInteriors(
+            CommandContext<CommandSourceStack> ctx,
+            com.mojang.brigadier.suggestion.SuggestionsBuilder builder
+    ) {
+        TardisInteriorRegistry.getAll().forEach(interior -> builder.suggest(interior.id()));
+        return builder.buildFuture();
+    }
+
+    public static int getInterior(CommandContext<CommandSourceStack> ctx) {
+        String tardisIdStr = StringArgumentType.getString(ctx, "id");
+        UUID tardisId;
+        try {
+            tardisId = UUID.fromString(tardisIdStr);
+        } catch (IllegalArgumentException e) {
+            ctx.getSource().sendFailure(Component.translatable("command.gallifreyan_chronicles.invalid_id", tardisIdStr));
+            return 0;
+        }
+
+        var server = ctx.getSource().getServer();
+        if (TardisManager.get(server).get(tardisId).isEmpty()) {
+            ctx.getSource().sendFailure(Component.translatable("command.gallifreyan_chronicles.no_tardis_id", tardisIdStr));
+            return 0;
+        }
+
+        String interiorId = TardisInteriorSystem.interiorFor(server, tardisId).id();
+        ctx.getSource().sendSuccess(
+                () -> Component.translatable("command.gallifreyan_chronicles.get_interior", tardisIdStr, interiorId),
+                false
+        );
+        return 1;
+    }
+
+    public static int setInterior(CommandContext<CommandSourceStack> ctx) {
+        String tardisIdStr = StringArgumentType.getString(ctx, "id");
+        String interiorId = StringArgumentType.getString(ctx, "interior_id");
+
+        UUID tardisId;
+        try {
+            tardisId = UUID.fromString(tardisIdStr);
+        } catch (IllegalArgumentException e) {
+            ctx.getSource().sendFailure(Component.translatable("command.gallifreyan_chronicles.invalid_id", tardisIdStr));
+            return 0;
+        }
+
+        var server = ctx.getSource().getServer();
+        if (TardisManager.get(server).get(tardisId).isEmpty()) {
+            ctx.getSource().sendFailure(Component.translatable("command.gallifreyan_chronicles.no_tardis_id", tardisIdStr));
+            return 0;
+        }
+
+        switch (TardisInteriorSystem.changeInterior(server, tardisId, interiorId)) {
+            case UNKNOWN_INTERIOR -> {
+                ctx.getSource().sendFailure(Component.translatable("command.gallifreyan_chronicles.unknown_interior", interiorId));
+                return 0;
+            }
+            case MISSING_TEMPLATE -> {
+                ctx.getSource().sendFailure(Component.translatable("command.gallifreyan_chronicles.missing_interior_template", interiorId));
+                return 0;
+            }
+            case UNCHANGED -> {
+                ctx.getSource().sendFailure(Component.translatable("command.gallifreyan_chronicles.interior_unchanged", tardisIdStr, interiorId));
+                return 0;
+            }
+            case CHANGED -> {
+                ctx.getSource().sendSuccess(
+                        () -> Component.translatable("command.gallifreyan_chronicles.set_interior", tardisIdStr, interiorId),
+                        true
+                );
+                return 1;
+            }
+        }
+        return 0;
+    }
+
     public static int setConsole(CommandContext<CommandSourceStack> ctx) {
         String tardisIdStr = StringArgumentType.getString(ctx, "id");
         String consoleId = StringArgumentType.getString(ctx, "console_id");
@@ -215,7 +294,7 @@ public class TardisCommand {
         return 1;
     }
 
-    public static java.util.concurrent.CompletableFuture<com.mojang.brigadier.suggestion.Suggestions> suggestConsoleVariants(
+    public static CompletableFuture<com.mojang.brigadier.suggestion.Suggestions> suggestConsoleVariants(
             CommandContext<CommandSourceStack> ctx,
             com.mojang.brigadier.suggestion.SuggestionsBuilder builder
     ) {
@@ -439,9 +518,9 @@ public class TardisCommand {
         return 1;
     }
 
-    public static java.util.concurrent.CompletableFuture<com.mojang.brigadier.suggestion.Suggestions> suggestSubsystems(
+    public static CompletableFuture<Suggestions> suggestSubsystems(
             CommandContext<CommandSourceStack> ctx,
-            com.mojang.brigadier.suggestion.SuggestionsBuilder builder
+            SuggestionsBuilder builder
     ) {
         for (TardisSubsystem subsystem : TardisSubsystem.values()) {
             builder.suggest(subsystem.id());

@@ -144,6 +144,13 @@ public final class DoorSyncSystem {
         syncDoorControl(server, tardisId, doors.getFirst().getDoorState());
     }
 
+    public static void reconcileConsole(MinecraftServer server, UUID tardisId) {
+        TardisExteriorBlockEntity exterior = findExterior(server, tardisId);
+        if (exterior == null) return;
+        applyDoorControl(server, tardisId, exterior.getDoorState(), true);
+        applyLockControl(server, tardisId, exterior.isLocked(), true);
+    }
+
     public static void pullFromExterior(MinecraftServer server, UUID tardisId, InteriorDoorBlockEntity door) {
         TardisExteriorBlockEntity exterior = findExterior(server, tardisId);
         if (exterior != null) {

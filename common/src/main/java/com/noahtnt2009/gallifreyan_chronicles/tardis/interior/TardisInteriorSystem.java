@@ -4,17 +4,25 @@ import com.noahtnt2009.gallifreyan_chronicles.Constants;
 import com.noahtnt2009.gallifreyan_chronicles.block.entity.TardisConsoleBlockEntity;
 import com.noahtnt2009.gallifreyan_chronicles.block.entity.TardisExteriorBlockEntity;
 import com.noahtnt2009.gallifreyan_chronicles.init.GCBlocks;
-import com.noahtnt2009.gallifreyan_chronicles.init.GCDimensions;
+import com.noahtnt2009.gallifreyan_chronicles.tardis.console.TardisConsole;
 import com.noahtnt2009.gallifreyan_chronicles.tardis.console.TardisConsoleRegistry;
 import com.noahtnt2009.gallifreyan_chronicles.tardis.ecs.system.ConsoleLinkSystem;
+import com.noahtnt2009.gallifreyan_chronicles.tardis.ecs.system.DoorSyncSystem;
 import com.noahtnt2009.gallifreyan_chronicles.tardis.ecs.system.ExteriorLinkSystem;
 import com.noahtnt2009.gallifreyan_chronicles.tardis.manager.TardisManager;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Vec3i;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.Identifier;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.Clearable;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.levelgen.structure.templatesystem.StructurePlaceSettings;
 import net.minecraft.world.level.levelgen.structure.templatesystem.StructureTemplate;
@@ -39,6 +47,14 @@ public final class TardisInteriorSystem {
     private static final double EXIT_DISTANCE = 2.0;
 
     private static final String INTERIOR_PREFIX = "tardis/";
+
+    private static final Vec3i FALLBACK_CLEAR_SIZE = new Vec3i(64, 64, 64);
+    private static final int CLEAR_FLAGS = Block.UPDATE_CLIENTS | Block.UPDATE_KNOWN_SHAPE | Block.UPDATE_SUPPRESS_DROPS;
+
+    private record ConsoleCarryover(TardisConsole console, @Nullable String variant, CompoundTag controlStates) {
+    }
+
+    public enum ChangeResult { CHANGED, UNCHANGED, UNKNOWN_INTERIOR, MISSING_TEMPLATE }
 
     private TardisInteriorSystem() {
     }
@@ -139,6 +155,10 @@ public final class TardisInteriorSystem {
     }
 
     public static boolean ensureBuilt(ServerLevel interior, UUID tardisId) {
+        return ensureBuilt(interior, tardisId, null);
+    }
+
+    private static boolean ensureBuilt(ServerLevel interior, UUID tardisId, @Nullable ConsoleCarryover carry) {
         TardisManager manager = TardisManager.get(interior.getServer());
         if (manager.getInteriorOrigin(tardisId) != null) return false;
 
@@ -164,9 +184,7 @@ public final class TardisInteriorSystem {
 
         if (interior.getBlockEntity(consolePos) instanceof TardisConsoleBlockEntity console) {
             ConsoleLinkSystem.link(interior, tardisId, consolePos);
-            if (console.getConsole() == null) {
-                console.setConsole(TardisConsoleRegistry.get(TardisConsoleRegistry.defaultId()));
-            }
+            applyInteriorConsole(console, interiorFor(interior.getServer(), tardisId), carry);
             ConsoleLinkSystem.spawnDefaultControls(console);
             console.sync();
         } else {
@@ -175,6 +193,115 @@ public final class TardisInteriorSystem {
 
         manager.setInteriorOrigin(tardisId, origin);
         return true;
+    }
+
+    private static void applyInteriorConsole(TardisConsoleBlockEntity console, TardisInterior def,
+                                             @Nullable ConsoleCarryover carry) {
+        TardisConsole model = null;
+        String variant = null;
+
+        if (def.console().isPresent()) {
+            // console ids are namespaced ("gallifreyan_chronicles:brachacki_console"); accept the short form too
+            String consoleId = def.console().get();
+            if (!consoleId.contains(":")) consoleId = Constants.MOD_ID + ":" + consoleId;
+            if (TardisConsoleRegistry.contains(consoleId)) {
+                model = TardisConsoleRegistry.get(consoleId);
+            } else {
+                Constants.LOG.warn("interior {} names unknown console {}", def.id(), consoleId);
+            }
+        }
+        if (model == null && console.getConsole() != null) {
+            model = console.getConsole();
+            variant = console.getVariant();
+        }
+        if (model == null && carry != null) {
+            model = carry.console();
+            variant = carry.variant();
+        }
+        if (model == null) {
+            model = TardisConsoleRegistry.get(TardisConsoleRegistry.defaultId());
+        }
+
+        if (def.consoleVariant().isPresent()) {
+            variant = def.consoleVariant().get();
+            if (!model.hasVariant(variant)) {
+                Constants.LOG.warn("interior {} console variant {} does not belong to console {}",
+                        def.id(), variant, model.id());
+            }
+        }
+
+        if (variant != null) console.setConsole(model, variant);
+        else console.setConsole(model);
+
+        if (carry != null) console.applyCarriedControlStates(carry.controlStates());
+    }
+
+    public static ChangeResult changeInterior(MinecraftServer server, UUID tardisId, String newId) {
+        if (!TardisInteriorRegistry.contains(newId)) return ChangeResult.UNKNOWN_INTERIOR;
+
+        TardisManager manager = TardisManager.get(server);
+        TardisInterior oldDef = interiorFor(server, tardisId);
+        TardisInterior newDef = TardisInteriorRegistry.get(newId);
+        if (oldDef.id().equals(newDef.id())) return ChangeResult.UNCHANGED;
+
+        Optional<StructureTemplate> newTemplate = server.getStructureTemplateManager().get(newDef.structure());
+        if (newTemplate.isEmpty()) return ChangeResult.MISSING_TEMPLATE;
+
+        if (manager.getInteriorOrigin(tardisId) == null) {
+            manager.setInteriorId(tardisId, newDef.id());
+            return ChangeResult.CHANGED;
+        }
+
+        ServerLevel level = TardisDimensionManager.getOrCreate(server, tardisId);
+
+        ConsoleCarryover carry = null;
+        Optional<TardisConsoleBlockEntity> oldConsole = ConsoleLinkSystem.resolve(level, tardisId);
+        if (oldConsole.isPresent() && oldConsole.get().getConsole() != null) {
+            carry = new ConsoleCarryover(oldConsole.get().getConsole(), oldConsole.get().getVariant(),
+                    oldConsole.get().copyControlStates());
+        }
+
+        List<ServerPlayer> occupants = List.copyOf(level.players());
+
+        Vec3i oldSize = server.getStructureTemplateManager().get(oldDef.structure())
+                .map(StructureTemplate::getSize).orElse(FALLBACK_CLEAR_SIZE);
+        Vec3i newSize = newTemplate.get().getSize();
+        Vec3i size = new Vec3i(Math.max(oldSize.getX(), newSize.getX()),
+                Math.max(oldSize.getY(), newSize.getY()),
+                Math.max(oldSize.getZ(), newSize.getZ()));
+
+        clearArea(level, size);
+
+        manager.clearInteriorOrigin(tardisId);
+        manager.setInteriorId(tardisId, newDef.id());
+        ensureBuilt(level, tardisId, carry);
+        DoorSyncSystem.reconcileConsole(server, tardisId);
+        TardisDimensionManager.scheduleControlPlacement(tardisId);
+
+        Vec3 target = arrivalPoint(newDef);
+        for (ServerPlayer player : occupants) {
+            player.teleportTo(level, target.x, target.y, target.z, Set.of(), newDef.spawnYaw(), 0.0f, true);
+        }
+        return ChangeResult.CHANGED;
+    }
+
+    private static void clearArea(ServerLevel level, Vec3i size) {
+        loadChunks(level, ORIGIN, size);
+        BlockPos max = ORIGIN.offset(size.getX() - 1, size.getY() - 1, size.getZ() - 1);
+
+        for (BlockPos p : BlockPos.betweenClosed(ORIGIN, max)) {
+            BlockEntity be = level.getBlockEntity(p);
+            if (be instanceof Clearable container) container.clearContent();
+            if (!level.getBlockState(p).isAir()) {
+                level.setBlock(p, Blocks.AIR.defaultBlockState(), CLEAR_FLAGS);
+            }
+        }
+
+        net.minecraft.world.phys.AABB box = new net.minecraft.world.phys.AABB(
+                Vec3.atLowerCornerOf(ORIGIN), Vec3.atLowerCornerOf(max.offset(1, 1, 1)));
+        for (Entity entity : level.getEntities((Entity) null, box, e -> !(e instanceof Player))) {
+            entity.discard();
+        }
     }
 
     private static void loadChunks(ServerLevel level, BlockPos origin, Vec3i size) {
@@ -191,7 +318,7 @@ public final class TardisInteriorSystem {
 
     private static @Nullable BlockPos findConsole(ServerLevel level, BlockPos origin, Vec3i size) {
         BlockPos max = origin.offset(size.getX() - 1, size.getY() - 1, size.getZ() - 1);
-        for (BlockPos p : BlockPos.betweenClosed(origin, max)) {
+        for (BlockPos p : BlockPos.betweenClosed(ORIGIN, max)) {
             if (level.getBlockEntity(p) instanceof TardisConsoleBlockEntity) {
                 return p.immutable();
             }

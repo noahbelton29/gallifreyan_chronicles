@@ -4,6 +4,7 @@ import com.noahtnt2009.gallifreyan_chronicles.Constants;
 import com.noahtnt2009.gallifreyan_chronicles.block.entity.InteriorDoorBlockEntity;
 import com.noahtnt2009.gallifreyan_chronicles.block.entity.TardisConsoleBlockEntity;
 import com.noahtnt2009.gallifreyan_chronicles.block.entity.TardisExteriorBlockEntity;
+import com.noahtnt2009.gallifreyan_chronicles.tardis.control.impl.DoorLockControl;
 import com.noahtnt2009.gallifreyan_chronicles.tardis.ecs.component.DoorState;
 import com.noahtnt2009.gallifreyan_chronicles.tardis.interior.TardisDimensionManager;
 import com.noahtnt2009.gallifreyan_chronicles.tardis.manager.TardisManager;
@@ -98,18 +99,35 @@ public final class DoorSyncSystem {
     }
 
     private static void applyDoorControl(MinecraftServer server, UUID tardisId, DoorState state, boolean silent) {
+        applyControl(server, tardisId, "door_control", !state.isClosed(), silent);
+    }
+
+    private static void applyLockControl(MinecraftServer server, UUID tardisId, boolean locked, boolean silent) {
+        applyControl(server, tardisId, DoorLockControl.ID, locked, silent);
+    }
+
+    private static void applyControl(MinecraftServer server, UUID tardisId, String controlId,
+                                     boolean activated, boolean silent) {
         ServerLevel interior = TardisDimensionManager.get(server, tardisId);
         if (interior == null) return;
         BlockPos pos = TardisManager.get(server).getConsoleBlockPos(tardisId);
         if (pos == null) return;
         interior.getChunkAt(pos);
         if (interior.getBlockEntity(pos) instanceof TardisConsoleBlockEntity console) {
-            boolean activated = !state.isClosed();
             if (silent) {
-                console.reconcileControl("door_control", activated);
+                console.reconcileControl(controlId, activated);
             } else {
-                console.setControlActivated("door_control", activated);
+                console.setControlActivated(controlId, activated);
             }
+        }
+    }
+
+    public static void lockChanged(MinecraftServer server, UUID tardisId, boolean locked, boolean fromConsole) {
+        for (InteriorDoorBlockEntity door : doorsOf(tardisId)) {
+            door.applySyncedLock(locked);
+        }
+        if (!fromConsole) {
+            applyLockControl(server, tardisId, locked, false);
         }
     }
 
@@ -131,6 +149,7 @@ public final class DoorSyncSystem {
         if (exterior != null) {
             door.snapTo(exterior.getDoorState());
             applyDoorControl(server, tardisId, exterior.getDoorState(), true);
+            applyLockControl(server, tardisId, exterior.isLocked(), true);
         }
     }
 }

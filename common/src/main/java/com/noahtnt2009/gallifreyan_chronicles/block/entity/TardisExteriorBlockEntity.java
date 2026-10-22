@@ -148,6 +148,27 @@ public class TardisExteriorBlockEntity extends BlockEntity implements GeoBlockEn
         triggerAnim("key_controller", animName);
         playKeySound();
         sync();
+
+        if (level instanceof ServerLevel serverLevel) {
+            UUID id = getTardisId();
+            if (id != null) {
+                DoorSyncSystem.lockChanged(serverLevel.getServer(), id, nowLocked, false);
+            }
+        }
+    }
+
+    public void setLockedFromConsole(boolean nowLocked) {
+        if (locked == nowLocked) return;
+        locked = nowLocked;
+        playKeySound();
+        sync();
+
+        if (level instanceof ServerLevel serverLevel) {
+            UUID id = getTardisId();
+            if (id != null) {
+                DoorSyncSystem.lockChanged(serverLevel.getServer(), id, nowLocked, true);
+            }
+        }
     }
 
     public @Nullable UUID getRenderedKeyOwner() {

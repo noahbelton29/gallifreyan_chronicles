@@ -48,9 +48,11 @@ public class InteriorDoorBlockEntity extends BlockEntity implements GeoBlockEnti
     private final ComponentStore components = new ComponentStore();
     private AnimatableInstanceCache cache = GeckoLibUtil.createInstanceCache(this);
     private AnimationController<InteriorDoorBlockEntity> controller;
+    private static final String LOCK_CONTROLLER = "lock_controller";
     private boolean needsStateSync = false;
     private boolean pulledFromExterior = false;
     private @Nullable UUID tardisId = null;
+    private long lastLockedFeedbackAt = 0L;
 
     public InteriorDoorBlockEntity(BlockPos pos, BlockState state) {
         super(TYPE.get(), pos, state);
@@ -106,6 +108,10 @@ public class InteriorDoorBlockEntity extends BlockEntity implements GeoBlockEnti
     }
 
     public void interact(boolean sneaking) {
+        if (isTardisLocked()) {
+            announceLocked();
+            return;
+        }
         DoorSystem.InteractionResult result =
                 DoorSystem.interact(asEntity(), sneaking, System.currentTimeMillis());
         if (result.playedNothing()) return;
@@ -132,6 +138,26 @@ public class InteriorDoorBlockEntity extends BlockEntity implements GeoBlockEnti
         sync();
     }
 
+    private boolean isTardisLocked() {
+        if (tardisId == null || !(level instanceof ServerLevel serverLevel)) return false;
+        TardisExteriorBlockEntity exterior = DoorSyncSystem.findExterior(serverLevel.getServer(), tardisId);
+        return exterior != null && exterior.isLocked();
+    }
+
+    private void announceLocked() {
+        long now = System.currentTimeMillis();
+        if (now - lastLockedFeedbackAt < 1000L) return;
+        lastLockedFeedbackAt = now;
+        triggerAnim(LOCK_CONTROLLER, "is_locked");
+        if (level != null) {
+            level.playSound(null, getBlockPos(), GCSounds.TARDIS_IS_LOCKED, SoundSource.BLOCKS, 1.0f, 1.0f);
+        }
+    }
+
+    public void applySyncedLock(boolean locked) {
+        playLockSound(locked);
+    }
+
     public void snapTo(DoorState state) {
         if (getDoorState() == state) return;
         DoorSystem.snap(asEntity(), state);
@@ -151,6 +177,12 @@ public class InteriorDoorBlockEntity extends BlockEntity implements GeoBlockEnti
     private void playDoorSound(boolean opening) {
         if (level == null) return;
         SoundEvent sound = opening ? GCSounds.TARDIS_DOOR_OPEN : GCSounds.TARDIS_DOOR_CLOSE;
+        level.playSound(null, getBlockPos(), sound, SoundSource.BLOCKS, 1.0f, 1.0f);
+    }
+
+    private void playLockSound(boolean locked) {
+        if (level == null) return;
+        SoundEvent sound = locked ? GCSounds.TARDIS_DOOR_LOCK : GCSounds.TARDIS_DOOR_UNLOCK;
         level.playSound(null, getBlockPos(), sound, SoundSource.BLOCKS, 1.0f, 1.0f);
     }
 
@@ -212,6 +244,11 @@ public class InteriorDoorBlockEntity extends BlockEntity implements GeoBlockEnti
                 .triggerableAnim("close_right", RawAnimation.begin().thenPlay("close_right"))
                 .triggerableAnim("close_all", RawAnimation.begin().thenPlay("close_all"));
         registrar.add(controller);
+
+        AnimationController<InteriorDoorBlockEntity> lockController =
+                new AnimationController<>(LOCK_CONTROLLER, 0, _ -> PlayState.CONTINUE);
+        lockController.triggerableAnim("is_locked", RawAnimation.begin().thenPlay("is_locked"));
+        registrar.add(lockController);
     }
 
     @Override

@@ -2,10 +2,13 @@ package com.noahtnt2009.gallifreyan_chronicles.tardis.control.impl;
 
 import com.noahtnt2009.gallifreyan_chronicles.Constants;
 import com.noahtnt2009.gallifreyan_chronicles.block.entity.TardisConsoleBlockEntity;
+import com.noahtnt2009.gallifreyan_chronicles.block.entity.TardisExteriorBlockEntity;
 import com.noahtnt2009.gallifreyan_chronicles.entity.TardisControlEntity;
 import com.noahtnt2009.gallifreyan_chronicles.init.GCSounds;
 import com.noahtnt2009.gallifreyan_chronicles.tardis.control.TardisControl;
 import com.noahtnt2009.gallifreyan_chronicles.tardis.ecs.system.DoorSyncSystem;
+import net.minecraft.ChatFormatting;
+import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundSource;
@@ -23,6 +26,20 @@ public class DoorControl implements TardisControl {
         var console = entity.getConsole();
         if (console == null) {
             return InteractionResult.FAIL;
+        }
+
+        if (entity.level() instanceof ServerLevel serverLevel) {
+            UUID tardisId = console.getTardisId();
+            if (tardisId == null) {
+                tardisId = DoorSyncSystem.tardisIdOf(serverLevel);
+            }
+            TardisExteriorBlockEntity exterior =
+                    tardisId == null ? null : DoorSyncSystem.findExterior(serverLevel.getServer(), tardisId);
+            if (exterior != null && exterior.isLocked()) {
+                player.sendOverlayMessage(
+                        Component.literal("The doors are locked!").withStyle(ChatFormatting.RED));
+                return InteractionResult.FAIL;
+            }
         }
 
         SoundEvent sound = GCSounds.SLIDER;

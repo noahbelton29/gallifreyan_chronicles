@@ -35,8 +35,15 @@ public class GCCreativeModeTabs {
                         output.accept(GCBlocks.BRACHACKI_WALL);
                         output.accept(GCBlocks.BRACHACKI_FENCE);
                         output.accept(GCBlocks.BRACHACKI_FENCE_GATE);
-                        output.accept(GCBlocks.TARDIS_DOOR);
-                        output.accept(GCBlocks.BRACHACKI_DOORS);
+                        output.accept(GCBlocks.BRACHACKI_STAIRS_2);
+                        output.accept(GCBlocks.BRACHACKI_SLAB_2);
+                        output.accept(GCBlocks.BRACHACKI_PRESSURE_PLATE_2);
+                        output.accept(GCBlocks.BRACHACKI_WALL_2);
+                        output.accept(GCBlocks.BRACHACKI_FENCE_2);
+                        output.accept(GCBlocks.BRACHACKI_FENCE_GATE_2);
+                        output.accept(GCBlocks.TARDIS_INTERIOR_DOOR);
+                        output.accept(GCBlocks.FIRST_DOCTORS_DOOR);
+                        output.accept(GCBlocks.SECOND_DOCTORS_DOOR);
                     }).build());
 
     public static final Supplier<CreativeModeTab> NATURAL_BLOCKS_TAB = CREATIVE_MODE_TABS.register("natural_blocks",

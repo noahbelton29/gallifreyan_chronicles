@@ -9,7 +9,8 @@
     "gallifreyan_chronicles:gallifreyan_mudstone",
     "gallifreyan_chronicles:moonslate",
     "gallifreyan_chronicles:lunar_regolith",
-    "gallifreyan_chronicles:tardis_door",
-    "gallifreyan_chronicles:brachacki_doors"
+    "gallifreyan_chronicles:tardis_interior_door",
+    "gallifreyan_chronicles:first_doctors_door",
+    "gallifreyan_chronicles:second_doctors_door"
   ]
 }

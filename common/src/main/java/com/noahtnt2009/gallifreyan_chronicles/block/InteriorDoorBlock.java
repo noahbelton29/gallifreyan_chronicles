@@ -44,11 +44,21 @@ public class InteriorDoorBlock extends BaseEntityBlock {
 
     private final String variant;
     private final boolean linked;
+    private final String fixedVariantId;
 
-    public InteriorDoorBlock(String variant, boolean linked, Properties properties) {
+    public InteriorDoorBlock(String variant, Properties properties) {
+        this(variant, true, "", properties);
+    }
+
+    public InteriorDoorBlock(String variant, String fixedVariantId, Properties properties) {
+        this(variant, false, fixedVariantId, properties);
+    }
+
+    private InteriorDoorBlock(String variant, boolean linked, String fixedVariantId, Properties properties) {
         super(properties);
         this.variant = variant;
         this.linked = linked;
+        this.fixedVariantId = fixedVariantId;
         this.registerDefaultState(this.stateDefinition.any()
                 .setValue(FACING, Direction.NORTH)
                 .setValue(PART_X, 0)
@@ -61,6 +71,10 @@ public class InteriorDoorBlock extends BaseEntityBlock {
 
     public boolean isLinked() {
         return linked;
+    }
+
+    public String fixedVariantId() {
+        return fixedVariantId;
     }
 
     @Override

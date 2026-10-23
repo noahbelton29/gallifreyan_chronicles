@@ -1,6 +1,6 @@
 {
   "parent": "minecraft:item/generated",
   "textures": {
-    "layer0": "gallifreyan_chronicles:item/tardis_door"
+    "layer0": "gallifreyan_chronicles:item/first_doctors_door"
   }
 }

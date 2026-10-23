@@ -76,6 +76,8 @@ public class InteriorDoorBlockEntity extends BlockEntity implements GeoBlockEnti
     }
 
     public String getDoorVariantId() {
+        String fixed = ((InteriorDoorBlock) getBlockState().getBlock()).fixedVariantId();
+        if (!fixed.isEmpty()) return fixed;
         return asEntity().get(TardisComponentTypes.DOOR_VARIANT).variantId();
     }
 

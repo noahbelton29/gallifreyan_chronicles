@@ -19,7 +19,8 @@ public class GCBlockEntities {
         TardisConsoleBlockEntity.TYPE = BLOCK_ENTITIES.register("tardis_console_entity", () ->
                 new BlockEntityType<>(TardisConsoleBlockEntity::new, GCBlocks.TARDIS_CONSOLE));
         InteriorDoorBlockEntity.TYPE = BLOCK_ENTITIES.register("interior_door_block_entity", () ->
-                new BlockEntityType<>(InteriorDoorBlockEntity::new, GCBlocks.TARDIS_DOOR, GCBlocks.BRACHACKI_DOORS));
+                new BlockEntityType<>(InteriorDoorBlockEntity::new, GCBlocks.TARDIS_INTERIOR_DOOR,
+                        GCBlocks.FIRST_DOCTORS_DOOR, GCBlocks.SECOND_DOCTORS_DOOR));
         BLOCK_ENTITIES.register(eventBus);
 
         Constants.LOG.info("Registered GC Block Entities (NeoForge)");

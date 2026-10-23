@@ -1,0 +1,8 @@
+{
+  "parent": "minecraft:block/outer_stairs",
+  "textures": {
+    "bottom": "gallifreyan_chronicles:block/brachacki_wall_block_2",
+    "side": "gallifreyan_chronicles:block/brachacki_wall_block_2",
+    "top": "gallifreyan_chronicles:block/brachacki_wall_block_2"
+  }
+}

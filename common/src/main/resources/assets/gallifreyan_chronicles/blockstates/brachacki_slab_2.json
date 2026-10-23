@@ -1,0 +1,13 @@
+{
+  "variants": {
+    "type=bottom": {
+      "model": "gallifreyan_chronicles:block/brachacki_slab_2"
+    },
+    "type=double": {
+      "model": "gallifreyan_chronicles:block/brachacki_wall_block_2"
+    },
+    "type=top": {
+      "model": "gallifreyan_chronicles:block/brachacki_slab_2_top"
+    }
+  }
+}

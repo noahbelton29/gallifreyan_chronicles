@@ -61,15 +61,22 @@ public class GCBlocks {
                     .sound(SoundType.STONE)
                     .noOcclusion()));
 
-    public static final Block TARDIS_DOOR = registerBlock("tardis_door",
-            properties -> new InteriorDoorBlock("brachacki_doors", true, properties.strength(3F, 3F)
+    public static final Block TARDIS_INTERIOR_DOOR = registerBlock("tardis_interior_door",
+            properties -> new InteriorDoorBlock("brachacki_doors", properties.strength(3F, 3F)
                     .sound(SoundType.STONE)
                     .noOcclusion()
                     .noLootTable()
                     .pushReaction(PushReaction.POPPED)));
 
-    public static final Block BRACHACKI_DOORS = registerBlock("brachacki_doors",
-            properties -> new InteriorDoorBlock("brachacki_doors", false, properties.strength(3F, 3F)
+    public static final Block FIRST_DOCTORS_DOOR = registerBlock("first_doctors_door",
+            properties -> new InteriorDoorBlock("brachacki_doors", "first_doctors_doors", properties.strength(3F, 3F)
+                    .sound(SoundType.STONE)
+                    .noOcclusion()
+                    .noLootTable()
+                    .pushReaction(PushReaction.POPPED)));
+
+    public static final Block SECOND_DOCTORS_DOOR = registerBlock("second_doctors_door",
+            properties -> new InteriorDoorBlock("brachacki_doors", "second_doctors_doors", properties.strength(3F, 3F)
                     .sound(SoundType.STONE)
                     .noOcclusion()
                     .noLootTable()
@@ -159,6 +166,43 @@ public class GCBlocks {
                     .sound(SoundType.STONE)));
 
     public static final Block BRACHACKI_FENCE_GATE = registerBlock("brachacki_fence_gate",
+            properties -> new FenceGateBlock(WoodType.ACACIA,
+                    properties.strength(3F, 3F)
+                            .forceSolidOn()
+                            .requiresCorrectToolForDrops()
+                            .sound(SoundType.STONE)));
+
+    public static final Block BRACHACKI_STAIRS_2 = registerBlock("brachacki_stairs_2",
+            properties -> new StairBlock(BRACHACKI_FLOOR_BLOCK.defaultBlockState(),
+                    properties.strength(3F, 3F)
+                            .requiresCorrectToolForDrops()
+                            .sound(SoundType.STONE)));
+
+    public static final Block BRACHACKI_SLAB_2 = registerBlock("brachacki_slab_2",
+            properties -> new SlabBlock(properties.strength(3F, 3F)
+                    .requiresCorrectToolForDrops()
+                    .sound(SoundType.STONE)));
+
+    public static final Block BRACHACKI_PRESSURE_PLATE_2 = registerBlock("brachacki_pressure_plate_2",
+            properties -> new PressurePlateBlock(BlockSetType.STONE,
+                    properties.strength(0.5F)
+                            .requiresCorrectToolForDrops()
+                            .sound(SoundType.STONE)
+                            .forceSolidOn()
+                            .noCollision()
+                            .pushReaction(PushReaction.POPPED)));
+
+    public static final Block BRACHACKI_WALL_2 = registerBlock("brachacki_wall_2",
+            properties -> new WallBlock(properties.strength(3F, 3F)
+                    .requiresCorrectToolForDrops()
+                    .sound(SoundType.STONE)));
+
+    public static final Block BRACHACKI_FENCE_2 = registerBlock("brachacki_fence_2",
+            properties -> new FenceBlock(properties.strength(3F, 3F)
+                    .requiresCorrectToolForDrops()
+                    .sound(SoundType.STONE)));
+
+    public static final Block BRACHACKI_FENCE_GATE_2 = registerBlock("brachacki_fence_gate_2",
             properties -> new FenceGateBlock(WoodType.ACACIA,
                     properties.strength(3F, 3F)
                             .forceSolidOn()

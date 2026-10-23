@@ -54,7 +54,7 @@ public class TardisConsoleBlockEntity extends BlockEntity implements GeoBlockEnt
 
     private String currentRotorState = IDLE_STATE;
 
-    private static final RawAnimation IDEAL_ANIM =
+    private static final RawAnimation IDLE_ANIM =
             RawAnimation.begin().thenLoop(IDLE_STATE);
 
     private static final RawAnimation FLIGHT_ANIM =
@@ -88,7 +88,7 @@ public class TardisConsoleBlockEntity extends BlockEntity implements GeoBlockEnt
                 return test.setAndContinue(FLIGHT_ANIM);
             }
 
-            return test.setAndContinue(IDEAL_ANIM);
+            return test.setAndContinue(IDLE_ANIM);
         });
         this.flightController = this.idleController;
 

@@ -78,6 +78,13 @@ public class GCNeoForgeCommands {
                                                         .executes(TardisCommand::linkConsole))
                                                 .then(literal("unlink")
                                                         .executes(TardisCommand::unlinkConsole)))
+                                        .then(literal("door")
+                                                .then(literal("variant")
+                                                        .then(literal("set")
+                                                                .then(argument("variant_id",
+                                                                        StringArgumentType.greedyString())
+                                                                        .suggests(TardisCommand::suggestDoorVariants)
+                                                                        .executes(TardisCommand::setDoorVariant)))))
                                         .then(literal("interior")
                                                 .then(literal("get")
                                                         .executes(TardisCommand::getInterior))

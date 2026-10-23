@@ -26,12 +26,16 @@ public class GCCreativeModeTabs {
                         output.accept(GCBlocks.BRACHACKI_WALL_BLOCK);
                         output.accept(GCBlocks.BRACHACKI_ROUNDEL_BLOCK);
                         output.accept(GCBlocks.BRACHACKI_HALF_ROUNDEL_BLOCK);
+                        output.accept(GCBlocks.BRACHACKI_WALL_BLOCK_2);
+                        output.accept(GCBlocks.BRACHACKI_ROUNDEL_BLOCK_2);
+                        output.accept(GCBlocks.BRACHACKI_HALF_ROUNDEL_BLOCK_2);
                         output.accept(GCBlocks.BRACHACKI_STAIRS);
                         output.accept(GCBlocks.BRACHACKI_SLAB);
                         output.accept(GCBlocks.BRACHACKI_PRESSURE_PLATE);
                         output.accept(GCBlocks.BRACHACKI_WALL);
                         output.accept(GCBlocks.BRACHACKI_FENCE);
                         output.accept(GCBlocks.BRACHACKI_FENCE_GATE);
+                        output.accept(GCBlocks.TARDIS_DOOR);
                         output.accept(GCBlocks.BRACHACKI_DOORS);
                     }).build());
 

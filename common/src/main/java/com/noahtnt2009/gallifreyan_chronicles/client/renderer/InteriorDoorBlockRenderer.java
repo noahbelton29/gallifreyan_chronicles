@@ -15,6 +15,7 @@ import org.jspecify.annotations.NonNull;
 
 public class InteriorDoorBlockRenderer extends GeoBlockRenderer<@NotNull InteriorDoorBlockEntity, @NotNull TardisExteriorBlockRenderState> {
     public static final DataTicket<String> VARIANT = DataTicket.create("interior_door_variant", String.class);
+    public static final DataTicket<String> TEXTURE_ID = DataTicket.create("interior_door_texture_id", String.class);
     public static final DataTicket<Float> YAW = DataTicket.create("interior_door_yaw", Float.class);
 
     public InteriorDoorBlockRenderer(BlockEntityRendererProvider.Context context) {
@@ -31,6 +32,7 @@ public class InteriorDoorBlockRenderer extends GeoBlockRenderer<@NotNull Interio
     public void addRenderData(InteriorDoorBlockEntity animatable, Void relatedObject,
                               TardisExteriorBlockRenderState renderState, float partialTick) {
         renderState.addGeckolibData(VARIANT, animatable.getVariant());
+        renderState.addGeckolibData(TEXTURE_ID, animatable.getTextureId());
         renderState.addGeckolibData(YAW, animatable.getFacing().toYRot());
     }
 

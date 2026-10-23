@@ -14,9 +14,13 @@ import com.noahtnt2009.gallifreyan_chronicles.ecs.ComponentType;
 import com.noahtnt2009.gallifreyan_chronicles.ecs.Entity;
 import com.noahtnt2009.gallifreyan_chronicles.init.GCSounds;
 import com.noahtnt2009.gallifreyan_chronicles.tardis.ecs.TardisComponentTypes;
+import com.noahtnt2009.gallifreyan_chronicles.tardis.door.TardisDoorRegistry;
 import com.noahtnt2009.gallifreyan_chronicles.tardis.ecs.component.DoorState;
+import com.noahtnt2009.gallifreyan_chronicles.tardis.ecs.component.DoorVariantComponent;
 import com.noahtnt2009.gallifreyan_chronicles.tardis.ecs.system.DoorSyncSystem;
 import com.noahtnt2009.gallifreyan_chronicles.tardis.ecs.system.DoorSystem;
+import com.noahtnt2009.gallifreyan_chronicles.tardis.interior.TardisInterior;
+import com.noahtnt2009.gallifreyan_chronicles.tardis.interior.TardisInteriorSystem;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.HolderLookup;
@@ -43,7 +47,7 @@ import java.util.function.Supplier;
 
 public class InteriorDoorBlockEntity extends BlockEntity implements GeoBlockEntity, ComponentHolder {
     public static Supplier<BlockEntityType<InteriorDoorBlockEntity>> TYPE;
-    private static final List<ComponentType<?>> SAVED = List.of(TardisComponentTypes.DOOR);
+    private static final List<ComponentType<?>> SAVED = List.of(TardisComponentTypes.DOOR, TardisComponentTypes.DOOR_VARIANT);
 
     private final ComponentStore components = new ComponentStore();
     private AnimatableInstanceCache cache = GeckoLibUtil.createInstanceCache(this);
@@ -69,6 +73,26 @@ public class InteriorDoorBlockEntity extends BlockEntity implements GeoBlockEnti
 
     public String getVariant() {
         return ((InteriorDoorBlock) getBlockState().getBlock()).variant();
+    }
+
+    public String getDoorVariantId() {
+        return asEntity().get(TardisComponentTypes.DOOR_VARIANT).variantId();
+    }
+
+    public void setDoorVariant(String variantId) {
+        String model = getVariant();
+        String resolved = TardisDoorRegistry.hasVariant(model, variantId)
+                ? variantId
+                : TardisDoorRegistry.defaultVariantId(model);
+        asEntity().set(TardisComponentTypes.DOOR_VARIANT, new DoorVariantComponent(resolved));
+    }
+
+    public String getTextureId() {
+        return TardisDoorRegistry.textureIdFor(getVariant(), getDoorVariantId());
+    }
+
+    public boolean isLinked() {
+        return ((InteriorDoorBlock) getBlockState().getBlock()).isLinked();
     }
 
     public Direction getFacing() {
@@ -101,10 +125,18 @@ public class InteriorDoorBlockEntity extends BlockEntity implements GeoBlockEnti
     public void serverTick() {
         if (pulledFromExterior || !(level instanceof ServerLevel serverLevel)) return;
         pulledFromExterior = true;
+        if (!isLinked()) return;
         tardisId = DoorSyncSystem.tardisIdOf(serverLevel);
         if (tardisId == null) return;
         DoorSyncSystem.register(tardisId, this);
+        applyInteriorDoorVariant(serverLevel);
         DoorSyncSystem.pullFromExterior(serverLevel.getServer(), tardisId, this);
+    }
+
+    private void applyInteriorDoorVariant(ServerLevel serverLevel) {
+        if (tardisId == null || !getDoorVariantId().isEmpty()) return;
+        TardisInterior interior = TardisInteriorSystem.interiorFor(serverLevel.getServer(), tardisId);
+        interior.doorVariant().ifPresent(this::setDoorVariant);
     }
 
     public void interact(boolean sneaking) {

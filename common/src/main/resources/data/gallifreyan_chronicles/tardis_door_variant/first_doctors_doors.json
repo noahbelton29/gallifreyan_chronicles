@@ -1,0 +1,5 @@
+{
+  "parent": "gallifreyan_chronicles:brachacki_doors",
+  "texture": "gallifreyan_chronicles:brachacki_doors/first_doctors_doors",
+  "default": true
+}

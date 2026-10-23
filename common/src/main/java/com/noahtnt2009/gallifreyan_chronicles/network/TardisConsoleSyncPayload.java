@@ -3,6 +3,8 @@ package com.noahtnt2009.gallifreyan_chronicles.network;
 import com.noahtnt2009.gallifreyan_chronicles.tardis.console.TardisConsole;
 import com.noahtnt2009.gallifreyan_chronicles.tardis.console.TardisConsoleRegistry;
 import com.noahtnt2009.gallifreyan_chronicles.tardis.console.TardisConsoleVariant;
+import com.noahtnt2009.gallifreyan_chronicles.tardis.door.TardisDoorRegistry;
+import com.noahtnt2009.gallifreyan_chronicles.tardis.door.TardisDoorVariant;
 import com.noahtnt2009.gallifreyan_chronicles.util.GCUtils;
 import net.minecraft.client.Minecraft;
 import net.minecraft.network.RegistryFriendlyByteBuf;
@@ -15,7 +17,8 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-public record TardisConsoleSyncPayload(List<TardisConsole> consoles, List<TardisConsoleVariant> variants, String defaultId) implements CustomPacketPayload {
+public record TardisConsoleSyncPayload(List<TardisConsole> consoles, List<TardisConsoleVariant> variants, String defaultId,
+                                       List<TardisDoorVariant> doorVariants) implements CustomPacketPayload {
     public static final Type<TardisConsoleSyncPayload> TYPE =
             new Type<>(GCUtils.of("tardis_console_sync"));
 
@@ -26,6 +29,8 @@ public record TardisConsoleSyncPayload(List<TardisConsole> consoles, List<Tardis
             TardisConsoleSyncPayload::variants,
             ByteBufCodecs.STRING_UTF8,
             TardisConsoleSyncPayload::defaultId,
+            TardisDoorVariant.STREAM_CODEC.apply(ByteBufCodecs.list()),
+            TardisConsoleSyncPayload::doorVariants,
             TardisConsoleSyncPayload::new
     );
 
@@ -34,7 +39,8 @@ public record TardisConsoleSyncPayload(List<TardisConsole> consoles, List<Tardis
         return new TardisConsoleSyncPayload(
                 List.copyOf(TardisConsoleRegistry.getAll()),
                 List.copyOf(TardisConsoleRegistry.getAllVariants()),
-                defaultConsole != null ? defaultConsole.id() : ""
+                defaultConsole != null ? defaultConsole.id() : "",
+                List.copyOf(TardisDoorRegistry.getAll())
         );
     }
 
@@ -45,6 +51,7 @@ public record TardisConsoleSyncPayload(List<TardisConsole> consoles, List<Tardis
 
         GCSyncPayload.apply(consoles, TardisConsoleRegistry::clear, TardisConsoleRegistry::register, "TARDIS Console");
         GCSyncPayload.apply(variants, TardisConsoleRegistry::clearVariants, TardisConsoleRegistry::registerVariant, "TARDIS Console Variant");
+        GCSyncPayload.apply(doorVariants, TardisDoorRegistry::clear, TardisDoorRegistry::register, "TARDIS Door Variant");
         if (defaultId != null && TardisConsoleRegistry.contains(defaultId)) {
             TardisConsoleRegistry.setDefault(TardisConsoleRegistry.get(defaultId));
         }

@@ -1,0 +1,18 @@
+{
+  "type": "minecraft:block",
+  "pools": [
+    {
+      "condition": {
+        "type": "minecraft:survives_explosion"
+      },
+      "entries": [
+        {
+          "type": "minecraft:item",
+          "name": "gallifreyan_chronicles:brachacki_half_roundel_block_2"
+        }
+      ],
+      "rolls": 1
+    }
+  ],
+  "random_sequence": "gallifreyan_chronicles:blocks/brachacki_half_roundel_block_2"
+}

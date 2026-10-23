@@ -65,6 +65,7 @@ public class GCBlockTagProvider extends BlockTagsProvider {
                 GCBlocks.GALLIFREYAN_MUDSTONE,
                 GCBlocks.MOONSLATE,
                 GCBlocks.LUNAR_REGOLITH,
+                GCBlocks.TARDIS_DOOR,
                 GCBlocks.BRACHACKI_DOORS);
 
         tagAdd(BlockTags.MINEABLE_WITH_SHOVEL,

@@ -15,6 +15,9 @@ public final class TardisComponentTypes {
     public static final ComponentType<DoorComponent> DOOR =
             ComponentType.persistentDefaulted("door", DoorComponent.CODEC, DoorComponent::closed);
 
+    public static final ComponentType<DoorVariantComponent> DOOR_VARIANT =
+            ComponentType.persistentDefaulted("door_variant", DoorVariantComponent.CODEC, DoorVariantComponent::unset);
+
     public static final ComponentType<TransformComponent> TRANSFORM =
             ComponentType.persistentDefaulted("transform", TransformComponent.CODEC, () -> TransformComponent.IDENTITY);
 

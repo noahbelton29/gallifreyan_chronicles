@@ -43,10 +43,12 @@ public class InteriorDoorBlock extends BaseEntityBlock {
     private static final VoxelShape SHAPE_X = Block.box(4, 0, 0, 12, 16, 16);
 
     private final String variant;
+    private final boolean linked;
 
-    public InteriorDoorBlock(String variant, Properties properties) {
+    public InteriorDoorBlock(String variant, boolean linked, Properties properties) {
         super(properties);
         this.variant = variant;
+        this.linked = linked;
         this.registerDefaultState(this.stateDefinition.any()
                 .setValue(FACING, Direction.NORTH)
                 .setValue(PART_X, 0)
@@ -55,6 +57,10 @@ public class InteriorDoorBlock extends BaseEntityBlock {
 
     public String variant() {
         return variant;
+    }
+
+    public boolean isLinked() {
+        return linked;
     }
 
     @Override

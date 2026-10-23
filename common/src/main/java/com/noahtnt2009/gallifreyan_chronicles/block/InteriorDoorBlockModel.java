@@ -19,6 +19,12 @@ public class InteriorDoorBlockModel extends GeoModel<InteriorDoorBlockEntity> {
 
     @Override
     public @NonNull Identifier getTextureResource(@NonNull GeoRenderState renderState) {
+        if (renderState.hasGeckolibData(InteriorDoorBlockRenderer.TEXTURE_ID)) {
+            String textureId = renderState.getGeckolibData(InteriorDoorBlockRenderer.TEXTURE_ID);
+            if (textureId != null && !textureId.isEmpty()) {
+                return InteriorDoorAssets.texture(textureId);
+            }
+        }
         return InteriorDoorAssets.texture(getVariantId(renderState));
     }
 

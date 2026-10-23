@@ -54,7 +54,7 @@ public final class DoorSyncSystem {
         if (doors.isEmpty()) INTERIOR_DOORS.remove(tardisId);
     }
 
-    private static synchronized List<InteriorDoorBlockEntity> doorsOf(UUID tardisId) {
+    public static synchronized List<InteriorDoorBlockEntity> doorsOf(UUID tardisId) {
         Set<InteriorDoorBlockEntity> doors = INTERIOR_DOORS.get(tardisId);
         if (doors == null) return List.of();
         List<InteriorDoorBlockEntity> live = new ArrayList<>();

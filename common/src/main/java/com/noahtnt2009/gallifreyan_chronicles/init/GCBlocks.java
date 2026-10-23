@@ -61,8 +61,15 @@ public class GCBlocks {
                     .sound(SoundType.STONE)
                     .noOcclusion()));
 
+    public static final Block TARDIS_DOOR = registerBlock("tardis_door",
+            properties -> new InteriorDoorBlock("brachacki_doors", true, properties.strength(3F, 3F)
+                    .sound(SoundType.STONE)
+                    .noOcclusion()
+                    .noLootTable()
+                    .pushReaction(PushReaction.POPPED)));
+
     public static final Block BRACHACKI_DOORS = registerBlock("brachacki_doors",
-            properties -> new InteriorDoorBlock("brachacki_doors", properties.strength(3F, 3F)
+            properties -> new InteriorDoorBlock("brachacki_doors", false, properties.strength(3F, 3F)
                     .sound(SoundType.STONE)
                     .noOcclusion()
                     .noLootTable()
@@ -102,6 +109,21 @@ public class GCBlocks {
                     .sound(SoundType.STONE)));
 
     public static final Block BRACHACKI_HALF_ROUNDEL_BLOCK = registerBlock("brachacki_half_roundel_block",
+            properties -> new Block(properties.strength(3F, 3F)
+                    .requiresCorrectToolForDrops()
+                    .sound(SoundType.STONE)));
+
+    public static final Block BRACHACKI_WALL_BLOCK_2 = registerBlock("brachacki_wall_block_2",
+            properties -> new Block(properties.strength(3F, 3F)
+                    .requiresCorrectToolForDrops()
+                    .sound(SoundType.STONE)));
+
+    public static final Block BRACHACKI_ROUNDEL_BLOCK_2 = registerBlock("brachacki_roundel_block_2",
+            properties -> new Block(properties.strength(3F, 3F)
+                    .requiresCorrectToolForDrops()
+                    .sound(SoundType.STONE)));
+
+    public static final Block BRACHACKI_HALF_ROUNDEL_BLOCK_2 = registerBlock("brachacki_half_roundel_block_2",
             properties -> new Block(properties.strength(3F, 3F)
                     .requiresCorrectToolForDrops()
                     .sound(SoundType.STONE)));

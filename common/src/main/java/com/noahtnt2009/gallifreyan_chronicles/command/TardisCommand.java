@@ -6,15 +6,18 @@ import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.suggestion.Suggestions;
 import com.mojang.brigadier.suggestion.SuggestionsBuilder;
+import com.noahtnt2009.gallifreyan_chronicles.block.entity.InteriorDoorBlockEntity;
 import com.noahtnt2009.gallifreyan_chronicles.block.entity.TardisConsoleBlockEntity;
 import com.noahtnt2009.gallifreyan_chronicles.block.entity.TardisExteriorBlockEntity;
 import com.noahtnt2009.gallifreyan_chronicles.network.TardisConsoleSyncPayload;
 import com.noahtnt2009.gallifreyan_chronicles.platform.Services;
 import com.noahtnt2009.gallifreyan_chronicles.tardis.console.TardisConsole;
 import com.noahtnt2009.gallifreyan_chronicles.tardis.console.TardisConsoleRegistry;
+import com.noahtnt2009.gallifreyan_chronicles.tardis.door.TardisDoorRegistry;
 import com.noahtnt2009.gallifreyan_chronicles.tardis.ecs.component.TardisComponent;
 import com.noahtnt2009.gallifreyan_chronicles.tardis.ecs.component.TardisSubsystem;
 import com.noahtnt2009.gallifreyan_chronicles.tardis.ecs.system.ConsoleLinkSystem;
+import com.noahtnt2009.gallifreyan_chronicles.tardis.ecs.system.DoorSyncSystem;
 import com.noahtnt2009.gallifreyan_chronicles.tardis.ecs.system.ExteriorLinkSystem;
 import com.noahtnt2009.gallifreyan_chronicles.tardis.interior.TardisInteriorRegistry;
 import com.noahtnt2009.gallifreyan_chronicles.tardis.interior.TardisInteriorSystem;
@@ -33,6 +36,7 @@ import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
 
 import java.util.Collection;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
@@ -386,6 +390,71 @@ public class TardisCommand {
         );
 
         return 1;
+    }
+
+    public static CompletableFuture<Suggestions> suggestDoorVariants(
+            CommandContext<CommandSourceStack> ctx,
+            SuggestionsBuilder builder
+    ) {
+        try {
+            UUID tardisId = UUID.fromString(StringArgumentType.getString(ctx, "id"));
+            DoorSyncSystem.doorsOf(tardisId).stream().findFirst()
+                    .ifPresent(door -> TardisDoorRegistry.variantIds(door.getVariant()).forEach(builder::suggest));
+        } catch (IllegalArgumentException ignored) {
+        }
+        return builder.buildFuture();
+    }
+
+    public static int setDoorVariant(CommandContext<CommandSourceStack> ctx) {
+        String tardisIdStr = StringArgumentType.getString(ctx, "id");
+        String variantId = StringArgumentType.getString(ctx, "variant_id");
+
+        UUID tardisId;
+        try {
+            tardisId = UUID.fromString(tardisIdStr);
+        } catch (IllegalArgumentException e) {
+            ctx.getSource().sendFailure(Component.translatable(
+                    "command.gallifreyan_chronicles.invalid_id",
+                    tardisIdStr
+            ));
+            return 0;
+        }
+
+        List<InteriorDoorBlockEntity> doors = DoorSyncSystem.doorsOf(tardisId);
+        if (doors.isEmpty()) {
+            ctx.getSource().sendFailure(Component.translatable(
+                    "command.gallifreyan_chronicles.no_interior_door",
+                    tardisIdStr
+            ));
+            return 0;
+        }
+
+        int changed = 0;
+        for (InteriorDoorBlockEntity door : doors) {
+            if (!TardisDoorRegistry.hasVariant(door.getVariant(), variantId)) {
+                ctx.getSource().sendFailure(Component.translatable(
+                        "command.gallifreyan_chronicles.unknown_door_variant",
+                        variantId,
+                        door.getVariant()
+                ));
+                continue;
+            }
+            door.setDoorVariant(variantId);
+            changed++;
+        }
+        if (changed == 0) return 0;
+
+        int count = changed;
+        ctx.getSource().sendSuccess(
+                () -> Component.translatable(
+                        "command.gallifreyan_chronicles.set_door_variant",
+                        tardisIdStr,
+                        variantId,
+                        count
+                ),
+                true
+        );
+        return count;
     }
 
     public static int getConsole(CommandContext<CommandSourceStack> ctx) {

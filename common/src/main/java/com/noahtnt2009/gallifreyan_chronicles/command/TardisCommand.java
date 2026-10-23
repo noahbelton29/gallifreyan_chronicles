@@ -1009,8 +1009,8 @@ public class TardisCommand {
         ctx.getSource().sendSuccess(
                 () -> Component.translatable(
                         "command.gallifreyan_chronicles.owner",
-                        component.getOwnerId() != null
-                                ? component.getOwnerId().toString()
+                        component.ownerId() != null
+                                ? component.ownerId().toString()
                                 : "None"
                 ),
                 false

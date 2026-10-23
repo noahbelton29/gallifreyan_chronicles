@@ -11,7 +11,6 @@ import net.minecraft.world.level.biome.MobSpawnSettings;
 import net.minecraft.world.level.levelgen.GenerationStep;
 import net.minecraft.world.level.levelgen.carver.WorldCarver;
 import net.minecraft.world.level.levelgen.placement.PlacedFeature;
-import org.joml.Vector3f;
 
 import static com.noahtnt2009.gallifreyan_chronicles.util.GCUtils.rgb;
 

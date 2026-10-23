@@ -165,12 +165,12 @@ public class InteriorDoorBlock extends BaseEntityBlock {
     }
 
     @Override
-    protected @NonNull BlockState rotate(BlockState state, Rotation rotation) {
+    protected @NonNull BlockState rotate(@NonNull BlockState state, @NonNull Rotation rotation) {
         return state;
     }
 
     @Override
-    protected @NonNull BlockState mirror(BlockState state, Mirror mirror) {
+    protected @NonNull BlockState mirror(@NonNull BlockState state, @NonNull Mirror mirror) {
         return state;
     }
 
@@ -189,7 +189,7 @@ public class InteriorDoorBlock extends BaseEntityBlock {
             @NotNull Level level, @NotNull BlockState state, @NotNull BlockEntityType<T> type) {
         if (level.isClientSide()) return null;
         return type == InteriorDoorBlockEntity.TYPE.get()
-                ? (lvl, pos, st, be) -> ((InteriorDoorBlockEntity) be).serverTick()
+                ? (_, _, _, be) -> ((InteriorDoorBlockEntity) be).serverTick()
                 : null;
     }
 }

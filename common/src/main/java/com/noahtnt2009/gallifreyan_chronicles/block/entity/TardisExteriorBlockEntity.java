@@ -122,10 +122,6 @@ public class TardisExteriorBlockEntity extends BlockEntity implements GeoBlockEn
         return locked;
     }
 
-    public void toggleKeyLockAnimation() {
-        toggleKeyLockAnimation(null);
-    }
-
     public void toggleKeyLockAnimation(@Nullable Player player) {
         if (!hasKeyRendered()) {
             return;
@@ -438,7 +434,7 @@ public class TardisExteriorBlockEntity extends BlockEntity implements GeoBlockEn
             return Component.literal("this TARDIS");
         }
 
-        UUID ownerId = tardis.get().getOwnerId();
+        UUID ownerId = tardis.get().ownerId();
         var owner = serverLevel.getServer().getPlayerList().getPlayer(ownerId);
         String ownerName = owner != null ? owner.getGameProfile().name() : "an unknown Player";
 

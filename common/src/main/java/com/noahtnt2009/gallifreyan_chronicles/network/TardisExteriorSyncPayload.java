@@ -1,6 +1,5 @@
 package com.noahtnt2009.gallifreyan_chronicles.network;
 
-import com.noahtnt2009.gallifreyan_chronicles.tardis.console.TardisConsole;
 import com.noahtnt2009.gallifreyan_chronicles.tardis.exterior.TardisExterior;
 import com.noahtnt2009.gallifreyan_chronicles.tardis.exterior.TardisExteriorRegistry;
 import com.noahtnt2009.gallifreyan_chronicles.util.GCUtils;

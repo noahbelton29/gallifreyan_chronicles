@@ -14,7 +14,6 @@ import com.noahtnt2009.gallifreyan_chronicles.util.GCUtils;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.rendering.v1.hud.HudElementRegistry;
 import net.fabricmc.fabric.api.item.v1.BlockTransformerHelper;
-import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderers;
 import net.minecraft.client.renderer.entity.EntityRenderers;
 
@@ -38,7 +37,7 @@ public class GallifreyanChroniclesFabricClient implements ClientModInitializer {
 
         HudElementRegistry.addLast(
                 GCUtils.of("hud_overlay"),
-                (graphics, tickCounter) -> GCHudRenderer.render((GuiGraphicsExtractor) graphics)
+                (graphics, _) -> GCHudRenderer.render(graphics)
         );
 
 //        ImGuiMCEvents.INSTANCE.imGuiLoadPre(() -> {

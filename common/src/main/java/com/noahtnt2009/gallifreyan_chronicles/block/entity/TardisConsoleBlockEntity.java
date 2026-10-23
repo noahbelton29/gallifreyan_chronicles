@@ -7,7 +7,6 @@ import com.geckolib.animation.AnimationController;
 import com.geckolib.animation.RawAnimation;
 import com.geckolib.animation.object.PlayState;
 import com.geckolib.util.GeckoLibUtil;
-import com.noahtnt2009.gallifreyan_chronicles.Constants;
 import com.noahtnt2009.gallifreyan_chronicles.block.ConsoleBlock;
 import com.noahtnt2009.gallifreyan_chronicles.client.sound.TardisConsoleHumSoundInstance;
 import com.noahtnt2009.gallifreyan_chronicles.ecs.ComponentHolder;
@@ -320,11 +319,9 @@ public class TardisConsoleBlockEntity extends BlockEntity implements GeoBlockEnt
 
         if (level.isClientSide() && !humStarted) {
             humStarted = true;
-            Minecraft.getInstance().execute(() -> {
-                Minecraft.getInstance().getSoundManager().play(
-                        new TardisConsoleHumSoundInstance(getBlockPos(), this::isHumStillValid)
-                );
-            });
+            Minecraft.getInstance().execute(() -> Minecraft.getInstance().getSoundManager().play(
+                    new TardisConsoleHumSoundInstance(getBlockPos(), this::isHumStillValid)
+            ));
         }
     }
 

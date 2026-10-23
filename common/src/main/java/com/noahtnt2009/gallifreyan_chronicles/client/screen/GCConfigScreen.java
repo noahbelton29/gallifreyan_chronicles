@@ -8,6 +8,7 @@ import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.EditBox;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
+import org.jspecify.annotations.NonNull;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -44,7 +45,7 @@ public class GCConfigScreen extends Screen {
         addRow(x, y + ROW_SPACING * 2, "menu.gallifreyan_chronicles.config.interior",
                 GCConfig::defaultInterior, GCConfig::setDefaultInterior);
 
-        this.addRenderableWidget(Button.builder(Component.translatable("gui.done"), button -> this.onClose())
+        this.addRenderableWidget(Button.builder(Component.translatable("gui.done"), _ -> this.onClose())
                 .bounds(x, y + ROW_SPACING * 3 + 6, BOX_WIDTH, BOX_HEIGHT)
                 .build());
     }
@@ -64,7 +65,7 @@ public class GCConfigScreen extends Screen {
     }
 
     @Override
-    public void extractRenderState(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float partialTick) {
+    public void extractRenderState(@NonNull GuiGraphicsExtractor graphics, int mouseX, int mouseY, float partialTick) {
         super.extractRenderState(graphics, mouseX, mouseY, partialTick);
         drawCentered(graphics, this.title.getString(), 20, 0xFFFFFFFF);
 

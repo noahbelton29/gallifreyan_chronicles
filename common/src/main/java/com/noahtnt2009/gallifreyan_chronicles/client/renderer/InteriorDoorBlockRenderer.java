@@ -37,7 +37,7 @@ public class InteriorDoorBlockRenderer extends GeoBlockRenderer<@NotNull Interio
     }
 
     @Override
-    public void adjustRenderPose(RenderPassInfo<TardisExteriorBlockRenderState> renderPassInfo) {
+    public void adjustRenderPose(@NonNull RenderPassInfo<TardisExteriorBlockRenderState> renderPassInfo) {
         super.adjustRenderPose(renderPassInfo);
 
         Float yawValue = renderPassInfo.renderState().getGeckolibData(YAW);

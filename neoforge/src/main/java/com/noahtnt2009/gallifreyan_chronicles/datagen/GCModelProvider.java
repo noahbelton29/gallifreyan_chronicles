@@ -1,7 +1,6 @@
 package com.noahtnt2009.gallifreyan_chronicles.datagen;
 
 import com.noahtnt2009.gallifreyan_chronicles.Constants;
-import com.noahtnt2009.gallifreyan_chronicles.init.GCArmorMaterials;
 import com.noahtnt2009.gallifreyan_chronicles.init.GCBlocks;
 import com.noahtnt2009.gallifreyan_chronicles.init.GCItems;
 import net.minecraft.client.data.models.BlockModelGenerators;
@@ -13,9 +12,7 @@ import net.minecraft.client.renderer.block.dispatch.Variant;
 import net.minecraft.data.PackOutput;
 import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.Item;
-import net.minecraft.world.item.Items;
 import net.minecraft.world.level.block.Block;
-import net.minecraft.world.level.block.Blocks;
 
 import java.util.Map;
 
@@ -23,7 +20,7 @@ public class GCModelProvider extends ModelProvider {
     private static final int GALLIFREYAN_GRASS_TINT = 0xFFE0E0E0;
 
     public GCModelProvider(PackOutput output) {
-        super(output, String.valueOf(Constants.MOD_ID));
+        super(output, Constants.MOD_ID);
     }
 
     @Override
@@ -105,7 +102,7 @@ public class GCModelProvider extends ModelProvider {
 
         registerGrassBlock(blockModels);
         registerCadonwoodSet(blockModels);
-        createCustomVine(blockModels, itemModels, GCBlocks.GALLIFREYAN_VINE, GCBlocks.GALLIFREYAN_VINE.asItem());
+        createCustomVine(blockModels, GCBlocks.GALLIFREYAN_VINE, GCBlocks.GALLIFREYAN_VINE.asItem());
 
         itemModels.generateFlatItem(GCItems.TARDIS_KEY, ModelTemplates.FLAT_ITEM);
         itemModels.generateFlatItem(GCItems.MASTER_TARDIS_KEY, ModelTemplates.FLAT_ITEM);
@@ -129,9 +126,9 @@ public class GCModelProvider extends ModelProvider {
         );
     }
 
-    public void createCustomVine(BlockModelGenerators blockModelGenerators, ItemModelGenerators itemModelGenerators, Block vineBlock, Item vineItem) {
+    public void createCustomVine(BlockModelGenerators blockModelGenerators, Block vineBlock, Item vineItem) {
         blockModelGenerators.createMultifaceBlockStates(vineBlock);
-        Identifier itemModel = blockModelGenerators.createFlatItemModelWithBlockTexture(vineItem, vineBlock);
+        blockModelGenerators.createFlatItemModelWithBlockTexture(vineItem, vineBlock);
 //        this.registerSimpleTintedItemModel(Blocks.VINE, itemModel, ItemModelUtils.constantTint(-12012264));
     }
 

@@ -8,10 +8,11 @@ import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
+import org.jspecify.annotations.NonNull;
 
 public class TaraniumLavaDamageHandler implements ServerLivingEntityEvents.AllowDamage {
     @Override
-    public boolean allowDamage(LivingEntity entity, DamageSource source, float amount) {
+    public boolean allowDamage(@NonNull LivingEntity entity, @NonNull DamageSource source, float amount) {
         if (!(entity instanceof Player player)) return true;
 
         var typeKey = source.typeHolder().unwrapKey();

@@ -18,6 +18,6 @@ public class GCUtils {
     }
 
     public static String ofNamespace(String name) {
-        return String.format(Constants.MOD_ID + ":" + name);
+        return String.format(Constants.MOD_ID.concat(": ".concat(name)));
     }
 }

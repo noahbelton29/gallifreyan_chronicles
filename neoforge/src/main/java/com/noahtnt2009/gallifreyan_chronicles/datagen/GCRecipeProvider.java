@@ -5,10 +5,8 @@ import com.noahtnt2009.gallifreyan_chronicles.init.GCBlocks;
 import com.noahtnt2009.gallifreyan_chronicles.init.GCItems;
 import com.noahtnt2009.gallifreyan_chronicles.util.GCUtils;
 import net.minecraft.advancements.Advancement;
-import net.minecraft.core.HolderLookup;
 import net.minecraft.core.registries.MultiRegistryBootstrap;
 import net.minecraft.core.registries.Registries;
-import net.minecraft.data.PackOutput;
 import net.minecraft.data.recipes.*;
 import net.minecraft.data.worldgen.BootstrapContext;
 import net.minecraft.resources.ResourceKey;
@@ -22,7 +20,6 @@ import net.minecraft.world.level.block.Blocks;
 import org.jspecify.annotations.NonNull;
 
 import java.util.List;
-import java.util.concurrent.CompletableFuture;
 
 public class GCRecipeProvider extends RecipeProvider {
     public GCRecipeProvider(BootstrapContext<Recipe<?>> recipes, BootstrapContext<Advancement> advancements) {

@@ -38,7 +38,7 @@ public class TardisManager extends SavedData {
             ENTRY_CODEC.listOf().fieldOf("tardises").forGetter(manager -> {
                 List<Entry> entries = new ArrayList<>();
                 for (TardisComponent component : manager.byTardisId.values()) {
-                    UUID id = component.getTardisId();
+                    UUID id = component.tardisId();
                     entries.add(new Entry(
                             component,
                             Optional.ofNullable(manager.blockPosById.get(id)),
@@ -55,11 +55,11 @@ public class TardisManager extends SavedData {
         TardisManager manager = new TardisManager();
         for (Entry entry : entries) {
             TardisComponent component = entry.component();
-            UUID id = component.getTardisId();
+            UUID id = component.tardisId();
 
             manager.byTardisId.put(id, component);
             manager.byOwnerId
-                    .computeIfAbsent(component.getOwnerId(), ignored -> new ArrayList<>())
+                    .computeIfAbsent(component.ownerId(), ignored -> new ArrayList<>())
                     .add(id);
 
             entry.blockPos().ifPresent(pos -> manager.blockPosById.put(id, pos));
@@ -119,7 +119,7 @@ public class TardisManager extends SavedData {
     public void remove(UUID tardisId) {
         TardisComponent component = byTardisId.remove(tardisId);
         if (component != null) {
-            List<UUID> owned = byOwnerId.get(component.getOwnerId());
+            List<UUID> owned = byOwnerId.get(component.ownerId());
             if (owned != null) owned.remove(tardisId);
         }
         blockPosById.remove(tardisId);

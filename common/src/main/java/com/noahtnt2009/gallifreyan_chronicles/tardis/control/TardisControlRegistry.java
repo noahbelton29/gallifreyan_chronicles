@@ -1,8 +1,5 @@
 package com.noahtnt2009.gallifreyan_chronicles.tardis.control;
 
-import com.noahtnt2009.gallifreyan_chronicles.tardis.control.impl.FlightLeverControl;
-import com.noahtnt2009.gallifreyan_chronicles.tardis.control.impl.HandbrakeControl;
-
 import java.util.HashMap;
 import java.util.Map;
 

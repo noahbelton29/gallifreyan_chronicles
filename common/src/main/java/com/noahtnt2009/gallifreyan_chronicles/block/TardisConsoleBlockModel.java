@@ -8,7 +8,6 @@ import com.noahtnt2009.gallifreyan_chronicles.client.tardis.TardisConsoleAssets;
 import com.noahtnt2009.gallifreyan_chronicles.tardis.console.TardisConsoleRegistry;
 import net.minecraft.resources.Identifier;
 import org.jspecify.annotations.NonNull;
-import org.jspecify.annotations.Nullable;
 
 public class TardisConsoleBlockModel extends GeoModel<TardisConsoleBlockEntity> {
     @Override
@@ -22,7 +21,7 @@ public class TardisConsoleBlockModel extends GeoModel<TardisConsoleBlockEntity> 
     }
 
     @Override
-    public @Nullable Identifier getAnimationResource(@NonNull TardisConsoleBlockEntity animatable) {
+    public @NonNull Identifier getAnimationResource(TardisConsoleBlockEntity animatable) {
         return TardisConsoleAssets.animation(animatable.getConsole().id());
     }
 

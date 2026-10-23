@@ -7,7 +7,6 @@ import com.noahtnt2009.gallifreyan_chronicles.init.GCDataComponents;
 import com.noahtnt2009.gallifreyan_chronicles.init.GCItems;
 import com.noahtnt2009.gallifreyan_chronicles.tardis.ecs.system.TardisLinkSystem;
 import com.noahtnt2009.gallifreyan_chronicles.tardis.ecs.component.TardisComponent;
-import com.noahtnt2009.gallifreyan_chronicles.tardis.ecs.component.DoorState;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
@@ -67,7 +66,7 @@ public class TardisBlock extends BaseEntityBlock {
             blockEntity.spawnKeyEntity();
 
             ItemStack key = new ItemStack(GCItems.TARDIS_KEY);
-            key.set(GCDataComponents.TARDIS_ID, record.getTardisId());
+            key.set(GCDataComponents.TARDIS_ID, record.tardisId());
             key.set(GCDataComponents.KEY_INSERTED, false);
             if (!player.getInventory().add(key)) {
                 player.drop(key, false, Prediction.SERVER_ONLY);
@@ -75,7 +74,7 @@ public class TardisBlock extends BaseEntityBlock {
 
             Constants.LOG.debug(
                     "Registered TARDIS {} for player {}",
-                    record.getTardisId(),
+                    record.tardisId(),
                     player.getName().getString()
             );
         }
@@ -155,7 +154,7 @@ public class TardisBlock extends BaseEntityBlock {
             @NotNull Level level, @NotNull BlockState state, @NotNull BlockEntityType<T> type) {
         if (level.isClientSide()) return null;
         return type == TardisExteriorBlockEntity.TYPE.get()
-                ? (lvl, pos, st, be) -> TardisExteriorBlockEntity.serverTick(lvl, (TardisExteriorBlockEntity) be)
+                ? (lvl, _, _, be) -> TardisExteriorBlockEntity.serverTick(lvl, (TardisExteriorBlockEntity) be)
                 : null;
     }
 }

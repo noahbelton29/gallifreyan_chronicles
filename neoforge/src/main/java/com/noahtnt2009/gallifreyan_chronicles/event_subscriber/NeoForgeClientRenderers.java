@@ -9,8 +9,6 @@ import com.noahtnt2009.gallifreyan_chronicles.client.renderer.TardisKeyEntityRen
 import com.noahtnt2009.gallifreyan_chronicles.block.entity.InteriorDoorBlockEntity;
 import com.noahtnt2009.gallifreyan_chronicles.client.renderer.InteriorDoorBlockRenderer;
 import com.noahtnt2009.gallifreyan_chronicles.client.renderer.TardisExteriorBlockRenderer;
-import net.minecraft.client.Minecraft;
-import net.neoforged.neoforge.client.event.ClientTickEvent;
 import com.noahtnt2009.gallifreyan_chronicles.init.GCEntityTypes;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.SubscribeEvent;

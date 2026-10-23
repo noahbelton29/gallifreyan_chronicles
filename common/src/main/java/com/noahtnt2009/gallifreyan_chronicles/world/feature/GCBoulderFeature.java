@@ -10,6 +10,7 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.chunk.ChunkGenerator;
 import net.minecraft.world.level.levelgen.feature.Feature;
+import org.jspecify.annotations.NonNull;
 
 import java.util.List;
 
@@ -22,12 +23,12 @@ public record GCBoulderFeature(List<Block> blocks) implements Feature {
     ).apply(instance, GCBoulderFeature::new));
 
     @Override
-    public MapCodec<GCBoulderFeature> codec() {
+    public @NonNull MapCodec<GCBoulderFeature> codec() {
         return CODEC;
     }
 
     @Override
-    public boolean place(WorldGenLevel level, ChunkGenerator chunkGenerator, RandomSource random, BlockPos origin) {
+    public boolean place(@NonNull WorldGenLevel level, @NonNull ChunkGenerator chunkGenerator, @NonNull RandomSource random, @NonNull BlockPos origin) {
         if (this.blocks.isEmpty()) {
             return false;
         }

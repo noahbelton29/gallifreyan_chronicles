@@ -12,8 +12,8 @@ import net.minecraft.client.resources.sounds.AbstractTickableSoundInstance;
 import java.util.function.BooleanSupplier;
 
 public class TardisConsoleHumSoundInstance extends AbstractTickableSoundInstance {
-    public static final double HEARING_RANGE = 20.0;
-    private static final float IN_RANGE_VOLUME = 1.0F;
+    public static final double HEARING_RANGE = 30.0;
+    private static final float IN_RANGE_VOLUME = .75F;
 
     private final BooleanSupplier stillValid;
     private int tickCount = 0;

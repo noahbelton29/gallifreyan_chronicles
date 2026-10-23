@@ -939,7 +939,9 @@ public class TardisCommand {
         var controls = console.get().getControlEntities();
         if (controls.isEmpty()) {
             ctx.getSource().sendSuccess(
-                    () -> Component.literal("This console has no control entities."),
+                    () -> Component.translatable(
+                            "command.gallifreyan_chronicles.no_control_entities"
+                    ),
                     false
             );
             return 0;
@@ -949,7 +951,9 @@ public class TardisCommand {
         try {
             player = ctx.getSource().getPlayerOrException();
         } catch (com.mojang.brigadier.exceptions.CommandSyntaxException e) {
-            ctx.getSource().sendFailure(Component.literal("This command must be run by a player."));
+            ctx.getSource().sendFailure(Component.translatable(
+                    "command.gallifreyan_chronicles.player_only"
+            ));
             return 0;
         }
 

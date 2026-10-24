@@ -58,7 +58,7 @@ public class DoorControl implements TardisControl {
             }
         }
 
-        SoundEvent sound = GCSounds.SLIDER;
+        SoundEvent sound = GCSounds.SWITCH;
 
         entity.level().playSound(
                 null,
@@ -66,7 +66,7 @@ public class DoorControl implements TardisControl {
                 sound,
                 SoundSource.BLOCKS,
                 1.0F,
-                STATE ? 1.0f : 0.9f
+                STATE ? 1.0f : 0.8f
         );
 
         Constants.LOG.info("clicked door control");

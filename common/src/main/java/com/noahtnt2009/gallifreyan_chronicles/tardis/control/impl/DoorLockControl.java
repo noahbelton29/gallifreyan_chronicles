@@ -57,10 +57,10 @@ public record DoorLockControl(ControlAnimations animations) implements TardisCon
         entity.level().playSound(
                 null,
                 entity.blockPosition(),
-                GCSounds.SLIDER,
+                GCSounds.SWITCH,
                 SoundSource.BLOCKS,
                 1.0F,
-                locking ? 1.0f : 0.9f
+                locking ? 1.0f : 0.8f
         );
 
         return InteractionResult.SUCCESS;

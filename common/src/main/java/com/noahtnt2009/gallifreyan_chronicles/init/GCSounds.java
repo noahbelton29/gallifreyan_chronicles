@@ -10,6 +10,7 @@ public class GCSounds {
     public static final SoundEvent TARDIS_DOOR_OPEN = register("tardis_door_open");
     public static final SoundEvent TARDIS_DOOR_CLOSE = register("tardis_door_close");
     public static final SoundEvent SLIDER = register("slider_sound");
+    public static final SoundEvent SWITCH = register("switch");
     public static final SoundEvent FIRST_DOCTORS_HUM = register("first_doctors_hum");
     public static final SoundEvent TARDIS_DOOR_LOCK = register("tardis_door_lock");
     public static final SoundEvent TARDIS_DOOR_UNLOCK = register("tardis_door_unlock");

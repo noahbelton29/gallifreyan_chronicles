@@ -31,6 +31,8 @@ import com.noahtnt2009.gallifreyan_chronicles.tardis.interior.TardisInteriorSyst
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.HolderLookup;
+import net.minecraft.core.particles.BlockParticleOption;
+import net.minecraft.core.particles.ParticleOptions;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
@@ -46,6 +48,7 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
+import net.minecraft.world.level.block.RenderShape;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.storage.ValueInput;
 import net.minecraft.world.level.storage.ValueOutput;
@@ -402,6 +405,60 @@ public class TardisExteriorBlockEntity extends BlockEntity implements GeoBlockEn
         TardisInteriorSystem.tickEntryZone(level, blockEntity);
         if (level instanceof ServerLevel serverLevel) {
             blockEntity.tickLockDamageEffects(serverLevel);
+            blockEntity.tickTakeoffWind(serverLevel);
+        }
+    }
+
+    private static final int WIND_MAX_DUST = 10;
+    private static final double WIND_DUST_RADIUS = 0.95;
+    private static final float WIND_DUST_SPEED = 0.2f;
+    private static final double WIND_CLOUD_RADIUS = 0.6;
+    private static final float WIND_CLOUD_SPEED = 0.08f;
+    private static final float WIND_END_PROGRESS = 0.92f;
+
+    private void tickTakeoffWind(ServerLevel serverLevel) {
+        if (!inFlight || isFullyInvisible()) return;
+
+        long now = serverLevel.getGameTime();
+        float progress = Math.clamp((now - fadeStartTick) / (float) fadeDuration(), 0.0f, 1.0f);
+        if (progress >= WIND_END_PROGRESS) return;
+
+        float strength = (1.0f - progress / WIND_END_PROGRESS);
+        strength *= strength;
+
+        if (now % 3L != 0L) return;
+
+        double cx = getBlockPos().getX() + 0.5;
+        double cy = getBlockPos().getY() + 0.05;
+        double cz = getBlockPos().getZ() + 0.5;
+
+        BlockState ground = serverLevel.getBlockState(getBlockPos().below());
+        ParticleOptions dust = ground.isAir() || ground.getRenderShape() == RenderShape.INVISIBLE
+                ? ParticleTypes.CLOUD
+                : new BlockParticleOption(ParticleTypes.BLOCK, ground);
+
+        var random = serverLevel.getRandom();
+        double spin = now * 0.15;
+
+        int dustPoints = Math.max(2, Math.round(WIND_MAX_DUST * strength));
+        float dustSpeed = WIND_DUST_SPEED * (0.5f + 0.5f * strength);
+        for (int i = 0; i < dustPoints; i++) {
+            double angle = spin + (Math.PI * 2.0 * i) / dustPoints + (random.nextDouble() - 0.5) * 0.3;
+            double dx = Math.cos(angle);
+            double dz = Math.sin(angle);
+            serverLevel.sendParticles(dust,
+                    cx + dx * WIND_DUST_RADIUS, cy, cz + dz * WIND_DUST_RADIUS,
+                    0, dx, 0.0, dz, dustSpeed);
+        }
+
+        int clouds = strength > 0.5f ? 2 : 1;
+        for (int i = 0; i < clouds; i++) {
+            double angle = random.nextDouble() * Math.PI * 2.0;
+            double dx = Math.cos(angle);
+            double dz = Math.sin(angle);
+            serverLevel.sendParticles(ParticleTypes.CLOUD,
+                    cx + dx * WIND_CLOUD_RADIUS, cy, cz + dz * WIND_CLOUD_RADIUS,
+                    0, dx, 0.0, dz, WIND_CLOUD_SPEED * (0.6f + 0.4f * strength));
         }
     }
 

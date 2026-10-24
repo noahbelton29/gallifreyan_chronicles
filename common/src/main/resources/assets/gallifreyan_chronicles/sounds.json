@@ -73,5 +73,13 @@
         "attenuation_distance": 25
       }
     ]
+  },
+  "switch": {
+    "subtitle": "sounds.gallifreyan_chronicles.block_entity.switch",
+    "sounds": [
+      {
+        "name": "gallifreyan_chronicles:block_entity/tardis/control/switch"
+      }
+    ]
   }
 }

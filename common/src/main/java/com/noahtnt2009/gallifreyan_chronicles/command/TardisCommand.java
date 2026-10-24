@@ -15,12 +15,15 @@ import com.noahtnt2009.gallifreyan_chronicles.network.TardisConsoleSyncPayload;
 import com.noahtnt2009.gallifreyan_chronicles.platform.Services;
 import com.noahtnt2009.gallifreyan_chronicles.tardis.console.TardisConsole;
 import com.noahtnt2009.gallifreyan_chronicles.tardis.console.TardisConsoleRegistry;
+import com.noahtnt2009.gallifreyan_chronicles.entity.TardisControlEntity;
+import com.noahtnt2009.gallifreyan_chronicles.tardis.control.TardisControlRegistry;
 import com.noahtnt2009.gallifreyan_chronicles.tardis.door.TardisDoorRegistry;
 import com.noahtnt2009.gallifreyan_chronicles.tardis.ecs.component.TardisComponent;
 import com.noahtnt2009.gallifreyan_chronicles.tardis.ecs.component.TardisSubsystem;
 import com.noahtnt2009.gallifreyan_chronicles.tardis.ecs.system.ConsoleLinkSystem;
 import com.noahtnt2009.gallifreyan_chronicles.tardis.ecs.system.DoorSyncSystem;
 import com.noahtnt2009.gallifreyan_chronicles.tardis.ecs.system.ExteriorLinkSystem;
+import com.noahtnt2009.gallifreyan_chronicles.tardis.interior.TardisDimensionManager;
 import com.noahtnt2009.gallifreyan_chronicles.tardis.interior.TardisInteriorRegistry;
 import com.noahtnt2009.gallifreyan_chronicles.tardis.interior.TardisInteriorSystem;
 import com.noahtnt2009.gallifreyan_chronicles.tardis.manager.TardisManager;
@@ -34,6 +37,8 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.InteractionResult;
 import net.minecraft.world.level.ClipContext;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntity;
@@ -681,6 +686,128 @@ public class TardisCommand {
         }
 
         return action.apply(tardisIdStr, blockEntity.get());
+    }
+
+    private static Optional<TardisConsoleBlockEntity> loadConsole(CommandContext<CommandSourceStack> ctx,
+                                                                  UUID tardisId) {
+        MinecraftServer server = ctx.getSource().getServer();
+        BlockPos pos = TardisManager.get(server).getConsoleBlockPos(tardisId);
+        if (pos == null) return Optional.empty();
+
+        ServerLevel interior = TardisDimensionManager.get(server, tardisId);
+        if (interior != null) {
+            interior.getChunkAt(pos);
+            if (interior.getBlockEntity(pos) instanceof TardisConsoleBlockEntity console) {
+                return Optional.of(console);
+            }
+        }
+        return findBlockEntity(ctx, pos, TardisConsoleBlockEntity.class);
+    }
+
+    public static CompletableFuture<Suggestions> suggestControls(
+            CommandContext<CommandSourceStack> ctx,
+            SuggestionsBuilder builder
+    ) {
+        try {
+            UUID tardisId = UUID.fromString(StringArgumentType.getString(ctx, "id"));
+            BlockPos pos = TardisManager.get(ctx.getSource().getServer()).getConsoleBlockPos(tardisId);
+            Optional<TardisConsoleBlockEntity> console = findBlockEntity(ctx, pos, TardisConsoleBlockEntity.class);
+            if (console.isPresent()) {
+                console.get().getControlEntities().forEach(control -> builder.suggest(control.getControlId()));
+                return builder.buildFuture();
+            }
+        } catch (IllegalArgumentException ignored) {
+        }
+        TardisControlRegistry.allIds().forEach(builder::suggest);
+        return builder.buildFuture();
+    }
+
+    public static int setControl(CommandContext<CommandSourceStack> ctx, boolean on) {
+        String tardisIdStr = StringArgumentType.getString(ctx, "id");
+        String controlId = StringArgumentType.getString(ctx, "control");
+
+        UUID tardisId;
+        try {
+            tardisId = UUID.fromString(tardisIdStr);
+        } catch (IllegalArgumentException e) {
+            ctx.getSource().sendFailure(Component.translatable(
+                    "command.gallifreyan_chronicles.invalid_id",
+                    tardisIdStr
+            ));
+            return 0;
+        }
+
+        if (TardisManager.get(ctx.getSource().getServer()).get(tardisId).isEmpty()) {
+            ctx.getSource().sendFailure(Component.translatable(
+                    "command.gallifreyan_chronicles.no_tardis_id",
+                    tardisIdStr
+            ));
+            return 0;
+        }
+
+        if (!TardisControlRegistry.allIds().contains(controlId)) {
+            ctx.getSource().sendFailure(Component.translatable(
+                    "command.gallifreyan_chronicles.unknown_control",
+                    controlId
+            ));
+            return 0;
+        }
+
+        Optional<TardisConsoleBlockEntity> console = loadConsole(ctx, tardisId);
+        if (console.isEmpty()) {
+            ctx.getSource().sendFailure(Component.translatable(
+                    "command.gallifreyan_chronicles.no_console",
+                    tardisIdStr
+            ));
+            return 0;
+        }
+
+        TardisControlEntity entity = null;
+        for (TardisControlEntity candidate : console.get().getControlEntities()) {
+            if (candidate.getControlId().equals(controlId)) {
+                entity = candidate;
+                break;
+            }
+        }
+        if (entity == null) {
+            ctx.getSource().sendFailure(Component.translatable(
+                    "command.gallifreyan_chronicles.control_not_on_console",
+                    controlId,
+                    tardisIdStr
+            ));
+            return 0;
+        }
+
+        String stateName = on ? "on" : "off";
+        if (console.get().getControlState(controlId) == on) {
+            ctx.getSource().sendFailure(Component.translatable(
+                    "command.gallifreyan_chronicles.control_already",
+                    controlId,
+                    stateName
+            ));
+            return 0;
+        }
+
+        InteractionResult result = entity.activate(ctx.getSource().getPlayer(), InteractionHand.MAIN_HAND);
+        if (result != InteractionResult.SUCCESS) {
+            ctx.getSource().sendFailure(Component.translatable(
+                    "command.gallifreyan_chronicles.control_refused",
+                    controlId,
+                    stateName
+            ));
+            return 0;
+        }
+
+        ctx.getSource().sendSuccess(
+                () -> Component.translatable(
+                        "command.gallifreyan_chronicles.set_control",
+                        controlId,
+                        tardisIdStr,
+                        stateName
+                ),
+                true
+        );
+        return 1;
     }
 
     public static CompletableFuture<Suggestions> suggestSubsystems(

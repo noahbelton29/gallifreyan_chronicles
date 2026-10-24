@@ -142,7 +142,7 @@ public class InteriorDoorBlockEntity extends BlockEntity implements GeoBlockEnti
     }
 
     public void interact(boolean sneaking) {
-        if (isTardisLocked()) {
+        if (isTardisLocked() || isTardisSealedForTravel()) {
             announceLocked();
             return;
         }
@@ -178,7 +178,13 @@ public class InteriorDoorBlockEntity extends BlockEntity implements GeoBlockEnti
         return exterior != null && exterior.isLocked();
     }
 
-    private void announceLocked() {
+    private boolean isTardisSealedForTravel() {
+        if (tardisId == null || !(level instanceof ServerLevel serverLevel)) return false;
+        TardisExteriorBlockEntity exterior = DoorSyncSystem.findExterior(serverLevel.getServer(), tardisId);
+        return exterior != null && exterior.areDoorsSealedForTravel();
+    }
+
+    public void announceLocked() {
         long now = System.currentTimeMillis();
         if (now - lastLockedFeedbackAt < 1000L) return;
         lastLockedFeedbackAt = now;

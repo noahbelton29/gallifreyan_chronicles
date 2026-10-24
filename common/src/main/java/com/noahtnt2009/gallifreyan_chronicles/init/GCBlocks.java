@@ -120,6 +120,16 @@ public class GCBlocks {
                     .requiresCorrectToolForDrops()
                     .sound(SoundType.STONE)));
 
+    public static final Block BRACHACKI_ROUNDEL_ALT_BLOCK = registerBlock("brachacki_roundel_alt_block",
+            properties -> new Block(properties.strength(3F, 3F)
+                    .requiresCorrectToolForDrops()
+                    .sound(SoundType.STONE)));
+
+    public static final Block BRACHACKI_HALF_ROUNDEL_ALT_BLOCK = registerBlock("brachacki_half_roundel_alt_block",
+            properties -> new Block(properties.strength(3F, 3F)
+                    .requiresCorrectToolForDrops()
+                    .sound(SoundType.STONE)));
+
     public static final Block BRACHACKI_WALL_BLOCK_2 = registerBlock("brachacki_wall_block_2",
             properties -> new Block(properties.strength(3F, 3F)
                     .requiresCorrectToolForDrops()

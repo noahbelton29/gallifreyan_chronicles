@@ -7,7 +7,7 @@ import com.mojang.serialization.codecs.RecordCodecBuilder;
 public final class PulseFadeType extends FadeType {
     public static final MapCodec<PulseFadeType> CODEC = RecordCodecBuilder.mapCodec(inst -> inst.group(
             FadeTiming.CODEC.forGetter(PulseFadeType::timing),
-            Codec.floatRange(1.0f, 1200.0f).optionalFieldOf("pulse_ticks", 30.0f)
+            Codec.floatRange(1.0f, 1200.0f).optionalFieldOf("pulse_ticks", 35.0f)
                     .forGetter(PulseFadeType::pulseTicks),
             Codec.floatRange(0.0f, 100.0f).optionalFieldOf("pulse_ramp", 2.5f)
                     .forGetter(PulseFadeType::pulseRamp),
@@ -19,6 +19,7 @@ public final class PulseFadeType extends FadeType {
     private final float pulseTicks;
     private final float pulseRamp;
     private final float pulseDepth;
+    private static final float MID_DEPTH_CAP = 0.5f;
 
     public PulseFadeType(String id, FadeTiming timing, float pulseTicks, float pulseRamp, float pulseDepth) {
         super(id, timing);
@@ -47,7 +48,8 @@ public final class PulseFadeType extends FadeType {
     @Override
     public float opacity(float gone, float elapsed) {
         float wave = 0.5f + 0.5f * (float) Math.cos(elapsed * 2.0 * Math.PI / pulseTicks);
-        float depth = Math.min(pulseDepth, gone * pulseRamp);
+        float cap = MID_DEPTH_CAP + (1.0f - MID_DEPTH_CAP) * gone * gone * gone;
+        float depth = Math.min(Math.min(pulseDepth, gone * pulseRamp), cap);
         return (1.0f - gone) * (1.0f - depth * (1.0f - wave));
     }
 

@@ -40,8 +40,10 @@ public record DoorLockControl(ControlAnimations animations) implements TardisCon
 
         TardisExteriorBlockEntity exterior = findExterior(console, serverLevel);
         if (exterior == null) {
-            player.sendOverlayMessage(
-                    Component.literal("The door lock has no linked TARDIS exterior!").withStyle(ChatFormatting.RED));
+            if (player != null) {
+                player.sendOverlayMessage(
+                        Component.literal("The door lock has no linked TARDIS exterior!").withStyle(ChatFormatting.RED));
+            }
             return InteractionResult.FAIL;
         }
 
@@ -50,7 +52,9 @@ public record DoorLockControl(ControlAnimations animations) implements TardisCon
 
         boolean locking = !exterior.isLocked();
         if (locking && !exterior.areDoorsFullyClosed()) {
-            player.sendOverlayMessage(Component.literal("Close both doors before locking!"));
+            if (player != null) {
+                player.sendOverlayMessage(Component.literal("Close both doors before locking!"));
+            }
             return InteractionResult.FAIL;
         }
 

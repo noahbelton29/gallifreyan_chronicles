@@ -138,6 +138,8 @@ public class GCModelProvider extends ModelProvider {
         generators.createTrivialCube(GCBlocks.BRACHACKI_FLOOR_BLOCK);
         generators.createTrivialCube(GCBlocks.BRACHACKI_ROUNDEL_BLOCK);
         generators.createTrivialCube(GCBlocks.BRACHACKI_HALF_ROUNDEL_BLOCK);
+        generators.createTrivialCube(GCBlocks.BRACHACKI_ROUNDEL_ALT_BLOCK);
+        generators.createTrivialCube(GCBlocks.BRACHACKI_HALF_ROUNDEL_ALT_BLOCK);
         generators.createTrivialCube(GCBlocks.BRACHACKI_ROUNDEL_BLOCK_2);
         generators.createTrivialCube(GCBlocks.BRACHACKI_HALF_ROUNDEL_BLOCK_2);
 

@@ -21,7 +21,6 @@ import static net.minecraft.commands.Commands.literal;
 
 @EventBusSubscriber(modid = Constants.MOD_ID)
 public class GCNeoForgeCommands {
-
     @SubscribeEvent
     public static void onRegisterCommands(RegisterCommandsEvent event) {
         event.getDispatcher().register(
@@ -29,6 +28,15 @@ public class GCNeoForgeCommands {
                         .then(literal("tardis")
                                 .then(literal("list")
                                         .executes(TardisCommand::listTardis))
+                                .then(literal("controls")
+                                        .then(argument("control", StringArgumentType.word())
+                                                .suggests(TardisCommand::suggestControls)
+                                                .then(literal("set")
+                                                        .then(literal("on")
+                                                                .executes(ctx -> TardisCommand.setControl(ctx, true)))
+                                                        .then(literal("off")
+                                                                .executes(ctx -> TardisCommand.setControl(ctx, false)))))
+                                )
                                 .then(argument("id", StringArgumentType.string())
                                         .suggests((ctx, builder) -> {
                                             TardisManager.get(ctx.getSource().getServer())
@@ -145,4 +153,5 @@ public class GCNeoForgeCommands {
 
         Constants.LOG.info("Registered GC Commands (NeoForge)");
     }
+
 }

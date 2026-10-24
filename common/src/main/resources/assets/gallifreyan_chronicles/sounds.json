@@ -2,19 +2,28 @@
   "tardis_door_open": {
     "subtitle": "sounds.gallifreyan_chronicles.block_entity.tardis_door_open",
     "sounds": [
-      "gallifreyan_chronicles:block_entity/tardis/door/door_open"
+      {
+        "name": "gallifreyan_chronicles:block_entity/tardis/door/door_open",
+        "attenuation_distance": 30
+      }
     ]
   },
   "tardis_door_close": {
     "subtitle": "sounds.gallifreyan_chronicles.block_entity.tardis_door_open",
     "sounds": [
-      "gallifreyan_chronicles:block_entity/tardis/door/door_close"
+      {
+        "name": "gallifreyan_chronicles:block_entity/tardis/door/door_close",
+        "attenuation_distance": 30
+      }
     ]
   },
   "slider_sound": {
     "subtitle": "sounds.gallifreyan_chronicles.block_entity.slider_sound",
     "sounds": [
-      "gallifreyan_chronicles:block_entity/tardis/control/slider_sound"
+      {
+        "name": "gallifreyan_chronicles:block_entity/tardis/control/slider_sound",
+        "attenuation_distance": 16
+      }
     ]
   },
   "first_doctors_hum": {
@@ -22,39 +31,51 @@
     "sounds": [
       {
         "name": "gallifreyan_chronicles:block_entity/tardis/rotor/first_doctors_hum",
-        "stream": true
+        "attenuation_distance": 45
       }
     ]
   },
   "tardis_door_lock": {
     "subtitle": "sounds.gallifreyan_chronicles.block_entity.door_lock",
     "sounds": [
-      "gallifreyan_chronicles:block_entity/tardis/door/door_lock"
+      {
+        "name": "gallifreyan_chronicles:block_entity/tardis/door/door_lock",
+        "attenuation_distance": 16
+      }
     ]
   },
   "tardis_door_unlock": {
     "subtitle": "sounds.gallifreyan_chronicles.block_entity.door_unlock",
     "sounds": [
-      "gallifreyan_chronicles:block_entity/tardis/door/door_unlock"
+      {
+        "name": "gallifreyan_chronicles:block_entity/tardis/door/door_unlock",
+        "attenuation_distance": 16
+      }
     ]
   },
   "tardis_is_locked": {
     "subtitle": "sounds.gallifreyan_chronicles.block_entity.is_locked",
     "sounds": [
-      "gallifreyan_chronicles:block_entity/tardis/door/is_locked"
+      {
+        "name": "gallifreyan_chronicles:block_entity/tardis/door/is_locked",
+        "attenuation_distance": 25
+      }
     ]
   },
   "tardis_key_jammed": {
     "subtitle": "sounds.gallifreyan_chronicles.block_entity.key_jammed",
     "sounds": [
-      "gallifreyan_chronicles:block_entity/tardis/door/key_jammed"
+      {
+        "name": "gallifreyan_chronicles:block_entity/tardis/door/key_jammed",
+        "attenuation_distance": 16
+      }
     ]
   },
   "tardis_drum": {
     "sounds": [
       {
         "name": "gallifreyan_chronicles:block_entity/tardis/tardis_drum",
-        "attenuation_distance": 25
+        "attenuation_distance": 16
       }
     ]
   },
@@ -62,7 +83,7 @@
     "sounds": [
       {
         "name": "gallifreyan_chronicles:block_entity/tardis/tardis_takeoff",
-        "attenuation_distance": 25
+        "attenuation_distance": 16
       }
     ]
   },
@@ -70,15 +91,31 @@
     "sounds": [
       {
         "name": "gallifreyan_chronicles:block_entity/tardis/tardis_vworp",
-        "attenuation_distance": 25
+        "attenuation_distance": 16
+      }
+    ]
+  },
+  "tardis_land": {
+    "sounds": [
+      {
+        "name": "gallifreyan_chronicles:block_entity/tardis/tardis_land",
+        "attenuation_distance": 16
+      }
+    ]
+  },
+  "tardis_land_drum": {
+    "sounds": [
+      {
+        "name": "gallifreyan_chronicles:block_entity/tardis/tardis_land_drum",
+        "attenuation_distance": 16
       }
     ]
   },
   "switch": {
-    "subtitle": "sounds.gallifreyan_chronicles.block_entity.switch",
     "sounds": [
       {
-        "name": "gallifreyan_chronicles:block_entity/tardis/control/switch"
+        "name": "gallifreyan_chronicles:block_entity/tardis/control/switch",
+        "attenuation_distance": 16
       }
     ]
   }

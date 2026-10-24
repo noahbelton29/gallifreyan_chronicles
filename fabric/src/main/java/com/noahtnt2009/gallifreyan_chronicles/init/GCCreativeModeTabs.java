@@ -23,6 +23,8 @@ public class GCCreativeModeTabs {
                         output.accept(GCBlocks.BRACHACKI_WALL_BLOCK);
                         output.accept(GCBlocks.BRACHACKI_ROUNDEL_BLOCK);
                         output.accept(GCBlocks.BRACHACKI_HALF_ROUNDEL_BLOCK);
+                        output.accept(GCBlocks.BRACHACKI_ROUNDEL_ALT_BLOCK);
+                        output.accept(GCBlocks.BRACHACKI_HALF_ROUNDEL_ALT_BLOCK);
                         output.accept(GCBlocks.BRACHACKI_WALL_BLOCK_2);
                         output.accept(GCBlocks.BRACHACKI_ROUNDEL_BLOCK_2);
                         output.accept(GCBlocks.BRACHACKI_HALF_ROUNDEL_BLOCK_2);

@@ -16,6 +16,7 @@ import com.noahtnt2009.gallifreyan_chronicles.ecs.Entity;
 import com.noahtnt2009.gallifreyan_chronicles.entity.TardisKeyEntity;
 import com.noahtnt2009.gallifreyan_chronicles.tardis.ecs.TardisLinkable;
 import com.noahtnt2009.gallifreyan_chronicles.tardis.ecs.component.DoorState;
+import com.noahtnt2009.gallifreyan_chronicles.tardis.flight.TardisFlightState;
 import com.noahtnt2009.gallifreyan_chronicles.tardis.ecs.TardisComponentTypes;
 import com.noahtnt2009.gallifreyan_chronicles.tardis.ecs.component.TardisSubsystem;
 import com.noahtnt2009.gallifreyan_chronicles.tardis.ecs.component.TransformComponent;
@@ -72,7 +73,10 @@ public class TardisExteriorBlockEntity extends BlockEntity implements GeoBlockEn
     private AnimationController<TardisExteriorBlockEntity> controller;
     private boolean locked = true;
     private boolean inFlight = false;
+    private TardisFlightState flightState = TardisFlightState.IDLE;
+    private long flightStateEndTick = 0L;
     private long fadeStartTick = 0L;
+    private long landAtTick = -1L;
     private FadeType fadeType = FadeTypes.DEFAULT;
     private int seenFadeGeneration = -1;
     private final ComponentStore components = new ComponentStore();
@@ -127,6 +131,30 @@ public class TardisExteriorBlockEntity extends BlockEntity implements GeoBlockEn
     public boolean areDoorsFullyClosed() {
         return getDoorState().isClosed()
                 && !DoorSystem.isAnimating(asEntity(), System.currentTimeMillis());
+    }
+
+    public TardisFlightState getFlightState() {
+        if (flightState.isTimed() && level != null && !level.isClientSide()
+                && level.getGameTime() >= flightStateEndTick) {
+            flightState = flightState.afterTimer();
+            setChanged();
+        }
+        return flightState;
+    }
+
+    public void setFlightState(TardisFlightState state, long durationTicks) {
+        if (level == null || level.isClientSide()) return;
+        flightState = state;
+        flightStateEndTick = level.getGameTime() + durationTicks;
+        setChanged();
+    }
+
+    public boolean isTravelling() {
+        return !getFlightState().isIdle();
+    }
+
+    public boolean areDoorsSealedForTravel() {
+        return isTravelling() && getDoorState().isClosed();
     }
 
     public boolean isLocked() {
@@ -251,6 +279,9 @@ public class TardisExteriorBlockEntity extends BlockEntity implements GeoBlockEn
         this.locked = other.locked;
         this.inFlight = other.inFlight;
         this.fadeStartTick = other.fadeStartTick;
+        this.landAtTick = other.landAtTick;
+        this.flightState = other.flightState;
+        this.flightStateEndTick = other.flightStateEndTick;
         this.fadeType = other.fadeType;
         this.renderedKeyOwner = other.renderedKeyOwner;
         this.heldKeyStack = other.heldKeyStack.copy();
@@ -303,9 +334,14 @@ public class TardisExteriorBlockEntity extends BlockEntity implements GeoBlockEn
     }
 
     public void setInFlight(boolean inFlight) {
+        if (level == null || level.isClientSide()) return;
+        setInFlight(inFlight, level.getGameTime());
+    }
+
+    private void setInFlight(boolean inFlight, long atTick) {
         if (this.inFlight == inFlight || level == null || level.isClientSide()) return;
 
-        long now = level.getGameTime();
+        long now = atTick;
         float oldProgress = Math.clamp((now - fadeStartTick) / (float) fadeDuration(), 0.0f, 1.0f);
         float gone = this.inFlight ? oldProgress : 1.0f - oldProgress;
 
@@ -316,6 +352,26 @@ public class TardisExteriorBlockEntity extends BlockEntity implements GeoBlockEn
             this.fadeStartTick = now + fadeType.timing().takeoffDelayTicks();
         }
         sync();
+    }
+
+    public void scheduleLanding(int delayTicks) {
+        if (level == null || level.isClientSide() || !inFlight) return;
+        landAtTick = level.getGameTime() + delayTicks;
+        setChanged();
+    }
+
+    public void cancelLanding() {
+        if (landAtTick < 0L) return;
+        landAtTick = -1L;
+        setChanged();
+    }
+
+    private void tickLanding(Level level) {
+        if (landAtTick < 0L || level.getGameTime() < landAtTick) return;
+        long dueTick = landAtTick;
+        landAtTick = -1L;
+        setInFlight(false, dueTick);
+        setChanged();
     }
 
     public FadeType getFadeType() {
@@ -339,14 +395,12 @@ public class TardisExteriorBlockEntity extends BlockEntity implements GeoBlockEn
         sync();
     }
 
-    // the block entity saves its own copy of the fade, so after a /reload it has to pick up the new data by id
     private void refreshFadeType() {
         int generation = FadeTypes.generation();
         if (seenFadeGeneration == generation) return;
         seenFadeGeneration = generation;
 
         String id = fadeType.id();
-        // a fade that was removed from the datapack keeps working from the copy saved here
         if (!FadeTypes.contains(id)) return;
         setFadeType(FadeTypes.get(id));
     }
@@ -395,6 +449,7 @@ public class TardisExteriorBlockEntity extends BlockEntity implements GeoBlockEn
     public static void serverTick(Level level, TardisExteriorBlockEntity blockEntity) {
         if (level.isClientSide()) return;
         blockEntity.refreshFadeType();
+        blockEntity.tickLanding(level);
         MinecraftServer server = level.getServer();
         boolean daylightAffectsGlow = server == null
                 || server.getGameRules().get(GCGameRules.DAYLIGHT_CYCLE_AFFECTS_GLOW);
@@ -417,14 +472,18 @@ public class TardisExteriorBlockEntity extends BlockEntity implements GeoBlockEn
     private static final float WIND_END_PROGRESS = 0.92f;
 
     private void tickTakeoffWind(ServerLevel serverLevel) {
-        if (!inFlight || isFullyInvisible()) return;
-
         long now = serverLevel.getGameTime();
         float progress = Math.clamp((now - fadeStartTick) / (float) fadeDuration(), 0.0f, 1.0f);
-        if (progress >= WIND_END_PROGRESS) return;
 
-        float strength = (1.0f - progress / WIND_END_PROGRESS);
-        strength *= strength;
+        float strength;
+        if (inFlight) {
+            if (isFullyInvisible() || progress >= WIND_END_PROGRESS) return;
+            strength = 1.0f - progress / WIND_END_PROGRESS;
+            strength *= strength;
+        } else {
+            if (progress >= 1.0f || fadeStartTick > now) return;
+            strength = progress * progress;
+        }
 
         if (now % 3L != 0L) return;
 
@@ -440,7 +499,7 @@ public class TardisExteriorBlockEntity extends BlockEntity implements GeoBlockEn
         var random = serverLevel.getRandom();
         double spin = now * 0.15;
 
-        int dustPoints = Math.max(2, Math.round(WIND_MAX_DUST * strength));
+        int dustPoints = Math.max(inFlight ? 2 : 1, Math.round(WIND_MAX_DUST * strength));
         float dustSpeed = WIND_DUST_SPEED * (0.5f + 0.5f * strength);
         for (int i = 0; i < dustPoints; i++) {
             double angle = spin + (Math.PI * 2.0 * i) / dustPoints + (random.nextDouble() - 0.5) * 0.3;
@@ -512,6 +571,10 @@ public class TardisExteriorBlockEntity extends BlockEntity implements GeoBlockEn
     }
 
     public void interact(boolean sneaking, boolean ignoreLock) {
+        if (areDoorsSealedForTravel()) {
+            announceSealed();
+            return;
+        }
         if (!ignoreLock && isLocked()) {
             return;
         }
@@ -559,6 +622,17 @@ public class TardisExteriorBlockEntity extends BlockEntity implements GeoBlockEn
 
     public void setSubsystemHealth(TardisSubsystem subsystem, float health) {
         SubsystemSystem.setHealth(asEntity(), subsystem, health);
+    }
+
+    public void announceSealed() {
+        long now = System.currentTimeMillis();
+        if (now - lastLockedFeedbackAt < 1000L) {
+            return;
+        }
+        lastLockedFeedbackAt = now;
+
+        triggerAnim("key_controller", "is_locked");
+        playLockedSound();
     }
 
     public void announceLocked(Player player) {
@@ -644,6 +718,10 @@ public class TardisExteriorBlockEntity extends BlockEntity implements GeoBlockEn
         output.putBoolean("Locked", locked);
         output.putBoolean("InFlight", inFlight);
         output.putLong("FadeStartTick", fadeStartTick);
+        output.putLong("LandAtTick", landAtTick);
+        output.putString("FlightState", flightState.name());
+        output.putLong("FlightStateEnd", flightStateEndTick);
+        output.putLong("LandAtTick", landAtTick);
         output.putString("FadeType", fadeType.id());
         output.store("Fade", FadeTypeKinds.CODEC, fadeType);
     }
@@ -658,6 +736,11 @@ public class TardisExteriorBlockEntity extends BlockEntity implements GeoBlockEn
         locked = input.getBooleanOr("Locked", true);
         inFlight = input.getBooleanOr("InFlight", false);
         fadeStartTick = input.getLongOr("FadeStartTick", 0L);
+        landAtTick = input.getLongOr("LandAtTick", -1L);
+        flightState = TardisFlightState.parse(input.getStringOr("FlightState", ""),
+                inFlight ? TardisFlightState.IN_VORTEX : TardisFlightState.IDLE);
+        flightStateEndTick = input.getLongOr("FlightStateEnd", 0L);
+        landAtTick = input.getLongOr("LandAtTick", -1L);
         String fadeId = input.getStringOr("FadeType", FadeTypes.DEFAULT.id());
         fadeType = input.read("Fade", FadeTypeKinds.CODEC)
                 .map(fade -> fade.withId(fadeId))

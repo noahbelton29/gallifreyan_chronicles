@@ -126,8 +126,6 @@ public class GCLanguageProvider extends LanguageProvider {
                 "Summoned TARDIS %s to %s");
         add("command.gallifreyan_chronicles.summon_blocked",
                 "Something is in the way, move and try again");
-        add("command.gallifreyan_chronicles.player_only",
-                "This command can only be used by a player");
 
         // Commands: Exterior glow
         add("command.gallifreyan_chronicles.set_glow",

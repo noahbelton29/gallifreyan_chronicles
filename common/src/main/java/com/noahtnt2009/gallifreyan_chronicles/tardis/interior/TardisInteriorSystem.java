@@ -203,7 +203,6 @@ public final class TardisInteriorSystem {
         String variant = null;
 
         if (def.console().isPresent()) {
-            // console ids are namespaced ("gallifreyan_chronicles:brachacki_console"); accept the short form too
             String consoleId = def.console().get();
             if (!consoleId.contains(":")) consoleId = Constants.MOD_ID + ":" + consoleId;
             if (TardisConsoleRegistry.contains(consoleId)) {

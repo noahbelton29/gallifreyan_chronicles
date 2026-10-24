@@ -14,7 +14,7 @@ import com.noahtnt2009.gallifreyan_chronicles.tardis.control.impl.PowerLeverCont
 
 public class GCTardisControls {
     public static void registerTardisControls() {
-        // control kinds, each with the codec for its settings
+        // control kinds
         TardisControlTypes.register("noop", NoopControl.CODEC);
         TardisControlTypes.register("flight_lever", FlightLeverControl.CODEC);
         TardisControlTypes.register("handbrake", HandbrakeControl.CODEC);

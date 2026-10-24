@@ -34,6 +34,6 @@ public class TardisInteriorLoader extends GCJsonReloadListener<TardisInterior> {
 
     @Override
     protected void broadcastSync(MinecraftServer server) {
-        // Interiors are server-side only.
+
     }
 }

@@ -131,6 +131,12 @@ public final class DoorSyncSystem {
         }
     }
 
+    public static void announceSealed(UUID tardisId) {
+        for (InteriorDoorBlockEntity door : doorsOf(tardisId)) {
+            door.announceLocked();
+        }
+    }
+
     public static void toggleAllDoors(MinecraftServer server, UUID tardisId) {
         TardisExteriorBlockEntity exterior = findExterior(server, tardisId);
         if (exterior != null) {

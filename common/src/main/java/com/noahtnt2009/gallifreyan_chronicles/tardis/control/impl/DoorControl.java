@@ -52,8 +52,19 @@ public class DoorControl implements TardisControl {
             TardisExteriorBlockEntity exterior =
                     tardisId == null ? null : DoorSyncSystem.findExterior(serverLevel.getServer(), tardisId);
             if (exterior != null && exterior.isLocked()) {
-                player.sendOverlayMessage(
-                        Component.literal("The doors are locked!").withStyle(ChatFormatting.RED));
+                if (player != null) {
+                    player.sendOverlayMessage(
+                            Component.literal("The doors are locked!").withStyle(ChatFormatting.RED));
+                }
+                return InteractionResult.FAIL;
+            }
+            if (exterior != null && exterior.areDoorsSealedForTravel()) {
+                DoorSyncSystem.announceSealed(tardisId);
+                if (player != null) {
+                    player.sendOverlayMessage(
+                            Component.literal("The doors are sealed while the TARDIS is travelling!")
+                                    .withStyle(ChatFormatting.RED));
+                }
                 return InteractionResult.FAIL;
             }
         }
@@ -68,6 +79,8 @@ public class DoorControl implements TardisControl {
                 1.0F,
                 STATE ? 1.0f : 0.8f
         );
+
+        // TODO: play at console pos for all tardis sounds
 
         Constants.LOG.info("clicked door control");
         return InteractionResult.SUCCESS;

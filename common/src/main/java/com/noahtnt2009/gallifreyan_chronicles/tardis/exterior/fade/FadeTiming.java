@@ -5,7 +5,7 @@ import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 
 public record FadeTiming(int takeoffDelayTicks, int fadeOutTicks, int fadeInTicks) {
-    public static final FadeTiming DEFAULT = new FadeTiming(70, 190, 240);
+    public static final FadeTiming DEFAULT = new FadeTiming(50, 210, 260);
 
     private static final int MAX_TICKS = 24000;
 

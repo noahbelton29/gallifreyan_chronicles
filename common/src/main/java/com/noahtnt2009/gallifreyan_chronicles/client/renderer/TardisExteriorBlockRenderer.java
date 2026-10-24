@@ -2,6 +2,7 @@ package com.noahtnt2009.gallifreyan_chronicles.client.renderer;
 
 import com.geckolib.constant.dataticket.DataTicket;
 import com.geckolib.renderer.GeoBlockRenderer;
+import com.geckolib.renderer.base.BoneSnapshots;
 import com.geckolib.renderer.base.RenderPassInfo;
 import com.mojang.math.Axis;
 import com.noahtnt2009.gallifreyan_chronicles.block.TardisExteriorBlockModel;
@@ -89,6 +90,16 @@ public class TardisExteriorBlockRenderer extends GeoBlockRenderer<@NotNull Tardi
             super.submitRenderTasks(renderPassInfo, maskTasks, RenderTypes.waterMask());
         }
         super.submitRenderTasks(renderPassInfo, renderTasks, renderType);
+    }
+
+    @Override
+    public void adjustModelBonesForRender(@NonNull RenderPassInfo<TardisExteriorBlockRenderState> renderPassInfo, @NonNull BoneSnapshots snapshots) {
+        super.adjustModelBonesForRender(renderPassInfo, snapshots);
+
+        float opacity = renderPassInfo.renderState().getOrDefaultGeckolibData(OPACITY, 1.0f);
+        if (opacity < 1.0f) {
+            snapshots.ifPresent(TardisExteriorKeyLayer.KEY_BONE_NAME, snapshot -> snapshot.skipRender(true));
+        }
     }
 
     @Override

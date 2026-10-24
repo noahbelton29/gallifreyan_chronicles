@@ -184,6 +184,10 @@ public class TardisControlEntity extends Entity {
         }
         this.lastInteractTime = now;
 
+        return activate(player, hand);
+    }
+
+    public InteractionResult activate(@Nullable Player player, InteractionHand hand) {
         TardisControl control = TardisControlRegistry.get(this.getControlId());
         InteractionResult result = control.onRightClick(this, player, hand);
 

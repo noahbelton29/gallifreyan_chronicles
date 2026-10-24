@@ -86,19 +86,19 @@ public class InteriorDoorBlock extends BaseEntityBlock {
         return state.getValue(PART_X) == 0 && state.getValue(PART_Y) == 0;
     }
 
-    public static Direction rightOf(Direction facing) {
+    public static Direction rightDirectionOf(Direction facing) {
         return facing.getCounterClockWise();
     }
 
-    public static BlockPos masterPos(BlockState state, BlockPos pos) {
-        return pos.relative(rightOf(state.getValue(FACING)), -state.getValue(PART_X))
+    public static BlockPos masterBlockPos(BlockState state, BlockPos pos) {
+        return pos.relative(rightDirectionOf(state.getValue(FACING)), -state.getValue(PART_X))
                 .below(state.getValue(PART_Y));
     }
 
     @Override
     public @Nullable BlockState getStateForPlacement(BlockPlaceContext context) {
         Direction facing = context.getHorizontalDirection().getOpposite();
-        Direction right = rightOf(facing);
+        Direction right = rightDirectionOf(facing);
         Level level = context.getLevel();
         BlockPos origin = context.getClickedPos();
 
@@ -119,7 +119,7 @@ public class InteriorDoorBlock extends BaseEntityBlock {
         super.setPlacedBy(level, pos, state, placer, stack);
         if (level.isClientSide()) return;
 
-        Direction right = rightOf(state.getValue(FACING));
+        Direction right = rightDirectionOf(state.getValue(FACING));
         for (int x = 0; x < WIDTH; x++) {
             for (int y = 0; y < HEIGHT; y++) {
                 if (x == 0 && y == 0) continue;
@@ -133,8 +133,8 @@ public class InteriorDoorBlock extends BaseEntityBlock {
     public @NotNull BlockState playerWillDestroy(@NotNull Level level, @NotNull BlockPos pos,
                                                  @NotNull BlockState state, @NotNull Player player) {
         if (!level.isClientSide()) {
-            BlockPos master = masterPos(state, pos);
-            Direction right = rightOf(state.getValue(FACING));
+            BlockPos master = masterBlockPos(state, pos);
+            Direction right = rightDirectionOf(state.getValue(FACING));
             for (int x = 0; x < WIDTH; x++) {
                 for (int y = 0; y < HEIGHT; y++) {
                     BlockPos p = master.relative(right, x).above(y);
@@ -156,7 +156,7 @@ public class InteriorDoorBlock extends BaseEntityBlock {
     protected @NonNull InteractionResult useWithoutItem(@NonNull BlockState state, Level level, @NonNull BlockPos pos,
                                                         @NonNull Player player, @NonNull BlockHitResult hitResult) {
         if (level.isClientSide()) return InteractionResult.SUCCESS;
-        if (level.getBlockEntity(masterPos(state, pos)) instanceof InteriorDoorBlockEntity door) {
+        if (level.getBlockEntity(masterBlockPos(state, pos)) instanceof InteriorDoorBlockEntity door) {
             door.interact(player.isShiftKeyDown());
         }
         return InteractionResult.CONSUME;
@@ -171,7 +171,7 @@ public class InteriorDoorBlock extends BaseEntityBlock {
     @Override
     protected @NonNull VoxelShape getCollisionShape(@NonNull BlockState state, @NonNull BlockGetter level,
                                                     @NonNull BlockPos pos, @NonNull CollisionContext context) {
-        if (level.getBlockEntity(masterPos(state, pos)) instanceof InteriorDoorBlockEntity door
+        if (level.getBlockEntity(masterBlockPos(state, pos)) instanceof InteriorDoorBlockEntity door
                 && !door.getDoorState().isClosed()) {
             return Shapes.empty();
         }

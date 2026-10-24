@@ -42,7 +42,7 @@ public class GCDataComponents {
     private static <T> DataComponentType<T> register(String name, Supplier<DataComponentType<T>> supplier) {
         return Registry.register(
                 BuiltInRegistries.DATA_COMPONENT_TYPE,
-                GCUtils.of(name),
+                GCUtils.modIdentifier(name),
                 supplier.get()
         );
     }

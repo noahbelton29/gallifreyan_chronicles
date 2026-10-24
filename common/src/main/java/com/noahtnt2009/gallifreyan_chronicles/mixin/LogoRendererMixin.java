@@ -15,7 +15,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 @Mixin(LogoRenderer.class)
 public class LogoRendererMixin {
     @Unique
-    private static final Identifier TITLE_LOGO = GCUtils.of("textures/gui/title/logo.png");
+    private static final Identifier TITLE_LOGO = GCUtils.modIdentifier("textures/gui/title/logo.png");
 
     @Unique
     private static final int gallifreyan_chronicles_26_1_2$WIDTH = (int)(256 * 0.9f);

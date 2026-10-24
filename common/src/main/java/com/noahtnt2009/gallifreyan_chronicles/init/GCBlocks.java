@@ -472,12 +472,12 @@ public class GCBlocks {
             Rarity rarity
     ) {
         Block toRegister = function.apply(BlockBehaviour.Properties.of()
-                .setId(ResourceKey.create(Registries.BLOCK, GCUtils.of(name))));
+                .setId(ResourceKey.create(Registries.BLOCK, GCUtils.modIdentifier(name))));
 
         registerBlockItem(name, toRegister, rarity);
         BLOCKS.add(toRegister);
 
-        return Registry.register(BuiltInRegistries.BLOCK, GCUtils.of(name), toRegister);
+        return Registry.register(BuiltInRegistries.BLOCK, GCUtils.modIdentifier(name), toRegister);
     }
 
     private static Block registerBlock(
@@ -492,19 +492,19 @@ public class GCBlocks {
             Function<BlockBehaviour.Properties, Block> function
     ) {
         Block toRegister = function.apply(BlockBehaviour.Properties.of()
-                .setId(ResourceKey.create(Registries.BLOCK, GCUtils.of(name))));
+                .setId(ResourceKey.create(Registries.BLOCK, GCUtils.modIdentifier(name))));
 
         BLOCKS.add(toRegister);
 
-        return Registry.register(BuiltInRegistries.BLOCK, GCUtils.of(name), toRegister);
+        return Registry.register(BuiltInRegistries.BLOCK, GCUtils.modIdentifier(name), toRegister);
     }
 
     private static void registerBlockItem(String name, Block block, Rarity rarity) {
-        Registry.register(BuiltInRegistries.ITEM, GCUtils.of(name),
+        Registry.register(BuiltInRegistries.ITEM, GCUtils.modIdentifier(name),
                 new BlockItem(block, new Item.Properties()
                         .useBlockDescriptionPrefix()
                         .rarity(rarity)
-                        .setId(ResourceKey.create(Registries.ITEM, GCUtils.of(name)))));
+                        .setId(ResourceKey.create(Registries.ITEM, GCUtils.modIdentifier(name)))));
     }
 
     public static void registerBlocks() {

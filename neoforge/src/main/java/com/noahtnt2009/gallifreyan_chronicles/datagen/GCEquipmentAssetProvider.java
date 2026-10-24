@@ -25,9 +25,9 @@ public class GCEquipmentAssetProvider implements DataProvider {
     private static void bootstrap(BiConsumer<ResourceKey<EquipmentAsset>, EquipmentClientInfo> consumer) {
         consumer.accept(GCArmorMaterials.TARANIUM_KEY,
                 EquipmentClientInfo.builder()
-                        .addHumanoidLayers(GCUtils.of("taranium"))
+                        .addHumanoidLayers(GCUtils.modIdentifier("taranium"))
                         .addLayers(EquipmentClientInfo.LayerType.HORSE_BODY,
-                                new EquipmentClientInfo.Layer(GCUtils.of("taranium")))
+                                new EquipmentClientInfo.Layer(GCUtils.modIdentifier("taranium")))
                         .build());
     }
 

@@ -34,29 +34,29 @@ import static com.noahtnt2009.gallifreyan_chronicles.util.GCUtils.rgb;
 
 public class GCDimensions {
     public static final ResourceKey<LevelStem> GALLIFREY_KEY = ResourceKey.create(Registries.LEVEL_STEM,
-            GCUtils.of("gallifrey"));
+            GCUtils.modIdentifier("gallifrey"));
     public static final ResourceKey<Level> GALLIFREY_LEVEL_KEY = ResourceKey.create(Registries.DIMENSION,
-            GCUtils.of("gallifrey"));
+            GCUtils.modIdentifier("gallifrey"));
     public static final ResourceKey<DimensionType> GALLIFREY_TYPE_KEY = ResourceKey.create(Registries.DIMENSION_TYPE,
-            GCUtils.of("gallifrey_type"));
+            GCUtils.modIdentifier("gallifrey_type"));
     public static final ResourceKey<NoiseGeneratorSettings> GALLIFREY_NOISE_SETTINGS = ResourceKey.create(Registries.NOISE_SETTINGS,
-            GCUtils.of("gallifrey"));
+            GCUtils.modIdentifier("gallifrey"));
 
     public static final ResourceKey<LevelStem> MOON_KEY = ResourceKey.create(Registries.LEVEL_STEM,
-            GCUtils.of("moon"));
+            GCUtils.modIdentifier("moon"));
     public static final ResourceKey<Level> MOON_LEVEL_KEY = ResourceKey.create(Registries.DIMENSION,
-            GCUtils.of("moon"));
+            GCUtils.modIdentifier("moon"));
     public static final ResourceKey<DimensionType> MOON_TYPE_KEY = ResourceKey.create(Registries.DIMENSION_TYPE,
-            GCUtils.of("moon_type"));
+            GCUtils.modIdentifier("moon_type"));
     public static final ResourceKey<NoiseGeneratorSettings> MOON_NOISE_SETTINGS = ResourceKey.create(Registries.NOISE_SETTINGS,
-            GCUtils.of("moon"));
+            GCUtils.modIdentifier("moon"));
 
     public static final ResourceKey<LevelStem> TARDIS_INTERIOR_KEY = ResourceKey.create(Registries.LEVEL_STEM,
-            GCUtils.of("tardis_interior"));
+            GCUtils.modIdentifier("tardis_interior"));
     public static final ResourceKey<Level> TARDIS_INTERIOR_LEVEL_KEY = ResourceKey.create(Registries.DIMENSION,
-            GCUtils.of("tardis_interior"));
+            GCUtils.modIdentifier("tardis_interior"));
     public static final ResourceKey<DimensionType> TARDIS_INTERIOR_TYPE_KEY = ResourceKey.create(Registries.DIMENSION_TYPE,
-            GCUtils.of("tardis_interior_type"));
+            GCUtils.modIdentifier("tardis_interior_type"));
 
     public static void bootstrapType(BootstrapContext<DimensionType> context) {
         var timelines = context.lookup(Registries.TIMELINE);

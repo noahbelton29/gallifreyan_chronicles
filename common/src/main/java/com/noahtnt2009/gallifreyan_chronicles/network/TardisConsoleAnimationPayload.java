@@ -11,7 +11,7 @@ import org.jspecify.annotations.NonNull;
 
 public record TardisConsoleAnimationPayload(BlockPos pos, String animationName, String controllerName) implements CustomPacketPayload {
     public static final Type<TardisConsoleAnimationPayload> TYPE =
-            new Type<>(GCUtils.of("tardis_console_animation"));
+            new Type<>(GCUtils.modIdentifier("tardis_console_animation"));
 
     public static final StreamCodec<RegistryFriendlyByteBuf, TardisConsoleAnimationPayload> STREAM_CODEC = StreamCodec.composite(
             BlockPos.STREAM_CODEC,

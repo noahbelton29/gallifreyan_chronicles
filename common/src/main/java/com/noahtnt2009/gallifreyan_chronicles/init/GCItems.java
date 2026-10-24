@@ -72,10 +72,10 @@ public class GCItems {
     private static <T extends Item> T registerItem(String name, Function<Item.Properties, T> factory) {
         T item = Registry.register(
                 BuiltInRegistries.ITEM,
-                GCUtils.of(name),
+                GCUtils.modIdentifier(name),
                 factory.apply(new Item.Properties().setId(
                         ResourceKey.create(Registries.ITEM,
-                                GCUtils.of(name)
+                                GCUtils.modIdentifier(name)
                         )
                 ))
         );

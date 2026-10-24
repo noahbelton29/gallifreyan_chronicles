@@ -93,6 +93,8 @@ public class TardisBlock extends BaseEntityBlock {
             return InteractionResult.CONSUME;
         }
 
+        if (tardis.isFullyInvisible()) return InteractionResult.PASS;
+
         if (tardis.hasKeyRendered()) {
             if (level.isClientSide()) return InteractionResult.SUCCESS;
 
@@ -131,9 +133,19 @@ public class TardisBlock extends BaseEntityBlock {
     }
 
     @Override
+    protected @NonNull VoxelShape getShape(@NonNull BlockState state, @NonNull BlockGetter level,
+                                           @NonNull BlockPos pos, @NonNull CollisionContext context) {
+        if (level.getBlockEntity(pos) instanceof TardisExteriorBlockEntity tardis && tardis.isFullyInvisible()) {
+            return Shapes.empty();
+        }
+        return super.getShape(state, level, pos, context);
+    }
+
+    @Override
     protected @NonNull VoxelShape getCollisionShape(@NonNull BlockState state, @NonNull BlockGetter level,
                                                     @NonNull BlockPos pos, @NonNull CollisionContext context) {
-        if (level.getBlockEntity(pos) instanceof TardisExteriorBlockEntity tardis && !tardis.getDoorState().isClosed()) {
+        if (level.getBlockEntity(pos) instanceof TardisExteriorBlockEntity tardis
+                && (tardis.isFullyInvisible() || !tardis.getDoorState().isClosed())) {
             return Shapes.empty();
         }
         return super.getCollisionShape(state, level, pos, context);

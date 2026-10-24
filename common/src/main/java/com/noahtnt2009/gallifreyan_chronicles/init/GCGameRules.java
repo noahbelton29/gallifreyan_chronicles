@@ -21,7 +21,7 @@ public class GCGameRules {
     );
 
     private static GameRule<Boolean> register(String id, GameRuleCategory category, boolean defaultValue) {
-        Identifier identifier = GCUtils.of(id);
+        Identifier identifier = GCUtils.modIdentifier(id);
 
         GameRule<Boolean> rule = new GameRule<>(
                 category,

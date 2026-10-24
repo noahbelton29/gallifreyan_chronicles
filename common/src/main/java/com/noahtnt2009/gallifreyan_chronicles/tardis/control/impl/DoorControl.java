@@ -91,6 +91,6 @@ public class DoorControl implements TardisControl {
             return;
         }
 
-        DoorSyncSystem.toggleAll(serverLevel.getServer(), tardisId);
+        DoorSyncSystem.toggleAllDoors(serverLevel.getServer(), tardisId);
     }
 }

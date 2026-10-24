@@ -122,9 +122,25 @@ public class GCLanguageProvider extends LanguageProvider {
         add("command.gallifreyan_chronicles.set_door_variant",
                 "Set door variant of TARDIS %s to %s (%s doors updated)");
 
+        // Commands: Summon
+        add("command.gallifreyan_chronicles.summon_tardis",
+                "Summoned TARDIS %s to %s");
+        add("command.gallifreyan_chronicles.summon_blocked",
+                "Something is in the way, move and try again");
+        add("command.gallifreyan_chronicles.player_only",
+                "This command can only be used by a player");
+
         // Commands: Exterior glow
         add("command.gallifreyan_chronicles.set_glow",
                 "Set exterior glow of TARDIS %s to %s");
+
+        // Commands: Fade type
+        add("command.gallifreyan_chronicles.get_fade_type",
+                "TARDIS %s uses the %s fade");
+        add("command.gallifreyan_chronicles.set_fade_type",
+                "Set fade type of TARDIS %s to %s");
+        add("command.gallifreyan_chronicles.unknown_fade_type",
+                "Unknown fade type %s (use newwho or classicwho)");
 
         // Commands: Subsystems
         add("command.gallifreyan_chronicles.unknown_subsystem",

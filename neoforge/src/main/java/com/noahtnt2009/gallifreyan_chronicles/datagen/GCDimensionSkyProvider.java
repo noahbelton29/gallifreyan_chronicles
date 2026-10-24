@@ -55,7 +55,7 @@ public class GCDimensionSkyProvider implements DataProvider {
                     ? sky.id().substring(sky.id().indexOf(':') + 1)
                     : sky.id();
 
-            Identifier fileId = GCUtils.of(filePath);
+            Identifier fileId = GCUtils.modIdentifier(filePath);
 
             var encodeResult = DimensionSky.CODEC.encodeStart(JsonOps.INSTANCE, sky);
             encodeResult.ifSuccess(json -> {

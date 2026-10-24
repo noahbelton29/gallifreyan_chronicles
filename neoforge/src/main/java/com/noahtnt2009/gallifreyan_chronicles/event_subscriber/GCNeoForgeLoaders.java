@@ -21,7 +21,7 @@ public final class GCNeoForgeLoaders {
     private GCNeoForgeLoaders() {}
 
     public static void register(String path, Supplier<GCJsonReloadListener<?>> factory) {
-        LOADERS.put(GCUtils.of(path), factory);
+        LOADERS.put(GCUtils.modIdentifier(path), factory);
     }
 
     @SubscribeEvent

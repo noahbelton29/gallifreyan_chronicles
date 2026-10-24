@@ -41,7 +41,7 @@ public record TardisInterior(String id, Identifier structure, Vec3 spawn, Direct
     ).apply(inst, TardisInterior::new));
 
     public static final TardisInterior FALLBACK = new TardisInterior(
-            "fallback", GCUtils.of("template_interior"), new Vec3(7.4, 1.0, 3.5), Direction.SOUTH,
+            "fallback", GCUtils.modIdentifier("template_interior"), new Vec3(7.4, 1.0, 3.5), Direction.SOUTH,
             Optional.empty(), Optional.empty(), Optional.empty(), Optional.empty());
 
     public TardisInterior {

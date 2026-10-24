@@ -35,7 +35,7 @@ public final class TardisDimensionManager {
     }
 
     public static ResourceKey<Level> levelKey(UUID tardisId) {
-        return ResourceKey.create(Registries.DIMENSION, GCUtils.of("tardis/" + tardisId));
+        return ResourceKey.create(Registries.DIMENSION, GCUtils.modIdentifier("tardis/" + tardisId));
     }
 
     public static @Nullable ServerLevel get(MinecraftServer server, UUID tardisId) {
@@ -82,16 +82,17 @@ public final class TardisDimensionManager {
         }
     }
 
-    public static void request(MinecraftServer server, ServerPlayer player, UUID tardisId) {
+    // if the interior is not loaded yet, the player waits in the queue
+    public static void requestEntry(MinecraftServer server, ServerPlayer player, UUID tardisId) {
         ServerLevel level = get(server, tardisId);
         if (level != null) {
-            enterNow(player, level, tardisId);
+            teleportPlayerIntoInterior(player, level, tardisId);
             return;
         }
         PENDING.putIfAbsent(player.getUUID(), tardisId);
     }
 
-    public static void processQueue(MinecraftServer server) {
+    public static void processPendingEntries(MinecraftServer server) {
         processControlPlacement(server);
         if (PENDING.isEmpty()) return;
 
@@ -103,7 +104,7 @@ public final class TardisDimensionManager {
             if (player == null) continue;
             try {
                 ServerLevel level = getOrCreate(server, entry.getValue());
-                enterNow(player, level, entry.getValue());
+                teleportPlayerIntoInterior(player, level, entry.getValue());
             } catch (Exception e) {
                 Constants.LOG.error("failed to enter tardis {}", entry.getValue(), e);
             }
@@ -114,9 +115,9 @@ public final class TardisDimensionManager {
         PLACE_CONTROLS.put(tardisId, CONTROL_PLACE_DELAY_TICKS);
     }
 
-    private static void enterNow(ServerPlayer player, ServerLevel interior, UUID tardisId) {
-        boolean firstEntry = TardisInteriorSystem.ensureBuilt(interior, tardisId);
-        TardisInterior definition = TardisInteriorSystem.interiorFor(interior.getServer(), tardisId);
+    private static void teleportPlayerIntoInterior(ServerPlayer player, ServerLevel interior, UUID tardisId) {
+        boolean firstEntry = TardisInteriorSystem.buildInteriorIfMissing(interior, tardisId);
+        TardisInterior definition = TardisInteriorSystem.getInteriorDefinition(interior.getServer(), tardisId);
         Vec3 target = TardisInteriorSystem.arrivalPoint(definition);
         player.teleportTo(interior, target.x, target.y, target.z, Set.of(),
                 definition.spawnYaw(), 0.0f, true);

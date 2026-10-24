@@ -16,6 +16,7 @@ public final class GCFabricNetworking {
         PayloadTypeRegistry.clientboundPlay().register(DimensionSkySyncPayload.TYPE, DimensionSkySyncPayload.STREAM_CODEC);
         PayloadTypeRegistry.clientboundPlay().register(TardisConsoleAnimationPayload.TYPE, TardisConsoleAnimationPayload.STREAM_CODEC);
         PayloadTypeRegistry.clientboundPlay().register(TardisConsoleRotorStatePayload.TYPE, TardisConsoleRotorStatePayload.STREAM_CODEC);
+        PayloadTypeRegistry.clientboundPlay().register(TardisDrumShakePayload.TYPE, TardisDrumShakePayload.STREAM_CODEC);
 
         ServerLifecycleEvents.SERVER_STARTED.register(GCJsonReloadListener::setCurrentServer);
 

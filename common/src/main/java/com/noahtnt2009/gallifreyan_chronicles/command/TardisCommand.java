@@ -6,9 +6,11 @@ import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.suggestion.Suggestions;
 import com.mojang.brigadier.suggestion.SuggestionsBuilder;
+import com.noahtnt2009.gallifreyan_chronicles.block.TardisBlock;
 import com.noahtnt2009.gallifreyan_chronicles.block.entity.InteriorDoorBlockEntity;
 import com.noahtnt2009.gallifreyan_chronicles.block.entity.TardisConsoleBlockEntity;
 import com.noahtnt2009.gallifreyan_chronicles.block.entity.TardisExteriorBlockEntity;
+import com.noahtnt2009.gallifreyan_chronicles.init.GCBlocks;
 import com.noahtnt2009.gallifreyan_chronicles.network.TardisConsoleSyncPayload;
 import com.noahtnt2009.gallifreyan_chronicles.platform.Services;
 import com.noahtnt2009.gallifreyan_chronicles.tardis.console.TardisConsole;
@@ -24,12 +26,16 @@ import com.noahtnt2009.gallifreyan_chronicles.tardis.interior.TardisInteriorSyst
 import com.noahtnt2009.gallifreyan_chronicles.tardis.manager.TardisManager;
 import com.noahtnt2009.gallifreyan_chronicles.tardis.exterior.TardisExterior;
 import com.noahtnt2009.gallifreyan_chronicles.tardis.exterior.TardisExteriorRegistry;
+import com.noahtnt2009.gallifreyan_chronicles.tardis.exterior.fade.FadeType;
+import com.noahtnt2009.gallifreyan_chronicles.tardis.exterior.fade.FadeTypes;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
+import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.level.ClipContext;
+import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.HitResult;
@@ -40,6 +46,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
+import java.util.stream.Collectors;
 
 public class TardisCommand {
     private static <T extends BlockEntity> Optional<T> findBlockEntity(
@@ -181,7 +188,7 @@ public class TardisCommand {
             return 0;
         }
 
-        String interiorId = TardisInteriorSystem.interiorFor(server, tardisId).id();
+        String interiorId = TardisInteriorSystem.getInteriorDefinition(server, tardisId).id();
         ctx.getSource().sendSuccess(
                 () -> Component.translatable("command.gallifreyan_chronicles.get_interior", tardisIdStr, interiorId),
                 false
@@ -563,7 +570,7 @@ public class TardisCommand {
             return 0;
         }
 
-        BlockPos pos = manager.getBlockPos(tardisId);
+        BlockPos pos = manager.getRegisteredBlockPos(tardisId);
         Optional<TardisExteriorBlockEntity> blockEntity = findBlockEntity(ctx, pos, TardisExteriorBlockEntity.class);
         blockEntity.ifPresent(be -> be.setGlowing(glowing));
 
@@ -585,6 +592,95 @@ public class TardisCommand {
         );
 
         return 1;
+    }
+
+    public static CompletableFuture<Suggestions> suggestFadeTypes(
+            CommandContext<CommandSourceStack> ctx,
+            SuggestionsBuilder builder
+    ) {
+        for (FadeType type : FadeTypes.getAll()) {
+            builder.suggest(type.id());
+        }
+        return builder.buildFuture();
+    }
+
+    public static int getFadeType(CommandContext<CommandSourceStack> ctx) {
+        return withFadeExterior(ctx, (tardisIdStr, be) -> {
+            ctx.getSource().sendSuccess(
+                    () -> Component.translatable(
+                            "command.gallifreyan_chronicles.get_fade_type",
+                            tardisIdStr,
+                            be.getFadeType().id()
+                    ),
+                    false
+            );
+            return 1;
+        });
+    }
+
+    public static int setFadeType(CommandContext<CommandSourceStack> ctx) {
+        String typeId = StringArgumentType.getString(ctx, "fade_type");
+        if (!FadeTypes.contains(typeId)) {
+            ctx.getSource().sendFailure(Component.translatable(
+                    "command.gallifreyan_chronicles.unknown_fade_type",
+                    typeId,
+                    FadeTypes.getAll().stream().map(FadeType::id).collect(Collectors.joining(", "))
+            ));
+            return 0;
+        }
+        FadeType type = FadeTypes.get(typeId);
+
+        return withFadeExterior(ctx, (tardisIdStr, be) -> {
+            be.setFadeType(type);
+            ctx.getSource().sendSuccess(
+                    () -> Component.translatable(
+                            "command.gallifreyan_chronicles.set_fade_type",
+                            tardisIdStr,
+                            type.id()
+                    ),
+                    true
+            );
+            return 1;
+        });
+    }
+
+    private static int withFadeExterior(
+            CommandContext<CommandSourceStack> ctx,
+            java.util.function.BiFunction<String, TardisExteriorBlockEntity, Integer> action
+    ) {
+        String tardisIdStr = StringArgumentType.getString(ctx, "id");
+
+        UUID tardisId;
+        try {
+            tardisId = UUID.fromString(tardisIdStr);
+        } catch (IllegalArgumentException e) {
+            ctx.getSource().sendFailure(Component.translatable(
+                    "command.gallifreyan_chronicles.invalid_id",
+                    tardisIdStr
+            ));
+            return 0;
+        }
+
+        TardisManager manager = TardisManager.get(ctx.getSource().getServer());
+        if (manager.get(tardisId).isEmpty()) {
+            ctx.getSource().sendFailure(Component.translatable(
+                    "command.gallifreyan_chronicles.no_tardis_id",
+                    tardisIdStr
+            ));
+            return 0;
+        }
+
+        BlockPos pos = manager.getRegisteredBlockPos(tardisId);
+        Optional<TardisExteriorBlockEntity> blockEntity = findBlockEntity(ctx, pos, TardisExteriorBlockEntity.class);
+        if (blockEntity.isEmpty()) {
+            ctx.getSource().sendFailure(Component.translatable(
+                    "command.gallifreyan_chronicles.no_exterior",
+                    tardisIdStr
+            ));
+            return 0;
+        }
+
+        return action.apply(tardisIdStr, blockEntity.get());
     }
 
     public static CompletableFuture<Suggestions> suggestSubsystems(
@@ -1032,6 +1128,99 @@ public class TardisCommand {
                 false
         );
 
+        return 1;
+    }
+
+    private static final int SUMMON_DISTANCE = 5;
+
+    // debug only: moves the exterior in front of the player, any dimension
+    public static int summonTardis(CommandContext<CommandSourceStack> ctx) {
+        String tardisIdStr = StringArgumentType.getString(ctx, "id");
+
+        UUID tardisId;
+        try {
+            tardisId = UUID.fromString(tardisIdStr);
+        } catch (IllegalArgumentException e) {
+            ctx.getSource().sendFailure(Component.translatable(
+                    "command.gallifreyan_chronicles.invalid_id",
+                    tardisIdStr
+            ));
+            return 0;
+        }
+
+        ServerPlayer player;
+        try {
+            player = ctx.getSource().getPlayerOrException();
+        } catch (com.mojang.brigadier.exceptions.CommandSyntaxException e) {
+            ctx.getSource().sendFailure(Component.translatable("command.gallifreyan_chronicles.player_only"));
+            return 0;
+        }
+
+        MinecraftServer server = ctx.getSource().getServer();
+        TardisManager manager = TardisManager.get(server);
+        if (manager.get(tardisId).isEmpty()) {
+            ctx.getSource().sendFailure(Component.translatable(
+                    "command.gallifreyan_chronicles.no_tardis_id",
+                    tardisIdStr
+            ));
+            return 0;
+        }
+
+        ServerLevel oldLevel = server.getLevel(manager.getExteriorDimension(tardisId));
+        BlockPos oldPos = manager.resolveExteriorBlockPos(tardisId);
+        if (oldLevel == null || oldPos == null
+                || !(oldLevel.getBlockEntity(oldPos) instanceof TardisExteriorBlockEntity oldExterior)) {
+            ctx.getSource().sendFailure(Component.translatable(
+                    "command.gallifreyan_chronicles.no_exterior",
+                    tardisIdStr
+            ));
+            return 0;
+        }
+
+        ServerLevel targetLevel = ctx.getSource().getLevel();
+        BlockPos targetPos = player.blockPosition().relative(player.getDirection(), SUMMON_DISTANCE);
+        boolean samePlace = targetLevel == oldLevel && targetPos.equals(oldPos);
+        if (!samePlace && !targetLevel.getBlockState(targetPos).canBeReplaced()) {
+            ctx.getSource().sendFailure(Component.translatable("command.gallifreyan_chronicles.summon_blocked"));
+            return 0;
+        }
+
+        boolean glowing = oldExterior.getBlockState().getValue(TardisBlock.GLOWING);
+
+        oldLevel.removeBlock(oldPos, false);
+        if (oldLevel.getBlockState(oldPos.above()).is(GCBlocks.TARDIS_TOP)) {
+            oldLevel.removeBlock(oldPos.above(), false);
+        }
+
+        targetLevel.setBlock(
+                targetPos,
+                GCBlocks.TARDIS.defaultBlockState().setValue(TardisBlock.GLOWING, glowing),
+                Block.UPDATE_ALL
+        );
+        if (!(targetLevel.getBlockEntity(targetPos) instanceof TardisExteriorBlockEntity newExterior)) {
+            ctx.getSource().sendFailure(Component.translatable(
+                    "command.gallifreyan_chronicles.no_exterior",
+                    tardisIdStr
+            ));
+            return 0;
+        }
+        newExterior.copyStateFrom(oldExterior);
+        newExterior.spawnKeyEntity();
+
+        manager.setRegisteredBlockPos(tardisId, targetPos);
+        manager.setExteriorDimension(tardisId, targetLevel.dimension());
+        if (manager.getExteriorBlockPos(tardisId) != null) {
+            manager.setExteriorBlockPos(tardisId, targetPos);
+        }
+
+        ctx.getSource().sendSuccess(
+                () -> Component.translatable(
+                        "command.gallifreyan_chronicles.summon_tardis",
+                        tardisIdStr,
+                        targetPos.toShortString()
+                ),
+                true
+        );
         return 1;
     }
 }

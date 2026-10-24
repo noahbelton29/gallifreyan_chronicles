@@ -18,7 +18,7 @@ public class GCArmorMaterials {
 
     public static final ResourceKey<EquipmentAsset> TARANIUM_KEY =
             ResourceKey.create(REGISTRY_KEY,
-                    GCUtils.of("taranium"));
+                    GCUtils.modIdentifier("taranium"));
 
     public static final ArmorMaterial TARANIUM_ARMOR_MATERIAL =
             new ArmorMaterial(

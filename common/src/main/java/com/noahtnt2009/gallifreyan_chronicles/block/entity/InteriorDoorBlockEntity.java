@@ -137,7 +137,7 @@ public class InteriorDoorBlockEntity extends BlockEntity implements GeoBlockEnti
 
     private void applyInteriorDoorVariant(ServerLevel serverLevel) {
         if (tardisId == null || !getDoorVariantId().isEmpty()) return;
-        TardisInterior interior = TardisInteriorSystem.interiorFor(serverLevel.getServer(), tardisId);
+        TardisInterior interior = TardisInteriorSystem.getInteriorDefinition(serverLevel.getServer(), tardisId);
         interior.doorVariant().ifPresent(this::setDoorVariant);
     }
 
@@ -148,7 +148,7 @@ public class InteriorDoorBlockEntity extends BlockEntity implements GeoBlockEnti
         }
         DoorSystem.InteractionResult result =
                 DoorSystem.interact(asEntity(), sneaking, System.currentTimeMillis());
-        if (result.playedNothing()) return;
+        if (result.hasNoAnimation()) return;
         if (controller != null) {
             controller.setAnimationSpeed(1.0);
         }
@@ -157,13 +157,13 @@ public class InteriorDoorBlockEntity extends BlockEntity implements GeoBlockEnti
         sync();
 
         if (tardisId != null && level instanceof ServerLevel serverLevel) {
-            DoorSyncSystem.interiorChanged(serverLevel.getServer(), tardisId, this,
+            DoorSyncSystem.onInteriorDoorChanged(serverLevel.getServer(), tardisId, this,
                     result.state(), result.animationName(), result.opening());
         }
     }
 
     public void applySyncedDoor(DoorState state, String animation, boolean opening) {
-        DoorSystem.applyRemote(asEntity(), state, opening, System.currentTimeMillis());
+        DoorSystem.applyRemoteDoorState(asEntity(), state, opening, System.currentTimeMillis());
         if (controller != null) {
             controller.setAnimationSpeed(1.0);
         }
@@ -194,7 +194,7 @@ public class InteriorDoorBlockEntity extends BlockEntity implements GeoBlockEnti
 
     public void snapTo(DoorState state) {
         if (getDoorState() == state) return;
-        DoorSystem.snap(asEntity(), state);
+        DoorSystem.snapToState(asEntity(), state);
         triggerAnim("anim_controller", animationFor(state));
         sync();
     }

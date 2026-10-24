@@ -36,7 +36,7 @@ public class GallifreyanChroniclesFabricClient implements ClientModInitializer {
         GCFabricClientNetworking.registerClientNetworking();
 
         HudElementRegistry.addLast(
-                GCUtils.of("hud_overlay"),
+                GCUtils.modIdentifier("hud_overlay"),
                 (graphics, _) -> GCHudRenderer.render(graphics)
         );
 

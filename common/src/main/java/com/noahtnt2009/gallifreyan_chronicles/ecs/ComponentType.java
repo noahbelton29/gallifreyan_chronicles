@@ -11,7 +11,7 @@ public final class ComponentType<T extends Component> {
     private final Supplier<T> initializer;
 
     private ComponentType(String id, Codec<T> codec, Supplier<T> initializer) {
-        this.id = GCUtils.of(id).toString();
+        this.id = GCUtils.modIdentifier(id).toString();
         this.codec = codec;
         this.initializer = initializer;
     }

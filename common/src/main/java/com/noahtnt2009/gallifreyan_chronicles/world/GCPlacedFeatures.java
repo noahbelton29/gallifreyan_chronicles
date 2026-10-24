@@ -172,7 +172,7 @@ public class GCPlacedFeatures {
     }
 
     public static ResourceKey<PlacedFeature> registerKey(String name) {
-        return ResourceKey.create(Registries.PLACED_FEATURE, GCUtils.of(name));
+        return ResourceKey.create(Registries.PLACED_FEATURE, GCUtils.modIdentifier(name));
     }
 
     private static PlacementModifier triangleOffset(int xzSpread, int ySpread) {

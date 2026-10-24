@@ -9,7 +9,7 @@ public class GCGameRuleCategories {
     public static final GameRuleCategory GALLIFREYAN_CHRONICLES = register("gallifreyan_chronicles");
 
     private static GameRuleCategory register(String name) {
-        Identifier id = GCUtils.of(name);
+        Identifier id = GCUtils.modIdentifier(name);
         return GameRuleCategory.register(id);
     }
 

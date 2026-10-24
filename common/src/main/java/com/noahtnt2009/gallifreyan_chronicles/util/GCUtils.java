@@ -13,11 +13,11 @@ public class GCUtils {
         );
     }
     
-    public static Identifier of(String name) {
+    public static Identifier modIdentifier(String name) {
         return Identifier.fromNamespaceAndPath(Constants.MOD_ID, name);
     }
 
-    public static String ofNamespace(String name) {
+    public static String withModIdPrefix(String name) {
         return String.format(Constants.MOD_ID.concat(": ".concat(name)));
     }
 }

@@ -13,7 +13,8 @@
     "MinecraftAtlasManagerAccessor",
     "SkyRendererInvoker",
     "client.DebugRendererMixin",
-    "client.SkyRendererMixin"
+    "client.SkyRendererMixin",
+    "client.CameraShakeMixin"
   ],
   "server": [],
   "injectors": {

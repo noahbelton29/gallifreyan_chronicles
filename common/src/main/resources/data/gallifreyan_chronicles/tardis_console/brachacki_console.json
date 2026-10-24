@@ -66,6 +66,17 @@
       "height": 0.1875
     },
     {
+      "depth": 0.125,
+      "id": "takeoff",
+      "offset": {
+        "x": -0.1875,
+        "y": 0.5597,
+        "z": -0.9512
+      },
+      "width": 0.125,
+      "height": 0.125
+    },
+    {
       "depth": 0.1875,
       "id": "power_lever",
       "offset": {

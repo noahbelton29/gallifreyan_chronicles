@@ -8,7 +8,7 @@ import com.noahtnt2009.gallifreyan_chronicles.util.GCUtils;
 public class GCResourceLoaders {
     public static void registerResourceLoaders() {
         for (GCDataLoaders.Entry entry : GCDataLoaders.ALL) {
-            GCFabricLoaders.register(GCUtils.of(entry.path()), entry.factory().get());
+            GCFabricLoaders.register(GCUtils.modIdentifier(entry.path()), entry.factory().get());
         }
 
         Constants.LOG.info("Registered GC Resource Loaders (Fabric)");

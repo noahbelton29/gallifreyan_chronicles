@@ -27,12 +27,12 @@ public final class GCConfig {
     private GCConfig() {
     }
 
-    private static Path file() {
+    private static Path configFile() {
         return Services.PLATFORM.getConfigDir().resolve(Constants.MOD_ID + ".json");
     }
 
     public static void load() {
-        Path file = file();
+        Path file = configFile();
         Data loaded = null;
         if (Files.exists(file)) {
             try {
@@ -42,14 +42,14 @@ public final class GCConfig {
             }
         }
         data = loaded != null ? loaded : new Data();
-        if (blank(data.default_exterior)) data.default_exterior = BUILT_IN_EXTERIOR;
-        if (blank(data.default_console)) data.default_console = BUILT_IN_CONSOLE;
-        if (blank(data.default_interior)) data.default_interior = BUILT_IN_INTERIOR;
+        if (isBlank(data.default_exterior)) data.default_exterior = BUILT_IN_EXTERIOR;
+        if (isBlank(data.default_console)) data.default_console = BUILT_IN_CONSOLE;
+        if (isBlank(data.default_interior)) data.default_interior = BUILT_IN_INTERIOR;
         save();
     }
 
     public static void save() {
-        Path file = file();
+        Path file = configFile();
         try {
             Files.createDirectories(file.getParent());
             Files.writeString(file, GSON.toJson(data));
@@ -58,7 +58,7 @@ public final class GCConfig {
         }
     }
 
-    private static boolean blank(String s) {
+    private static boolean isBlank(String s) {
         return s == null || s.isBlank();
     }
 

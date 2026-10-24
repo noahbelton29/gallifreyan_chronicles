@@ -14,7 +14,7 @@ public class GCTags {
         public static final TagKey<Block> NEEDS_NETHERITE_TOOL = createTag("needs_netherite_tool");
 
         private static TagKey<Block> createTag(String name) {
-            return TagKey.create(Registries.BLOCK, GCUtils.of(name));
+            return TagKey.create(Registries.BLOCK, GCUtils.modIdentifier(name));
         }
     }
 
@@ -22,7 +22,7 @@ public class GCTags {
         public static final TagKey<Item> TARANIUM_REPAIRABLE = createTag("taranium_repairable");
 
         private static TagKey<Item> createTag(String name) {
-            return TagKey.create(Registries.ITEM, GCUtils.of(name));
+            return TagKey.create(Registries.ITEM, GCUtils.modIdentifier(name));
         }
     }
 }

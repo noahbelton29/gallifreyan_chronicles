@@ -16,7 +16,7 @@ import java.util.stream.Collectors;
 
 public record TardisExteriorSyncPayload(List<TardisExterior> exteriors, String defaultId) implements CustomPacketPayload {
     public static final Type<TardisExteriorSyncPayload> TYPE =
-            new Type<>(GCUtils.of("tardis_exterior_sync"));
+            new Type<>(GCUtils.modIdentifier("tardis_exterior_sync"));
 
     public static final StreamCodec<RegistryFriendlyByteBuf, TardisExteriorSyncPayload> STREAM_CODEC = StreamCodec.composite(
             TardisExterior.STREAM_CODEC.apply(ByteBufCodecs.list()),

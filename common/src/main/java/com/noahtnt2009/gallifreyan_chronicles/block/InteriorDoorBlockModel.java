@@ -30,16 +30,16 @@ public class InteriorDoorBlockModel extends GeoModel<InteriorDoorBlockEntity> {
 
     @Override
     public @NonNull Identifier getAnimationResource(InteriorDoorBlockEntity animatable) {
-        return InteriorDoorAssets.animation(GCUtils.of(animatable.getVariant()));
+        return InteriorDoorAssets.animation(GCUtils.modIdentifier(animatable.getVariant()));
     }
 
     private Identifier getVariantId(GeoRenderState renderState) {
         if (renderState.hasGeckolibData(InteriorDoorBlockRenderer.VARIANT)) {
             String id = renderState.getGeckolibData(InteriorDoorBlockRenderer.VARIANT);
             if (id != null) {
-                return GCUtils.of(id);
+                return GCUtils.modIdentifier(id);
             }
         }
-        return GCUtils.of(DEFAULT_VARIANT);
+        return GCUtils.modIdentifier(DEFAULT_VARIANT);
     }
 }

@@ -20,7 +20,7 @@ import java.util.stream.Collectors;
 public record TardisConsoleSyncPayload(List<TardisConsole> consoles, List<TardisConsoleVariant> variants, String defaultId,
                                        List<TardisDoorVariant> doorVariants) implements CustomPacketPayload {
     public static final Type<TardisConsoleSyncPayload> TYPE =
-            new Type<>(GCUtils.of("tardis_console_sync"));
+            new Type<>(GCUtils.modIdentifier("tardis_console_sync"));
 
     public static final StreamCodec<RegistryFriendlyByteBuf, TardisConsoleSyncPayload> STREAM_CODEC = StreamCodec.composite(
             TardisConsole.STREAM_CODEC.apply(ByteBufCodecs.list()),

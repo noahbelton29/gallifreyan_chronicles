@@ -73,7 +73,7 @@ public class TardisManager extends SavedData {
     }));
 
     public static final SavedDataType<TardisManager> TYPE = new SavedDataType<>(
-            GCUtils.of("tardises"),
+            GCUtils.modIdentifier("tardises"),
             TardisManager::new,
             CODEC,
             DataFixTypes.SAVED_DATA_COMMAND_STORAGE
@@ -131,7 +131,8 @@ public class TardisManager extends SavedData {
         setDirty();
     }
 
-    public void setBlockPos(UUID tardisId, BlockPos pos) {
+    // where the tardis was first placed. used when no exterior is linked
+    public void setRegisteredBlockPos(UUID tardisId, BlockPos pos) {
         if (pos == null) {
             blockPosById.remove(tardisId);
         } else {
@@ -140,7 +141,7 @@ public class TardisManager extends SavedData {
         setDirty();
     }
 
-    public @Nullable BlockPos getBlockPos(UUID tardisId) {
+    public @Nullable BlockPos getRegisteredBlockPos(UUID tardisId) {
         return blockPosById.get(tardisId);
     }
 

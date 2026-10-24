@@ -29,6 +29,6 @@ public class GCBiomes {
     }
 
     private static ResourceKey<Biome> registerBiomeKey(String name) {
-        return ResourceKey.create(Registries.BIOME, GCUtils.of(name));
+        return ResourceKey.create(Registries.BIOME, GCUtils.modIdentifier(name));
     }
 }

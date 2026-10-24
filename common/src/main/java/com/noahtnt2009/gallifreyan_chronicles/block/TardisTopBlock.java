@@ -53,7 +53,7 @@ public class TardisTopBlock extends Block {
     protected @NonNull VoxelShape getCollisionShape(@NonNull BlockState state, @NonNull BlockGetter level,
                                                     @NonNull BlockPos pos, @NonNull CollisionContext context) {
         if (level.getBlockEntity(pos.below()) instanceof TardisExteriorBlockEntity tardis
-                && !tardis.getDoorState().isClosed()) {
+                && (tardis.isFullyInvisible() || !tardis.getDoorState().isClosed())) {
             return Shapes.empty();
         }
         return super.getCollisionShape(state, level, pos, context);

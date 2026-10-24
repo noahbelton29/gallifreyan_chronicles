@@ -42,7 +42,7 @@ public class InteriorDoorBlockRenderer extends GeoBlockRenderer<@NotNull Interio
 
         Float yawValue = renderPassInfo.renderState().getGeckolibData(YAW);
         float yaw = yawValue != null ? yawValue : 0f;
-        Direction right = InteriorDoorBlock.rightOf(Direction.fromYRot(yaw));
+        Direction right = InteriorDoorBlock.rightDirectionOf(Direction.fromYRot(yaw));
 
         renderPassInfo.poseStack().translate(right.getStepX() * 0.5f, 0f, right.getStepZ() * 0.5f);
         renderPassInfo.poseStack().rotateDegrees(Axis.YP, TardisExterior.modelRotationDegrees(yaw));

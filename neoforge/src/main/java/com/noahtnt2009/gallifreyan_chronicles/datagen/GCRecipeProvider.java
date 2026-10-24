@@ -169,7 +169,7 @@ public class GCRecipeProvider extends RecipeProvider {
                 .unlockedBy(getHasName(GCBlocks.GALLIFREYAN_COBBLESTONE), has(Items.STICK))
                 .save(this.output, ResourceKey.create(
                         Registries.RECIPE,
-                        GCUtils.of("stone_pickaxe_from_gallifreyan_stone")));
+                        GCUtils.modIdentifier("stone_pickaxe_from_gallifreyan_stone")));
 
         shaped(RecipeCategory.COMBAT, GCItems.TARANIUM_HELMET)
                 .pattern("TTT")

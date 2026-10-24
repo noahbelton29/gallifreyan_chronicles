@@ -16,11 +16,11 @@ public class GCEntityTypes {
     public static EntityType<TardisKeyEntity> TARDIS_KEY_ENTITY_TYPE;
 
     public static void registerEntityTypes() {
-        ResourceKey<EntityType<?>> key = ResourceKey.create(Registries.ENTITY_TYPE, GCUtils.of("tardis_control"));
+        ResourceKey<EntityType<?>> key = ResourceKey.create(Registries.ENTITY_TYPE, GCUtils.modIdentifier("tardis_control"));
 
         TARDIS_CONTROL_ENTITY_TYPE = Registry.register(
                 BuiltInRegistries.ENTITY_TYPE,
-                GCUtils.of("tardis_control"),
+                GCUtils.modIdentifier("tardis_control"),
                 EntityType.Builder.of(TardisControlEntity::new, MobCategory.MISC)
                         .sized(TardisControlEntity.DEFAULT_WIDTH, TardisControlEntity.DEFAULT_HEIGHT)
                         .noSummon()
@@ -30,11 +30,11 @@ public class GCEntityTypes {
 
         TardisControlEntity.TYPE = () -> TARDIS_CONTROL_ENTITY_TYPE;
 
-        ResourceKey<EntityType<?>> keyEntityKey = ResourceKey.create(Registries.ENTITY_TYPE, GCUtils.of("tardis_key"));
+        ResourceKey<EntityType<?>> keyEntityKey = ResourceKey.create(Registries.ENTITY_TYPE, GCUtils.modIdentifier("tardis_key"));
 
         TARDIS_KEY_ENTITY_TYPE = Registry.register(
                 BuiltInRegistries.ENTITY_TYPE,
-                GCUtils.of("tardis_key"),
+                GCUtils.modIdentifier("tardis_key"),
                 EntityType.Builder.of(TardisKeyEntity::new, MobCategory.MISC)
                         .sized(TardisKeyEntity.DEFAULT_WIDTH, TardisKeyEntity.DEFAULT_HEIGHT)
                         .noSummon()

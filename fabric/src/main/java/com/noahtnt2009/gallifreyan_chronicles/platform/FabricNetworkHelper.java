@@ -4,6 +4,7 @@ import com.noahtnt2009.gallifreyan_chronicles.network.DimensionSkySyncPayload;
 import com.noahtnt2009.gallifreyan_chronicles.network.TardisConsoleAnimationPayload;
 import com.noahtnt2009.gallifreyan_chronicles.network.TardisConsoleRotorStatePayload;
 import com.noahtnt2009.gallifreyan_chronicles.network.TardisConsoleSyncPayload;
+import com.noahtnt2009.gallifreyan_chronicles.network.TardisDrumShakePayload;
 import com.noahtnt2009.gallifreyan_chronicles.network.TardisExteriorSyncPayload;
 import com.noahtnt2009.gallifreyan_chronicles.platform.services.INetworkHelper;
 import net.fabricmc.fabric.api.networking.v1.PlayerLookup;
@@ -78,5 +79,10 @@ public class FabricNetworkHelper implements INetworkHelper {
         for (ServerPlayer player : PlayerLookup.all(server)) {
             sendTardisConsoleRotorState(player, payload);
         }
+    }
+
+    @Override
+    public void sendTardisDrumShake(ServerPlayer player, TardisDrumShakePayload payload) {
+        ServerPlayNetworking.send(player, payload);
     }
 }

@@ -18,7 +18,7 @@ public class GCBlockEntities {
     public static void registerBlockEntities() {
         TARDIS_EXTERIOR_BLOCK_ENTITY_TYPE = Registry.register(
                 BuiltInRegistries.BLOCK_ENTITY_TYPE,
-                GCUtils.of("tardis_block_entity"),
+                GCUtils.modIdentifier("tardis_block_entity"),
                 FabricBlockEntityTypeBuilder.create(
                         TardisExteriorBlockEntity::new,
                         GCBlocks.TARDIS
@@ -27,7 +27,7 @@ public class GCBlockEntities {
 
         TARDIS_CONSOLE_BLOCK_ENTITY_TYPE = Registry.register(
                 BuiltInRegistries.BLOCK_ENTITY_TYPE,
-                GCUtils.of("tardis_console_block_entity"),
+                GCUtils.modIdentifier("tardis_console_block_entity"),
                 FabricBlockEntityTypeBuilder.create(
                         TardisConsoleBlockEntity::new,
                         GCBlocks.TARDIS_CONSOLE
@@ -36,7 +36,7 @@ public class GCBlockEntities {
 
         INTERIOR_DOOR_BLOCK_ENTITY_TYPE = Registry.register(
                 BuiltInRegistries.BLOCK_ENTITY_TYPE,
-                GCUtils.of("interior_door_block_entity"),
+                GCUtils.modIdentifier("interior_door_block_entity"),
                 FabricBlockEntityTypeBuilder.create(
                         InteriorDoorBlockEntity::new,
                         GCBlocks.TARDIS_INTERIOR_DOOR,

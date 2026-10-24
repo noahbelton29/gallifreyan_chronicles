@@ -171,7 +171,7 @@ public class TardisKeyEntity extends Entity {
         }
 
         TardisExteriorBlockEntity exterior = this.getExterior();
-        if (exterior == null || exterior.hasKeyRendered()) {
+        if (exterior == null || exterior.hasKeyRendered() || exterior.isFullyInvisible()) {
             return InteractionResult.PASS;
         }
 
@@ -245,7 +245,8 @@ public class TardisKeyEntity extends Entity {
 
     @Override
     public boolean isPickable() {
-        return true;
+        TardisExteriorBlockEntity exterior = this.getExterior();
+        return exterior == null || !exterior.isFullyInvisible();
     }
 
     @Override

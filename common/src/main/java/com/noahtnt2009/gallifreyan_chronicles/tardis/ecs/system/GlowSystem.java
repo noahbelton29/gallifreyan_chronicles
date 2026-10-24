@@ -20,7 +20,7 @@ public final class GlowSystem {
         return entity.get(TardisComponentTypes.GLOW).glowing();
     }
 
-    public static void setManual(Entity entity, boolean glowing) {
+    public static void setManualGlow(Entity entity, boolean glowing) {
         GlowComponent current = entity.get(TardisComponentTypes.GLOW);
         entity.set(TardisComponentTypes.GLOW, current.manualSet(glowing));
     }

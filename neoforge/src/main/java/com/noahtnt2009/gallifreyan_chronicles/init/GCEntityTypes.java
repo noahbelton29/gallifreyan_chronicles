@@ -25,7 +25,7 @@ public class GCEntityTypes {
                             .noSummon()
                             .noSave()
                             .build(ResourceKey.create(Registries.ENTITY_TYPE,
-                                    GCUtils.of("tardis_control"))));
+                                    GCUtils.modIdentifier("tardis_control"))));
 
     public static final Supplier<EntityType<TardisKeyEntity>> TARDIS_KEY_ENTITY_TYPE =
             ENTITY_TYPES.register("tardis_key", () ->
@@ -34,7 +34,7 @@ public class GCEntityTypes {
                             .noSummon()
                             .noSave()
                             .build(ResourceKey.create(Registries.ENTITY_TYPE,
-                                    GCUtils.of("tardis_key"))));
+                                    GCUtils.modIdentifier("tardis_key"))));
 
     public static void registerEntityTypes(IEventBus eventBus) {
         Constants.LOG.info("Registered GC Entity Types (NeoForge)");

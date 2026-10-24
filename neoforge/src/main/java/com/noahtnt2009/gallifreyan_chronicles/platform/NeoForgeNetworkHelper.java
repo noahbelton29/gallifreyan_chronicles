@@ -4,6 +4,7 @@ import com.noahtnt2009.gallifreyan_chronicles.network.DimensionSkySyncPayload;
 import com.noahtnt2009.gallifreyan_chronicles.network.TardisConsoleAnimationPayload;
 import com.noahtnt2009.gallifreyan_chronicles.network.TardisConsoleRotorStatePayload;
 import com.noahtnt2009.gallifreyan_chronicles.network.TardisConsoleSyncPayload;
+import com.noahtnt2009.gallifreyan_chronicles.network.TardisDrumShakePayload;
 import com.noahtnt2009.gallifreyan_chronicles.network.TardisExteriorSyncPayload;
 import com.noahtnt2009.gallifreyan_chronicles.platform.services.INetworkHelper;
 import net.minecraft.server.MinecraftServer;
@@ -77,5 +78,10 @@ public class NeoForgeNetworkHelper implements INetworkHelper {
         for (ServerPlayer player : server.getPlayerList().getPlayers()) {
             sendTardisConsoleRotorState(player, payload);
         }
+    }
+
+    @Override
+    public void sendTardisDrumShake(ServerPlayer player, TardisDrumShakePayload payload) {
+        PacketDistributor.sendToPlayer(player, payload);
     }
 }

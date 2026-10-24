@@ -10,7 +10,7 @@ import net.minecraft.core.registries.BuiltInRegistries;
 public class GCFeatures {
     public static final MapCodec<GCBoulderFeature> BOULDER =
             Registry.register(BuiltInRegistries.FEATURE_TYPE,
-                    GCUtils.of("boulder"),
+                    GCUtils.modIdentifier("boulder"),
                     GCBoulderFeature.CODEC);
 
     public static void registerFeatures() {

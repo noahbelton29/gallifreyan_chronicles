@@ -11,7 +11,7 @@ public class GCTreeDecoratorTypes {
     public static final TreeDecoratorType<CadonwoodTrunkVineDecorator> CADONWOOD_TRUNK_VINE =
             Registry.register(
                     BuiltInRegistries.TREE_DECORATOR_TYPE,
-                    GCUtils.of("cadonwood_trunk_vine"),
+                    GCUtils.modIdentifier("cadonwood_trunk_vine"),
                     new TreeDecoratorType<>(CadonwoodTrunkVineDecorator.CODEC)
             );
 

@@ -10,6 +10,7 @@ import com.geckolib.util.GeckoLibUtil;
 import com.noahtnt2009.gallifreyan_chronicles.block.TardisBlock;
 import com.noahtnt2009.gallifreyan_chronicles.client.renderer.geo_layer.TardisExteriorKeyLayer;
 import com.noahtnt2009.gallifreyan_chronicles.ecs.ComponentHolder;
+import com.noahtnt2009.gallifreyan_chronicles.ecs.ComponentType;
 import com.noahtnt2009.gallifreyan_chronicles.ecs.ComponentStore;
 import com.noahtnt2009.gallifreyan_chronicles.ecs.Entity;
 import com.noahtnt2009.gallifreyan_chronicles.entity.TardisKeyEntity;
@@ -51,6 +52,8 @@ import net.minecraft.world.level.storage.ValueOutput;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import com.noahtnt2009.gallifreyan_chronicles.tardis.exterior.fade.FadeType;
+import com.noahtnt2009.gallifreyan_chronicles.tardis.exterior.fade.FadeTypes;
 import org.jspecify.annotations.NonNull;
 import java.util.UUID;
 import java.util.function.Supplier;
@@ -64,6 +67,12 @@ public class TardisExteriorBlockEntity extends BlockEntity implements GeoBlockEn
     private long keyCooldownUntil = 0L;
     private AnimationController<TardisExteriorBlockEntity> controller;
     private boolean locked = true;
+    private static final long TAKEOFF_DELAY_TICKS = 70L;
+    private static final long FADE_OUT_TICKS = 190L;
+    private static final long FADE_IN_TICKS = 240L;
+    private boolean inFlight = false;
+    private long fadeStartTick = 0L;
+    private FadeType fadeType = FadeTypes.DEFAULT;
     private final ComponentStore components = new ComponentStore();
     private AnimatableInstanceCache cache = GeckoLibUtil.createInstanceCache(this);
     private boolean needsStateSync = false;
@@ -148,7 +157,7 @@ public class TardisExteriorBlockEntity extends BlockEntity implements GeoBlockEn
         if (level instanceof ServerLevel serverLevel) {
             UUID id = getTardisId();
             if (id != null) {
-                DoorSyncSystem.lockChanged(serverLevel.getServer(), id, nowLocked, false);
+                DoorSyncSystem.onLockChanged(serverLevel.getServer(), id, nowLocked, false);
             }
         }
     }
@@ -162,7 +171,7 @@ public class TardisExteriorBlockEntity extends BlockEntity implements GeoBlockEn
         if (level instanceof ServerLevel serverLevel) {
             UUID id = getTardisId();
             if (id != null) {
-                DoorSyncSystem.lockChanged(serverLevel.getServer(), id, nowLocked, true);
+                DoorSyncSystem.onLockChanged(serverLevel.getServer(), id, nowLocked, true);
             }
         }
     }
@@ -228,6 +237,24 @@ public class TardisExteriorBlockEntity extends BlockEntity implements GeoBlockEn
         resetAnimationState();
     }
 
+    // used by the summon command to move a tardis to a new block
+    @SuppressWarnings({"unchecked", "rawtypes"})
+    public void copyStateFrom(TardisExteriorBlockEntity other) {
+        for (ComponentType<?> type : TardisComponentTypes.ALL) {
+            com.noahtnt2009.gallifreyan_chronicles.ecs.Component value = other.components.getOrNull((ComponentType) type);
+            if (value != null) {
+                components.set((ComponentType) type, value);
+            }
+        }
+        this.locked = other.locked;
+        this.inFlight = other.inFlight;
+        this.fadeStartTick = other.fadeStartTick;
+        this.fadeType = other.fadeType;
+        this.renderedKeyOwner = other.renderedKeyOwner;
+        this.heldKeyStack = other.heldKeyStack.copy();
+        resetAnimationState();
+    }
+
     private void snapToState() {
         if (level == null || !level.isClientSide() || controller == null) return;
         DoorState state = getDoorState();
@@ -268,6 +295,51 @@ public class TardisExteriorBlockEntity extends BlockEntity implements GeoBlockEn
     public void setYaw(float yaw) {
         asEntity().set(TardisComponentTypes.TRANSFORM, new TransformComponent(yaw));
     }
+    
+    private long fadeDuration() {
+        return inFlight ? FADE_OUT_TICKS : FADE_IN_TICKS;
+    }
+
+    public void setInFlight(boolean inFlight) {
+        if (this.inFlight == inFlight || level == null || level.isClientSide()) return;
+
+        long now = level.getGameTime();
+        float oldProgress = Math.clamp((now - fadeStartTick) / (float) fadeDuration(), 0.0f, 1.0f);
+        float gone = this.inFlight ? oldProgress : 1.0f - oldProgress;
+
+        this.inFlight = inFlight;
+        float newProgress = inFlight ? gone : 1.0f - gone;
+        this.fadeStartTick = now - Math.round(newProgress * fadeDuration());
+        if (inFlight && gone <= 0.0f) {
+            this.fadeStartTick = now + TAKEOFF_DELAY_TICKS;
+        }
+        sync();
+    }
+
+    public FadeType getFadeType() {
+        return fadeType;
+    }
+
+    public void setFadeType(FadeType fadeType) {
+        if (this.fadeType == fadeType) return;
+        this.fadeType = fadeType;
+        sync();
+    }
+
+    public boolean isFullyInvisible() {
+        return inFlight && level != null && level.getGameTime() - fadeStartTick >= FADE_OUT_TICKS;
+    }
+
+    public float getOpacity(float partialTick) {
+        if (level == null) return inFlight ? 0.0f : 1.0f;
+
+        float elapsed = (level.getGameTime() - fadeStartTick) + partialTick;
+        float progress = Math.clamp(elapsed / fadeDuration(), 0.0f, 1.0f);
+        if (progress >= 1.0f) return inFlight ? 0.0f : 1.0f;
+
+        float gone = inFlight ? progress : 1.0f - progress;
+        return fadeType.opacity(gone, elapsed);
+    }
 
     public @Nullable UUID getTardisId() {
         return getLinkedTardisId().orElse(null);
@@ -282,7 +354,7 @@ public class TardisExteriorBlockEntity extends BlockEntity implements GeoBlockEn
     }
 
     public void setGlowing(boolean glowing) {
-        GlowSystem.setManual(asEntity(), glowing);
+        GlowSystem.setManualGlow(asEntity(), glowing);
         applyGlowToBlockState(glowing);
         sync();
     }
@@ -304,7 +376,7 @@ public class TardisExteriorBlockEntity extends BlockEntity implements GeoBlockEn
             blockEntity.applyGlowToBlockState(blockEntity.isGlowing());
             blockEntity.sync();
         }
-        TardisInteriorSystem.tickEntry(level, blockEntity);
+        TardisInteriorSystem.tickEntryZone(level, blockEntity);
         if (level instanceof ServerLevel serverLevel) {
             blockEntity.tickLockDamageEffects(serverLevel);
         }
@@ -365,7 +437,7 @@ public class TardisExteriorBlockEntity extends BlockEntity implements GeoBlockEn
         }
         DoorSystem.InteractionResult result =
                 DoorSystem.interact(asEntity(), sneaking, System.currentTimeMillis());
-        if (result.playedNothing()) return;
+        if (result.hasNoAnimation()) return;
         if (controller != null) {
             controller.setAnimationSpeed(1.0);
         }
@@ -375,14 +447,14 @@ public class TardisExteriorBlockEntity extends BlockEntity implements GeoBlockEn
         if (level instanceof ServerLevel serverLevel) {
             UUID id = getTardisId();
             if (id != null) {
-                DoorSyncSystem.exteriorChanged(serverLevel.getServer(), id, result.state(),
+                DoorSyncSystem.onExteriorDoorChanged(serverLevel.getServer(), id, result.state(),
                         result.animationName(), result.opening());
             }
         }
     }
 
     public void applySyncedDoor(DoorState state, String animation, boolean opening) {
-        DoorSystem.applyRemote(asEntity(), state, opening, System.currentTimeMillis());
+        DoorSystem.applyRemoteDoorState(asEntity(), state, opening, System.currentTimeMillis());
         if (controller != null) {
             controller.setAnimationSpeed(1.0);
         }
@@ -490,6 +562,9 @@ public class TardisExteriorBlockEntity extends BlockEntity implements GeoBlockEn
             output.store("HeldKeyStack", ItemStack.OPTIONAL_CODEC, heldKeyStack);
         }
         output.putBoolean("Locked", locked);
+        output.putBoolean("InFlight", inFlight);
+        output.putLong("FadeStartTick", fadeStartTick);
+        output.putString("FadeType", fadeType.id());
     }
 
     @Override
@@ -500,6 +575,9 @@ public class TardisExteriorBlockEntity extends BlockEntity implements GeoBlockEn
         heldKeyStack = input.read("HeldKeyStack", ItemStack.OPTIONAL_CODEC)
                 .orElse(ItemStack.EMPTY);
         locked = input.getBooleanOr("Locked", true);
+        inFlight = input.getBooleanOr("InFlight", false);
+        fadeStartTick = input.getLongOr("FadeStartTick", 0L);
+        fadeType = FadeTypes.get(input.getStringOr("FadeType", FadeTypes.DEFAULT.id()));
     }
 
     @Override

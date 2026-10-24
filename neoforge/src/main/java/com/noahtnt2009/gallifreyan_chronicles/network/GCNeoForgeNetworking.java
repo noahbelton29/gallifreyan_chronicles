@@ -51,6 +51,11 @@ public final class GCNeoForgeNetworking {
                 TardisConsoleRotorStatePayload.STREAM_CODEC,
                 (payload, context) -> context.enqueueWork(payload::apply)
         );
+        registrar.playToClient(
+                TardisDrumShakePayload.TYPE,
+                TardisDrumShakePayload.STREAM_CODEC,
+                (payload, context) -> context.enqueueWork(payload::apply)
+        );
         Constants.LOG.info("Registered GC Networking");
     }
 

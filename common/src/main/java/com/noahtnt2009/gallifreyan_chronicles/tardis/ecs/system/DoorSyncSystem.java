@@ -74,7 +74,7 @@ public final class DoorSyncSystem {
         return level.getBlockEntity(pos) instanceof TardisExteriorBlockEntity exterior ? exterior : null;
     }
 
-    public static void exteriorChanged(MinecraftServer server, UUID tardisId, DoorState state,
+    public static void onExteriorDoorChanged(MinecraftServer server, UUID tardisId, DoorState state,
                                        String animation, boolean opening) {
         for (InteriorDoorBlockEntity door : doorsOf(tardisId)) {
             door.applySyncedDoor(state, animation, opening);
@@ -82,7 +82,7 @@ public final class DoorSyncSystem {
         syncDoorControl(server, tardisId, state);
     }
 
-    public static void interiorChanged(MinecraftServer server, UUID tardisId, InteriorDoorBlockEntity source,
+    public static void onInteriorDoorChanged(MinecraftServer server, UUID tardisId, InteriorDoorBlockEntity source,
                                        DoorState state, String animation, boolean opening) {
         TardisExteriorBlockEntity exterior = findExterior(server, tardisId);
         if (exterior != null) {
@@ -122,7 +122,7 @@ public final class DoorSyncSystem {
         }
     }
 
-    public static void lockChanged(MinecraftServer server, UUID tardisId, boolean locked, boolean fromConsole) {
+    public static void onLockChanged(MinecraftServer server, UUID tardisId, boolean locked, boolean fromConsole) {
         for (InteriorDoorBlockEntity door : doorsOf(tardisId)) {
             door.applySyncedLock(locked);
         }
@@ -131,7 +131,7 @@ public final class DoorSyncSystem {
         }
     }
 
-    public static void toggleAll(MinecraftServer server, UUID tardisId) {
+    public static void toggleAllDoors(MinecraftServer server, UUID tardisId) {
         TardisExteriorBlockEntity exterior = findExterior(server, tardisId);
         if (exterior != null) {
             exterior.interact(true, true);

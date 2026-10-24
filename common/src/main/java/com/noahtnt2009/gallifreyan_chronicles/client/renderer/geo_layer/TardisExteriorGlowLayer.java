@@ -22,6 +22,7 @@ public class TardisExteriorGlowLayer<T extends GeoAnimatable, O, R extends GeoRe
         boolean glowing = renderState.getOrDefaultGeckolibData(TardisExteriorBlockRenderer.GLOWING, false);
 
         if (!glowing) return null;
+        if (renderState.getOrDefaultGeckolibData(TardisExteriorBlockRenderer.OPACITY, 1.0f) <= 0.0f) return null;
         return super.getRenderType(renderState);
     }
 
@@ -29,6 +30,6 @@ public class TardisExteriorGlowLayer<T extends GeoAnimatable, O, R extends GeoRe
     protected @NonNull Identifier getTextureResource(@NonNull R renderState) {
         Identifier base = this.renderer.getTextureLocation(renderState);
         String path = base.getPath().replace(".png", "_glowmask.png");
-        return GCUtils.of(path);
+        return GCUtils.modIdentifier(path);
     }
 }

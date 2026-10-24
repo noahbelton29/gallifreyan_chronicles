@@ -13,7 +13,7 @@ public final class DoorSystem {
     }
 
     public record InteractionResult(String animationName, boolean opening, DoorState state) {
-        public boolean playedNothing() {
+        public boolean hasNoAnimation() {
             return animationName == null;
         }
     }
@@ -26,12 +26,13 @@ public final class DoorSystem {
         return entity.get(TardisComponentTypes.DOOR).isAnimating(now);
     }
 
-    public static void applyRemote(Entity entity, DoorState next, boolean opening, long now) {
+    public static void applyRemoteDoorState(Entity entity, DoorState next, boolean opening, long now) {
         long duration = opening ? OPEN_DURATION_MS : CLOSE_DURATION_MS;
         entity.set(TardisComponentTypes.DOOR, entity.get(TardisComponentTypes.DOOR).animatingUntil(next, now + duration));
     }
 
-    public static void snap(Entity entity, DoorState state) {
+    // sets the state right away, no animation
+    public static void snapToState(Entity entity, DoorState state) {
         entity.set(TardisComponentTypes.DOOR, entity.get(TardisComponentTypes.DOOR).animatingUntil(state, 0L));
     }
 

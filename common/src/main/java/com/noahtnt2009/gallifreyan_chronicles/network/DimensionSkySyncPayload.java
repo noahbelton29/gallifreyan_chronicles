@@ -16,7 +16,7 @@ import java.util.stream.Collectors;
 
 public record DimensionSkySyncPayload(List<DimensionSky> skies) implements CustomPacketPayload {
     public static final Type<DimensionSkySyncPayload> TYPE =
-            new Type<>(GCUtils.of("dimension_sky_sync"));
+            new Type<>(GCUtils.modIdentifier("dimension_sky_sync"));
 
     public static final StreamCodec<FriendlyByteBuf, DimensionSkySyncPayload> STREAM_CODEC = StreamCodec.composite(
             DimensionSky.STREAM_CODEC.apply(ByteBufCodecs.list()), DimensionSkySyncPayload::skies,

@@ -153,7 +153,7 @@ public class GCConfiguredFeatures {
     }
 
     public static ResourceKey<Feature> registerKey(String name) {
-        return ResourceKey.create(Registries.FEATURE, GCUtils.of(name));
+        return ResourceKey.create(Registries.FEATURE, GCUtils.modIdentifier(name));
     }
 
     private static void register(BootstrapContext<Feature> context, ResourceKey<Feature> key, Feature feature) {

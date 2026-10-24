@@ -8,6 +8,7 @@ import com.geckolib.animation.RawAnimation;
 import com.geckolib.animation.object.PlayState;
 import com.geckolib.util.GeckoLibUtil;
 import com.noahtnt2009.gallifreyan_chronicles.block.ConsoleBlock;
+import com.noahtnt2009.gallifreyan_chronicles.client.camera.GCCameraShake;
 import com.noahtnt2009.gallifreyan_chronicles.client.sound.TardisConsoleHumSoundInstance;
 import com.noahtnt2009.gallifreyan_chronicles.ecs.ComponentHolder;
 import com.noahtnt2009.gallifreyan_chronicles.ecs.ComponentStore;
@@ -69,6 +70,7 @@ public class TardisConsoleBlockEntity extends BlockEntity implements GeoBlockEnt
     private final ConsoleAnimationDriver animationDriver;
     private final ConsoleControlManager controls;
     private boolean humStarted = false;
+    private boolean rumbleRegistered = false;
 
     private static final double SNAP_TO_END = 10_000.0;
     private final Map<String, Integer> snapFrames = new HashMap<>();
@@ -323,6 +325,35 @@ public class TardisConsoleBlockEntity extends BlockEntity implements GeoBlockEnt
                     new TardisConsoleHumSoundInstance(getBlockPos(), this::isHumStillValid)
             ));
         }
+
+        if (level.isClientSide() && !rumbleRegistered) {
+            rumbleRegistered = true;
+            Vec3 center = Vec3.atCenterOf(getBlockPos());
+            GCCameraShake.addFlightSource(new GCCameraShake.FlightSource() {
+                @Override
+                public Vec3 position() {
+                    return center;
+                }
+
+                @Override
+                public boolean isInFlight() {
+                    return TardisConsoleBlockEntity.this.isInFlight();
+                }
+
+                @Override
+                public boolean isValid() {
+                    return TardisConsoleBlockEntity.this.isRumbleSourceValid();
+                }
+            });
+        }
+    }
+
+    public boolean isInFlight() {
+        return FLIGHT_STATE.equals(this.currentRotorState);
+    }
+
+    private boolean isRumbleSourceValid() {
+        return !isRemoved() && level != null && level == Minecraft.getInstance().level;
     }
 
     private boolean isHumStillValid() {

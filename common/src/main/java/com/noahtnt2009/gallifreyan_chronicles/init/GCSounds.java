@@ -16,10 +16,20 @@ public class GCSounds {
     public static final SoundEvent TARDIS_IS_LOCKED = register("tardis_is_locked");
     public static final SoundEvent TARDIS_KEY_JAMMED = register("tardis_key_jammed");
 
+    public static final float TAKEOFF_HEARING_RANGE = 25.0F;
+    public static final SoundEvent TARDIS_DRUM = registerFixedRange("tardis_drum", TAKEOFF_HEARING_RANGE);
+    public static final SoundEvent TARDIS_TAKEOFF = registerFixedRange("tardis_takeoff", TAKEOFF_HEARING_RANGE);
+    public static final SoundEvent TARDIS_VWORP = registerFixedRange("tardis_vworp", TAKEOFF_HEARING_RANGE);
+
 
     private static SoundEvent register(String name) {
-        Identifier id = GCUtils.of(name);
+        Identifier id = GCUtils.modIdentifier(name);
         return Registry.register(BuiltInRegistries.SOUND_EVENT, id, SoundEvent.createVariableRangeEvent(id));
+    }
+
+    private static SoundEvent registerFixedRange(String name, float range) {
+        Identifier id = GCUtils.modIdentifier(name);
+        return Registry.register(BuiltInRegistries.SOUND_EVENT, id, SoundEvent.createFixedRangeEvent(id, range));
     }
 
     public static void registerSounds() {}

@@ -60,9 +60,10 @@ public final class TardisInteriorSystem {
     private TardisInteriorSystem() {
     }
 
-    public static void tickEntry(Level level, TardisExteriorBlockEntity exterior) {
+    public static void tickEntryZone(Level level, TardisExteriorBlockEntity exterior) {
         if (!(level instanceof ServerLevel serverLevel)) return;
         if (exterior.getDoorState().isClosed() || exterior.isLocked()) return;
+        if (exterior.isFullyInvisible()) return;
 
         UUID tardisId = exterior.getTardisId();
         if (tardisId == null) return;
@@ -76,7 +77,7 @@ public final class TardisInteriorSystem {
         for (ServerPlayer player : serverLevel.getEntitiesOfClass(ServerPlayer.class, search)) {
             if (player.isSpectator()) continue;
             if (!inEntryZone(player, pos, frontX, frontZ)) continue;
-            TardisDimensionManager.request(serverLevel.getServer(), player, tardisId);
+            TardisDimensionManager.requestEntry(serverLevel.getServer(), player, tardisId);
         }
     }
 
@@ -93,7 +94,7 @@ public final class TardisInteriorSystem {
                 && dy >= ZONE_BOTTOM && dy <= ZONE_TOP;
     }
 
-    public static void tickExits(MinecraftServer server) {
+    public static void tickExitZones(MinecraftServer server) {
         for (ServerPlayer player : List.copyOf(server.getPlayerList().getPlayers())) {
             Identifier dimension = player.level().dimension().identifier();
             if (!dimension.getNamespace().equals(Constants.MOD_ID)) continue;
@@ -108,18 +109,18 @@ public final class TardisInteriorSystem {
                 continue;
             }
 
-            AABB exitBox = interiorFor(server, tardisId).exitBox();
+            AABB exitBox = getInteriorDefinition(server, tardisId).exitBox();
             double dx = player.getX() - ORIGIN.getX();
             double dy = player.getY() - ORIGIN.getY();
             double dz = player.getZ() - ORIGIN.getZ();
             if (dx < exitBox.minX || dx > exitBox.maxX) continue;
             if (dy < exitBox.minY || dy > exitBox.maxY) continue;
             if (dz < exitBox.minZ || dz > exitBox.maxZ) continue;
-            exit(server, player, tardisId);
+            exitInterior(server, player, tardisId);
         }
     }
 
-    private static void exit(MinecraftServer server, ServerPlayer player, UUID tardisId) {
+    private static void exitInterior(MinecraftServer server, ServerPlayer player, UUID tardisId) {
         TardisManager manager = TardisManager.get(server);
         BlockPos exteriorPos = manager.resolveExteriorBlockPos(tardisId);
         if (exteriorPos == null) return;
@@ -145,7 +146,7 @@ public final class TardisInteriorSystem {
         return Vec3.atLowerCornerOf(ORIGIN).add(definition.spawn());
     }
 
-    public static TardisInterior interiorFor(MinecraftServer server, UUID tardisId) {
+    public static TardisInterior getInteriorDefinition(MinecraftServer server, UUID tardisId) {
         TardisManager manager = TardisManager.get(server);
         String stored = manager.getInteriorId(tardisId);
         if (stored != null) return TardisInteriorRegistry.get(stored);
@@ -155,15 +156,15 @@ public final class TardisInteriorSystem {
         return chosen;
     }
 
-    public static boolean ensureBuilt(ServerLevel interior, UUID tardisId) {
-        return ensureBuilt(interior, tardisId, null);
+    public static boolean buildInteriorIfMissing(ServerLevel interior, UUID tardisId) {
+        return buildInteriorIfMissing(interior, tardisId, null);
     }
 
-    private static boolean ensureBuilt(ServerLevel interior, UUID tardisId, @Nullable ConsoleCarryover carry) {
+    private static boolean buildInteriorIfMissing(ServerLevel interior, UUID tardisId, @Nullable ConsoleCarryover carry) {
         TardisManager manager = TardisManager.get(interior.getServer());
         if (manager.getInteriorOrigin(tardisId) != null) return false;
 
-        Identifier templateId = interiorFor(interior.getServer(), tardisId).structure();
+        Identifier templateId = getInteriorDefinition(interior.getServer(), tardisId).structure();
         Optional<StructureTemplate> template = interior.getServer().getStructureTemplateManager().get(templateId);
         if (template.isEmpty()) {
             Constants.LOG.error("missing interior template {}", templateId);
@@ -172,7 +173,7 @@ public final class TardisInteriorSystem {
 
         BlockPos origin = ORIGIN;
         Vec3i size = template.get().getSize();
-        loadChunks(interior, origin, size);
+        loadInteriorChunks(interior, origin, size);
 
         template.get().placeInWorld(interior, origin, origin, new StructurePlaceSettings(),
                 interior.getRandom(), 3);
@@ -185,7 +186,7 @@ public final class TardisInteriorSystem {
 
         if (interior.getBlockEntity(consolePos) instanceof TardisConsoleBlockEntity console) {
             ConsoleLinkSystem.link(interior, tardisId, consolePos);
-            applyInteriorConsole(console, interiorFor(interior.getServer(), tardisId), carry);
+            applyInteriorConsole(console, getInteriorDefinition(interior.getServer(), tardisId), carry);
             ConsoleLinkSystem.spawnDefaultControls(console);
             console.sync();
         } else {
@@ -241,7 +242,7 @@ public final class TardisInteriorSystem {
         if (!TardisInteriorRegistry.contains(newId)) return ChangeResult.UNKNOWN_INTERIOR;
 
         TardisManager manager = TardisManager.get(server);
-        TardisInterior oldDef = interiorFor(server, tardisId);
+        TardisInterior oldDef = getInteriorDefinition(server, tardisId);
         TardisInterior newDef = TardisInteriorRegistry.get(newId);
         if (oldDef.id().equals(newDef.id())) return ChangeResult.UNCHANGED;
 
@@ -275,7 +276,7 @@ public final class TardisInteriorSystem {
 
         manager.clearInteriorOrigin(tardisId);
         manager.setInteriorId(tardisId, newDef.id());
-        ensureBuilt(level, tardisId, carry);
+        buildInteriorIfMissing(level, tardisId, carry);
         DoorSyncSystem.reconcileConsole(server, tardisId);
         TardisDimensionManager.scheduleControlPlacement(tardisId);
 
@@ -287,7 +288,7 @@ public final class TardisInteriorSystem {
     }
 
     private static void clearArea(ServerLevel level, Vec3i size) {
-        loadChunks(level, ORIGIN, size);
+        loadInteriorChunks(level, ORIGIN, size);
         BlockPos max = ORIGIN.offset(size.getX() - 1, size.getY() - 1, size.getZ() - 1);
 
         for (BlockPos p : BlockPos.betweenClosed(ORIGIN, max)) {
@@ -305,7 +306,7 @@ public final class TardisInteriorSystem {
         }
     }
 
-    private static void loadChunks(ServerLevel level, BlockPos origin, Vec3i size) {
+    private static void loadInteriorChunks(ServerLevel level, BlockPos origin, Vec3i size) {
         int minCx = origin.getX() >> 4;
         int maxCx = (origin.getX() + size.getX() - 1) >> 4;
         int minCz = origin.getZ() >> 4;

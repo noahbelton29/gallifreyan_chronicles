@@ -1,10 +1,12 @@
 package com.noahtnt2009.gallifreyan_chronicles.tardis.control.impl;
 
+import com.mojang.serialization.MapCodec;
 import com.noahtnt2009.gallifreyan_chronicles.Constants;
 import com.noahtnt2009.gallifreyan_chronicles.block.entity.TardisConsoleBlockEntity;
 import com.noahtnt2009.gallifreyan_chronicles.block.entity.TardisExteriorBlockEntity;
 import com.noahtnt2009.gallifreyan_chronicles.entity.TardisControlEntity;
 import com.noahtnt2009.gallifreyan_chronicles.init.GCSounds;
+import com.noahtnt2009.gallifreyan_chronicles.tardis.control.ControlAnimations;
 import com.noahtnt2009.gallifreyan_chronicles.tardis.control.TardisControl;
 import com.noahtnt2009.gallifreyan_chronicles.tardis.ecs.system.DoorSyncSystem;
 import net.minecraft.ChatFormatting;
@@ -19,6 +21,20 @@ import net.minecraft.world.entity.player.Player;
 import java.util.UUID;
 
 public class DoorControl implements TardisControl {
+    public static final ControlAnimations DEFAULT_ANIMATIONS = new ControlAnimations("door_control_off", "door_control_on", true);
+    public static final MapCodec<DoorControl> CODEC = ControlAnimations.codec(DEFAULT_ANIMATIONS)
+            .xmap(DoorControl::new, DoorControl::animations);
+
+    private final ControlAnimations animations;
+
+    public DoorControl() {
+        this(DEFAULT_ANIMATIONS);
+    }
+
+    public DoorControl(ControlAnimations animations) {
+        this.animations = animations;
+    }
+
     private boolean STATE = false;
 
     @Override
@@ -64,12 +80,21 @@ public class DoorControl implements TardisControl {
 
     @Override
     public String getAnimation(boolean activated) {
-        return activated ? "door_control_off" : "door_control_on";
+        return activated ? animations.active() : animations.inactive();
     }
 
     @Override
     public boolean snapsWhenInactive() {
-        return true;
+        return animations.snapsWhenInactive();
+    }
+
+    @Override
+    public MapCodec<DoorControl> codec() {
+        return CODEC;
+    }
+
+    public ControlAnimations animations() {
+        return animations;
     }
 
     @Override

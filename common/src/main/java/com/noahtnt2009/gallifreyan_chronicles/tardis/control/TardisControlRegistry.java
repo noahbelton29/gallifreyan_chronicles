@@ -11,7 +11,7 @@ public class TardisControlRegistry {
     }
 
     public static TardisControl get(String id) {
-        return CONTROLS.getOrDefault(id, new TardisControl() {});
+        return CONTROLS.getOrDefault(id, NoopControl.INSTANCE);
     }
 
     public static java.util.Set<String> allIds() {

@@ -1,11 +1,13 @@
 package com.noahtnt2009.gallifreyan_chronicles.tardis.control.impl;
 
+import com.mojang.serialization.MapCodec;
 import com.noahtnt2009.gallifreyan_chronicles.Constants;
 import com.noahtnt2009.gallifreyan_chronicles.block.entity.TardisConsoleBlockEntity;
 import com.noahtnt2009.gallifreyan_chronicles.entity.TardisControlEntity;
 import com.noahtnt2009.gallifreyan_chronicles.init.GCSounds;
 import com.noahtnt2009.gallifreyan_chronicles.network.TardisDrumShakePayload;
 import com.noahtnt2009.gallifreyan_chronicles.block.entity.TardisExteriorBlockEntity;
+import com.noahtnt2009.gallifreyan_chronicles.tardis.control.ControlAnimations;
 import com.noahtnt2009.gallifreyan_chronicles.tardis.control.TardisControl;
 import com.noahtnt2009.gallifreyan_chronicles.tardis.ecs.system.DoorSyncSystem;
 import com.noahtnt2009.gallifreyan_chronicles.util.GCScheduler;
@@ -18,6 +20,20 @@ import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
 
 public class FlightLeverControl implements TardisControl {
+    public static final ControlAnimations DEFAULT_ANIMATIONS = new ControlAnimations("flight_lever_down", "flight_lever_up", false);
+    public static final MapCodec<FlightLeverControl> CODEC = ControlAnimations.codec(DEFAULT_ANIMATIONS)
+            .xmap(FlightLeverControl::new, FlightLeverControl::animations);
+
+    private final ControlAnimations animations;
+
+    public FlightLeverControl() {
+        this(DEFAULT_ANIMATIONS);
+    }
+
+    public FlightLeverControl(ControlAnimations animations) {
+        this.animations = animations;
+    }
+
     private static final int TAKEOFF_SOUND_DELAY_TICKS = 0;
     private static final int TAKEOFF_SOUND_LENGTH_TICKS = 425;
 
@@ -72,7 +88,21 @@ public class FlightLeverControl implements TardisControl {
 
     @Override
     public String getAnimation(boolean activated) {
-        return activated ? "flight_lever_down" : "flight_lever_up";
+        return activated ? animations.active() : animations.inactive();
+    }
+
+    @Override
+    public boolean snapsWhenInactive() {
+        return animations.snapsWhenInactive();
+    }
+
+    @Override
+    public MapCodec<FlightLeverControl> codec() {
+        return CODEC;
+    }
+
+    public ControlAnimations animations() {
+        return animations;
     }
 
     @Override

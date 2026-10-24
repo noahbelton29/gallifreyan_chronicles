@@ -1,9 +1,11 @@
 package com.noahtnt2009.gallifreyan_chronicles.tardis.control.impl;
 
+import com.mojang.serialization.MapCodec;
 import com.noahtnt2009.gallifreyan_chronicles.Constants;
 import com.noahtnt2009.gallifreyan_chronicles.block.entity.TardisConsoleBlockEntity;
 import com.noahtnt2009.gallifreyan_chronicles.entity.TardisControlEntity;
 import com.noahtnt2009.gallifreyan_chronicles.init.GCSounds;
+import com.noahtnt2009.gallifreyan_chronicles.tardis.control.ControlAnimations;
 import com.noahtnt2009.gallifreyan_chronicles.tardis.control.TardisControl;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundSource;
@@ -12,6 +14,20 @@ import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
 
 public class HandbrakeControl implements TardisControl {
+    public static final ControlAnimations DEFAULT_ANIMATIONS = new ControlAnimations("handbrake_down", "handbrake_up", false);
+    public static final MapCodec<HandbrakeControl> CODEC = ControlAnimations.codec(DEFAULT_ANIMATIONS)
+            .xmap(HandbrakeControl::new, HandbrakeControl::animations);
+
+    private final ControlAnimations animations;
+
+    public HandbrakeControl() {
+        this(DEFAULT_ANIMATIONS);
+    }
+
+    public HandbrakeControl(ControlAnimations animations) {
+        this.animations = animations;
+    }
+
     private boolean STATE = false;
 
     @Override
@@ -43,7 +59,21 @@ public class HandbrakeControl implements TardisControl {
 
     @Override
     public String getAnimation(boolean activated) {
-        return activated ? "handbrake_down" : "handbrake_up";
+        return activated ? animations.active() : animations.inactive();
+    }
+
+    @Override
+    public boolean snapsWhenInactive() {
+        return animations.snapsWhenInactive();
+    }
+
+    @Override
+    public MapCodec<HandbrakeControl> codec() {
+        return CODEC;
+    }
+
+    public ControlAnimations animations() {
+        return animations;
     }
 
     @Override

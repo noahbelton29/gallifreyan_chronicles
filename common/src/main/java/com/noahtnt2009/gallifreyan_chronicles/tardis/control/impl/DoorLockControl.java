@@ -1,10 +1,12 @@
 package com.noahtnt2009.gallifreyan_chronicles.tardis.control.impl;
 
+import com.mojang.serialization.MapCodec;
 import com.noahtnt2009.gallifreyan_chronicles.Constants;
 import com.noahtnt2009.gallifreyan_chronicles.block.entity.TardisConsoleBlockEntity;
 import com.noahtnt2009.gallifreyan_chronicles.block.entity.TardisExteriorBlockEntity;
 import com.noahtnt2009.gallifreyan_chronicles.entity.TardisControlEntity;
 import com.noahtnt2009.gallifreyan_chronicles.init.GCSounds;
+import com.noahtnt2009.gallifreyan_chronicles.tardis.control.ControlAnimations;
 import com.noahtnt2009.gallifreyan_chronicles.tardis.control.TardisControl;
 import com.noahtnt2009.gallifreyan_chronicles.tardis.ecs.system.DoorSyncSystem;
 import net.minecraft.ChatFormatting;
@@ -18,7 +20,15 @@ import org.jspecify.annotations.Nullable;
 
 import java.util.UUID;
 
-public class DoorLockControl implements TardisControl {
+public record DoorLockControl(ControlAnimations animations) implements TardisControl {
+    public static final ControlAnimations DEFAULT_ANIMATIONS = new ControlAnimations("door_lock_on", "door_lock_off", false);
+    public static final MapCodec<DoorLockControl> CODEC = ControlAnimations.codec(DEFAULT_ANIMATIONS)
+            .xmap(DoorLockControl::new, DoorLockControl::animations);
+
+    public DoorLockControl() {
+        this(DEFAULT_ANIMATIONS);
+    }
+
     public static final String ID = "door_lock";
 
     @Override
@@ -63,7 +73,17 @@ public class DoorLockControl implements TardisControl {
 
     @Override
     public String getAnimation(boolean activated) {
-        return activated ? "door_lock_on" : "door_lock_off";
+        return activated ? animations.active() : animations.inactive();
+    }
+
+    @Override
+    public boolean snapsWhenInactive() {
+        return animations.snapsWhenInactive();
+    }
+
+    @Override
+    public MapCodec<DoorLockControl> codec() {
+        return CODEC;
     }
 
     @Override

@@ -17,7 +17,7 @@ import java.util.stream.Collectors;
 import static net.minecraft.commands.Commands.argument;
 import static net.minecraft.commands.Commands.literal;
 
-public class GCCommands {
+public class GCFabricCommands {
     public static void registerCommands() {
         CommandRegistrationCallback.EVENT.register((dispatcher, _, _) -> {
             dispatcher.register(
@@ -86,7 +86,7 @@ public class GCCommands {
                                                     .then(literal("get")
                                                             .executes(TardisCommand::getFadeType))
                                                     .then(literal("set")
-                                                            .then(argument("fade_type", StringArgumentType.word())
+                                                            .then(argument("fade_type", StringArgumentType.string())
                                                                     .suggests(TardisCommand::suggestFadeTypes)
                                                                     .executes(TardisCommand::setFadeType))))
                                             .then(literal("glow")

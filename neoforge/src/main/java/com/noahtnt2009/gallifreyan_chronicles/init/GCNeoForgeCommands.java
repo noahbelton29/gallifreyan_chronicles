@@ -1,4 +1,3 @@
-
 package com.noahtnt2009.gallifreyan_chronicles.init;
 
 import com.mojang.brigadier.arguments.BoolArgumentType;
@@ -95,13 +94,13 @@ public class GCNeoForgeCommands {
                                                                 .suggests(TardisCommand::suggestInteriors)
                                                                 .executes(TardisCommand::setInterior))))
                                         .then(literal("fade")
-                                                    .then(literal("get")
-                                                            .executes(TardisCommand::getFadeType))
-                                                    .then(literal("set")
-                                                            .then(argument("fade_type", StringArgumentType.word())
-                                                                    .suggests(TardisCommand::suggestFadeTypes)
-                                                                    .executes(TardisCommand::setFadeType))))
-                                            .then(literal("glow")
+                                                .then(literal("get")
+                                                        .executes(TardisCommand::getFadeType))
+                                                .then(literal("set")
+                                                        .then(argument("fade_type", StringArgumentType.string())
+                                                                .suggests(TardisCommand::suggestFadeTypes)
+                                                                .executes(TardisCommand::setFadeType))))
+                                        .then(literal("glow")
                                                 .then(argument("glowing", BoolArgumentType.bool())
                                                         .executes(TardisCommand::setGlowing)))
                                         .then(literal("subsystem")

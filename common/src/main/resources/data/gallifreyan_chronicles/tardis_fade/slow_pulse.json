@@ -1,0 +1,9 @@
+{
+  "type": "pulse",
+  "pulse_ticks": 60,
+  "pulse_ramp": 1.5,
+  "pulse_depth": 0.7,
+  "takeoff_delay_ticks": 40,
+  "fade_out_ticks": 300,
+  "fade_in_ticks": 360
+}

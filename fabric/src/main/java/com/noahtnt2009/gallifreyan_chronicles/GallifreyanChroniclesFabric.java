@@ -7,8 +7,7 @@ import net.fabricmc.api.ModInitializer;
 public class GallifreyanChroniclesFabric implements ModInitializer {
     @Override
     public void onInitialize() {
-        Constants.LOG.info("Hello Fabric world!");
-        GCCommands.registerCommands();
+        GCFabricCommands.registerCommands();
         GCEntityTypes.registerEntityTypes();
         GCBlockEntities.registerBlockEntities();
         GCEvents.registerEvents();

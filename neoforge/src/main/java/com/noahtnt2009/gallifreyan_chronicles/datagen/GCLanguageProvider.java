@@ -1,4 +1,3 @@
-
 package com.noahtnt2009.gallifreyan_chronicles.datagen;
 
 import com.noahtnt2009.gallifreyan_chronicles.Constants;
@@ -140,7 +139,7 @@ public class GCLanguageProvider extends LanguageProvider {
         add("command.gallifreyan_chronicles.set_fade_type",
                 "Set fade type of TARDIS %s to %s");
         add("command.gallifreyan_chronicles.unknown_fade_type",
-                "Unknown fade type %s (use newwho or classicwho)");
+                "Unknown fade type %s (available: %s)");
 
         // Commands: Subsystems
         add("command.gallifreyan_chronicles.unknown_subsystem",

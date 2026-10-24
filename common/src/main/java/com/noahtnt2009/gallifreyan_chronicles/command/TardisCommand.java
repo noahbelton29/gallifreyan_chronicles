@@ -46,7 +46,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
-import java.util.stream.Collectors;
+import java.util.function.BiFunction;
 
 public class TardisCommand {
     private static <T extends BlockEntity> Optional<T> findBlockEntity(
@@ -598,8 +598,8 @@ public class TardisCommand {
             CommandContext<CommandSourceStack> ctx,
             SuggestionsBuilder builder
     ) {
-        for (FadeType type : FadeTypes.getAll()) {
-            builder.suggest(type.id());
+        for (String id : FadeTypes.suggestionIds()) {
+            builder.suggest(id.contains(":") ? "\"" + id + "\"" : id);
         }
         return builder.buildFuture();
     }
@@ -624,7 +624,7 @@ public class TardisCommand {
             ctx.getSource().sendFailure(Component.translatable(
                     "command.gallifreyan_chronicles.unknown_fade_type",
                     typeId,
-                    FadeTypes.getAll().stream().map(FadeType::id).collect(Collectors.joining(", "))
+                    String.join(", ", FadeTypes.suggestionIds())
             ));
             return 0;
         }
@@ -646,7 +646,7 @@ public class TardisCommand {
 
     private static int withFadeExterior(
             CommandContext<CommandSourceStack> ctx,
-            java.util.function.BiFunction<String, TardisExteriorBlockEntity, Integer> action
+            BiFunction<String, TardisExteriorBlockEntity, Integer> action
     ) {
         String tardisIdStr = StringArgumentType.getString(ctx, "id");
 

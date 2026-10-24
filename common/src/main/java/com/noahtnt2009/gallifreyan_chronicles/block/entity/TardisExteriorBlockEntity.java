@@ -53,6 +53,7 @@ import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import com.noahtnt2009.gallifreyan_chronicles.tardis.exterior.fade.FadeType;
+import com.noahtnt2009.gallifreyan_chronicles.tardis.exterior.fade.FadeTypeKinds;
 import com.noahtnt2009.gallifreyan_chronicles.tardis.exterior.fade.FadeTypes;
 import org.jspecify.annotations.NonNull;
 import java.util.UUID;
@@ -67,12 +68,10 @@ public class TardisExteriorBlockEntity extends BlockEntity implements GeoBlockEn
     private long keyCooldownUntil = 0L;
     private AnimationController<TardisExteriorBlockEntity> controller;
     private boolean locked = true;
-    private static final long TAKEOFF_DELAY_TICKS = 70L;
-    private static final long FADE_OUT_TICKS = 190L;
-    private static final long FADE_IN_TICKS = 240L;
     private boolean inFlight = false;
     private long fadeStartTick = 0L;
     private FadeType fadeType = FadeTypes.DEFAULT;
+    private int seenFadeGeneration = -1;
     private final ComponentStore components = new ComponentStore();
     private AnimatableInstanceCache cache = GeckoLibUtil.createInstanceCache(this);
     private boolean needsStateSync = false;
@@ -297,7 +296,7 @@ public class TardisExteriorBlockEntity extends BlockEntity implements GeoBlockEn
     }
     
     private long fadeDuration() {
-        return inFlight ? FADE_OUT_TICKS : FADE_IN_TICKS;
+        return inFlight ? fadeType.timing().fadeOutTicks() : fadeType.timing().fadeInTicks();
     }
 
     public void setInFlight(boolean inFlight) {
@@ -311,7 +310,7 @@ public class TardisExteriorBlockEntity extends BlockEntity implements GeoBlockEn
         float newProgress = inFlight ? gone : 1.0f - gone;
         this.fadeStartTick = now - Math.round(newProgress * fadeDuration());
         if (inFlight && gone <= 0.0f) {
-            this.fadeStartTick = now + TAKEOFF_DELAY_TICKS;
+            this.fadeStartTick = now + fadeType.timing().takeoffDelayTicks();
         }
         sync();
     }
@@ -322,12 +321,35 @@ public class TardisExteriorBlockEntity extends BlockEntity implements GeoBlockEn
 
     public void setFadeType(FadeType fadeType) {
         if (this.fadeType == fadeType) return;
+
+        if (level != null && !level.isClientSide()) {
+            long now = level.getGameTime();
+            if (fadeStartTick <= now) {
+                float progress = Math.clamp((now - fadeStartTick) / (float) fadeDuration(), 0.0f, 1.0f);
+                this.fadeType = fadeType;
+                this.fadeStartTick = now - Math.round(progress * fadeDuration());
+                sync();
+                return;
+            }
+        }
         this.fadeType = fadeType;
         sync();
     }
 
+    // the block entity saves its own copy of the fade, so after a /reload it has to pick up the new data by id
+    private void refreshFadeType() {
+        int generation = FadeTypes.generation();
+        if (seenFadeGeneration == generation) return;
+        seenFadeGeneration = generation;
+
+        String id = fadeType.id();
+        // a fade that was removed from the datapack keeps working from the copy saved here
+        if (!FadeTypes.contains(id)) return;
+        setFadeType(FadeTypes.get(id));
+    }
+
     public boolean isFullyInvisible() {
-        return inFlight && level != null && level.getGameTime() - fadeStartTick >= FADE_OUT_TICKS;
+        return inFlight && level != null && level.getGameTime() - fadeStartTick >= fadeType.timing().fadeOutTicks();
     }
 
     public float getOpacity(float partialTick) {
@@ -369,6 +391,7 @@ public class TardisExteriorBlockEntity extends BlockEntity implements GeoBlockEn
 
     public static void serverTick(Level level, TardisExteriorBlockEntity blockEntity) {
         if (level.isClientSide()) return;
+        blockEntity.refreshFadeType();
         MinecraftServer server = level.getServer();
         boolean daylightAffectsGlow = server == null
                 || server.getGameRules().get(GCGameRules.DAYLIGHT_CYCLE_AFFECTS_GLOW);
@@ -565,6 +588,7 @@ public class TardisExteriorBlockEntity extends BlockEntity implements GeoBlockEn
         output.putBoolean("InFlight", inFlight);
         output.putLong("FadeStartTick", fadeStartTick);
         output.putString("FadeType", fadeType.id());
+        output.store("Fade", FadeTypeKinds.CODEC, fadeType);
     }
 
     @Override
@@ -577,7 +601,10 @@ public class TardisExteriorBlockEntity extends BlockEntity implements GeoBlockEn
         locked = input.getBooleanOr("Locked", true);
         inFlight = input.getBooleanOr("InFlight", false);
         fadeStartTick = input.getLongOr("FadeStartTick", 0L);
-        fadeType = FadeTypes.get(input.getStringOr("FadeType", FadeTypes.DEFAULT.id()));
+        String fadeId = input.getStringOr("FadeType", FadeTypes.DEFAULT.id());
+        fadeType = input.read("Fade", FadeTypeKinds.CODEC)
+                .map(fade -> fade.withId(fadeId))
+                .orElseGet(() -> FadeTypes.get(fadeId));
     }
 
     @Override

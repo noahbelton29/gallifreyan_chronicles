@@ -5,6 +5,7 @@ import com.noahtnt2009.gallifreyan_chronicles.tardis.console.TardisConsoleLoader
 import com.noahtnt2009.gallifreyan_chronicles.tardis.console.TardisConsoleVariantLoader;
 import com.noahtnt2009.gallifreyan_chronicles.tardis.door.TardisDoorVariantLoader;
 import com.noahtnt2009.gallifreyan_chronicles.tardis.exterior.TardisExteriorLoader;
+import com.noahtnt2009.gallifreyan_chronicles.tardis.exterior.fade.TardisFadeLoader;
 import com.noahtnt2009.gallifreyan_chronicles.tardis.interior.TardisInteriorLoader;
 
 import java.util.List;
@@ -16,6 +17,7 @@ public final class GCDataLoaders {
 
     public static final List<Entry> ALL = List.of(
             new Entry("tardis_exteriors", TardisExteriorLoader::new),
+            new Entry("tardis_fades", TardisFadeLoader::new),
             new Entry("tardis_interiors", TardisInteriorLoader::new),
             new Entry("tardis_consoles", TardisConsoleLoader::new),
             new Entry("tardis_console_variants", TardisConsoleVariantLoader::new),

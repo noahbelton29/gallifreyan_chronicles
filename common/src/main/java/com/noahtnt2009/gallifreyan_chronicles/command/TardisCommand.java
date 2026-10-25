@@ -1,5 +1,6 @@
 package com.noahtnt2009.gallifreyan_chronicles.command;
 
+import com.mojang.brigadier.Command;
 import com.mojang.brigadier.arguments.BoolArgumentType;
 import com.mojang.brigadier.arguments.FloatArgumentType;
 import com.mojang.brigadier.arguments.StringArgumentType;
@@ -42,6 +43,7 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.util.Mth;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.level.ClipContext;
@@ -1432,6 +1434,40 @@ public class TardisCommand {
                         pos.toShortString(),
                         level.dimension().identifier().toString(),
                         facing
+                ),
+                true
+        );
+        return 1;
+    }
+
+    public static int getCurrentDestination(CommandContext<CommandSourceStack> ctx) throws CommandSyntaxException {
+        UUID tardisId = parseDestinationTardis(ctx);
+        if (tardisId == null) return 0;
+
+        ServerPlayer player = ctx.getSource().getPlayerOrException();
+        ServerLevel level = ctx.getSource().getLevel();
+        BlockPos pos = player.blockPosition();
+        float yaw = Mth.positiveModulo(Math.round((player.getYRot() + 180f) / 45f) * 45f, 360f);
+
+        if (DoorSyncSystem.tardisIdOf(level) != null) {
+            ctx.getSource().sendFailure(Component.translatable("command.gallifreyan_chronicles.destination_interior"));
+            return 0;
+        }
+        if (level.isOutsideBuildHeight(pos) || level.isOutsideBuildHeight(pos.above())) {
+            ctx.getSource().sendFailure(Component.translatable("command.gallifreyan_chronicles.destination_out_of_world"));
+            return 0;
+        }
+
+        TardisManager.get(ctx.getSource().getServer())
+                .setLandingTarget(tardisId, new LandingTarget(level.dimension(), pos, yaw));
+
+        ctx.getSource().sendSuccess(
+                () -> Component.translatable(
+                        "command.gallifreyan_chronicles.destination_set",
+                        tardisId.toString(),
+                        pos.toShortString(),
+                        level.dimension().identifier().toString(),
+                        facingName(yaw)
                 ),
                 true
         );

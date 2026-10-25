@@ -99,6 +99,8 @@ public class GCNeoForgeCommands {
                                         .then(literal("destination")
                                                 .then(literal("get")
                                                         .executes(TardisCommand::getDestination))
+                                                .then(literal("here")
+                                                        .executes(TardisCommand::getCurrentDestination))
                                                 .then(literal("set")
                                                         .then(argument("dimension", DimensionArgument.dimension())
                                                                 .then(argument("pos", BlockPosArgument.blockPos())

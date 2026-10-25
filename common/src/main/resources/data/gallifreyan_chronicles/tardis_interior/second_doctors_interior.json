@@ -1,0 +1,12 @@
+{
+  "structure": "gallifreyan_chronicles:second_doctors",
+  "spawn": { "x": 7, "y": 1.0, "z": 12 },
+  "facing": "north",
+  "console": "brachacki_console",
+  "console_variant": "second_doctors_console",
+  "door_variant": "second_doctors_doors",
+  "exit": {
+    "min": { "x": 6, "y": 0.5, "z": 13 },
+    "max": { "x": 8, "y": 3.5, "z": 14 }
+  }
+}

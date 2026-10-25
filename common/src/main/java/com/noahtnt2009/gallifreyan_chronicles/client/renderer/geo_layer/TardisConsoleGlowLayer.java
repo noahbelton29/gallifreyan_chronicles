@@ -14,7 +14,11 @@ import com.noahtnt2009.gallifreyan_chronicles.tardis.console.TardisConsole;
 import com.noahtnt2009.gallifreyan_chronicles.tardis.console.TardisConsoleRegistry;
 import com.noahtnt2009.gallifreyan_chronicles.tardis.console.TardisConsoleVariant;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.client.renderer.SubmitNodeCollector;
+import net.minecraft.client.renderer.rendertype.LayeringTransform;
+import net.minecraft.client.renderer.rendertype.RenderSetup;
+import net.minecraft.client.renderer.rendertype.RenderType;
 import net.minecraft.resources.Identifier;
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
@@ -35,6 +39,18 @@ public class TardisConsoleGlowLayer<T extends GeoAnimatable, O, R extends GeoRen
     private static final long RECHECK_NANOS = 5_000_000_000L;
     private static final Map<Identifier, CachedExists> EXISTS = new HashMap<>();
 
+    private static final Map<Identifier, RenderType> GLOW_TYPES = new HashMap<>();
+
+    private static RenderType glowType(Identifier texture) {
+        return GLOW_TYPES.computeIfAbsent(texture, t -> RenderType.create(
+                "gc_console_glow",
+                RenderSetup.builder(RenderPipelines.EYES)
+                        .withTexture("Sampler0", t)
+                        .setLayeringTransform(LayeringTransform.VIEW_OFFSET_Z_LAYERING)
+                        .sortOnUpload()
+                        .createRenderSetup()));
+    }
+
     private record CachedExists(boolean exists, long checkedAt) {
     }
 
@@ -47,6 +63,11 @@ public class TardisConsoleGlowLayer<T extends GeoAnimatable, O, R extends GeoRen
         Identifier fallback = maskTexture(this.renderer.getTextureLocation(renderState), STATIC_SUFFIX);
 
         return renderState.getOrDefaultGeckolibData(ACTIVE_TEXTURE, fallback);
+    }
+
+    @Override
+    protected @Nullable RenderType getRenderType(@NonNull R renderState) {
+        return glowType(getTextureResource(renderState));
     }
 
     @Override

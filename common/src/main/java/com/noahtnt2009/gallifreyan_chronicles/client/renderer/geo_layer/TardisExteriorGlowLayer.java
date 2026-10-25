@@ -4,6 +4,7 @@ import com.geckolib.animatable.GeoAnimatable;
 import com.geckolib.renderer.layer.builtin.AutoGlowingGeoLayer;
 import com.geckolib.renderer.base.GeoRenderer;
 import com.geckolib.renderer.base.GeoRenderState;
+import com.noahtnt2009.gallifreyan_chronicles.client.renderer.GCRenderTypes;
 import com.noahtnt2009.gallifreyan_chronicles.client.renderer.TardisExteriorBlockRenderer;
 import com.noahtnt2009.gallifreyan_chronicles.util.GCUtils;
 import net.minecraft.client.renderer.rendertype.RenderType;
@@ -23,7 +24,7 @@ public class TardisExteriorGlowLayer<T extends GeoAnimatable, O, R extends GeoRe
 
         if (!glowing) return null;
         if (renderState.getOrDefaultGeckolibData(TardisExteriorBlockRenderer.OPACITY, 1.0f) <= 0.0f) return null;
-        return super.getRenderType(renderState);
+        return GCRenderTypes.layeredEyes(getTextureResource(renderState));
     }
 
     @Override

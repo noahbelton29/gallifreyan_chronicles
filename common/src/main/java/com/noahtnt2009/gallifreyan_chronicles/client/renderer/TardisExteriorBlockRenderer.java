@@ -4,6 +4,7 @@ import com.geckolib.constant.dataticket.DataTicket;
 import com.geckolib.renderer.GeoBlockRenderer;
 import com.geckolib.renderer.base.BoneSnapshots;
 import com.geckolib.renderer.base.RenderPassInfo;
+import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.math.Axis;
 import com.noahtnt2009.gallifreyan_chronicles.block.TardisExteriorBlockModel;
 import com.noahtnt2009.gallifreyan_chronicles.block.entity.TardisExteriorBlockEntity;
@@ -30,6 +31,7 @@ public class TardisExteriorBlockRenderer extends GeoBlockRenderer<@NotNull Tardi
     private static final float GLASS_STRENGTH = .1f;
     private static final float GLASS_SPEED = 1.0f;
     private static final int DEPTH_MASK_ORDER = -1;
+    private static final float DEPTH_MASK_PUSH = 1.0002f;
 
     public TardisExteriorBlockRenderer(BlockEntityRendererProvider.Context context) {
         super(context, new TardisExteriorBlockModel());
@@ -87,7 +89,11 @@ public class TardisExteriorBlockRenderer extends GeoBlockRenderer<@NotNull Tardi
             OrderedSubmitNodeCollector maskTasks = renderTasks instanceof SubmitNodeCollector collector
                     ? collector.order(DEPTH_MASK_ORDER)
                     : renderTasks;
+            PoseStack poseStack = renderPassInfo.poseStack();
+            poseStack.pushPose();
+            poseStack.last().pose().scaleLocal(DEPTH_MASK_PUSH, DEPTH_MASK_PUSH, DEPTH_MASK_PUSH);
             super.submitRenderTasks(renderPassInfo, maskTasks, RenderTypes.waterMask());
+            poseStack.popPose();
         }
         super.submitRenderTasks(renderPassInfo, renderTasks, renderType);
     }

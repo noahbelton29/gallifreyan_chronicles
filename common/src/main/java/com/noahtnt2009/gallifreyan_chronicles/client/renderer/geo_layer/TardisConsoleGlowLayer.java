@@ -7,6 +7,7 @@ import com.geckolib.renderer.base.GeoRenderState;
 import com.geckolib.renderer.base.GeoRenderer;
 import com.geckolib.renderer.base.RenderPassInfo;
 import com.geckolib.renderer.layer.builtin.AutoGlowingGeoLayer;
+import com.noahtnt2009.gallifreyan_chronicles.client.renderer.GCRenderTypes;
 import com.noahtnt2009.gallifreyan_chronicles.client.renderer.TardisConsoleBlockRenderer;
 import com.noahtnt2009.gallifreyan_chronicles.client.tardis.TardisConsoleAssets;
 import com.noahtnt2009.gallifreyan_chronicles.tardis.console.GlowGroup;
@@ -14,10 +15,7 @@ import com.noahtnt2009.gallifreyan_chronicles.tardis.console.TardisConsole;
 import com.noahtnt2009.gallifreyan_chronicles.tardis.console.TardisConsoleRegistry;
 import com.noahtnt2009.gallifreyan_chronicles.tardis.console.TardisConsoleVariant;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.client.renderer.SubmitNodeCollector;
-import net.minecraft.client.renderer.rendertype.LayeringTransform;
-import net.minecraft.client.renderer.rendertype.RenderSetup;
 import net.minecraft.client.renderer.rendertype.RenderType;
 import net.minecraft.resources.Identifier;
 import org.jspecify.annotations.NonNull;
@@ -39,18 +37,6 @@ public class TardisConsoleGlowLayer<T extends GeoAnimatable, O, R extends GeoRen
     private static final long RECHECK_NANOS = 5_000_000_000L;
     private static final Map<Identifier, CachedExists> EXISTS = new HashMap<>();
 
-    private static final Map<Identifier, RenderType> GLOW_TYPES = new HashMap<>();
-
-    private static RenderType glowType(Identifier texture) {
-        return GLOW_TYPES.computeIfAbsent(texture, t -> RenderType.create(
-                "gc_console_glow",
-                RenderSetup.builder(RenderPipelines.EYES)
-                        .withTexture("Sampler0", t)
-                        .setLayeringTransform(LayeringTransform.VIEW_OFFSET_Z_LAYERING)
-                        .sortOnUpload()
-                        .createRenderSetup()));
-    }
-
     private record CachedExists(boolean exists, long checkedAt) {
     }
 
@@ -67,7 +53,7 @@ public class TardisConsoleGlowLayer<T extends GeoAnimatable, O, R extends GeoRen
 
     @Override
     protected @Nullable RenderType getRenderType(@NonNull R renderState) {
-        return glowType(getTextureResource(renderState));
+        return GCRenderTypes.layeredEyes(getTextureResource(renderState));
     }
 
     @Override

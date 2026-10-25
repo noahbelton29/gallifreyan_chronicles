@@ -10,6 +10,7 @@ import com.noahtnt2009.gallifreyan_chronicles.block.entity.TardisExteriorBlockEn
 import com.noahtnt2009.gallifreyan_chronicles.tardis.control.ControlAnimations;
 import com.noahtnt2009.gallifreyan_chronicles.tardis.control.TardisControl;
 import com.noahtnt2009.gallifreyan_chronicles.tardis.ecs.system.DoorSyncSystem;
+import com.noahtnt2009.gallifreyan_chronicles.tardis.ecs.system.TardisLandingSystem;
 import com.noahtnt2009.gallifreyan_chronicles.tardis.exterior.fade.FadeTiming;
 import com.noahtnt2009.gallifreyan_chronicles.tardis.flight.TardisFlightState;
 import com.noahtnt2009.gallifreyan_chronicles.util.GCScheduler;
@@ -73,7 +74,6 @@ public class FlightLeverControl implements TardisControl {
                     return InteractionResult.FAIL;
                 }
 
-                // can't take off with a door open, remember the pull and go as soon as it's closed
                 if (takingOff && !exterior.areDoorsFullyClosed()) {
                     queueTakeoff(level, GlobalPos.of(level.dimension(), console.getBlockPos()), console,
                             entity.getControlId());
@@ -94,14 +94,19 @@ public class FlightLeverControl implements TardisControl {
         );
 
         if (takingOff && entity.level() instanceof ServerLevel level) {
-            beginTakeoffEffects(level, console, entity.getControlId(), entity.blockPosition(), entity.position());
+            beginTakeoffEffects(level, console, entity.getControlId(), console.getBlockPos(), entity.position());
         }
 
         if (!takingOff && entity.level() instanceof ServerLevel level) {
             VWORP_LOOPS.merge(GlobalPos.of(level.dimension(), console.getBlockPos()), 1, Integer::sum);
             stopVworp(level);
 
-            level.playSound(null, entity.blockPosition(), GCSounds.TARDIS_LAND, SoundSource.BLOCKS, 1.0F, 1.0F);
+            UUID landingId = console.getTardisId() != null ? console.getTardisId() : DoorSyncSystem.tardisIdOf(level);
+            if (landingId != null) {
+                TardisLandingSystem.relocate(level.getServer(), landingId);
+            }
+
+            level.playSound(null, console.getBlockPos(), GCSounds.TARDIS_LAND, SoundSource.BLOCKS, 1.0F, 1.0F);
             playAtExterior(console, level, GCSounds.TARDIS_LAND);
         }
 
@@ -225,7 +230,6 @@ public class FlightLeverControl implements TardisControl {
 
     private void vworpStep(ServerLevel level, BlockPos pos, GlobalPos key, int generation,
                            TardisConsoleBlockEntity console, String controlId) {
-        // a newer takeoff or a landing replaced this loop, or the lever is back up
         if (VWORP_LOOPS.getOrDefault(key, 0) != generation || !console.getControlState(controlId)) return;
 
         level.playSound(null, pos, GCSounds.TARDIS_VWORP, SoundSource.BLOCKS, 1.0F, 1.0F);
@@ -315,7 +319,6 @@ public class FlightLeverControl implements TardisControl {
 
         BlockPos pos = console.getBlockPos();
         GCScheduler.runLater(level.getServer(), LAND_FADE_DELAY_TICKS + fadeInTicks, () -> {
-            // pulled back up for another takeoff in the meantime
             if (console.getControlState("flight_lever")) return;
 
             console.triggerRotorAnimation("rotor_idle");

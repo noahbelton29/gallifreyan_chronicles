@@ -17,6 +17,7 @@ import com.noahtnt2009.gallifreyan_chronicles.tardis.ecs.TardisComponentTypes;
 import com.noahtnt2009.gallifreyan_chronicles.tardis.door.TardisDoorRegistry;
 import com.noahtnt2009.gallifreyan_chronicles.tardis.ecs.component.DoorState;
 import com.noahtnt2009.gallifreyan_chronicles.tardis.ecs.component.DoorVariantComponent;
+import com.noahtnt2009.gallifreyan_chronicles.tardis.ecs.system.ConsoleLinkSystem;
 import com.noahtnt2009.gallifreyan_chronicles.tardis.ecs.system.DoorSyncSystem;
 import com.noahtnt2009.gallifreyan_chronicles.tardis.ecs.system.DoorSystem;
 import com.noahtnt2009.gallifreyan_chronicles.tardis.interior.TardisInterior;
@@ -189,8 +190,10 @@ public class InteriorDoorBlockEntity extends BlockEntity implements GeoBlockEnti
         if (now - lastLockedFeedbackAt < 1000L) return;
         lastLockedFeedbackAt = now;
         triggerAnim(LOCK_CONTROLLER, "is_locked");
+        assert level != null;
+        level.playSound(null, getBlockPos(), GCSounds.TARDIS_IS_LOCKED, SoundSource.BLOCKS, 1.0f, 1.0f);
         if (level != null) {
-            level.playSound(null, getBlockPos(), GCSounds.TARDIS_IS_LOCKED, SoundSource.BLOCKS, 1.0f, 1.0f);
+            level.playSound(null, soundPos(), GCSounds.TARDIS_IS_LOCKED, SoundSource.BLOCKS, 1.0f, 1.0f);
         }
     }
 
@@ -214,16 +217,28 @@ public class InteriorDoorBlockEntity extends BlockEntity implements GeoBlockEnti
         };
     }
 
+    private BlockPos soundPos() {
+        if (level instanceof ServerLevel serverLevel) {
+            UUID id = tardisId != null ? tardisId : DoorSyncSystem.tardisIdOf(serverLevel);
+            if (id != null) {
+                return ConsoleLinkSystem.linkedConsolePos(serverLevel, id).orElse(getBlockPos());
+            }
+        }
+        return getBlockPos();
+    }
+
     private void playDoorSound(boolean opening) {
         if (level == null) return;
         SoundEvent sound = opening ? GCSounds.TARDIS_DOOR_OPEN : GCSounds.TARDIS_DOOR_CLOSE;
         level.playSound(null, getBlockPos(), sound, SoundSource.BLOCKS, 1.0f, 1.0f);
+        level.playSound(null, soundPos(), sound, SoundSource.BLOCKS, 1.0f, 1.0f);
     }
 
     private void playLockSound(boolean locked) {
         if (level == null) return;
         SoundEvent sound = locked ? GCSounds.TARDIS_DOOR_LOCK : GCSounds.TARDIS_DOOR_UNLOCK;
         level.playSound(null, getBlockPos(), sound, SoundSource.BLOCKS, 1.0f, 1.0f);
+        level.playSound(null, soundPos(), sound, SoundSource.BLOCKS, 1.0f, 1.0f);
     }
 
     private void snapAnimationClient(AnimationController<InteriorDoorBlockEntity> c) {

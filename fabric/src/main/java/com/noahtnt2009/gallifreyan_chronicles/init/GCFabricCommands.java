@@ -10,6 +10,8 @@ import com.noahtnt2009.gallifreyan_chronicles.tardis.manager.TardisManager;
 import com.noahtnt2009.gallifreyan_chronicles.tardis.exterior.TardisExterior;
 import com.noahtnt2009.gallifreyan_chronicles.tardis.exterior.TardisExteriorRegistry;
 import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
+import net.minecraft.commands.arguments.DimensionArgument;
+import net.minecraft.commands.arguments.coordinates.BlockPosArgument;
 import net.minecraft.network.chat.Component;
 
 import java.util.stream.Collectors;
@@ -75,6 +77,17 @@ public class GCFabricCommands {
                                                                             .executes(TardisCommand::setDoorVariant)))))
                                             .then(literal("summon")
                                                     .executes(TardisCommand::summonTardis))
+                                            .then(literal("destination")
+                                                    .then(literal("get")
+                                                            .executes(TardisCommand::getDestination))
+                                                    .then(literal("set")
+                                                            .then(argument("dimension", DimensionArgument.dimension())
+                                                                    .then(argument("pos", BlockPosArgument.blockPos())
+                                                                            .then(argument("facing", StringArgumentType.word())
+                                                                                    .suggests(TardisCommand::suggestFacings)
+                                                                                    .executes(TardisCommand::setDestination)))))
+                                                    .then(literal("clear")
+                                                            .executes(TardisCommand::clearDestination)))
                                             .then(literal("interior")
                                                     .then(literal("get")
                                                             .executes(TardisCommand::getInterior))

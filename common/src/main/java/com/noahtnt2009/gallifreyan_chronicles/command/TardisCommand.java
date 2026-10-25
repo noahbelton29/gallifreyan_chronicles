@@ -4,6 +4,7 @@ import com.mojang.brigadier.arguments.BoolArgumentType;
 import com.mojang.brigadier.arguments.FloatArgumentType;
 import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.context.CommandContext;
+import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.mojang.brigadier.suggestion.Suggestions;
 import com.mojang.brigadier.suggestion.SuggestionsBuilder;
 import com.noahtnt2009.gallifreyan_chronicles.block.TardisBlock;
@@ -31,7 +32,11 @@ import com.noahtnt2009.gallifreyan_chronicles.tardis.exterior.TardisExterior;
 import com.noahtnt2009.gallifreyan_chronicles.tardis.exterior.TardisExteriorRegistry;
 import com.noahtnt2009.gallifreyan_chronicles.tardis.exterior.fade.FadeType;
 import com.noahtnt2009.gallifreyan_chronicles.tardis.exterior.fade.FadeTypes;
+import com.noahtnt2009.gallifreyan_chronicles.tardis.flight.LandingTarget;
 import net.minecraft.commands.CommandSourceStack;
+import net.minecraft.commands.SharedSuggestionProvider;
+import net.minecraft.commands.arguments.DimensionArgument;
+import net.minecraft.commands.arguments.coordinates.BlockPosArgument;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.MinecraftServer;
@@ -48,6 +53,7 @@ import net.minecraft.world.phys.Vec3;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
@@ -1346,6 +1352,125 @@ public class TardisCommand {
                         tardisIdStr,
                         targetPos.toShortString()
                 ),
+                true
+        );
+        return 1;
+    }
+
+    private static final Map<String, Float> FACINGS = Map.of(
+            "south", 0f, "southwest", 45f, "west", 90f, "northwest", 135f,
+            "north", 180f, "northeast", 225f, "east", 270f, "southeast", 315f);
+
+    public static CompletableFuture<Suggestions> suggestFacings(
+            CommandContext<CommandSourceStack> ctx,
+            SuggestionsBuilder builder
+    ) {
+        return SharedSuggestionProvider.suggest(FACINGS.keySet(), builder);
+    }
+
+    private static String facingName(float yaw) {
+        for (Map.Entry<String, Float> entry : FACINGS.entrySet()) {
+            if (entry.getValue() == yaw) return entry.getKey();
+        }
+        return yaw + " degrees";
+    }
+
+    private static UUID parseDestinationTardis(CommandContext<CommandSourceStack> ctx) {
+        String tardisIdStr = StringArgumentType.getString(ctx, "id");
+        UUID tardisId;
+        try {
+            tardisId = UUID.fromString(tardisIdStr);
+        } catch (IllegalArgumentException e) {
+            ctx.getSource().sendFailure(Component.translatable(
+                    "command.gallifreyan_chronicles.invalid_id",
+                    tardisIdStr
+            ));
+            return null;
+        }
+        if (TardisManager.get(ctx.getSource().getServer()).get(tardisId).isEmpty()) {
+            ctx.getSource().sendFailure(Component.translatable(
+                    "command.gallifreyan_chronicles.no_tardis_id",
+                    tardisIdStr
+            ));
+            return null;
+        }
+        return tardisId;
+    }
+
+    public static int setDestination(CommandContext<CommandSourceStack> ctx) throws CommandSyntaxException {
+        UUID tardisId = parseDestinationTardis(ctx);
+        if (tardisId == null) return 0;
+
+        ServerLevel level = DimensionArgument.getDimension(ctx, "dimension");
+        BlockPos pos = BlockPosArgument.getBlockPos(ctx, "pos");
+        String facing = StringArgumentType.getString(ctx, "facing");
+
+        Float yaw = FACINGS.get(facing);
+        if (yaw == null) {
+            ctx.getSource().sendFailure(Component.translatable(
+                    "command.gallifreyan_chronicles.destination_bad_facing",
+                    facing
+            ));
+            return 0;
+        }
+        if (DoorSyncSystem.tardisIdOf(level) != null) {
+            ctx.getSource().sendFailure(Component.translatable("command.gallifreyan_chronicles.destination_interior"));
+            return 0;
+        }
+        if (level.isOutsideBuildHeight(pos) || level.isOutsideBuildHeight(pos.above())) {
+            ctx.getSource().sendFailure(Component.translatable("command.gallifreyan_chronicles.destination_out_of_world"));
+            return 0;
+        }
+
+        TardisManager.get(ctx.getSource().getServer())
+                .setLandingTarget(tardisId, new LandingTarget(level.dimension(), pos, yaw));
+
+        ctx.getSource().sendSuccess(
+                () -> Component.translatable(
+                        "command.gallifreyan_chronicles.destination_set",
+                        tardisId.toString(),
+                        pos.toShortString(),
+                        level.dimension().identifier().toString(),
+                        facing
+                ),
+                true
+        );
+        return 1;
+    }
+
+    public static int getDestination(CommandContext<CommandSourceStack> ctx) {
+        UUID tardisId = parseDestinationTardis(ctx);
+        if (tardisId == null) return 0;
+
+        LandingTarget target = TardisManager.get(ctx.getSource().getServer()).getLandingTarget(tardisId);
+        if (target == null) {
+            ctx.getSource().sendSuccess(
+                    () -> Component.translatable("command.gallifreyan_chronicles.destination_none", tardisId.toString()),
+                    false
+            );
+            return 1;
+        }
+
+        ctx.getSource().sendSuccess(
+                () -> Component.translatable(
+                        "command.gallifreyan_chronicles.destination_get",
+                        tardisId.toString(),
+                        target.pos().toShortString(),
+                        target.dimension().identifier().toString(),
+                        facingName(target.yaw())
+                ),
+                false
+        );
+        return 1;
+    }
+
+    public static int clearDestination(CommandContext<CommandSourceStack> ctx) {
+        UUID tardisId = parseDestinationTardis(ctx);
+        if (tardisId == null) return 0;
+
+        TardisManager.get(ctx.getSource().getServer()).setLandingTarget(tardisId, null);
+        ctx.getSource().sendSuccess(
+                () -> Component.translatable("command.gallifreyan_chronicles.destination_cleared", tardisId.toString()),
                 true
         );
         return 1;

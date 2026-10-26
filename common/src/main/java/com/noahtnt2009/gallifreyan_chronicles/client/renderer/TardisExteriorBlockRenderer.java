@@ -31,7 +31,7 @@ public class TardisExteriorBlockRenderer extends GeoBlockRenderer<@NotNull Tardi
     private static final float GLASS_STRENGTH = .1f;
     private static final float GLASS_SPEED = 1.0f;
     private static final int DEPTH_MASK_ORDER = -1;
-    private static final float DEPTH_MASK_PUSH = 1.0002f;
+    private static final float DEPTH_MASK_PUSH = 1.00005f;
 
     public TardisExteriorBlockRenderer(BlockEntityRendererProvider.Context context) {
         super(context, new TardisExteriorBlockModel());

@@ -2,6 +2,7 @@ package com.noahtnt2009.gallifreyan_chronicles.network;
 
 import com.noahtnt2009.gallifreyan_chronicles.Constants;
 import com.noahtnt2009.gallifreyan_chronicles.data.GCJsonReloadListener;
+import com.noahtnt2009.gallifreyan_chronicles.util.GCServerState;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 import net.fabricmc.fabric.api.networking.v1.PayloadTypeRegistry;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayConnectionEvents;
@@ -20,6 +21,7 @@ public final class GCFabricNetworking {
         PayloadTypeRegistry.clientboundPlay().register(TardisDrumShakePayload.TYPE, TardisDrumShakePayload.STREAM_CODEC);
 
         ServerLifecycleEvents.SERVER_STARTED.register(GCJsonReloadListener::setCurrentServer);
+        ServerLifecycleEvents.SERVER_STOPPED.register(_ -> GCServerState.onServerStop());
 
         ServerPlayConnectionEvents.JOIN.register((_, sender, _) -> {
             sender.sendPacket(TardisExteriorSyncPayload.create());

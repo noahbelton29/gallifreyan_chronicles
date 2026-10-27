@@ -21,6 +21,28 @@
   ],
   "controls": [
     {
+      "depth": 0.125,
+      "id": "door_control",
+      "offset": {
+        "x": -0.3438,
+        "y": 0.5592,
+        "z": 1.0224
+      },
+      "width": 0.125,
+      "height": 0.125
+    },
+    {
+      "depth": 0.125,
+      "id": "door_lock",
+      "offset": {
+        "x": 0.2187,
+        "y": 0.5592,
+        "z": 1.0224
+      },
+      "width": 0.125,
+      "height": 0.125
+    },
+    {
       "depth": 0.1875,
       "id": "flight_lever",
       "offset": {

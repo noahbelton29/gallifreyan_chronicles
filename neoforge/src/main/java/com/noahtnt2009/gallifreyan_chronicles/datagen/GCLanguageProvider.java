@@ -59,6 +59,10 @@ public class GCLanguageProvider extends LanguageProvider {
         add("tooltip.gallifreyan_chronicles.console.model", "Console");
         add("tooltip.gallifreyan_chronicles.console.variant", "Variant");
         add("tooltip.gallifreyan_chronicles.console.variant_default", "Default");
+        add("tooltip.gallifreyan_chronicles.door.type", "Door");
+        add("door_type.gallifreyan_chronicles.tardis_interior_door", "Default");
+        add("door_type.gallifreyan_chronicles.first_doctors_door", "First Doctor's Door");
+        add("door_type.gallifreyan_chronicles.second_doctors_door", "Second Doctor's Door");
         add("tooltip.gallifreyan_chronicles.scroll", "Scroll to change");
         add("tooltip.gallifreyan_chronicles.key.linked", "Linked to TARDIS ID");
         add("tooltip.gallifreyan_chronicles.key.unlinked", "Not linked to a TARDIS");

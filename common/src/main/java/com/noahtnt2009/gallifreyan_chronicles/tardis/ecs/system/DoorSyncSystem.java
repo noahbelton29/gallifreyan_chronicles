@@ -43,6 +43,10 @@ public final class DoorSyncSystem {
         }
     }
 
+    public static synchronized void clear() {
+        INTERIOR_DOORS.clear();
+    }
+
     public static synchronized void register(UUID tardisId, InteriorDoorBlockEntity door) {
         INTERIOR_DOORS.computeIfAbsent(tardisId, k -> Collections.newSetFromMap(new WeakHashMap<>())).add(door);
     }

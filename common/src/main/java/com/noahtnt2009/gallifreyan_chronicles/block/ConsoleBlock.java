@@ -4,6 +4,7 @@ import com.noahtnt2009.gallifreyan_chronicles.block.entity.TardisConsoleBlockEnt
 import com.noahtnt2009.gallifreyan_chronicles.init.GCDataComponents;
 import com.noahtnt2009.gallifreyan_chronicles.tardis.console.TardisConsole;
 import com.noahtnt2009.gallifreyan_chronicles.tardis.console.TardisConsoleRegistry;
+import com.noahtnt2009.gallifreyan_chronicles.tardis.ecs.system.ConsoleLinkSystem;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.entity.LivingEntity;
@@ -79,5 +80,7 @@ public class ConsoleBlock extends BaseEntityBlock {
         } else {
             console.setConsole(selected);
         }
+
+        ConsoleLinkSystem.onPlaced(console);
     }
 }

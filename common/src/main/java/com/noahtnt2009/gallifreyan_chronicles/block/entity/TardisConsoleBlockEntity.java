@@ -24,6 +24,7 @@ import com.noahtnt2009.gallifreyan_chronicles.tardis.control.ControlSpec;
 import com.noahtnt2009.gallifreyan_chronicles.tardis.control.TardisControlRegistry;
 import com.noahtnt2009.gallifreyan_chronicles.tardis.ecs.TardisComponentTypes;
 import com.noahtnt2009.gallifreyan_chronicles.tardis.ecs.TardisLinkable;
+import com.noahtnt2009.gallifreyan_chronicles.tardis.ecs.system.ConsoleSyncSystem;
 import com.noahtnt2009.gallifreyan_chronicles.tardis.ecs.system.ConsoleSystem;
 import net.minecraft.client.Minecraft;
 import net.minecraft.core.BlockPos;
@@ -75,6 +76,7 @@ public class TardisConsoleBlockEntity extends BlockEntity implements GeoBlockEnt
     private static final double SNAP_TO_END = 10_000.0;
     private final Map<String, Integer> snapFrames = new HashMap<>();
     private boolean controlStatesLoaded = false;
+    private @Nullable UUID syncedTardisId;
     private final Map<String, Boolean> clientAppliedStates = new HashMap<>();
 
     public TardisConsoleBlockEntity(BlockPos pos, BlockState state) {
@@ -174,18 +176,37 @@ public class TardisConsoleBlockEntity extends BlockEntity implements GeoBlockEnt
 
     public void triggerControl(String id, boolean activated, @Nullable Player triggeringPlayer) {
         controls.triggerControl(this, id, activated, triggeringPlayer);
+        ConsoleSyncSystem.mirrorActivated(this, id, activated);
     }
 
     public void setControlActivated(String id, boolean activated) {
+        setControlActivatedLocal(id, activated);
+        ConsoleSyncSystem.mirrorActivated(this, id, activated);
+    }
+
+    public void setControlActivatedLocal(String id, boolean activated) {
         if (controls.getControlState(id) == activated) return;
         controls.setControlState(id, activated);
         controls.playControlAnimation(id, activated, null);
     }
 
     public void reconcileControl(String id, boolean activated) {
+        reconcileControlLocal(id, activated);
+        ConsoleSyncSystem.mirrorReconcile(this, id, activated);
+    }
+
+    public void reconcileControlLocal(String id, boolean activated) {
         if (controls.getControlState(id) == activated) return;
         controls.setControlState(id, activated);
         sync();
+    }
+
+    public @Nullable UUID syncedTardisId() {
+        return syncedTardisId;
+    }
+
+    public void setSyncedTardisId(@Nullable UUID id) {
+        this.syncedTardisId = id;
     }
 
     public Entity asEntity() {
@@ -213,6 +234,7 @@ public class TardisConsoleBlockEntity extends BlockEntity implements GeoBlockEnt
     public void setRemoved() {
         super.setRemoved();
         controls.discardAll();
+        ConsoleSyncSystem.unregister(this);
     }
 
     public CompoundTag copyControlStates() {
@@ -314,6 +336,9 @@ public class TardisConsoleBlockEntity extends BlockEntity implements GeoBlockEnt
     @Override
     public void setLevel(@NonNull Level level) {
         super.setLevel(level);
+        if (level instanceof ServerLevel) {
+            ConsoleSyncSystem.register(this);
+        }
         getAnimatableInstanceCache().getManagerForId(0);
         animationDriver.bind(() -> this.level, () -> this.currentRotorState, idleController, flightController, controlControllers);
         this.respawnControls();

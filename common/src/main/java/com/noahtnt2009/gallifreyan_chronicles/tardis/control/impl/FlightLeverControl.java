@@ -8,7 +8,8 @@ import com.noahtnt2009.gallifreyan_chronicles.init.GCSounds;
 import com.noahtnt2009.gallifreyan_chronicles.network.TardisDrumShakePayload;
 import com.noahtnt2009.gallifreyan_chronicles.block.entity.TardisExteriorBlockEntity;
 import com.noahtnt2009.gallifreyan_chronicles.tardis.control.ControlAnimations;
-import com.noahtnt2009.gallifreyan_chronicles.tardis.control.TardisControl;
+import com.noahtnt2009.gallifreyan_chronicles.tardis.control.BaseControl;
+import com.noahtnt2009.gallifreyan_chronicles.tardis.ecs.system.ConsoleSyncSystem;
 import com.noahtnt2009.gallifreyan_chronicles.tardis.ecs.system.DoorSyncSystem;
 import com.noahtnt2009.gallifreyan_chronicles.tardis.ecs.system.TardisLandingSystem;
 import com.noahtnt2009.gallifreyan_chronicles.tardis.exterior.fade.FadeTiming;
@@ -22,7 +23,6 @@ import net.minecraft.network.protocol.game.ClientboundStopSoundPacket;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
@@ -31,23 +31,18 @@ import net.minecraft.world.phys.Vec3;
 import org.jspecify.annotations.Nullable;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
-public class FlightLeverControl implements TardisControl {
+public class FlightLeverControl extends BaseControl {
+    public static final String ID = "flight_lever";
     public static final ControlAnimations DEFAULT_ANIMATIONS = new ControlAnimations("flight_lever_down", "flight_lever_up", false);
-    public static final MapCodec<FlightLeverControl> CODEC = ControlAnimations.codec(DEFAULT_ANIMATIONS)
-            .xmap(FlightLeverControl::new, FlightLeverControl::animations);
+    public static final MapCodec<FlightLeverControl> CODEC = codec(DEFAULT_ANIMATIONS,
+            FlightLeverControl::new);
 
-    private final ControlAnimations animations;
-
-    public FlightLeverControl() {
-        this(DEFAULT_ANIMATIONS);
-    }
-
-    public FlightLeverControl(ControlAnimations animations) {
-        this.animations = animations;
-    }
+    public FlightLeverControl() { this(DEFAULT_ANIMATIONS); }
+    public FlightLeverControl(ControlAnimations animations) { super(animations); }
 
     private static final int TAKEOFF_SOUND_DELAY_TICKS = 0;
     private static final int TAKEOFF_SOUND_LENGTH_TICKS = 425;
@@ -56,10 +51,14 @@ public class FlightLeverControl implements TardisControl {
     private static final Map<GlobalPos, Integer> VWORP_LOOPS = new HashMap<>();
     private static final Map<UUID, Integer> QUEUED_TAKEOFFS = new HashMap<>();
     private static int queueGeneration = 0;
+    private static int vworpGeneration = 0;
     private static final int QUEUED_TAKEOFF_POLL_TICKS = 2;
     private static final int LAND_FADE_DELAY_TICKS = 130;
 
-    private boolean STATE = false;
+    public static void resetState() {
+        VWORP_LOOPS.clear();
+        QUEUED_TAKEOFFS.clear();
+    }
 
     @Override
     public InteractionResult onRightClick(TardisControlEntity entity, Player player, InteractionHand hand) {
@@ -68,149 +67,106 @@ public class FlightLeverControl implements TardisControl {
             return InteractionResult.FAIL;
         }
 
-        boolean takingOff = !console.getControlState(entity.getControlId());
+        String controlId = entity.getControlId();
+        boolean takingOff = !console.getControlState(controlId);
 
         if (entity.level() instanceof ServerLevel level) {
-            UUID tardisId = tardisIdOf(console, level);
+            UUID tardisId = tardisId(console, level);
 
-            if (!takingOff && tardisId != null && QUEUED_TAKEOFFS.containsKey(tardisId)) {
-                QUEUED_TAKEOFFS.remove(tardisId);
-                playSlider(level, entity.blockPosition(), 1.0f);
-                console.setControlActivated(entity.getControlId(), false);
+            if (refuseToggle(level, entity, console, tardisId, takingOff)) {
                 return InteractionResult.FAIL;
             }
 
-            TardisExteriorBlockEntity exterior = findExterior(console, level);
-            if (exterior != null) {
-                if (exterior.getFlightState().isTransitioning()) {
-                    return InteractionResult.FAIL;
-                }
+            playSound(entity, GCSounds.SLIDER, 0.9f);
 
-                if (!takingOff && !exterior.isTravelling()) {
-                    playSlider(level, entity.blockPosition(), 1.0f);
-                    console.setControlActivated(entity.getControlId(), false);
-                    return InteractionResult.FAIL;
-                }
-
-                if (takingOff && !exterior.areDoorsFullyClosed() && tardisId != null) {
-                    playSlider(level, entity.blockPosition(), 0.9f);
-                    console.setControlActivated(entity.getControlId(), true);
-                    queueTakeoff(level.getServer(), tardisId, entity.getControlId());
-                    return InteractionResult.FAIL;
-                }
+            if (takingOff) {
+                beginTakeoffEffects(level, console, controlId, entity.position());
+            } else {
+                land(level, console, tardisId);
             }
+            return InteractionResult.SUCCESS;
         }
 
-        SoundEvent sound = GCSounds.SLIDER;
-
-        entity.level().playSound(
-                null,
-                entity.blockPosition(),
-                sound,
-                SoundSource.BLOCKS,
-                1.0F,
-                STATE ? 1.0f : 0.9f
-        );
-
-        if (takingOff && entity.level() instanceof ServerLevel level) {
-            beginTakeoffEffects(level, console, entity.getControlId(), console.getBlockPos(), entity.position());
-        }
-
-        if (!takingOff && entity.level() instanceof ServerLevel level) {
-            VWORP_LOOPS.merge(GlobalPos.of(level.dimension(), console.getBlockPos()), 1, Integer::sum);
-            stopVworp(level);
-
-            UUID landingId = console.getTardisId() != null ? console.getTardisId() : DoorSyncSystem.tardisIdOf(level);
-            if (landingId != null) {
-                TardisLandingSystem.relocate(level.getServer(), landingId);
-            }
-
-            level.playSound(null, console.getBlockPos(), GCSounds.TARDIS_LAND, SoundSource.BLOCKS, 1.0F, 1.0F);
-            playAtExterior(console, level, GCSounds.TARDIS_LAND);
-        }
-
-        Constants.LOG.info("clicked flight control");
+        playSound(entity, GCSounds.SLIDER, 0.9f);
         return InteractionResult.SUCCESS;
+    }
+
+    private boolean refuseToggle(
+            ServerLevel level,
+            TardisControlEntity entity,
+            TardisConsoleBlockEntity console,
+            @Nullable UUID tardisId,
+            boolean takingOff
+    ) {
+        String controlId = entity.getControlId();
+
+        if (!takingOff && tardisId != null && QUEUED_TAKEOFFS.containsKey(tardisId)) {
+            QUEUED_TAKEOFFS.remove(tardisId);
+            playAt(level, entity.blockPosition(), GCSounds.SLIDER, 1.0f);
+            console.setControlActivated(controlId, false);
+            return true;
+        }
+
+        TardisExteriorBlockEntity exterior = tardisId == null
+                ? null
+                : DoorSyncSystem.findExterior(level.getServer(), tardisId);
+        if (exterior == null) {
+            return false;
+        }
+
+        if (exterior.getFlightState().isTransitioning()) {
+            return true;
+        }
+
+        if (!takingOff && !exterior.isTravelling()) {
+            playAt(level, entity.blockPosition(), GCSounds.SLIDER, 1.0f);
+            console.setControlActivated(controlId, false);
+            return true;
+        }
+
+        if (takingOff && !exterior.areDoorsFullyClosed() && tardisId != null) {
+            playAt(level, entity.blockPosition(), GCSounds.SLIDER, 0.9f);
+            console.setControlActivated(controlId, true);
+            queueTakeoff(level.getServer(), tardisId, controlId);
+            return true;
+        }
+
+        return false;
+    }
+
+    private static void land(ServerLevel level, TardisConsoleBlockEntity console, @Nullable UUID tardisId) {
+        VWORP_LOOPS.remove(GlobalPos.of(level.dimension(), console.getBlockPos()));
+        stopVworp(level);
+
+        if (tardisId != null) {
+            TardisLandingSystem.relocate(level.getServer(), tardisId);
+        }
+
+        playEverywhere(console, level, GCSounds.TARDIS_LAND);
     }
 
     private void beginTakeoffEffects(
             ServerLevel level,
             TardisConsoleBlockEntity console,
             String controlId,
-            BlockPos soundPos,
             Vec3 shakePos
     ) {
-        level.playSound(
-                null,
-                soundPos,
-                GCSounds.TARDIS_DRUM,
-                SoundSource.BLOCKS,
-                1.0F,
-                1.0F
-        );
+        playEverywhere(console, level, GCSounds.TARDIS_DRUM);
+        playEverywhere(console, level, GCSounds.TARDIS_TAKEOFF);
 
-        level.playSound(
-                null,
-                soundPos,
-                GCSounds.TARDIS_TAKEOFF,
-                SoundSource.BLOCKS,
-                1.0F,
-                1.0F
-        );
-
-        TardisDrumShakePayload.broadcast(level, shakePos, 1.0F);
-
-        playAtExterior(console, level, GCSounds.TARDIS_DRUM);
-        playAtExterior(console, level, GCSounds.TARDIS_TAKEOFF);
+        for (TardisConsoleBlockEntity each : ConsoleSyncSystem.liveConsolesWith(console)) {
+            if (!(each.getLevel() instanceof ServerLevel eachLevel)) continue;
+            Vec3 pos = each == console ? shakePos : Vec3.atCenterOf(each.getBlockPos());
+            TardisDrumShakePayload.broadcast(eachLevel, pos, 1.0F);
+        }
 
         startVworpLoop(level, console, controlId);
     }
 
-
-    private static void playAtExterior(
-            TardisConsoleBlockEntity console,
-            ServerLevel consoleLevel,
-            SoundEvent sound
-    ) {
-        TardisExteriorBlockEntity exterior = findExterior(console, consoleLevel);
-
-        if (exterior == null ||
-                !(exterior.getLevel() instanceof ServerLevel exteriorLevel)) {
-            return;
-        }
-
-        exteriorLevel.playSound(
-                null,
-                Vec3.atCenterOf(exterior.getBlockPos()).x,
-                Vec3.atCenterOf(exterior.getBlockPos()).y,
-                Vec3.atCenterOf(exterior.getBlockPos()).z,
-                sound,
-                SoundSource.BLOCKS,
-                1.0F,
-                1.0F
-        );
-    }
-
-    private static @Nullable TardisExteriorBlockEntity findExterior(TardisConsoleBlockEntity console,
-                                                                    ServerLevel level) {
-        UUID tardisId = console.getTardisId();
-        if (tardisId == null) {
-            tardisId = DoorSyncSystem.tardisIdOf(level);
-        }
-        if (tardisId == null) return null;
-        return DoorSyncSystem.findExterior(level.getServer(), tardisId);
-    }
-
-    private static void playSlider(ServerLevel level, BlockPos pos, float pitch) {
-        level.playSound(null, pos, GCSounds.SLIDER, SoundSource.BLOCKS, 1.0F, pitch);
-    }
-
-    private static @Nullable UUID tardisIdOf(TardisConsoleBlockEntity console, ServerLevel level) {
-        UUID tardisId = console.getTardisId();
-        return tardisId != null ? tardisId : DoorSyncSystem.tardisIdOf(level);
-    }
-
     private static @Nullable TardisConsoleBlockEntity resolveConsole(MinecraftServer server, UUID tardisId) {
+        List<TardisConsoleBlockEntity> live = ConsoleSyncSystem.consolesOf(tardisId);
+        if (!live.isEmpty()) return live.getFirst();
+
         ServerLevel interior = TardisDimensionManager.get(server, tardisId);
         BlockPos pos = TardisManager.get(server).getConsoleBlockPos(tardisId);
         if (interior == null || pos == null) return null;
@@ -240,9 +196,8 @@ public class FlightLeverControl implements TardisControl {
         if (exterior.areDoorsFullyClosed()) {
             QUEUED_TAKEOFFS.remove(tardisId);
 
-            BlockPos pos = console.getBlockPos();
             onStateChanged(console, true);
-            beginTakeoffEffects(level, console, controlId, pos, Vec3.atCenterOf(pos));
+            beginTakeoffEffects(level, console, controlId, Vec3.atCenterOf(console.getBlockPos()));
             return;
         }
 
@@ -252,20 +207,30 @@ public class FlightLeverControl implements TardisControl {
 
     private void startVworpLoop(ServerLevel level, TardisConsoleBlockEntity console, String controlId) {
         GlobalPos key = GlobalPos.of(level.dimension(), console.getBlockPos());
-        int generation = VWORP_LOOPS.merge(key, 1, Integer::sum);
-        BlockPos pos = console.getBlockPos();
+        int generation = ++vworpGeneration;
+        VWORP_LOOPS.put(key, generation);
 
         GCScheduler.runLater(level.getServer(), TAKEOFF_SOUND_DELAY_TICKS + TAKEOFF_SOUND_LENGTH_TICKS,
-                () -> vworpStep(level, pos, key, generation, console, controlId));
+                () -> vworpStep(level, key, generation, console, controlId));
     }
 
-    private void vworpStep(ServerLevel level, BlockPos pos, GlobalPos key, int generation,
+    private void vworpStep(ServerLevel level, GlobalPos key, int generation,
                            TardisConsoleBlockEntity console, String controlId) {
-        if (VWORP_LOOPS.getOrDefault(key, 0) != generation || !console.getControlState(controlId)) return;
+        Integer current = VWORP_LOOPS.get(key);
+        if (current == null || current != generation) return;
 
-        level.playSound(null, pos, GCSounds.TARDIS_VWORP, SoundSource.BLOCKS, 1.0F, 1.0F);
+        List<TardisConsoleBlockEntity> live = ConsoleSyncSystem.liveConsolesWith(console);
+        if (live.stream().noneMatch(each -> each.getControlState(controlId))) {
+            VWORP_LOOPS.remove(key, generation);
+            return;
+        }
+
+        for (TardisConsoleBlockEntity each : live) {
+            playAt(each.getLevel() instanceof ServerLevel eachLevel ? eachLevel : level,
+                    each.getBlockPos(), GCSounds.TARDIS_VWORP, 1.0F);
+        }
         GCScheduler.runLater(level.getServer(), VWORP_LOOP_TICKS,
-                () -> vworpStep(level, pos, key, generation, console, controlId));
+                () -> vworpStep(level, key, generation, console, controlId));
     }
 
     private static void stopVworp(ServerLevel level) {
@@ -275,44 +240,12 @@ public class FlightLeverControl implements TardisControl {
         }
     }
 
-    private static void playAfter(ServerLevel level, BlockPos pos, int delayTicks, SoundEvent sound) {
-        if (delayTicks <= 0) {
-            level.playSound(null, pos, sound, SoundSource.BLOCKS, 1.0F, 1.0F);
-            return;
-        }
-        GCScheduler.runLater(level.getServer(), delayTicks, () ->
-                level.playSound(null, pos, sound, SoundSource.BLOCKS, 1.0F, 1.0F));
-    }
-
     @Override
-    public boolean onLeftClick(TardisControlEntity entity, Player player) {
-        return true;
-    }
-
-    @Override
-    public String getAnimation(boolean activated) {
-        return activated ? animations.active() : animations.inactive();
-    }
-
-    @Override
-    public boolean snapsWhenInactive() {
-        return animations.snapsWhenInactive();
-    }
-
-    @Override
-    public MapCodec<FlightLeverControl> codec() {
-        return CODEC;
-    }
-
-    public ControlAnimations animations() {
-        return animations;
-    }
+    public MapCodec<FlightLeverControl> codec() { return CODEC; }
 
     @Override
     public void onStateChanged(TardisConsoleBlockEntity console, boolean activated) {
         Constants.LOG.info("Flight lever state changed to: {}", activated);
-
-        STATE = activated;
 
         if (console.getLevel() instanceof ServerLevel serverLevel) {
             TardisExteriorBlockEntity exterior = findExterior(console, serverLevel);
@@ -331,7 +264,9 @@ public class FlightLeverControl implements TardisControl {
         }
 
         if (activated) {
-            console.triggerRotorAnimation("rotor_flight");
+            for (TardisConsoleBlockEntity each : ConsoleSyncSystem.liveConsolesWith(console)) {
+                each.triggerRotorAnimation("rotor_flight");
+            }
         } else {
             scheduleLandingFinish(console);
         }
@@ -348,14 +283,17 @@ public class FlightLeverControl implements TardisControl {
                 .map(exterior -> exterior.getFadeType().timing().fadeInTicks())
                 .orElse(FadeTiming.DEFAULT.fadeInTicks());
 
-        BlockPos pos = console.getBlockPos();
         GCScheduler.runLater(level.getServer(), LAND_FADE_DELAY_TICKS + fadeInTicks, () -> {
-            if (console.getControlState("flight_lever")) return;
+            List<TardisConsoleBlockEntity> live = ConsoleSyncSystem.liveConsolesWith(console);
+            if (live.isEmpty() || live.stream().anyMatch(each -> each.getControlState(ID))) return;
 
-            console.triggerRotorAnimation("rotor_idle");
-            level.playSound(null, pos, GCSounds.TARDIS_LAND_DRUM, SoundSource.BLOCKS, 1.0F, 1.0F);
+            for (TardisConsoleBlockEntity each : live) {
+                if (!(each.getLevel() instanceof ServerLevel eachLevel)) continue;
+                each.triggerRotorAnimation("rotor_idle");
+                playAt(eachLevel, each.getBlockPos(), GCSounds.TARDIS_LAND_DRUM, 1.0F);
+                TardisDrumShakePayload.broadcast(eachLevel, Vec3.atCenterOf(each.getBlockPos()), 1.0F);
+            }
             playAtExterior(console, level, GCSounds.TARDIS_LAND_DRUM);
-            TardisDrumShakePayload.broadcast(level, Vec3.atCenterOf(pos), 1.0F);
         });
     }
 }

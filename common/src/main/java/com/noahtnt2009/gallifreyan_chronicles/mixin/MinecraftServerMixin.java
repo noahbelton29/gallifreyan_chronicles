@@ -2,6 +2,7 @@ package com.noahtnt2009.gallifreyan_chronicles.mixin;
 
 import com.noahtnt2009.gallifreyan_chronicles.tardis.interior.TardisDimensionManager;
 import com.noahtnt2009.gallifreyan_chronicles.util.GCScheduler;
+import com.noahtnt2009.gallifreyan_chronicles.util.GCServerState;
 import com.noahtnt2009.gallifreyan_chronicles.tardis.interior.TardisInteriorSystem;
 import net.minecraft.server.MinecraftServer;
 import org.spongepowered.asm.mixin.Mixin;
@@ -15,7 +16,7 @@ import java.util.function.BooleanSupplier;
 public abstract class MinecraftServerMixin {
     @Inject(method = "createLevels", at = @At("TAIL"))
     private void gallifreyan_chronicles$restoreInteriors(CallbackInfo ci) {
-        GCScheduler.clear();
+        GCServerState.onServerStart();
         TardisDimensionManager.restoreAll((MinecraftServer) (Object) this);
     }
 

@@ -9,6 +9,8 @@ import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.event.entity.player.PlayerEvent;
 import net.neoforged.neoforge.event.server.ServerStartedEvent;
+import net.neoforged.neoforge.event.server.ServerStoppedEvent;
+import com.noahtnt2009.gallifreyan_chronicles.util.GCServerState;
 import net.neoforged.neoforge.network.event.RegisterPayloadHandlersEvent;
 import net.neoforged.neoforge.network.registration.PayloadRegistrar;
 
@@ -69,6 +71,11 @@ public final class GCNeoForgeNetworking {
     @SubscribeEvent
     public static void onServerStarted(ServerStartedEvent event) {
         GCJsonReloadListener.setCurrentServer(event.getServer());
+    }
+
+    @SubscribeEvent
+    public static void onServerStopped(ServerStoppedEvent event) {
+        GCServerState.onServerStop();
     }
 
     @SubscribeEvent

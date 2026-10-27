@@ -29,6 +29,11 @@ public class GCDataComponents {
             () -> DataComponentType.<String>builder().persistent(Codec.STRING).build()
     );
 
+    public static final DataComponentType<String> DOOR_TYPE = register(
+            "door_type",
+            () -> DataComponentType.<String>builder().persistent(Codec.STRING).build()
+    );
+
     public static final DataComponentType<com.noahtnt2009.gallifreyan_chronicles.item.ItemInfoTooltip> ITEM_INFO = register(
             "item_info",
             () -> DataComponentType.<com.noahtnt2009.gallifreyan_chronicles.item.ItemInfoTooltip>builder()

@@ -1,10 +1,13 @@
 package com.noahtnt2009.gallifreyan_chronicles.tardis.ecs.system;
 
 import com.noahtnt2009.gallifreyan_chronicles.Constants;
+import com.noahtnt2009.gallifreyan_chronicles.block.ConsoleBlock;
 import com.noahtnt2009.gallifreyan_chronicles.block.entity.TardisConsoleBlockEntity;
+import com.noahtnt2009.gallifreyan_chronicles.block.entity.TardisExteriorBlockEntity;
 import com.noahtnt2009.gallifreyan_chronicles.init.GCBlocks;
 import com.noahtnt2009.gallifreyan_chronicles.tardis.console.TardisConsole;
 import com.noahtnt2009.gallifreyan_chronicles.tardis.console.TardisConsoleRegistry;
+import com.noahtnt2009.gallifreyan_chronicles.tardis.control.impl.FlightLeverControl;
 import com.noahtnt2009.gallifreyan_chronicles.tardis.manager.TardisManager;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
@@ -35,7 +38,10 @@ public final class ConsoleLinkSystem {
     }
 
     public static void link(ServerLevel level, UUID tardisId, BlockPos pos) {
-        findConsole(level, pos).ifPresent(console -> console.linkToTardis(tardisId));
+        findConsole(level, pos).ifPresent(console -> {
+            console.linkToTardis(tardisId);
+            ConsoleSyncSystem.register(console);
+        });
         TardisManager.get(level.getServer()).setConsoleBlockPos(tardisId, pos);
     }
 
@@ -66,6 +72,53 @@ public final class ConsoleLinkSystem {
         spawnDefaultControls(console);
 
         console.sync();
+    }
+
+    public static void onPlaced(TardisConsoleBlockEntity console) {
+        if (!(console.getLevel() instanceof ServerLevel level)) return;
+
+        UUID tardisId = DoorSyncSystem.tardisIdOf(level);
+        if (tardisId == null) return;
+
+        TardisManager manager = TardisManager.get(level.getServer());
+        if (manager.get(tardisId).isEmpty()) return;
+
+        console.linkToTardis(tardisId);
+        ConsoleSyncSystem.register(console);
+        adoptAsPrimaryIfNeeded(level, manager, tardisId, console.getBlockPos());
+        spawnDefaultControls(console);
+
+        TardisConsoleBlockEntity sibling = null;
+        for (TardisConsoleBlockEntity other : ConsoleSyncSystem.consolesOf(tardisId)) {
+            if (other != console) {
+                sibling = other;
+                break;
+            }
+        }
+
+        if (sibling != null) {
+            console.applyCarriedControlStates(sibling.copyControlStates());
+        } else {
+            TardisExteriorBlockEntity exterior = DoorSyncSystem.findExterior(level.getServer(), tardisId);
+            if (exterior != null && exterior.isTravelling()) {
+                console.reconcileControl(FlightLeverControl.ID, true);
+                console.triggerRotorAnimation("rotor_flight");
+            }
+        }
+
+        DoorSyncSystem.reconcileConsole(level.getServer(), tardisId);
+        console.sync();
+    }
+
+    private static void adoptAsPrimaryIfNeeded(ServerLevel level, TardisManager manager, UUID tardisId, BlockPos pos) {
+        BlockPos current = manager.getConsoleBlockPos(tardisId);
+        if (pos.equals(current)) return;
+
+        boolean stale = current == null
+                || (level.hasChunkAt(current) && !(level.getBlockState(current).getBlock() instanceof ConsoleBlock));
+        if (stale) {
+            manager.setConsoleBlockPos(tardisId, pos);
+        }
     }
 
     public static void spawnDefaultControls(TardisConsoleBlockEntity console) {

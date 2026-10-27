@@ -21,6 +21,7 @@ import java.util.function.Consumer;
 public enum ItemInfoTooltip implements TooltipProvider {
     TARDIS,
     CONSOLE,
+    DOOR,
     KEY;
 
     public static final Codec<ItemInfoTooltip> CODEC = Codec.STRING.comapFlatMap(
@@ -40,6 +41,7 @@ public enum ItemInfoTooltip implements TooltipProvider {
         switch (this) {
             case TARDIS -> addTardis(tooltip, flag, components);
             case CONSOLE -> addConsole(tooltip, flag, components);
+            case DOOR -> addDoor(tooltip, flag, components);
             case KEY -> addKey(tooltip, components);
         }
     }
@@ -80,6 +82,17 @@ public enum ItemInfoTooltip implements TooltipProvider {
         }
 
         if (flag.isCreative() && ConsoleBlockItem.selectionCount() > 1) {
+            tooltip.accept(SelectionTooltip.scrollHint());
+        }
+    }
+
+    private static void addDoor(Consumer<Component> tooltip, TooltipFlag flag, DataComponentGetter components) {
+        String type = components.get(GCDataComponents.DOOR_TYPE);
+        if (type == null || !DoorBlockItem.DOOR_IDS.contains(type)) type = DoorBlockItem.DOOR_IDS.getFirst();
+        tooltip.accept(SelectionTooltip.line("tooltip.gallifreyan_chronicles.door.type",
+                SelectionTooltip.highlight(SelectionTooltip.displayName("door_type", Constants.MOD_ID + ":" + type))));
+
+        if (flag.isCreative()) {
             tooltip.accept(SelectionTooltip.scrollHint());
         }
     }

@@ -3,6 +3,7 @@ package com.noahtnt2009.gallifreyan_chronicles.init;
 import com.noahtnt2009.gallifreyan_chronicles.Constants;
 import com.noahtnt2009.gallifreyan_chronicles.block.*;
 import com.noahtnt2009.gallifreyan_chronicles.item.ConsoleBlockItem;
+import com.noahtnt2009.gallifreyan_chronicles.item.DoorBlockItem;
 import com.noahtnt2009.gallifreyan_chronicles.item.TardisBlockItem;
 import com.noahtnt2009.gallifreyan_chronicles.util.GCUtils;
 import com.noahtnt2009.gallifreyan_chronicles.world.tree.GCTreeGrowers;
@@ -72,21 +73,27 @@ public class GCBlocks {
                     .sound(SoundType.STONE)
                     .noOcclusion()
                     .noLootTable()
-                    .pushReaction(PushReaction.POPPED)));
+                    .pushReaction(PushReaction.POPPED)),
+            Rarity.COMMON,
+            DoorBlockItem::new);
 
     public static final Block FIRST_DOCTORS_DOOR = registerBlock("first_doctors_door",
             properties -> new InteriorDoorBlock("brachacki_doors", "first_doctors_doors", properties.strength(3F, 3F)
                     .sound(SoundType.STONE)
                     .noOcclusion()
                     .noLootTable()
-                    .pushReaction(PushReaction.POPPED)));
+                    .pushReaction(PushReaction.POPPED)),
+            Rarity.COMMON,
+            DoorBlockItem::new);
 
     public static final Block SECOND_DOCTORS_DOOR = registerBlock("second_doctors_door",
             properties -> new InteriorDoorBlock("brachacki_doors", "second_doctors_doors", properties.strength(3F, 3F)
                     .sound(SoundType.STONE)
                     .noOcclusion()
                     .noLootTable()
-                    .pushReaction(PushReaction.POPPED)));
+                    .pushReaction(PushReaction.POPPED)),
+            Rarity.COMMON,
+            DoorBlockItem::new);
 
     public static final Block GALLIFREYAN_SAND = registerBlock("gallifreyan_sand",
             properties -> new GCFallingBlock(properties.strength(1.25F)

@@ -1,6 +1,34 @@
 {
   "model": {
-    "type": "minecraft:model",
-    "model": "gallifreyan_chronicles:item/first_doctors_door"
+    "type": "minecraft:select",
+    "property": "minecraft:component",
+    "component": "gallifreyan_chronicles:door_type",
+    "cases": [
+      {
+        "when": "tardis_interior_door",
+        "model": {
+          "type": "minecraft:model",
+          "model": "gallifreyan_chronicles:item/tardis_interior_door"
+        }
+      },
+      {
+        "when": "first_doctors_door",
+        "model": {
+          "type": "minecraft:model",
+          "model": "gallifreyan_chronicles:item/first_doctors_door"
+        }
+      },
+      {
+        "when": "second_doctors_door",
+        "model": {
+          "type": "minecraft:model",
+          "model": "gallifreyan_chronicles:item/second_doctors_door"
+        }
+      }
+    ],
+    "fallback": {
+      "type": "minecraft:model",
+      "model": "gallifreyan_chronicles:item/first_doctors_door"
+    }
   }
 }

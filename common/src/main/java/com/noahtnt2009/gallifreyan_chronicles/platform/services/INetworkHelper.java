@@ -6,12 +6,15 @@ import com.noahtnt2009.gallifreyan_chronicles.network.TardisConsoleRotorStatePay
 import com.noahtnt2009.gallifreyan_chronicles.network.TardisConsoleSyncPayload;
 import com.noahtnt2009.gallifreyan_chronicles.network.TardisDrumShakePayload;
 import com.noahtnt2009.gallifreyan_chronicles.network.TardisExteriorSyncPayload;
+import com.noahtnt2009.gallifreyan_chronicles.network.TardisInteriorSyncPayload;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerPlayer;
 
 public interface INetworkHelper {
     void sendTardisExteriorSync(ServerPlayer player, TardisExteriorSyncPayload payload);
     void broadcastTardisExteriorSync(MinecraftServer server, TardisExteriorSyncPayload payload);
+    void sendTardisInteriorSync(ServerPlayer player, TardisInteriorSyncPayload payload);
+    void broadcastTardisInteriorSync(MinecraftServer server, TardisInteriorSyncPayload payload);
     void sendDimensionSkySync(ServerPlayer player, DimensionSkySyncPayload payload);
     void broadcastDimensionSkySync(MinecraftServer server, DimensionSkySyncPayload payload);
     void sendTardisConsoleSync(ServerPlayer player, TardisConsoleSyncPayload payload);

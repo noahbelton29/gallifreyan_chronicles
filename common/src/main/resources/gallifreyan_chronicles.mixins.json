@@ -14,7 +14,9 @@
     "SkyRendererInvoker",
     "client.DebugRendererMixin",
     "client.SkyRendererMixin",
-    "client.CameraShakeMixin"
+    "client.CameraShakeMixin",
+    "client.AbstractContainerScreenAccessor",
+    "client.CreativeTardisScrollMixin"
   ],
   "server": [],
   "injectors": {

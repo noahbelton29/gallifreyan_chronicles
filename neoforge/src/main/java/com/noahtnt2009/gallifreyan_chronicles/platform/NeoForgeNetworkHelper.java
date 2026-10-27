@@ -6,6 +6,7 @@ import com.noahtnt2009.gallifreyan_chronicles.network.TardisConsoleRotorStatePay
 import com.noahtnt2009.gallifreyan_chronicles.network.TardisConsoleSyncPayload;
 import com.noahtnt2009.gallifreyan_chronicles.network.TardisDrumShakePayload;
 import com.noahtnt2009.gallifreyan_chronicles.network.TardisExteriorSyncPayload;
+import com.noahtnt2009.gallifreyan_chronicles.network.TardisInteriorSyncPayload;
 import com.noahtnt2009.gallifreyan_chronicles.platform.services.INetworkHelper;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerPlayer;
@@ -21,6 +22,18 @@ public class NeoForgeNetworkHelper implements INetworkHelper {
     public void broadcastTardisExteriorSync(MinecraftServer server, TardisExteriorSyncPayload payload) {
         for (ServerPlayer player : server.getPlayerList().getPlayers()) {
             sendTardisExteriorSync(player, payload);
+        }
+    }
+
+    @Override
+    public void sendTardisInteriorSync(ServerPlayer player, TardisInteriorSyncPayload payload) {
+        PacketDistributor.sendToPlayer(player, payload);
+    }
+
+    @Override
+    public void broadcastTardisInteriorSync(MinecraftServer server, TardisInteriorSyncPayload payload) {
+        for (ServerPlayer player : server.getPlayerList().getPlayers()) {
+            sendTardisInteriorSync(player, payload);
         }
     }
 

@@ -23,6 +23,8 @@ public class GCLanguageProvider extends LanguageProvider {
         for (Block block : GCBlocks.BLOCKS) {
             if (block == GCBlocks.TARDIS) {
                 add(block, "TARDIS");
+            } else if (block == GCBlocks.TARDIS_CONSOLE) {
+                add(block, "TARDIS Console");
             } else {
                 String path = BuiltInRegistries.BLOCK.getKey(block).getPath();
                 String displayName = Arrays.stream(path.split("_"))
@@ -34,6 +36,10 @@ public class GCLanguageProvider extends LanguageProvider {
 
         // Items
         for (Item item : GCItems.ITEMS) {
+            if (item == GCItems.TARDIS_KEY) {
+                add(item, "TARDIS Key");
+                continue;
+            }
             String path = BuiltInRegistries.ITEM.getKey(item).getPath();
             String displayName = Arrays.stream(path.split("_"))
                     .map(word -> Character.toUpperCase(word.charAt(0)) + word.substring(1))
@@ -49,6 +55,13 @@ public class GCLanguageProvider extends LanguageProvider {
 
         // Creative tabs
         add("creativetab.gallifreyan_chronicles.tardis", "GC: TARDIS");
+        add("tooltip.gallifreyan_chronicles.tardis.schema", "Schema");
+        add("tooltip.gallifreyan_chronicles.console.model", "Console");
+        add("tooltip.gallifreyan_chronicles.console.variant", "Variant");
+        add("tooltip.gallifreyan_chronicles.console.variant_default", "Default");
+        add("tooltip.gallifreyan_chronicles.scroll", "Scroll to change");
+        add("tooltip.gallifreyan_chronicles.key.linked", "Linked to TARDIS ID");
+        add("tooltip.gallifreyan_chronicles.key.unlinked", "Not linked to a TARDIS");
         add("creativetab.gallifreyan_chronicles.natural_blocks", "GC: Natural Blocks");
         add("creativetab.gallifreyan_chronicles.building_blocks", "GC: Building Blocks");
         add("creativetab.gallifreyan_chronicles.flora", "GC: Flora");

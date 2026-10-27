@@ -2,6 +2,8 @@ package com.noahtnt2009.gallifreyan_chronicles.tardis.interior;
 
 import com.noahtnt2009.gallifreyan_chronicles.Constants;
 import com.noahtnt2009.gallifreyan_chronicles.data.GCJsonReloadListener;
+import com.noahtnt2009.gallifreyan_chronicles.network.TardisInteriorSyncPayload;
+import com.noahtnt2009.gallifreyan_chronicles.platform.Services;
 import net.minecraft.server.MinecraftServer;
 
 public class TardisInteriorLoader extends GCJsonReloadListener<TardisInterior> {
@@ -34,6 +36,6 @@ public class TardisInteriorLoader extends GCJsonReloadListener<TardisInterior> {
 
     @Override
     protected void broadcastSync(MinecraftServer server) {
-
+        Services.NETWORK.broadcastTardisInteriorSync(server, TardisInteriorSyncPayload.create());
     }
 }

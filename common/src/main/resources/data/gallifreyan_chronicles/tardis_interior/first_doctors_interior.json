@@ -2,6 +2,7 @@
   "structure": "gallifreyan_chronicles:first_doctors",
   "spawn": { "x": 24, "y": 1.0, "z": 4.217 },
   "facing": "south",
+  "exterior": "first_doctors_exterior",
   "console": "brachacki_console",
   "console_variant": "first_doctors_console",
   "door_variant": "first_doctors_doors",

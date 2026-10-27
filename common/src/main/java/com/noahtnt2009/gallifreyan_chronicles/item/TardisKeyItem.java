@@ -16,7 +16,7 @@ import java.util.UUID;
 
 public class TardisKeyItem extends Item {
     public TardisKeyItem(Properties properties) {
-        super(properties);
+        super(properties.component(GCDataComponents.ITEM_INFO, ItemInfoTooltip.KEY));
     }
 
     @Override

@@ -12,6 +12,7 @@ public final class GCFabricNetworking {
 
     public static void registerNetworking() {
         PayloadTypeRegistry.clientboundPlay().register(TardisExteriorSyncPayload.TYPE, TardisExteriorSyncPayload.STREAM_CODEC);
+        PayloadTypeRegistry.clientboundPlay().register(TardisInteriorSyncPayload.TYPE, TardisInteriorSyncPayload.STREAM_CODEC);
         PayloadTypeRegistry.clientboundPlay().register(TardisConsoleSyncPayload.TYPE, TardisConsoleSyncPayload.STREAM_CODEC);
         PayloadTypeRegistry.clientboundPlay().register(DimensionSkySyncPayload.TYPE, DimensionSkySyncPayload.STREAM_CODEC);
         PayloadTypeRegistry.clientboundPlay().register(TardisConsoleAnimationPayload.TYPE, TardisConsoleAnimationPayload.STREAM_CODEC);
@@ -22,6 +23,7 @@ public final class GCFabricNetworking {
 
         ServerPlayConnectionEvents.JOIN.register((_, sender, _) -> {
             sender.sendPacket(TardisExteriorSyncPayload.create());
+            sender.sendPacket(TardisInteriorSyncPayload.create());
             sender.sendPacket(TardisConsoleSyncPayload.create());
             sender.sendPacket(DimensionSkySyncPayload.create());
         });

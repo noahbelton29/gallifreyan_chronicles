@@ -5,7 +5,12 @@ import com.noahtnt2009.gallifreyan_chronicles.block.entity.TardisExteriorBlockEn
 import com.noahtnt2009.gallifreyan_chronicles.ecs.Entity;
 import com.noahtnt2009.gallifreyan_chronicles.init.GCDataComponents;
 import com.noahtnt2009.gallifreyan_chronicles.init.GCItems;
+import com.noahtnt2009.gallifreyan_chronicles.tardis.ecs.system.ExteriorSystem;
 import com.noahtnt2009.gallifreyan_chronicles.tardis.ecs.system.TardisLinkSystem;
+import com.noahtnt2009.gallifreyan_chronicles.tardis.exterior.TardisExteriorRegistry;
+import com.noahtnt2009.gallifreyan_chronicles.tardis.interior.TardisInterior;
+import com.noahtnt2009.gallifreyan_chronicles.tardis.interior.TardisInteriorRegistry;
+import com.noahtnt2009.gallifreyan_chronicles.tardis.manager.TardisManager;
 import com.noahtnt2009.gallifreyan_chronicles.tardis.ecs.component.TardisComponent;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
@@ -61,6 +66,7 @@ public class TardisBlock extends BaseEntityBlock {
 
             Entity entity = blockEntity.asEntity();
             TardisComponent record = TardisLinkSystem.registerNewTardis(entity, serverLevel, player.getUUID(), pos);
+            applyChosenInterior(serverLevel, entity, record, stack);
             blockEntity.sync();
 
             blockEntity.spawnKeyEntity();
@@ -77,6 +83,19 @@ public class TardisBlock extends BaseEntityBlock {
                     record.tardisId(),
                     player.getName().getString()
             );
+        }
+    }
+
+    private static void applyChosenInterior(ServerLevel level, Entity entity, TardisComponent record, ItemStack stack) {
+        String chosen = stack.get(GCDataComponents.TARDIS_INTERIOR);
+        if (chosen == null || !TardisInteriorRegistry.contains(chosen)) return;
+
+        TardisInterior interior = TardisInteriorRegistry.get(chosen);
+        TardisManager.get(level.getServer()).setInteriorId(record.tardisId(), interior.id());
+
+        String exteriorId = interior.resolveExteriorId();
+        if (TardisExteriorRegistry.contains(exteriorId)) {
+            ExteriorSystem.setExterior(entity, TardisExteriorRegistry.get(exteriorId));
         }
     }
 

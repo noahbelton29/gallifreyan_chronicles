@@ -28,6 +28,13 @@ public final class GCNeoForgeNetworking {
                 )
         );
         registrar.playToClient(
+                TardisInteriorSyncPayload.TYPE,
+                TardisInteriorSyncPayload.STREAM_CODEC,
+                (payload, context) -> context.enqueueWork(() ->
+                        Minecraft.getInstance().execute(payload::apply)
+                )
+        );
+        registrar.playToClient(
                 DimensionSkySyncPayload.TYPE,
                 DimensionSkySyncPayload.STREAM_CODEC,
                 (payload, context) -> context.enqueueWork(() ->
@@ -68,6 +75,7 @@ public final class GCNeoForgeNetworking {
     public static void onPlayerLoggedIn(PlayerEvent.PlayerLoggedInEvent event) {
         if (!(event.getEntity() instanceof ServerPlayer player)) return;
         Services.NETWORK.sendTardisExteriorSync(player, TardisExteriorSyncPayload.create());
+        Services.NETWORK.sendTardisInteriorSync(player, TardisInteriorSyncPayload.create());
         Services.NETWORK.sendTardisConsoleSync(player, TardisConsoleSyncPayload.create());
         Services.NETWORK.sendDimensionSkySync(player, DimensionSkySyncPayload.create());
     }

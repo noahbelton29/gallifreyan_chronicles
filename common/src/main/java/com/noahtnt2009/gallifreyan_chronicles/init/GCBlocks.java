@@ -2,6 +2,8 @@ package com.noahtnt2009.gallifreyan_chronicles.init;
 
 import com.noahtnt2009.gallifreyan_chronicles.Constants;
 import com.noahtnt2009.gallifreyan_chronicles.block.*;
+import com.noahtnt2009.gallifreyan_chronicles.item.ConsoleBlockItem;
+import com.noahtnt2009.gallifreyan_chronicles.item.TardisBlockItem;
 import com.noahtnt2009.gallifreyan_chronicles.util.GCUtils;
 import com.noahtnt2009.gallifreyan_chronicles.world.tree.GCTreeGrowers;
 import net.minecraft.core.BlockPos;
@@ -29,6 +31,7 @@ import net.minecraft.world.phys.AABB;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.BiFunction;
 import java.util.function.Function;
 
 public class GCBlocks {
@@ -48,7 +51,8 @@ public class GCBlocks {
                     .sound(SoundType.STONE)
                     .noOcclusion()
                     .lightLevel(state -> state.getValue(TardisBlock.GLOWING) ? 12 : 0)),
-            Rarity.EPIC);
+            Rarity.EPIC,
+            TardisBlockItem::new);
 
     public static final Block TARDIS_TOP = registerBlockWithoutBlockItem("tardis_top",
             properties -> new TardisTopBlock(properties.strength(-1F)
@@ -59,7 +63,9 @@ public class GCBlocks {
     public static final Block TARDIS_CONSOLE = registerBlock("tardis_console",
             properties -> new ConsoleBlock(properties.strength(-1F)
                     .sound(SoundType.STONE)
-                    .noOcclusion()));
+                    .noOcclusion()),
+            Rarity.EPIC,
+            ConsoleBlockItem::new);
 
     public static final Block TARDIS_INTERIOR_DOOR = registerBlock("tardis_interior_door",
             properties -> new InteriorDoorBlock("brachacki_doors", properties.strength(3F, 3F)
@@ -481,10 +487,19 @@ public class GCBlocks {
             Function<BlockBehaviour.Properties, Block> function,
             Rarity rarity
     ) {
+        return registerBlock(name, function, rarity, BlockItem::new);
+    }
+
+    private static Block registerBlock(
+            String name,
+            Function<BlockBehaviour.Properties, Block> function,
+            Rarity rarity,
+            BiFunction<Block, Item.Properties, Item> itemFactory
+    ) {
         Block toRegister = function.apply(BlockBehaviour.Properties.of()
                 .setId(ResourceKey.create(Registries.BLOCK, GCUtils.modIdentifier(name))));
 
-        registerBlockItem(name, toRegister, rarity);
+        registerBlockItem(name, toRegister, rarity, itemFactory);
         BLOCKS.add(toRegister);
 
         return Registry.register(BuiltInRegistries.BLOCK, GCUtils.modIdentifier(name), toRegister);
@@ -509,9 +524,10 @@ public class GCBlocks {
         return Registry.register(BuiltInRegistries.BLOCK, GCUtils.modIdentifier(name), toRegister);
     }
 
-    private static void registerBlockItem(String name, Block block, Rarity rarity) {
+    private static void registerBlockItem(String name, Block block, Rarity rarity,
+                                          BiFunction<Block, Item.Properties, Item> itemFactory) {
         Registry.register(BuiltInRegistries.ITEM, GCUtils.modIdentifier(name),
-                new BlockItem(block, new Item.Properties()
+                itemFactory.apply(block, new Item.Properties()
                         .useBlockDescriptionPrefix()
                         .rarity(rarity)
                         .setId(ResourceKey.create(Registries.ITEM, GCUtils.modIdentifier(name)))));

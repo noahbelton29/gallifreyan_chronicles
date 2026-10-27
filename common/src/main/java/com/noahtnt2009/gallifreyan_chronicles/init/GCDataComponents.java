@@ -24,6 +24,17 @@ public class GCDataComponents {
             () -> DataComponentType.<String>builder().persistent(Codec.STRING).build()
     );
 
+    public static final DataComponentType<String> TARDIS_INTERIOR = register(
+            "tardis_interior",
+            () -> DataComponentType.<String>builder().persistent(Codec.STRING).build()
+    );
+
+    public static final DataComponentType<com.noahtnt2009.gallifreyan_chronicles.item.ItemInfoTooltip> ITEM_INFO = register(
+            "item_info",
+            () -> DataComponentType.<com.noahtnt2009.gallifreyan_chronicles.item.ItemInfoTooltip>builder()
+                    .persistent(com.noahtnt2009.gallifreyan_chronicles.item.ItemInfoTooltip.CODEC).build()
+    );
+
     public static final DataComponentType<java.util.UUID> TARDIS_ID = register(
             "tardis_id",
             () -> DataComponentType.<java.util.UUID>builder().persistent(net.minecraft.core.UUIDUtil.CODEC).build()

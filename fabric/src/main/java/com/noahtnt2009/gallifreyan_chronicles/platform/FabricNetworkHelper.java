@@ -6,6 +6,7 @@ import com.noahtnt2009.gallifreyan_chronicles.network.TardisConsoleRotorStatePay
 import com.noahtnt2009.gallifreyan_chronicles.network.TardisConsoleSyncPayload;
 import com.noahtnt2009.gallifreyan_chronicles.network.TardisDrumShakePayload;
 import com.noahtnt2009.gallifreyan_chronicles.network.TardisExteriorSyncPayload;
+import com.noahtnt2009.gallifreyan_chronicles.network.TardisInteriorSyncPayload;
 import com.noahtnt2009.gallifreyan_chronicles.platform.services.INetworkHelper;
 import net.fabricmc.fabric.api.networking.v1.PlayerLookup;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
@@ -22,6 +23,18 @@ public class FabricNetworkHelper implements INetworkHelper {
     public void broadcastTardisExteriorSync(MinecraftServer server, TardisExteriorSyncPayload payload) {
         for (ServerPlayer player : PlayerLookup.all(server)) {
             sendTardisExteriorSync(player, payload);
+        }
+    }
+
+    @Override
+    public void sendTardisInteriorSync(ServerPlayer player, TardisInteriorSyncPayload payload) {
+        ServerPlayNetworking.send(player, payload);
+    }
+
+    @Override
+    public void broadcastTardisInteriorSync(MinecraftServer server, TardisInteriorSyncPayload payload) {
+        for (ServerPlayer player : PlayerLookup.all(server)) {
+            sendTardisInteriorSync(player, payload);
         }
     }
 

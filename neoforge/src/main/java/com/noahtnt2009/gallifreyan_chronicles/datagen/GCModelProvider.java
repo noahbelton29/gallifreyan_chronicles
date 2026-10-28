@@ -15,9 +15,18 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.level.block.Block;
 
 import java.util.Map;
+import java.util.Optional;
 
 public class GCModelProvider extends ModelProvider {
     private static final int GALLIFREYAN_GRASS_TINT = 0xFFE0E0E0;
+
+    // Cactus-shaped parent shipped in common resources (models/block/thorivine_base.json).
+    // Kept in our own namespace so vanilla changes to the cactus model can't break Thorivine.
+    private static final ModelTemplate THORIVINE_TEMPLATE = new ModelTemplate(
+            Optional.of(Identifier.fromNamespaceAndPath(Constants.MOD_ID, "block/thorivine_base")),
+            Optional.empty(),
+            TextureSlot.TOP, TextureSlot.SIDE, TextureSlot.BOTTOM
+    );
 
     public GCModelProvider(PackOutput output) {
         super(output, Constants.MOD_ID);
@@ -44,8 +53,7 @@ public class GCModelProvider extends ModelProvider {
         blockModels.createTrivialCube(GCBlocks.GALLIFREYAN_STONE_COAL_ORE);
         blockModels.createTrivialCube(GCBlocks.COBBLED_LIMESTONE);
         blockModels.createTrivialCube(GCBlocks.ARCADIAN_SHALE_TARANIUM_ORE);
-        blockModels.createNonTemplateModelBlock(GCBlocks.THORIVINE);
-        blockModels.createFlatItemModel(GCBlocks.THORIVINE.asItem());
+        registerThorivine(blockModels);
         blockModels.createCrossBlockWithDefaultItem(GCBlocks.THORIVINE_FLOWER,
                 BlockModelGenerators.PlantType.NOT_TINTED);
 
@@ -160,6 +168,21 @@ public class GCModelProvider extends ModelProvider {
                 .fenceGate(GCBlocks.BRACHACKI_FENCE_GATE);
     }
 
+
+    private void registerThorivine(BlockModelGenerators generators) {
+        TextureMapping mapping = new TextureMapping()
+                .put(TextureSlot.TOP, TextureMapping.getBlockTexture(GCBlocks.THORIVINE, "_bottom"))
+                .put(TextureSlot.SIDE, TextureMapping.getBlockTexture(GCBlocks.THORIVINE, "_side"))
+                .put(TextureSlot.BOTTOM, TextureMapping.getBlockTexture(GCBlocks.THORIVINE, "_bottom"));
+
+        Identifier model = THORIVINE_TEMPLATE.create(GCBlocks.THORIVINE, mapping, generators.modelOutput);
+
+        generators.blockStateOutput.accept(BlockModelGenerators.createSimpleBlock(
+                GCBlocks.THORIVINE,
+                BlockModelGenerators.plainVariant(model)
+        ));
+        generators.registerSimpleItemModel(GCBlocks.THORIVINE, model);
+    }
 
     private void registerGrassBlock(BlockModelGenerators generators) {
         TextureMapping normalMapping = new TextureMapping()

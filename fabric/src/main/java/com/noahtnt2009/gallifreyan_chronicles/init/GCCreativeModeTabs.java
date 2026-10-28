@@ -41,8 +41,6 @@ public class GCCreativeModeTabs {
                         output.accept(GCBlocks.BRACHACKI_FENCE_2);
                         output.accept(GCBlocks.BRACHACKI_FENCE_GATE_2);
                         output.accept(GCBlocks.TARDIS_INTERIOR_DOOR);
-                        output.accept(GCBlocks.FIRST_DOCTORS_DOOR);
-                        output.accept(GCBlocks.SECOND_DOCTORS_DOOR);
                     }).build());
 
     public static final CreativeModeTab NATURAL_BLOCKS_TAB = Registry.register(BuiltInRegistries.CREATIVE_MODE_TAB,

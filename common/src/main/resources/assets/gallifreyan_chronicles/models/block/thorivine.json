@@ -1,0 +1,8 @@
+{
+  "parent": "gallifreyan_chronicles:block/thorivine_base",
+  "textures": {
+    "bottom": "gallifreyan_chronicles:block/thorivine_bottom",
+    "side": "gallifreyan_chronicles:block/thorivine_side",
+    "top": "gallifreyan_chronicles:block/thorivine_bottom"
+  }
+}

@@ -207,8 +207,13 @@ public class TardisControlEntity extends Entity {
     public void printPosition(Player player) {
         Vec3 pos = this.position();
         TardisConsoleBlockEntity console = this.getConsole();
-        Vec3 offset = console == null ? this.getOffset()
-                : ConsoleControlManager.unrotateOffset(this.getOffset(), console.getHostFacing());
+        Vec3 offset = this.getOffset();
+        if (console != null) {
+            offset = ConsoleControlManager.unrotateOffset(offset, console.getHostFacing());
+            if (console.isHostUpsideDown()) {
+                offset = ConsoleControlManager.flipOffset(offset, this.getControlHeight());
+            }
+        }
 
         String idPart = this.getControlId().isEmpty() ? "<unset>" : this.getControlId();
 

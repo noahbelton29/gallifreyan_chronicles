@@ -54,6 +54,10 @@ public class ConsoleControlManager {
         };
     }
 
+    public static Vec3 flipOffset(Vec3 o, float height) {
+        return new Vec3(-o.x, -o.y - height, o.z);
+    }
+
     public static Vec3 unrotateOffset(Vec3 o, Direction facing) {
         return rotateOffset(o, switch (facing) {
             case WEST -> Direction.EAST;
@@ -75,7 +79,8 @@ public class ConsoleControlManager {
         });
 
         Direction facing = host.getHostFacing();
-        Vec3 worldPos = Vec3.atCenterOf(host.getHostPos()).add(rotateOffset(spec.offset(), facing));
+        Vec3 localOffset = host.isHostUpsideDown() ? flipOffset(spec.offset(), spec.height()) : spec.offset();
+        Vec3 worldPos = Vec3.atCenterOf(host.getHostPos()).add(rotateOffset(localOffset, facing));
         TardisControlEntity entity = TardisControlEntity.create(serverLevel, host.getHostPos(), spec.id(), worldPos);
 
         boolean quarterTurn = facing.getAxis() == Direction.Axis.X;

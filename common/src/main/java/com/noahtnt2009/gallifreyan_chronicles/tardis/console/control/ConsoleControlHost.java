@@ -12,4 +12,8 @@ public interface ConsoleControlHost {
     default Direction getHostFacing() {
         return Direction.NORTH;
     }
+
+    default boolean isHostUpsideDown() {
+        return false;
+    }
 }

@@ -299,6 +299,11 @@ public class TardisConsoleBlockEntity extends BlockEntity implements GeoBlockEnt
     }
 
     @Override
+    public boolean isHostUpsideDown() {
+        return ConsoleBlock.isUpsideDown(getBlockState());
+    }
+
+    @Override
     public BlockPos getHostPos() {
         return getBlockPos();
     }

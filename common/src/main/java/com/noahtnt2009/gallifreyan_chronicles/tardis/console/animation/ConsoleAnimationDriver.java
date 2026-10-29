@@ -11,6 +11,7 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 import org.jspecify.annotations.Nullable;
 
+import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Supplier;
 
@@ -26,6 +27,9 @@ public class ConsoleAnimationDriver implements ConsoleAnimatable {
     private @Nullable AnimationController<?> idleController;
     private @Nullable AnimationController<?> flightController;
     private Map<String, AnimationController<?>> controlControllers = Map.of();
+
+    private final Map<String, String> lastAnimation = new HashMap<>();
+    private final Map<String, Boolean> alternate = new HashMap<>();
 
     public ConsoleAnimationDriver(BlockPos pos) {
         this.pos = pos;
@@ -78,7 +82,11 @@ public class ConsoleAnimationDriver implements ConsoleAnimatable {
         }
         AnimationController<?> controller = controllerFor(controllerName);
         if (controller != null) {
-            controller.setAnimation(RawAnimation.begin().thenPlay(animationName));
+            boolean repeat = animationName.equals(lastAnimation.put(controllerName, animationName));
+            boolean flip = repeat && !alternate.getOrDefault(controllerName, false);
+            alternate.put(controllerName, flip);
+            RawAnimation raw = RawAnimation.begin().thenPlay(animationName);
+            controller.setAnimation(flip ? raw.thenWait(1) : raw);
         } else {
             Constants.LOG.warn("No animation controller found for control '{}', is it registered in TardisControlRegistry?", controllerName);
         }

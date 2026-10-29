@@ -22,7 +22,8 @@ public class TardisManager extends SavedData {
     private record Entry(TardisComponent component, Optional<BlockPos> blockPos,
                          Optional<BlockPos> consoleBlockPos, Optional<BlockPos> exteriorBlockPos,
                          Optional<BlockPos> interiorOrigin, Optional<Identifier> exteriorDimension,
-                         Optional<String> interiorId, Optional<LandingTarget> landingTarget) {
+                         Optional<String> interiorId, Optional<LandingTarget> landingTarget,
+                         Optional<Integer> coordIncrement, Optional<Boolean> coordIncrementNegative) {
     }
 
     private static final Codec<Entry> ENTRY_CODEC = RecordCodecBuilder.create(inst -> inst.group(
@@ -33,7 +34,9 @@ public class TardisManager extends SavedData {
             BlockPos.CODEC.optionalFieldOf("interior_origin").forGetter(Entry::interiorOrigin),
             Identifier.CODEC.optionalFieldOf("exterior_dimension").forGetter(Entry::exteriorDimension),
             Codec.STRING.optionalFieldOf("interior_id").forGetter(Entry::interiorId),
-            LandingTarget.CODEC.optionalFieldOf("landing_target").forGetter(Entry::landingTarget)
+            LandingTarget.CODEC.optionalFieldOf("landing_target").forGetter(Entry::landingTarget),
+            Codec.INT.optionalFieldOf("coord_increment").forGetter(Entry::coordIncrement),
+            Codec.BOOL.optionalFieldOf("coord_increment_negative").forGetter(Entry::coordIncrementNegative)
     ).apply(inst, Entry::new));
 
     public static final Codec<TardisManager> CODEC = RecordCodecBuilder.create(inst -> inst.group(
@@ -49,7 +52,9 @@ public class TardisManager extends SavedData {
                             Optional.ofNullable(manager.interiorOriginById.get(id)),
                             Optional.ofNullable(manager.exteriorDimensionById.get(id)),
                             Optional.ofNullable(manager.interiorIdById.get(id)),
-                            Optional.ofNullable(manager.landingTargetById.get(id))
+                            Optional.ofNullable(manager.landingTargetById.get(id)),
+                            Optional.ofNullable(manager.coordIncrementById.get(id)),
+                            manager.negativeIncrements.contains(id) ? Optional.of(true) : Optional.empty()
                     ));
                 }
                 return entries;
@@ -72,6 +77,8 @@ public class TardisManager extends SavedData {
             entry.exteriorDimension().ifPresent(dim -> manager.exteriorDimensionById.put(id, dim));
             entry.interiorId().ifPresent(interior -> manager.interiorIdById.put(id, interior));
             entry.landingTarget().ifPresent(target -> manager.landingTargetById.put(id, target));
+            entry.coordIncrement().ifPresent(index -> manager.coordIncrementById.put(id, index));
+            if (entry.coordIncrementNegative().orElse(false)) manager.negativeIncrements.add(id);
         }
         return manager;
     }));
@@ -92,6 +99,8 @@ public class TardisManager extends SavedData {
     private final Map<UUID, Identifier> exteriorDimensionById = new HashMap<>();
     private final Map<UUID, String> interiorIdById = new HashMap<>();
     private final Map<UUID, LandingTarget> landingTargetById = new HashMap<>();
+    private final Map<UUID, Integer> coordIncrementById = new HashMap<>();
+    private final Set<UUID> negativeIncrements = new HashSet<>();
 
     public Optional<TardisComponent> get(UUID tardisId) {
         if (tardisId == null) {
@@ -134,6 +143,8 @@ public class TardisManager extends SavedData {
         exteriorDimensionById.remove(tardisId);
         interiorIdById.remove(tardisId);
         landingTargetById.remove(tardisId);
+        coordIncrementById.remove(tardisId);
+        negativeIncrements.remove(tardisId);
         setDirty();
     }
 
@@ -196,6 +207,27 @@ public class TardisManager extends SavedData {
         } else {
             landingTargetById.put(tardisId, target);
         }
+        setDirty();
+    }
+
+    // index into TardisDestinations.INCREMENTS, the step the console's x/y/z controls move the destination by
+    public int getCoordIncrementIndex(UUID tardisId) {
+        return coordIncrementById.getOrDefault(tardisId, 0);
+    }
+
+    // when set, the x/y/z controls subtract the increment instead of adding it
+    public boolean isCoordIncrementNegative(UUID tardisId) {
+        return negativeIncrements.contains(tardisId);
+    }
+
+    public void setCoordIncrementNegative(UUID tardisId, boolean negative) {
+        if (negative) negativeIncrements.add(tardisId);
+        else negativeIncrements.remove(tardisId);
+        setDirty();
+    }
+
+    public void setCoordIncrementIndex(UUID tardisId, int index) {
+        coordIncrementById.put(tardisId, index);
         setDirty();
     }
 

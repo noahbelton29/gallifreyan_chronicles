@@ -22,9 +22,31 @@
   "controls": [
     {
       "depth": 0.125,
+      "id": "change_increment",
+      "offset": {
+        "x": 0.9611,
+        "y": 0.5969,
+        "z": -0.3913
+      },
+      "width": 0.175,
+      "height": 0.125
+    },
+    {
+      "depth": 0.125,
+      "id": "dimension_selector",
+      "offset": {
+        "x": 0.7173,
+        "y": 0.5344,
+        "z": -0.7538
+      },
+      "width": 0.1375,
+      "height": 0.1625
+    },
+    {
+      "depth": 0.125,
       "id": "door_control",
       "offset": {
-        "x": -0.3438,
+        "x": -0.3437,
         "y": 0.5592,
         "z": 1.0224
       },
@@ -35,7 +57,7 @@
       "depth": 0.125,
       "id": "door_lock",
       "offset": {
-        "x": 0.2187,
+        "x": 0.2188,
         "y": 0.5592,
         "z": 1.0224
       },
@@ -74,6 +96,39 @@
       },
       "width": 0.125,
       "height": 0.1875
+    },
+    {
+      "depth": 0.1062,
+      "id": "x_increment",
+      "offset": {
+        "x": 1.0923,
+        "y": 0.5406,
+        "z": -0.1382
+      },
+      "width": 0.15,
+      "height": 0.1563
+    },
+    {
+      "depth": 0.1063,
+      "id": "y_increment",
+      "offset": {
+        "x": 0.9486,
+        "y": 0.5719,
+        "z": -0.2445
+      },
+      "width": 0.15,
+      "height": 0.1563
+    },
+    {
+      "depth": 0.15,
+      "id": "z_increment",
+      "offset": {
+        "x": 0.6236,
+        "y": 0.6719,
+        "z": -0.3663
+      },
+      "width": 0.15,
+      "height": 0.1563
     }
   ]
 }

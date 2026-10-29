@@ -20,6 +20,7 @@ public final class GCConfig {
         String default_exterior = BUILT_IN_EXTERIOR;
         String default_console = BUILT_IN_CONSOLE;
         String default_interior = BUILT_IN_INTERIOR;
+        boolean show_version_hud = true;
     }
 
     private static Data data = new Data();
@@ -74,6 +75,10 @@ public final class GCConfig {
         return data.default_interior;
     }
 
+    public static boolean showVersionHud() {
+        return data.show_version_hud;
+    }
+
     public static void setDefaultExterior(String id) {
         data.default_exterior = id;
     }
@@ -84,5 +89,9 @@ public final class GCConfig {
 
     public static void setDefaultInterior(String id) {
         data.default_interior = id;
+    }
+
+    public static void setShowVersionHud(boolean show) {
+        data.show_version_hud = show;
     }
 }

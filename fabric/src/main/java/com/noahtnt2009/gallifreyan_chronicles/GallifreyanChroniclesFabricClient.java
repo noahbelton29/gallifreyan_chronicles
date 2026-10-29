@@ -1,6 +1,8 @@
 package com.noahtnt2009.gallifreyan_chronicles;
 
 import com.noahtnt2009.gallifreyan_chronicles.client.hud.GCHudRenderer;
+import com.noahtnt2009.gallifreyan_chronicles.client.watermark.WatermarkIdentity;
+import com.noahtnt2009.gallifreyan_chronicles.client.watermark.WatermarkOverlay;
 import com.noahtnt2009.gallifreyan_chronicles.client.renderer.TardisConsoleBlockRenderer;
 import com.noahtnt2009.gallifreyan_chronicles.client.renderer.TardisControlEntityRenderer;
 import com.noahtnt2009.gallifreyan_chronicles.client.renderer.TardisKeyEntityRenderer;
@@ -20,6 +22,7 @@ import net.minecraft.client.renderer.entity.EntityRenderers;
 public class GallifreyanChroniclesFabricClient implements ClientModInitializer {
     @Override
     public void onInitializeClient() {
+        WatermarkIdentity.enabled();
 //        BlockColorRegistry.register(
 //                List.of(BlockTintSources.constant(0xFF590a0a, 0xFF590a0a)),
 //                GCBlocks.SHORT_GALLIFREYAN_GRASS,
@@ -38,6 +41,11 @@ public class GallifreyanChroniclesFabricClient implements ClientModInitializer {
         HudElementRegistry.addLast(
                 GCUtils.modIdentifier("hud_overlay"),
                 (graphics, _) -> GCHudRenderer.render(graphics)
+        );
+
+        HudElementRegistry.addLast(
+                GCUtils.modIdentifier("watermark_overlay"),
+                (graphics, _) -> WatermarkOverlay.render(graphics)
         );
 
 //        ImGuiMCEvents.INSTANCE.imGuiLoadPre(() -> {

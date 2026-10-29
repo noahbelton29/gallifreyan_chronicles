@@ -1,9 +1,11 @@
 package com.noahtnt2009.gallifreyan_chronicles.platform.services;
 
+import java.nio.file.Path;
+
 public interface IPlatformHelper {
 
     /** The loader's config directory. */
-    java.nio.file.Path getConfigDir();
+    Path getConfigDir();
 
     /**
      * Gets the name of the current platform
@@ -19,6 +21,14 @@ public interface IPlatformHelper {
      * @return True if the mod is loaded, false otherwise.
      */
     boolean isModLoaded(String modId);
+
+    /**
+     * Gets the version string of a loaded mod (use {@code "minecraft"} for the game itself).
+     *
+     * @param modId The mod to look up.
+     * @return The version, or {@code "unknown"} if the mod is not loaded.
+     */
+    String getModVersion(String modId);
 
     /**
      * Check if the game is currently in a development environment.

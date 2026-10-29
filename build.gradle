@@ -4,3 +4,18 @@ plugins {
     // see https://projects.neoforged.net/neoforged/moddevgradle for new versions
     id 'net.neoforged.moddev' version '2.0.147' apply false
 }
+
+def baseVersion = project.version.toString()
+def buildStamp = java.time.LocalDateTime.now().format(java.time.format.DateTimeFormatter.ofPattern('yyddMM-HHmm'))
+allprojects {
+    version = "${baseVersion}-dev-${buildStamp}"
+}
+
+subprojects {
+    afterEvaluate {
+        def base = extensions.findByType(org.gradle.api.plugins.BasePluginExtension)
+        if (base != null) {
+            base.archivesName.set("gc-${project.name}")
+        }
+    }
+}

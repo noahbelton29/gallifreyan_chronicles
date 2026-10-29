@@ -16,7 +16,9 @@
     "client.SkyRendererMixin",
     "client.CameraShakeMixin",
     "client.AbstractContainerScreenAccessor",
-    "client.CreativeTardisScrollMixin"
+    "client.CreativeTardisScrollMixin",
+    "client.ScreenshotMixin",
+    "client.NativeImageSaveMixin"
   ],
   "server": [],
   "injectors": {

@@ -96,3 +96,39 @@ sourceSets.configureEach {
         }
     }
 }
+
+def gcBuildIdDir = layout.buildDirectory.dir('generated/gc-build-id')
+def gcTesterLabel = providers.gradleProperty('testerLabel').orElse('-')
+def gcWatermarkOff = providers.gradleProperty('watermark')
+        .map { it.equalsIgnoreCase('off') || it.equalsIgnoreCase('false') }
+        .orElse(false)
+def gcLedgerFile = rootProject.layout.projectDirectory.file('build-ledger.csv')
+
+def generateBuildId = tasks.register('generateBuildId') {
+    outputs.dir(gcBuildIdDir)
+    outputs.upToDateWhen { false }
+    doLast {
+        def alphabet = '0123456789ABCDEFGHJKMNPQRSTVWXYZ'
+        def random = new java.security.SecureRandom()
+        def buildId = (1..8).collect { alphabet.charAt(random.nextInt(alphabet.length())) }.join()
+        def watermarkOn = !gcWatermarkOff.get()
+
+        def dir = gcBuildIdDir.get().asFile
+        dir.mkdirs()
+        new File(dir, 'gc_build.properties').text = "build_id=${buildId}\nwatermark=${watermarkOn}\n"
+
+        if (watermarkOn) {
+            def label = gcTesterLabel.get().replaceAll('[^A-Za-z0-9._ -]', '_')
+            def ledger = gcLedgerFile.asFile
+            if (!ledger.exists()) ledger.text = 'timestamp,build_id,tester,jar\n'
+            def jarName = "gc-${project.name}-${project.version}.jar"
+            ledger << "${java.time.OffsetDateTime.now()},${buildId},${label},${jarName}\n"
+            logger.lifecycle("Watermark build ID ${buildId} for tester '${label}' (logged to build-ledger.csv)")
+        } else {
+            logger.lifecycle('Watermark disabled for this build')
+        }
+    }
+}
+
+sourceSets.main.resources.srcDir(gcBuildIdDir)
+tasks.named('processResources') { dependsOn(generateBuildId) }

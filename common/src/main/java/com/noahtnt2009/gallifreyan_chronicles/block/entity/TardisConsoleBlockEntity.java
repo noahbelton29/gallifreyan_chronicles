@@ -8,8 +8,7 @@ import com.geckolib.animation.RawAnimation;
 import com.geckolib.animation.object.PlayState;
 import com.geckolib.util.GeckoLibUtil;
 import com.noahtnt2009.gallifreyan_chronicles.block.ConsoleBlock;
-import com.noahtnt2009.gallifreyan_chronicles.client.camera.GCCameraShake;
-import com.noahtnt2009.gallifreyan_chronicles.client.sound.TardisConsoleHumSoundInstance;
+import com.noahtnt2009.gallifreyan_chronicles.client.GCClientHooks;
 import com.noahtnt2009.gallifreyan_chronicles.ecs.ComponentHolder;
 import com.noahtnt2009.gallifreyan_chronicles.ecs.ComponentStore;
 import com.noahtnt2009.gallifreyan_chronicles.ecs.Entity;
@@ -26,7 +25,6 @@ import com.noahtnt2009.gallifreyan_chronicles.tardis.ecs.TardisComponentTypes;
 import com.noahtnt2009.gallifreyan_chronicles.tardis.ecs.TardisLinkable;
 import com.noahtnt2009.gallifreyan_chronicles.tardis.ecs.system.ConsoleSyncSystem;
 import com.noahtnt2009.gallifreyan_chronicles.tardis.ecs.system.ConsoleSystem;
-import net.minecraft.client.Minecraft;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.HolderLookup;
@@ -70,8 +68,7 @@ public class TardisConsoleBlockEntity extends BlockEntity implements GeoBlockEnt
 
     private final ConsoleAnimationDriver animationDriver;
     private final ConsoleControlManager controls;
-    private boolean humStarted = false;
-    private boolean rumbleRegistered = false;
+    private boolean clientEffectsStarted = false;
 
     private static final double SNAP_TO_END = 10_000.0;
     private final Map<String, Integer> snapFrames = new HashMap<>();
@@ -344,45 +341,14 @@ public class TardisConsoleBlockEntity extends BlockEntity implements GeoBlockEnt
         this.respawnControls();
         settleControlAnimations();
 
-        if (level.isClientSide() && !humStarted) {
-            humStarted = true;
-            Minecraft.getInstance().execute(() -> Minecraft.getInstance().getSoundManager().play(
-                    new TardisConsoleHumSoundInstance(getBlockPos(), this::isHumStillValid)
-            ));
-        }
-
-        if (level.isClientSide() && !rumbleRegistered) {
-            rumbleRegistered = true;
-            Vec3 center = Vec3.atCenterOf(getBlockPos());
-            GCCameraShake.addFlightSource(new GCCameraShake.FlightSource() {
-                @Override
-                public Vec3 position() {
-                    return center;
-                }
-
-                @Override
-                public boolean isInFlight() {
-                    return TardisConsoleBlockEntity.this.isInFlight();
-                }
-
-                @Override
-                public boolean isValid() {
-                    return TardisConsoleBlockEntity.this.isRumbleSourceValid();
-                }
-            });
+        if (level.isClientSide() && !clientEffectsStarted) {
+            clientEffectsStarted = true;
+            GCClientHooks.startConsoleClientEffects(this);
         }
     }
 
     public boolean isInFlight() {
         return FLIGHT_STATE.equals(this.currentRotorState);
-    }
-
-    private boolean isRumbleSourceValid() {
-        return !isRemoved() && level != null && level == Minecraft.getInstance().level;
-    }
-
-    private boolean isHumStillValid() {
-        return !isRemoved() && level != null && level.isClientSide();
     }
 
     @Override

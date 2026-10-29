@@ -1,6 +1,6 @@
 package com.noahtnt2009.gallifreyan_chronicles.network;
 
-import com.noahtnt2009.gallifreyan_chronicles.block.entity.TardisConsoleBlockEntity;
+import com.noahtnt2009.gallifreyan_chronicles.client.GCClientHooks;
 import com.noahtnt2009.gallifreyan_chronicles.util.GCUtils;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.RegistryFriendlyByteBuf;
@@ -28,13 +28,7 @@ public record TardisConsoleAnimationPayload(BlockPos pos, String animationName, 
     }
 
     public void apply() {
-        var level = net.minecraft.client.Minecraft.getInstance().level;
-        if (level == null) return;
-
-        var be = level.getBlockEntity(pos);
-        if (be instanceof TardisConsoleBlockEntity console) {
-            console.triggerAnimationClient(animationName, controllerName);
-        }
+        GCClientHooks.applyConsoleAnimation(pos, animationName, controllerName);
     }
 
     @Override

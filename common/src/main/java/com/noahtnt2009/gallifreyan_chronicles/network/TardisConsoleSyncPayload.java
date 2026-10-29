@@ -6,7 +6,7 @@ import com.noahtnt2009.gallifreyan_chronicles.tardis.console.TardisConsoleVarian
 import com.noahtnt2009.gallifreyan_chronicles.tardis.door.TardisDoorRegistry;
 import com.noahtnt2009.gallifreyan_chronicles.tardis.door.TardisDoorVariant;
 import com.noahtnt2009.gallifreyan_chronicles.util.GCUtils;
-import net.minecraft.client.Minecraft;
+import com.noahtnt2009.gallifreyan_chronicles.client.GCClientHooks;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
@@ -61,8 +61,7 @@ public record TardisConsoleSyncPayload(List<TardisConsole> consoles, List<Tardis
                 .collect(Collectors.toSet());
 
         if (!newIds.equals(previousIds)) {
-            Minecraft mc = Minecraft.getInstance();
-            mc.execute(mc::reloadResourcePacks);
+            GCClientHooks.reloadResourcePacks();
         }
     }
 

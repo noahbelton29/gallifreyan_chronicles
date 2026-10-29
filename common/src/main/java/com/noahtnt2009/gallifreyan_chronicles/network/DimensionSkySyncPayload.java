@@ -3,7 +3,7 @@ package com.noahtnt2009.gallifreyan_chronicles.network;
 import com.noahtnt2009.gallifreyan_chronicles.client.sky.data.DimensionSky;
 import com.noahtnt2009.gallifreyan_chronicles.client.sky.data.DimensionSkyRegistry;
 import com.noahtnt2009.gallifreyan_chronicles.util.GCUtils;
-import net.minecraft.client.Minecraft;
+import com.noahtnt2009.gallifreyan_chronicles.client.GCClientHooks;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
@@ -39,8 +39,7 @@ public record DimensionSkySyncPayload(List<DimensionSky> skies) implements Custo
                 .collect(Collectors.toSet());
 
         if (!newIds.equals(previousIds)) {
-            Minecraft mc = Minecraft.getInstance();
-            mc.execute(mc::reloadResourcePacks);
+            GCClientHooks.reloadResourcePacks();
         }
     }
 

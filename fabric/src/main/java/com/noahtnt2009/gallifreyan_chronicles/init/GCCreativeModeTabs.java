@@ -16,7 +16,9 @@ public class GCCreativeModeTabs {
                     .title(Component.translatable("creativetab.gallifreyan_chronicles.tardis"))
                     .displayItems((parameters, output) -> {
                         output.accept(GCBlocks.TARDIS);
-                        output.accept(GCBlocks.TARDIS_CONSOLE);
+                        ItemStack brachackiConsole = new ItemStack(GCBlocks.TARDIS_CONSOLE);
+                        brachackiConsole.set(GCDataComponents.CONSOLE_ID, Constants.MOD_ID + ":brachacki_console");
+                        output.accept(brachackiConsole);
                         output.accept(GCItems.TARDIS_KEY);
                         output.accept(GCItems.MASTER_TARDIS_KEY);
                         output.accept(GCBlocks.BRACHACKI_FLOOR_BLOCK);

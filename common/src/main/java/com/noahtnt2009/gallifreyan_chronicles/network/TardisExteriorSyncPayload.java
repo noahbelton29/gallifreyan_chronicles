@@ -3,7 +3,7 @@ package com.noahtnt2009.gallifreyan_chronicles.network;
 import com.noahtnt2009.gallifreyan_chronicles.tardis.exterior.TardisExterior;
 import com.noahtnt2009.gallifreyan_chronicles.tardis.exterior.TardisExteriorRegistry;
 import com.noahtnt2009.gallifreyan_chronicles.util.GCUtils;
-import net.minecraft.client.Minecraft;
+import com.noahtnt2009.gallifreyan_chronicles.client.GCClientHooks;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
@@ -49,8 +49,7 @@ public record TardisExteriorSyncPayload(List<TardisExterior> exteriors, String d
                 .collect(Collectors.toSet());
 
         if (!newIds.equals(previousIds)) {
-            Minecraft mc = Minecraft.getInstance();
-            mc.execute(mc::reloadResourcePacks);
+            GCClientHooks.reloadResourcePacks();
         }
     }
 

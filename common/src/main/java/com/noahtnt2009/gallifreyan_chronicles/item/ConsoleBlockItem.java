@@ -31,17 +31,41 @@ public class ConsoleBlockItem extends BlockItem implements ScrollSelectable {
         return console.variants().size() > 1;
     }
 
+    private static final List<String> CONSOLE_ORDER = List.of(
+            "brachacki_console",
+            "inferno_console",
+            "ambassadors_of_death_console"
+    );
+
+    private static final List<String> VARIANT_ORDER = List.of(
+            "first_doctors_console",
+            "second_doctors_console",
+            "tuat_console"
+    );
+
+    private static String localId(String id) {
+        int colon = id.indexOf(':');
+        return colon < 0 ? id : id.substring(colon + 1);
+    }
+
+    private static int orderIndex(List<String> order, String localId) {
+        int index = order.indexOf(localId);
+        return index < 0 ? order.size() : index;
+    }
+
     private static List<Entry> entries() {
-        String defaultId = defaultConsoleId();
         List<TardisConsole> consoles = new ArrayList<>(TardisConsoleRegistry.getAll());
-        consoles.sort(Comparator.comparing((TardisConsole c) -> !c.id().equals(defaultId))
+        consoles.sort(Comparator.comparingInt((TardisConsole c) -> orderIndex(CONSOLE_ORDER, localId(c.id())))
                 .thenComparing(TardisConsole::id));
 
         List<Entry> entries = new ArrayList<>();
         for (TardisConsole console : consoles) {
             entries.add(new Entry(console.id(), null));
             if (hasChoice(console)) {
-                for (TardisConsoleVariant variant : console.variants()) {
+                List<TardisConsoleVariant> variants = new ArrayList<>(console.variants());
+                variants.sort(Comparator.comparingInt((TardisConsoleVariant v) -> orderIndex(VARIANT_ORDER, v.localId()))
+                        .thenComparing(TardisConsoleVariant::localId));
+                for (TardisConsoleVariant variant : variants) {
                     entries.add(new Entry(console.id(), variant.localId()));
                 }
             }

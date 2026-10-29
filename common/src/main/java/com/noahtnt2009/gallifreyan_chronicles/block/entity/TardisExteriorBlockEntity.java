@@ -75,7 +75,8 @@ public class TardisExteriorBlockEntity extends BlockEntity implements GeoBlockEn
     private boolean inFlight = false;
     private TardisFlightState flightState = TardisFlightState.IDLE;
     private long flightStateEndTick = 0L;
-    private long fadeStartTick = 0L;
+    private static final long NO_FADE_START_TICK = Long.MIN_VALUE / 4;
+    private long fadeStartTick = NO_FADE_START_TICK;
     private long landAtTick = -1L;
     private FadeType fadeType = FadeTypes.DEFAULT;
     private int seenFadeGeneration = -1;
@@ -735,7 +736,7 @@ public class TardisExteriorBlockEntity extends BlockEntity implements GeoBlockEn
                 .orElse(ItemStack.EMPTY);
         locked = input.getBooleanOr("Locked", true);
         inFlight = input.getBooleanOr("InFlight", false);
-        fadeStartTick = input.getLongOr("FadeStartTick", 0L);
+        fadeStartTick = input.getLongOr("FadeStartTick", NO_FADE_START_TICK);
         landAtTick = input.getLongOr("LandAtTick", -1L);
         flightState = TardisFlightState.parse(input.getStringOr("FlightState", ""),
                 inFlight ? TardisFlightState.IN_VORTEX : TardisFlightState.IDLE);

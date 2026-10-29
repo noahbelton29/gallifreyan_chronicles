@@ -1,6 +1,6 @@
 package com.noahtnt2009.gallifreyan_chronicles.network;
 
-import com.noahtnt2009.gallifreyan_chronicles.client.camera.GCCameraShake;
+import com.noahtnt2009.gallifreyan_chronicles.client.GCClientHooks;
 import com.noahtnt2009.gallifreyan_chronicles.platform.Services;
 import com.noahtnt2009.gallifreyan_chronicles.util.GCUtils;
 import net.minecraft.network.RegistryFriendlyByteBuf;
@@ -13,6 +13,8 @@ import net.minecraft.world.phys.Vec3;
 import org.jspecify.annotations.NonNull;
 
 public record TardisDrumShakePayload(double x, double y, double z, float strength) implements CustomPacketPayload {
+    private static final double MAX_DISTANCE = 25.0;
+
     public static final Type<TardisDrumShakePayload> TYPE =
             new Type<>(GCUtils.modIdentifier("tardis_drum_shake"));
 
@@ -30,7 +32,7 @@ public record TardisDrumShakePayload(double x, double y, double z, float strengt
 
     public static void broadcast(ServerLevel level, Vec3 origin, float strength) {
         TardisDrumShakePayload payload = new TardisDrumShakePayload(origin.x, origin.y, origin.z, strength);
-        double maxDistanceSqr = GCCameraShake.MAX_DISTANCE * GCCameraShake.MAX_DISTANCE;
+        double maxDistanceSqr = MAX_DISTANCE * MAX_DISTANCE;
         for (ServerPlayer player : level.players()) {
             if (player.distanceToSqr(origin) < maxDistanceSqr) {
                 Services.NETWORK.sendTardisDrumShake(player, payload);
@@ -39,7 +41,7 @@ public record TardisDrumShakePayload(double x, double y, double z, float strengt
     }
 
     public void apply() {
-        GCCameraShake.trigger(new Vec3(x, y, z), strength);
+        GCClientHooks.triggerCameraShake(new Vec3(x, y, z), strength);
     }
 
     @Override

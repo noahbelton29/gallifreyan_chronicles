@@ -17,6 +17,7 @@ public final class WatermarkIdentity {
 
     private static boolean loaded;
     private static boolean enabled = true;
+    private static boolean fileEnabled = true;
     private static String buildId = "NOBUILD";
 
     private WatermarkIdentity() {
@@ -38,6 +39,8 @@ public final class WatermarkIdentity {
             Constants.LOG.error("Could not read {}", RESOURCE, e);
         }
 
+        fileEnabled = enabled;
+
         if (Services.PLATFORM.isDevelopmentEnvironment() && !Boolean.getBoolean(FORCE_PROPERTY)) {
             enabled = false;
         }
@@ -47,6 +50,11 @@ public final class WatermarkIdentity {
     public static boolean enabled() {
         load();
         return enabled;
+    }
+
+    public static boolean bannerEnabled() {
+        load();
+        return fileEnabled;
     }
 
     public static String buildId() {

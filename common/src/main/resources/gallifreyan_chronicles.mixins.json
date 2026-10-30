@@ -18,7 +18,8 @@
     "client.AbstractContainerScreenAccessor",
     "client.CreativeTardisScrollMixin",
     "client.ScreenshotMixin",
-    "client.NativeImageSaveMixin"
+    "client.NativeImageSaveMixin",
+    "client.HiddenGuiBannerMixin"
   ],
   "server": [],
   "injectors": {

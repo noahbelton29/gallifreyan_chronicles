@@ -5,6 +5,7 @@ import com.noahtnt2009.gallifreyan_chronicles.tardis.control.impl.DoorControl;
 import com.noahtnt2009.gallifreyan_chronicles.tardis.control.impl.DoorLockControl;
 import com.noahtnt2009.gallifreyan_chronicles.tardis.control.impl.FlightLeverControl;
 import com.mojang.serialization.JsonOps;
+import com.mojang.serialization.MapCodec;
 import com.noahtnt2009.gallifreyan_chronicles.tardis.control.NoopControl;
 import com.noahtnt2009.gallifreyan_chronicles.tardis.control.TardisControl;
 import com.noahtnt2009.gallifreyan_chronicles.tardis.control.TardisControlRegistry;
@@ -18,34 +19,40 @@ import com.noahtnt2009.gallifreyan_chronicles.tardis.control.impl.YIncrementCont
 import com.noahtnt2009.gallifreyan_chronicles.tardis.control.impl.ZIncrementControl;
 
 public class GCTardisControls {
-    public static void registerTardisControls() {
-        // control kinds
-        TardisControlTypes.register("noop", NoopControl.CODEC);
-        TardisControlTypes.register("flight_lever", FlightLeverControl.CODEC);
-        TardisControlTypes.register("handbrake", HandbrakeControl.CODEC);
-        TardisControlTypes.register("power_lever", PowerLeverControl.CODEC);
-        TardisControlTypes.register("door_control", DoorControl.CODEC);
-        TardisControlTypes.register(DoorLockControl.ID, DoorLockControl.CODEC);
-        TardisControlTypes.register(XIncrementControl.ID, XIncrementControl.CODEC);
-        TardisControlTypes.register(YIncrementControl.ID, YIncrementControl.CODEC);
-        TardisControlTypes.register(ZIncrementControl.ID, ZIncrementControl.CODEC);
-        TardisControlTypes.register(ChangeIncrementControl.ID, ChangeIncrementControl.CODEC);
-        TardisControlTypes.register(DimensionSelectorControl.ID, DimensionSelectorControl.CODEC);
+    public static final String NOOP_CONTROL = "noop";
+    public static final String FLIGHT_LEVER = "flight_lever";
+    public static final String HANDBRAKE = "handbrake";
+    public static final String POWER_LEVER = "power_lever";
+    public static final String DOOR_CONTROL = "door_control";
+    public static final String DOOR_LOCK_CONTROL = "door_lock";
+    public static final String X_INCREMENT_CONTROL = "x_increment";
+    public static final String Y_INCREMENT_CONTROL = "y_increment";
+    public static final String Z_INCREMENT_CONTROL = "z_increment";
+    public static final String CHANGE_INCREMENT = "change_increment";
+    public static final String DIMENSION_SELECTOR = "dimension_selector";
 
-        // the controls on a console, by control id
-        TardisControlRegistry.register("flight_lever", new FlightLeverControl());
-        TardisControlRegistry.register("handbrake", new HandbrakeControl());
-        TardisControlRegistry.register("power_lever", new PowerLeverControl());
-        TardisControlRegistry.register("door_control", new DoorControl());
-        TardisControlRegistry.register(DoorLockControl.ID, new DoorLockControl());
-        TardisControlRegistry.register(XIncrementControl.ID, new XIncrementControl());
-        TardisControlRegistry.register(YIncrementControl.ID, new YIncrementControl());
-        TardisControlRegistry.register(ZIncrementControl.ID, new ZIncrementControl());
-        TardisControlRegistry.register(ChangeIncrementControl.ID, new ChangeIncrementControl());
-        TardisControlRegistry.register(DimensionSelectorControl.ID, new DimensionSelectorControl());
+    public static void registerTardisControls() {
+        // every control goes through control(...), which registers its codec and its instance together,
+        // so TardisControlRegistry holds all of them and the language provider can iterate it
+        TardisControlTypes.register(NOOP_CONTROL, NoopControl.CODEC);
+        control(FLIGHT_LEVER, FlightLeverControl.CODEC, new FlightLeverControl());
+        control(HANDBRAKE, HandbrakeControl.CODEC, new HandbrakeControl());
+        control(POWER_LEVER, PowerLeverControl.CODEC, new PowerLeverControl());
+        control(DOOR_CONTROL, DoorControl.CODEC, new DoorControl());
+        control(DOOR_LOCK_CONTROL, DoorLockControl.CODEC, new DoorLockControl());
+        control(X_INCREMENT_CONTROL, XIncrementControl.CODEC, new XIncrementControl());
+        control(Y_INCREMENT_CONTROL, YIncrementControl.CODEC, new YIncrementControl());
+        control(Z_INCREMENT_CONTROL, ZIncrementControl.CODEC, new ZIncrementControl());
+        control(CHANGE_INCREMENT, ChangeIncrementControl.CODEC, new ChangeIncrementControl());
+        control(DIMENSION_SELECTOR, DimensionSelectorControl.CODEC, new DimensionSelectorControl());
 
         verifyCodecs();
         Constants.LOG.info("Registered GC TARDIS Controls");
+    }
+
+    private static <T extends TardisControl> void control(String id, MapCodec<T> codec, T instance) {
+        TardisControlTypes.register(id, codec);
+        TardisControlRegistry.register(id, instance);
     }
 
     // writes every registered control out and reads it back, so a broken codec shows up in the log at startup

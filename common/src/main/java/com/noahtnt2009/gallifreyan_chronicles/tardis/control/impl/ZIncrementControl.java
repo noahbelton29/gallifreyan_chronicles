@@ -10,7 +10,6 @@ import net.minecraft.world.entity.player.Player;
 import java.util.UUID;
 
 public class ZIncrementControl extends DestinationControl {
-    public static final String ID = "z_increment";
     public static final ControlAnimations DEFAULT_ANIMATIONS = new ControlAnimations("z_increment", "z_increment", false);
     public static final MapCodec<ZIncrementControl> CODEC = codec(DEFAULT_ANIMATIONS, ZIncrementControl::new);
 

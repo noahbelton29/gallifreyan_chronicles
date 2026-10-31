@@ -74,6 +74,18 @@ public class TardisControlEntity extends Entity {
     }
 
     @Override
+    public boolean isInvisibleTo(Player player) {
+        return false;
+    }
+
+    @Override
+    protected @NonNull Component getTypeName() {
+        String id = this.getControlId();
+        if (id.isEmpty()) return super.getTypeName();
+        return Component.translatableWithFallback(TardisControlRegistry.translationKey(id), id);
+    }
+
+    @Override
     public boolean hurtServer(@NonNull ServerLevel serverLevel, DamageSource damageSource, float v) {
         if (damageSource.getEntity() instanceof Player player) {
             TardisControl control = TardisControlRegistry.get(this.getControlId());

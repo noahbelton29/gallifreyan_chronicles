@@ -10,7 +10,6 @@ import net.minecraft.world.entity.player.Player;
 import java.util.UUID;
 
 public class DimensionSelectorControl extends DestinationControl {
-    public static final String ID = "dimension_selector";
     public static final ControlAnimations DEFAULT_ANIMATIONS = new ControlAnimations("change_increment", "change_increment", false);
     public static final MapCodec<DimensionSelectorControl> CODEC = codec(DEFAULT_ANIMATIONS, DimensionSelectorControl::new);
 

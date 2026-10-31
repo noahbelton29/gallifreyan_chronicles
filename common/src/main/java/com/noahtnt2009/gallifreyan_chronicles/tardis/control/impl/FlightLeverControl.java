@@ -5,6 +5,7 @@ import com.noahtnt2009.gallifreyan_chronicles.Constants;
 import com.noahtnt2009.gallifreyan_chronicles.block.entity.TardisConsoleBlockEntity;
 import com.noahtnt2009.gallifreyan_chronicles.entity.TardisControlEntity;
 import com.noahtnt2009.gallifreyan_chronicles.init.GCSounds;
+import com.noahtnt2009.gallifreyan_chronicles.init.GCTardisControls;
 import com.noahtnt2009.gallifreyan_chronicles.network.TardisDrumShakePayload;
 import com.noahtnt2009.gallifreyan_chronicles.block.entity.TardisExteriorBlockEntity;
 import com.noahtnt2009.gallifreyan_chronicles.tardis.control.ControlAnimations;
@@ -124,7 +125,8 @@ public class FlightLeverControl extends BaseControl {
             return true;
         }
 
-        if (takingOff && !exterior.areDoorsFullyClosed() && tardisId != null) {
+        boolean handbrakeOn = console.getControlState(GCTardisControls.HANDBRAKE);
+        if (takingOff && (handbrakeOn || !exterior.areDoorsFullyClosed())) {
             playAt(level, entity.blockPosition(), GCSounds.SLIDER, 0.9f);
             console.setControlActivated(controlId, true);
             queueTakeoff(level.getServer(), tardisId, controlId);
@@ -193,7 +195,7 @@ public class FlightLeverControl extends BaseControl {
             return;
         }
 
-        if (exterior.areDoorsFullyClosed()) {
+        if (exterior.areDoorsFullyClosed() && !console.getControlState(GCTardisControls.HANDBRAKE)) {
             QUEUED_TAKEOFFS.remove(tardisId);
 
             onStateChanged(console, true);

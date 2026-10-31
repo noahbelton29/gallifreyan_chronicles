@@ -4,6 +4,7 @@ import com.noahtnt2009.gallifreyan_chronicles.Constants;
 import com.noahtnt2009.gallifreyan_chronicles.block.entity.InteriorDoorBlockEntity;
 import com.noahtnt2009.gallifreyan_chronicles.block.entity.TardisConsoleBlockEntity;
 import com.noahtnt2009.gallifreyan_chronicles.block.entity.TardisExteriorBlockEntity;
+import com.noahtnt2009.gallifreyan_chronicles.init.GCTardisControls;
 import com.noahtnt2009.gallifreyan_chronicles.tardis.control.impl.DoorLockControl;
 import com.noahtnt2009.gallifreyan_chronicles.tardis.ecs.component.DoorState;
 import com.noahtnt2009.gallifreyan_chronicles.tardis.interior.TardisDimensionManager;
@@ -103,11 +104,11 @@ public final class DoorSyncSystem {
     }
 
     private static void applyDoorControl(MinecraftServer server, UUID tardisId, DoorState state, boolean silent) {
-        applyControl(server, tardisId, "door_control", !state.isClosed(), silent);
+        applyControl(server, tardisId, GCTardisControls.DOOR_CONTROL, !state.isClosed(), silent);
     }
 
     private static void applyLockControl(MinecraftServer server, UUID tardisId, boolean locked, boolean silent) {
-        applyControl(server, tardisId, DoorLockControl.ID, locked, silent);
+        applyControl(server, tardisId, GCTardisControls.DOOR_LOCK_CONTROL, locked, silent);
     }
 
     private static void applyControl(MinecraftServer server, UUID tardisId, String controlId,

@@ -10,7 +10,6 @@ import net.minecraft.world.entity.player.Player;
 import java.util.UUID;
 
 public class YIncrementControl extends DestinationControl {
-    public static final String ID = "y_increment";
     public static final ControlAnimations DEFAULT_ANIMATIONS = new ControlAnimations("y_increment", "y_increment", false);
     public static final MapCodec<YIncrementControl> CODEC = codec(DEFAULT_ANIMATIONS, YIncrementControl::new);
 

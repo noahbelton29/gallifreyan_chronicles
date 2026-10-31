@@ -74,6 +74,8 @@ loom {
 
 dependencies {
     implementation("com.geckolib:geckolib-fabric-${providers.gradleProperty("minecraft_version").get()}:${providers.gradleProperty("geckolib_version").get()}")
+    compileOnly("maven.modrinth:jade:${jade_fabric_version}")
+    runtimeOnly("maven.modrinth:jade:${jade_fabric_version}")
 //    implementation("foundry.imguimc:imguimc-fabric-${project.minecraft_version}:${project.imguimc_version}")
 //    runtimeOnly("foundry.imguimc:imguimc-fabric-${project.minecraft_version}:${project.imguimc_version}")
 }

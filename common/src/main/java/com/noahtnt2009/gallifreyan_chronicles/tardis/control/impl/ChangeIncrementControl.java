@@ -10,7 +10,6 @@ import net.minecraft.world.entity.player.Player;
 import java.util.UUID;
 
 public class ChangeIncrementControl extends DestinationControl {
-    public static final String ID = "change_increment";
     public static final ControlAnimations DEFAULT_ANIMATIONS = new ControlAnimations("change_increment", "change_increment", false);
     public static final MapCodec<ChangeIncrementControl> CODEC = codec(DEFAULT_ANIMATIONS, ChangeIncrementControl::new);
 

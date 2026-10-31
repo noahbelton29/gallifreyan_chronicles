@@ -1,4 +1,4 @@
-package com.noahtnt2009.gallifreyan_chronicles.client.compat;
+package com.noahtnt2009.gallifreyan_chronicles.compat;
 
 import java.lang.invoke.MethodHandle;
 import java.lang.invoke.MethodHandles;

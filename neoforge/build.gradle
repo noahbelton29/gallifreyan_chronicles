@@ -80,6 +80,7 @@ repositories {
 
 dependencies {
     implementation("com.geckolib:geckolib-neoforge-${providers.gradleProperty("minecraft_version").get()}:${providers.gradleProperty("geckolib_version").get()}")
+    compileOnly("maven.modrinth:jade:${jade_neoforge_version}")
 //    implementation("foundry.imguimc:imguimc-neoforge-${project.minecraft_version}:${project.imguimc_version}")
 //    runtimeOnly("foundry.imguimc:imguimc-neoforge-${project.minecraft_version}:${project.imguimc_version}")
 //    runtimeOnly("maven.modrinth:sodium:${providers.gradleProperty("sodium_version").get()}")

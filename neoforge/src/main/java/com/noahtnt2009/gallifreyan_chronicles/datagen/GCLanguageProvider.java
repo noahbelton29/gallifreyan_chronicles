@@ -46,7 +46,7 @@ public class GCLanguageProvider extends LanguageProvider {
             add(item, titleCase(BuiltInRegistries.ITEM.getKey(item).getPath()));
         }
 
-        // TARDIS controls
+        // TARDIS controls: every registered control gets a name, so a new control can't ship without one
         for (String id : TardisControlRegistry.allIds()) {
             add(TardisControlRegistry.translationKey(id), titleCase(id));
         }
@@ -248,6 +248,9 @@ public class GCLanguageProvider extends LanguageProvider {
         add("sounds.gallifreyan_chronicles.block_entity.first_doctors_hum", "TARDIS hums");
 
         // Jade
+        add("tooltip.gallifreyan_chronicles.tardis.owner", "Owner");
+        add("tooltip.gallifreyan_chronicles.tardis.owner_unknown", "Unknown");
+        add("config.jade.plugin_gallifreyan_chronicles.tardis_owner", "TARDIS Owner");
         add("config.jade.plugin_gallifreyan_chronicles", "Gallifreyan Chronicles");
         add("config.jade.plugin_gallifreyan_chronicles.tardis_control", "TARDIS Control Icon");
     }

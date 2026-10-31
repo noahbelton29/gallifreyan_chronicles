@@ -30,6 +30,10 @@ public class MasterTardisKeyItem extends Item {
         if (level.isClientSide()) return InteractionResult.SUCCESS;
 
         if (exterior.hasKeyRendered()) {
+            if (!exterior.canRemoveKey(player)) {
+                player.sendOverlayMessage(Component.literal("That is not your key!"));
+                return InteractionResult.FAIL;
+            }
             ItemStack returned = exterior.clearHeldKey();
             returned.set(GCDataComponents.KEY_INSERTED, false);
             if (!player.getInventory().add(returned)) {
@@ -46,10 +50,7 @@ public class MasterTardisKeyItem extends Item {
         }
 
         ItemStack stack = context.getItemInHand();
-        ItemStack toStore = stack.copyWithCount(1);
-        toStore.set(GCDataComponents.KEY_INSERTED, true);
-        exterior.setHeldKey(player.getUUID(), toStore);
-        stack.shrink(1);
+        exterior.insertKey(player, context.getHand(), stack);
         exterior.toggleKeyLockAnimation(player);
 
         return InteractionResult.CONSUME;

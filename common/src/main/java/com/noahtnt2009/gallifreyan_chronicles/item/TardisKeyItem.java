@@ -51,12 +51,12 @@ public class TardisKeyItem extends Item {
                 return InteractionResult.FAIL;
             }
 
-            ItemStack toStore = stack.copyWithCount(1);
-            toStore.set(GCDataComponents.KEY_INSERTED, true);
-            exterior.setHeldKey(player.getUUID(), toStore);
-            stack.shrink(1);
+            exterior.insertKey(player, context.getHand(), stack);
         } else {
-            if (!player.getUUID().equals(exterior.getRenderedKeyOwner())) return InteractionResult.FAIL;
+            if (!exterior.canRemoveKey(player)) {
+                player.sendOverlayMessage(Component.literal("That is not your key!"));
+                return InteractionResult.FAIL;
+            }
 
             ItemStack returned = exterior.clearHeldKey();
             returned.set(GCDataComponents.KEY_INSERTED, false);

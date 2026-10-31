@@ -28,9 +28,9 @@ public final class TardisLinkSystem {
         entity.remove(TardisComponentTypes.TARDIS_LINK);
     }
 
-    public static TardisComponent registerNewTardis(Entity entity, ServerLevel level, UUID ownerId, BlockPos pos) {
+    public static TardisComponent registerNewTardis(Entity entity, ServerLevel level, UUID ownerId, String ownerName, BlockPos pos) {
         TardisManager manager = TardisManager.get(level.getServer());
-        TardisComponent record = manager.create(ownerId);
+        TardisComponent record = manager.create(ownerId, ownerName);
         manager.setRegisteredBlockPos(record.tardisId(), pos);
         manager.setExteriorDimension(record.tardisId(), level.dimension());
 

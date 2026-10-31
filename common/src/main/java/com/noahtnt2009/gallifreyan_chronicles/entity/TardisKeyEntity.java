@@ -217,10 +217,7 @@ public class TardisKeyEntity extends Entity {
             }
         }
 
-        ItemStack toStore = held.copyWithCount(1);
-        toStore.set(GCDataComponents.KEY_INSERTED, true);
-        exterior.setHeldKey(player.getUUID(), toStore);
-        held.shrink(1);
+        exterior.insertKey(player, hand, held);
 
         return InteractionResult.CONSUME;
     }

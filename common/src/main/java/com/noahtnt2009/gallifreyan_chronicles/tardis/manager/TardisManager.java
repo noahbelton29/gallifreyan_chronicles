@@ -121,13 +121,20 @@ public class TardisManager extends SavedData {
         return byTardisId.keySet();
     }
 
-    public TardisComponent create(UUID ownerId) {
+    public TardisComponent create(UUID ownerId, String ownerName) {
         UUID tardisId = UUID.randomUUID();
-        TardisComponent component = new TardisComponent(tardisId, ownerId);
+        TardisComponent component = new TardisComponent(tardisId, ownerId, ownerName);
         byTardisId.put(tardisId, component);
         byOwnerId.computeIfAbsent(ownerId, ignored -> new ArrayList<>()).add(tardisId);
         setDirty();
         return component;
+    }
+
+    public void updateOwnerName(UUID tardisId, String ownerName) {
+        TardisComponent old = byTardisId.get(tardisId);
+        if (old == null || old.ownerName().equals(ownerName)) return;
+        byTardisId.put(tardisId, new TardisComponent(old.tardisId(), old.ownerId(), ownerName));
+        setDirty();
     }
 
     public void remove(UUID tardisId) {

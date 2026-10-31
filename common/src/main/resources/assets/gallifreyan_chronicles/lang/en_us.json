@@ -122,6 +122,7 @@
   "command.gallifreyan_chronicles.unlink_exterior": "Exterior unlinked from TARDIS ID: %s",
   "config.jade.plugin_gallifreyan_chronicles": "Gallifreyan Chronicles",
   "config.jade.plugin_gallifreyan_chronicles.tardis_control": "TARDIS Control Icon",
+  "config.jade.plugin_gallifreyan_chronicles.tardis_owner": "TARDIS Owner",
   "control.gallifreyan_chronicles.change_increment": "Change Increment",
   "control.gallifreyan_chronicles.dimension_selector": "Dimension Selector",
   "control.gallifreyan_chronicles.door_control": "Door Control",
@@ -182,5 +183,7 @@
   "tooltip.gallifreyan_chronicles.key.linked": "Linked to TARDIS ID",
   "tooltip.gallifreyan_chronicles.key.unlinked": "Not linked to a TARDIS",
   "tooltip.gallifreyan_chronicles.scroll": "Scroll to change",
+  "tooltip.gallifreyan_chronicles.tardis.owner": "Owner",
+  "tooltip.gallifreyan_chronicles.tardis.owner_unknown": "Unknown",
   "tooltip.gallifreyan_chronicles.tardis.schema": "Schema"
 }

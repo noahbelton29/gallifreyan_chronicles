@@ -65,7 +65,8 @@ public class TardisBlock extends BaseEntityBlock {
             if (!(placer instanceof Player player)) return;
 
             Entity entity = blockEntity.asEntity();
-            TardisComponent record = TardisLinkSystem.registerNewTardis(entity, serverLevel, player.getUUID(), pos);
+            TardisComponent record = TardisLinkSystem.registerNewTardis(entity, serverLevel, player.getUUID(),
+                    player.getGameProfile().name(), pos);
             applyChosenInterior(serverLevel, entity, record, stack);
             blockEntity.sync();
 
@@ -119,7 +120,7 @@ public class TardisBlock extends BaseEntityBlock {
 
             boolean isOwner = player.getUUID().equals(tardis.getRenderedKeyOwner());
 
-            if (player.isShiftKeyDown() && isOwner) {
+            if (player.isShiftKeyDown() && tardis.canRemoveKey(player)) {
                 if (tardis.areDoorsFullyClosed()) {
                     ItemStack returned = tardis.clearHeldKey();
                     returned.set(GCDataComponents.KEY_INSERTED, false);
@@ -135,6 +136,10 @@ public class TardisBlock extends BaseEntityBlock {
             else if (!player.isShiftKeyDown() && isOwner) {
                 tardis.toggleKeyLockAnimation(player);
                 return InteractionResult.CONSUME;
+            }
+
+            if (player.isShiftKeyDown()) {
+                player.sendOverlayMessage(Component.literal("That is not your key!"));
             }
 
             return InteractionResult.CONSUME;

@@ -14,6 +14,7 @@ import com.noahtnt2009.gallifreyan_chronicles.ecs.ComponentType;
 import com.noahtnt2009.gallifreyan_chronicles.ecs.ComponentStore;
 import com.noahtnt2009.gallifreyan_chronicles.ecs.Entity;
 import com.noahtnt2009.gallifreyan_chronicles.entity.TardisKeyEntity;
+import com.noahtnt2009.gallifreyan_chronicles.init.GCDataComponents;
 import com.noahtnt2009.gallifreyan_chronicles.tardis.ecs.TardisLinkable;
 import com.noahtnt2009.gallifreyan_chronicles.tardis.ecs.component.DoorState;
 import com.noahtnt2009.gallifreyan_chronicles.tardis.flight.TardisFlightState;
@@ -44,6 +45,7 @@ import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundSource;
+import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
@@ -123,6 +125,28 @@ public class TardisExteriorBlockEntity extends BlockEntity implements GeoBlockEn
 
     public TardisExteriorBlockEntity(BlockPos pos, BlockState state) {
         super(TYPE.get(), pos, state);
+    }
+
+    public void insertKey(Player player, InteractionHand hand, ItemStack held) {
+        ItemStack toStore = held.copyWithCount(1);
+        toStore.set(GCDataComponents.KEY_INSERTED, true);
+        setHeldKey(player.getUUID(), toStore);
+
+        ItemStack remaining = held.copyWithCount(held.getCount() - 1);
+        player.setItemInHand(hand, remaining.isEmpty() ? ItemStack.EMPTY : remaining);
+    }
+
+    public boolean canRemoveKey(Player player) {
+        UUID id = player.getUUID();
+
+        if (id.equals(renderedKeyOwner)) return true;
+
+        if (level instanceof ServerLevel serverLevel) {
+            var tardis = resolveTardis(serverLevel);
+            return tardis.isPresent() && id.equals(tardis.get().ownerId());
+        }
+
+        return false;
     }
 
     public boolean hasKeyRendered() {
@@ -649,6 +673,26 @@ public class TardisExteriorBlockEntity extends BlockEntity implements GeoBlockEn
         Component overlay = Component.literal("Locked, ").withStyle(ChatFormatting.RED)
                 .append(ownerDisplayName());
         player.sendOverlayMessage(overlay);
+    }
+
+    /** The TARDIS owner's name, or null if it isn't known. Server side only. */
+    public @Nullable String getOwnerName() {
+        if (!(level instanceof ServerLevel serverLevel)) return null;
+
+        var tardis = resolveTardis(serverLevel);
+        if (tardis.isEmpty()) return null;
+
+        var online = serverLevel.getServer().getPlayerList().getPlayer(tardis.get().ownerId());
+        if (online != null) {
+            String name = online.getGameProfile().name();
+            // keep the saved name current so it still works once the owner logs off
+            com.noahtnt2009.gallifreyan_chronicles.tardis.manager.TardisManager.get(serverLevel.getServer())
+                    .updateOwnerName(tardis.get().tardisId(), name);
+            return name;
+        }
+
+        String saved = tardis.get().ownerName();
+        return saved.isEmpty() ? null : saved;
     }
 
     private Component ownerDisplayName() {

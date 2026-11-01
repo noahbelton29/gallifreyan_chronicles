@@ -57,7 +57,7 @@ public class TardisBlock extends BaseEntityBlock {
                             @NonNull ItemStack stack) {
         super.setPlacedBy(level, pos, state, placer, stack);
         if (!(level.getBlockEntity(pos) instanceof TardisExteriorBlockEntity blockEntity)) return;
-
+        stack.shrink(1);
         blockEntity.setYaw(snapYawTo45(placer.getYRot() + 180));
 
         if (!level.isClientSide()) {

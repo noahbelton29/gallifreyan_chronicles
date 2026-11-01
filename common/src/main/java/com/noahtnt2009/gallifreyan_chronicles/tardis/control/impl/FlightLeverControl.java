@@ -1,5 +1,6 @@
 package com.noahtnt2009.gallifreyan_chronicles.tardis.control.impl;
 
+import com.noahtnt2009.gallifreyan_chronicles.sound.TimedSounds;
 import java.util.Optional;
 import net.minecraft.core.BlockPos;
 import com.noahtnt2009.gallifreyan_chronicles.tardis.api.TardisEvents;
@@ -46,20 +47,17 @@ public class FlightLeverControl extends BaseControl {
     public FlightLeverControl() { this(DEFAULT_ANIMATIONS); }
     public FlightLeverControl(ControlAnimations animations) { super(animations); }
 
+    private static final float VWORP_VOLUME = 0.35F;
     private static final int TAKEOFF_SOUND_DELAY_TICKS = 0;
     private static final int TAKEOFF_SOUND_LENGTH_TICKS = 425;
-    private static final int VWORP_LOOP_TICKS = 273;
 
-    private static final Map<GlobalPos, Integer> VWORP_LOOPS = new HashMap<>();
     private static final Map<UUID, Integer> QUEUED_TAKEOFFS = new HashMap<>();
     private static int queueGeneration = 0;
-    private static int vworpGeneration = 0;
     private static final int QUEUED_TAKEOFF_POLL_TICKS = 2;
     private static final int LAND_FADE_DELAY_TICKS = 130;
     private static final int LAND_SOUND_LENGTH_TICKS = 393;
 
     public static void resetState() {
-        VWORP_LOOPS.clear();
         QUEUED_TAKEOFFS.clear();
     }
 
@@ -156,7 +154,6 @@ public class FlightLeverControl extends BaseControl {
     }
 
     private static void land(ServerLevel level, TardisConsoleBlockEntity console, @Nullable UUID tardisId) {
-        VWORP_LOOPS.remove(GlobalPos.of(level.dimension(), console.getBlockPos()));
         stopVworp(level);
 
         if (tardisId != null) {
@@ -175,7 +172,12 @@ public class FlightLeverControl extends BaseControl {
             Vec3 shakePos
     ) {
         playEverywhere(console, level, GCSounds.TARDIS_DRUM);
-        playEverywhere(console, level, GCSounds.TARDIS_TAKEOFF);
+        for (TardisConsoleBlockEntity each : ConsoleSyncSystem.liveConsolesWith(console)) {
+            if (!(each.getLevel() instanceof ServerLevel eachLevel)) continue;
+            TimedSounds.playThenLoop(eachLevel, each.getBlockPos(), GCSounds.TARDIS_TAKEOFF, GCSounds.TARDIS_VWORP,
+                    SoundSource.BLOCKS, 1.0F, 1.0F, VWORP_VOLUME);
+        }
+        playAtExterior(console, level, GCSounds.TARDIS_TAKEOFF);
         tardis(console).ifPresent(TardisEvents.TAKE_OFF::fire);
 
         for (TardisConsoleBlockEntity each : ConsoleSyncSystem.liveConsolesWith(console)) {
@@ -183,8 +185,6 @@ public class FlightLeverControl extends BaseControl {
             Vec3 pos = each == console ? shakePos : Vec3.atCenterOf(each.getBlockPos());
             TardisDrumShakePayload.broadcast(eachLevel, pos, 1.0F);
         }
-
-        startVworpLoop(level, console, controlId);
     }
 
     private static void queueTakeoff(MinecraftServer server, UUID tardisId, String controlId) {
@@ -219,35 +219,8 @@ public class FlightLeverControl extends BaseControl {
                 () -> pollQueuedTakeoff(server, tardisId, controlId, generation));
     }
 
-    private static void startVworpLoop(ServerLevel level, TardisConsoleBlockEntity console, String controlId) {
-        GlobalPos key = GlobalPos.of(level.dimension(), console.getBlockPos());
-        int generation = ++vworpGeneration;
-        VWORP_LOOPS.put(key, generation);
-
-        GCScheduler.runLater(level.getServer(), TAKEOFF_SOUND_DELAY_TICKS + TAKEOFF_SOUND_LENGTH_TICKS,
-                () -> vworpStep(level, key, generation, console, controlId));
-    }
-
-    private static void vworpStep(ServerLevel level, GlobalPos key, int generation,
-                           TardisConsoleBlockEntity console, String controlId) {
-        Integer current = VWORP_LOOPS.get(key);
-        if (current == null || current != generation) return;
-
-        List<TardisConsoleBlockEntity> live = ConsoleSyncSystem.liveConsolesWith(console);
-        if (live.stream().noneMatch(each -> each.getControlState(controlId))) {
-            VWORP_LOOPS.remove(key, generation);
-            return;
-        }
-
-        for (TardisConsoleBlockEntity each : live) {
-            playAt(each.getLevel() instanceof ServerLevel eachLevel ? eachLevel : level,
-                    each.getBlockPos(), GCSounds.TARDIS_VWORP, 1.0F);
-        }
-        GCScheduler.runLater(level.getServer(), VWORP_LOOP_TICKS,
-                () -> vworpStep(level, key, generation, console, controlId));
-    }
-
     private static void stopVworp(ServerLevel level) {
+        TimedSounds.stop(level, GCSounds.TARDIS_VWORP);
         ClientboundStopSoundPacket packet = new ClientboundStopSoundPacket(GCSounds.TARDIS_VWORP.location(), SoundSource.BLOCKS);
         for (ServerPlayer player : level.players()) {
             player.connection.send(packet);

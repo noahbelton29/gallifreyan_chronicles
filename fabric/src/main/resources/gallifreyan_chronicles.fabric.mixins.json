@@ -9,7 +9,8 @@
     "WindowMixin",
     "SkyRendererInvoker",
     "TitleScreenMixin",
-    "client.SkyRendererMixin"
+    "client.SkyRendererMixin",
+    "client.IrisBlindnessMixin"
   ],
   "server": [],
   "injectors": {

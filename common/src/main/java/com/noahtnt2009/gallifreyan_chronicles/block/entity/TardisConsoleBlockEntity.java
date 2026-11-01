@@ -1,5 +1,9 @@
 package com.noahtnt2009.gallifreyan_chronicles.block.entity;
 
+import com.noahtnt2009.gallifreyan_chronicles.tardis.flight.TardisFlightState;
+import com.noahtnt2009.gallifreyan_chronicles.tardis.api.Tardis;
+import com.noahtnt2009.gallifreyan_chronicles.tardis.api.TardisApi;
+import com.noahtnt2009.gallifreyan_chronicles.util.GCScheduler;
 import com.noahtnt2009.gallifreyan_chronicles.init.GCTardisControls;
 import com.geckolib.animatable.GeoBlockEntity;
 import com.geckolib.animatable.instance.AnimatableInstanceCache;
@@ -50,6 +54,7 @@ import java.util.function.Supplier;
 
 public class TardisConsoleBlockEntity extends BlockEntity implements GeoBlockEntity, ComponentHolder, TardisLinkable, ConsoleControlHost {
     public static Supplier<BlockEntityType<TardisConsoleBlockEntity>> TYPE;
+    private static final int FLIGHT_RECONCILE_DELAY_TICKS = 5;
     private static final String IDLE_STATE = "rotor_idle";
     private static final String FLIGHT_STATE = "rotor_flight";
 
@@ -77,6 +82,10 @@ public class TardisConsoleBlockEntity extends BlockEntity implements GeoBlockEnt
     private @Nullable UUID syncedTardisId;
     private final Map<String, Boolean> clientAppliedStates = new HashMap<>();
 
+    private static final float GLOW_FADE_SECONDS = 1.0F;
+    private float glowLevel = -1.0F;
+    private long lastGlowNanos = 0L;
+
     public TardisConsoleBlockEntity(BlockPos pos, BlockState state) {
         super(TYPE.get(), pos, state);
         this.animationDriver = new ConsoleAnimationDriver(pos);
@@ -86,9 +95,10 @@ public class TardisConsoleBlockEntity extends BlockEntity implements GeoBlockEnt
     public void registerControllers(AnimatableManager.@NonNull ControllerRegistrar controllerRegistrar) {
         this.idleController = new AnimationController<>("rotor", 15, test -> {
             if (!this.hasPower()) {
-                PlayState state = test.setAndContinue(IDLE_ANIM);
-                test.controller().setAnimationTime(0);
-                return state;
+                if (test.controller().getCurrentRawAnimation() == null) {
+                    return test.setAndContinue(IDLE_ANIM);
+                }
+                return PlayState.PAUSE;
             }
             if (FLIGHT_STATE.equals(this.currentRotorState)) {
                 return test.setAndContinue(FLIGHT_ANIM);
@@ -174,6 +184,23 @@ public class TardisConsoleBlockEntity extends BlockEntity implements GeoBlockEnt
 
     public boolean getControlState(String controlId) {
         return controls.getControlState(controlId);
+    }
+
+    public float glowLevel() {
+        float target = hasPower() ? 1.0F : 0.0F;
+        long now = System.nanoTime();
+        if (glowLevel < 0.0F) {
+            glowLevel = target;
+        } else {
+            float step = Math.min((now - lastGlowNanos) / 1.0E9F, 0.1F) / GLOW_FADE_SECONDS;
+            glowLevel = glowLevel < target ? Math.min(target, glowLevel + step) : Math.max(target, glowLevel - step);
+        }
+        lastGlowNanos = now;
+        return glowLevel;
+    }
+
+    public boolean isPowerKnown() {
+        return controlStatesLoaded;
     }
 
     public boolean hasPower() {
@@ -358,10 +385,23 @@ public class TardisConsoleBlockEntity extends BlockEntity implements GeoBlockEnt
         this.respawnControls();
         settleControlAnimations();
 
+        if (level instanceof ServerLevel serverLevel) {
+            GCScheduler.runLater(serverLevel.getServer(), FLIGHT_RECONCILE_DELAY_TICKS, this::reconcileFlightWithExterior);
+        }
+
         if (level.isClientSide() && !clientEffectsStarted) {
             clientEffectsStarted = true;
             GCClientHooks.startConsoleClientEffects(this);
         }
+    }
+
+    private void reconcileFlightWithExterior() {
+        if (isRemoved() || !(level instanceof ServerLevel)) return;
+        TardisFlightState state = TardisApi.of(this).map(Tardis::flightState).orElse(TardisFlightState.IDLE);
+        boolean inVortex = state == TardisFlightState.TAKING_OFF || state == TardisFlightState.IN_VORTEX;
+        if (!inVortex || controls.getControlState(GCTardisControls.FLIGHT_LEVER)) return;
+        reconcileControl(GCTardisControls.FLIGHT_LEVER, true);
+        triggerRotorAnimation(FLIGHT_STATE);
     }
 
     public boolean isInFlight() {

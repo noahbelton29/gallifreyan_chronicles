@@ -69,6 +69,7 @@ public class TardisConsoleGlowLayer<T extends GeoAnimatable, O, R extends GeoRen
                 state.getOrDefaultGeckolibData(TardisConsoleBlockRenderer.CONSOLE_VARIANT, ""));
 
         int originalColor = info.renderColor();
+        float power = state.getOrDefaultGeckolibData(TardisConsoleBlockRenderer.GLOW_POWER, 1f);
 
         try {
             if (hasGroupTextures(base, variant, groups)) {
@@ -78,7 +79,7 @@ public class TardisConsoleGlowLayer<T extends GeoAnimatable, O, R extends GeoRen
                     Identifier groupBase = groupBase(base, variant, group);
 
                     for (int frame = 0; frame < group.frames(); frame++) {
-                        float weight = group.weight(time, frame);
+                        float weight = group.weight(time, frame) * power;
                         if (weight < MIN_WEIGHT)
                             continue;
 
@@ -89,8 +90,8 @@ public class TardisConsoleGlowLayer<T extends GeoAnimatable, O, R extends GeoRen
                 }
             } else {
                 Identifier texture = maskTexture(base, STATIC_SUFFIX);
-                if (textureExists(texture))
-                    submitMask(info, tasks, texture, 1f);
+                if (power >= MIN_WEIGHT && textureExists(texture))
+                    submitMask(info, tasks, texture, power);
             }
         } finally {
             state.addGeckolibData(DataTickets.RENDER_COLOR, originalColor);

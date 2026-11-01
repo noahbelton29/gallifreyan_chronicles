@@ -20,8 +20,10 @@
     "client.ScreenshotMixin",
     "client.NativeImageSaveMixin",
     "client.HiddenGuiBannerMixin",
-    "client.PowerDarknessFogMixin$Applicable",
-    "client.PowerDarknessFogMixin$Setup"
+    "client.ChannelMixin",
+    "client.SoundEngineMixin",
+    "client.PowerDarknessApplicableMixin",
+    "client.PowerDarknessSetupMixin"
   ],
   "server": [],
   "injectors": {

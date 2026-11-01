@@ -17,6 +17,7 @@ public class TardisConsoleBlockRenderer extends GeoBlockRenderer<@NotNull Tardis
     public static final DataTicket<String> CONSOLE_VARIANT = DataTicket.create("console_variant", String.class);
     public static final DataTicket<String> CONSOLE_TEXTURE_ID = DataTicket.create("console_texture_id", String.class);
     public static final DataTicket<Float> GLOW_TIME = DataTicket.create("console_glow_time", Float.class);
+    public static final DataTicket<Float> GLOW_POWER = DataTicket.create("console_glow_power", Float.class);
     public static final DataTicket<Boolean> UPSIDE_DOWN = DataTicket.create("console_upside_down", Boolean.class);
 
     public TardisConsoleBlockRenderer(BlockEntityRendererProvider.Context context) {
@@ -35,6 +36,7 @@ public class TardisConsoleBlockRenderer extends GeoBlockRenderer<@NotNull Tardis
         renderState.addGeckolibData(CONSOLE_ID, animatable.getConsole().id());
         renderState.addGeckolibData(CONSOLE_VARIANT, animatable.getVariant());
         renderState.addGeckolibData(CONSOLE_TEXTURE_ID, animatable.getConsole().textureIdFor(animatable.getVariant()));
+        renderState.addGeckolibData(GLOW_POWER, animatable.glowLevel());
         renderState.addGeckolibData(UPSIDE_DOWN, ConsoleBlock.isUpsideDown(animatable.getBlockState()));
         if (animatable.getLevel() != null) {
             renderState.addGeckolibData(GLOW_TIME, animatable.getLevel().getGameTime() + partialTick);

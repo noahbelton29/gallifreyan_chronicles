@@ -1,5 +1,6 @@
 package com.noahtnt2009.gallifreyan_chronicles.platform.services;
 
+import com.noahtnt2009.gallifreyan_chronicles.network.ResumeSoundPayload;
 import com.noahtnt2009.gallifreyan_chronicles.network.DimensionSkySyncPayload;
 import com.noahtnt2009.gallifreyan_chronicles.network.TardisConsoleAnimationPayload;
 import com.noahtnt2009.gallifreyan_chronicles.network.TardisConsoleRotorStatePayload;
@@ -26,4 +27,5 @@ public interface INetworkHelper {
     void sendTardisConsoleRotorState(ServerPlayer player, TardisConsoleRotorStatePayload payload);
     void broadcastTardisConsoleRotorState(MinecraftServer server, TardisConsoleRotorStatePayload payload);
     void sendTardisDrumShake(ServerPlayer player, TardisDrumShakePayload payload);
+    void sendResumeSound(ServerPlayer player, ResumeSoundPayload payload);
 }

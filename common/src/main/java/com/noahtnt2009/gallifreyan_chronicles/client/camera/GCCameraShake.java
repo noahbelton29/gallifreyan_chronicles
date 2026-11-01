@@ -25,6 +25,7 @@ public final class GCCameraShake {
 
     public static final double RUMBLE_RANGE = 25.0;
     public static final double RUMBLE_DELAY = 0.6;
+    private static final double JOIN_SNAP_SECONDS = 2.0;
     public static final double RUMBLE_FADE_IN = 1.5;
     public static final double RUMBLE_FADE_OUT = 1.2;
     public static final float RUMBLE_PITCH_DEGREES = 0.35F;
@@ -49,6 +50,7 @@ public final class GCCameraShake {
         final FlightSource source;
         double flightSeconds = 0.0;
         double level = 0.0;
+        double ageSeconds = 0.0;
 
         RumbleSource(FlightSource source) {
             this.source = source;
@@ -127,6 +129,12 @@ public final class GCCameraShake {
             if (!rumble.source.isValid()) {
                 RUMBLE_SOURCES.remove(i);
                 continue;
+            }
+
+            rumble.ageSeconds += dt;
+            if (rumble.ageSeconds < JOIN_SNAP_SECONDS && rumble.source.isInFlight()) {
+                rumble.flightSeconds = RUMBLE_DELAY + 1.0;
+                rumble.level = 1.0;
             }
 
             if (rumble.source.isInFlight()) {

@@ -1,8 +1,15 @@
 package com.noahtnt2009.gallifreyan_chronicles.tardis.control.impl;
 
 import com.mojang.serialization.MapCodec;
+import com.noahtnt2009.gallifreyan_chronicles.entity.TardisControlEntity;
+import com.noahtnt2009.gallifreyan_chronicles.init.GCSounds;
+import com.noahtnt2009.gallifreyan_chronicles.init.GCTardisControls;
 import com.noahtnt2009.gallifreyan_chronicles.tardis.control.BaseControl;
 import com.noahtnt2009.gallifreyan_chronicles.tardis.control.ControlAnimations;
+import net.minecraft.sounds.SoundEvent;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.world.entity.player.Player;
 
 public class PowerLeverControl extends BaseControl {
     public static final ControlAnimations DEFAULT_ANIMATIONS = new ControlAnimations("power_lever_down", "power_lever_up", false);
@@ -10,6 +17,19 @@ public class PowerLeverControl extends BaseControl {
 
     public PowerLeverControl() { this(DEFAULT_ANIMATIONS); }
     public PowerLeverControl(ControlAnimations animations) { super(animations); }
+
+    @Override
+    public InteractionResult onRightClick(TardisControlEntity entity, Player player, InteractionHand hand) {
+        super.onRightClick(entity, player, hand);
+        var console = entity.getConsole();
+        if (console == null) {
+            return InteractionResult.FAIL;
+        }
+        boolean controlState = console.getControlState(GCTardisControls.POWER_LEVER);
+        SoundEvent sound = controlState ? GCSounds.TARDIS_POWER_OFF : GCSounds.TARDIS_POWER_ON;
+        playSound(entity, sound, 1.0f);
+        return InteractionResult.SUCCESS;
+    }
 
     @Override
     public MapCodec<PowerLeverControl> codec() { return CODEC; }

@@ -1,5 +1,6 @@
 package com.noahtnt2009.gallifreyan_chronicles.platform;
 
+import com.noahtnt2009.gallifreyan_chronicles.network.ResumeSoundPayload;
 import com.noahtnt2009.gallifreyan_chronicles.network.DimensionSkySyncPayload;
 import com.noahtnt2009.gallifreyan_chronicles.network.TardisConsoleAnimationPayload;
 import com.noahtnt2009.gallifreyan_chronicles.network.TardisConsoleRotorStatePayload;
@@ -95,6 +96,11 @@ public class NeoForgeNetworkHelper implements INetworkHelper {
 
     @Override
     public void sendTardisDrumShake(ServerPlayer player, TardisDrumShakePayload payload) {
+        PacketDistributor.sendToPlayer(player, payload);
+    }
+
+    @Override
+    public void sendResumeSound(ServerPlayer player, ResumeSoundPayload payload) {
         PacketDistributor.sendToPlayer(player, payload);
     }
 }

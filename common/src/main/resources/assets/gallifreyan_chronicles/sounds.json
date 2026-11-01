@@ -126,5 +126,21 @@
         "attenuation_distance": 16
       }
     ]
+  },
+  "power_on": {
+    "sounds": [
+      {
+        "name": "gallifreyan_chronicles:block_entity/tardis/power_on",
+        "attenuation_distance": 16
+      }
+    ]
+  },
+  "power_off": {
+    "sounds": [
+      {
+        "name": "gallifreyan_chronicles:block_entity/tardis/power_off",
+        "attenuation_distance": 16
+      }
+    ]
   }
 }

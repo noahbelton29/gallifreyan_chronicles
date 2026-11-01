@@ -19,15 +19,19 @@ public class TardisConsoleHumSoundInstance extends AbstractTickableSoundInstance
 
     private final BooleanSupplier stillValid;
     private final BooleanSupplier powered;
+    private final BooleanSupplier known;
+    private boolean settled;
     private float fade;
     private int tickCount = 0;
 
-    public TardisConsoleHumSoundInstance(BlockPos pos, BooleanSupplier stillValid, BooleanSupplier powered) {
+    public TardisConsoleHumSoundInstance(BlockPos pos, BooleanSupplier stillValid, BooleanSupplier powered, BooleanSupplier known) {
         super(GCSounds.FIRST_DOCTORS_HUM, SoundSource.BLOCKS, RandomSource.create());
 
         this.stillValid = stillValid;
         this.powered = powered;
-        this.fade = powered.getAsBoolean() ? 1.0F : 0.0F;
+        this.known = known;
+        this.settled = known.getAsBoolean();
+        this.fade = settled && powered.getAsBoolean() ? 1.0F : 0.0F;
         this.x = pos.getX() + 0.5;
         this.y = pos.getY() + 0.5;
         this.z = pos.getZ() + 0.5;
@@ -47,6 +51,15 @@ public class TardisConsoleHumSoundInstance extends AbstractTickableSoundInstance
         if (player == null || !stillValid.getAsBoolean()) {
             this.stop();
             return;
+        }
+
+        if (!settled) {
+            if (!known.getAsBoolean()) {
+                this.volume = 0.0F;
+                return;
+            }
+            settled = true;
+            fade = powered.getAsBoolean() ? 1.0F : 0.0F;
         }
 
         float target = powered.getAsBoolean() ? 1.0F : 0.0F;

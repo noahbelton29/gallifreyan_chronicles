@@ -4,6 +4,7 @@ import com.noahtnt2009.gallifreyan_chronicles.tardis.interior.TardisDimensionMan
 import com.noahtnt2009.gallifreyan_chronicles.util.GCScheduler;
 import com.noahtnt2009.gallifreyan_chronicles.util.GCServerState;
 import com.noahtnt2009.gallifreyan_chronicles.tardis.interior.TardisInteriorSystem;
+import com.noahtnt2009.gallifreyan_chronicles.sound.TimedSounds;
 import net.minecraft.server.MinecraftServer;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
@@ -18,6 +19,7 @@ public abstract class MinecraftServerMixin {
     private void gallifreyan_chronicles$restoreInteriors(CallbackInfo ci) {
         GCServerState.onServerStart();
         TardisDimensionManager.restoreAll((MinecraftServer) (Object) this);
+        TimedSounds.onServerStart((MinecraftServer) (Object) this);
     }
 
     @Inject(method = "tickChildren", at = @At("HEAD"))

@@ -1,5 +1,6 @@
 package com.noahtnt2009.gallifreyan_chronicles.tardis.control;
 
+import com.noahtnt2009.gallifreyan_chronicles.sound.TimedSounds;
 import com.mojang.serialization.MapCodec;
 import com.noahtnt2009.gallifreyan_chronicles.block.entity.TardisConsoleBlockEntity;
 import com.noahtnt2009.gallifreyan_chronicles.entity.TardisControlEntity;
@@ -61,11 +62,16 @@ public abstract class BaseControl implements TardisControl {
     protected static void playSound(TardisControlEntity entity, SoundEvent sound, float offPitch) {
         TardisConsoleBlockEntity console = entity.getConsole();
         boolean on = console != null && console.getControlState(entity.getControlId());
-        entity.level().playSound(null, entity.blockPosition(), sound, SoundSource.BLOCKS, 1.0F, on ? 1.0F : offPitch);
+        float pitch = on ? 1.0F : offPitch;
+        if (entity.level() instanceof ServerLevel serverLevel) {
+            TimedSounds.play(serverLevel, entity.blockPosition(), sound, SoundSource.BLOCKS, 1.0F, pitch);
+        } else {
+            entity.level().playSound(null, entity.blockPosition(), sound, SoundSource.BLOCKS, 1.0F, pitch);
+        }
     }
 
     protected static void playAt(ServerLevel level, BlockPos pos, SoundEvent sound, float pitch) {
-        level.playSound(null, pos, sound, SoundSource.BLOCKS, 1.0F, pitch);
+        TimedSounds.play(level, pos, sound, SoundSource.BLOCKS, 1.0F, pitch);
     }
 
     protected static void playAtConsole(TardisConsoleBlockEntity console, ServerLevel level, SoundEvent sound) {

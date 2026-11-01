@@ -14,6 +14,8 @@ public class GCSounds {
     public static final SoundEvent TARDIS_IS_LOCKED = registerFixedRange("tardis_is_locked", HEARING_RANGE);
     public static final SoundEvent TARDIS_KEY_JAMMED = registerFixedRange("tardis_key_jammed", HEARING_RANGE);
     public static final SoundEvent TARDIS_CLOISTER_BELL = registerFixedRange("cloister", HEARING_RANGE);
+    public static final SoundEvent TARDIS_POWER_ON = registerFixedRange("power_on", HEARING_RANGE);
+    public static final SoundEvent TARDIS_POWER_OFF = registerFixedRange("power_off", HEARING_RANGE);
 
     public static final float TAKEOFF_HEARING_RANGE = 25.0F;
 

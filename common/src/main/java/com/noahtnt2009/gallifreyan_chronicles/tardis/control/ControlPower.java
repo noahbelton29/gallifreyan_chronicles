@@ -1,5 +1,7 @@
 package com.noahtnt2009.gallifreyan_chronicles.tardis.control;
 
+import com.noahtnt2009.gallifreyan_chronicles.tardis.api.TardisApi;
+import com.noahtnt2009.gallifreyan_chronicles.tardis.api.Tardis;
 import com.noahtnt2009.gallifreyan_chronicles.block.entity.TardisConsoleBlockEntity;
 import com.noahtnt2009.gallifreyan_chronicles.init.GCTardisControls;
 
@@ -16,6 +18,10 @@ public final class ControlPower {
     }
 
     public static boolean canUse(TardisConsoleBlockEntity console, String controlId) {
+        if (GCTardisControls.POWER_LEVER.equals(controlId)
+                && TardisApi.of(console).map(Tardis::isTravelling).orElse(false)) {
+            return false;
+        }
         return console.hasPower() || USABLE_WITHOUT_POWER.contains(controlId);
     }
 }

@@ -1,5 +1,6 @@
 package com.noahtnt2009.gallifreyan_chronicles.network;
 
+import com.noahtnt2009.gallifreyan_chronicles.sound.TimedSounds;
 import com.noahtnt2009.gallifreyan_chronicles.Constants;
 import com.noahtnt2009.gallifreyan_chronicles.data.GCJsonReloadListener;
 import com.noahtnt2009.gallifreyan_chronicles.platform.Services;
@@ -56,6 +57,11 @@ public final class GCNeoForgeNetworking {
                 TardisDrumShakePayload.STREAM_CODEC,
                 (payload, context) -> context.enqueueWork(payload::apply)
         );
+        registrar.playToClient(
+                ResumeSoundPayload.TYPE,
+                ResumeSoundPayload.STREAM_CODEC,
+                (payload, context) -> context.enqueueWork(payload::apply)
+        );
         Constants.LOG.info("Registered GC Networking");
     }
 
@@ -76,5 +82,12 @@ public final class GCNeoForgeNetworking {
         Services.NETWORK.sendTardisInteriorSync(player, TardisInteriorSyncPayload.create());
         Services.NETWORK.sendTardisConsoleSync(player, TardisConsoleSyncPayload.create());
         Services.NETWORK.sendDimensionSkySync(player, DimensionSkySyncPayload.create());
+        TimedSounds.resume(player);
+    }
+
+    @SubscribeEvent
+    public static void onPlayerChangedDimension(PlayerEvent.PlayerChangedDimensionEvent event) {
+        if (!(event.getEntity() instanceof ServerPlayer player)) return;
+        TimedSounds.resume(player);
     }
 }

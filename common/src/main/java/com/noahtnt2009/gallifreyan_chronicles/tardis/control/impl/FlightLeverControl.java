@@ -56,7 +56,7 @@ public class FlightLeverControl extends BaseControl {
     private static int vworpGeneration = 0;
     private static final int QUEUED_TAKEOFF_POLL_TICKS = 2;
     private static final int LAND_FADE_DELAY_TICKS = 130;
-    private static final int LAND_SOUND_LENGTH_TICKS = 393; // tardis_land.ogg is 19.6 seconds
+    private static final int LAND_SOUND_LENGTH_TICKS = 393;
 
     public static void resetState() {
         VWORP_LOOPS.clear();

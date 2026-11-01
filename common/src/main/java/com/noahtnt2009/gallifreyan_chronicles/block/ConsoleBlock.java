@@ -71,7 +71,7 @@ public class ConsoleBlock extends BaseEntityBlock {
                 .setValue(HALF, half);
     }
 
-    private void repel(Level level, BlockPos pos, Entity entity) {
+    public static void repel(Level level, BlockPos pos, Entity entity) {
         if (!(level instanceof ServerLevel)) return;
         if (!(entity instanceof LivingEntity livingEntity)) return;
 

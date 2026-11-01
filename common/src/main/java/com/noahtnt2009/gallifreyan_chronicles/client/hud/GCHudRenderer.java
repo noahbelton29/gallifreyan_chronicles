@@ -47,6 +47,7 @@ public final class GCHudRenderer {
     }
 
     public static void render(GuiGraphicsExtractor graphics) {
+        GCPowerDarkness.render(graphics);
         if (!GCConfig.showVersionHud()) return;
 
         Minecraft minecraft = Minecraft.getInstance();

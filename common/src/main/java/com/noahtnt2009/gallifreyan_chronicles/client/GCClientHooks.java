@@ -2,6 +2,7 @@ package com.noahtnt2009.gallifreyan_chronicles.client;
 
 import com.noahtnt2009.gallifreyan_chronicles.block.entity.TardisConsoleBlockEntity;
 import com.noahtnt2009.gallifreyan_chronicles.client.camera.GCCameraShake;
+import com.noahtnt2009.gallifreyan_chronicles.client.hud.GCPowerDarkness;
 import com.noahtnt2009.gallifreyan_chronicles.client.sound.TardisConsoleHumSoundInstance;
 import net.minecraft.client.Minecraft;
 import net.minecraft.core.BlockPos;
@@ -38,10 +39,12 @@ public final class GCClientHooks {
 
     public static void startConsoleClientEffects(TardisConsoleBlockEntity be) {
         BlockPos pos = be.getBlockPos();
+        GCPowerDarkness.track(be);
 
         Minecraft.getInstance().execute(() -> Minecraft.getInstance().getSoundManager().play(
                 new TardisConsoleHumSoundInstance(pos,
-                        () -> !be.isRemoved() && be.getLevel() != null && be.getLevel().isClientSide())
+                        () -> !be.isRemoved() && be.getLevel() != null && be.getLevel().isClientSide(),
+                        be::hasPower)
         ));
 
         Vec3 center = Vec3.atCenterOf(pos);

@@ -1,5 +1,6 @@
 package com.noahtnt2009.gallifreyan_chronicles.block.entity;
 
+import com.noahtnt2009.gallifreyan_chronicles.init.GCTardisControls;
 import com.geckolib.animatable.GeoBlockEntity;
 import com.geckolib.animatable.instance.AnimatableInstanceCache;
 import com.geckolib.animatable.manager.AnimatableManager;
@@ -84,6 +85,11 @@ public class TardisConsoleBlockEntity extends BlockEntity implements GeoBlockEnt
     @Override
     public void registerControllers(AnimatableManager.@NonNull ControllerRegistrar controllerRegistrar) {
         this.idleController = new AnimationController<>("rotor", 15, test -> {
+            if (!this.hasPower()) {
+                PlayState state = test.setAndContinue(IDLE_ANIM);
+                test.controller().setAnimationTime(0);
+                return state;
+            }
             if (FLIGHT_STATE.equals(this.currentRotorState)) {
                 return test.setAndContinue(FLIGHT_ANIM);
             }
@@ -168,6 +174,13 @@ public class TardisConsoleBlockEntity extends BlockEntity implements GeoBlockEnt
 
     public boolean getControlState(String controlId) {
         return controls.getControlState(controlId);
+    }
+
+    public boolean hasPower() {
+        if (level != null && level.isClientSide()) {
+            return !Boolean.FALSE.equals(clientAppliedStates.get(GCTardisControls.POWER_LEVER));
+        }
+        return controls.getControlState(GCTardisControls.POWER_LEVER);
     }
 
     public void triggerControl(String id, boolean activated, @Nullable Player triggeringPlayer) {

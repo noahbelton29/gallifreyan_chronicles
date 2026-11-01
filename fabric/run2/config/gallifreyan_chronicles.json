@@ -1,0 +1,6 @@
+{
+  "default_exterior": "gallifreyan_chronicles:first_doctors_exterior",
+  "default_console": "gallifreyan_chronicles:brachacki_console",
+  "default_interior": "gallifreyan_chronicles:first_doctors_interior",
+  "show_version_hud": true
+}

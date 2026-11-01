@@ -1,19 +1,19 @@
 package com.noahtnt2009.gallifreyan_chronicles.entity;
 
+import com.noahtnt2009.gallifreyan_chronicles.tardis.control.ControlPower;
 import com.noahtnt2009.gallifreyan_chronicles.Constants;
 import com.noahtnt2009.gallifreyan_chronicles.block.entity.TardisConsoleBlockEntity;
 import com.noahtnt2009.gallifreyan_chronicles.tardis.api.TardisApi;
 import com.noahtnt2009.gallifreyan_chronicles.tardis.console.control.ConsoleControlManager;
 import com.noahtnt2009.gallifreyan_chronicles.tardis.control.TardisControl;
 import com.noahtnt2009.gallifreyan_chronicles.tardis.control.TardisControlRegistry;
-import net.minecraft.ChatFormatting;
+import com.noahtnt2009.gallifreyan_chronicles.tardis.security.IsomorphicPunishment;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.server.level.ServerLevel;
-import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.damagesource.DamageSource;
@@ -31,7 +31,6 @@ import net.minecraft.world.phys.Vec3;
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 
-import java.util.UUID;
 import java.util.function.Supplier;
 
 public class TardisControlEntity extends Entity {
@@ -92,6 +91,14 @@ public class TardisControlEntity extends Entity {
     @Override
     public boolean hurtServer(@NonNull ServerLevel serverLevel, DamageSource damageSource, float v) {
         if (damageSource.getEntity() instanceof Player player) {
+            TardisConsoleBlockEntity console = this.getConsole();
+            if (console != null && !TardisApi.canUseControls(console, player)) {
+                IsomorphicPunishment.punish(player, console);
+                return false;
+            }
+            if (console != null && !ControlPower.canUse(console, this.getControlId())) {
+                return false;
+            }
             TardisControl control = TardisControlRegistry.get(this.getControlId());
             return control.onLeftClick(this, player);
         }
@@ -196,10 +203,11 @@ public class TardisControlEntity extends Entity {
 
         TardisConsoleBlockEntity console = this.getConsole();
         if (console != null && !TardisApi.canUseControls(console, player)) {
-            if (player instanceof ServerPlayer sp) {
-                sp.sendOverlayMessage(Component.literal("Only the owner can use these controls.")
-                        .withStyle(ChatFormatting.RED));
-            }
+            IsomorphicPunishment.punish(player, console);
+            return InteractionResult.FAIL;
+        }
+
+        if (console != null && !ControlPower.canUse(console, this.getControlId())) {
             return InteractionResult.FAIL;
         }
 

@@ -19,7 +19,9 @@
     "client.CreativeTardisScrollMixin",
     "client.ScreenshotMixin",
     "client.NativeImageSaveMixin",
-    "client.HiddenGuiBannerMixin"
+    "client.HiddenGuiBannerMixin",
+    "client.PowerDarknessFogMixin$Applicable",
+    "client.PowerDarknessFogMixin$Setup"
   ],
   "server": [],
   "injectors": {

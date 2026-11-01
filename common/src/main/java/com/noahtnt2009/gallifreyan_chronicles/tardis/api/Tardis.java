@@ -186,6 +186,10 @@ public final class Tardis {
         return true;
     }
 
+    public boolean hasPower() {
+        return console().map(TardisConsoleBlockEntity::hasPower).orElse(true);
+    }
+
     public boolean toggleControl(String controlId) {
         return setControl(controlId, !getControl(controlId));
     }
@@ -213,12 +217,12 @@ public final class Tardis {
     }
 
     public boolean takeOff() {
-        if (getControl(GCTardisControls.FLIGHT_LEVER)) return false;
+        if (!hasPower() || getControl(GCTardisControls.FLIGHT_LEVER)) return false;
         return console().map(FlightLeverControl::pull).orElse(false);
     }
 
     public boolean land() {
-        if (!getControl(GCTardisControls.FLIGHT_LEVER)) return false;
+        if (!hasPower() || !getControl(GCTardisControls.FLIGHT_LEVER)) return false;
         return console().map(FlightLeverControl::pull).orElse(false);
     }
 

@@ -1,5 +1,6 @@
 package com.noahtnt2009.gallifreyan_chronicles.tardis.console.control;
 
+import com.noahtnt2009.gallifreyan_chronicles.init.GCTardisControls;
 import com.noahtnt2009.gallifreyan_chronicles.Constants;
 import com.noahtnt2009.gallifreyan_chronicles.block.entity.TardisConsoleBlockEntity;
 import com.noahtnt2009.gallifreyan_chronicles.entity.TardisControlEntity;
@@ -90,7 +91,7 @@ public class ConsoleControlManager {
         controlEntities.add(entity);
 
         if (!controlStates.contains(spec.id())) {
-            setControlState(spec.id(), false);
+            setControlState(spec.id(), defaultState(spec.id()));
         }
 
         return entity;
@@ -125,8 +126,12 @@ public class ConsoleControlManager {
         controlEntities.clear();
     }
 
+    public static boolean defaultState(String controlId) {
+        return GCTardisControls.POWER_LEVER.equals(controlId);
+    }
+
     public boolean getControlState(String controlId) {
-        return controlStates.getBooleanOr(controlId, false);
+        return controlStates.getBooleanOr(controlId, defaultState(controlId));
     }
 
     public void setControlState(String controlId, boolean state) {

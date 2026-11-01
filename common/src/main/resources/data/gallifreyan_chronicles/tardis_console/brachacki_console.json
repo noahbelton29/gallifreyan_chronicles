@@ -130,6 +130,17 @@
       },
       "width": 0.15,
       "height": 0.1563
+    },
+    {
+      "depth": 0.125,
+      "id": "isomorphic_control",
+      "offset": {
+        "x": -0.0312,
+        "y": 0.5592,
+        "z": 1.0224
+      },
+      "width": 0.25,
+      "height": 0.125
     }
   ]
 }

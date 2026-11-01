@@ -409,26 +409,19 @@
 		},
 		"isomorphic_control_on": {
 			"loop": "hold_on_last_frame",
-			"animation_length": 0.8333,
+			"animation_length": 0.75,
 			"bones": {
 				"bone3": {
 					"rotation": {
-						"0.0": {
-							"vector": [0, 0, 0]
-						},
-						"0.25": {
-							"vector": [-50, 0, 0]
-						}
+						"0.0": { "vector": [0, 0, 0] },
+						"0.25": { "vector": [-50, 0, 0] }
 					}
 				},
 				"bone4": {
 					"rotation": {
-						"0.5": {
-							"vector": [0, 0, 0]
-						},
-						"0.75": {
-							"vector": [-50, 0, 0]
-						}
+						"0.0": { "vector": [0, 0, 0] },
+						"0.5": { "vector": [0, 0, 0] },
+						"0.75": { "vector": [-50, 0, 0] }
 					}
 				}
 			}
@@ -439,22 +432,15 @@
 			"bones": {
 				"bone3": {
 					"rotation": {
-						"0.0": {
-							"vector": [-50, 0, 0]
-						},
-						"0.25": {
-							"vector": [0, 0, 0]
-						}
+						"0.0": { "vector": [-50, 0, 0] },
+						"0.25": { "vector": [0, 0, 0] }
 					}
 				},
 				"bone4": {
 					"rotation": {
-						"0.5": {
-							"vector": [-50, 0, 0]
-						},
-						"0.75": {
-							"vector": [0, 0, 0]
-						}
+						"0.0": { "vector": [-50, 0, 0] },
+						"0.5": { "vector": [-50, 0, 0] },
+						"0.75": { "vector": [0, 0, 0] }
 					}
 				}
 			}

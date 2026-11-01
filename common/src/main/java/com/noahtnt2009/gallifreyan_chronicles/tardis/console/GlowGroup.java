@@ -1,5 +1,6 @@
 package com.noahtnt2009.gallifreyan_chronicles.tardis.console;
 
+import java.util.Optional;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import net.minecraft.network.FriendlyByteBuf;
@@ -13,7 +14,7 @@ public record GlowGroup(String name, String prefix, int frames, int holdTicks, i
 
     public static final Codec<GlowGroup> CODEC = RecordCodecBuilder.create(inst -> inst.group(
             Codec.STRING.fieldOf("name").forGetter(GlowGroup::name),
-            Codec.STRING.optionalFieldOf("prefix").forGetter(group -> java.util.Optional.of(group.prefix)),
+            Codec.STRING.optionalFieldOf("prefix").forGetter(group -> Optional.of(group.prefix)),
             Codec.intRange(1, 256).optionalFieldOf("frames", 1).forGetter(GlowGroup::frames),
             Codec.intRange(1, Integer.MAX_VALUE).optionalFieldOf("hold_ticks", DEFAULT_HOLD_TICKS).forGetter(GlowGroup::holdTicks),
             Codec.intRange(0, Integer.MAX_VALUE).optionalFieldOf("fade_ticks", DEFAULT_FADE_TICKS).forGetter(GlowGroup::fadeTicks)

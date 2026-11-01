@@ -1,15 +1,15 @@
 package com.noahtnt2009.gallifreyan_chronicles.tardis.interior;
 
+import com.noahtnt2009.gallifreyan_chronicles.tardis.api.TardisApi;
+import com.noahtnt2009.gallifreyan_chronicles.tardis.api.Tardis;
 import com.noahtnt2009.gallifreyan_chronicles.Constants;
 import com.noahtnt2009.gallifreyan_chronicles.block.entity.TardisConsoleBlockEntity;
 import com.noahtnt2009.gallifreyan_chronicles.block.entity.TardisExteriorBlockEntity;
 import com.noahtnt2009.gallifreyan_chronicles.init.GCBlocks;
-import com.noahtnt2009.gallifreyan_chronicles.mixin.MinecraftServerMixin;
 import com.noahtnt2009.gallifreyan_chronicles.tardis.console.TardisConsole;
 import com.noahtnt2009.gallifreyan_chronicles.tardis.console.TardisConsoleRegistry;
 import com.noahtnt2009.gallifreyan_chronicles.tardis.ecs.system.ConsoleLinkSystem;
 import com.noahtnt2009.gallifreyan_chronicles.tardis.ecs.system.DoorSyncSystem;
-import com.noahtnt2009.gallifreyan_chronicles.tardis.ecs.system.ExteriorLinkSystem;
 import com.noahtnt2009.gallifreyan_chronicles.tardis.manager.TardisManager;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Vec3i;
@@ -131,7 +131,7 @@ public final class TardisInteriorSystem {
         Vec3 spot = Vec3.atBottomCenterOf(exteriorPos).add(0.0, 1.0, 0.0);
         float yaw = 0.0f;
 
-        Optional<TardisExteriorBlockEntity> exterior = ExteriorLinkSystem.resolve(target, tardisId);
+        Optional<TardisExteriorBlockEntity> exterior = TardisApi.get(server, tardisId).flatMap(Tardis::exterior);
         if (exterior.isPresent()) {
             double yawRad = Math.toRadians(exterior.get().getYaw());
             spot = Vec3.atBottomCenterOf(exteriorPos)
@@ -256,7 +256,7 @@ public final class TardisInteriorSystem {
         ServerLevel level = TardisDimensionManager.getOrCreate(server, tardisId);
 
         ConsoleCarryover carry = null;
-        Optional<TardisConsoleBlockEntity> oldConsole = ConsoleLinkSystem.resolve(level, tardisId);
+        Optional<TardisConsoleBlockEntity> oldConsole = TardisApi.get(server, tardisId).flatMap(Tardis::console);
         if (oldConsole.isPresent() && oldConsole.get().getConsole() != null) {
             carry = new ConsoleCarryover(oldConsole.get().getConsole(), oldConsole.get().getVariant(),
                     oldConsole.get().copyControlStates());
@@ -298,7 +298,7 @@ public final class TardisInteriorSystem {
             }
         }
 
-        net.minecraft.world.phys.AABB box = new net.minecraft.world.phys.AABB(
+        AABB box = new AABB(
                 Vec3.atLowerCornerOf(ORIGIN), Vec3.atLowerCornerOf(max.offset(1, 1, 1)));
         for (Entity entity : level.getEntities((Entity) null, box, e -> !(e instanceof Player))) {
             entity.discard();

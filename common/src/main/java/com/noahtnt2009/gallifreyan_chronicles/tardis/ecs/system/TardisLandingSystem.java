@@ -1,5 +1,8 @@
 package com.noahtnt2009.gallifreyan_chronicles.tardis.ecs.system;
 
+import org.jspecify.annotations.Nullable;
+import com.noahtnt2009.gallifreyan_chronicles.tardis.api.TardisApi;
+import com.noahtnt2009.gallifreyan_chronicles.tardis.api.Tardis;
 import com.noahtnt2009.gallifreyan_chronicles.block.TardisBlock;
 import com.noahtnt2009.gallifreyan_chronicles.block.entity.TardisExteriorBlockEntity;
 import com.noahtnt2009.gallifreyan_chronicles.init.GCBlocks;
@@ -45,32 +48,42 @@ public final class TardisLandingSystem {
     }
 
     public static void relocate(MinecraftServer server, UUID tardisId) {
-        TardisManager manager = TardisManager.get(server);
-        LandingTarget target = manager.getLandingTarget(tardisId);
+        Tardis tardis = TardisApi.get(server, tardisId).orElse(null);
+        if (tardis == null) return;
+        LandingTarget target = tardis.landingTarget().orElse(null);
         if (target == null) return;
 
-        ServerLevel oldLevel = server.getLevel(manager.getExteriorDimension(tardisId));
-        BlockPos oldPos = manager.resolveExteriorBlockPos(tardisId);
         ServerLevel newLevel = server.getLevel(target.dimension());
-        if (oldLevel == null || oldPos == null || newLevel == null
-                || !(oldLevel.getBlockEntity(oldPos) instanceof TardisExteriorBlockEntity old)) {
-            return;
-        }
+        TardisExteriorBlockEntity old = tardis.exterior().orElse(null);
+        if (newLevel == null || old == null) return;
 
+        BlockPos oldPos = old.getBlockPos();
         BlockPos pos = target.pos();
         if (newLevel.isOutsideBuildHeight(pos) || newLevel.isOutsideBuildHeight(pos.above())) return;
         newLevel.getChunkAt(pos);
         pos = findLandingSpot(newLevel, pos);
 
-        if (newLevel == oldLevel && pos.equals(oldPos)) {
+        if (newLevel == old.getLevel() && pos.equals(oldPos)) {
             old.setYaw(target.yaw());
-            manager.setLandingTarget(tardisId, null);
+            tardis.data().setLandingTarget(tardisId, null);
             return;
         }
 
         if (!newLevel.getBlockState(pos).canBeReplaced() || !newLevel.getBlockState(pos.above()).canBeReplaced()) {
             return;
         }
+
+        TardisExteriorBlockEntity fresh = moveExterior(tardis, newLevel, pos);
+        if (fresh == null) return;
+
+        fresh.setYaw(target.yaw());
+        tardis.data().setLandingTarget(tardisId, null);
+    }
+
+    public static @Nullable TardisExteriorBlockEntity moveExterior(Tardis tardis, ServerLevel newLevel, BlockPos pos) {
+        TardisExteriorBlockEntity old = tardis.exterior().orElse(null);
+        if (old == null || !(old.getLevel() instanceof ServerLevel oldLevel)) return null;
+        BlockPos oldPos = old.getBlockPos();
 
         boolean glowing = old.getBlockState().getValue(TardisBlock.GLOWING);
 
@@ -84,17 +97,18 @@ public final class TardisLandingSystem {
                 GCBlocks.TARDIS.defaultBlockState().setValue(TardisBlock.GLOWING, glowing),
                 Block.UPDATE_ALL
         );
-        if (!(newLevel.getBlockEntity(pos) instanceof TardisExteriorBlockEntity fresh)) return;
+        if (!(newLevel.getBlockEntity(pos) instanceof TardisExteriorBlockEntity fresh)) return null;
 
         fresh.copyStateFrom(old);
-        fresh.setYaw(target.yaw());
         fresh.spawnKeyEntity();
 
-        manager.setRegisteredBlockPos(tardisId, pos);
-        manager.setExteriorDimension(tardisId, newLevel.dimension());
-        if (manager.getExteriorBlockPos(tardisId) != null) {
-            manager.setExteriorBlockPos(tardisId, pos);
+        TardisManager manager = tardis.data();
+        UUID id = tardis.id();
+        manager.setRegisteredBlockPos(id, pos);
+        manager.setExteriorDimension(id, newLevel.dimension());
+        if (manager.getExteriorBlockPos(id) != null) {
+            manager.setExteriorBlockPos(id, pos);
         }
-        manager.setLandingTarget(tardisId, null);
+        return fresh;
     }
 }

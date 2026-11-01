@@ -22,7 +22,7 @@ public interface INetworkHelper {
     void sendTardisConsoleAnimation(ServerPlayer player, TardisConsoleAnimationPayload payload);
     void broadcastTardisConsoleAnimation(MinecraftServer server, TardisConsoleAnimationPayload payload);
 
-    void broadcastTardisConsoleAnimation(MinecraftServer server, TardisConsoleAnimationPayload payload, net.minecraft.server.level.ServerPlayer excludedPlayer);
+    void broadcastTardisConsoleAnimation(MinecraftServer server, TardisConsoleAnimationPayload payload, ServerPlayer excludedPlayer);
     void sendTardisConsoleRotorState(ServerPlayer player, TardisConsoleRotorStatePayload payload);
     void broadcastTardisConsoleRotorState(MinecraftServer server, TardisConsoleRotorStatePayload payload);
     void sendTardisDrumShake(ServerPlayer player, TardisDrumShakePayload payload);

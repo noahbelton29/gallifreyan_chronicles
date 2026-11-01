@@ -1,5 +1,6 @@
 package com.noahtnt2009.gallifreyan_chronicles.tardis.ecs.system;
 
+import com.noahtnt2009.gallifreyan_chronicles.tardis.api.TardisApi;
 import com.noahtnt2009.gallifreyan_chronicles.block.entity.TardisConsoleBlockEntity;
 import com.noahtnt2009.gallifreyan_chronicles.tardis.manager.TardisManager;
 import net.minecraft.server.level.ServerLevel;
@@ -16,7 +17,7 @@ public final class ConsoleSyncSystem {
     private static @Nullable UUID keyOf(TardisConsoleBlockEntity console) {
         UUID id = console.getTardisId();
         if (id == null && console.getLevel() != null) {
-            id = DoorSyncSystem.tardisIdOf(console.getLevel());
+            id = TardisApi.idOfLevel(console.getLevel()).orElse(null);
         }
         return id;
     }

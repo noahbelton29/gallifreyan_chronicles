@@ -1,8 +1,9 @@
 package com.noahtnt2009.gallifreyan_chronicles.tardis.interior;
 
+import com.noahtnt2009.gallifreyan_chronicles.tardis.api.TardisApi;
+import com.noahtnt2009.gallifreyan_chronicles.tardis.api.Tardis;
 import com.noahtnt2009.gallifreyan_chronicles.Constants;
 import com.noahtnt2009.gallifreyan_chronicles.block.entity.TardisConsoleBlockEntity;
-import com.noahtnt2009.gallifreyan_chronicles.tardis.ecs.system.ConsoleLinkSystem;
 import com.noahtnt2009.gallifreyan_chronicles.init.GCDimensions;
 import com.noahtnt2009.gallifreyan_chronicles.mixin.MinecraftServerAccessor;
 import com.noahtnt2009.gallifreyan_chronicles.tardis.manager.TardisManager;
@@ -140,10 +141,7 @@ public final class TardisDimensionManager {
             iterator.remove();
 
             UUID tardisId = entry.getKey();
-            ServerLevel level = get(server, tardisId);
-            if (level == null) continue;
-
-            ConsoleLinkSystem.resolve(level, tardisId).ifPresentOrElse(
+            TardisApi.get(server, tardisId).flatMap(Tardis::console).ifPresentOrElse(
                     TardisConsoleBlockEntity::respawnControls,
                     () -> Constants.LOG.warn("no console to place controls on for tardis {}", tardisId));
         }

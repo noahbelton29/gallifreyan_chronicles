@@ -1,5 +1,6 @@
 package com.noahtnt2009.gallifreyan_chronicles.tardis.control.impl;
 
+import com.noahtnt2009.gallifreyan_chronicles.tardis.api.Tardis;
 import com.noahtnt2009.gallifreyan_chronicles.block.entity.TardisConsoleBlockEntity;
 import com.noahtnt2009.gallifreyan_chronicles.entity.TardisControlEntity;
 import com.noahtnt2009.gallifreyan_chronicles.init.GCSounds;
@@ -30,7 +31,7 @@ public abstract class DestinationControl extends BaseControl {
         if (console == null) return InteractionResult.FAIL;
         if (!(entity.level() instanceof ServerLevel level)) return InteractionResult.SUCCESS;
 
-        UUID tardisId = tardisId(console, level);
+        UUID tardisId = tardis(console).map(Tardis::id).orElse(null);
         if (tardisId == null || !apply(level.getServer(), tardisId, player)) {
             tell(player, "This console has no TARDIS destination to set!");
             return InteractionResult.FAIL;

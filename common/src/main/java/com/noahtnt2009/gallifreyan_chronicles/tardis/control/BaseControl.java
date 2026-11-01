@@ -2,11 +2,11 @@ package com.noahtnt2009.gallifreyan_chronicles.tardis.control;
 
 import com.mojang.serialization.MapCodec;
 import com.noahtnt2009.gallifreyan_chronicles.block.entity.TardisConsoleBlockEntity;
-import com.noahtnt2009.gallifreyan_chronicles.block.entity.TardisExteriorBlockEntity;
 import com.noahtnt2009.gallifreyan_chronicles.entity.TardisControlEntity;
 import com.noahtnt2009.gallifreyan_chronicles.init.GCSounds;
 import com.noahtnt2009.gallifreyan_chronicles.tardis.ecs.system.ConsoleSyncSystem;
-import com.noahtnt2009.gallifreyan_chronicles.tardis.ecs.system.DoorSyncSystem;
+import com.noahtnt2009.gallifreyan_chronicles.tardis.api.Tardis;
+import com.noahtnt2009.gallifreyan_chronicles.tardis.api.TardisApi;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
@@ -18,7 +18,7 @@ import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
 import org.jspecify.annotations.Nullable;
 
-import java.util.UUID;
+import java.util.Optional;
 import java.util.function.Function;
 
 public abstract class BaseControl implements TardisControl {
@@ -79,9 +79,11 @@ public abstract class BaseControl implements TardisControl {
     }
 
     protected static void playAtExterior(TardisConsoleBlockEntity console, ServerLevel level, SoundEvent sound) {
-        TardisExteriorBlockEntity exterior = findExterior(console, level);
-        if (exterior == null || !(exterior.getLevel() instanceof ServerLevel exteriorLevel)) return;
-        playAt(exteriorLevel, exterior.getBlockPos(), sound, 1.0F);
+        tardis(console).flatMap(Tardis::exterior).ifPresent(exterior -> {
+            if (exterior.getLevel() instanceof ServerLevel exteriorLevel) {
+                playAt(exteriorLevel, exterior.getBlockPos(), sound, 1.0F);
+            }
+        });
     }
 
     protected static void playEverywhere(TardisConsoleBlockEntity console, ServerLevel level, SoundEvent sound) {
@@ -93,13 +95,8 @@ public abstract class BaseControl implements TardisControl {
         if (player != null) player.sendOverlayMessage(Component.literal(message).withStyle(ChatFormatting.RED));
     }
 
-    protected static @Nullable UUID tardisId(TardisConsoleBlockEntity console, ServerLevel level) {
-        UUID id = console.getTardisId();
-        return id != null ? id : DoorSyncSystem.tardisIdOf(level);
+    protected static Optional<Tardis> tardis(TardisConsoleBlockEntity console) {
+        return TardisApi.of(console);
     }
 
-    protected static @Nullable TardisExteriorBlockEntity findExterior(TardisConsoleBlockEntity console, ServerLevel level) {
-        UUID id = tardisId(console, level);
-        return id == null ? null : DoorSyncSystem.findExterior(level.getServer(), id);
-    }
 }

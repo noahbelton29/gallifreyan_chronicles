@@ -118,5 +118,13 @@
         "attenuation_distance": 16
       }
     ]
+  },
+  "cloister": {
+    "sounds": [
+      {
+        "name": "gallifreyan_chronicles:block_entity/tardis/cloister",
+        "attenuation_distance": 16
+      }
+    ]
   }
 }

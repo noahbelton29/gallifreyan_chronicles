@@ -1,5 +1,6 @@
 package com.noahtnt2009.gallifreyan_chronicles.world.feature.tree_decorators;
 
+import net.minecraft.world.level.block.state.properties.BooleanProperty;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
@@ -65,7 +66,7 @@ public class CadonwoodTrunkVineDecorator extends TreeDecorator {
         });
     }
 
-    private net.minecraft.world.level.block.state.properties.BooleanProperty getDirectionProperty(Direction direction) {
+    private BooleanProperty getDirectionProperty(Direction direction) {
         return switch (direction) {
             case NORTH -> VineBlock.NORTH;
             case SOUTH -> VineBlock.SOUTH;

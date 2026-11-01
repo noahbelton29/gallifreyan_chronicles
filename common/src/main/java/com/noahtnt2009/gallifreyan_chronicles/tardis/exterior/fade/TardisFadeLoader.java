@@ -1,5 +1,6 @@
 package com.noahtnt2009.gallifreyan_chronicles.tardis.exterior.fade;
 
+import com.mojang.serialization.JsonOps;
 import com.noahtnt2009.gallifreyan_chronicles.Constants;
 import com.noahtnt2009.gallifreyan_chronicles.data.GCJsonReloadListener;
 import net.minecraft.server.MinecraftServer;
@@ -18,7 +19,7 @@ public class TardisFadeLoader extends GCJsonReloadListener<FadeType> {
     protected void register(FadeType value) {
         FadeTypes.register(value);
         Constants.LOG.info("Registered TARDIS fade {} ({})", value.id(), FadeTypeKinds.CODEC.encodeStart(
-                com.mojang.serialization.JsonOps.INSTANCE, value).result().map(Object::toString).orElse("?"));
+                JsonOps.INSTANCE, value).result().map(Object::toString).orElse("?"));
     }
 
     @Override

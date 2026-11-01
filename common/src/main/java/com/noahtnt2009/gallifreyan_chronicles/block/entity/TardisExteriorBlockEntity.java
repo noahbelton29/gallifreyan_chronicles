@@ -1,5 +1,6 @@
 package com.noahtnt2009.gallifreyan_chronicles.block.entity;
 
+import com.noahtnt2009.gallifreyan_chronicles.tardis.api.TardisApi;
 import com.geckolib.animatable.GeoBlockEntity;
 import com.geckolib.animatable.instance.AnimatableInstanceCache;
 import com.geckolib.animatable.manager.AnimatableManager;
@@ -137,16 +138,8 @@ public class TardisExteriorBlockEntity extends BlockEntity implements GeoBlockEn
     }
 
     public boolean canRemoveKey(Player player) {
-        UUID id = player.getUUID();
-
-        if (id.equals(renderedKeyOwner)) return true;
-
-        if (level instanceof ServerLevel serverLevel) {
-            var tardis = resolveTardis(serverLevel);
-            return tardis.isPresent() && id.equals(tardis.get().ownerId());
-        }
-
-        return false;
+        return player.getUUID().equals(renderedKeyOwner)
+                || TardisApi.of(this).map(tardis -> tardis.isOwner(player)).orElse(false);
     }
 
     public boolean hasKeyRendered() {
@@ -670,47 +663,13 @@ public class TardisExteriorBlockEntity extends BlockEntity implements GeoBlockEn
         triggerAnim("key_controller", "is_locked");
         playLockedSound();
 
-        Component overlay = Component.literal("Locked, ").withStyle(ChatFormatting.RED)
-                .append(ownerDisplayName());
+        Component owner = TardisApi.of(this)
+                .map(tardis -> Component.literal("this TARDIS belongs to ")
+                        .append(Component.literal(tardis.ownerName().orElse("an unknown Player"))
+                                .withStyle(ChatFormatting.AQUA)))
+                .orElse(Component.literal("this TARDIS"));
+        Component overlay = Component.literal("Locked, ").withStyle(ChatFormatting.RED).append(owner);
         player.sendOverlayMessage(overlay);
-    }
-
-    /** The TARDIS owner's name, or null if it isn't known. Server side only. */
-    public @Nullable String getOwnerName() {
-        if (!(level instanceof ServerLevel serverLevel)) return null;
-
-        var tardis = resolveTardis(serverLevel);
-        if (tardis.isEmpty()) return null;
-
-        var online = serverLevel.getServer().getPlayerList().getPlayer(tardis.get().ownerId());
-        if (online != null) {
-            String name = online.getGameProfile().name();
-            // keep the saved name current so it still works once the owner logs off
-            com.noahtnt2009.gallifreyan_chronicles.tardis.manager.TardisManager.get(serverLevel.getServer())
-                    .updateOwnerName(tardis.get().tardisId(), name);
-            return name;
-        }
-
-        String saved = tardis.get().ownerName();
-        return saved.isEmpty() ? null : saved;
-    }
-
-    private Component ownerDisplayName() {
-        if (!(level instanceof ServerLevel serverLevel)) {
-            return Component.literal("this TARDIS");
-        }
-
-        var tardis = resolveTardis(serverLevel);
-        if (tardis.isEmpty()) {
-            return Component.literal("this TARDIS");
-        }
-
-        UUID ownerId = tardis.get().ownerId();
-        var owner = serverLevel.getServer().getPlayerList().getPlayer(ownerId);
-        String ownerName = owner != null ? owner.getGameProfile().name() : "an unknown Player";
-
-        return Component.literal("this TARDIS belongs to ")
-                .append(Component.literal(ownerName).withStyle(ChatFormatting.AQUA));
     }
 
     private void playLockedSound() {

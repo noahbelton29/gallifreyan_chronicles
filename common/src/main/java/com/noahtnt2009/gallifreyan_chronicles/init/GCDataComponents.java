@@ -1,5 +1,8 @@
 package com.noahtnt2009.gallifreyan_chronicles.init;
 
+import java.util.UUID;
+import com.noahtnt2009.gallifreyan_chronicles.item.ItemInfoTooltip;
+import net.minecraft.core.UUIDUtil;
 import com.mojang.serialization.Codec;
 import com.noahtnt2009.gallifreyan_chronicles.util.GCUtils;
 import net.minecraft.core.Registry;
@@ -34,15 +37,15 @@ public class GCDataComponents {
             () -> DataComponentType.<String>builder().persistent(Codec.STRING).build()
     );
 
-    public static final DataComponentType<com.noahtnt2009.gallifreyan_chronicles.item.ItemInfoTooltip> ITEM_INFO = register(
+    public static final DataComponentType<ItemInfoTooltip> ITEM_INFO = register(
             "item_info",
-            () -> DataComponentType.<com.noahtnt2009.gallifreyan_chronicles.item.ItemInfoTooltip>builder()
-                    .persistent(com.noahtnt2009.gallifreyan_chronicles.item.ItemInfoTooltip.CODEC).build()
+            () -> DataComponentType.<ItemInfoTooltip>builder()
+                    .persistent(ItemInfoTooltip.CODEC).build()
     );
 
-    public static final DataComponentType<java.util.UUID> TARDIS_ID = register(
+    public static final DataComponentType<UUID> TARDIS_ID = register(
             "tardis_id",
-            () -> DataComponentType.<java.util.UUID>builder().persistent(net.minecraft.core.UUIDUtil.CODEC).build()
+            () -> DataComponentType.<UUID>builder().persistent(UUIDUtil.CODEC).build()
     );
 
     public static final DataComponentType<Boolean> KEY_INSERTED = register(

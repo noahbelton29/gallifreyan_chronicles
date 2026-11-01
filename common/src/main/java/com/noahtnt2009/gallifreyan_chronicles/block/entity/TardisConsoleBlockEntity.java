@@ -81,7 +81,6 @@ public class TardisConsoleBlockEntity extends BlockEntity implements GeoBlockEnt
         this.animationDriver = new ConsoleAnimationDriver(pos);
         this.controls = new ConsoleControlManager(this, animationDriver);
     }
-
     @Override
     public void registerControllers(AnimatableManager.@NonNull ControllerRegistrar controllerRegistrar) {
         this.idleController = new AnimationController<>("rotor", 15, test -> {

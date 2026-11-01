@@ -1,7 +1,8 @@
 package com.noahtnt2009.gallifreyan_chronicles.tardis.flight;
 
+import com.noahtnt2009.gallifreyan_chronicles.tardis.api.TardisApi;
+import com.noahtnt2009.gallifreyan_chronicles.tardis.api.Tardis;
 import com.noahtnt2009.gallifreyan_chronicles.block.entity.TardisExteriorBlockEntity;
-import com.noahtnt2009.gallifreyan_chronicles.tardis.ecs.system.DoorSyncSystem;
 import com.noahtnt2009.gallifreyan_chronicles.tardis.manager.TardisManager;
 import com.noahtnt2009.gallifreyan_chronicles.Constants;
 import com.noahtnt2009.gallifreyan_chronicles.init.GCDimensions;
@@ -39,16 +40,16 @@ public final class TardisDestinations {
     }
 
     public static @Nullable LandingTarget current(MinecraftServer server, UUID tardisId) {
-        TardisManager manager = TardisManager.get(server);
-        LandingTarget target = manager.getLandingTarget(tardisId);
+        Tardis tardis = TardisApi.get(server, tardisId).orElse(null);
+        if (tardis == null) return null;
+        LandingTarget target = tardis.landingTarget().orElse(null);
         if (target != null) return target;
 
-        BlockPos pos = manager.resolveExteriorBlockPos(tardisId);
+        BlockPos pos = tardis.exteriorPos().orElse(null);
         if (pos == null) return null;
 
-        TardisExteriorBlockEntity exterior = DoorSyncSystem.findExterior(server, tardisId);
-        float yaw = exterior == null ? 0f : exterior.getYaw();
-        return new LandingTarget(manager.getExteriorDimension(tardisId), pos, yaw);
+        float yaw = tardis.exterior().map(TardisExteriorBlockEntity::getYaw).orElse(0f);
+        return new LandingTarget(tardis.exteriorDimension(), pos, yaw);
     }
 
     public static int toggleNegative(MinecraftServer server, UUID tardisId) {
@@ -143,7 +144,7 @@ public final class TardisDestinations {
     }
 
     private static boolean isTardisInterior(ServerLevel level) {
-        if (DoorSyncSystem.tardisIdOf(level) != null) return true;
+        if (TardisApi.idOfLevel(level).isPresent()) return true;
         if (level.dimension().equals(GCDimensions.TARDIS_INTERIOR_LEVEL_KEY)) return true;
         Identifier id = level.dimension().identifier();
         return id.getNamespace().equals(Constants.MOD_ID) && id.getPath().startsWith("tardis");

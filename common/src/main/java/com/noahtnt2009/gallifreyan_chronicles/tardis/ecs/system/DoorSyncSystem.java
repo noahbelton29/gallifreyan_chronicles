@@ -1,19 +1,12 @@
 package com.noahtnt2009.gallifreyan_chronicles.tardis.ecs.system;
 
-import com.noahtnt2009.gallifreyan_chronicles.Constants;
 import com.noahtnt2009.gallifreyan_chronicles.block.entity.InteriorDoorBlockEntity;
-import com.noahtnt2009.gallifreyan_chronicles.block.entity.TardisConsoleBlockEntity;
 import com.noahtnt2009.gallifreyan_chronicles.block.entity.TardisExteriorBlockEntity;
 import com.noahtnt2009.gallifreyan_chronicles.init.GCTardisControls;
-import com.noahtnt2009.gallifreyan_chronicles.tardis.control.impl.DoorLockControl;
+import com.noahtnt2009.gallifreyan_chronicles.tardis.api.Tardis;
+import com.noahtnt2009.gallifreyan_chronicles.tardis.api.TardisApi;
 import com.noahtnt2009.gallifreyan_chronicles.tardis.ecs.component.DoorState;
-import com.noahtnt2009.gallifreyan_chronicles.tardis.interior.TardisDimensionManager;
-import com.noahtnt2009.gallifreyan_chronicles.tardis.manager.TardisManager;
-import net.minecraft.core.BlockPos;
-import net.minecraft.resources.Identifier;
 import net.minecraft.server.MinecraftServer;
-import net.minecraft.server.level.ServerLevel;
-import net.minecraft.world.level.Level;
 import org.jspecify.annotations.Nullable;
 
 import java.util.ArrayList;
@@ -26,22 +19,13 @@ import java.util.UUID;
 import java.util.WeakHashMap;
 
 public final class DoorSyncSystem {
-    private static final String INTERIOR_PREFIX = "tardis/";
     private static final Map<UUID, Set<InteriorDoorBlockEntity>> INTERIOR_DOORS = new HashMap<>();
 
     private DoorSyncSystem() {
     }
 
-    public static @Nullable UUID tardisIdOf(Level level) {
-        Identifier dimension = level.dimension().identifier();
-        if (!dimension.getNamespace().equals(Constants.MOD_ID)) return null;
-        String path = dimension.getPath();
-        if (!path.startsWith(INTERIOR_PREFIX)) return null;
-        try {
-            return UUID.fromString(path.substring(INTERIOR_PREFIX.length()));
-        } catch (IllegalArgumentException e) {
-            return null;
-        }
+    private static @Nullable TardisExteriorBlockEntity exteriorOf(MinecraftServer server, UUID tardisId) {
+        return TardisApi.get(server, tardisId).flatMap(Tardis::exterior).orElse(null);
     }
 
     public static synchronized void clear() {
@@ -69,16 +53,6 @@ public final class DoorSyncSystem {
         return live;
     }
 
-    public static @Nullable TardisExteriorBlockEntity findExterior(MinecraftServer server, UUID tardisId) {
-        TardisManager manager = TardisManager.get(server);
-        BlockPos pos = manager.resolveExteriorBlockPos(tardisId);
-        if (pos == null) return null;
-        ServerLevel level = server.getLevel(manager.getExteriorDimension(tardisId));
-        if (level == null) return null;
-        level.getChunkAt(pos);
-        return level.getBlockEntity(pos) instanceof TardisExteriorBlockEntity exterior ? exterior : null;
-    }
-
     public static void onExteriorDoorChanged(MinecraftServer server, UUID tardisId, DoorState state,
                                        String animation, boolean opening) {
         for (InteriorDoorBlockEntity door : doorsOf(tardisId)) {
@@ -89,7 +63,7 @@ public final class DoorSyncSystem {
 
     public static void onInteriorDoorChanged(MinecraftServer server, UUID tardisId, InteriorDoorBlockEntity source,
                                        DoorState state, String animation, boolean opening) {
-        TardisExteriorBlockEntity exterior = findExterior(server, tardisId);
+        TardisExteriorBlockEntity exterior = exteriorOf(server, tardisId);
         if (exterior != null) {
             exterior.applySyncedDoor(state, animation, opening);
         }
@@ -113,18 +87,13 @@ public final class DoorSyncSystem {
 
     private static void applyControl(MinecraftServer server, UUID tardisId, String controlId,
                                      boolean activated, boolean silent) {
-        ServerLevel interior = TardisDimensionManager.get(server, tardisId);
-        if (interior == null) return;
-        BlockPos pos = TardisManager.get(server).getConsoleBlockPos(tardisId);
-        if (pos == null) return;
-        interior.getChunkAt(pos);
-        if (interior.getBlockEntity(pos) instanceof TardisConsoleBlockEntity console) {
+        TardisApi.get(server, tardisId).flatMap(Tardis::console).ifPresent(console -> {
             if (silent) {
                 console.reconcileControl(controlId, activated);
             } else {
                 console.setControlActivated(controlId, activated);
             }
-        }
+        });
     }
 
     public static void onLockChanged(MinecraftServer server, UUID tardisId, boolean locked, boolean fromConsole) {
@@ -143,7 +112,7 @@ public final class DoorSyncSystem {
     }
 
     public static void toggleAllDoors(MinecraftServer server, UUID tardisId) {
-        TardisExteriorBlockEntity exterior = findExterior(server, tardisId);
+        TardisExteriorBlockEntity exterior = exteriorOf(server, tardisId);
         if (exterior != null) {
             exterior.interact(true, true);
             syncDoorControl(server, tardisId, exterior.getDoorState());
@@ -156,14 +125,14 @@ public final class DoorSyncSystem {
     }
 
     public static void reconcileConsole(MinecraftServer server, UUID tardisId) {
-        TardisExteriorBlockEntity exterior = findExterior(server, tardisId);
+        TardisExteriorBlockEntity exterior = exteriorOf(server, tardisId);
         if (exterior == null) return;
         applyDoorControl(server, tardisId, exterior.getDoorState(), true);
         applyLockControl(server, tardisId, exterior.isLocked(), true);
     }
 
     public static void pullFromExterior(MinecraftServer server, UUID tardisId, InteriorDoorBlockEntity door) {
-        TardisExteriorBlockEntity exterior = findExterior(server, tardisId);
+        TardisExteriorBlockEntity exterior = exteriorOf(server, tardisId);
         if (exterior != null) {
             door.snapTo(exterior.getDoorState());
             applyDoorControl(server, tardisId, exterior.getDoorState(), true);

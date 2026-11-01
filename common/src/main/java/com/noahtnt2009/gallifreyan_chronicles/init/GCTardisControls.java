@@ -1,22 +1,13 @@
 package com.noahtnt2009.gallifreyan_chronicles.init;
 
 import com.noahtnt2009.gallifreyan_chronicles.Constants;
-import com.noahtnt2009.gallifreyan_chronicles.tardis.control.impl.DoorControl;
-import com.noahtnt2009.gallifreyan_chronicles.tardis.control.impl.DoorLockControl;
-import com.noahtnt2009.gallifreyan_chronicles.tardis.control.impl.FlightLeverControl;
+import com.noahtnt2009.gallifreyan_chronicles.tardis.control.impl.*;
 import com.mojang.serialization.JsonOps;
 import com.mojang.serialization.MapCodec;
 import com.noahtnt2009.gallifreyan_chronicles.tardis.control.NoopControl;
 import com.noahtnt2009.gallifreyan_chronicles.tardis.control.TardisControl;
 import com.noahtnt2009.gallifreyan_chronicles.tardis.control.TardisControlRegistry;
 import com.noahtnt2009.gallifreyan_chronicles.tardis.control.TardisControlTypes;
-import com.noahtnt2009.gallifreyan_chronicles.tardis.control.impl.HandbrakeControl;
-import com.noahtnt2009.gallifreyan_chronicles.tardis.control.impl.PowerLeverControl;
-import com.noahtnt2009.gallifreyan_chronicles.tardis.control.impl.ChangeIncrementControl;
-import com.noahtnt2009.gallifreyan_chronicles.tardis.control.impl.DimensionSelectorControl;
-import com.noahtnt2009.gallifreyan_chronicles.tardis.control.impl.XIncrementControl;
-import com.noahtnt2009.gallifreyan_chronicles.tardis.control.impl.YIncrementControl;
-import com.noahtnt2009.gallifreyan_chronicles.tardis.control.impl.ZIncrementControl;
 
 public class GCTardisControls {
     public static final String NOOP_CONTROL = "noop";
@@ -30,10 +21,9 @@ public class GCTardisControls {
     public static final String Z_INCREMENT_CONTROL = "z_increment";
     public static final String CHANGE_INCREMENT = "change_increment";
     public static final String DIMENSION_SELECTOR = "dimension_selector";
+    public static final String ISOMORPHIC_CONTROL = "isomorphic_control";
 
     public static void registerTardisControls() {
-        // every control goes through control(...), which registers its codec and its instance together,
-        // so TardisControlRegistry holds all of them and the language provider can iterate it
         TardisControlTypes.register(NOOP_CONTROL, NoopControl.CODEC);
         control(FLIGHT_LEVER, FlightLeverControl.CODEC, new FlightLeverControl());
         control(HANDBRAKE, HandbrakeControl.CODEC, new HandbrakeControl());
@@ -45,6 +35,7 @@ public class GCTardisControls {
         control(Z_INCREMENT_CONTROL, ZIncrementControl.CODEC, new ZIncrementControl());
         control(CHANGE_INCREMENT, ChangeIncrementControl.CODEC, new ChangeIncrementControl());
         control(DIMENSION_SELECTOR, DimensionSelectorControl.CODEC, new DimensionSelectorControl());
+        control(ISOMORPHIC_CONTROL, IsomorphicControl.CODEC, new IsomorphicControl());
 
         verifyCodecs();
         Constants.LOG.info("Registered GC TARDIS Controls");

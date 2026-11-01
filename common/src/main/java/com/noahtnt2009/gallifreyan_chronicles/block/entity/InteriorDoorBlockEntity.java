@@ -1,5 +1,8 @@
 package com.noahtnt2009.gallifreyan_chronicles.block.entity;
 
+import java.util.Optional;
+import com.noahtnt2009.gallifreyan_chronicles.tardis.api.TardisApi;
+import com.noahtnt2009.gallifreyan_chronicles.tardis.api.Tardis;
 import com.geckolib.animatable.GeoBlockEntity;
 import com.geckolib.animatable.instance.AnimatableInstanceCache;
 import com.geckolib.animatable.manager.AnimatableManager;
@@ -17,7 +20,6 @@ import com.noahtnt2009.gallifreyan_chronicles.tardis.ecs.TardisComponentTypes;
 import com.noahtnt2009.gallifreyan_chronicles.tardis.door.TardisDoorRegistry;
 import com.noahtnt2009.gallifreyan_chronicles.tardis.ecs.component.DoorState;
 import com.noahtnt2009.gallifreyan_chronicles.tardis.ecs.component.DoorVariantComponent;
-import com.noahtnt2009.gallifreyan_chronicles.tardis.ecs.system.ConsoleLinkSystem;
 import com.noahtnt2009.gallifreyan_chronicles.tardis.ecs.system.DoorSyncSystem;
 import com.noahtnt2009.gallifreyan_chronicles.tardis.ecs.system.DoorSystem;
 import com.noahtnt2009.gallifreyan_chronicles.tardis.interior.TardisInterior;
@@ -129,7 +131,7 @@ public class InteriorDoorBlockEntity extends BlockEntity implements GeoBlockEnti
         if (pulledFromExterior || !(level instanceof ServerLevel serverLevel)) return;
         pulledFromExterior = true;
         if (!isLinked()) return;
-        tardisId = DoorSyncSystem.tardisIdOf(serverLevel);
+        tardisId = TardisApi.idOfLevel(serverLevel).orElse(null);
         if (tardisId == null) return;
         DoorSyncSystem.register(tardisId, this);
         applyInteriorDoorVariant(serverLevel);
@@ -173,16 +175,18 @@ public class InteriorDoorBlockEntity extends BlockEntity implements GeoBlockEnti
         sync();
     }
 
+    private Optional<Tardis> tardisApi() {
+        return level instanceof ServerLevel serverLevel
+                ? TardisApi.get(serverLevel.getServer(), tardisId)
+                : Optional.empty();
+    }
+
     private boolean isTardisLocked() {
-        if (tardisId == null || !(level instanceof ServerLevel serverLevel)) return false;
-        TardisExteriorBlockEntity exterior = DoorSyncSystem.findExterior(serverLevel.getServer(), tardisId);
-        return exterior != null && exterior.isLocked();
+        return tardisApi().map(Tardis::isLocked).orElse(false);
     }
 
     private boolean isTardisSealedForTravel() {
-        if (tardisId == null || !(level instanceof ServerLevel serverLevel)) return false;
-        TardisExteriorBlockEntity exterior = DoorSyncSystem.findExterior(serverLevel.getServer(), tardisId);
-        return exterior != null && exterior.areDoorsSealedForTravel();
+        return tardisApi().map(Tardis::areDoorsSealedForTravel).orElse(false);
     }
 
     public void announceLocked() {
@@ -219,10 +223,8 @@ public class InteriorDoorBlockEntity extends BlockEntity implements GeoBlockEnti
 
     private BlockPos soundPos() {
         if (level instanceof ServerLevel serverLevel) {
-            UUID id = tardisId != null ? tardisId : DoorSyncSystem.tardisIdOf(serverLevel);
-            if (id != null) {
-                return ConsoleLinkSystem.linkedConsolePos(serverLevel, id).orElse(getBlockPos());
-            }
+            UUID id = tardisId != null ? tardisId : TardisApi.idOfLevel(serverLevel).orElse(null);
+            return TardisApi.get(serverLevel.getServer(), id).flatMap(Tardis::consolePos).orElse(getBlockPos());
         }
         return getBlockPos();
     }

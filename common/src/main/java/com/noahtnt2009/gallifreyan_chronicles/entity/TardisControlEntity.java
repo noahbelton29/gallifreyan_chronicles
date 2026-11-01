@@ -2,15 +2,18 @@ package com.noahtnt2009.gallifreyan_chronicles.entity;
 
 import com.noahtnt2009.gallifreyan_chronicles.Constants;
 import com.noahtnt2009.gallifreyan_chronicles.block.entity.TardisConsoleBlockEntity;
+import com.noahtnt2009.gallifreyan_chronicles.tardis.api.TardisApi;
 import com.noahtnt2009.gallifreyan_chronicles.tardis.console.control.ConsoleControlManager;
 import com.noahtnt2009.gallifreyan_chronicles.tardis.control.TardisControl;
 import com.noahtnt2009.gallifreyan_chronicles.tardis.control.TardisControlRegistry;
+import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.damagesource.DamageSource;
@@ -28,6 +31,7 @@ import net.minecraft.world.phys.Vec3;
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 
+import java.util.UUID;
 import java.util.function.Supplier;
 
 public class TardisControlEntity extends Entity {
@@ -188,6 +192,15 @@ public class TardisControlEntity extends Entity {
                                                @NonNull Vec3 location) {
         if (this.level().isClientSide()) {
             return InteractionResult.SUCCESS;
+        }
+
+        TardisConsoleBlockEntity console = this.getConsole();
+        if (console != null && !TardisApi.canUseControls(console, player)) {
+            if (player instanceof ServerPlayer sp) {
+                sp.sendOverlayMessage(Component.literal("Only the owner can use these controls.")
+                        .withStyle(ChatFormatting.RED));
+            }
+            return InteractionResult.FAIL;
         }
 
         long now = System.currentTimeMillis();

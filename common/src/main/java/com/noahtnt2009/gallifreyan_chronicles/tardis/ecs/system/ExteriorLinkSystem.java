@@ -1,5 +1,7 @@
 package com.noahtnt2009.gallifreyan_chronicles.tardis.ecs.system;
 
+import com.noahtnt2009.gallifreyan_chronicles.tardis.api.TardisApi;
+import com.noahtnt2009.gallifreyan_chronicles.tardis.api.Tardis;
 import com.noahtnt2009.gallifreyan_chronicles.block.entity.TardisExteriorBlockEntity;
 import com.noahtnt2009.gallifreyan_chronicles.tardis.manager.TardisManager;
 import net.minecraft.core.BlockPos;
@@ -10,14 +12,6 @@ import java.util.UUID;
 
 public final class ExteriorLinkSystem {
     private ExteriorLinkSystem() {}
-
-    public static Optional<BlockPos> resolvedExteriorPos(ServerLevel level, UUID tardisId) {
-        return Optional.ofNullable(TardisManager.get(level.getServer()).resolveExteriorBlockPos(tardisId));
-    }
-
-    public static Optional<TardisExteriorBlockEntity> resolve(ServerLevel level, UUID tardisId) {
-        return resolvedExteriorPos(level, tardisId).flatMap(pos -> findExterior(level, pos));
-    }
 
     private static Optional<TardisExteriorBlockEntity> findExterior(ServerLevel level, BlockPos pos) {
         if (level.getBlockEntity(pos) instanceof TardisExteriorBlockEntity exterior) {
@@ -34,7 +28,8 @@ public final class ExteriorLinkSystem {
     }
 
     public static void unlink(ServerLevel level, UUID tardisId) {
-        resolve(level, tardisId).ifPresent(TardisExteriorBlockEntity::unlinkFromTardis);
+        TardisApi.get(level.getServer(), tardisId).flatMap(Tardis::exterior)
+                .ifPresent(TardisExteriorBlockEntity::unlinkFromTardis);
         TardisManager.get(level.getServer()).unlinkExterior(tardisId);
     }
 }

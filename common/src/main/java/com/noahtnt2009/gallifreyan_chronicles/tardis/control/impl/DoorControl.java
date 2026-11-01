@@ -1,8 +1,9 @@
 package com.noahtnt2009.gallifreyan_chronicles.tardis.control.impl;
 
+import java.util.Optional;
+import com.noahtnt2009.gallifreyan_chronicles.tardis.api.Tardis;
 import com.mojang.serialization.MapCodec;
 import com.noahtnt2009.gallifreyan_chronicles.block.entity.TardisConsoleBlockEntity;
-import com.noahtnt2009.gallifreyan_chronicles.block.entity.TardisExteriorBlockEntity;
 import com.noahtnt2009.gallifreyan_chronicles.entity.TardisControlEntity;
 import com.noahtnt2009.gallifreyan_chronicles.init.GCSounds;
 import com.noahtnt2009.gallifreyan_chronicles.tardis.control.BaseControl;
@@ -13,7 +14,6 @@ import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
 
-import java.util.UUID;
 
 public class DoorControl extends BaseControl {
     public static final ControlAnimations DEFAULT_ANIMATIONS = new ControlAnimations("door_control_off", "door_control_on", true);
@@ -28,13 +28,13 @@ public class DoorControl extends BaseControl {
         if (console == null) return InteractionResult.FAIL;
 
         if (entity.level() instanceof ServerLevel level) {
-            TardisExteriorBlockEntity exterior = findExterior(console, level);
-            if (exterior != null && exterior.isLocked()) {
+            Optional<Tardis> tardis = tardis(console);
+            if (tardis.map(Tardis::isLocked).orElse(false)) {
                 tell(player, "The doors are locked!");
                 return InteractionResult.FAIL;
             }
-            if (exterior != null && exterior.areDoorsSealedForTravel()) {
-                DoorSyncSystem.announceSealed(tardisId(console, level));
+            if (tardis.map(Tardis::areDoorsSealedForTravel).orElse(false)) {
+                DoorSyncSystem.announceSealed(tardis.get().id());
                 tell(player, "The doors are sealed while the TARDIS is travelling!");
                 return InteractionResult.FAIL;
             }
@@ -48,8 +48,7 @@ public class DoorControl extends BaseControl {
     public void onStateChanged(TardisConsoleBlockEntity console, boolean activated) {
         if (!(console.getLevel() instanceof ServerLevel level)) return;
 
-        UUID tardisId = tardisId(console, level);
-        if (tardisId != null) DoorSyncSystem.toggleAllDoors(level.getServer(), tardisId);
+        tardis(console).ifPresent(tardis -> DoorSyncSystem.toggleAllDoors(level.getServer(), tardis.id()));
     }
 
     @Override

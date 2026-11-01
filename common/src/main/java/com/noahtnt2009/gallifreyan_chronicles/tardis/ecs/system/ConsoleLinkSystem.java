@@ -1,9 +1,10 @@
 package com.noahtnt2009.gallifreyan_chronicles.tardis.ecs.system;
 
+import com.noahtnt2009.gallifreyan_chronicles.tardis.api.TardisApi;
+import com.noahtnt2009.gallifreyan_chronicles.tardis.api.Tardis;
 import com.noahtnt2009.gallifreyan_chronicles.Constants;
 import com.noahtnt2009.gallifreyan_chronicles.block.ConsoleBlock;
 import com.noahtnt2009.gallifreyan_chronicles.block.entity.TardisConsoleBlockEntity;
-import com.noahtnt2009.gallifreyan_chronicles.block.entity.TardisExteriorBlockEntity;
 import com.noahtnt2009.gallifreyan_chronicles.init.GCBlocks;
 import com.noahtnt2009.gallifreyan_chronicles.tardis.console.TardisConsole;
 import com.noahtnt2009.gallifreyan_chronicles.tardis.console.TardisConsoleRegistry;
@@ -22,14 +23,6 @@ public final class ConsoleLinkSystem {
 
     private static final int CONSOLE_OFFSET_DISTANCE = 3;
 
-    public static Optional<BlockPos> linkedConsolePos(ServerLevel level, UUID tardisId) {
-        return Optional.ofNullable(TardisManager.get(level.getServer()).getConsoleBlockPos(tardisId));
-    }
-
-    public static Optional<TardisConsoleBlockEntity> resolve(ServerLevel level, UUID tardisId) {
-        return linkedConsolePos(level, tardisId).flatMap(pos -> findConsole(level, pos));
-    }
-
     private static Optional<TardisConsoleBlockEntity> findConsole(ServerLevel level, BlockPos pos) {
         if (level.getBlockEntity(pos) instanceof TardisConsoleBlockEntity console) {
             return Optional.of(console);
@@ -46,14 +39,16 @@ public final class ConsoleLinkSystem {
     }
 
     public static void unlink(ServerLevel level, UUID tardisId) {
-        resolve(level, tardisId).ifPresent(TardisConsoleBlockEntity::unlinkFromTardis);
+        TardisApi.get(level.getServer(), tardisId).flatMap(Tardis::console)
+                .ifPresent(TardisConsoleBlockEntity::unlinkFromTardis);
         TardisManager.get(level.getServer()).unlinkConsole(tardisId);
     }
 
     public static void spawnAndLink(ServerLevel level, UUID tardisId, BlockPos exteriorPos) {
         TardisManager manager = TardisManager.get(level.getServer());
         if (manager.getConsoleBlockPos(tardisId) != null) {
-            resolve(level, tardisId).ifPresent(console -> console.linkToTardis(tardisId));
+            TardisApi.get(level.getServer(), tardisId).flatMap(Tardis::console)
+                    .ifPresent(console -> console.linkToTardis(tardisId));
             return;
         }
 
@@ -77,11 +72,11 @@ public final class ConsoleLinkSystem {
     public static void onPlaced(TardisConsoleBlockEntity console) {
         if (!(console.getLevel() instanceof ServerLevel level)) return;
 
-        UUID tardisId = DoorSyncSystem.tardisIdOf(level);
-        if (tardisId == null) return;
+        Tardis tardis = TardisApi.ofLevel(level).orElse(null);
+        if (tardis == null) return;
+        UUID tardisId = tardis.id();
 
-        TardisManager manager = TardisManager.get(level.getServer());
-        if (manager.get(tardisId).isEmpty()) return;
+        TardisManager manager = tardis.data();
 
         console.linkToTardis(tardisId);
         ConsoleSyncSystem.register(console);
@@ -99,8 +94,7 @@ public final class ConsoleLinkSystem {
         if (sibling != null) {
             console.applyCarriedControlStates(sibling.copyControlStates());
         } else {
-            TardisExteriorBlockEntity exterior = DoorSyncSystem.findExterior(level.getServer(), tardisId);
-            if (exterior != null && exterior.isTravelling()) {
+            if (tardis.isTravelling()) {
                 console.reconcileControl(FlightLeverControl.ID, true);
                 console.triggerRotorAnimation("rotor_flight");
             }
@@ -112,10 +106,10 @@ public final class ConsoleLinkSystem {
 
     private static void adoptAsPrimaryIfNeeded(ServerLevel level, TardisManager manager, UUID tardisId, BlockPos pos) {
         BlockPos current = manager.getConsoleBlockPos(tardisId);
+        assert current != null;
         if (pos.equals(current)) return;
 
-        boolean stale = current == null
-                || (level.hasChunkAt(current) && !(level.getBlockState(current).getBlock() instanceof ConsoleBlock));
+        boolean stale = level.hasChunkAt(current) && !(level.getBlockState(current).getBlock() instanceof ConsoleBlock);
         if (stale) {
             manager.setConsoleBlockPos(tardisId, pos);
         }

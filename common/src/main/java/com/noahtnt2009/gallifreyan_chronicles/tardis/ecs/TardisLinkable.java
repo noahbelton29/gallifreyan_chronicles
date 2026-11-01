@@ -1,9 +1,7 @@
 package com.noahtnt2009.gallifreyan_chronicles.tardis.ecs;
 
 import com.noahtnt2009.gallifreyan_chronicles.ecs.Entity;
-import com.noahtnt2009.gallifreyan_chronicles.tardis.ecs.component.TardisComponent;
 import com.noahtnt2009.gallifreyan_chronicles.tardis.ecs.system.TardisLinkSystem;
-import net.minecraft.server.level.ServerLevel;
 
 import java.util.Optional;
 import java.util.UUID;
@@ -27,7 +25,4 @@ public interface TardisLinkable {
         return getLinkedTardisId().isPresent();
     }
 
-    default Optional<TardisComponent> resolveTardis(ServerLevel level) {
-        return TardisLinkSystem.resolve(asEntity(), level);
-    }
 }

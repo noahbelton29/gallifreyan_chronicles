@@ -1,5 +1,6 @@
 package com.noahtnt2009.gallifreyan_chronicles.tardis.console;
 
+import java.util.Optional;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import com.noahtnt2009.gallifreyan_chronicles.data.IdentifiableData;
@@ -26,7 +27,7 @@ public record TardisConsole(String id, List<ControlEntry> controls, String defau
                 VEC3_CODEC.fieldOf("offset").forGetter(ControlEntry::offset),
                 Codec.FLOAT.optionalFieldOf("width", TardisControlEntity.DEFAULT_WIDTH).forGetter(ControlEntry::width),
                 Codec.FLOAT.optionalFieldOf("height", TardisControlEntity.DEFAULT_HEIGHT).forGetter(ControlEntry::height),
-                Codec.FLOAT.optionalFieldOf("depth").forGetter(entry -> java.util.Optional.of(entry.depth))
+                Codec.FLOAT.optionalFieldOf("depth").forGetter(entry -> Optional.of(entry.depth))
         ).apply(inst, (id, offset, width, height, depth) ->
                 new ControlEntry(id, offset, width, height, depth.orElse(width))));
 

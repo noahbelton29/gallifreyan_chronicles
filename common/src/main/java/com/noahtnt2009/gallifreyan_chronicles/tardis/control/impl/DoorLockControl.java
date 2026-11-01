@@ -1,5 +1,6 @@
 package com.noahtnt2009.gallifreyan_chronicles.tardis.control.impl;
 
+import com.noahtnt2009.gallifreyan_chronicles.tardis.api.Tardis;
 import com.mojang.serialization.MapCodec;
 import com.noahtnt2009.gallifreyan_chronicles.block.entity.TardisConsoleBlockEntity;
 import com.noahtnt2009.gallifreyan_chronicles.block.entity.TardisExteriorBlockEntity;
@@ -25,7 +26,7 @@ public class DoorLockControl extends BaseControl {
         var console = entity.getConsole();
         if (console == null || !(entity.level() instanceof ServerLevel level)) return InteractionResult.FAIL;
 
-        TardisExteriorBlockEntity exterior = findExterior(console, level);
+        TardisExteriorBlockEntity exterior = tardis(console).flatMap(Tardis::exterior).orElse(null);
         if (exterior == null) {
             tell(player, "The door lock has no linked TARDIS exterior!");
             return InteractionResult.FAIL;
@@ -46,8 +47,7 @@ public class DoorLockControl extends BaseControl {
     public void onStateChanged(TardisConsoleBlockEntity console, boolean activated) {
         if (!(console.getLevel() instanceof ServerLevel level)) return;
 
-        TardisExteriorBlockEntity exterior = findExterior(console, level);
-        if (exterior != null) exterior.setLockedFromConsole(activated);
+        tardis(console).flatMap(Tardis::exterior).ifPresent(exterior -> exterior.setLockedFromConsole(activated));
     }
 
     @Override

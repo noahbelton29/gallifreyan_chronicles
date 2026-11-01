@@ -1,12 +1,19 @@
 package com.noahtnt2009.gallifreyan_chronicles.block;
 
+import com.noahtnt2009.gallifreyan_chronicles.Constants;
 import com.noahtnt2009.gallifreyan_chronicles.block.entity.TardisConsoleBlockEntity;
 import com.noahtnt2009.gallifreyan_chronicles.init.GCDataComponents;
+import com.noahtnt2009.gallifreyan_chronicles.init.GCSounds;
 import com.noahtnt2009.gallifreyan_chronicles.tardis.console.TardisConsole;
 import com.noahtnt2009.gallifreyan_chronicles.tardis.console.TardisConsoleRegistry;
 import com.noahtnt2009.gallifreyan_chronicles.tardis.ecs.system.ConsoleLinkSystem;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.network.protocol.game.ClientboundSetEntityMotionPacket;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.sounds.SoundSource;
+import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.context.BlockPlaceContext;
@@ -21,6 +28,7 @@ import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.level.block.state.properties.EnumProperty;
 import net.minecraft.world.level.block.state.properties.Half;
+import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.NotNull;
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
@@ -40,6 +48,16 @@ public class ConsoleBlock extends BaseEntityBlock {
     }
 
     @Override
+    public void fallOn(Level level, BlockState state, BlockPos pos, Entity entity, double fallDistance) {
+        repel(level, pos, entity);
+    }
+
+    @Override
+    public void stepOn(Level level, BlockPos pos, BlockState onState, Entity entity) {
+        repel(level, pos, entity);
+    }
+
+    @Override
     protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
         builder.add(FACING, HALF);
     }
@@ -51,6 +69,20 @@ public class ConsoleBlock extends BaseEntityBlock {
         return this.defaultBlockState()
                 .setValue(FACING, context.getHorizontalDirection().getOpposite())
                 .setValue(HALF, half);
+    }
+
+    private void repel(Level level, BlockPos pos, Entity entity) {
+        if (!(level instanceof ServerLevel)) return;
+        if (!(entity instanceof LivingEntity livingEntity)) return;
+
+        float yaw = livingEntity.getYRot() * ((float) Math.PI / 180F);
+        double power = 0.3;
+
+        livingEntity.setDeltaMovement(Math.sin(yaw) * power, 0.3, -Math.cos(yaw) * power);
+        if (livingEntity instanceof ServerPlayer sp) {
+            sp.connection.send(new ClientboundSetEntityMotionPacket(sp));
+        }
+        level.playSound(null, pos, GCSounds.TARDIS_CLOISTER_BELL, SoundSource.BLOCKS);
     }
 
     public static boolean isUpsideDown(BlockState state) {

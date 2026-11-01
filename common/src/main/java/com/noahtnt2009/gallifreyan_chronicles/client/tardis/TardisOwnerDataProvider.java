@@ -1,5 +1,7 @@
 package com.noahtnt2009.gallifreyan_chronicles.client.tardis;
 
+import com.noahtnt2009.gallifreyan_chronicles.tardis.api.Tardis;
+import com.noahtnt2009.gallifreyan_chronicles.tardis.api.TardisApi;
 import com.noahtnt2009.gallifreyan_chronicles.block.entity.TardisExteriorBlockEntity;
 import com.noahtnt2009.gallifreyan_chronicles.util.GCUtils;
 import net.minecraft.nbt.CompoundTag;
@@ -15,8 +17,7 @@ public class TardisOwnerDataProvider implements IServerDataProvider<BlockAccesso
     @Override
     public void appendServerData(CompoundTag data, BlockAccessor accessor) {
         if (accessor.getBlockEntity() instanceof TardisExteriorBlockEntity exterior) {
-            String name = exterior.getOwnerName();
-            if (name != null) data.putString(KEY, name);
+            TardisApi.of(exterior).flatMap(Tardis::ownerName).ifPresent(name -> data.putString(KEY, name));
         }
     }
 

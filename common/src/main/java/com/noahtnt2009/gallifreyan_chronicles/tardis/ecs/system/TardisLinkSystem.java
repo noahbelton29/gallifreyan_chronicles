@@ -37,8 +37,4 @@ public final class TardisLinkSystem {
         link(entity, record.tardisId());
         return record;
     }
-
-    public static Optional<TardisComponent> resolve(Entity entity, ServerLevel level) {
-        return linkedTardisId(entity).flatMap(id -> TardisManager.get(level.getServer()).get(id));
-    }
 }

@@ -1,6 +1,9 @@
 package com.noahtnt2009.gallifreyan_chronicles.command;
 
-import com.mojang.brigadier.Command;
+import org.jspecify.annotations.Nullable;
+import com.noahtnt2009.gallifreyan_chronicles.tardis.ecs.system.TardisLandingSystem;
+import com.noahtnt2009.gallifreyan_chronicles.tardis.api.TardisApi;
+import com.noahtnt2009.gallifreyan_chronicles.tardis.api.Tardis;
 import com.mojang.brigadier.arguments.BoolArgumentType;
 import com.mojang.brigadier.arguments.FloatArgumentType;
 import com.mojang.brigadier.arguments.StringArgumentType;
@@ -8,11 +11,9 @@ import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.mojang.brigadier.suggestion.Suggestions;
 import com.mojang.brigadier.suggestion.SuggestionsBuilder;
-import com.noahtnt2009.gallifreyan_chronicles.block.TardisBlock;
 import com.noahtnt2009.gallifreyan_chronicles.block.entity.InteriorDoorBlockEntity;
 import com.noahtnt2009.gallifreyan_chronicles.block.entity.TardisConsoleBlockEntity;
 import com.noahtnt2009.gallifreyan_chronicles.block.entity.TardisExteriorBlockEntity;
-import com.noahtnt2009.gallifreyan_chronicles.init.GCBlocks;
 import com.noahtnt2009.gallifreyan_chronicles.network.TardisConsoleSyncPayload;
 import com.noahtnt2009.gallifreyan_chronicles.platform.Services;
 import com.noahtnt2009.gallifreyan_chronicles.tardis.console.TardisConsole;
@@ -20,12 +21,10 @@ import com.noahtnt2009.gallifreyan_chronicles.tardis.console.TardisConsoleRegist
 import com.noahtnt2009.gallifreyan_chronicles.entity.TardisControlEntity;
 import com.noahtnt2009.gallifreyan_chronicles.tardis.control.TardisControlRegistry;
 import com.noahtnt2009.gallifreyan_chronicles.tardis.door.TardisDoorRegistry;
-import com.noahtnt2009.gallifreyan_chronicles.tardis.ecs.component.TardisComponent;
 import com.noahtnt2009.gallifreyan_chronicles.tardis.ecs.component.TardisSubsystem;
 import com.noahtnt2009.gallifreyan_chronicles.tardis.ecs.system.ConsoleLinkSystem;
 import com.noahtnt2009.gallifreyan_chronicles.tardis.ecs.system.DoorSyncSystem;
 import com.noahtnt2009.gallifreyan_chronicles.tardis.ecs.system.ExteriorLinkSystem;
-import com.noahtnt2009.gallifreyan_chronicles.tardis.interior.TardisDimensionManager;
 import com.noahtnt2009.gallifreyan_chronicles.tardis.interior.TardisInteriorRegistry;
 import com.noahtnt2009.gallifreyan_chronicles.tardis.interior.TardisInteriorSystem;
 import com.noahtnt2009.gallifreyan_chronicles.tardis.manager.TardisManager;
@@ -62,6 +61,18 @@ import java.util.concurrent.CompletableFuture;
 import java.util.function.BiFunction;
 
 public class TardisCommand {
+    private static @Nullable UUID parseTardisId(CommandContext<CommandSourceStack> ctx, String tardisIdStr) {
+        try {
+            return UUID.fromString(tardisIdStr);
+        } catch (IllegalArgumentException e) {
+            ctx.getSource().sendFailure(Component.translatable(
+                    "command.gallifreyan_chronicles.invalid_id",
+                    tardisIdStr
+            ));
+            return null;
+        }
+    }
+
     private static <T extends BlockEntity> Optional<T> findBlockEntity(
             CommandContext<CommandSourceStack> ctx,
             BlockPos pos,
@@ -92,7 +103,7 @@ public class TardisCommand {
         ServerPlayer player;
         try {
             player = ctx.getSource().getPlayerOrException();
-        } catch (com.mojang.brigadier.exceptions.CommandSyntaxException e) {
+        } catch (CommandSyntaxException e) {
             return Optional.empty();
         }
 
@@ -122,16 +133,8 @@ public class TardisCommand {
         String tardisIdStr = StringArgumentType.getString(ctx, "id");
         String exteriorId = StringArgumentType.getString(ctx, "exterior_id");
 
-        UUID tardisId;
-        try {
-            tardisId = UUID.fromString(tardisIdStr);
-        } catch (IllegalArgumentException e) {
-            ctx.getSource().sendFailure(Component.translatable(
-                    "command.gallifreyan_chronicles.invalid_id",
-                    tardisIdStr
-            ));
-            return 0;
-        }
+        UUID tardisId = parseTardisId(ctx, tardisIdStr);
+        if (tardisId == null) return 0;
 
         if (!TardisExteriorRegistry.contains(exteriorId)) {
             ctx.getSource().sendFailure(Component.translatable(
@@ -142,7 +145,7 @@ public class TardisCommand {
         }
 
         TardisManager manager = TardisManager.get(ctx.getSource().getServer());
-        Optional<TardisComponent> opt = manager.get(tardisId);
+        Optional<Tardis> opt = TardisApi.get(ctx.getSource().getServer(), tardisId);
 
         if (opt.isEmpty()) {
             ctx.getSource().sendFailure(Component.translatable(
@@ -179,7 +182,7 @@ public class TardisCommand {
 
     public static CompletableFuture<Suggestions> suggestInteriors(
             CommandContext<CommandSourceStack> ctx,
-            com.mojang.brigadier.suggestion.SuggestionsBuilder builder
+            SuggestionsBuilder builder
     ) {
         TardisInteriorRegistry.getAll().forEach(interior -> builder.suggest(interior.id()));
         return builder.buildFuture();
@@ -187,16 +190,11 @@ public class TardisCommand {
 
     public static int getInterior(CommandContext<CommandSourceStack> ctx) {
         String tardisIdStr = StringArgumentType.getString(ctx, "id");
-        UUID tardisId;
-        try {
-            tardisId = UUID.fromString(tardisIdStr);
-        } catch (IllegalArgumentException e) {
-            ctx.getSource().sendFailure(Component.translatable("command.gallifreyan_chronicles.invalid_id", tardisIdStr));
-            return 0;
-        }
+        UUID tardisId = parseTardisId(ctx, tardisIdStr);
+        if (tardisId == null) return 0;
 
         var server = ctx.getSource().getServer();
-        if (TardisManager.get(server).get(tardisId).isEmpty()) {
+        if (TardisApi.get(server, tardisId).isEmpty()) {
             ctx.getSource().sendFailure(Component.translatable("command.gallifreyan_chronicles.no_tardis_id", tardisIdStr));
             return 0;
         }
@@ -213,16 +211,11 @@ public class TardisCommand {
         String tardisIdStr = StringArgumentType.getString(ctx, "id");
         String interiorId = StringArgumentType.getString(ctx, "interior_id");
 
-        UUID tardisId;
-        try {
-            tardisId = UUID.fromString(tardisIdStr);
-        } catch (IllegalArgumentException e) {
-            ctx.getSource().sendFailure(Component.translatable("command.gallifreyan_chronicles.invalid_id", tardisIdStr));
-            return 0;
-        }
+        UUID tardisId = parseTardisId(ctx, tardisIdStr);
+        if (tardisId == null) return 0;
 
         var server = ctx.getSource().getServer();
-        if (TardisManager.get(server).get(tardisId).isEmpty()) {
+        if (TardisApi.get(server, tardisId).isEmpty()) {
             ctx.getSource().sendFailure(Component.translatable("command.gallifreyan_chronicles.no_tardis_id", tardisIdStr));
             return 0;
         }
@@ -255,16 +248,8 @@ public class TardisCommand {
         String tardisIdStr = StringArgumentType.getString(ctx, "id");
         String consoleId = StringArgumentType.getString(ctx, "console_id");
 
-        UUID tardisId;
-        try {
-            tardisId = UUID.fromString(tardisIdStr);
-        } catch (IllegalArgumentException e) {
-            ctx.getSource().sendFailure(Component.translatable(
-                    "command.gallifreyan_chronicles.invalid_id",
-                    tardisIdStr
-            ));
-            return 0;
-        }
+        UUID tardisId = parseTardisId(ctx, tardisIdStr);
+        if (tardisId == null) return 0;
 
         if (!TardisConsoleRegistry.contains(consoleId)) {
             ctx.getSource().sendFailure(Component.translatable(
@@ -275,7 +260,7 @@ public class TardisCommand {
         }
 
         TardisManager manager = TardisManager.get(ctx.getSource().getServer());
-        Optional<TardisComponent> opt = manager.get(tardisId);
+        Optional<Tardis> opt = TardisApi.get(ctx.getSource().getServer(), tardisId);
 
         if (opt.isEmpty()) {
             ctx.getSource().sendFailure(Component.translatable(
@@ -318,9 +303,9 @@ public class TardisCommand {
         return 1;
     }
 
-    public static CompletableFuture<com.mojang.brigadier.suggestion.Suggestions> suggestConsoleVariants(
+    public static CompletableFuture<Suggestions> suggestConsoleVariants(
             CommandContext<CommandSourceStack> ctx,
-            com.mojang.brigadier.suggestion.SuggestionsBuilder builder
+            SuggestionsBuilder builder
     ) {
         String tardisIdStr;
         try {
@@ -349,19 +334,11 @@ public class TardisCommand {
         String tardisIdStr = StringArgumentType.getString(ctx, "id");
         String variantId = StringArgumentType.getString(ctx, "variant_id");
 
-        UUID tardisId;
-        try {
-            tardisId = UUID.fromString(tardisIdStr);
-        } catch (IllegalArgumentException e) {
-            ctx.getSource().sendFailure(Component.translatable(
-                    "command.gallifreyan_chronicles.invalid_id",
-                    tardisIdStr
-            ));
-            return 0;
-        }
+        UUID tardisId = parseTardisId(ctx, tardisIdStr);
+        if (tardisId == null) return 0;
 
         TardisManager manager = TardisManager.get(ctx.getSource().getServer());
-        Optional<TardisComponent> opt = manager.get(tardisId);
+        Optional<Tardis> opt = TardisApi.get(ctx.getSource().getServer(), tardisId);
 
         if (opt.isEmpty()) {
             ctx.getSource().sendFailure(Component.translatable(
@@ -429,16 +406,8 @@ public class TardisCommand {
         String tardisIdStr = StringArgumentType.getString(ctx, "id");
         String variantId = StringArgumentType.getString(ctx, "variant_id");
 
-        UUID tardisId;
-        try {
-            tardisId = UUID.fromString(tardisIdStr);
-        } catch (IllegalArgumentException e) {
-            ctx.getSource().sendFailure(Component.translatable(
-                    "command.gallifreyan_chronicles.invalid_id",
-                    tardisIdStr
-            ));
-            return 0;
-        }
+        UUID tardisId = parseTardisId(ctx, tardisIdStr);
+        if (tardisId == null) return 0;
 
         List<InteriorDoorBlockEntity> doors = DoorSyncSystem.doorsOf(tardisId);
         if (doors.isEmpty()) {
@@ -480,19 +449,11 @@ public class TardisCommand {
     public static int getConsole(CommandContext<CommandSourceStack> ctx) {
         String tardisIdStr = StringArgumentType.getString(ctx, "id");
 
-        UUID tardisId;
-        try {
-            tardisId = UUID.fromString(tardisIdStr);
-        } catch (IllegalArgumentException e) {
-            ctx.getSource().sendFailure(Component.translatable(
-                    "command.gallifreyan_chronicles.invalid_id",
-                    tardisIdStr
-            ));
-            return 0;
-        }
+        UUID tardisId = parseTardisId(ctx, tardisIdStr);
+        if (tardisId == null) return 0;
 
         TardisManager manager = TardisManager.get(ctx.getSource().getServer());
-        Optional<TardisComponent> component = manager.get(tardisId);
+        Optional<Tardis> component = TardisApi.get(ctx.getSource().getServer(), tardisId);
 
         if (component.isEmpty()) {
             ctx.getSource().sendFailure(Component.translatable(
@@ -522,19 +483,11 @@ public class TardisCommand {
     public static int unlinkConsole(CommandContext<CommandSourceStack> ctx) {
         String tardisIdStr = StringArgumentType.getString(ctx, "id");
 
-        UUID tardisId;
-        try {
-            tardisId = UUID.fromString(tardisIdStr);
-        } catch (IllegalArgumentException e) {
-            ctx.getSource().sendFailure(Component.translatable(
-                    "command.gallifreyan_chronicles.invalid_id",
-                    tardisIdStr
-            ));
-            return 0;
-        }
+        UUID tardisId = parseTardisId(ctx, tardisIdStr);
+        if (tardisId == null) return 0;
 
         TardisManager manager = TardisManager.get(ctx.getSource().getServer());
-        Optional<TardisComponent> opt = manager.get(tardisId);
+        Optional<Tardis> opt = TardisApi.get(ctx.getSource().getServer(), tardisId);
 
         if (opt.isEmpty()) {
             ctx.getSource().sendFailure(Component.translatable(
@@ -561,19 +514,11 @@ public class TardisCommand {
         String tardisIdStr = StringArgumentType.getString(ctx, "id");
         boolean glowing = BoolArgumentType.getBool(ctx, "glowing");
 
-        UUID tardisId;
-        try {
-            tardisId = UUID.fromString(tardisIdStr);
-        } catch (IllegalArgumentException e) {
-            ctx.getSource().sendFailure(Component.translatable(
-                    "command.gallifreyan_chronicles.invalid_id",
-                    tardisIdStr
-            ));
-            return 0;
-        }
+        UUID tardisId = parseTardisId(ctx, tardisIdStr);
+        if (tardisId == null) return 0;
 
         TardisManager manager = TardisManager.get(ctx.getSource().getServer());
-        Optional<TardisComponent> opt = manager.get(tardisId);
+        Optional<Tardis> opt = TardisApi.get(ctx.getSource().getServer(), tardisId);
 
         if (opt.isEmpty()) {
             ctx.getSource().sendFailure(Component.translatable(
@@ -663,19 +608,11 @@ public class TardisCommand {
     ) {
         String tardisIdStr = StringArgumentType.getString(ctx, "id");
 
-        UUID tardisId;
-        try {
-            tardisId = UUID.fromString(tardisIdStr);
-        } catch (IllegalArgumentException e) {
-            ctx.getSource().sendFailure(Component.translatable(
-                    "command.gallifreyan_chronicles.invalid_id",
-                    tardisIdStr
-            ));
-            return 0;
-        }
+        UUID tardisId = parseTardisId(ctx, tardisIdStr);
+        if (tardisId == null) return 0;
 
         TardisManager manager = TardisManager.get(ctx.getSource().getServer());
-        if (manager.get(tardisId).isEmpty()) {
+        if (TardisApi.get(ctx.getSource().getServer(), tardisId).isEmpty()) {
             ctx.getSource().sendFailure(Component.translatable(
                     "command.gallifreyan_chronicles.no_tardis_id",
                     tardisIdStr
@@ -698,18 +635,7 @@ public class TardisCommand {
 
     private static Optional<TardisConsoleBlockEntity> loadConsole(CommandContext<CommandSourceStack> ctx,
                                                                   UUID tardisId) {
-        MinecraftServer server = ctx.getSource().getServer();
-        BlockPos pos = TardisManager.get(server).getConsoleBlockPos(tardisId);
-        if (pos == null) return Optional.empty();
-
-        ServerLevel interior = TardisDimensionManager.get(server, tardisId);
-        if (interior != null) {
-            interior.getChunkAt(pos);
-            if (interior.getBlockEntity(pos) instanceof TardisConsoleBlockEntity console) {
-                return Optional.of(console);
-            }
-        }
-        return findBlockEntity(ctx, pos, TardisConsoleBlockEntity.class);
+        return TardisApi.get(ctx.getSource().getServer(), tardisId).flatMap(Tardis::console);
     }
 
     public static CompletableFuture<Suggestions> suggestControls(
@@ -734,18 +660,10 @@ public class TardisCommand {
         String tardisIdStr = StringArgumentType.getString(ctx, "id");
         String controlId = StringArgumentType.getString(ctx, "control");
 
-        UUID tardisId;
-        try {
-            tardisId = UUID.fromString(tardisIdStr);
-        } catch (IllegalArgumentException e) {
-            ctx.getSource().sendFailure(Component.translatable(
-                    "command.gallifreyan_chronicles.invalid_id",
-                    tardisIdStr
-            ));
-            return 0;
-        }
+        UUID tardisId = parseTardisId(ctx, tardisIdStr);
+        if (tardisId == null) return 0;
 
-        if (TardisManager.get(ctx.getSource().getServer()).get(tardisId).isEmpty()) {
+        if (TardisApi.get(ctx.getSource().getServer(), tardisId).isEmpty()) {
             ctx.getSource().sendFailure(Component.translatable(
                     "command.gallifreyan_chronicles.no_tardis_id",
                     tardisIdStr
@@ -830,19 +748,11 @@ public class TardisCommand {
 
     private static Optional<TardisExteriorBlockEntity> resolveExteriorForSubsystem(
             CommandContext<CommandSourceStack> ctx, String tardisIdStr) {
-        UUID tardisId;
-        try {
-            tardisId = UUID.fromString(tardisIdStr);
-        } catch (IllegalArgumentException e) {
-            ctx.getSource().sendFailure(Component.translatable(
-                    "command.gallifreyan_chronicles.invalid_id",
-                    tardisIdStr
-            ));
-            return Optional.empty();
-        }
+        UUID tardisId = parseTardisId(ctx, tardisIdStr);
+        if (tardisId == null) return Optional.empty();
 
         TardisManager manager = TardisManager.get(ctx.getSource().getServer());
-        if (manager.get(tardisId).isEmpty()) {
+        if (TardisApi.get(ctx.getSource().getServer(), tardisId).isEmpty()) {
             ctx.getSource().sendFailure(Component.translatable(
                     "command.gallifreyan_chronicles.no_tardis_id",
                     tardisIdStr
@@ -925,19 +835,11 @@ public class TardisCommand {
     public static int getExterior(CommandContext<CommandSourceStack> ctx) {
         String tardisIdStr = StringArgumentType.getString(ctx, "id");
 
-        UUID tardisId;
-        try {
-            tardisId = UUID.fromString(tardisIdStr);
-        } catch (IllegalArgumentException e) {
-            ctx.getSource().sendFailure(Component.translatable(
-                    "command.gallifreyan_chronicles.invalid_id",
-                    tardisIdStr
-            ));
-            return 0;
-        }
+        UUID tardisId = parseTardisId(ctx, tardisIdStr);
+        if (tardisId == null) return 0;
 
         TardisManager manager = TardisManager.get(ctx.getSource().getServer());
-        Optional<TardisComponent> component = manager.get(tardisId);
+        Optional<Tardis> component = TardisApi.get(ctx.getSource().getServer(), tardisId);
 
         if (component.isEmpty()) {
             ctx.getSource().sendFailure(Component.translatable(
@@ -967,19 +869,10 @@ public class TardisCommand {
     public static int linkExterior(CommandContext<CommandSourceStack> ctx) {
         String tardisIdStr = StringArgumentType.getString(ctx, "id");
 
-        UUID tardisId;
-        try {
-            tardisId = UUID.fromString(tardisIdStr);
-        } catch (IllegalArgumentException e) {
-            ctx.getSource().sendFailure(Component.translatable(
-                    "command.gallifreyan_chronicles.invalid_id",
-                    tardisIdStr
-            ));
-            return 0;
-        }
+        UUID tardisId = parseTardisId(ctx, tardisIdStr);
+        if (tardisId == null) return 0;
 
-        TardisManager manager = TardisManager.get(ctx.getSource().getServer());
-        Optional<TardisComponent> opt = manager.get(tardisId);
+        Optional<Tardis> opt = TardisApi.get(ctx.getSource().getServer(), tardisId);
 
         if (opt.isEmpty()) {
             ctx.getSource().sendFailure(Component.translatable(
@@ -1022,19 +915,10 @@ public class TardisCommand {
     public static int unlinkExterior(CommandContext<CommandSourceStack> ctx) {
         String tardisIdStr = StringArgumentType.getString(ctx, "id");
 
-        UUID tardisId;
-        try {
-            tardisId = UUID.fromString(tardisIdStr);
-        } catch (IllegalArgumentException e) {
-            ctx.getSource().sendFailure(Component.translatable(
-                    "command.gallifreyan_chronicles.invalid_id",
-                    tardisIdStr
-            ));
-            return 0;
-        }
+        UUID tardisId = parseTardisId(ctx, tardisIdStr);
+        if (tardisId == null) return 0;
 
-        TardisManager manager = TardisManager.get(ctx.getSource().getServer());
-        Optional<TardisComponent> opt = manager.get(tardisId);
+        Optional<Tardis> opt = TardisApi.get(ctx.getSource().getServer(), tardisId);
 
         if (opt.isEmpty()) {
             ctx.getSource().sendFailure(Component.translatable(
@@ -1061,19 +945,10 @@ public class TardisCommand {
     public static int linkConsole(CommandContext<CommandSourceStack> ctx) {
         String tardisIdStr = StringArgumentType.getString(ctx, "id");
 
-        UUID tardisId;
-        try {
-            tardisId = UUID.fromString(tardisIdStr);
-        } catch (IllegalArgumentException e) {
-            ctx.getSource().sendFailure(Component.translatable(
-                    "command.gallifreyan_chronicles.invalid_id",
-                    tardisIdStr
-            ));
-            return 0;
-        }
+        UUID tardisId = parseTardisId(ctx, tardisIdStr);
+        if (tardisId == null) return 0;
 
-        TardisManager manager = TardisManager.get(ctx.getSource().getServer());
-        Optional<TardisComponent> opt = manager.get(tardisId);
+        Optional<Tardis> opt = TardisApi.get(ctx.getSource().getServer(), tardisId);
 
         if (opt.isEmpty()) {
             ctx.getSource().sendFailure(Component.translatable(
@@ -1181,7 +1056,7 @@ public class TardisCommand {
         ServerPlayer player;
         try {
             player = ctx.getSource().getPlayerOrException();
-        } catch (com.mojang.brigadier.exceptions.CommandSyntaxException e) {
+        } catch (CommandSyntaxException e) {
             ctx.getSource().sendFailure(Component.translatable(
                     "command.gallifreyan_chronicles.player_only"
             ));
@@ -1198,19 +1073,11 @@ public class TardisCommand {
     public static int debugTardis(CommandContext<CommandSourceStack> ctx) {
         String tardisIdStr = StringArgumentType.getString(ctx, "id");
 
-        UUID tardisId;
-        try {
-            tardisId = UUID.fromString(tardisIdStr);
-        } catch (IllegalArgumentException e) {
-            ctx.getSource().sendFailure(Component.translatable(
-                    "command.gallifreyan_chronicles.invalid_id",
-                    tardisIdStr
-            ));
-            return 0;
-        }
+        UUID tardisId = parseTardisId(ctx, tardisIdStr);
+        if (tardisId == null) return 0;
 
         TardisManager manager = TardisManager.get(ctx.getSource().getServer());
-        Optional<TardisComponent> opt = manager.get(tardisId);
+        Optional<Tardis> opt = TardisApi.get(ctx.getSource().getServer(), tardisId);
 
         if (opt.isEmpty()) {
             ctx.getSource().sendFailure(Component.translatable(
@@ -1220,7 +1087,7 @@ public class TardisCommand {
             return 0;
         }
 
-        TardisComponent component = opt.get();
+        Tardis component = opt.get();
         BlockPos pos = manager.resolveExteriorBlockPos(tardisId);
         String posStr = pos != null
                 ? pos.getX() + " " + pos.getY() + " " + pos.getZ()
@@ -1272,28 +1139,19 @@ public class TardisCommand {
     public static int summonTardis(CommandContext<CommandSourceStack> ctx) {
         String tardisIdStr = StringArgumentType.getString(ctx, "id");
 
-        UUID tardisId;
-        try {
-            tardisId = UUID.fromString(tardisIdStr);
-        } catch (IllegalArgumentException e) {
-            ctx.getSource().sendFailure(Component.translatable(
-                    "command.gallifreyan_chronicles.invalid_id",
-                    tardisIdStr
-            ));
-            return 0;
-        }
+        UUID tardisId = parseTardisId(ctx, tardisIdStr);
+        if (tardisId == null) return 0;
 
         ServerPlayer player;
         try {
             player = ctx.getSource().getPlayerOrException();
-        } catch (com.mojang.brigadier.exceptions.CommandSyntaxException e) {
+        } catch (CommandSyntaxException e) {
             ctx.getSource().sendFailure(Component.translatable("command.gallifreyan_chronicles.player_only"));
             return 0;
         }
 
         MinecraftServer server = ctx.getSource().getServer();
-        TardisManager manager = TardisManager.get(server);
-        if (manager.get(tardisId).isEmpty()) {
+        if (TardisApi.get(ctx.getSource().getServer(), tardisId).isEmpty()) {
             ctx.getSource().sendFailure(Component.translatable(
                     "command.gallifreyan_chronicles.no_tardis_id",
                     tardisIdStr
@@ -1301,10 +1159,10 @@ public class TardisCommand {
             return 0;
         }
 
-        ServerLevel oldLevel = server.getLevel(manager.getExteriorDimension(tardisId));
-        BlockPos oldPos = manager.resolveExteriorBlockPos(tardisId);
-        if (oldLevel == null || oldPos == null
-                || !(oldLevel.getBlockEntity(oldPos) instanceof TardisExteriorBlockEntity oldExterior)) {
+        Tardis tardis = TardisApi.get(server, tardisId).orElseThrow();
+        ServerLevel oldLevel = tardis.exteriorLevel().orElse(null);
+        BlockPos oldPos = tardis.exteriorPos().orElse(null);
+        if (oldLevel == null || oldPos == null || tardis.exterior().isEmpty()) {
             ctx.getSource().sendFailure(Component.translatable(
                     "command.gallifreyan_chronicles.no_exterior",
                     tardisIdStr
@@ -1320,32 +1178,12 @@ public class TardisCommand {
             return 0;
         }
 
-        boolean glowing = oldExterior.getBlockState().getValue(TardisBlock.GLOWING);
-
-        oldLevel.removeBlock(oldPos, false);
-        if (oldLevel.getBlockState(oldPos.above()).is(GCBlocks.TARDIS_TOP)) {
-            oldLevel.removeBlock(oldPos.above(), false);
-        }
-
-        targetLevel.setBlock(
-                targetPos,
-                GCBlocks.TARDIS.defaultBlockState().setValue(TardisBlock.GLOWING, glowing),
-                Block.UPDATE_ALL
-        );
-        if (!(targetLevel.getBlockEntity(targetPos) instanceof TardisExteriorBlockEntity newExterior)) {
+        if (TardisLandingSystem.moveExterior(tardis, targetLevel, targetPos) == null) {
             ctx.getSource().sendFailure(Component.translatable(
                     "command.gallifreyan_chronicles.no_exterior",
                     tardisIdStr
             ));
             return 0;
-        }
-        newExterior.copyStateFrom(oldExterior);
-        newExterior.spawnKeyEntity();
-
-        manager.setRegisteredBlockPos(tardisId, targetPos);
-        manager.setExteriorDimension(tardisId, targetLevel.dimension());
-        if (manager.getExteriorBlockPos(tardisId) != null) {
-            manager.setExteriorBlockPos(tardisId, targetPos);
         }
 
         ctx.getSource().sendSuccess(
@@ -1379,17 +1217,9 @@ public class TardisCommand {
 
     private static UUID parseDestinationTardis(CommandContext<CommandSourceStack> ctx) {
         String tardisIdStr = StringArgumentType.getString(ctx, "id");
-        UUID tardisId;
-        try {
-            tardisId = UUID.fromString(tardisIdStr);
-        } catch (IllegalArgumentException e) {
-            ctx.getSource().sendFailure(Component.translatable(
-                    "command.gallifreyan_chronicles.invalid_id",
-                    tardisIdStr
-            ));
-            return null;
-        }
-        if (TardisManager.get(ctx.getSource().getServer()).get(tardisId).isEmpty()) {
+        UUID tardisId = parseTardisId(ctx, tardisIdStr);
+        if (tardisId == null) return null;
+        if (TardisApi.get(ctx.getSource().getServer(), tardisId).isEmpty()) {
             ctx.getSource().sendFailure(Component.translatable(
                     "command.gallifreyan_chronicles.no_tardis_id",
                     tardisIdStr
@@ -1415,7 +1245,7 @@ public class TardisCommand {
             ));
             return 0;
         }
-        if (DoorSyncSystem.tardisIdOf(level) != null) {
+        if (TardisApi.idOfLevel(level).isPresent()) {
             ctx.getSource().sendFailure(Component.translatable("command.gallifreyan_chronicles.destination_interior"));
             return 0;
         }
@@ -1449,7 +1279,7 @@ public class TardisCommand {
         BlockPos pos = player.blockPosition();
         float yaw = Mth.positiveModulo(Math.round((player.getYRot() + 180f) / 45f) * 45f, 360f);
 
-        if (DoorSyncSystem.tardisIdOf(level) != null) {
+        if (TardisApi.idOfLevel(level).isPresent()) {
             ctx.getSource().sendFailure(Component.translatable("command.gallifreyan_chronicles.destination_interior"));
             return 0;
         }

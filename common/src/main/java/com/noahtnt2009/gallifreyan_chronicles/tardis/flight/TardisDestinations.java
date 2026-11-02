@@ -28,6 +28,11 @@ public final class TardisDestinations {
 
     private static final int WORLD_LIMIT = 29_999_999;
 
+    private static final float[] FACING_YAWS = {180f, 225f, 270f, 315f, 0f, 45f, 90f, 135f};
+    private static final String[] FACING_NAMES = {
+            "North", "North-East", "East", "South-East", "South", "South-West", "West", "North-West"
+    };
+
     public enum Axis { X, Y, Z }
 
     private TardisDestinations() {
@@ -87,6 +92,34 @@ public final class TardisDestinations {
         LandingTarget updated = new LandingTarget(target.dimension(), new BlockPos(x, y, z), target.yaw());
         TardisManager.get(server).setLandingTarget(tardisId, updated);
         return updated;
+    }
+
+    public static @Nullable LandingTarget rotate(MinecraftServer server, UUID tardisId, int direction) {
+        LandingTarget target = current(server, tardisId);
+        if (target == null) return null;
+
+        int next = Math.floorMod(facingIndex(target.yaw()) + direction, FACING_YAWS.length);
+        LandingTarget updated = new LandingTarget(target.dimension(), target.pos(), FACING_YAWS[next]);
+        TardisManager.get(server).setLandingTarget(tardisId, updated);
+        return updated;
+    }
+
+    public static String facingName(float yaw) {
+        return FACING_NAMES[facingIndex(yaw)];
+    }
+
+    private static int facingIndex(float yaw) {
+        float wrapped = Mth.positiveModulo(yaw, 360f);
+        int best = 0;
+        float bestDiff = Float.MAX_VALUE;
+        for (int i = 0; i < FACING_YAWS.length; i++) {
+            float diff = Math.abs(Mth.wrapDegrees(wrapped - FACING_YAWS[i]));
+            if (diff < bestDiff) {
+                bestDiff = diff;
+                best = i;
+            }
+        }
+        return best;
     }
 
     public static @Nullable LandingTarget nextDimension(MinecraftServer server, UUID tardisId) {
@@ -181,6 +214,13 @@ public final class TardisDestinations {
                 dimensionName(target.dimension()),
                 Component.literal(landableIndex(server, target.dimension()) + "/" + landableCount(server))
                         .withStyle(ChatFormatting.GRAY)).withStyle(ChatFormatting.GOLD));
+    }
+
+    public static void showDirection(@Nullable Player player, LandingTarget target) {
+        if (player == null) return;
+        player.sendOverlayMessage(Component.translatable("overlay.gallifreyan_chronicles.destination_direction",
+                Component.literal(facingName(target.yaw())).withStyle(ChatFormatting.WHITE))
+                .withStyle(ChatFormatting.GOLD));
     }
 
     public static void showIncrement(@Nullable Player player, int increment) {

@@ -1,5 +1,6 @@
 package com.noahtnt2009.gallifreyan_chronicles.block.entity;
 
+import com.noahtnt2009.gallifreyan_chronicles.tardis.api.Tardis;
 import com.noahtnt2009.gallifreyan_chronicles.tardis.api.TardisApi;
 import com.geckolib.animatable.GeoBlockEntity;
 import com.geckolib.animatable.instance.AnimatableInstanceCache;
@@ -75,6 +76,8 @@ public class TardisExteriorBlockEntity extends BlockEntity implements GeoBlockEn
     private long keyCooldownUntil = 0L;
     private AnimationController<TardisExteriorBlockEntity> controller;
     private boolean locked = true;
+    private static final int POWER_CHECK_INTERVAL_TICKS = 10;
+    private boolean powered = true;
     private boolean inFlight = false;
     private TardisFlightState flightState = TardisFlightState.IDLE;
     private long flightStateEndTick = 0L;
@@ -471,7 +474,10 @@ public class TardisExteriorBlockEntity extends BlockEntity implements GeoBlockEn
         MinecraftServer server = level.getServer();
         boolean daylightAffectsGlow = server == null
                 || server.getGameRules().get(GCGameRules.DAYLIGHT_CYCLE_AFFECTS_GLOW);
-        if (GlowSystem.tick(blockEntity.asEntity(), level.getDefaultClockTime(), daylightAffectsGlow)) {
+        if (level.getGameTime() % POWER_CHECK_INTERVAL_TICKS == 0) {
+            blockEntity.powered = TardisApi.of(blockEntity).map(Tardis::hasPower).orElse(true);
+        }
+        if (GlowSystem.tick(blockEntity.asEntity(), level.getDefaultClockTime(), daylightAffectsGlow, blockEntity.powered)) {
             blockEntity.applyGlowToBlockState(blockEntity.isGlowing());
             blockEntity.sync();
         }

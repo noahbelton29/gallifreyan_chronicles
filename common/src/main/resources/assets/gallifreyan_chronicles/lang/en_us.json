@@ -170,6 +170,7 @@
   "overlay.gallifreyan_chronicles.coord_increment": "Increment: %s",
   "overlay.gallifreyan_chronicles.destination": "Destination: %s  |  %s",
   "overlay.gallifreyan_chronicles.destination_dimension": "Dimension: %s  (%s)",
+  "overlay.gallifreyan_chronicles.destination_direction": "Facing: %s",
   "sounds.gallifreyan_chronicles.block_entity.door_lock": "TARDIS door locks",
   "sounds.gallifreyan_chronicles.block_entity.door_unlock": "TARDIS door unlocks",
   "sounds.gallifreyan_chronicles.block_entity.first_doctors_hum": "TARDIS hums",

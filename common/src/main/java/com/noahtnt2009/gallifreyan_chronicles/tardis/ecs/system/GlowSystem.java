@@ -25,8 +25,16 @@ public final class GlowSystem {
         entity.set(TardisComponentTypes.GLOW, current.manualSet(glowing));
     }
 
-    public static boolean tick(Entity entity, long dayTime, boolean daylightCycleAffectsGlow) {
+    public static boolean tick(Entity entity, long dayTime, boolean daylightCycleAffectsGlow, boolean powered) {
         GlowComponent glow = entity.get(TardisComponentTypes.GLOW);
+
+        if (!powered) {
+            if (!glow.glowing() && !glow.manualOverride()) {
+                return false;
+            }
+            entity.set(TardisComponentTypes.GLOW, GlowComponent.off());
+            return glow.glowing();
+        }
 
         if (!daylightCycleAffectsGlow) {
             return false;

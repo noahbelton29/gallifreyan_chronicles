@@ -1,5 +1,6 @@
 package com.noahtnt2009.gallifreyan_chronicles.tardis.api;
 
+import com.noahtnt2009.gallifreyan_chronicles.init.GCItems;
 import com.noahtnt2009.gallifreyan_chronicles.tardis.control.impl.FlightLeverControl;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.util.Prediction;
@@ -249,15 +250,30 @@ public final class Tardis {
         TardisExteriorBlockEntity exterior = exterior().orElse(null);
         if (exterior == null) return false;
         if (!exterior.canRemoveKey(player)) {
-            player.sendOverlayMessage(Component.literal("That is not your key!"));
+            player.sendOverlayMessage(Component.translatable("message.gallifreyan_chronicles.not_your_key"));
             return false;
         }
         ItemStack returned = exterior.clearHeldKey();
         returned.set(GCDataComponents.KEY_INSERTED, false);
-        if (!player.getInventory().add(returned)) {
-            player.drop(returned, false, Prediction.SERVER_ONLY);
-        }
+        give(player, returned);
         return true;
+    }
+
+    public ItemStack createKey() {
+        ItemStack key = new ItemStack(GCItems.TARDIS_KEY);
+        key.set(GCDataComponents.TARDIS_ID, id);
+        key.set(GCDataComponents.KEY_INSERTED, false);
+        return key;
+    }
+
+    public void giveKeyTo(Player player) {
+        give(player, createKey());
+    }
+
+    private static void give(Player player, ItemStack stack) {
+        if (!player.getInventory().add(stack)) {
+            player.drop(stack, false, Prediction.SERVER_ONLY);
+        }
     }
 
     @Override

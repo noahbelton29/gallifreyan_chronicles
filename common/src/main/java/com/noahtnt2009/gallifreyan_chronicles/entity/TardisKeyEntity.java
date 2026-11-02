@@ -177,7 +177,7 @@ public class TardisKeyEntity extends Entity {
 
         if (!exterior.areDoorsFullyClosed()) {
             if (!this.level().isClientSide()) {
-                player.sendOverlayMessage(Component.literal("Close both doors before inserting the key!"));
+                player.sendOverlayMessage(Component.translatable("message.gallifreyan_chronicles.close_doors_to_insert_key"));
             }
             return InteractionResult.FAIL;
         }

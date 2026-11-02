@@ -22,7 +22,7 @@ public class TardisOwnerProvider implements IBlockComponentProvider {
                 : Component.literal(name).withStyle(ChatFormatting.AQUA);
 
         tooltip.add(Component.translatable("tooltip.gallifreyan_chronicles.tardis.owner")
-                .append(Component.literal(": "))
+                .append(Component.translatable("tooltip.gallifreyan_chronicles.label_separator"))
                 .append(value));
     }
 

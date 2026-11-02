@@ -11,7 +11,7 @@ public final class SelectionTooltip {
 
     public static Component line(String labelKey, Component value) {
         return Component.translatable(labelKey).withStyle(ChatFormatting.GRAY)
-                .append(Component.literal(": ").withStyle(ChatFormatting.GRAY))
+                .append(Component.translatable("tooltip.gallifreyan_chronicles.label_separator").withStyle(ChatFormatting.GRAY))
                 .append(value);
     }
 

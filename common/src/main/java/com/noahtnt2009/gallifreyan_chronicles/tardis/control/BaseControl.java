@@ -97,8 +97,8 @@ public abstract class BaseControl implements TardisControl {
         playAtExterior(console, level, sound);
     }
 
-    protected static void tell(@Nullable Player player, String message) {
-        if (player != null) player.sendOverlayMessage(Component.literal(message).withStyle(ChatFormatting.RED));
+    protected static void tell(@Nullable Player player, String translationKey) {
+        if (player != null) player.sendOverlayMessage(Component.translatable(translationKey).withStyle(ChatFormatting.RED));
     }
 
     protected static Optional<Tardis> tardis(TardisConsoleBlockEntity console) {

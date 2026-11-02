@@ -30,12 +30,12 @@ public class DoorControl extends BaseControl {
         if (entity.level() instanceof ServerLevel level) {
             Optional<Tardis> tardis = tardis(console);
             if (tardis.map(Tardis::isLocked).orElse(false)) {
-                tell(player, "The doors are locked!");
+                tell(player, "message.gallifreyan_chronicles.doors_locked");
                 return InteractionResult.FAIL;
             }
             if (tardis.map(Tardis::areDoorsSealedForTravel).orElse(false)) {
                 DoorSyncSystem.announceSealed(tardis.get().id());
-                tell(player, "The doors are sealed while the TARDIS is travelling!");
+                tell(player, "message.gallifreyan_chronicles.doors_sealed");
                 return InteractionResult.FAIL;
             }
         }

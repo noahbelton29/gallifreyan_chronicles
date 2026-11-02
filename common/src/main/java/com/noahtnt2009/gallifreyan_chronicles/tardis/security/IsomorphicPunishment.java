@@ -56,7 +56,7 @@ public final class IsomorphicPunishment {
         strikes++;
         RECORDS.put(player.getUUID(), new Record(strikes, now, deaths));
 
-        serverPlayer.sendOverlayMessage(Component.literal("Isomorphic security: only the owner can use these controls.")
+        serverPlayer.sendOverlayMessage(Component.translatable("message.gallifreyan_chronicles.isomorphic_denied")
                 .withStyle(ChatFormatting.RED));
 
         float damage = FIRST_DAMAGE + EXTRA_DAMAGE_PER_STRIKE * (strikes - 1);

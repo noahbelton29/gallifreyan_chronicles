@@ -33,7 +33,7 @@ public abstract class DestinationControl extends BaseControl {
 
         UUID tardisId = tardis(console).map(Tardis::id).orElse(null);
         if (tardisId == null || !apply(level.getServer(), tardisId, player)) {
-            tell(player, "This console has no TARDIS destination to set!");
+            tell(player, "message.gallifreyan_chronicles.no_destination_to_set");
             return InteractionResult.FAIL;
         }
 

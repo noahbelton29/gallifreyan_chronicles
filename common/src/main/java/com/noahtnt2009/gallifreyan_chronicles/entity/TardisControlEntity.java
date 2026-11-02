@@ -261,15 +261,19 @@ public class TardisControlEntity extends Entity {
             }
         }
 
-        String idPart = this.getControlId().isEmpty() ? "<unset>" : this.getControlId();
+        String idPart = this.getControlId();
 
-        String chatLine = String.format(
-                "[%s] pos=(%.4f, %.4f, %.4f) offset=(%.4f, %.4f, %.4f) size=(%.4f, %.4f, %.4f)",
-                idPart, pos.x, pos.y, pos.z, offset.x, offset.y, offset.z,
+        String posText = String.format("%.4f, %.4f, %.4f", pos.x, pos.y, pos.z);
+        String offsetText = String.format("%.4f, %.4f, %.4f", offset.x, offset.y, offset.z);
+        String sizeText = String.format("%.4f, %.4f, %.4f",
                 this.getControlWidth(), this.getControlHeight(), this.getControlDepth());
 
-        player.sendSystemMessage(Component.literal(chatLine));
-        Constants.LOG.info("TardisControlEntity {} -> {}", idPart, chatLine);
+        Component idComponent = this.getControlId().isEmpty()
+                ? Component.translatable("debug.gallifreyan_chronicles.control_unset")
+                : Component.literal(idPart);
+        player.sendSystemMessage(Component.translatable("debug.gallifreyan_chronicles.control_position",
+                idComponent, posText, offsetText, sizeText));
+        Constants.LOG.info("TardisControlEntity {} -> pos=({}) offset=({}) size=({})", idPart, posText, offsetText, sizeText);
     }
 
     @Override

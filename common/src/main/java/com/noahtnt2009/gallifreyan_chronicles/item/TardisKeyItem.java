@@ -47,7 +47,7 @@ public class TardisKeyItem extends Item {
             if (exterior.rejectKeyIfLockBroken(player)) return InteractionResult.FAIL;
 
             if (!exterior.areDoorsFullyClosed()) {
-                player.sendOverlayMessage(Component.literal("Close both doors before inserting the key!"));
+                player.sendOverlayMessage(Component.translatable("message.gallifreyan_chronicles.close_doors_to_insert_key"));
                 return InteractionResult.FAIL;
             }
 

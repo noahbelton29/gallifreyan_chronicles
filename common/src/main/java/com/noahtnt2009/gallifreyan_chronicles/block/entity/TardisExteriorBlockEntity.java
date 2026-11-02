@@ -585,7 +585,7 @@ public class TardisExteriorBlockEntity extends BlockEntity implements GeoBlockEn
         }
         if (player != null) {
             player.sendOverlayMessage(
-                    Component.literal("The lock is too damaged to take the key!").withStyle(ChatFormatting.RED));
+                    Component.translatable("message.gallifreyan_chronicles.lock_too_damaged").withStyle(ChatFormatting.RED));
         }
         return true;
     }
@@ -636,7 +636,7 @@ public class TardisExteriorBlockEntity extends BlockEntity implements GeoBlockEn
             level.playSound(null, getBlockPos(), GCSounds.TARDIS_KEY_JAMMED, SoundSource.BLOCKS, 1.0f, 1.0f);
         }
         if (player != null) {
-            player.sendOverlayMessage(Component.literal("The lock is jammed!").withStyle(ChatFormatting.RED));
+            player.sendOverlayMessage(Component.translatable("message.gallifreyan_chronicles.lock_jammed").withStyle(ChatFormatting.RED));
         }
     }
 
@@ -669,13 +669,13 @@ public class TardisExteriorBlockEntity extends BlockEntity implements GeoBlockEn
         triggerAnim("key_controller", "is_locked");
         playLockedSound();
 
-        Component owner = TardisApi.of(this)
-                .map(tardis -> Component.literal("this TARDIS belongs to ")
-                        .append(Component.literal(tardis.ownerName().orElse("an unknown Player"))
-                                .withStyle(ChatFormatting.AQUA)))
-                .orElse(Component.literal("this TARDIS"));
-        Component overlay = Component.literal("Locked, ").withStyle(ChatFormatting.RED).append(owner);
-        player.sendOverlayMessage(overlay);
+        Component overlay = TardisApi.of(this)
+                .map(tardis -> Component.translatable("message.gallifreyan_chronicles.locked_owned",
+                        tardis.ownerName()
+                                .map(name -> Component.literal(name).withStyle(ChatFormatting.AQUA))
+                                .orElseGet(() -> Component.translatable("message.gallifreyan_chronicles.unknown_player").withStyle(ChatFormatting.AQUA))))
+                .orElseGet(() -> Component.translatable("message.gallifreyan_chronicles.locked"));
+        player.sendOverlayMessage(overlay.copy().withStyle(ChatFormatting.RED));
     }
 
     private void playLockedSound() {

@@ -28,14 +28,14 @@ public class DoorLockControl extends BaseControl {
 
         TardisExteriorBlockEntity exterior = tardis(console).flatMap(Tardis::exterior).orElse(null);
         if (exterior == null) {
-            tell(player, "The door lock has no linked TARDIS exterior!");
+            tell(player, "message.gallifreyan_chronicles.lock_no_exterior");
             return InteractionResult.FAIL;
         }
 
         console.reconcileControl(GCTardisControls.DOOR_LOCK_CONTROL, exterior.isLocked());
 
         if (!exterior.isLocked() && !exterior.areDoorsFullyClosed()) {
-            tell(player, "Close both doors before locking!");
+            tell(player, "message.gallifreyan_chronicles.close_doors_to_lock");
             return InteractionResult.FAIL;
         }
 

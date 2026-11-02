@@ -1,10 +1,10 @@
 package com.noahtnt2009.gallifreyan_chronicles.block;
 
+import com.noahtnt2009.gallifreyan_chronicles.tardis.api.TardisApi;
 import com.noahtnt2009.gallifreyan_chronicles.Constants;
 import com.noahtnt2009.gallifreyan_chronicles.block.entity.TardisExteriorBlockEntity;
 import com.noahtnt2009.gallifreyan_chronicles.ecs.Entity;
 import com.noahtnt2009.gallifreyan_chronicles.init.GCDataComponents;
-import com.noahtnt2009.gallifreyan_chronicles.init.GCItems;
 import com.noahtnt2009.gallifreyan_chronicles.tardis.ecs.system.ExteriorSystem;
 import com.noahtnt2009.gallifreyan_chronicles.tardis.ecs.system.TardisLinkSystem;
 import com.noahtnt2009.gallifreyan_chronicles.tardis.exterior.TardisExteriorRegistry;
@@ -15,7 +15,6 @@ import com.noahtnt2009.gallifreyan_chronicles.tardis.ecs.component.TardisCompone
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
-import net.minecraft.util.Prediction;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
@@ -72,12 +71,7 @@ public class TardisBlock extends BaseEntityBlock {
 
             blockEntity.spawnKeyEntity();
 
-            ItemStack key = new ItemStack(GCItems.TARDIS_KEY);
-            key.set(GCDataComponents.TARDIS_ID, record.tardisId());
-            key.set(GCDataComponents.KEY_INSERTED, false);
-            if (!player.getInventory().add(key)) {
-                player.drop(key, false, Prediction.SERVER_ONLY);
-            }
+            TardisApi.get(serverLevel.getServer(), record.tardisId()).ifPresent(tardis -> tardis.giveKeyTo(player));
 
             Constants.LOG.debug(
                     "Registered TARDIS {} for player {}",
@@ -122,14 +116,10 @@ public class TardisBlock extends BaseEntityBlock {
 
             if (player.isShiftKeyDown() && tardis.canRemoveKey(player)) {
                 if (tardis.areDoorsFullyClosed()) {
-                    ItemStack returned = tardis.clearHeldKey();
-                    returned.set(GCDataComponents.KEY_INSERTED, false);
-                    if (!player.getInventory().add(returned)) {
-                        player.drop(returned, false, Prediction.SERVER_ONLY);
-                    }
+                    TardisApi.of(tardis).ifPresent(api -> api.returnKeyTo(player));
                     return InteractionResult.CONSUME;
                 } else {
-                    player.sendOverlayMessage(Component.literal("Close the doors before removing the key!"));
+                    player.sendOverlayMessage(Component.translatable("message.gallifreyan_chronicles.close_doors_to_remove_key"));
                     return InteractionResult.FAIL;
                 }
             }
@@ -139,7 +129,7 @@ public class TardisBlock extends BaseEntityBlock {
             }
 
             if (player.isShiftKeyDown()) {
-                player.sendOverlayMessage(Component.literal("That is not your key!"));
+                player.sendOverlayMessage(Component.translatable("message.gallifreyan_chronicles.not_your_key"));
             }
 
             return InteractionResult.CONSUME;

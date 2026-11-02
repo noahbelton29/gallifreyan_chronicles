@@ -29,8 +29,15 @@ public final class TardisDestinations {
     private static final int WORLD_LIMIT = 29_999_999;
 
     private static final float[] FACING_YAWS = {180f, 225f, 270f, 315f, 0f, 45f, 90f, 135f};
-    private static final String[] FACING_NAMES = {
-            "North", "North-East", "East", "South-East", "South", "South-West", "West", "North-West"
+    private static final String[] FACING_KEYS = {
+            "facing.gallifreyan_chronicles.north",
+            "facing.gallifreyan_chronicles.north_east",
+            "facing.gallifreyan_chronicles.east",
+            "facing.gallifreyan_chronicles.south_east",
+            "facing.gallifreyan_chronicles.south",
+            "facing.gallifreyan_chronicles.south_west",
+            "facing.gallifreyan_chronicles.west",
+            "facing.gallifreyan_chronicles.north_west"
     };
 
     public enum Axis { X, Y, Z }
@@ -104,8 +111,8 @@ public final class TardisDestinations {
         return updated;
     }
 
-    public static String facingName(float yaw) {
-        return FACING_NAMES[facingIndex(yaw)];
+    public static Component facingName(float yaw) {
+        return Component.translatable(FACING_KEYS[facingIndex(yaw)]);
     }
 
     private static int facingIndex(float yaw) {
@@ -219,7 +226,7 @@ public final class TardisDestinations {
     public static void showDirection(@Nullable Player player, LandingTarget target) {
         if (player == null) return;
         player.sendOverlayMessage(Component.translatable("overlay.gallifreyan_chronicles.destination_direction",
-                Component.literal(facingName(target.yaw())).withStyle(ChatFormatting.WHITE))
+                facingName(target.yaw()).copy().withStyle(ChatFormatting.WHITE))
                 .withStyle(ChatFormatting.GOLD));
     }
 

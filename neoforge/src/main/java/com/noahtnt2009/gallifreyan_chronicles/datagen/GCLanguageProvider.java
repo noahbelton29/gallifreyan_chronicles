@@ -230,6 +230,40 @@ public class GCLanguageProvider extends LanguageProvider {
                 "Dimension: %s  (%s)");
         add("overlay.gallifreyan_chronicles.coord_increment",
                 "Increment: %s");
+        add("overlay.gallifreyan_chronicles.destination_direction",
+                "Facing: %s");
+
+        // Messages
+        add("message.gallifreyan_chronicles.lock_too_damaged", "The lock is too damaged to take the key!");
+        add("message.gallifreyan_chronicles.lock_jammed", "The lock is jammed!");
+        add("message.gallifreyan_chronicles.locked", "Locked, this TARDIS");
+        add("message.gallifreyan_chronicles.locked_owned", "Locked, this TARDIS belongs to %s");
+        add("message.gallifreyan_chronicles.unknown_player", "an unknown Player");
+        add("message.gallifreyan_chronicles.not_your_key", "That is not your key!");
+        add("message.gallifreyan_chronicles.close_doors_to_remove_key", "Close the doors before removing the key!");
+        add("message.gallifreyan_chronicles.close_doors_to_insert_key", "Close both doors before inserting the key!");
+        add("message.gallifreyan_chronicles.close_doors_to_lock", "Close both doors before locking!");
+        add("message.gallifreyan_chronicles.no_destination_to_set", "This console has no TARDIS destination to set!");
+        add("message.gallifreyan_chronicles.doors_locked", "The doors are locked!");
+        add("message.gallifreyan_chronicles.doors_sealed", "The doors are sealed while the TARDIS is travelling!");
+        add("message.gallifreyan_chronicles.lock_no_exterior", "The door lock has no linked TARDIS exterior!");
+        add("message.gallifreyan_chronicles.isomorphic_denied", "Isomorphic security: only the owner can use these controls.");
+
+        // Facing
+        add("facing.gallifreyan_chronicles.north", "North");
+        add("facing.gallifreyan_chronicles.north_east", "North-East");
+        add("facing.gallifreyan_chronicles.east", "East");
+        add("facing.gallifreyan_chronicles.south_east", "South-East");
+        add("facing.gallifreyan_chronicles.south", "South");
+        add("facing.gallifreyan_chronicles.south_west", "South-West");
+        add("facing.gallifreyan_chronicles.west", "West");
+        add("facing.gallifreyan_chronicles.north_west", "North-West");
+
+        // Debug
+        add("debug.gallifreyan_chronicles.control_position", "[%s] pos=(%s) offset=(%s) size=(%s)");
+        add("debug.gallifreyan_chronicles.control_unset", "<unset>");
+
+        add("tooltip.gallifreyan_chronicles.label_separator", ": ");
 
         // Config screen
         add("menu.gallifreyan_chronicles.config", "Gallifreyan Chronicles Config");

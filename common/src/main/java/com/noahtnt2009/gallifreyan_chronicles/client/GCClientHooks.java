@@ -3,6 +3,7 @@ package com.noahtnt2009.gallifreyan_chronicles.client;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.core.registries.BuiltInRegistries;
 import com.noahtnt2009.gallifreyan_chronicles.client.sound.OffsetSoundInstance;
+import com.noahtnt2009.gallifreyan_chronicles.client.sound.SoundResumeStatus;
 import com.noahtnt2009.gallifreyan_chronicles.network.ResumeSoundPayload;
 import com.noahtnt2009.gallifreyan_chronicles.block.entity.TardisConsoleBlockEntity;
 import com.noahtnt2009.gallifreyan_chronicles.client.camera.GCCameraShake;
@@ -42,6 +43,7 @@ public final class GCClientHooks {
         if (minecraft.level == null) return;
         SoundEvent event = BuiltInRegistries.SOUND_EVENT.getOptional(payload.sound())
                 .orElseGet(() -> SoundEvent.createVariableRangeEvent(payload.sound()));
+        SoundResumeStatus.warnIfEngineUnhooked();
         minecraft.getSoundManager().play(new OffsetSoundInstance(
                 event, payload.volume(), payload.pitch(), payload.x(), payload.y(), payload.z(), payload.offsetSeconds()));
     }

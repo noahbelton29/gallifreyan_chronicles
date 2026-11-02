@@ -5,7 +5,7 @@ import com.geckolib.renderer.GeoBlockRenderer;
 import com.geckolib.renderer.base.RenderPassInfo;
 import com.mojang.math.Axis;
 import com.noahtnt2009.gallifreyan_chronicles.block.ConsoleBlock;
-import com.noahtnt2009.gallifreyan_chronicles.block.TardisConsoleBlockModel;
+import com.noahtnt2009.gallifreyan_chronicles.client.model.TardisConsoleBlockModel;
 import com.noahtnt2009.gallifreyan_chronicles.block.entity.TardisConsoleBlockEntity;
 import com.noahtnt2009.gallifreyan_chronicles.client.renderer.geo_layer.TardisConsoleGlowLayer;
 import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;

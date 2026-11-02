@@ -72,6 +72,13 @@ public record TardisConsole(String id, List<ControlEntry> controls, String defau
             TardisConsole::new
     );
 
+    public @Nullable ControlEntry controlEntry(String controlId) {
+        for (ControlEntry entry : controls) {
+            if (entry.id().equals(controlId)) return entry;
+        }
+        return null;
+    }
+
     public List<TardisConsoleVariant> variants() {
         return TardisConsoleRegistry.variantsOf(id);
     }

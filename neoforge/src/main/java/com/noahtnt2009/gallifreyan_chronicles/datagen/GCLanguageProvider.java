@@ -242,6 +242,7 @@ public class GCLanguageProvider extends LanguageProvider {
         add("message.gallifreyan_chronicles.not_your_key", "That is not your key!");
         add("message.gallifreyan_chronicles.close_doors_to_remove_key", "Close the doors before removing the key!");
         add("message.gallifreyan_chronicles.close_doors_to_insert_key", "Close both doors before inserting the key!");
+        add("message.gallifreyan_chronicles.key_linked", "The key is now linked to this TARDIS.");
         add("message.gallifreyan_chronicles.close_doors_to_lock", "Close both doors before locking!");
         add("message.gallifreyan_chronicles.no_destination_to_set", "This console has no TARDIS destination to set!");
         add("message.gallifreyan_chronicles.doors_locked", "The doors are locked!");

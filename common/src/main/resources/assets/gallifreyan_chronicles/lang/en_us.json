@@ -180,6 +180,7 @@
   "menu.gallifreyan_chronicles.config.interior": "Default Interior",
   "menu.gallifreyan_chronicles.credits": "Credits",
   "message.gallifreyan_chronicles.close_doors_to_insert_key": "Close both doors before inserting the key!",
+  "message.gallifreyan_chronicles.key_linked": "The key is now linked to this TARDIS.",
   "message.gallifreyan_chronicles.close_doors_to_lock": "Close both doors before locking!",
   "message.gallifreyan_chronicles.close_doors_to_remove_key": "Close the doors before removing the key!",
   "message.gallifreyan_chronicles.doors_locked": "The doors are locked!",

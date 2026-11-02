@@ -21,6 +21,9 @@ import com.noahtnt2009.gallifreyan_chronicles.entity.TardisControlEntity;
 import com.noahtnt2009.gallifreyan_chronicles.network.TardisConsoleRotorStatePayload;
 import com.noahtnt2009.gallifreyan_chronicles.platform.Services;
 import com.noahtnt2009.gallifreyan_chronicles.tardis.console.animation.ConsoleAnimationDriver;
+import com.noahtnt2009.gallifreyan_chronicles.tardis.console.animation.ConsoleControllers;
+import com.noahtnt2009.gallifreyan_chronicles.client.tardis.ConsoleAnimationCheck;
+import com.noahtnt2009.gallifreyan_chronicles.util.FadingValue;
 import com.noahtnt2009.gallifreyan_chronicles.tardis.console.control.ConsoleControlHost;
 import com.noahtnt2009.gallifreyan_chronicles.tardis.console.control.ConsoleControlManager;
 import com.noahtnt2009.gallifreyan_chronicles.tardis.console.TardisConsole;
@@ -55,20 +58,12 @@ import java.util.function.Supplier;
 public class TardisConsoleBlockEntity extends BlockEntity implements GeoBlockEntity, ComponentHolder, TardisLinkable, ConsoleControlHost {
     public static Supplier<BlockEntityType<TardisConsoleBlockEntity>> TYPE;
     private static final int FLIGHT_RECONCILE_DELAY_TICKS = 5;
-    private static final String IDLE_STATE = "rotor_idle";
-    private static final String FLIGHT_STATE = "rotor_flight";
+    private static final String IDLE_STATE = ConsoleControllers.IDLE_STATE;
+    private static final String FLIGHT_STATE = ConsoleControllers.FLIGHT_STATE;
 
     private String currentRotorState = IDLE_STATE;
 
-    private static final RawAnimation IDLE_ANIM =
-            RawAnimation.begin().thenLoop(IDLE_STATE);
-
-    private static final RawAnimation FLIGHT_ANIM =
-            RawAnimation.begin().thenLoop(FLIGHT_STATE);
-
-    private Map<String, AnimationController<TardisConsoleBlockEntity>> controlControllers = Map.of();
-    private AnimationController<TardisConsoleBlockEntity> idleController;
-    private AnimationController<TardisConsoleBlockEntity> flightController;
+    private final ConsoleControllers controllers = new ConsoleControllers();
     private final AnimatableInstanceCache cache = GeckoLibUtil.createInstanceCache(this);
     private final ComponentStore components = new ComponentStore();
 
@@ -76,15 +71,11 @@ public class TardisConsoleBlockEntity extends BlockEntity implements GeoBlockEnt
     private final ConsoleControlManager controls;
     private boolean clientEffectsStarted = false;
 
-    private static final double SNAP_TO_END = 10_000.0;
-    private final Map<String, Integer> snapFrames = new HashMap<>();
     private boolean controlStatesLoaded = false;
     private @Nullable UUID syncedTardisId;
     private final Map<String, Boolean> clientAppliedStates = new HashMap<>();
 
-    private static final float GLOW_FADE_SECONDS = 1.0F;
-    private float glowLevel = -1.0F;
-    private long lastGlowNanos = 0L;
+    private final FadingValue glowFade = FadingValue.snapping(1.0F);
 
     public TardisConsoleBlockEntity(BlockPos pos, BlockState state) {
         super(TYPE.get(), pos, state);
@@ -93,43 +84,7 @@ public class TardisConsoleBlockEntity extends BlockEntity implements GeoBlockEnt
     }
     @Override
     public void registerControllers(AnimatableManager.@NonNull ControllerRegistrar controllerRegistrar) {
-        this.idleController = new AnimationController<>("rotor", 15, test -> {
-            if (!this.hasPower()) {
-                if (test.controller().getCurrentRawAnimation() == null) {
-                    return test.setAndContinue(IDLE_ANIM);
-                }
-                return PlayState.PAUSE;
-            }
-            if (FLIGHT_STATE.equals(this.currentRotorState)) {
-                return test.setAndContinue(FLIGHT_ANIM);
-            }
-
-            return test.setAndContinue(IDLE_ANIM);
-        });
-        this.flightController = this.idleController;
-
-        Map<String, AnimationController<TardisConsoleBlockEntity>> builtControlControllers = new HashMap<>();
-        for (String controlId : TardisControlRegistry.allIds()) {
-            AnimationController<TardisConsoleBlockEntity> controller = new AnimationController<>(controlId, 0, test -> {
-                if (test.controller().getCurrentRawAnimation() == null) {
-                    return PlayState.STOP;
-                }
-                Integer framesLeft = snapFrames.get(controlId);
-                if (framesLeft != null) {
-                    test.controller().setAnimationTime(SNAP_TO_END);
-                    if (framesLeft <= 1) snapFrames.remove(controlId);
-                    else snapFrames.put(controlId, framesLeft - 1);
-                }
-                return PlayState.CONTINUE;
-            });
-            builtControlControllers.put(controlId, controller);
-        }
-        this.controlControllers = Collections.unmodifiableMap(builtControlControllers);
-
-        controllerRegistrar.add(this.idleController);
-        for (AnimationController<TardisConsoleBlockEntity> controller : this.controlControllers.values()) {
-            controllerRegistrar.add(controller);
-        }
+        controllers.register(controllerRegistrar, this::hasPower, () -> this.currentRotorState);
     }
 
 
@@ -157,9 +112,9 @@ public class TardisConsoleBlockEntity extends BlockEntity implements GeoBlockEnt
 
             if (!isControlAnimated(controlId)) continue;
             String animation = TardisControlRegistry.get(controlId).getAnimation(state);
-            if (animation == null) continue;
+            if (animation == null || !hasAnimation(controlId, animation)) continue;
 
-            snapFrames.put(controlId, 2);
+            controllers.requestSnap(controlId);
             animationDriver.applyAnimationLocally(controlId, animation);
         }
     }
@@ -168,7 +123,13 @@ public class TardisConsoleBlockEntity extends BlockEntity implements GeoBlockEnt
         this.currentRotorState = rotorState;
     }
 
+    private boolean hasAnimation(String controlId, String animation) {
+        TardisConsole model = getConsole();
+        return model == null || ConsoleAnimationCheck.exists(model.id(), controlId, animation);
+    }
+
     public void triggerAnimationClient(String animationName, String controllerName) {
+        if (!"rotor".equals(controllerName) && !hasAnimation(controllerName, animationName)) return;
         if ("rotor".equals(controllerName)) {
             this.currentRotorState = animationName;
         } else {
@@ -188,39 +149,23 @@ public class TardisConsoleBlockEntity extends BlockEntity implements GeoBlockEnt
     }
 
     public float glowLevel() {
-        float target = hasPower() ? 1.0F : 0.0F;
-        long now = System.nanoTime();
-        if (glowLevel < 0.0F) {
-            glowLevel = target;
-        } else {
-            float step = Math.min((now - lastGlowNanos) / 1.0E9F, 0.1F) / GLOW_FADE_SECONDS;
-            glowLevel = glowLevel < target ? Math.min(target, glowLevel + step) : Math.max(target, glowLevel - step);
-        }
-        lastGlowNanos = now;
-        return glowLevel;
+        return glowFade.update(hasPower() ? 1.0F : 0.0F);
     }
 
     @Override
     public boolean isControlAnimated(String controlId) {
+        TardisConsole.ControlEntry entry = findControlEntry(controlId);
+        return entry == null || entry.animated();
+    }
+
+    private TardisConsole.@Nullable ControlEntry findControlEntry(String controlId) {
         TardisConsole model = getConsole();
-        if (model == null) return true;
-        for (TardisConsole.ControlEntry entry : model.controls()) {
-            if (entry.id().equals(controlId)) return entry.animated();
-        }
-        return true;
+        return model == null ? null : model.controlEntry(controlId);
     }
 
     public int controlCooldownTicks(String controlId) {
-        TardisConsole model = getConsole();
-        float seconds = TardisConsole.ControlEntry.DEFAULT_COOLDOWN_SECONDS;
-        if (model != null) {
-            for (TardisConsole.ControlEntry entry : model.controls()) {
-                if (entry.id().equals(controlId)) {
-                    seconds = entry.cooldown();
-                    break;
-                }
-            }
-        }
+        TardisConsole.ControlEntry entry = findControlEntry(controlId);
+        float seconds = entry == null ? TardisConsole.ControlEntry.DEFAULT_COOLDOWN_SECONDS : entry.cooldown();
         return Math.round(seconds * 20.0F);
     }
 
@@ -406,7 +351,7 @@ public class TardisConsoleBlockEntity extends BlockEntity implements GeoBlockEnt
             ConsoleSyncSystem.register(this);
         }
         getAnimatableInstanceCache().getManagerForId(0);
-        animationDriver.bind(() -> this.level, () -> this.currentRotorState, idleController, flightController, controlControllers);
+        animationDriver.bind(() -> this.level, () -> this.currentRotorState, controllers.rotor(), controllers.rotor(), controllers.controls());
         this.respawnControls();
         settleControlAnimations();
 

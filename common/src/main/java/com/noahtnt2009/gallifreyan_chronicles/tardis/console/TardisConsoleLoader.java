@@ -39,6 +39,7 @@ public class TardisConsoleLoader extends GCJsonReloadListener<TardisConsole> {
 
         TardisConsoleRegistry.setDefault(TardisConsoleRegistry.get(TardisConsoleRegistry.defaultId()));
         TardisConsoleRegistry.validateVariants();
+        TardisConsoleValidator.validate(TardisConsoleRegistry.getAll());
         respawnAllLiveConsoles();
     }
 

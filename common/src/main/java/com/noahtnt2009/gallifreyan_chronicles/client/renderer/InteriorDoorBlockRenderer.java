@@ -5,7 +5,7 @@ import com.geckolib.renderer.GeoBlockRenderer;
 import com.geckolib.renderer.base.RenderPassInfo;
 import com.mojang.math.Axis;
 import com.noahtnt2009.gallifreyan_chronicles.block.InteriorDoorBlock;
-import com.noahtnt2009.gallifreyan_chronicles.block.InteriorDoorBlockModel;
+import com.noahtnt2009.gallifreyan_chronicles.client.model.InteriorDoorBlockModel;
 import com.noahtnt2009.gallifreyan_chronicles.block.entity.InteriorDoorBlockEntity;
 import com.noahtnt2009.gallifreyan_chronicles.tardis.exterior.TardisExterior;
 import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;

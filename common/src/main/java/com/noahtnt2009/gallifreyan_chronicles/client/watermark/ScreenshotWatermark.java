@@ -20,7 +20,7 @@ public final class ScreenshotWatermark {
     public static void apply(NativeImage image) {
         if (DONE.contains(image)) return;
         try {
-            Constants.LOG.info("[GC] Screenshot callback: {}x{}, watermark enabled={}",
+            Constants.LOG.debug("[GC] Screenshot callback: {}x{}, watermark enabled={}",
                     image.getWidth(), image.getHeight(), WatermarkIdentity.enabled());
             if (!WatermarkIdentity.enabled()) return;
             if (image.getWidth() < MIN_SIZE || image.getHeight() < MIN_SIZE) return;
@@ -29,7 +29,7 @@ public final class ScreenshotWatermark {
             String label = WatermarkIdentity.label(user.getName(), user.getProfileId());
             WatermarkRenderer.apply(new NativeImageSurface(image), label, WatermarkIdentity.seed(label));
             DONE.add(image);
-            Constants.LOG.info("[GC] Watermarked screenshot with build ID {}", WatermarkIdentity.buildId());
+            Constants.LOG.debug("[GC] Watermarked screenshot with build ID {}", WatermarkIdentity.buildId());
         } catch (Throwable t) {
             Constants.LOG.error("Failed to watermark screenshot", t);
         }

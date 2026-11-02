@@ -242,7 +242,7 @@ public class TardisControlEntity extends Entity {
             if (console != null) {
                 boolean currentState = console.getControlState(this.getControlId());
                 boolean newState = !currentState;
-                Constants.LOG.info("Control {} state toggled from {} to {}", this.getControlId(), currentState, newState);
+                Constants.LOG.debug("Control {} state toggled from {} to {}", this.getControlId(), currentState, newState);
                 console.triggerControl(this.getControlId(), newState, player);
             }
         }
@@ -273,7 +273,7 @@ public class TardisControlEntity extends Entity {
                 : Component.literal(idPart);
         player.sendSystemMessage(Component.translatable("debug.gallifreyan_chronicles.control_position",
                 idComponent, posText, offsetText, sizeText));
-        Constants.LOG.info("TardisControlEntity {} -> pos=({}) offset=({}) size=({})", idPart, posText, offsetText, sizeText);
+        Constants.LOG.debug("TardisControlEntity {} -> pos=({}) offset=({}) size=({})", idPart, posText, offsetText, sizeText);
     }
 
     @Override

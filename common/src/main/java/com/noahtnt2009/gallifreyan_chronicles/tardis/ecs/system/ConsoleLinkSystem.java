@@ -118,12 +118,12 @@ public final class ConsoleLinkSystem {
     public static void spawnDefaultControls(TardisConsoleBlockEntity console) {
         TardisConsole model = console.getConsole();
         if (model == null) {
-            Constants.LOG.info("spawnDefaultControls: no console model set");
+            Constants.LOG.debug("spawnDefaultControls: no console model set");
             return;
         }
 
         var entries = model.controls();
-        Constants.LOG.info("spawnDefaultControls: consoleId={}, {} control entries", model.id(), entries.size());
+        Constants.LOG.debug("spawnDefaultControls: consoleId={}, {} control entries", model.id(), entries.size());
 
         for (TardisConsole.ControlEntry entry : entries) {
             console.addControl(entry.id(), entry.offset(), entry.width(), entry.height(), entry.depth());

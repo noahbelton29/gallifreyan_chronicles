@@ -17,7 +17,7 @@ public abstract class NativeImageSaveMixin {
     private void gallifreyan_chronicles$watermarkOnSave(Path path, CallbackInfo ci) {
         String normalized = path.toString().replace('\\', '/').toLowerCase(Locale.ROOT);
         if (!normalized.contains("/screenshots/")) return;
-        Constants.LOG.info("[GC] NativeImage save hook reached: {}", path.getFileName());
+        Constants.LOG.debug("[GC] NativeImage save hook reached: {}", path.getFileName());
         ScreenshotWatermark.apply((NativeImage) (Object) this);
     }
 }

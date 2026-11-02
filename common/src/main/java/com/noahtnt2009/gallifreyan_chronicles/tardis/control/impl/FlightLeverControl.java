@@ -236,7 +236,7 @@ public class FlightLeverControl extends BaseControl {
     }
 
     private static void applyLeverState(TardisConsoleBlockEntity console, boolean activated) {
-        Constants.LOG.info("Flight lever state changed to: {}", activated);
+        Constants.LOG.debug("Flight lever state changed to: {}", activated);
 
         if (console.getLevel() instanceof ServerLevel serverLevel) {
             TardisExteriorBlockEntity exterior = tardis(console).flatMap(Tardis::exterior).orElse(null);

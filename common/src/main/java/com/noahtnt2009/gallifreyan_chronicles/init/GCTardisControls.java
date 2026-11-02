@@ -4,6 +4,7 @@ import com.noahtnt2009.gallifreyan_chronicles.Constants;
 import com.noahtnt2009.gallifreyan_chronicles.tardis.control.impl.*;
 import com.mojang.serialization.JsonOps;
 import com.mojang.serialization.MapCodec;
+import com.noahtnt2009.gallifreyan_chronicles.tardis.control.ControlPower;
 import com.noahtnt2009.gallifreyan_chronicles.tardis.control.NoopControl;
 import com.noahtnt2009.gallifreyan_chronicles.tardis.control.TardisControl;
 import com.noahtnt2009.gallifreyan_chronicles.tardis.control.TardisControlRegistry;
@@ -42,6 +43,7 @@ public class GCTardisControls {
         control(CLOAK_CONTROL, CloakControl.CODEC, new CloakControl());
 
         verifyCodecs();
+        ControlPower.validate();
         Constants.LOG.info("Registered GC TARDIS Controls");
     }
 

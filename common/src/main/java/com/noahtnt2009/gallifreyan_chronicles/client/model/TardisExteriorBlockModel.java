@@ -1,4 +1,4 @@
-package com.noahtnt2009.gallifreyan_chronicles.block;
+package com.noahtnt2009.gallifreyan_chronicles.client.model;
 
 import com.geckolib.model.GeoModel;
 import com.geckolib.renderer.base.GeoRenderState;

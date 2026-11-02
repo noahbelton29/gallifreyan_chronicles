@@ -144,7 +144,7 @@ public class ConsoleControlManager {
     }
 
     public void triggerControl(TardisConsoleBlockEntity console, String id, boolean activated, @Nullable Player triggeringPlayer) {
-        Constants.LOG.info("Triggering control: {} with state: {}", id, activated);
+        Constants.LOG.debug("Triggering control: {} with state: {}", id, activated);
 
         setControlState(id, activated);
         playControlAnimation(id, activated, triggeringPlayer);
@@ -161,7 +161,7 @@ public class ConsoleControlManager {
         if (!host.isControlAnimated(controlId)) return;
         TardisControl control = TardisControlRegistry.get(controlId);
         String animationName = control.getAnimation(activated);
-        Constants.LOG.info("Playing animation: {} for control: {} (activated: {})", animationName, controlId, activated);
+        Constants.LOG.debug("Playing animation: {} for control: {} (activated: {})", animationName, controlId, activated);
 
         if (animationName != null) {
             animatable.triggerAnimation(controlId, animationName, triggeringPlayer);

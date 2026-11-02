@@ -21,6 +21,10 @@ public class TardisControlRegistry {
         return CONTROLS.getOrDefault(id, NoopControl.INSTANCE);
     }
 
+    public static boolean isRegistered(String id) {
+        return CONTROLS.containsKey(id);
+    }
+
     public static Set<String> allIds() {
         return Collections.unmodifiableSet(CONTROLS.keySet());
     }

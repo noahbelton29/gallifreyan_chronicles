@@ -76,7 +76,7 @@ public class ConsoleAnimationDriver implements ConsoleAnimatable {
 
     @Override
     public void applyAnimationLocally(String controllerName, String animationName) {
-        Constants.LOG.info("Client triggering animation: {} on controller: {}", animationName, controllerName);
+        Constants.LOG.debug("Client triggering animation: {} on controller: {}", animationName, controllerName);
         if (ROTOR.equals(controllerName)) {
             return;
         }

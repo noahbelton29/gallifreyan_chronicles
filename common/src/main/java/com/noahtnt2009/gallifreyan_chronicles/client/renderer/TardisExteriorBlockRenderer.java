@@ -6,7 +6,7 @@ import com.geckolib.renderer.base.BoneSnapshots;
 import com.geckolib.renderer.base.RenderPassInfo;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.math.Axis;
-import com.noahtnt2009.gallifreyan_chronicles.block.TardisExteriorBlockModel;
+import com.noahtnt2009.gallifreyan_chronicles.client.model.TardisExteriorBlockModel;
 import com.noahtnt2009.gallifreyan_chronicles.block.entity.TardisExteriorBlockEntity;
 import com.noahtnt2009.gallifreyan_chronicles.client.renderer.geo_layer.TardisExteriorGlowLayer;
 import com.noahtnt2009.gallifreyan_chronicles.client.renderer.geo_layer.TardisExteriorKeyLayer;

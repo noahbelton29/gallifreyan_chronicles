@@ -30,7 +30,7 @@ public abstract class ChannelMixin implements OffsetChannel {
         this.gc$offsetSeconds = seconds;
     }
 
-    @Inject(method = "play", at = @At("HEAD"))
+    @Inject(method = "play", at = @At("HEAD"), require = 0)
     private void gc$applyOffset(CallbackInfo ci) {
         if (gc$offsetSeconds > 0.0F && stream == null) {
             AL10.alSourcef(source, AL11.AL_SEC_OFFSET, gc$offsetSeconds);

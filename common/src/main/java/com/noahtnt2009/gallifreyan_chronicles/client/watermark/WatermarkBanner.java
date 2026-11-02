@@ -34,7 +34,7 @@ public final class WatermarkBanner {
 
         if (!logged) {
             logged = true;
-            Constants.LOG.info("[GC] F1 banner is being drawn");
+            Constants.LOG.debug("[GC] F1 banner is being drawn");
         }
 
         Minecraft minecraft = Minecraft.getInstance();

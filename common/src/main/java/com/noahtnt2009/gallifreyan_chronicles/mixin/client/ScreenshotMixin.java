@@ -14,7 +14,7 @@ import java.util.function.Consumer;
 public abstract class ScreenshotMixin {
     @ModifyVariable(method = "takeScreenshot*", at = @At("HEAD"), argsOnly = true, name = "callback")
     private static Consumer<NativeImage> gallifreyan_chronicles$watermark(Consumer<NativeImage> original) {
-        Constants.LOG.info("[GC] Screenshot hook reached");
+        Constants.LOG.debug("[GC] Screenshot hook reached");
         return image -> {
             ScreenshotWatermark.apply(image);
             original.accept(image);

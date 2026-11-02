@@ -51,7 +51,7 @@ public final class HudVisibility {
                 Field field = findField(root.getClass(), name);
                 if (field != null && field.getType() == boolean.class) {
                     field.setAccessible(true);
-                    Constants.LOG.info("[GC] HUD hidden flag found: {}.{}", root.getClass().getName(), name);
+                    Constants.LOG.debug("[GC] HUD hidden flag found: {}.{}", root.getClass().getName(), name);
                     return () -> {
                         try {
                             return field.getBoolean(Modifier.isStatic(field.getModifiers()) ? null : root);
@@ -68,7 +68,7 @@ public final class HudVisibility {
                     boolean invert = false;
                     for (String inverted : INVERTED) invert |= inverted.equals(name);
                     final boolean flip = invert;
-                    Constants.LOG.info("[GC] HUD hidden flag found: {}.{}()", root.getClass().getName(), name);
+                    Constants.LOG.debug("[GC] HUD hidden flag found: {}.{}()", root.getClass().getName(), name);
                     return () -> {
                         try {
                             return flip != (boolean) method.invoke(root);
@@ -92,7 +92,7 @@ public final class HudVisibility {
                     }
                 }
             }
-            Constants.LOG.info("[GC] HUD flag candidates on {}:{}", root.getClass().getName(), sb);
+            Constants.LOG.debug("[GC] HUD flag candidates on {}:{}", root.getClass().getName(), sb);
         }
         return null;
     }

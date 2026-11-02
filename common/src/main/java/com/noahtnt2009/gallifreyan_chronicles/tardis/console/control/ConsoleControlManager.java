@@ -158,9 +158,7 @@ public class ConsoleControlManager {
     }
 
     public void playControlAnimation(String controlId, boolean activated, @Nullable Player triggeringPlayer) {
-        if (!host.isControlAnimated(controlId)) return;
-        TardisControl control = TardisControlRegistry.get(controlId);
-        String animationName = control.getAnimation(activated);
+        String animationName = host.resolveControlAnimation(controlId, activated);
         Constants.LOG.debug("Playing animation: {} for control: {} (activated: {})", animationName, controlId, activated);
 
         if (animationName != null) {

@@ -59,6 +59,15 @@ public final class ConsoleSyncSystem {
         }
     }
 
+    public static synchronized @Nullable TardisConsoleBlockEntity firstLiveOf(UUID tardisId) {
+        Set<TardisConsoleBlockEntity> set = CONSOLES.get(tardisId);
+        if (set == null) return null;
+        for (TardisConsoleBlockEntity console : set) {
+            if (!console.isRemoved()) return console;
+        }
+        return null;
+    }
+
     public static synchronized List<TardisConsoleBlockEntity> consolesOf(UUID tardisId) {
         Set<TardisConsoleBlockEntity> set = CONSOLES.get(tardisId);
         if (set == null) return List.of();

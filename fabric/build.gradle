@@ -112,6 +112,9 @@ def gcWatermarkOff = providers.gradleProperty('watermark')
         .map { it.equalsIgnoreCase('off') || it.equalsIgnoreCase('false') }
         .orElse(false)
 def gcLedgerFile = rootProject.layout.projectDirectory.file('build-ledger.csv')
+def gcLockUuids = providers.gradleProperty('lockUuid').orElse('')
+def gcExpiresIn = providers.gradleProperty('expiresIn').orElse('')
+def gcLedgerHeader = 'timestamp,build_id,tester,jar,locked_to,expires_at'
 
 def generateBuildId = tasks.register('generateBuildId') {
     outputs.dir(gcBuildIdDir)
@@ -121,17 +124,52 @@ def generateBuildId = tasks.register('generateBuildId') {
         def random = new java.security.SecureRandom()
         def buildId = (1..8).collect { alphabet.charAt(random.nextInt(alphabet.length())) }.join()
         def watermarkOn = !gcWatermarkOff.get()
+        def lockIds = gcLockUuids.get().split(',').collect { it.trim() }.findAll { !it.isEmpty() }.collect { raw ->
+            def text = raw.replace('-', '')
+            if (!(text ==~ /[0-9a-fA-F]{32}/)) {
+                throw new GradleException("lockUuid '${raw}' is not a Minecraft UUID")
+            }
+            java.util.UUID.fromString(text.replaceFirst(/(.{8})(.{4})(.{4})(.{4})(.{12})/, '$1-$2-$3-$4-$5')).toString()
+        }
+
+        def expiresAt = ''
+        def expirySpec = gcExpiresIn.get().trim().toLowerCase()
+        if (!expirySpec.isEmpty()) {
+            def matcher = expirySpec =~ /(\d+(?:\.\d+)?)\s*([smhd]?)/
+            def totalMillis = 0L
+            def matched = ''
+            matcher.each { whole, amount, unit ->
+                def factor = [s: 1000L, m: 60000L, h: 3600000L, d: 86400000L][unit ?: 'm']
+                totalMillis += (long) (Double.parseDouble(amount) * factor)
+                matched += whole
+            }
+            if (totalMillis <= 0L || matched.replaceAll('\\s', '') != expirySpec.replaceAll('\\s', '')) {
+                throw new GradleException("expiresIn '${gcExpiresIn.get()}' is not a duration like 30s, 90, 2h or 1h30m")
+            }
+            def expiry = java.time.Instant.now().plusMillis(totalMillis)
+            expiresAt = expiry.toEpochMilli().toString()
+            logger.lifecycle("Build expires at ${expiry.atZone(java.time.ZoneId.systemDefault())}")
+        }
 
         def dir = gcBuildIdDir.get().asFile
         dir.mkdirs()
-        new File(dir, 'gc_build.properties').text = "build_id=${buildId}\nwatermark=${watermarkOn}\n"
+        new File(dir, 'gc_build.properties').text = "build_id=${buildId}\nwatermark=${watermarkOn}\nlock_uuids=${lockIds.join(',')}\nexpires_at=${expiresAt}\n"
+        if (!lockIds.isEmpty()) {
+            logger.lifecycle("Build locked to Minecraft account(s): ${lockIds.join(', ')}")
+        }
 
         if (watermarkOn) {
             def label = gcTesterLabel.get().replaceAll('[^A-Za-z0-9._ -]', '_')
             def ledger = gcLedgerFile.asFile
-            if (!ledger.exists()) ledger.text = 'timestamp,build_id,tester,jar\n'
+            if (!ledger.exists()) ledger.text = gcLedgerHeader + '\n'
+            def ledgerLines = ledger.readLines()
+            if (!ledgerLines.isEmpty() && ledgerLines[0] != gcLedgerHeader) {
+                ledgerLines[0] = gcLedgerHeader
+                ledger.text = ledgerLines.join('\n') + '\n'
+            }
+            def expiryText = expiresAt.isEmpty() ? '' : java.time.Instant.ofEpochMilli(Long.parseLong(expiresAt)).toString()
             def jarName = "gc-${project.name}-${project.version}.jar"
-            ledger << "${java.time.OffsetDateTime.now()},${buildId},${label},${jarName}\n"
+            ledger << "${java.time.OffsetDateTime.now()},${buildId},${label},${jarName},${lockIds.join(' ')},${expiryText}\n"
             logger.lifecycle("Watermark build ID ${buildId} for tester '${label}' (logged to build-ledger.csv)")
         } else {
             logger.lifecycle('Watermark disabled for this build')

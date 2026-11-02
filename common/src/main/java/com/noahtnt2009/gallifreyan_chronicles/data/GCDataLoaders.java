@@ -1,6 +1,6 @@
 package com.noahtnt2009.gallifreyan_chronicles.data;
 
-import com.noahtnt2009.gallifreyan_chronicles.client.sky.data.DimensionSkyLoader;
+import com.noahtnt2009.gallifreyan_chronicles.sky.DimensionSkyLoader;
 import com.noahtnt2009.gallifreyan_chronicles.tardis.console.TardisConsoleLoader;
 import com.noahtnt2009.gallifreyan_chronicles.tardis.console.TardisConsoleVariantLoader;
 import com.noahtnt2009.gallifreyan_chronicles.tardis.door.TardisDoorVariantLoader;

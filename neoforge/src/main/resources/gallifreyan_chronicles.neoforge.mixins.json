@@ -4,9 +4,7 @@
   "package": "com.noahtnt2009.gallifreyan_chronicles.mixin",
   "compatibilityLevel": "JAVA_25",
   "client": [
-    "LogoRendererMixin",
-    "SkyRendererInvoker",
-    "client.SkyRendererMixin"
+    "LogoRendererMixin"
   ],
   "server": [],
   "injectors": {

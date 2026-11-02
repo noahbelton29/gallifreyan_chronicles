@@ -1,7 +1,7 @@
 package com.noahtnt2009.gallifreyan_chronicles.network;
 
-import com.noahtnt2009.gallifreyan_chronicles.client.sky.data.DimensionSky;
-import com.noahtnt2009.gallifreyan_chronicles.client.sky.data.DimensionSkyRegistry;
+import com.noahtnt2009.gallifreyan_chronicles.sky.DimensionSky;
+import com.noahtnt2009.gallifreyan_chronicles.sky.DimensionSkyRegistry;
 import com.noahtnt2009.gallifreyan_chronicles.util.GCUtils;
 import com.noahtnt2009.gallifreyan_chronicles.client.GCClientHooks;
 import net.minecraft.network.FriendlyByteBuf;

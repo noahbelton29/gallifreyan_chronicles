@@ -1,5 +1,6 @@
 package com.noahtnt2009.gallifreyan_chronicles.client.camera;
 
+import com.noahtnt2009.gallifreyan_chronicles.config.GCConfig;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.world.phys.Vec3;
@@ -107,6 +108,14 @@ public final class GCCameraShake {
     }
 
     public static @Nullable Sample current() {
+        float intensity = (float) GCConfig.cameraShakeIntensity();
+        if (intensity <= 0.0F) return null;
+        Sample combined = combined();
+        if (combined == null || intensity >= 1.0F) return combined;
+        return new Sample(combined.pitch() * intensity, combined.yaw() * intensity, combined.roll() * intensity);
+    }
+
+    private static @Nullable Sample combined() {
         Sample drum = drumSample();
         Sample rumble = rumbleSample();
         if (drum == null) return rumble;

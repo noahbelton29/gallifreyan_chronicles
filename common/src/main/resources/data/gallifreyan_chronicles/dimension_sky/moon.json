@@ -1,4 +1,28 @@
 {
   "dimension": "gallifreyan_chronicles:moon",
-  "render_dark_disc": false
+  "sky_color": "#000000",
+  "shader_dimension": "the_end",
+  "stars": {
+    "count": 4000,
+    "min_size": 0.15,
+    "max_size": 0.35,
+    "fades_in_rain": false
+  },
+  "bodies": [
+    {
+      "texture": "minecraft:textures/environment/celestial/sun.png",
+      "yaw": 120.0,
+      "pitch": 35.0,
+      "size": 24.0,
+      "blend": "additive",
+      "fades_in_rain": false
+    },
+    {
+      "texture": "gallifreyan_chronicles:textures/environment/earth.png",
+      "yaw": 210.0,
+      "pitch": 30.0,
+      "size": 32.0,
+      "fades_in_rain": false
+    }
+  ]
 }

@@ -23,7 +23,8 @@ public class TardisManager extends SavedData {
                          Optional<BlockPos> consoleBlockPos, Optional<BlockPos> exteriorBlockPos,
                          Optional<BlockPos> interiorOrigin, Optional<Identifier> exteriorDimension,
                          Optional<String> interiorId, Optional<LandingTarget> landingTarget,
-                         Optional<Integer> coordIncrement, Optional<Boolean> coordIncrementNegative) {
+                         Optional<Integer> coordIncrement, Optional<Boolean> coordIncrementNegative,
+                         Optional<List<UUID>> trusted) {
     }
 
     private static final Codec<Entry> ENTRY_CODEC = RecordCodecBuilder.create(inst -> inst.group(
@@ -36,7 +37,8 @@ public class TardisManager extends SavedData {
             Codec.STRING.optionalFieldOf("interior_id").forGetter(Entry::interiorId),
             LandingTarget.CODEC.optionalFieldOf("landing_target").forGetter(Entry::landingTarget),
             Codec.INT.optionalFieldOf("coord_increment").forGetter(Entry::coordIncrement),
-            Codec.BOOL.optionalFieldOf("coord_increment_negative").forGetter(Entry::coordIncrementNegative)
+            Codec.BOOL.optionalFieldOf("coord_increment_negative").forGetter(Entry::coordIncrementNegative),
+            TardisComponent.UUID_CODEC.listOf().optionalFieldOf("trusted").forGetter(Entry::trusted)
     ).apply(inst, Entry::new));
 
     public static final Codec<TardisManager> CODEC = RecordCodecBuilder.create(inst -> inst.group(
@@ -54,7 +56,10 @@ public class TardisManager extends SavedData {
                             Optional.ofNullable(manager.interiorIdById.get(id)),
                             Optional.ofNullable(manager.landingTargetById.get(id)),
                             Optional.ofNullable(manager.coordIncrementById.get(id)),
-                            manager.negativeIncrements.contains(id) ? Optional.of(true) : Optional.empty()
+                            manager.negativeIncrements.contains(id) ? Optional.of(true) : Optional.empty(),
+                            manager.trustedById.containsKey(id)
+                                    ? Optional.of(List.copyOf(manager.trustedById.get(id)))
+                                    : Optional.empty()
                     ));
                 }
                 return entries;
@@ -79,6 +84,7 @@ public class TardisManager extends SavedData {
             entry.landingTarget().ifPresent(target -> manager.landingTargetById.put(id, target));
             entry.coordIncrement().ifPresent(index -> manager.coordIncrementById.put(id, index));
             if (entry.coordIncrementNegative().orElse(false)) manager.negativeIncrements.add(id);
+            entry.trusted().ifPresent(players -> manager.trustedById.put(id, new HashSet<>(players)));
         }
         return manager;
     }));
@@ -101,6 +107,7 @@ public class TardisManager extends SavedData {
     private final Map<UUID, LandingTarget> landingTargetById = new HashMap<>();
     private final Map<UUID, Integer> coordIncrementById = new HashMap<>();
     private final Set<UUID> negativeIncrements = new HashSet<>();
+    private final Map<UUID, Set<UUID>> trustedById = new HashMap<>();
 
     public Optional<TardisComponent> get(UUID tardisId) {
         if (tardisId == null) {
@@ -137,6 +144,19 @@ public class TardisManager extends SavedData {
         setDirty();
     }
 
+    public boolean isTrusted(UUID tardisId, UUID playerId) {
+        return trustedById.getOrDefault(tardisId, Set.of()).contains(playerId);
+    }
+
+    public boolean setTrusted(UUID tardisId, UUID playerId, boolean trusted) {
+        if (!byTardisId.containsKey(tardisId)) return false;
+        Set<UUID> players = trustedById.computeIfAbsent(tardisId, ignored -> new HashSet<>());
+        boolean changed = trusted ? players.add(playerId) : players.remove(playerId);
+        if (players.isEmpty()) trustedById.remove(tardisId);
+        if (changed) setDirty();
+        return changed;
+    }
+
     public void remove(UUID tardisId) {
         TardisComponent component = byTardisId.remove(tardisId);
         if (component != null) {
@@ -152,6 +172,7 @@ public class TardisManager extends SavedData {
         landingTargetById.remove(tardisId);
         coordIncrementById.remove(tardisId);
         negativeIncrements.remove(tardisId);
+        trustedById.remove(tardisId);
         setDirty();
     }
 

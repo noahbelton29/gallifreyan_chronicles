@@ -28,6 +28,7 @@ import com.noahtnt2009.gallifreyan_chronicles.tardis.console.control.ConsoleCont
 import com.noahtnt2009.gallifreyan_chronicles.tardis.console.control.ConsoleControlManager;
 import com.noahtnt2009.gallifreyan_chronicles.tardis.console.TardisConsole;
 import com.noahtnt2009.gallifreyan_chronicles.tardis.control.ControlSpec;
+import com.noahtnt2009.gallifreyan_chronicles.tardis.control.TardisControl;
 import com.noahtnt2009.gallifreyan_chronicles.tardis.control.TardisControlRegistry;
 import com.noahtnt2009.gallifreyan_chronicles.tardis.ecs.TardisComponentTypes;
 import com.noahtnt2009.gallifreyan_chronicles.tardis.ecs.TardisLinkable;
@@ -66,6 +67,7 @@ public class TardisConsoleBlockEntity extends BlockEntity implements GeoBlockEnt
     private final ConsoleControllers controllers = new ConsoleControllers();
     private final AnimatableInstanceCache cache = GeckoLibUtil.createInstanceCache(this);
     private final ComponentStore components = new ComponentStore();
+    private final Entity ecsEntity = Entity.of(this, this::sync);
 
     private final ConsoleAnimationDriver animationDriver;
     private final ConsoleControlManager controls;
@@ -108,10 +110,9 @@ public class TardisConsoleBlockEntity extends BlockEntity implements GeoBlockEnt
             Boolean applied = clientAppliedStates.get(controlId);
             if (applied != null && applied == state) continue;
             clientAppliedStates.put(controlId, state);
-            if (applied == null && !state && !TardisControlRegistry.get(controlId).snapsWhenInactive()) continue;
+            if (applied == null && !state && !controlSnapsWhenInactive(controlId)) continue;
 
-            if (!isControlAnimated(controlId)) continue;
-            String animation = TardisControlRegistry.get(controlId).getAnimation(state);
+            String animation = resolveControlAnimation(controlId, state);
             if (animation == null || !hasAnimation(controlId, animation)) continue;
 
             controllers.requestSnap(controlId);
@@ -133,10 +134,9 @@ public class TardisConsoleBlockEntity extends BlockEntity implements GeoBlockEnt
         if ("rotor".equals(controllerName)) {
             this.currentRotorState = animationName;
         } else {
-            var control = TardisControlRegistry.get(controllerName);
-            if (animationName.equals(control.getAnimation(true))) {
+            if (animationName.equals(resolveControlAnimation(controllerName, true))) {
                 clientAppliedStates.put(controllerName, true);
-            } else if (animationName.equals(control.getAnimation(false))) {
+            } else if (animationName.equals(resolveControlAnimation(controllerName, false))) {
                 clientAppliedStates.put(controllerName, false);
             }
         }
@@ -153,9 +153,18 @@ public class TardisConsoleBlockEntity extends BlockEntity implements GeoBlockEnt
     }
 
     @Override
-    public boolean isControlAnimated(String controlId) {
+    public @Nullable String resolveControlAnimation(String controlId, boolean activated) {
+        TardisControl control = TardisControlRegistry.get(controlId);
+        String fallback = control.getAnimation(activated);
         TardisConsole.ControlEntry entry = findControlEntry(controlId);
-        return entry == null || entry.animated();
+        return entry == null ? fallback : entry.animation().animationFor(activated, fallback);
+    }
+
+    @Override
+    public boolean controlSnapsWhenInactive(String controlId) {
+        boolean fallback = TardisControlRegistry.get(controlId).snapsWhenInactive();
+        TardisConsole.ControlEntry entry = findControlEntry(controlId);
+        return entry == null ? fallback : entry.animation().snapsWhenInactive(fallback);
     }
 
     private TardisConsole.@Nullable ControlEntry findControlEntry(String controlId) {
@@ -216,7 +225,7 @@ public class TardisConsoleBlockEntity extends BlockEntity implements GeoBlockEnt
     }
 
     public Entity asEntity() {
-        return Entity.of(this, this::sync);
+        return ecsEntity;
     }
 
     public List<TardisControlEntity> getControlEntities() {

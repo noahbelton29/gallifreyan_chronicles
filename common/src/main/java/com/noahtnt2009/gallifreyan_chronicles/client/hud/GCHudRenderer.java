@@ -1,5 +1,6 @@
 package com.noahtnt2009.gallifreyan_chronicles.client.hud;
 
+import com.noahtnt2009.gallifreyan_chronicles.client.security.BuildExpiryOverlay;
 import com.noahtnt2009.gallifreyan_chronicles.config.GCConfig;
 import com.noahtnt2009.gallifreyan_chronicles.platform.Services;
 import net.minecraft.client.Minecraft;
@@ -48,6 +49,7 @@ public final class GCHudRenderer {
 
     public static void render(GuiGraphicsExtractor graphics) {
         GCPowerDarkness.render(graphics);
+        BuildExpiryOverlay.render(graphics);
         if (!GCConfig.showVersionHud()) return;
 
         Minecraft minecraft = Minecraft.getInstance();

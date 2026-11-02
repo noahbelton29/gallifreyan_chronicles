@@ -1,5 +1,7 @@
 package com.noahtnt2009.gallifreyan_chronicles.init;
 
+import net.minecraft.core.HolderSet;
+
 import com.mojang.datafixers.util.Pair;
 import com.noahtnt2009.gallifreyan_chronicles.util.GCUtils;
 import com.noahtnt2009.gallifreyan_chronicles.world.biome.GCMaterialRules;
@@ -109,17 +111,17 @@ public class GCDimensions {
                 CardinalLighting.Type.DEFAULT,
                 EnvironmentAttributeMap.builder()
                         .set(EnvironmentAttributes.STAR_BRIGHTNESS, 1.0f)
-                        .set(EnvironmentAttributes.SKY_COLOR, rgb(0xFF6600))
+                        .set(EnvironmentAttributes.SKY_COLOR, rgb(0x000000))
+                        .set(EnvironmentAttributes.FOG_COLOR, rgb(0x000000))
                         .set(EnvironmentAttributes.SKY_LIGHT_COLOR, rgb(0xCCCCCC))
-                        .set(EnvironmentAttributes.SUNRISE_SUNSET_COLOR, ARGB.vector4fFromARGB32(0xFFCCCCCC))
-                        .set(EnvironmentAttributes.CLOUD_COLOR, ARGB.vector4fFromARGB32(0xFFCCCCCC))
-                        .set(EnvironmentAttributes.CLOUD_HEIGHT, 192.0f)
+                        .set(EnvironmentAttributes.SUNRISE_SUNSET_COLOR, ARGB.vector4fFromARGB32(0x00000000))
+                        .set(EnvironmentAttributes.CLOUD_COLOR, ARGB.vector4fFromARGB32(0x00000000))
                         .set(EnvironmentAttributes.BACKGROUND_MUSIC, BackgroundMusic.OVERWORLD)
                         .set(EnvironmentAttributes.AMBIENT_SOUNDS, AmbientSounds.LEGACY_CAVE_SETTINGS)
                         .set(EnvironmentAttributes.AMBIENT_LIGHT_COLOR, rgb(0xCCCCCC))
                         .build(),
-                timelines.getOrThrow(TimelineTags.IN_OVERWORLD),
-                Optional.of(clocks.getOrThrow(WorldClocks.OVERWORLD))));
+                HolderSet.empty(),
+                Optional.empty()));
     }
 
     public static void bootstrapNoise(BootstrapContext<NoiseGeneratorSettings> context) {

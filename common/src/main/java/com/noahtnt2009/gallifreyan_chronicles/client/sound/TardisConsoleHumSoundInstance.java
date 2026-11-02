@@ -1,5 +1,6 @@
 package com.noahtnt2009.gallifreyan_chronicles.client.sound;
 
+import com.noahtnt2009.gallifreyan_chronicles.config.GCConfig;
 import com.noahtnt2009.gallifreyan_chronicles.init.GCSounds;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.player.LocalPlayer;
@@ -76,7 +77,7 @@ public class TardisConsoleHumSoundInstance extends AbstractTickableSoundInstance
             float attenuation = (float) (1.0 - distance / HEARING_RANGE);
             this.volume = IN_RANGE_VOLUME * attenuation;
         }
-        this.volume *= fade;
+        this.volume *= fade * (float) GCConfig.tardisHumVolume();
     }
 
     @Override

@@ -85,13 +85,16 @@ public class TardisExteriorBlockEntity extends BlockEntity implements GeoBlockEn
     private AnimationController<TardisExteriorBlockEntity> controller;
     private boolean locked = true;
     private static final int POWER_CHECK_INTERVAL_TICKS = 10;
+    private static final int ENTRY_ZONE_INTERVAL_TICKS = 2;
     private boolean powered = true;
+    private final int tickOffset;
     private final ExteriorFlight flight = new ExteriorFlight();
     private final HeldKey heldKey = new HeldKey();
     private final CloakFade cloak = new CloakFade();
     private static final float KEY_REVEAL_OPACITY = 0.2f;
     private final FadingValue keyReveal = new FadingValue(0.5f, 0.0f);
     private final ComponentStore components = new ComponentStore();
+    private final Entity ecsEntity = Entity.of(this, this::sync);
     private AnimatableInstanceCache cache = GeckoLibUtil.createInstanceCache(this);
     private boolean needsStateSync = false;
     private TardisKeyEntity keyEntity = null;
@@ -132,6 +135,7 @@ public class TardisExteriorBlockEntity extends BlockEntity implements GeoBlockEn
 
     public TardisExteriorBlockEntity(BlockPos pos, BlockState state) {
         super(TYPE.get(), pos, state);
+        this.tickOffset = Math.floorMod(pos.hashCode(), POWER_CHECK_INTERVAL_TICKS);
     }
 
     public void insertKey(Player player, InteractionHand hand, ItemStack held) {
@@ -253,7 +257,7 @@ public class TardisExteriorBlockEntity extends BlockEntity implements GeoBlockEn
     }
 
     public Entity asEntity() {
-        return Entity.of(this, this::sync);
+        return ecsEntity;
     }
 
     @Override
@@ -453,20 +457,29 @@ public class TardisExteriorBlockEntity extends BlockEntity implements GeoBlockEn
         if (level.isClientSide()) return;
         blockEntity.refreshFadeType();
         blockEntity.tickLanding(level);
+        if ((level.getGameTime() + blockEntity.tickOffset) % POWER_CHECK_INTERVAL_TICKS == 0) {
+            blockEntity.refreshPowerAndGlow(level);
+        }
+        if ((level.getGameTime() + blockEntity.tickOffset) % ENTRY_ZONE_INTERVAL_TICKS == 0) {
+            TardisInteriorSystem.tickEntryZone(level, blockEntity);
+        }
+        if (level instanceof ServerLevel serverLevel) {
+            float lockHealth = SubsystemSystem.healthOf(blockEntity.asEntity(), TardisSubsystem.DOOR_LOCK);
+            if (lockHealth < SubsystemSystem.SMOKE_THRESHOLD) {
+                LockDamageEffects.tick(serverLevel, blockEntity.getKeyWorldPos(), lockHealth);
+            }
+            blockEntity.tickTakeoffWind(serverLevel);
+        }
+    }
+
+    private void refreshPowerAndGlow(Level level) {
+        powered = TardisApi.of(this).flatMap(Tardis::livePower).orElse(powered);
         MinecraftServer server = level.getServer();
         boolean daylightAffectsGlow = server == null
                 || server.getGameRules().get(GCGameRules.DAYLIGHT_CYCLE_AFFECTS_GLOW);
-        if (level.getGameTime() % POWER_CHECK_INTERVAL_TICKS == 0) {
-            blockEntity.powered = TardisApi.of(blockEntity).map(Tardis::hasPower).orElse(true);
-        }
-        if (GlowSystem.tick(blockEntity.asEntity(), level.getDefaultClockTime(), daylightAffectsGlow, blockEntity.powered)) {
-            blockEntity.applyGlowToBlockState(blockEntity.isGlowing());
-            blockEntity.sync();
-        }
-        TardisInteriorSystem.tickEntryZone(level, blockEntity);
-        if (level instanceof ServerLevel serverLevel) {
-            LockDamageEffects.tick(serverLevel, blockEntity.getKeyWorldPos(), SubsystemSystem.healthOf(blockEntity.asEntity(), TardisSubsystem.DOOR_LOCK));
-            blockEntity.tickTakeoffWind(serverLevel);
+        if (GlowSystem.tick(asEntity(), level.getDefaultClockTime(), daylightAffectsGlow, powered)) {
+            applyGlowToBlockState(isGlowing());
+            sync();
         }
     }
 
@@ -587,6 +600,7 @@ public class TardisExteriorBlockEntity extends BlockEntity implements GeoBlockEn
         super.saveAdditional(output);
         components.save(output, TardisComponentTypes.ALL);
         heldKey.save(output);
+        output.putBoolean("Powered", powered);
         output.putBoolean("Locked", locked);
         flight.save(output);
         cloak.save(output);
@@ -597,6 +611,7 @@ public class TardisExteriorBlockEntity extends BlockEntity implements GeoBlockEn
         super.loadAdditional(input);
         components.load(input, TardisComponentTypes.ALL);
         heldKey.load(input);
+        powered = input.getBooleanOr("Powered", true);
         locked = input.getBooleanOr("Locked", true);
         flight.load(input);
         cloak.load(input);

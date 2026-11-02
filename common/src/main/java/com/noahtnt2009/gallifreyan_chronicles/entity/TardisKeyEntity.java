@@ -58,10 +58,12 @@ public class TardisKeyEntity extends Entity {
         return create(level, exteriorPos, worldPos, Vec3.ZERO);
     }
 
+    private static final int KEY_SYNC_INTERVAL_TICKS = 10;
+
     @Override
     public void tick() {
         super.tick();
-        if (this.level().isClientSide()) {
+        if (this.level().isClientSide() || this.tickCount % KEY_SYNC_INTERVAL_TICKS != 0) {
             return;
         }
         if (!(this.level().getBlockEntity(this.getExteriorPos()) instanceof TardisExteriorBlockEntity exterior)) {

@@ -59,6 +59,10 @@ public class TardisControlEntity extends Entity {
         this.setInvisible(true);
     }
 
+    @Override
+    public void tick() {
+    }
+
     public static TardisControlEntity create(Level level, BlockPos consolePos, String controlId, Vec3 worldPos) {
         TardisControlEntity entity = new TardisControlEntity(TYPE.get(), level);
         entity.setConsolePos(consolePos);

@@ -32,6 +32,8 @@ import net.minecraft.world.phys.Vec3;
 import org.jspecify.annotations.Nullable;
 
 import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
@@ -94,21 +96,30 @@ public final class TardisInteriorSystem {
                 && dy >= ZONE_BOTTOM && dy <= ZONE_TOP;
     }
 
+    private static final int EXIT_CHECK_INTERVAL_TICKS = 4;
+    private static final Map<Identifier, Optional<UUID>> DIMENSION_TARDIS_IDS = new ConcurrentHashMap<>();
+
+    private static Optional<UUID> parseTardisId(Identifier dimension) {
+        if (!dimension.getNamespace().equals(Constants.MOD_ID)) return Optional.empty();
+        String path = dimension.getPath();
+        if (!path.startsWith(INTERIOR_PREFIX)) return Optional.empty();
+        try {
+            return Optional.of(UUID.fromString(path.substring(INTERIOR_PREFIX.length())));
+        } catch (IllegalArgumentException e) {
+            return Optional.empty();
+        }
+    }
+
     public static void tickExitZones(MinecraftServer server) {
+        if (server.getTickCount() % EXIT_CHECK_INTERVAL_TICKS != 0) return;
+
         for (ServerPlayer player : List.copyOf(server.getPlayerList().getPlayers())) {
-            Identifier dimension = player.level().dimension().identifier();
-            if (!dimension.getNamespace().equals(Constants.MOD_ID)) continue;
-            String path = dimension.getPath();
-            if (!path.startsWith(INTERIOR_PREFIX)) continue;
+            Optional<UUID> interiorId = DIMENSION_TARDIS_IDS.computeIfAbsent(
+                    player.level().dimension().identifier(), TardisInteriorSystem::parseTardisId);
+            if (interiorId.isEmpty()) continue;
             if (player.isSpectator()) continue;
 
-            UUID tardisId;
-            try {
-                tardisId = UUID.fromString(path.substring(INTERIOR_PREFIX.length()));
-            } catch (IllegalArgumentException e) {
-                continue;
-            }
-
+            UUID tardisId = interiorId.get();
             AABB exitBox = getInteriorDefinition(server, tardisId).exitBox();
             double dx = player.getX() - ORIGIN.getX();
             double dy = player.getY() - ORIGIN.getY();

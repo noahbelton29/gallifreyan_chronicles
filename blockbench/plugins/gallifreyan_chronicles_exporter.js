@@ -6,7 +6,7 @@
     author: 'noahbelton29',
     icon: 'crop_free',
     description: '',
-    version: '1.0.0',
+    version: '1.1.0',
     variant: 'both',
     onload() {
       action = new Action('gc_export', {
@@ -34,7 +34,7 @@
       buttons: ['Export Console', 'Export Exterior', 'Cancel'],
       lines: [
         '<p>Choose what to export:</p>',
-        '<p><b>Console</b> - exports control hitboxes from the "hitboxes" bone.</p>',
+        '<p><b>Console</b> - exports control hitboxes from the "hitboxes" bone as position and size.</p>',
         '<p><b>Exterior</b> - exports the key offset from "key_to_render".</p>'
       ],
       form: {
@@ -165,18 +165,21 @@
     const worldCenter = getWorldCenterOf(cube);
     const worldBottomY = worldCenter[1] - (Math.abs(to[1] - from[1]) / 2);
 
-    const offset = {
-      x: round4((worldCenter[0] - centerRef[0]) / 16),
-      y: round4((worldBottomY - centerRef[1]) / 16),
-      z: round4((worldCenter[2] - centerRef[2]) / 16)
-    };
-
     return {
-      width: round4(size[0]),
-      height: round4(size[1]),
-      depth: round4(size[2]),
-      offset: offset
+      position: [
+        round4((worldCenter[0] - centerRef[0]) / 16),
+        round4((worldBottomY - centerRef[1]) / 16),
+        round4((worldCenter[2] - centerRef[2]) / 16)
+      ],
+      size: [round4(size[0]), round4(size[1]), round4(size[2])]
     };
+  }
+
+  function stringifyCompact(value) {
+    return JSON.stringify(value, null, 2).replace(
+        /\[\s+(-?[\d.eE+-]+(?:,\s+-?[\d.eE+-]+)*)\s+\]/g,
+        (match, inner) => '[' + inner.replace(/,\s+/g, ', ') + ']'
+    );
   }
 
   function idFromName(name) {
@@ -217,11 +220,9 @@
       const bounds = getCubeBounds(targetCube, centerRef);
 
       controls.push({
-        depth: bounds.depth,
         id: idFromName(el.name),
-        offset: bounds.offset,
-        width: bounds.width,
-        height: bounds.height
+        position: bounds.position,
+        size: bounds.size
       });
     });
 
@@ -229,7 +230,7 @@
 
     const modelId = getModelId();
     const output = { id: getFullId(idOverride), controls: controls };
-    const json = JSON.stringify(output, null, 2);
+    const json = stringifyCompact(output);
 
     Blockbench.export({
       type: 'JSON',
@@ -302,7 +303,7 @@
       key_offset: keyOffset
     };
 
-    const json = JSON.stringify(output, null, 2);
+    const json = stringifyCompact(output);
 
     Blockbench.export({
       type: 'JSON',

@@ -1,6 +1,7 @@
 package com.noahtnt2009.gallifreyan_chronicles.client.hud;
 
 import com.noahtnt2009.gallifreyan_chronicles.block.entity.TardisConsoleBlockEntity;
+import com.noahtnt2009.gallifreyan_chronicles.config.GCConfig;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.world.level.Level;
@@ -68,14 +69,15 @@ public final class GCPowerDarkness {
             darkness = target;
         }
 
-        return darkness;
+        return darkness * (float) GCConfig.powerDarknessStrength();
     }
 
     public static void render(GuiGraphicsExtractor graphics) {
         Minecraft minecraft = Minecraft.getInstance();
-        if (update() <= 0.0F) return;
+        float level = update();
+        if (level <= 0.0F) return;
         float maxAlpha = ShaderPackDetector.isShaderPackInUse() ? SHADER_MAX_ALPHA : MAX_ALPHA;
-        int alpha = (int) (darkness * maxAlpha * 255.0F);
+        int alpha = (int) (level * maxAlpha * 255.0F);
         graphics.fill(0, 0, minecraft.getWindow().getGuiScaledWidth(), minecraft.getWindow().getGuiScaledHeight(), alpha << 24);
     }
 }

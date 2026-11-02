@@ -8,7 +8,8 @@ import com.noahtnt2009.gallifreyan_chronicles.network.ResumeSoundPayload;
 import com.noahtnt2009.gallifreyan_chronicles.block.entity.TardisConsoleBlockEntity;
 import com.noahtnt2009.gallifreyan_chronicles.client.camera.GCCameraShake;
 import com.noahtnt2009.gallifreyan_chronicles.client.hud.GCPowerDarkness;
-import com.noahtnt2009.gallifreyan_chronicles.client.sound.TardisConsoleHumSoundInstance;
+import com.noahtnt2009.gallifreyan_chronicles.client.security.BuildExpiry;
+import com.noahtnt2009.gallifreyan_chronicles.client.sound.ConsoleHumSounds;
 import net.minecraft.client.Minecraft;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.Level;
@@ -52,16 +53,17 @@ public final class GCClientHooks {
         GCCameraShake.trigger(origin, strength);
     }
 
+    public static void clientTick() {
+        Minecraft minecraft = Minecraft.getInstance();
+        BuildExpiry.tick(minecraft);
+        ConsoleHumSounds.tick();
+    }
+
     public static void startConsoleClientEffects(TardisConsoleBlockEntity be) {
         BlockPos pos = be.getBlockPos();
         GCPowerDarkness.track(be);
 
-        Minecraft.getInstance().execute(() -> Minecraft.getInstance().getSoundManager().play(
-                new TardisConsoleHumSoundInstance(pos,
-                        () -> !be.isRemoved() && be.getLevel() != null && be.getLevel().isClientSide(),
-                        be::hasPower,
-                        be::isPowerKnown)
-        ));
+        ConsoleHumSounds.track(be);
 
         Vec3 center = Vec3.atCenterOf(pos);
         GCCameraShake.addFlightSource(new GCCameraShake.FlightSource() {

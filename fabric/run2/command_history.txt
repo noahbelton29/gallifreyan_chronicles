@@ -1,1 +1,2 @@
 /gamemode survival
+/gc tardis f4b823f0-e1cf-4aa0-826a-412b38ee8b00 exterior set gallifreyan_chronicles:second_doctors_exterior

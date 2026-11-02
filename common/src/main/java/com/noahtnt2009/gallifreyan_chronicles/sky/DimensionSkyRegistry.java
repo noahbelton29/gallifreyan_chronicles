@@ -1,4 +1,4 @@
-package com.noahtnt2009.gallifreyan_chronicles.client.sky.data;
+package com.noahtnt2009.gallifreyan_chronicles.sky;
 
 import com.noahtnt2009.gallifreyan_chronicles.data.GCJsonDataRegistry;
 import net.minecraft.resources.Identifier;

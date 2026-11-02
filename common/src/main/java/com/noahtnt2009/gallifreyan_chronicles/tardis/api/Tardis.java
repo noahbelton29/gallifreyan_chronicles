@@ -111,6 +111,15 @@ public final class Tardis {
                 : Optional.empty();
     }
 
+    public Optional<TardisExteriorBlockEntity> exteriorIfLoaded() {
+        Optional<BlockPos> pos = exteriorPos();
+        Optional<ServerLevel> level = exteriorLevel();
+        if (pos.isEmpty() || level.isEmpty() || !level.get().hasChunkAt(pos.get())) return Optional.empty();
+        return level.get().getBlockEntity(pos.get()) instanceof TardisExteriorBlockEntity exterior
+                ? Optional.of(exterior)
+                : Optional.empty();
+    }
+
     public Optional<BlockPos> consolePos() {
         return Optional.ofNullable(data().getConsoleBlockPos(id));
     }
@@ -120,8 +129,8 @@ public final class Tardis {
     }
 
     public Optional<TardisConsoleBlockEntity> console() {
-        List<TardisConsoleBlockEntity> live = consoles();
-        if (!live.isEmpty()) return Optional.of(live.getFirst());
+        TardisConsoleBlockEntity live = ConsoleSyncSystem.firstLiveOf(id);
+        if (live != null) return Optional.of(live);
 
         Optional<ServerLevel> interior = interiorLevel();
         Optional<BlockPos> pos = consolePos();
@@ -187,6 +196,11 @@ public final class Tardis {
         return true;
     }
 
+    public Optional<Boolean> livePower() {
+        TardisConsoleBlockEntity live = ConsoleSyncSystem.firstLiveOf(id);
+        return live == null ? Optional.empty() : Optional.of(live.hasPower());
+    }
+
     public boolean hasPower() {
         return console().map(TardisConsoleBlockEntity::hasPower).orElse(true);
     }
@@ -243,7 +257,19 @@ public final class Tardis {
     }
 
     public boolean canUseControls(Player player) {
-        return !isIsomorphicActive() || isOwner(player);
+        return !isIsomorphicActive() || isOwner(player) || isTrusted(player.getUUID());
+    }
+
+    public boolean isTrusted(UUID playerId) {
+        return data().isTrusted(id, playerId);
+    }
+
+    public boolean trust(UUID playerId) {
+        return data().setTrusted(id, playerId, true);
+    }
+
+    public boolean untrust(UUID playerId) {
+        return data().setTrusted(id, playerId, false);
     }
 
     public boolean returnKeyTo(Player player) {

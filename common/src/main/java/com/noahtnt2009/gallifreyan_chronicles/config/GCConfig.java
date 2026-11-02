@@ -21,6 +21,10 @@ public final class GCConfig {
         String default_console = BUILT_IN_CONSOLE;
         String default_interior = BUILT_IN_INTERIOR;
         boolean show_version_hud = true;
+        double tardis_hum_volume = 1.0;
+        double camera_shake_intensity = 1.0;
+        double power_darkness_strength = 1.0;
+        String star_density = "normal";
     }
 
     private static Data data = new Data();
@@ -46,6 +50,10 @@ public final class GCConfig {
         if (isBlank(data.default_exterior)) data.default_exterior = BUILT_IN_EXTERIOR;
         if (isBlank(data.default_console)) data.default_console = BUILT_IN_CONSOLE;
         if (isBlank(data.default_interior)) data.default_interior = BUILT_IN_INTERIOR;
+        data.tardis_hum_volume = clampVolume(data.tardis_hum_volume);
+        data.camera_shake_intensity = clampVolume(data.camera_shake_intensity);
+        data.power_darkness_strength = clampVolume(data.power_darkness_strength);
+        if (isBlank(data.star_density)) data.star_density = "normal";
         save();
     }
 
@@ -89,6 +97,42 @@ public final class GCConfig {
 
     public static void setDefaultInterior(String id) {
         data.default_interior = id;
+    }
+
+    public static double tardisHumVolume() {
+        return data.tardis_hum_volume;
+    }
+
+    public static void setTardisHumVolume(double volume) {
+        data.tardis_hum_volume = clampVolume(volume);
+    }
+
+    public static double cameraShakeIntensity() {
+        return data.camera_shake_intensity;
+    }
+
+    public static void setCameraShakeIntensity(double intensity) {
+        data.camera_shake_intensity = clampVolume(intensity);
+    }
+
+    public static double powerDarknessStrength() {
+        return data.power_darkness_strength;
+    }
+
+    public static void setPowerDarknessStrength(double strength) {
+        data.power_darkness_strength = clampVolume(strength);
+    }
+
+    public static String starDensity() {
+        return data.star_density;
+    }
+
+    public static void setStarDensity(String density) {
+        data.star_density = isBlank(density) ? "normal" : density;
+    }
+
+    private static double clampVolume(double volume) {
+        return Double.isNaN(volume) ? 1.0 : Math.clamp(volume, 0.0, 1.0);
     }
 
     public static void setShowVersionHud(boolean show) {

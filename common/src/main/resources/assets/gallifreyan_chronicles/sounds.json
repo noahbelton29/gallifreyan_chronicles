@@ -142,5 +142,29 @@
         "attenuation_distance": 16
       }
     ]
+  },
+  "lever": {
+    "sounds": [
+      {
+        "name": "gallifreyan_chronicles:block_entity/tardis/control/lever",
+        "attenuation_distance": 16
+      }
+    ]
+  },
+  "cloak": {
+    "sounds": [
+      {
+        "name": "gallifreyan_chronicles:block_entity/tardis/cloak",
+        "attenuation_distance": 16
+      }
+    ]
+  },
+  "uncloak": {
+    "sounds": [
+      {
+        "name": "gallifreyan_chronicles:block_entity/tardis/uncloak",
+        "attenuation_distance": 16
+      }
+    ]
   }
 }

@@ -8,6 +8,7 @@ public class GCSounds {
     public static final SoundEvent TARDIS_DOOR_CLOSE = registerFixedRange("tardis_door_close", HEARING_RANGE);
     public static final SoundEvent SLIDER = registerFixedRange("slider_sound", HEARING_RANGE);
     public static final SoundEvent SWITCH = registerFixedRange("switch", HEARING_RANGE);
+    public static final SoundEvent LEVER = registerFixedRange("lever", HEARING_RANGE);
     public static final SoundEvent FIRST_DOCTORS_HUM = registerFixedRange("first_doctors_hum", HEARING_RANGE);
     public static final SoundEvent TARDIS_DOOR_LOCK = registerFixedRange("tardis_door_lock", HEARING_RANGE);
     public static final SoundEvent TARDIS_DOOR_UNLOCK = registerFixedRange("tardis_door_unlock", HEARING_RANGE);
@@ -16,6 +17,8 @@ public class GCSounds {
     public static final SoundEvent TARDIS_CLOISTER_BELL = registerFixedRange("cloister", HEARING_RANGE);
     public static final SoundEvent TARDIS_POWER_ON = registerFixedRange("power_on", HEARING_RANGE);
     public static final SoundEvent TARDIS_POWER_OFF = registerFixedRange("power_off", HEARING_RANGE);
+    public static final SoundEvent TARDIS_CLOAK = registerFixedRange("cloak", HEARING_RANGE);
+    public static final SoundEvent TARDIS_UNCLOAK = registerFixedRange("uncloak", HEARING_RANGE);
 
     public static final float TAKEOFF_HEARING_RANGE = 25.0F;
 

@@ -22,6 +22,10 @@ public final class ControlPower {
                 && TardisApi.of(console).map(Tardis::isTravelling).orElse(false)) {
             return false;
         }
+        if ((GCTardisControls.FLIGHT_LEVER.equals(controlId) || GCTardisControls.POWER_LEVER.equals(controlId))
+                && console.getControlState(GCTardisControls.CLOAK_CONTROL)) {
+            return false;
+        }
         return console.hasPower() || USABLE_WITHOUT_POWER.contains(controlId);
     }
 }

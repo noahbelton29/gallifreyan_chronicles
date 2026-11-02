@@ -155,6 +155,7 @@ public class TardisConsoleBlockEntity extends BlockEntity implements GeoBlockEnt
             clientAppliedStates.put(controlId, state);
             if (applied == null && !state && !TardisControlRegistry.get(controlId).snapsWhenInactive()) continue;
 
+            if (!isControlAnimated(controlId)) continue;
             String animation = TardisControlRegistry.get(controlId).getAnimation(state);
             if (animation == null) continue;
 
@@ -197,6 +198,16 @@ public class TardisConsoleBlockEntity extends BlockEntity implements GeoBlockEnt
         }
         lastGlowNanos = now;
         return glowLevel;
+    }
+
+    @Override
+    public boolean isControlAnimated(String controlId) {
+        TardisConsole model = getConsole();
+        if (model == null) return true;
+        for (TardisConsole.ControlEntry entry : model.controls()) {
+            if (entry.id().equals(controlId)) return entry.animated();
+        }
+        return true;
     }
 
     public int controlCooldownTicks(String controlId) {

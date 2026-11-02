@@ -83,6 +83,13 @@ public class TardisExteriorBlockEntity extends BlockEntity implements GeoBlockEn
     private long flightStateEndTick = 0L;
     private static final long NO_FADE_START_TICK = Long.MIN_VALUE / 4;
     private long fadeStartTick = NO_FADE_START_TICK;
+    private static final int CLOAK_FADE_TICKS = 30;
+    private boolean cloaked = false;
+    private long cloakStartTick = NO_FADE_START_TICK;
+    private static final float KEY_REVEAL_OPACITY = 0.2f;
+    private static final float KEY_REVEAL_SECONDS = 0.5f;
+    private float keyReveal = 0.0f;
+    private long keyRevealNanos = 0L;
     private long landAtTick = -1L;
     private FadeType fadeType = FadeTypes.DEFAULT;
     private int seenFadeGeneration = -1;
@@ -300,6 +307,8 @@ public class TardisExteriorBlockEntity extends BlockEntity implements GeoBlockEn
         this.locked = other.locked;
         this.inFlight = other.inFlight;
         this.fadeStartTick = other.fadeStartTick;
+        this.cloaked = other.cloaked;
+        this.cloakStartTick = other.cloakStartTick;
         this.landAtTick = other.landAtTick;
         this.flightState = other.flightState;
         this.flightStateEndTick = other.flightStateEndTick;
@@ -426,11 +435,51 @@ public class TardisExteriorBlockEntity extends BlockEntity implements GeoBlockEn
         setFadeType(FadeTypes.get(id));
     }
 
+    public boolean isCloaked() {
+        return cloaked;
+    }
+
+    public void setCloaked(boolean cloaked) {
+        if (this.cloaked == cloaked || level == null || level.isClientSide()) return;
+        long now = level.getGameTime();
+        float current = cloakOpacity(0.0f);
+        this.cloaked = cloaked;
+        float progress = cloaked ? 1.0f - current : current;
+        this.cloakStartTick = now - Math.round(progress * CLOAK_FADE_TICKS);
+        sync();
+    }
+
+    private float cloakOpacity(float partialTick) {
+        if (level == null) return cloaked ? 0.0f : 1.0f;
+        float elapsed = (level.getGameTime() - cloakStartTick) + partialTick;
+        float progress = Math.clamp(elapsed / CLOAK_FADE_TICKS, 0.0f, 1.0f);
+        return cloaked ? 1.0f - progress : progress;
+    }
+
     public boolean isFullyInvisible() {
-        return inFlight && level != null && level.getGameTime() - fadeStartTick >= fadeType.timing().fadeOutTicks();
+        if (level == null) return false;
+        return inFlight && level.getGameTime() - fadeStartTick >= fadeType.timing().fadeOutTicks();
     }
 
     public float getOpacity(float partialTick) {
+        float flight = flightOpacity(partialTick);
+        float base = Math.min(flight, cloakOpacity(partialTick));
+        if (level == null || !level.isClientSide()) return base;
+        float revealed = Math.min(flight, updateKeyReveal() * KEY_REVEAL_OPACITY);
+        return Math.max(base, revealed);
+    }
+
+    private float updateKeyReveal() {
+        long now = System.nanoTime();
+        float dt = keyRevealNanos == 0L ? 0.0f : Math.min((now - keyRevealNanos) / 1.0E9f, 0.1f);
+        keyRevealNanos = now;
+        boolean target = cloaked && com.noahtnt2009.gallifreyan_chronicles.client.renderer.CloakKeyReveal.isHoldingKeyFor(getTardisId());
+        float step = dt / KEY_REVEAL_SECONDS;
+        keyReveal = target ? Math.min(1.0f, keyReveal + step) : Math.max(0.0f, keyReveal - step);
+        return keyReveal;
+    }
+
+    private float flightOpacity(float partialTick) {
         if (level == null) return inFlight ? 0.0f : 1.0f;
 
         float elapsed = (level.getGameTime() - fadeStartTick) + partialTick;
@@ -496,6 +545,7 @@ public class TardisExteriorBlockEntity extends BlockEntity implements GeoBlockEn
     private static final float WIND_END_PROGRESS = 0.92f;
 
     private void tickTakeoffWind(ServerLevel serverLevel) {
+        if (cloaked) return;
         long now = serverLevel.getGameTime();
         float progress = Math.clamp((now - fadeStartTick) / (float) fadeDuration(), 0.0f, 1.0f);
 
@@ -728,6 +778,8 @@ public class TardisExteriorBlockEntity extends BlockEntity implements GeoBlockEn
         output.putBoolean("Locked", locked);
         output.putBoolean("InFlight", inFlight);
         output.putLong("FadeStartTick", fadeStartTick);
+        output.putBoolean("Cloaked", cloaked);
+        output.putLong("CloakStartTick", cloakStartTick);
         output.putLong("LandAtTick", landAtTick);
         output.putString("FlightState", flightState.name());
         output.putLong("FlightStateEnd", flightStateEndTick);
@@ -746,6 +798,8 @@ public class TardisExteriorBlockEntity extends BlockEntity implements GeoBlockEn
         locked = input.getBooleanOr("Locked", true);
         inFlight = input.getBooleanOr("InFlight", false);
         fadeStartTick = input.getLongOr("FadeStartTick", NO_FADE_START_TICK);
+        cloaked = input.getBooleanOr("Cloaked", false);
+        cloakStartTick = input.getLongOr("CloakStartTick", NO_FADE_START_TICK);
         landAtTick = input.getLongOr("LandAtTick", -1L);
         flightState = TardisFlightState.parse(input.getStringOr("FlightState", ""),
                 inFlight ? TardisFlightState.IN_VORTEX : TardisFlightState.IDLE);

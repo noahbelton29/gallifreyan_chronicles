@@ -23,6 +23,7 @@ public class GCTardisControls {
     public static final String DIMENSION_SELECTOR = "dimension_selector";
     public static final String ISOMORPHIC_CONTROL = "isomorphic_control";
     public static final String DIRECTION_CONTROL = "direction_control";
+    public static final String CLOAK_CONTROL = "cloak_control";
 
     public static void registerTardisControls() {
         TardisControlTypes.register(NOOP_CONTROL, NoopControl.CODEC);
@@ -38,6 +39,7 @@ public class GCTardisControls {
         control(DIMENSION_SELECTOR, DimensionSelectorControl.CODEC, new DimensionSelectorControl());
         control(ISOMORPHIC_CONTROL, IsomorphicControl.CODEC, new IsomorphicControl());
         control(DIRECTION_CONTROL, DirectionControl.CODEC, new DirectionControl());
+        control(CLOAK_CONTROL, CloakControl.CODEC, new CloakControl());
 
         verifyCodecs();
         Constants.LOG.info("Registered GC TARDIS Controls");

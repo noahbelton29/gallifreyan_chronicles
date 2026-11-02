@@ -124,6 +124,7 @@
   "config.jade.plugin_gallifreyan_chronicles.tardis_control": "TARDIS Control Icon",
   "config.jade.plugin_gallifreyan_chronicles.tardis_owner": "TARDIS Owner",
   "control.gallifreyan_chronicles.change_increment": "Change Increment",
+  "control.gallifreyan_chronicles.cloak_control": "Cloak Control",
   "control.gallifreyan_chronicles.dimension_selector": "Dimension Selector",
   "control.gallifreyan_chronicles.direction_control": "Direction Control",
   "control.gallifreyan_chronicles.door_control": "Door Control",

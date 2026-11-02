@@ -15,7 +15,7 @@ import java.util.List;
 
 public record TardisConsole(String id, List<ControlEntry> controls, String defaultVariant,
                             List<GlowGroup> glowGroups) implements IdentifiableData<TardisConsole> {
-    public record ControlEntry(String id, Vec3 offset, float width, float height, float depth, float cooldown) {
+    public record ControlEntry(String id, Vec3 offset, float width, float height, float depth, float cooldown, boolean animated) {
         public static final float DEFAULT_COOLDOWN_SECONDS = 1.5F;
 
         private static final Codec<Vec3> VEC3_CODEC = RecordCodecBuilder.create(inst -> inst.group(
@@ -30,9 +30,10 @@ public record TardisConsole(String id, List<ControlEntry> controls, String defau
                 Codec.FLOAT.optionalFieldOf("width", TardisControlEntity.DEFAULT_WIDTH).forGetter(ControlEntry::width),
                 Codec.FLOAT.optionalFieldOf("height", TardisControlEntity.DEFAULT_HEIGHT).forGetter(ControlEntry::height),
                 Codec.FLOAT.optionalFieldOf("depth").forGetter(entry -> Optional.of(entry.depth)),
-                Codec.floatRange(0.0F, Float.MAX_VALUE).optionalFieldOf("cooldown", DEFAULT_COOLDOWN_SECONDS).forGetter(ControlEntry::cooldown)
-        ).apply(inst, (id, offset, width, height, depth, cooldown) ->
-                new ControlEntry(id, offset, width, height, depth.orElse(width), cooldown)));
+                Codec.floatRange(0.0F, Float.MAX_VALUE).optionalFieldOf("cooldown", DEFAULT_COOLDOWN_SECONDS).forGetter(ControlEntry::cooldown),
+                Codec.BOOL.optionalFieldOf("animated", true).forGetter(ControlEntry::animated)
+        ).apply(inst, (id, offset, width, height, depth, cooldown, animated) ->
+                new ControlEntry(id, offset, width, height, depth.orElse(width), cooldown, animated)));
 
         public static final StreamCodec<FriendlyByteBuf, ControlEntry> STREAM_CODEC = StreamCodec.composite(
                 ByteBufCodecs.STRING_UTF8, ControlEntry::id,
@@ -43,7 +44,8 @@ public record TardisConsole(String id, List<ControlEntry> controls, String defau
                 ByteBufCodecs.FLOAT, ControlEntry::height,
                 ByteBufCodecs.FLOAT, ControlEntry::depth,
                 ByteBufCodecs.FLOAT, ControlEntry::cooldown,
-                (id, x, y, z, width, height, depth, cooldown) -> new ControlEntry(id, new Vec3(x, y, z), width, height, depth, cooldown)
+                ByteBufCodecs.BOOL, ControlEntry::animated,
+                (id, x, y, z, width, height, depth, cooldown, animated) -> new ControlEntry(id, new Vec3(x, y, z), width, height, depth, cooldown, animated)
         );
     }
 

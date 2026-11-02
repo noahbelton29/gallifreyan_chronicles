@@ -404,6 +404,31 @@
 					}
 				}
 			}
+		},
+		"cloak_control_on": {
+			"loop": "hold_on_last_frame",
+			"animation_length": 0.25,
+			"bones": {
+				"cloak_control": {
+					"rotation": {
+						"0.0": [0, 0, 0],
+						"0.25": [100, 0, 0]
+					}
+				}
+			}
+		},
+		"cloak_control_off": {
+			"loop": "hold_on_last_frame",
+			"animation_length": 0.5,
+			"bones": {
+				"cloak_control": {
+					"rotation": {
+						"0.0": [100, 0, 0],
+						"0.25": [0, 0, 0]
+					}
+				}
+			}
 		}
 	}
+}
 }

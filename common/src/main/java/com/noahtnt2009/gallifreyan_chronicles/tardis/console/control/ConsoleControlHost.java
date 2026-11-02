@@ -13,6 +13,10 @@ public interface ConsoleControlHost {
         return Direction.NORTH;
     }
 
+    default boolean isControlAnimated(String controlId) {
+        return true;
+    }
+
     default boolean isHostUpsideDown() {
         return false;
     }

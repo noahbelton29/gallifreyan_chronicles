@@ -10,7 +10,7 @@ import net.minecraft.world.entity.player.Player;
 import java.util.UUID;
 
 public class DirectionControl extends DestinationControl {
-    public static final ControlAnimations DEFAULT_ANIMATIONS = new ControlAnimations("direction_control", "direction_control", false);
+    public static final ControlAnimations DEFAULT_ANIMATIONS = new ControlAnimations("direction_control_on", "direction_control_off", false);
     public static final MapCodec<DirectionControl> CODEC = codec(DEFAULT_ANIMATIONS, DirectionControl::new);
 
     public DirectionControl() { this(DEFAULT_ANIMATIONS); }

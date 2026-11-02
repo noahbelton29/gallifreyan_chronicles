@@ -33,6 +33,18 @@
       "cooldown": 0.75
     },
     {
+      "depth": 0.0625,
+      "id": "cloak_control",
+      "offset": {
+        "x": -0.525,
+        "y": 0.6875,
+        "z": -0.5
+      },
+      "width": 0.0625,
+      "height": 0.1875,
+      "cooldown": 1.5
+    },
+    {
       "depth": 0.125,
       "id": "dimension_selector",
       "offset": {
@@ -42,7 +54,8 @@
       },
       "width": 0.1375,
       "height": 0.1625,
-      "cooldown": 0.5
+      "cooldown": 0.5,
+      "animated": false
     },
     {
       "depth": 0.125,
@@ -162,8 +175,8 @@
       },
       "width": 0.125,
       "height": 0.1875,
-      "cooldown": 0.5
+      "cooldown": 0.5,
+      "animated": false
     }
-  ]
   ]
 }

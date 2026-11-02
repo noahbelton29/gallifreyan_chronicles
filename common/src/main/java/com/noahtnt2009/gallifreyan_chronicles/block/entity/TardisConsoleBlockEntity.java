@@ -199,6 +199,20 @@ public class TardisConsoleBlockEntity extends BlockEntity implements GeoBlockEnt
         return glowLevel;
     }
 
+    public int controlCooldownTicks(String controlId) {
+        TardisConsole model = getConsole();
+        float seconds = TardisConsole.ControlEntry.DEFAULT_COOLDOWN_SECONDS;
+        if (model != null) {
+            for (TardisConsole.ControlEntry entry : model.controls()) {
+                if (entry.id().equals(controlId)) {
+                    seconds = entry.cooldown();
+                    break;
+                }
+            }
+        }
+        return Math.round(seconds * 20.0F);
+    }
+
     public boolean isPowerKnown() {
         return controlStatesLoaded;
     }

@@ -15,7 +15,9 @@ import java.util.List;
 
 public record TardisConsole(String id, List<ControlEntry> controls, String defaultVariant,
                             List<GlowGroup> glowGroups) implements IdentifiableData<TardisConsole> {
-    public record ControlEntry(String id, Vec3 offset, float width, float height, float depth) {
+    public record ControlEntry(String id, Vec3 offset, float width, float height, float depth, float cooldown) {
+        public static final float DEFAULT_COOLDOWN_SECONDS = 1.5F;
+
         private static final Codec<Vec3> VEC3_CODEC = RecordCodecBuilder.create(inst -> inst.group(
                 Codec.DOUBLE.fieldOf("x").forGetter(Vec3::x),
                 Codec.DOUBLE.fieldOf("y").forGetter(Vec3::y),
@@ -27,9 +29,10 @@ public record TardisConsole(String id, List<ControlEntry> controls, String defau
                 VEC3_CODEC.fieldOf("offset").forGetter(ControlEntry::offset),
                 Codec.FLOAT.optionalFieldOf("width", TardisControlEntity.DEFAULT_WIDTH).forGetter(ControlEntry::width),
                 Codec.FLOAT.optionalFieldOf("height", TardisControlEntity.DEFAULT_HEIGHT).forGetter(ControlEntry::height),
-                Codec.FLOAT.optionalFieldOf("depth").forGetter(entry -> Optional.of(entry.depth))
-        ).apply(inst, (id, offset, width, height, depth) ->
-                new ControlEntry(id, offset, width, height, depth.orElse(width))));
+                Codec.FLOAT.optionalFieldOf("depth").forGetter(entry -> Optional.of(entry.depth)),
+                Codec.floatRange(0.0F, Float.MAX_VALUE).optionalFieldOf("cooldown", DEFAULT_COOLDOWN_SECONDS).forGetter(ControlEntry::cooldown)
+        ).apply(inst, (id, offset, width, height, depth, cooldown) ->
+                new ControlEntry(id, offset, width, height, depth.orElse(width), cooldown)));
 
         public static final StreamCodec<FriendlyByteBuf, ControlEntry> STREAM_CODEC = StreamCodec.composite(
                 ByteBufCodecs.STRING_UTF8, ControlEntry::id,
@@ -39,7 +42,8 @@ public record TardisConsole(String id, List<ControlEntry> controls, String defau
                 ByteBufCodecs.FLOAT, ControlEntry::width,
                 ByteBufCodecs.FLOAT, ControlEntry::height,
                 ByteBufCodecs.FLOAT, ControlEntry::depth,
-                (id, x, y, z, width, height, depth) -> new ControlEntry(id, new Vec3(x, y, z), width, height, depth)
+                ByteBufCodecs.FLOAT, ControlEntry::cooldown,
+                (id, x, y, z, width, height, depth, cooldown) -> new ControlEntry(id, new Vec3(x, y, z), width, height, depth, cooldown)
         );
     }
 

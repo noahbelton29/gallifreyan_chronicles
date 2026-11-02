@@ -1,5 +1,6 @@
 package com.noahtnt2009.gallifreyan_chronicles.entity;
 
+import com.noahtnt2009.gallifreyan_chronicles.tardis.console.TardisConsole;
 import com.noahtnt2009.gallifreyan_chronicles.tardis.control.ControlPower;
 import com.noahtnt2009.gallifreyan_chronicles.Constants;
 import com.noahtnt2009.gallifreyan_chronicles.block.entity.TardisConsoleBlockEntity;
@@ -50,8 +51,7 @@ public class TardisControlEntity extends Entity {
     public static final float DEFAULT_WIDTH = .1f;
     public static final float DEFAULT_HEIGHT = 0.25f;
     public static final float DEFAULT_DEPTH = DEFAULT_WIDTH;
-    private static final long INTERACT_COOLDOWN_MS = 1500L;
-    private long lastInteractTime = 0L;
+    private long lastInteractTick = Long.MIN_VALUE;
 
     public TardisControlEntity(EntityType<? extends TardisControlEntity> type, Level level) {
         super(type, level);
@@ -97,6 +97,9 @@ public class TardisControlEntity extends Entity {
                 return false;
             }
             if (console != null && !ControlPower.canUse(console, this.getControlId())) {
+                return false;
+            }
+            if (isOnCooldown(console)) {
                 return false;
             }
             TardisControl control = TardisControlRegistry.get(this.getControlId());
@@ -211,13 +214,23 @@ public class TardisControlEntity extends Entity {
             return InteractionResult.FAIL;
         }
 
-        long now = System.currentTimeMillis();
-        if (now - this.lastInteractTime < INTERACT_COOLDOWN_MS) {
+        if (isOnCooldown(console)) {
             return InteractionResult.FAIL;
         }
-        this.lastInteractTime = now;
 
         return activate(player, hand);
+    }
+
+    private boolean isOnCooldown(@Nullable TardisConsoleBlockEntity console) {
+        long now = this.level().getGameTime();
+        int cooldown = console == null
+                ? Math.round(TardisConsole.ControlEntry.DEFAULT_COOLDOWN_SECONDS * 20.0F)
+                : console.controlCooldownTicks(this.getControlId());
+        if (this.lastInteractTick != Long.MIN_VALUE && now - this.lastInteractTick < cooldown) {
+            return true;
+        }
+        this.lastInteractTick = now;
+        return false;
     }
 
     public InteractionResult activate(@Nullable Player player, InteractionHand hand) {

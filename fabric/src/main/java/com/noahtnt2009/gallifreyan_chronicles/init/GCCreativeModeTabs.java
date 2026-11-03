@@ -21,6 +21,7 @@ public class GCCreativeModeTabs {
                         output.accept(brachackiConsole);
                         output.accept(GCItems.TARDIS_KEY);
                         output.accept(GCItems.MASTER_TARDIS_KEY);
+                        output.accept(GCBlocks.TARDIS_INTERIOR_DOOR);
                         output.accept(GCBlocks.BRACHACKI_FLOOR_BLOCK);
                         output.accept(GCBlocks.BRACHACKI_WALL_BLOCK);
                         output.accept(GCBlocks.BRACHACKI_ROUNDEL_BLOCK);
@@ -30,6 +31,15 @@ public class GCCreativeModeTabs {
                         output.accept(GCBlocks.BRACHACKI_WALL_BLOCK_2);
                         output.accept(GCBlocks.BRACHACKI_ROUNDEL_BLOCK_2);
                         output.accept(GCBlocks.BRACHACKI_HALF_ROUNDEL_BLOCK_2);
+                        output.accept(GCBlocks.BRACHACKI_WALL_BLOCK_3);
+                        output.accept(GCBlocks.BRACHACKI_ROUNDEL_BLOCK_3);
+                        output.accept(GCBlocks.BRACHACKI_HALF_ROUNDEL_BLOCK_3);
+                        output.accept(GCBlocks.BRACHACKI_TUAT_FLOOR_BLOCK);
+                        output.accept(GCBlocks.BRACHACKI_TUAT_WALL_BLOCK);
+                        output.accept(GCBlocks.BRACHACKI_TUAT_ROUNDEL_BLOCK);
+                        output.accept(GCBlocks.BRACHACKI_TUAT_HALF_ROUNDEL_BLOCK);
+                        output.accept(GCBlocks.BRACHACKI_TUAT_HEXAGONAL_ROUNDEL_BLOCK);
+                        output.accept(GCBlocks.BRACHACKI_TUAT_HALF_HEXAGONAL_ROUNDEL_BLOCK);
                         output.accept(GCBlocks.BRACHACKI_STAIRS);
                         output.accept(GCBlocks.BRACHACKI_SLAB);
                         output.accept(GCBlocks.BRACHACKI_PRESSURE_PLATE);
@@ -42,7 +52,18 @@ public class GCCreativeModeTabs {
                         output.accept(GCBlocks.BRACHACKI_WALL_2);
                         output.accept(GCBlocks.BRACHACKI_FENCE_2);
                         output.accept(GCBlocks.BRACHACKI_FENCE_GATE_2);
-                        output.accept(GCBlocks.TARDIS_INTERIOR_DOOR);
+                        output.accept(GCBlocks.BRACHACKI_STAIRS_3);
+                        output.accept(GCBlocks.BRACHACKI_SLAB_3);
+                        output.accept(GCBlocks.BRACHACKI_PRESSURE_PLATE_3);
+                        output.accept(GCBlocks.BRACHACKI_WALL_3);
+                        output.accept(GCBlocks.BRACHACKI_FENCE_3);
+                        output.accept(GCBlocks.BRACHACKI_FENCE_GATE_3);
+                        output.accept(GCBlocks.BRACHACKI_TUAT_STAIRS);
+                        output.accept(GCBlocks.BRACHACKI_TUAT_SLAB);
+                        output.accept(GCBlocks.BRACHACKI_TUAT_PRESSURE_PLATE);
+                        output.accept(GCBlocks.BRACHACKI_TUAT_WALL);
+                        output.accept(GCBlocks.BRACHACKI_TUAT_FENCE);
+                        output.accept(GCBlocks.BRACHACKI_TUAT_FENCE_GATE);
                     }).build());
 
     public static final CreativeModeTab NATURAL_BLOCKS_TAB = Registry.register(BuiltInRegistries.CREATIVE_MODE_TAB,
@@ -84,6 +105,14 @@ public class GCCreativeModeTabs {
                         output.accept(GCBlocks.CADONWOOD_WALL);
                         output.accept(GCBlocks.CADONWOOD_PRESSURE_PLATE);
                         output.accept(GCBlocks.CADONWOOD_BUTTON);
+                        for (String wood : GCBlocks.ROUNDEL_WOODS) {
+                            output.accept(GCBlocks.WOOD_ROUNDELS.get(wood));
+                            output.accept(GCBlocks.WOOD_HALF_ROUNDELS.get(wood));
+                        }
+                        for (String colour : GCBlocks.ROUNDEL_CONCRETES) {
+                            output.accept(GCBlocks.CONCRETE_ROUNDELS.get(colour));
+                            output.accept(GCBlocks.CONCRETE_HALF_ROUNDELS.get(colour));
+                        }
                     }).build());
 
     public static final CreativeModeTab FLORA_TAB = Registry.register(BuiltInRegistries.CREATIVE_MODE_TAB,

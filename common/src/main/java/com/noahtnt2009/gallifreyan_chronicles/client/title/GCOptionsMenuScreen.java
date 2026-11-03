@@ -1,11 +1,15 @@
 package com.noahtnt2009.gallifreyan_chronicles.client.title;
 
+import com.noahtnt2009.gallifreyan_chronicles.compat.EssentialMenuCompat;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.client.gui.screens.TitleScreen;
 import net.minecraft.client.gui.screens.options.AccessibilityOptionsScreen;
 import net.minecraft.client.gui.screens.options.LanguageSelectScreen;
 import net.minecraft.client.gui.screens.options.OptionsScreen;
 import net.minecraft.network.chat.Component;
+
+import java.util.List;
 
 public class GCOptionsMenuScreen extends Screen {
     private static final int BUTTON_WIDTH = 200;
@@ -14,6 +18,9 @@ public class GCOptionsMenuScreen extends Screen {
     private static final int DONE_GAP = 12;
     private static final int TITLE_GAP = 20;
     private static final int TITLE_COLOR = 0xFFFFFFFF;
+    private static final int SECTION_COLOR = 0xFFA0A0A0;
+    private static final int SECTION_GAP = 22;
+    private static final int COLUMN_GAP = 4;
 
     private final Screen parent;
 
@@ -22,8 +29,25 @@ public class GCOptionsMenuScreen extends Screen {
         this.parent = parent;
     }
 
+    private List<String> essentialIds() {
+        return this.parent instanceof TitleScreen ? EssentialMenuCompat.titleMenuIds() : List.of();
+    }
+
+    private int essentialRows() {
+        return (this.essentialIds().size() + 1) / 2;
+    }
+
+    private int essentialHeight() {
+        int rows = this.essentialRows();
+        return rows == 0 ? 0 : SECTION_GAP + rows * BUTTON_STEP;
+    }
+
     private int top() {
-        return (this.height - (BUTTON_STEP * 3 + DONE_GAP + BUTTON_HEIGHT)) / 2;
+        return (this.height - (BUTTON_STEP * 3 + this.essentialHeight() + DONE_GAP + BUTTON_HEIGHT)) / 2;
+    }
+
+    private int essentialHeadingY() {
+        return this.top() + BUTTON_STEP * 3 + SECTION_GAP - 12;
     }
 
     @Override
@@ -44,7 +68,26 @@ public class GCOptionsMenuScreen extends Screen {
         this.addRenderableWidget(new GCButton(x, y, BUTTON_WIDTH, BUTTON_HEIGHT,
                 Component.translatable("options.accessibility"),
                 button -> this.minecraft.gui.setScreen(new AccessibilityOptionsScreen(this, this.minecraft.options))));
-        y += BUTTON_STEP + DONE_GAP;
+        y += BUTTON_STEP;
+
+        List<String> ids = this.essentialIds();
+        if (!ids.isEmpty()) {
+            y += SECTION_GAP;
+            int half = (BUTTON_WIDTH - COLUMN_GAP) / 2;
+            for (int i = 0; i < ids.size(); i++) {
+                String id = ids.get(i);
+                int column = i % 2;
+                int bx = column == 0 ? x : x + BUTTON_WIDTH - half;
+                int width = column == 0 && i == ids.size() - 1 ? BUTTON_WIDTH : half;
+                this.addRenderableWidget(new GCButton(bx, y, width, BUTTON_HEIGHT, EssentialMenuCompat.label(id),
+                        button -> {
+                            EssentialMenuCompat.requestOnTitleScreen(id);
+                            this.minecraft.gui.setScreen(this.parent);
+                        }));
+                if (column == 1 || i == ids.size() - 1) y += BUTTON_STEP;
+            }
+        }
+        y += DONE_GAP;
 
         this.addRenderableWidget(new GCButton(x, y, BUTTON_WIDTH, BUTTON_HEIGHT,
                 Component.translatable("gui.done"), button -> this.onClose()));
@@ -54,6 +97,10 @@ public class GCOptionsMenuScreen extends Screen {
     public void extractRenderState(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float partialTick) {
         super.extractRenderState(graphics, mouseX, mouseY, partialTick);
         graphics.centeredText(this.font, this.title, this.width / 2, this.top() - TITLE_GAP, TITLE_COLOR);
+        if (this.essentialRows() > 0) {
+            graphics.centeredText(this.font, Component.translatableWithFallback("menu.gallifreyan_chronicles.essential", "Essential"),
+                    this.width / 2, this.essentialHeadingY(), SECTION_COLOR);
+        }
     }
 
     @Override

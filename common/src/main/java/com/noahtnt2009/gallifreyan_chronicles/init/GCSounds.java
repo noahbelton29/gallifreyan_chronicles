@@ -20,6 +20,8 @@ public class GCSounds {
     public static final SoundEvent TARDIS_CLOAK = registerFixedRange("cloak", HEARING_RANGE);
     public static final SoundEvent TARDIS_UNCLOAK = registerFixedRange("uncloak", HEARING_RANGE);
 
+    public static final SoundEvent TITLE_THEME = register("title_theme");
+
     public static final float TAKEOFF_HEARING_RANGE = 25.0F;
 
     public static final SoundEvent TARDIS_DRUM =

@@ -56,6 +56,41 @@ public class GCRecipeProvider extends RecipeProvider {
                 .unlockedBy(getHasName(GCItems.TARANIUM_SCRAP), has(GCItems.REFINED_TARANIUM_CRYSTAL))
                 .save(output);
 
+        for (String wood : GCBlocks.ROUNDEL_WOODS) {
+            ItemLike planks = GCBlocks.woodPlanks(wood);
+            ItemLike roundel = GCBlocks.WOOD_ROUNDELS.get(wood);
+            shaped(RecipeCategory.BUILDING_BLOCKS, roundel, 8)
+                    .pattern("PPP")
+                    .pattern("PSP")
+                    .pattern("PPP")
+                    .define('P', planks)
+                    .define('S', Items.STICK)
+                    .unlockedBy(getHasName(planks), has(planks))
+                    .save(output);
+            shapeless(RecipeCategory.BUILDING_BLOCKS, GCBlocks.WOOD_HALF_ROUNDELS.get(wood), 2)
+                    .requires(roundel)
+                    .requires(planks)
+                    .unlockedBy(getHasName(roundel), has(roundel))
+                    .save(output);
+        }
+
+        for (String colour : GCBlocks.ROUNDEL_CONCRETES) {
+            ItemLike concrete = GCBlocks.concrete(colour);
+            ItemLike roundel = GCBlocks.CONCRETE_ROUNDELS.get(colour);
+            shaped(RecipeCategory.BUILDING_BLOCKS, roundel, 8)
+                    .pattern("CCC")
+                    .pattern("C C")
+                    .pattern("CCC")
+                    .define('C', concrete)
+                    .unlockedBy(getHasName(concrete), has(concrete))
+                    .save(output);
+            shapeless(RecipeCategory.BUILDING_BLOCKS, GCBlocks.CONCRETE_HALF_ROUNDELS.get(colour), 2)
+                    .requires(roundel)
+                    .requires(concrete)
+                    .unlockedBy(getHasName(roundel), has(roundel))
+                    .save(output);
+        }
+
         shaped(RecipeCategory.BUILDING_BLOCKS, GCBlocks.CADONWOOD_PLANKS, 4)
                 .pattern("L")
                 .define('L', GCBlocks.CADONWOOD_LOG)

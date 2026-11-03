@@ -1,0 +1,12 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "building",
+  "ingredients": [
+    "gallifreyan_chronicles:jungle_roundel_block",
+    "minecraft:jungle_planks"
+  ],
+  "result": {
+    "count": 2,
+    "id": "gallifreyan_chronicles:jungle_half_roundel_block"
+  }
+}

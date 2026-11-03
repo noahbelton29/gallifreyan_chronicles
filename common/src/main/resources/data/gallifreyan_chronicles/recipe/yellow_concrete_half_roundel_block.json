@@ -1,0 +1,12 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "building",
+  "ingredients": [
+    "gallifreyan_chronicles:yellow_concrete_roundel_block",
+    "minecraft:yellow_concrete"
+  ],
+  "result": {
+    "count": 2,
+    "id": "gallifreyan_chronicles:yellow_concrete_half_roundel_block"
+  }
+}

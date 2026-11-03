@@ -1,5 +1,6 @@
 package com.noahtnt2009.gallifreyan_chronicles.item;
 
+import com.noahtnt2009.gallifreyan_chronicles.init.GCDataComponents;
 import com.noahtnt2009.gallifreyan_chronicles.tardis.api.TardisApi;
 import com.noahtnt2009.gallifreyan_chronicles.block.entity.TardisExteriorBlockEntity;
 import net.minecraft.network.chat.Component;
@@ -11,7 +12,19 @@ import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.level.Level;
 import org.jspecify.annotations.NonNull;
 
-public class MasterTardisKeyItem extends Item {
+public class MasterTardisKeyItem extends Item implements ScrollSelectable {
+    @Override
+    public boolean cycleSelection(ItemStack stack, int step) {
+        int index = TardisKeyItem.STYLES.indexOf(TardisKeyItem.styleOf(stack.get(GCDataComponents.KEY_STYLE)));
+        String next = TardisKeyItem.STYLES.get(Math.floorMod(index + step, TardisKeyItem.STYLES.size()));
+        if (next.equals(TardisKeyItem.STYLES.getFirst())) {
+            stack.remove(GCDataComponents.KEY_STYLE);
+        } else {
+            stack.set(GCDataComponents.KEY_STYLE, next);
+        }
+        return true;
+    }
+
     public MasterTardisKeyItem(Properties properties) {
         super(properties);
     }

@@ -1,6 +1,7 @@
 package com.noahtnt2009.gallifreyan_chronicles.mixin.client;
 
 import com.noahtnt2009.gallifreyan_chronicles.client.title.GCTitleScreenLayout;
+import com.noahtnt2009.gallifreyan_chronicles.compat.EssentialMenuCompat;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.screens.Screen;
@@ -22,6 +23,7 @@ public abstract class TitleScreenMixin extends Screen {
     private void gc$buildTitleScreen(CallbackInfo ci) {
         if (this.minecraft.isDemo()) return;
         GCTitleScreenLayout.build(this, this.minecraft, this.font, this.width, this.height, this::gc$addWidget);
+        EssentialMenuCompat.initTitleProxies(this);
         ci.cancel();
     }
 

@@ -15,9 +15,10 @@ import java.util.List;
 
 public class DoorBlockItem extends BlockItem implements ScrollSelectable {
     public static final List<String> DOOR_IDS = List.of(
-            "tardis_interior_door",
             "first_doctors_door",
-            "second_doctors_door"
+            "second_doctors_door",
+            "second_doctors_door_alt",
+            "tuat_door"
     );
 
     public DoorBlockItem(Block block, Properties properties) {
@@ -30,7 +31,8 @@ public class DoorBlockItem extends BlockItem implements ScrollSelectable {
 
     public static String selectedId(ItemStack stack, String fallback) {
         String id = stack.get(GCDataComponents.DOOR_TYPE);
-        return id != null && DOOR_IDS.contains(id) ? id : fallback;
+        if (id != null && DOOR_IDS.contains(id)) return id;
+        return DOOR_IDS.contains(fallback) ? fallback : DOOR_IDS.getFirst();
     }
 
     public String selectedId(ItemStack stack) {

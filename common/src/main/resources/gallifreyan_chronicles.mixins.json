@@ -20,6 +20,7 @@
     "client.VideoSettingsScreenMixin",
     "client.AccessibilityOptionsScreenMixin",
     "client.TitleScreenMixin",
+    "client.TitleMusicMixin",
     "client.CameraShakeMixin",
     "client.AbstractContainerScreenAccessor",
     "client.CreativeTardisScrollMixin",
@@ -29,7 +30,10 @@
     "client.ChannelMixin",
     "client.SoundEngineMixin",
     "client.PowerDarknessApplicableMixin",
-    "client.PowerDarknessSetupMixin"
+    "client.PowerDarknessSetupMixin",
+    "client.SelectItemModelPropertiesMixin",
+    "client.EssentialMenuScreenMixin",
+    "client.SoundPhysicsTardisEchoMixin"
   ],
   "server": [],
   "injectors": {

@@ -166,5 +166,13 @@
         "attenuation_distance": 16
       }
     ]
+  },
+  "title_theme": {
+    "sounds": [
+      {
+        "name": "gallifreyan_chronicles:title/title_theme",
+        "stream": true
+      }
+    ]
   }
 }

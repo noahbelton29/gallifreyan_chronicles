@@ -18,6 +18,7 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.LevelReader;
 import net.minecraft.world.level.block.BaseEntityBlock;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Mirror;
@@ -125,5 +126,22 @@ public class ConsoleBlock extends BaseEntityBlock {
         }
 
         ConsoleLinkSystem.onPlaced(console);
+    }
+
+    @Override
+    protected @NonNull ItemStack getCloneItemStack(@NonNull LevelReader level, @NonNull BlockPos pos,
+                                                   @NonNull BlockState state, boolean includeData) {
+        ItemStack stack = super.getCloneItemStack(level, pos, state, includeData);
+        if (!(level.getBlockEntity(pos) instanceof TardisConsoleBlockEntity console)) return stack;
+
+        TardisConsole model = console.getConsole();
+        if (model == null) return stack;
+        stack.set(GCDataComponents.CONSOLE_ID, model.id());
+
+        String variantId = console.getVariant();
+        if (variantId != null && !variantId.isEmpty() && model.hasVariant(variantId)) {
+            stack.set(GCDataComponents.CONSOLE_VARIANT, variantId.substring(variantId.indexOf(':') + 1));
+        }
+        return stack;
     }
 }

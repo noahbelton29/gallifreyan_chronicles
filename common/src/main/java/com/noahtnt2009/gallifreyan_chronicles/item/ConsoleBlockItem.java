@@ -60,8 +60,9 @@ public class ConsoleBlockItem extends BlockItem implements ScrollSelectable {
 
         List<Entry> entries = new ArrayList<>();
         for (TardisConsole console : consoles) {
-            entries.add(new Entry(console.id(), null));
-            if (hasChoice(console)) {
+            if (!hasChoice(console)) {
+                entries.add(new Entry(console.id(), null));
+            } else {
                 List<TardisConsoleVariant> variants = new ArrayList<>(console.variants());
                 variants.sort(Comparator.comparingInt((TardisConsoleVariant v) -> orderIndex(VARIANT_ORDER, v.localId()))
                         .thenComparing(TardisConsoleVariant::localId));
@@ -71,6 +72,22 @@ public class ConsoleBlockItem extends BlockItem implements ScrollSelectable {
             }
         }
         return entries;
+    }
+
+    static @Nullable String effectiveVariantId(String consoleId, @Nullable String variantId) {
+        if (variantId != null || !TardisConsoleRegistry.contains(consoleId)) return variantId;
+        TardisConsole console = TardisConsoleRegistry.get(consoleId);
+        if (!hasChoice(console)) return null;
+        String fallback = console.resolvedDefaultVariant();
+        return fallback.isEmpty() ? null : fallback;
+    }
+
+    public static String selectedVariantKey(ItemStack stack) {
+        String variantId = stack.get(GCDataComponents.CONSOLE_VARIANT);
+        if (variantId != null) return localId(variantId);
+        String consoleId = stack.get(GCDataComponents.CONSOLE_ID);
+        if (consoleId == null) consoleId = defaultConsoleId();
+        return consoleId == null ? "" : localId(consoleId);
     }
 
     static int selectionCount() {
@@ -84,7 +101,7 @@ public class ConsoleBlockItem extends BlockItem implements ScrollSelectable {
 
         String consoleId = stack.get(GCDataComponents.CONSOLE_ID);
         if (consoleId == null) consoleId = defaultConsoleId();
-        String variantId = stack.get(GCDataComponents.CONSOLE_VARIANT);
+        String variantId = effectiveVariantId(consoleId, stack.get(GCDataComponents.CONSOLE_VARIANT));
 
         int index = 0;
         for (int i = 0; i < entries.size(); i++) {

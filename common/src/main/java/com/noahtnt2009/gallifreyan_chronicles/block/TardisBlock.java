@@ -21,6 +21,7 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.LevelReader;
 import net.minecraft.world.level.block.BaseEntityBlock;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.RenderShape;
@@ -37,6 +38,8 @@ import net.minecraft.world.phys.shapes.VoxelShape;
 import org.jetbrains.annotations.NotNull;
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
+
+import java.util.UUID;
 
 public class TardisBlock extends BaseEntityBlock {
     public static final BooleanProperty GLOWING = BooleanProperty.create("glowing");
@@ -56,6 +59,7 @@ public class TardisBlock extends BaseEntityBlock {
                             @NonNull ItemStack stack) {
         super.setPlacedBy(level, pos, state, placer, stack);
         if (!(level.getBlockEntity(pos) instanceof TardisExteriorBlockEntity blockEntity)) return;
+        String chosenInterior = stack.get(GCDataComponents.TARDIS_INTERIOR);
         stack.shrink(1);
         blockEntity.setYaw(snapYawTo45(placer.getYRot() + 180));
 
@@ -66,7 +70,7 @@ public class TardisBlock extends BaseEntityBlock {
             Entity entity = blockEntity.asEntity();
             TardisComponent record = TardisLinkSystem.registerNewTardis(entity, serverLevel, player.getUUID(),
                     player.getGameProfile().name(), pos);
-            applyChosenInterior(serverLevel, entity, record, stack);
+            applyChosenInterior(serverLevel, entity, record, chosenInterior);
             blockEntity.sync();
 
             blockEntity.spawnKeyEntity();
@@ -81,8 +85,7 @@ public class TardisBlock extends BaseEntityBlock {
         }
     }
 
-    private static void applyChosenInterior(ServerLevel level, Entity entity, TardisComponent record, ItemStack stack) {
-        String chosen = stack.get(GCDataComponents.TARDIS_INTERIOR);
+    private static void applyChosenInterior(ServerLevel level, Entity entity, TardisComponent record, String chosen) {
         if (chosen == null || !TardisInteriorRegistry.contains(chosen)) return;
 
         TardisInterior interior = TardisInteriorRegistry.get(chosen);
@@ -92,6 +95,21 @@ public class TardisBlock extends BaseEntityBlock {
         if (TardisExteriorRegistry.contains(exteriorId)) {
             ExteriorSystem.setExterior(entity, TardisExteriorRegistry.get(exteriorId));
         }
+    }
+
+    @Override
+    protected @NonNull ItemStack getCloneItemStack(@NonNull LevelReader level, @NonNull BlockPos pos,
+                                                   @NonNull BlockState state, boolean includeData) {
+        ItemStack stack = super.getCloneItemStack(level, pos, state, includeData);
+        if (level instanceof ServerLevel serverLevel
+                && level.getBlockEntity(pos) instanceof TardisExteriorBlockEntity tardis) {
+            UUID tardisId = tardis.getTardisId();
+            if (tardisId != null) {
+                String interiorId = TardisManager.get(serverLevel.getServer()).getInteriorId(tardisId);
+                if (interiorId != null) stack.set(GCDataComponents.TARDIS_INTERIOR, interiorId);
+            }
+        }
+        return stack;
     }
 
     private static float snapYawTo45(float yaw) {

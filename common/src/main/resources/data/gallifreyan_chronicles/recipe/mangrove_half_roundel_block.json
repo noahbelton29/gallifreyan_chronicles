@@ -1,0 +1,12 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "building",
+  "ingredients": [
+    "gallifreyan_chronicles:mangrove_roundel_block",
+    "minecraft:mangrove_planks"
+  ],
+  "result": {
+    "count": 2,
+    "id": "gallifreyan_chronicles:mangrove_half_roundel_block"
+  }
+}

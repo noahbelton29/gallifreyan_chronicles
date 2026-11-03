@@ -26,7 +26,7 @@ public abstract class CreativeTardisScrollMixin {
         ItemStack stack = slot.getItem();
         if (!(stack.getItem() instanceof ScrollSelectable selectable)) return;
 
-        if (selectable.cycleSelection(stack, scrollY > 0.0 ? -1 : 1)) {
+        if (selectable.cycleSelection(stack, scrollY > 0.0 ? 1 : -1)) {
             Minecraft.getInstance().getSoundManager().play(SimpleSoundInstance.forUI(SoundEvents.UI_BUTTON_CLICK, 1.0F));
             cir.setReturnValue(true);
         }

@@ -1,0 +1,12 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "building",
+  "ingredients": [
+    "gallifreyan_chronicles:birch_roundel_block",
+    "minecraft:birch_planks"
+  ],
+  "result": {
+    "count": 2,
+    "id": "gallifreyan_chronicles:birch_half_roundel_block"
+  }
+}

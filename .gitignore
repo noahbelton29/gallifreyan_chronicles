@@ -27,3 +27,6 @@ runs2
 
 *.zip
 build-ledger.csv
+
+# essential jars (local copies)
+libs/essential/

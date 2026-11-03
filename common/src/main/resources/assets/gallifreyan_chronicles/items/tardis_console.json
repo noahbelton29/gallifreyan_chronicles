@@ -1,6 +1,50 @@
 {
   "model": {
-    "type": "minecraft:model",
-    "model": "gallifreyan_chronicles:item/tardis_console"
+    "type": "minecraft:select",
+    "cases": [
+      {
+        "model": {
+          "type": "minecraft:model",
+          "model": "gallifreyan_chronicles:item/tardis_console"
+        },
+        "when": [
+          "brachacki_console",
+          "first_doctors_console"
+        ]
+      },
+      {
+        "model": {
+          "type": "minecraft:model",
+          "model": "gallifreyan_chronicles:item/tardis_console/second_doctors_console"
+        },
+        "when": "second_doctors_console"
+      },
+      {
+        "model": {
+          "type": "minecraft:model",
+          "model": "gallifreyan_chronicles:item/tardis_console/tuat_console"
+        },
+        "when": "tuat_console"
+      },
+      {
+        "model": {
+          "type": "minecraft:model",
+          "model": "gallifreyan_chronicles:item/tardis_console/inferno_console"
+        },
+        "when": "inferno_console"
+      },
+      {
+        "model": {
+          "type": "minecraft:model",
+          "model": "gallifreyan_chronicles:item/tardis_console/ambassadors_of_death_console"
+        },
+        "when": "ambassadors_of_death_console"
+      }
+    ],
+    "fallback": {
+      "type": "minecraft:model",
+      "model": "gallifreyan_chronicles:item/tardis_console"
+    },
+    "property": "gallifreyan_chronicles:console_variant"
   }
 }

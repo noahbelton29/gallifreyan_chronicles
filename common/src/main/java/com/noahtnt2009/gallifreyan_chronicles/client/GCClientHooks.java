@@ -10,6 +10,7 @@ import com.noahtnt2009.gallifreyan_chronicles.client.camera.GCCameraShake;
 import com.noahtnt2009.gallifreyan_chronicles.client.hud.GCPowerDarkness;
 import com.noahtnt2009.gallifreyan_chronicles.client.security.BuildExpiry;
 import com.noahtnt2009.gallifreyan_chronicles.client.sound.ConsoleHumSounds;
+import com.noahtnt2009.gallifreyan_chronicles.client.sound.GCMusic;
 import net.minecraft.client.Minecraft;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.Level;
@@ -57,6 +58,7 @@ public final class GCClientHooks {
         Minecraft minecraft = Minecraft.getInstance();
         BuildExpiry.tick(minecraft);
         ConsoleHumSounds.tick();
+        GCMusic.tick(minecraft);
     }
 
     public static void startConsoleClientEffects(TardisConsoleBlockEntity be) {

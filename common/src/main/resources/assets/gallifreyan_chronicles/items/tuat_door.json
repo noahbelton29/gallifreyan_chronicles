@@ -1,0 +1,41 @@
+{
+  "model": {
+    "type": "minecraft:select",
+    "cases": [
+      {
+        "model": {
+          "type": "minecraft:model",
+          "model": "gallifreyan_chronicles:item/first_doctors_door"
+        },
+        "when": "first_doctors_door"
+      },
+      {
+        "model": {
+          "type": "minecraft:model",
+          "model": "gallifreyan_chronicles:item/second_doctors_door"
+        },
+        "when": "second_doctors_door"
+      },
+      {
+        "model": {
+          "type": "minecraft:model",
+          "model": "gallifreyan_chronicles:item/second_doctors_door_alt"
+        },
+        "when": "second_doctors_door_alt"
+      },
+      {
+        "model": {
+          "type": "minecraft:model",
+          "model": "gallifreyan_chronicles:item/tuat_door"
+        },
+        "when": "tuat_door"
+      }
+    ],
+    "component": "gallifreyan_chronicles:door_type",
+    "fallback": {
+      "type": "minecraft:model",
+      "model": "gallifreyan_chronicles:item/tuat_door"
+    },
+    "property": "minecraft:component"
+  }
+}

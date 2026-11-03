@@ -14,10 +14,30 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.level.Level;
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
+import java.util.List;
 import java.util.UUID;
 
-public class TardisKeyItem extends Item {
+public class TardisKeyItem extends Item implements ScrollSelectable {
+    public static final List<String> STYLES = List.of("tardis", "gallifreyan", "yale");
+
+    public static String styleOf(@Nullable String stored) {
+        return stored != null && STYLES.contains(stored) ? stored : STYLES.getFirst();
+    }
+
+    @Override
+    public boolean cycleSelection(ItemStack stack, int step) {
+        int index = STYLES.indexOf(styleOf(stack.get(GCDataComponents.KEY_STYLE)));
+        String next = STYLES.get(Math.floorMod(index + step, STYLES.size()));
+        if (next.equals(STYLES.getFirst())) {
+            stack.remove(GCDataComponents.KEY_STYLE);
+        } else {
+            stack.set(GCDataComponents.KEY_STYLE, next);
+        }
+        return true;
+    }
+
     private static InteractionResult linkToConsole(Player player, InteractionHand hand, ItemStack stack,
                                                    TardisConsoleBlockEntity console, Level level) {
         UUID tardisId = console.getTardisId();

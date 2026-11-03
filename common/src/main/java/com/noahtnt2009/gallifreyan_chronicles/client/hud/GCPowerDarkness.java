@@ -17,7 +17,7 @@ public final class GCPowerDarkness {
     private static final long SNAP_WINDOW_NANOS = 2_000_000_000L;
 
     private static final List<TardisConsoleBlockEntity> CONSOLES = new ArrayList<>();
-    private static float darkness = 0.0F;
+    private static volatile float darkness = 0.0F;
     private static long lastNanos = 0L;
     private static long snapUntilNanos = 0L;
     private static Level lastLevel;
@@ -47,6 +47,10 @@ public final class GCPowerDarkness {
             if (!console.hasPower()) dark = true;
         }
         return dark;
+    }
+
+    public static float powerOffAmount() {
+        return darkness;
     }
 
     public static float update() {

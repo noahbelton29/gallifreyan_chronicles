@@ -53,6 +53,11 @@ public class GCDataComponents {
             () -> DataComponentType.<Boolean>builder().persistent(Codec.BOOL).build()
     );
 
+    public static final DataComponentType<String> KEY_STYLE = register(
+            "key_style",
+            () -> DataComponentType.<String>builder().persistent(Codec.STRING).build()
+    );
+
     public static final DataComponentType<Boolean> MASTER_KEY = register(
             "master_key",
             () -> DataComponentType.<Boolean>builder().persistent(Codec.BOOL).build()

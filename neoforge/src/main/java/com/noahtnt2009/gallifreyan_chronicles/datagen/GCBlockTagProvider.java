@@ -67,7 +67,9 @@ public class GCBlockTagProvider extends BlockTagsProvider {
                 GCBlocks.LUNAR_REGOLITH,
                 GCBlocks.TARDIS_INTERIOR_DOOR,
                 GCBlocks.FIRST_DOCTORS_DOOR,
-                GCBlocks.SECOND_DOCTORS_DOOR);
+                GCBlocks.SECOND_DOCTORS_DOOR,
+                GCBlocks.SECOND_DOCTORS_DOOR_ALT,
+                GCBlocks.TUAT_DOOR);
 
         tagAdd(BlockTags.MINEABLE_WITH_SHOVEL,
                 GCBlocks.GALLIFREYAN_DIRT,
@@ -89,6 +91,10 @@ public class GCBlockTagProvider extends BlockTagsProvider {
                 GCBlocks.CADONWOOD_WALL,
                 GCBlocks.CADONWOOD_BUTTON,
                 GCBlocks.CADONWOOD_PRESSURE_PLATE);
+        tagAdd(BlockTags.MINEABLE_WITH_AXE, GCBlocks.WOOD_ROUNDELS.values().toArray(Block[]::new));
+        tagAdd(BlockTags.MINEABLE_WITH_AXE, GCBlocks.WOOD_HALF_ROUNDELS.values().toArray(Block[]::new));
+        tagAdd(BlockTags.MINEABLE_WITH_PICKAXE, GCBlocks.CONCRETE_ROUNDELS.values().toArray(Block[]::new));
+        tagAdd(BlockTags.MINEABLE_WITH_PICKAXE, GCBlocks.CONCRETE_HALF_ROUNDELS.values().toArray(Block[]::new));
 
         tagAdd(BlockTags.MINEABLE_WITH_HOE,
                 GCBlocks.CADONWOOD_LEAVES);
@@ -133,29 +139,47 @@ public class GCBlockTagProvider extends BlockTagsProvider {
 
         tagAdd(BlockTags.STAIRS,
                 GCBlocks.CADONWOOD_STAIRS,
-                GCBlocks.BRACHACKI_SLAB);
+                GCBlocks.BRACHACKI_SLAB,
+                GCBlocks.BRACHACKI_STAIRS_2,
+                GCBlocks.BRACHACKI_STAIRS_3,
+                GCBlocks.BRACHACKI_TUAT_STAIRS);
 
         tagAdd(BlockTags.SLABS,
                 GCBlocks.CADONWOOD_SLAB,
-                GCBlocks.BRACHACKI_SLAB);
+                GCBlocks.BRACHACKI_SLAB,
+                GCBlocks.BRACHACKI_SLAB_2,
+                GCBlocks.BRACHACKI_SLAB_3,
+                GCBlocks.BRACHACKI_TUAT_SLAB);
 
         tagAdd(BlockTags.PRESSURE_PLATES,
                 GCBlocks.CADONWOOD_PRESSURE_PLATE,
-                GCBlocks.BRACHACKI_PRESSURE_PLATE);
+                GCBlocks.BRACHACKI_PRESSURE_PLATE,
+                GCBlocks.BRACHACKI_PRESSURE_PLATE_2,
+                GCBlocks.BRACHACKI_PRESSURE_PLATE_3,
+                GCBlocks.BRACHACKI_TUAT_PRESSURE_PLATE);
 
         tagAdd(BlockTags.BUTTONS,
                 GCBlocks.CADONWOOD_BUTTON);
 
         tagAdd(BlockTags.FENCES,
                 GCBlocks.CADONWOOD_FENCE,
-                GCBlocks.BRACHACKI_FENCE);
+                GCBlocks.BRACHACKI_FENCE,
+                GCBlocks.BRACHACKI_FENCE_2,
+                GCBlocks.BRACHACKI_FENCE_3,
+                GCBlocks.BRACHACKI_TUAT_FENCE);
 
         tagAdd(BlockTags.FENCE_GATES,
                 GCBlocks.CADONWOOD_FENCE_GATE,
-                GCBlocks.BRACHACKI_FENCE_GATE);
+                GCBlocks.BRACHACKI_FENCE_GATE,
+                GCBlocks.BRACHACKI_FENCE_GATE_2,
+                GCBlocks.BRACHACKI_FENCE_GATE_3,
+                GCBlocks.BRACHACKI_TUAT_FENCE_GATE);
 
         tagAdd(BlockTags.WALLS,
                 GCBlocks.CADONWOOD_WALL,
-                GCBlocks.BRACHACKI_WALL);
+                GCBlocks.BRACHACKI_WALL,
+                GCBlocks.BRACHACKI_WALL_2,
+                GCBlocks.BRACHACKI_WALL_3,
+                GCBlocks.BRACHACKI_TUAT_WALL);
     }
 }

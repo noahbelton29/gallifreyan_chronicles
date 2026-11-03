@@ -3,21 +3,15 @@ package com.noahtnt2009.gallifreyan_chronicles.client.renderer;
 import com.geckolib.constant.dataticket.DataTicket;
 import com.geckolib.renderer.GeoBlockRenderer;
 import com.geckolib.renderer.base.RenderPassInfo;
-import com.mojang.blaze3d.vertex.PoseStack;
-import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.mojang.math.Axis;
 import com.noahtnt2009.gallifreyan_chronicles.block.InteriorDoorBlock;
 import com.noahtnt2009.gallifreyan_chronicles.client.model.InteriorDoorBlockModel;
 import com.noahtnt2009.gallifreyan_chronicles.block.entity.InteriorDoorBlockEntity;
-import com.noahtnt2009.gallifreyan_chronicles.client.sky.SkyShaderCompat;
 import com.noahtnt2009.gallifreyan_chronicles.tardis.exterior.TardisExterior;
-import net.minecraft.client.renderer.OrderedSubmitNodeCollector;
 import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
-import net.minecraft.client.renderer.rendertype.RenderType;
 import net.minecraft.core.Direction;
 import org.jetbrains.annotations.NotNull;
 import org.jspecify.annotations.NonNull;
-import org.jspecify.annotations.Nullable;
 
 public class InteriorDoorBlockRenderer extends GeoBlockRenderer<@NotNull InteriorDoorBlockEntity, @NotNull TardisExteriorBlockRenderState> {
     public static final DataTicket<String> VARIANT = DataTicket.create("interior_door_variant", String.class);
@@ -40,31 +34,6 @@ public class InteriorDoorBlockRenderer extends GeoBlockRenderer<@NotNull Interio
         renderState.addGeckolibData(VARIANT, animatable.getVariant());
         renderState.addGeckolibData(TEXTURE_ID, animatable.getTextureId());
         renderState.addGeckolibData(YAW, animatable.getFacing().toYRot());
-    }
-
-    @Override
-    public void submitRenderTasks(@NonNull RenderPassInfo<TardisExteriorBlockRenderState> renderPassInfo,
-                                  @NonNull OrderedSubmitNodeCollector renderTasks, @Nullable RenderType renderType) {
-        if (renderType == null || SkyShaderCompat.isShaderPackInUse()) {
-            super.submitRenderTasks(renderPassInfo, renderTasks, renderType);
-            return;
-        }
-        if (renderPassInfo.model().isMissingno()) {
-            submitMissingModelRender(renderPassInfo, renderTasks);
-            return;
-        }
-
-        int packedLight = renderPassInfo.packedLight();
-        int packedOverlay = renderPassInfo.packedOverlay();
-        int renderColor = renderPassInfo.renderColor();
-        renderTasks.submitCustomGeometry(renderPassInfo.poseStack(), renderType, (pose, vertexConsumer) -> {
-            PoseStack poseStack = renderPassInfo.poseStack();
-            poseStack.pushPose();
-            poseStack.last().set(pose);
-            VertexConsumer shaded = new BlockShadedVertexConsumer(vertexConsumer);
-            renderPassInfo.renderPosed(() -> renderPassInfo.model().render(renderPassInfo, shaded, packedLight, packedOverlay, renderColor));
-            poseStack.popPose();
-        });
     }
 
     @Override

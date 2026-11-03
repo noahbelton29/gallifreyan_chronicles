@@ -1,6 +1,27 @@
 {
   "model": {
-    "type": "minecraft:model",
-    "model": "gallifreyan_chronicles:item/tardis_key"
+    "type": "minecraft:select",
+    "property": "minecraft:component",
+    "component": "gallifreyan_chronicles:key_style",
+    "cases": [
+      {
+        "when": "gallifreyan",
+        "model": {
+          "type": "minecraft:model",
+          "model": "gallifreyan_chronicles:item/gallifreyan_tardis_key"
+        }
+      },
+      {
+        "when": "yale",
+        "model": {
+          "type": "minecraft:model",
+          "model": "gallifreyan_chronicles:item/yale_tardis_key"
+        }
+      }
+    ],
+    "fallback": {
+      "type": "minecraft:model",
+      "model": "gallifreyan_chronicles:item/tardis_key"
+    }
   }
 }

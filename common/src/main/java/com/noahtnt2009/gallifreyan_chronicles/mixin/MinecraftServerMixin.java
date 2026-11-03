@@ -1,5 +1,6 @@
 package com.noahtnt2009.gallifreyan_chronicles.mixin;
 
+import com.noahtnt2009.gallifreyan_chronicles.tardis.exterior.TardisKeyLocator;
 import com.noahtnt2009.gallifreyan_chronicles.tardis.interior.TardisDimensionManager;
 import com.noahtnt2009.gallifreyan_chronicles.util.GCScheduler;
 import com.noahtnt2009.gallifreyan_chronicles.util.GCServerState;
@@ -27,5 +28,6 @@ public abstract class MinecraftServerMixin {
         TardisDimensionManager.processPendingEntries((MinecraftServer) (Object) this);
         TardisInteriorSystem.tickExitZones((MinecraftServer) (Object) this);
         GCScheduler.tick((MinecraftServer) (Object) this);
+        TardisKeyLocator.tick((MinecraftServer) (Object) this);
     }
 }

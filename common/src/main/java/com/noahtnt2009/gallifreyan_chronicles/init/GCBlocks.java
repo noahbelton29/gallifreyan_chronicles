@@ -25,13 +25,17 @@ import net.minecraft.world.level.block.sounds.AmbientLeavesBlockSoundPlayer;
 import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.BlockSetType;
+import net.minecraft.world.item.DyeColor;
+import net.minecraft.world.level.block.state.properties.NoteBlockInstrument;
 import net.minecraft.world.level.block.state.properties.WoodType;
 import net.minecraft.world.level.material.MapColor;
 import net.minecraft.world.level.material.PushReaction;
 import net.minecraft.world.phys.AABB;
 
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 
@@ -88,6 +92,24 @@ public class GCBlocks {
 
     public static final Block SECOND_DOCTORS_DOOR = registerBlock("second_doctors_door",
             properties -> new InteriorDoorBlock("brachacki_doors", "second_doctors_doors", properties.strength(3F, 3F)
+                    .sound(SoundType.STONE)
+                    .noOcclusion()
+                    .noLootTable()
+                    .pushReaction(PushReaction.POPPED)),
+            Rarity.COMMON,
+            DoorBlockItem::new);
+
+    public static final Block TUAT_DOOR = registerBlock("tuat_door",
+            properties -> new InteriorDoorBlock("brachacki_doors", "tuat_doors", properties.strength(3F, 3F)
+                    .sound(SoundType.STONE)
+                    .noOcclusion()
+                    .noLootTable()
+                    .pushReaction(PushReaction.POPPED)),
+            Rarity.COMMON,
+            DoorBlockItem::new);
+
+    public static final Block SECOND_DOCTORS_DOOR_ALT = registerBlock("second_doctors_door_alt",
+            properties -> new InteriorDoorBlock("brachacki_doors", "second_doctors_doors_alt", properties.strength(3F, 3F)
                     .sound(SoundType.STONE)
                     .noOcclusion()
                     .noLootTable()
@@ -154,6 +176,51 @@ public class GCBlocks {
                     .sound(SoundType.STONE)));
 
     public static final Block BRACHACKI_HALF_ROUNDEL_BLOCK_2 = registerBlock("brachacki_half_roundel_block_2",
+            properties -> new Block(properties.strength(3F, 3F)
+                    .requiresCorrectToolForDrops()
+                    .sound(SoundType.STONE)));
+
+    public static final Block BRACHACKI_WALL_BLOCK_3 = registerBlock("brachacki_wall_block_3",
+            properties -> new Block(properties.strength(3F, 3F)
+                    .requiresCorrectToolForDrops()
+                    .sound(SoundType.STONE)));
+
+    public static final Block BRACHACKI_ROUNDEL_BLOCK_3 = registerBlock("brachacki_roundel_block_3",
+            properties -> new Block(properties.strength(3F, 3F)
+                    .requiresCorrectToolForDrops()
+                    .sound(SoundType.STONE)));
+
+    public static final Block BRACHACKI_HALF_ROUNDEL_BLOCK_3 = registerBlock("brachacki_half_roundel_block_3",
+            properties -> new Block(properties.strength(3F, 3F)
+                    .requiresCorrectToolForDrops()
+                    .sound(SoundType.STONE)));
+
+    public static final Block BRACHACKI_TUAT_FLOOR_BLOCK = registerBlock("brachacki_tuat_floor_block",
+            properties -> new Block(properties.strength(3F, 3F)
+                    .requiresCorrectToolForDrops()
+                    .sound(SoundType.STONE)));
+
+    public static final Block BRACHACKI_TUAT_WALL_BLOCK = registerBlock("brachacki_tuat_wall_block",
+            properties -> new Block(properties.strength(3F, 3F)
+                    .requiresCorrectToolForDrops()
+                    .sound(SoundType.STONE)));
+
+    public static final Block BRACHACKI_TUAT_ROUNDEL_BLOCK = registerBlock("brachacki_tuat_roundel_block",
+            properties -> new Block(properties.strength(3F, 3F)
+                    .requiresCorrectToolForDrops()
+                    .sound(SoundType.STONE)));
+
+    public static final Block BRACHACKI_TUAT_HALF_ROUNDEL_BLOCK = registerBlock("brachacki_tuat_half_roundel_block",
+            properties -> new Block(properties.strength(3F, 3F)
+                    .requiresCorrectToolForDrops()
+                    .sound(SoundType.STONE)));
+
+    public static final Block BRACHACKI_TUAT_HEXAGONAL_ROUNDEL_BLOCK = registerBlock("brachacki_tuat_hexagonal_roundel_block",
+            properties -> new Block(properties.strength(3F, 3F)
+                    .requiresCorrectToolForDrops()
+                    .sound(SoundType.STONE)));
+
+    public static final Block BRACHACKI_TUAT_HALF_HEXAGONAL_ROUNDEL_BLOCK = registerBlock("brachacki_tuat_half_hexagonal_roundel_block",
             properties -> new Block(properties.strength(3F, 3F)
                     .requiresCorrectToolForDrops()
                     .sound(SoundType.STONE)));
@@ -226,6 +293,80 @@ public class GCBlocks {
                     .sound(SoundType.STONE)));
 
     public static final Block BRACHACKI_FENCE_GATE_2 = registerBlock("brachacki_fence_gate_2",
+            properties -> new FenceGateBlock(WoodType.ACACIA,
+                    properties.strength(3F, 3F)
+                            .forceSolidOn()
+                            .requiresCorrectToolForDrops()
+                            .sound(SoundType.STONE)));
+
+    public static final Block BRACHACKI_STAIRS_3 = registerBlock("brachacki_stairs_3",
+            properties -> new StairBlock(BRACHACKI_WALL_BLOCK_3.defaultBlockState(),
+                    properties.strength(3F, 3F)
+                            .requiresCorrectToolForDrops()
+                            .sound(SoundType.STONE)));
+
+    public static final Block BRACHACKI_SLAB_3 = registerBlock("brachacki_slab_3",
+            properties -> new SlabBlock(properties.strength(3F, 3F)
+                    .requiresCorrectToolForDrops()
+                    .sound(SoundType.STONE)));
+
+    public static final Block BRACHACKI_PRESSURE_PLATE_3 = registerBlock("brachacki_pressure_plate_3",
+            properties -> new PressurePlateBlock(BlockSetType.STONE,
+                    properties.strength(0.5F)
+                            .requiresCorrectToolForDrops()
+                            .sound(SoundType.STONE)
+                            .forceSolidOn()
+                            .noCollision()
+                            .pushReaction(PushReaction.POPPED)));
+
+    public static final Block BRACHACKI_WALL_3 = registerBlock("brachacki_wall_3",
+            properties -> new WallBlock(properties.strength(3F, 3F)
+                    .requiresCorrectToolForDrops()
+                    .sound(SoundType.STONE)));
+
+    public static final Block BRACHACKI_FENCE_3 = registerBlock("brachacki_fence_3",
+            properties -> new FenceBlock(properties.strength(3F, 3F)
+                    .requiresCorrectToolForDrops()
+                    .sound(SoundType.STONE)));
+
+    public static final Block BRACHACKI_FENCE_GATE_3 = registerBlock("brachacki_fence_gate_3",
+            properties -> new FenceGateBlock(WoodType.ACACIA,
+                    properties.strength(3F, 3F)
+                            .forceSolidOn()
+                            .requiresCorrectToolForDrops()
+                            .sound(SoundType.STONE)));
+
+    public static final Block BRACHACKI_TUAT_STAIRS = registerBlock("brachacki_tuat_stairs",
+            properties -> new StairBlock(BRACHACKI_TUAT_WALL_BLOCK.defaultBlockState(),
+                    properties.strength(3F, 3F)
+                            .requiresCorrectToolForDrops()
+                            .sound(SoundType.STONE)));
+
+    public static final Block BRACHACKI_TUAT_SLAB = registerBlock("brachacki_tuat_slab",
+            properties -> new SlabBlock(properties.strength(3F, 3F)
+                    .requiresCorrectToolForDrops()
+                    .sound(SoundType.STONE)));
+
+    public static final Block BRACHACKI_TUAT_PRESSURE_PLATE = registerBlock("brachacki_tuat_pressure_plate",
+            properties -> new PressurePlateBlock(BlockSetType.STONE,
+                    properties.strength(0.5F)
+                            .requiresCorrectToolForDrops()
+                            .sound(SoundType.STONE)
+                            .forceSolidOn()
+                            .noCollision()
+                            .pushReaction(PushReaction.POPPED)));
+
+    public static final Block BRACHACKI_TUAT_WALL = registerBlock("brachacki_tuat_wall",
+            properties -> new WallBlock(properties.strength(3F, 3F)
+                    .requiresCorrectToolForDrops()
+                    .sound(SoundType.STONE)));
+
+    public static final Block BRACHACKI_TUAT_FENCE = registerBlock("brachacki_tuat_fence",
+            properties -> new FenceBlock(properties.strength(3F, 3F)
+                    .requiresCorrectToolForDrops()
+                    .sound(SoundType.STONE)));
+
+    public static final Block BRACHACKI_TUAT_FENCE_GATE = registerBlock("brachacki_tuat_fence_gate",
             properties -> new FenceGateBlock(WoodType.ACACIA,
                     properties.strength(3F, 3F)
                             .forceSolidOn()
@@ -461,6 +602,85 @@ public class GCBlocks {
             BlockPos blockPos
     ) {
         return false;
+    }
+
+    public static final List<String> ROUNDEL_WOODS = List.of(
+            "oak", "spruce", "birch", "jungle", "acacia", "dark_oak", "mangrove",
+            "cherry", "pale_oak", "bamboo", "crimson", "warped", "cadonwood"
+    );
+    public static final Map<String, Block> WOOD_ROUNDELS = new LinkedHashMap<>();
+    public static final Map<String, Block> WOOD_HALF_ROUNDELS = new LinkedHashMap<>();
+
+    static {
+        for (String wood : ROUNDEL_WOODS) {
+            WOOD_ROUNDELS.put(wood, registerWoodRoundel(wood + "_roundel_block", wood));
+            WOOD_HALF_ROUNDELS.put(wood, registerWoodRoundel(wood + "_half_roundel_block", wood));
+        }
+    }
+
+    public static Block woodPlanks(String wood) {
+        return switch (wood) {
+            case "oak" -> Blocks.OAK_PLANKS;
+            case "spruce" -> Blocks.SPRUCE_PLANKS;
+            case "birch" -> Blocks.BIRCH_PLANKS;
+            case "jungle" -> Blocks.JUNGLE_PLANKS;
+            case "acacia" -> Blocks.ACACIA_PLANKS;
+            case "dark_oak" -> Blocks.DARK_OAK_PLANKS;
+            case "mangrove" -> Blocks.MANGROVE_PLANKS;
+            case "cherry" -> Blocks.CHERRY_PLANKS;
+            case "pale_oak" -> Blocks.PALE_OAK_PLANKS;
+            case "bamboo" -> Blocks.BAMBOO_PLANKS;
+            case "crimson" -> Blocks.CRIMSON_PLANKS;
+            case "warped" -> Blocks.WARPED_PLANKS;
+            case "cadonwood" -> CADONWOOD_PLANKS;
+            default -> throw new IllegalArgumentException("Unknown roundel wood " + wood);
+        };
+    }
+
+    private static Block registerWoodRoundel(String name, String wood) {
+        Block planks = woodPlanks(wood);
+        boolean nether = wood.equals("crimson") || wood.equals("warped");
+        SoundType sound = switch (wood) {
+            case "cherry" -> SoundType.CHERRY_WOOD;
+            case "bamboo" -> SoundType.BAMBOO_WOOD;
+            case "crimson", "warped" -> SoundType.NETHER_WOOD;
+            default -> SoundType.WOOD;
+        };
+        return registerBlock(name, properties -> {
+            properties.mapColor(planks.defaultMapColor())
+                    .instrument(NoteBlockInstrument.BASS)
+                    .strength(2F, 3F)
+                    .sound(sound);
+            if (!nether) properties.ignitedByLava();
+            return new Block(properties);
+        });
+    }
+
+    public static final List<String> ROUNDEL_CONCRETES = List.of(
+            "white", "light_gray", "gray", "black", "brown", "red", "orange", "yellow",
+            "lime", "green", "cyan", "light_blue", "blue", "purple", "magenta", "pink"
+    );
+    public static final Map<String, Block> CONCRETE_ROUNDELS = new LinkedHashMap<>();
+    public static final Map<String, Block> CONCRETE_HALF_ROUNDELS = new LinkedHashMap<>();
+
+    static {
+        for (String colour : ROUNDEL_CONCRETES) {
+            CONCRETE_ROUNDELS.put(colour, registerConcreteRoundel(colour + "_concrete_roundel_block", colour));
+            CONCRETE_HALF_ROUNDELS.put(colour, registerConcreteRoundel(colour + "_concrete_half_roundel_block", colour));
+        }
+    }
+
+    public static Block concrete(String colour) {
+        return Blocks.CONCRETE.pick(DyeColor.byName(colour, DyeColor.WHITE));
+    }
+
+    private static Block registerConcreteRoundel(String name, String colour) {
+        DyeColor dye = DyeColor.byName(colour, DyeColor.WHITE);
+        return registerBlock(name, properties -> new Block(properties
+                .mapColor(dye)
+                .instrument(NoteBlockInstrument.BASEDRUM)
+                .requiresCorrectToolForDrops()
+                .strength(1.8F)));
     }
 
     public static final Block CADONWOOD_SAPLING = registerBlock("cadonwood_sapling",

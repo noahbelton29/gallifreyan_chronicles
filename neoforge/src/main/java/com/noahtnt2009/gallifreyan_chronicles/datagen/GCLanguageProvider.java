@@ -32,8 +32,10 @@ public class GCLanguageProvider extends LanguageProvider {
                 add(block, "TARDIS");
             } else if (block == GCBlocks.TARDIS_CONSOLE) {
                 add(block, "TARDIS Console");
+            } else if (block == GCBlocks.TARDIS_INTERIOR_DOOR) {
+                add(block, "TARDIS Interior Door");
             } else {
-                add(block, titleCase(BuiltInRegistries.BLOCK.getKey(block).getPath()));
+                add(block, titleCase(BuiltInRegistries.BLOCK.getKey(block).getPath()).replace("Tuat", "TUAT"));
             }
         }
 
@@ -41,6 +43,10 @@ public class GCLanguageProvider extends LanguageProvider {
         for (Item item : GCItems.ITEMS) {
             if (item == GCItems.TARDIS_KEY) {
                 add(item, "TARDIS Key");
+                continue;
+            }
+            if (item == GCItems.MASTER_TARDIS_KEY) {
+                add(item, "Master TARDIS Key");
                 continue;
             }
             add(item, titleCase(BuiltInRegistries.ITEM.getKey(item).getPath()));
@@ -70,6 +76,8 @@ public class GCLanguageProvider extends LanguageProvider {
         add("door_type.gallifreyan_chronicles.tardis_interior_door", "Default");
         add("door_type.gallifreyan_chronicles.first_doctors_door", "First Doctor's Door");
         add("door_type.gallifreyan_chronicles.second_doctors_door", "Second Doctor's Door");
+        add("door_type.gallifreyan_chronicles.second_doctors_door_alt", "Second Doctor's Door (Alt)");
+        add("door_type.gallifreyan_chronicles.tuat_door", "TUAT Door");
         add("tooltip.gallifreyan_chronicles.scroll", "Scroll to change");
         add("tooltip.gallifreyan_chronicles.key.linked", "Linked to TARDIS ID");
         add("tooltip.gallifreyan_chronicles.key.unlinked", "Not linked to a TARDIS");
@@ -316,11 +324,19 @@ public class GCLanguageProvider extends LanguageProvider {
         add("sounds.gallifreyan_chronicles.block_entity.is_locked", "TARDIS door is locked");
         add("sounds.gallifreyan_chronicles.block_entity.key_jammed", "TARDIS key jams");
         add("sounds.gallifreyan_chronicles.block_entity.first_doctors_hum", "TARDIS hums");
+        add("gallifreyan_chronicles.title.tile_screen", "Gallifreyan Chronicles Main Theme");
 
         // Jade
         add("tooltip.gallifreyan_chronicles.tardis.owner", "Owner");
+        add("tooltip.gallifreyan_chronicles.key.style", "Style");
+        add("key_style.gallifreyan_chronicles.tardis", "TARDIS");
+        add("key_style.gallifreyan_chronicles.gallifreyan", "Gallifreyan");
+        add("key_style.gallifreyan_chronicles.yale", "Yale");
         add("tooltip.gallifreyan_chronicles.tardis.owner_unknown", "Unknown");
         add("config.jade.plugin_gallifreyan_chronicles.tardis_owner", "TARDIS Owner");
+        add("config.jade.plugin_gallifreyan_chronicles.tardis_exterior_info", "TARDIS Exterior");
+        add("config.jade.plugin_gallifreyan_chronicles.tardis_console_info", "TARDIS Console Model and Variant");
+        add("tooltip.gallifreyan_chronicles.tardis.exterior", "Exterior");
         add("config.jade.plugin_gallifreyan_chronicles", "Gallifreyan Chronicles");
         add("config.jade.plugin_gallifreyan_chronicles.tardis_control", "TARDIS Control Icon");
     }

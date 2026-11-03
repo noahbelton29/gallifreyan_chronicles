@@ -63,12 +63,14 @@ loom {
             ideConfigGenerated(true)
             runDir('runs/client')
             programArgs "--username", "Tester1"
+            property('fabric.remapClasspathFile', layout.buildDirectory.file('essential-dev/remapClasspath.txt').get().asFile.absolutePath)
         }
         client2 {
             client()
             name = "Client 2"
             runDir "run2"
             programArgs "--username", "Tester2"
+            property('fabric.remapClasspathFile', layout.buildDirectory.file('essential-dev/remapClasspath.txt').get().asFile.absolutePath)
         }
         server {
             server()
@@ -79,10 +81,29 @@ loom {
     }
 }
 
+def essentialDevDir = layout.buildDirectory.dir('essential-dev')
+def essentialDevSetup = tasks.register('essentialDevSetup') {
+    def outDir = essentialDevDir
+    def remapClasspath = configurations.compileClasspath
+    inputs.files(remapClasspath)
+    outputs.dir(outDir)
+    doLast {
+        def dir = outDir.get().asFile
+        new File(dir, 'mappings').mkdirs()
+        new File(dir, 'mappings/mappings.tiny').text = "tiny\t2\t0\tofficial\tintermediary\tnamed\n"
+        new File(dir, 'remapClasspath.txt').text = remapClasspath.files.collect { it.absolutePath }.join(File.pathSeparator)
+    }
+}
+
 dependencies {
     implementation("com.geckolib:geckolib-fabric-${providers.gradleProperty("minecraft_version").get()}:${providers.gradleProperty("geckolib_version").get()}")
     compileOnly("maven.modrinth:jade:${jade_fabric_version}")
     runtimeOnly("maven.modrinth:jade:${jade_fabric_version}")
+    compileOnly(files(rootProject.file("libs/essential/essential-fabric-26.3.jar")))
+    runtimeOnly(files(rootProject.file("libs/essential/essential-1.5.1-fabric-26.3.jar")))
+    runtimeOnly(files(essentialDevDir).builtBy(essentialDevSetup))
+    compileOnly("maven.modrinth:sound-physics-remastered:fabric-${sound_physics_version}")
+    runtimeOnly("maven.modrinth:sound-physics-remastered:fabric-${sound_physics_version}")
 //    implementation("foundry.imguimc:imguimc-fabric-${project.minecraft_version}:${project.imguimc_version}")
 //    runtimeOnly("foundry.imguimc:imguimc-fabric-${project.minecraft_version}:${project.imguimc_version}")
 }

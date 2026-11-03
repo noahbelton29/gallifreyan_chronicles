@@ -42,7 +42,7 @@ public enum ItemInfoTooltip implements TooltipProvider {
             case TARDIS -> addTardis(tooltip, flag, components);
             case CONSOLE -> addConsole(tooltip, flag, components);
             case DOOR -> addDoor(tooltip, flag, components);
-            case KEY -> addKey(tooltip, components);
+            case KEY -> addKey(tooltip, flag, components);
         }
     }
 
@@ -64,6 +64,7 @@ public enum ItemInfoTooltip implements TooltipProvider {
         String variantId = components.get(GCDataComponents.CONSOLE_VARIANT);
 
         if (consoleId != null && !consoleId.isEmpty()) {
+            variantId = ConsoleBlockItem.effectiveVariantId(consoleId, variantId);
             tooltip.accept(SelectionTooltip.line("tooltip.gallifreyan_chronicles.console.model",
                     SelectionTooltip.highlight(SelectionTooltip.displayName("tardis_console", consoleId))));
 
@@ -97,7 +98,14 @@ public enum ItemInfoTooltip implements TooltipProvider {
         }
     }
 
-    private static void addKey(Consumer<Component> tooltip, DataComponentGetter components) {
+    private static void addKey(Consumer<Component> tooltip, TooltipFlag flag, DataComponentGetter components) {
+        String style = TardisKeyItem.styleOf(components.get(GCDataComponents.KEY_STYLE));
+        tooltip.accept(SelectionTooltip.line("tooltip.gallifreyan_chronicles.key.style",
+                SelectionTooltip.highlight(SelectionTooltip.displayName("key_style", Constants.MOD_ID + ":" + style))));
+        if (flag.isCreative()) {
+            tooltip.accept(SelectionTooltip.scrollHint());
+        }
+
         UUID tardisId = components.get(GCDataComponents.TARDIS_ID);
         if (tardisId == null) {
             tooltip.accept(Component.translatable("tooltip.gallifreyan_chronicles.key.unlinked")

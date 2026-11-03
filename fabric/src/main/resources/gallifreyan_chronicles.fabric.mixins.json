@@ -7,7 +7,6 @@
   "client": [
     "LogoRendererMixin",
     "WindowMixin",
-    "TitleScreenMixin",
     "client.IrisBlindnessMixin"
   ],
   "server": [],

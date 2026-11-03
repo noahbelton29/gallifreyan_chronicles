@@ -34,7 +34,6 @@ public class GCGallifreyBiomes {
         MobSpawnSettings.Builder spawnBuilder = new MobSpawnSettings.Builder();
         BiomeGenerationSettings.Builder biomeBuilder =
                 new BiomeGenerationSettings.Builder(placedFeatureGetter, carverGetter);
-        BiomeDefaultFeatures.addDefaultCrystalFormations(biomeBuilder);
         BiomeDefaultFeatures.addDefaultMonsterRoom(biomeBuilder);
         BiomeDefaultFeatures.addDefaultUndergroundVariety(biomeBuilder);
         BiomeDefaultFeatures.addDefaultOres(biomeBuilder);
@@ -63,9 +62,9 @@ public class GCGallifreyBiomes {
                         .build())
                 .setAttribute(EnvironmentAttributes.SKY_COLOR, rgb(0xFF8833))
                 .setAttribute(EnvironmentAttributes.AMBIENT_LIGHT_COLOR, rgb(0xFF9944))
-                .setAttribute(EnvironmentAttributes.FOG_COLOR, rgb(0xFF9944))
-                .setAttribute(EnvironmentAttributes.FOG_START_DISTANCE, 40.0F)
-                .setAttribute(EnvironmentAttributes.FOG_END_DISTANCE, 100.0F)
+                .setAttribute(EnvironmentAttributes.FOG_COLOR, rgb(0xF0964A))
+                .setAttribute(EnvironmentAttributes.FOG_START_DISTANCE, 48.0F)
+                .setAttribute(EnvironmentAttributes.FOG_END_DISTANCE, 192.0F)
                 .mobSpawnSettings(spawnBuilder.build())
                 .generationSettings(biomeBuilder.build())
                 .build();
@@ -78,7 +77,6 @@ public class GCGallifreyBiomes {
         MobSpawnSettings.Builder spawnBuilder = new MobSpawnSettings.Builder();
         BiomeGenerationSettings.Builder biomeBuilder =
                 new BiomeGenerationSettings.Builder(placedFeatureGetter, carverGetter);
-        BiomeDefaultFeatures.addDefaultCrystalFormations(biomeBuilder);
         BiomeDefaultFeatures.addDefaultMonsterRoom(biomeBuilder);
         BiomeDefaultFeatures.addDefaultUndergroundVariety(biomeBuilder);
         BiomeDefaultFeatures.addDefaultOres(biomeBuilder);
@@ -116,11 +114,11 @@ public class GCGallifreyBiomes {
                         .waterColor(0xBDB133)
                         .grassColorOverride(0xE0E0E0)
                         .build())
-                .setAttribute(EnvironmentAttributes.FOG_COLOR, rgb(0xFF590a0a))
-                .setAttribute(EnvironmentAttributes.SKY_COLOR, rgb(0xFF790d0d))
+                .setAttribute(EnvironmentAttributes.FOG_COLOR, rgb(0x8C2218))
+                .setAttribute(EnvironmentAttributes.SKY_COLOR, rgb(0xB02A1E))
                 .setAttribute(EnvironmentAttributes.AMBIENT_LIGHT_COLOR, rgb(0xFF590a0a))
-                .setAttribute(EnvironmentAttributes.FOG_START_DISTANCE, 40.0F)
-                .setAttribute(EnvironmentAttributes.FOG_END_DISTANCE, 60.0F)
+                .setAttribute(EnvironmentAttributes.FOG_START_DISTANCE, 32.0F)
+                .setAttribute(EnvironmentAttributes.FOG_END_DISTANCE, 160.0F)
                 .mobSpawnSettings(spawnBuilder.build())
                 .generationSettings(biomeBuilder.build())
                 .build();
@@ -133,7 +131,6 @@ public class GCGallifreyBiomes {
         MobSpawnSettings.Builder spawnBuilder = new MobSpawnSettings.Builder();
         BiomeGenerationSettings.Builder biomeBuilder =
                 new BiomeGenerationSettings.Builder(placedFeatureGetter, carverGetter);
-        BiomeDefaultFeatures.addDefaultCrystalFormations(biomeBuilder);
         BiomeDefaultFeatures.addDefaultMonsterRoom(biomeBuilder);
         BiomeDefaultFeatures.addDefaultUndergroundVariety(biomeBuilder);
         BiomeDefaultFeatures.addDefaultOres(biomeBuilder);
@@ -152,9 +149,9 @@ public class GCGallifreyBiomes {
                         .build())
                 .setAttribute(EnvironmentAttributes.SKY_COLOR, rgb(0xFF6622))
                 .setAttribute(EnvironmentAttributes.AMBIENT_LIGHT_COLOR, rgb(0xFF7733))
-                .setAttribute(EnvironmentAttributes.FOG_COLOR, rgb(0xFF7733))
-                .setAttribute(EnvironmentAttributes.FOG_START_DISTANCE, 30.0F)
-                .setAttribute(EnvironmentAttributes.FOG_END_DISTANCE, 80.0F)
+                .setAttribute(EnvironmentAttributes.FOG_COLOR, rgb(0xE0723A))
+                .setAttribute(EnvironmentAttributes.FOG_START_DISTANCE, 40.0F)
+                .setAttribute(EnvironmentAttributes.FOG_END_DISTANCE, 176.0F)
                 .mobSpawnSettings(spawnBuilder.build())
                 .generationSettings(biomeBuilder.build())
                 .build();

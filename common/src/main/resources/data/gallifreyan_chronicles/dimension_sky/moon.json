@@ -1,28 +1,30 @@
 {
-  "dimension": "gallifreyan_chronicles:moon",
-  "sky_color": "#000000",
-  "shader_dimension": "the_end",
-  "stars": {
-    "count": 4000,
-    "min_size": 0.15,
-    "max_size": 0.35,
-    "fades_in_rain": false
-  },
   "bodies": [
     {
-      "texture": "minecraft:textures/environment/celestial/sun.png",
-      "yaw": 120.0,
+      "body": "gallifreyan_chronicles:sun",
+      "fades_in_rain": false,
       "pitch": 35.0,
       "size": 24.0,
-      "blend": "additive",
-      "fades_in_rain": false
+      "yaw": 120.0
     },
     {
-      "texture": "gallifreyan_chronicles:textures/environment/earth.png",
-      "yaw": 210.0,
+      "body": "gallifreyan_chronicles:earth",
       "pitch": 30.0,
-      "size": 32.0,
-      "fades_in_rain": false
+      "yaw": 210.0
     }
-  ]
+  ],
+  "dimension": "gallifreyan_chronicles:moon",
+  "overlay_fog": {
+    "end": 0.7,
+    "start": 0.1
+  },
+  "shader_dimension": "overworld",
+  "shader_sky": "overlay",
+  "sky_color": "#000000",
+  "stars": {
+    "count": 4000,
+    "fades_in_rain": false,
+    "max_size": 0.35,
+    "twinkle": 0.5
+  }
 }

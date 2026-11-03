@@ -8,10 +8,10 @@
       "modifier": "overlay"
     },
     "minecraft:visual/ambient_light_color": "#590a0a",
-    "minecraft:visual/fog_color": "#590a0a",
-    "minecraft:visual/fog_end_distance": 60.0,
-    "minecraft:visual/fog_start_distance": 40.0,
-    "minecraft:visual/sky_color": "#790d0d"
+    "minecraft:visual/fog_color": "#8c2218",
+    "minecraft:visual/fog_end_distance": 160.0,
+    "minecraft:visual/fog_start_distance": 32.0,
+    "minecraft:visual/sky_color": "#b02a1e"
   },
   "carvers": [],
   "downfall": 0.1,
@@ -22,9 +22,7 @@
   "features": [
     [],
     [],
-    [
-      "minecraft:amethyst_geode"
-    ],
+    [],
     [
       "minecraft:monster_room",
       "minecraft:monster_room_deep"

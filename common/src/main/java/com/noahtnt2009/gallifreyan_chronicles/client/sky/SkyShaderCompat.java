@@ -30,6 +30,9 @@ public final class SkyShaderCompat {
     private static @Nullable Method namespacedIdNamespace;
     private static @Nullable Method namespacedIdName;
     private static boolean pipelinesAssigned;
+    private static boolean packCheckResolved;
+    private static @Nullable Object irisApi;
+    private static @Nullable Method isShaderPackInUse;
 
     private SkyShaderCompat() {
     }
@@ -52,6 +55,27 @@ public final class SkyShaderCompat {
             available = true;
         } catch (ReflectiveOperationException | LinkageError e) {
             available = false;
+        }
+    }
+
+    public static boolean isShaderPackInUse() {
+        if (!packCheckResolved) {
+            packCheckResolved = true;
+            try {
+                Class<?> api = Class.forName("net.irisshaders.iris.api.v0.IrisApi");
+                irisApi = api.getMethod("getInstance").invoke(null);
+                isShaderPackInUse = api.getMethod("isShaderPackInUse");
+            } catch (ReflectiveOperationException | LinkageError | RuntimeException e) {
+                irisApi = null;
+                isShaderPackInUse = null;
+            }
+        }
+        if (irisApi == null || isShaderPackInUse == null) return false;
+        try {
+            return (Boolean) isShaderPackInUse.invoke(irisApi);
+        } catch (ReflectiveOperationException | RuntimeException e) {
+            isShaderPackInUse = null;
+            return false;
         }
     }
 

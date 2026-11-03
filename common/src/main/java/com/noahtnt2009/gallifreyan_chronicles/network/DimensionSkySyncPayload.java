@@ -1,5 +1,7 @@
 package com.noahtnt2009.gallifreyan_chronicles.network;
 
+import com.noahtnt2009.gallifreyan_chronicles.sky.CelestialBody;
+import com.noahtnt2009.gallifreyan_chronicles.sky.CelestialBodyRegistry;
 import com.noahtnt2009.gallifreyan_chronicles.sky.DimensionSky;
 import com.noahtnt2009.gallifreyan_chronicles.sky.DimensionSkyRegistry;
 import com.noahtnt2009.gallifreyan_chronicles.util.GCUtils;
@@ -14,17 +16,18 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-public record DimensionSkySyncPayload(List<DimensionSky> skies) implements CustomPacketPayload {
+public record DimensionSkySyncPayload(List<CelestialBody> bodies, List<DimensionSky> skies) implements CustomPacketPayload {
     public static final Type<DimensionSkySyncPayload> TYPE =
             new Type<>(GCUtils.modIdentifier("dimension_sky_sync"));
 
     public static final StreamCodec<FriendlyByteBuf, DimensionSkySyncPayload> STREAM_CODEC = StreamCodec.composite(
+            CelestialBody.STREAM_CODEC.apply(ByteBufCodecs.list()), DimensionSkySyncPayload::bodies,
             DimensionSky.STREAM_CODEC.apply(ByteBufCodecs.list()), DimensionSkySyncPayload::skies,
             DimensionSkySyncPayload::new
     );
 
     public static DimensionSkySyncPayload create() {
-        return new DimensionSkySyncPayload(List.copyOf(DimensionSkyRegistry.getAll()));
+        return new DimensionSkySyncPayload(List.copyOf(CelestialBodyRegistry.getAll()), List.copyOf(DimensionSkyRegistry.getAll()));
     }
 
     public void apply() {
@@ -32,6 +35,7 @@ public record DimensionSkySyncPayload(List<DimensionSky> skies) implements Custo
                 .map(DimensionSky::id)
                 .collect(Collectors.toSet());
 
+        GCSyncPayload.apply(bodies, CelestialBodyRegistry::clear, CelestialBodyRegistry::register, "Celestial Body");
         GCSyncPayload.apply(skies, DimensionSkyRegistry::clear, DimensionSkyRegistry::register, "Dimension Sky");
 
         Set<String> newIds = skies.stream()

@@ -1,5 +1,6 @@
 package com.noahtnt2009.gallifreyan_chronicles.data;
 
+import com.noahtnt2009.gallifreyan_chronicles.sky.CelestialBodyLoader;
 import com.noahtnt2009.gallifreyan_chronicles.sky.DimensionSkyLoader;
 import com.noahtnt2009.gallifreyan_chronicles.tardis.console.TardisConsoleLoader;
 import com.noahtnt2009.gallifreyan_chronicles.tardis.console.TardisConsoleVariantLoader;
@@ -22,6 +23,7 @@ public final class GCDataLoaders {
             new Entry("tardis_consoles", TardisConsoleLoader::new),
             new Entry("tardis_console_variants", TardisConsoleVariantLoader::new),
             new Entry("tardis_door_variants", TardisDoorVariantLoader::new),
+            new Entry("celestial_body", CelestialBodyLoader::new),
             new Entry("dimension_sky", DimensionSkyLoader::new)
     );
 

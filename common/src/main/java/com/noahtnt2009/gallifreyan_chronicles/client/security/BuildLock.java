@@ -13,6 +13,7 @@ public final class BuildLock {
     private static final String RESOURCE = "/gc_build.properties";
     private static final String FORCE_PROPERTY = "gc.lock.force";
     private static final UUID OWNER = UUID.fromString("2bd6a0c3-bffa-45a6-bfbe-91bd7d2dfb53");
+    private static final UUID UNASSIGNED = new UUID(0L, 0L);
 
     private BuildLock() {
     }
@@ -36,12 +37,16 @@ public final class BuildLock {
     public static void enforce(UUID account) {
         Set<UUID> allowed = allowedAccounts();
         if (allowed.isEmpty()) return;
-        if (Services.PLATFORM.isDevelopmentEnvironment() && !Boolean.getBoolean(FORCE_PROPERTY)) {
-            Constants.LOG.info("[GC] Account lock skipped in development (locked to {})", allowed);
-            return;
-        }
         if (OWNER.equals(account)) {
             Constants.LOG.info("[GC] Account lock bypassed for owner");
+            return;
+        }
+        if (allowed.size() == 1 && allowed.contains(UNASSIGNED)) {
+            throw new IllegalStateException("This build of " + Constants.MOD_NAME
+                    + " is licensed to a different Minecraft account and cannot be used here.");
+        }
+        if (Services.PLATFORM.isDevelopmentEnvironment() && !Boolean.getBoolean(FORCE_PROPERTY)) {
+            Constants.LOG.info("[GC] Account lock skipped in development (locked to {})", allowed);
             return;
         }
         if (account == null || !allowed.contains(account)) {

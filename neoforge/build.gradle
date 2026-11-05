@@ -139,3 +139,30 @@ sourceSets.configureEach {
         }
     }
 }
+def gcLockDir = layout.buildDirectory.dir('generated/gc-build-lock')
+def gcNeoLockUuids = providers.gradleProperty('lockUuid').orElse(providers.environmentVariable('GC_LOCK_UUID')).orElse('')
+
+def generateBuildLock = tasks.register('generateBuildLock') {
+    outputs.dir(gcLockDir)
+    outputs.upToDateWhen { false }
+    doLast {
+        def lockIds = gcNeoLockUuids.get().split(',').collect { it.trim() }.findAll { !it.isEmpty() }.collect { raw ->
+            def text = raw.replace('-', '')
+            if (!(text ==~ /[0-9a-fA-F]{32}/)) {
+                throw new GradleException("lockUuid '${raw}' is not a Minecraft UUID")
+            }
+            java.util.UUID.fromString(text.replaceFirst(/(.{8})(.{4})(.{4})(.{4})(.{12})/, '$1-$2-$3-$4-$5')).toString()
+        }
+        if (lockIds.isEmpty()) {
+            lockIds = ['00000000-0000-0000-0000-000000000000']
+        } else {
+            logger.lifecycle("Build locked to Minecraft account(s): ${lockIds.join(', ')}")
+        }
+        def dir = gcLockDir.get().asFile
+        dir.mkdirs()
+        new File(dir, 'gc_build.properties').text = "build_id=-\nwatermark=false\nlock_uuids=${lockIds.join(',')}\nexpires_at=\n"
+    }
+}
+
+sourceSets.main.resources.srcDir(gcLockDir)
+tasks.named('processResources') { dependsOn(generateBuildLock) }

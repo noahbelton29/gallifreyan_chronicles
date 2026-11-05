@@ -32,6 +32,7 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.protocol.Packet;
 import net.minecraft.network.protocol.game.ClientGamePacketListener;
 import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
+import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundSource;
@@ -165,13 +166,21 @@ public class InteriorDoorBlockEntity extends BlockEntity implements GeoBlockEnti
 
     private void applyInteriorDoorVariant(ServerLevel serverLevel) {
         if (tardisId == null || !storedVariantId().isEmpty()) return;
-        TardisInterior interior = TardisInteriorSystem.getInteriorDefinition(serverLevel.getServer(), tardisId);
-        if (interior.doorVariant().isPresent()) {
-            setDoorVariant(interior.doorVariant().get());
+        matchTardis(serverLevel.getServer(), tardisId);
+    }
+
+    public void matchTardis(MinecraftServer server, UUID id) {
+        if (!isLinked()) return;
+        String fromExterior = TardisApi.get(server, id).flatMap(Tardis::exterior)
+                .map(exterior -> TardisDoorRegistry.interiorVariantForExterior(exterior.getExterior().id()))
+                .orElse(null);
+        if (fromExterior != null) {
+            setDoorVariant(fromExterior);
             return;
         }
-        TardisApi.get(serverLevel.getServer(), tardisId).flatMap(Tardis::exterior)
-                .map(exterior -> TardisDoorRegistry.interiorVariantForExterior(exterior.getExterior().id()))
+        TardisInterior interior = TardisInteriorSystem.getInteriorDefinition(server, id);
+        interior.doorVariant()
+                .filter(TardisDoorRegistry::isInteriorVariant)
                 .ifPresent(this::setDoorVariant);
     }
 

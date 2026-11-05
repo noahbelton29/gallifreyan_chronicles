@@ -52,7 +52,7 @@ public class GCLanguageProvider extends LanguageProvider {
             add(item, titleCase(BuiltInRegistries.ITEM.getKey(item).getPath()));
         }
 
-        // TARDIS controls: every registered control gets a name, so a new control can't ship without one
+        // TARDIS controls
         for (String id : TardisControlRegistry.allIds()) {
             add(TardisControlRegistry.translationKey(id), titleCase(id));
         }

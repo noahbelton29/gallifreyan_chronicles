@@ -1,0 +1,13 @@
+{
+  "structure": "gallifreyan_chronicles:tuat_interior",
+  "spawn": { "x": 8.171, "y": 1.0, "z": 18.872 },
+  "facing": "north",
+  "exterior": "first_doctors_exterior",
+  "console": "brachacki_console",
+  "console_variant": "tuat_console",
+  "door_variant": "first_doctors_doors",
+  "exit": {
+    "min": { "x": 6, "y": 0.5, "z": 21 },
+    "max": { "x": 8, "y": 3.5, "z": 22 }
+  }
+}

@@ -357,6 +357,10 @@ public final class TardisInteriorSystem {
         manager.clearInteriorOrigin(tardisId);
         manager.setInteriorId(tardisId, newDef.id());
         buildInteriorIfMissing(level, tardisId, carry);
+        BlockPos doorPos = findInteriorDoor(level, tardisId);
+        if (doorPos != null && level.getBlockEntity(doorPos) instanceof InteriorDoorBlockEntity door) {
+            door.matchTardis(server, tardisId);
+        }
         DoorSyncSystem.reconcileConsole(server, tardisId);
         TardisDimensionManager.scheduleControlPlacement(tardisId);
 

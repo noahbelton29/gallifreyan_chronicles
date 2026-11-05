@@ -5,7 +5,7 @@ import com.noahtnt2009.gallifreyan_chronicles.tardis.control.ControlPower;
 import com.noahtnt2009.gallifreyan_chronicles.Constants;
 import com.noahtnt2009.gallifreyan_chronicles.block.entity.TardisConsoleBlockEntity;
 import com.noahtnt2009.gallifreyan_chronicles.tardis.api.TardisApi;
-import com.noahtnt2009.gallifreyan_chronicles.tardis.console.control.ConsoleControlManager;
+import com.noahtnt2009.gallifreyan_chronicles.tardis.control.ConsoleControlManager;
 import com.noahtnt2009.gallifreyan_chronicles.tardis.control.TardisControl;
 import com.noahtnt2009.gallifreyan_chronicles.tardis.control.TardisControlRegistry;
 import com.noahtnt2009.gallifreyan_chronicles.tardis.security.IsomorphicPunishment;

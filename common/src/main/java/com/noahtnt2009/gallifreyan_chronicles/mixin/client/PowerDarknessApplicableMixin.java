@@ -1,6 +1,6 @@
 package com.noahtnt2009.gallifreyan_chronicles.mixin.client;
 
-import com.noahtnt2009.gallifreyan_chronicles.client.hud.GCPowerDarkness;
+import com.noahtnt2009.gallifreyan_chronicles.client.gui.hud.GCPowerDarkness;
 import net.minecraft.client.Camera;
 import net.minecraft.client.DeltaTracker;
 import net.minecraft.client.Minecraft;

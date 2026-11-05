@@ -1,7 +1,7 @@
 package com.noahtnt2009.gallifreyan_chronicles.world.tree;
 
 import com.noahtnt2009.gallifreyan_chronicles.Constants;
-import com.noahtnt2009.gallifreyan_chronicles.world.GCConfiguredFeatures;
+import com.noahtnt2009.gallifreyan_chronicles.world.feature.GCConfiguredFeatures;
 import net.minecraft.util.random.WeightedList;
 import net.minecraft.world.level.block.grower.TreeGrower;
 

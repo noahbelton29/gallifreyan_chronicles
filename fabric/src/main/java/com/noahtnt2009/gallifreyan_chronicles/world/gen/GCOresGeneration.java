@@ -2,7 +2,7 @@ package com.noahtnt2009.gallifreyan_chronicles.world.gen;
 
 import com.noahtnt2009.gallifreyan_chronicles.Constants;
 import com.noahtnt2009.gallifreyan_chronicles.init.GCDimensions;
-import com.noahtnt2009.gallifreyan_chronicles.world.GCPlacedFeatures;
+import com.noahtnt2009.gallifreyan_chronicles.world.feature.GCPlacedFeatures;
 import net.fabricmc.fabric.api.biome.v1.BiomeModifications;
 import net.minecraft.world.level.levelgen.GenerationStep;
 

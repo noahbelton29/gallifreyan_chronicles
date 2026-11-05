@@ -25,9 +25,9 @@
             "com.noahtnt2009.gallifreyan_chronicles.GallifreyanChroniclesFabricClient"
         ],
         "modmenu": [
-            "com.noahtnt2009.gallifreyan_chronicles.compat.GCModMenuIntegration"
+            "com.noahtnt2009.gallifreyan_chronicles.compat.modmenu.GCModMenuIntegration"
         ],
-        "jade": ["com.noahtnt2009.gallifreyan_chronicles.compat.GCJadePlugin"]
+        "jade": ["com.noahtnt2009.gallifreyan_chronicles.compat.jade.GCJadePlugin"]
     },
     "mixins": [
         "${mod_id}.mixins.json",

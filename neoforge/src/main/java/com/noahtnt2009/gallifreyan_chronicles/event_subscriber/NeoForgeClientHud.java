@@ -1,7 +1,7 @@
 package com.noahtnt2009.gallifreyan_chronicles.event_subscriber;
 
 import com.noahtnt2009.gallifreyan_chronicles.Constants;
-import com.noahtnt2009.gallifreyan_chronicles.client.hud.GCHudRenderer;
+import com.noahtnt2009.gallifreyan_chronicles.client.gui.hud.GCHudRenderer;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;

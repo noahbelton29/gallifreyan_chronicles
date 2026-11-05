@@ -2,5 +2,9 @@
   "default_exterior": "gallifreyan_chronicles:first_doctors_exterior",
   "default_console": "gallifreyan_chronicles:brachacki_console",
   "default_interior": "gallifreyan_chronicles:first_doctors_interior",
-  "show_version_hud": true
+  "show_version_hud": true,
+  "tardis_hum_volume": 1.0,
+  "camera_shake_intensity": 1.0,
+  "power_darkness_strength": 1.0,
+  "star_density": "normal"
 }

@@ -297,6 +297,8 @@
   "message.gallifreyan_chronicles.isomorphic_denied": "Isomorphic security: only the owner can use these controls.",
   "message.gallifreyan_chronicles.key_linked": "The key is now linked to this TARDIS.",
   "message.gallifreyan_chronicles.lock_jammed": "The lock is jammed!",
+  "message.gallifreyan_chronicles.wrong_key": "That key doesn't fit this TARDIS!",
+  "message.gallifreyan_chronicles.wrong_key_cooldown": "You can't try a key in this TARDIS for another %s seconds.",
   "message.gallifreyan_chronicles.lock_no_exterior": "The door lock has no linked TARDIS exterior!",
   "message.gallifreyan_chronicles.lock_too_damaged": "The lock is too damaged to take the key!",
   "message.gallifreyan_chronicles.locked": "Locked, this TARDIS",

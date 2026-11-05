@@ -260,6 +260,8 @@ public class GCLanguageProvider extends LanguageProvider {
         // Messages
         add("message.gallifreyan_chronicles.lock_too_damaged", "The lock is too damaged to take the key!");
         add("message.gallifreyan_chronicles.lock_jammed", "The lock is jammed!");
+        add("message.gallifreyan_chronicles.wrong_key", "That key doesn't fit this TARDIS!");
+        add("message.gallifreyan_chronicles.wrong_key_cooldown", "You can't try a key in this TARDIS for another %s seconds.");
         add("message.gallifreyan_chronicles.locked", "Locked, this TARDIS");
         add("message.gallifreyan_chronicles.locked_owned", "Locked, this TARDIS belongs to %s");
         add("message.gallifreyan_chronicles.unknown_player", "an unknown Player");

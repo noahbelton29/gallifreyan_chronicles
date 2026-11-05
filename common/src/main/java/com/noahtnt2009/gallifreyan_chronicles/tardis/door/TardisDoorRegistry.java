@@ -72,6 +72,49 @@ public final class TardisDoorRegistry {
         return variant != null ? variant.texture() : normalize(modelId);
     }
 
+    public static List<TardisDoorVariant> interiorVariants() {
+        return VARIANTS.values().stream().filter(TardisDoorVariant::interior).toList();
+    }
+
+    public static List<String> interiorVariantIds() {
+        return interiorVariants().stream().map(TardisDoorVariant::localId).toList();
+    }
+
+    public static boolean isInteriorVariant(String variantId) {
+        TardisDoorVariant variant = VARIANTS.get(localId(variantId));
+        return variant != null && variant.interior();
+    }
+
+    public static String defaultInteriorVariantId() {
+        List<TardisDoorVariant> all = interiorVariants();
+        for (TardisDoorVariant variant : all) {
+            if (variant.isDefault()) return variant.localId();
+        }
+        return all.isEmpty() ? "" : all.getFirst().localId();
+    }
+
+    public static @Nullable TardisDoorVariant resolveInterior(String variantId) {
+        TardisDoorVariant variant = VARIANTS.get(localId(variantId));
+        if (variant != null && variant.interior()) return variant;
+        return VARIANTS.get(defaultInteriorVariantId());
+    }
+
+    public static @Nullable String interiorVariantForExterior(String exteriorId) {
+        if (exteriorId == null || exteriorId.isEmpty()) return null;
+        String wanted = normalize(exteriorId);
+        for (TardisDoorVariant variant : interiorVariants()) {
+            if (!variant.exterior().isEmpty() && normalize(variant.exterior()).equals(wanted)) {
+                return variant.localId();
+            }
+        }
+        return null;
+    }
+
+    public static String localId(String id) {
+        int colon = id.indexOf(':');
+        return colon < 0 ? id : id.substring(colon + 1);
+    }
+
     public static void validate() {
         for (TardisDoorVariant variant : VARIANTS.values()) {
             long defaults = variantsOf(variant.parent()).stream().filter(TardisDoorVariant::isDefault).count();

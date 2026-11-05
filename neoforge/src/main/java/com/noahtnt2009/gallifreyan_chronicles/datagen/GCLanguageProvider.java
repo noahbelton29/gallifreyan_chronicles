@@ -73,11 +73,12 @@ public class GCLanguageProvider extends LanguageProvider {
         add("tooltip.gallifreyan_chronicles.console.variant", "Variant");
         add("tooltip.gallifreyan_chronicles.console.variant_default", "Default");
         add("tooltip.gallifreyan_chronicles.door.type", "Door");
-        add("door_type.gallifreyan_chronicles.tardis_interior_door", "Default");
         add("door_type.gallifreyan_chronicles.first_doctors_door", "First Doctor's Door");
         add("door_type.gallifreyan_chronicles.second_doctors_door", "Second Doctor's Door");
         add("door_type.gallifreyan_chronicles.second_doctors_door_alt", "Second Doctor's Door (Alt)");
         add("door_type.gallifreyan_chronicles.tuat_door", "TUAT Door");
+        add("door_type.gallifreyan_chronicles.first_doctors_interior_doors", "First Doctor's Interior Doors");
+        add("door_type.gallifreyan_chronicles.second_doctors_interior_doors", "Second Doctor's Interior Doors");
         add("tooltip.gallifreyan_chronicles.scroll", "Scroll to change");
         add("tooltip.gallifreyan_chronicles.key.linked", "Linked to TARDIS ID");
         add("tooltip.gallifreyan_chronicles.key.unlinked", "Not linked to a TARDIS");
@@ -339,5 +340,6 @@ public class GCLanguageProvider extends LanguageProvider {
         add("tooltip.gallifreyan_chronicles.tardis.exterior", "Exterior");
         add("config.jade.plugin_gallifreyan_chronicles", "Gallifreyan Chronicles");
         add("config.jade.plugin_gallifreyan_chronicles.tardis_control", "TARDIS Control Icon");
+        add("config.jade.plugin_gallifreyan_chronicles.tardis_block_icon", "TARDIS Exterior and Console Icon");
     }
 }

@@ -69,7 +69,7 @@ public class ConsoleAnimationDriver implements ConsoleAnimatable {
         if (level != null && level.isClientSide()) {
             applyAnimationLocally(controllerName, animationName);
         } else if (level instanceof ServerLevel serverLevel) {
-            TardisConsoleAnimationPayload payload = new TardisConsoleAnimationPayload(pos, animationName, controllerName);
+            TardisConsoleAnimationPayload payload = new TardisConsoleAnimationPayload(serverLevel.dimension().identifier(), pos, animationName, controllerName);
             Services.NETWORK.broadcastTardisConsoleAnimation(serverLevel.getServer(), payload);
         }
     }

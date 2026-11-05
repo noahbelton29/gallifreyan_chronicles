@@ -96,7 +96,7 @@ public class TardisConsoleBlockEntity extends BlockEntity implements GeoBlockEnt
         if (level instanceof ServerLevel serverLevel) {
             Services.NETWORK.broadcastTardisConsoleRotorState(
                     serverLevel.getServer(),
-                    new TardisConsoleRotorStatePayload(getBlockPos(), currentRotorState)
+                    new TardisConsoleRotorStatePayload(serverLevel.dimension().identifier(), getBlockPos(), currentRotorState)
             );
         }
     }
@@ -238,6 +238,10 @@ public class TardisConsoleBlockEntity extends BlockEntity implements GeoBlockEnt
 
     public void respawnControls() {
         controls.respawnControls();
+    }
+
+    public void ensureControls() {
+        controls.ensureControls();
     }
 
     @SuppressWarnings("unused")

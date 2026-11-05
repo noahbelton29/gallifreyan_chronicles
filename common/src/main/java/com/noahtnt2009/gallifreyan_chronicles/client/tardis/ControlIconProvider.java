@@ -1,5 +1,7 @@
 package com.noahtnt2009.gallifreyan_chronicles.client.tardis;
 
+import com.noahtnt2009.gallifreyan_chronicles.block.entity.TardisConsoleBlockEntity;
+import com.noahtnt2009.gallifreyan_chronicles.entity.TardisControlEntity;
 import com.noahtnt2009.gallifreyan_chronicles.init.GCBlocks;
 import com.noahtnt2009.gallifreyan_chronicles.util.GCUtils;
 import net.minecraft.resources.Identifier;
@@ -19,6 +21,11 @@ public class ControlIconProvider implements IEntityComponentProvider {
 
     @Override
     public @Nullable Element getIcon(@NonNull EntityAccessor accessor, @NonNull IPluginConfig config, @Nullable Element currentIcon) {
+        if (accessor.getEntity() instanceof TardisControlEntity control
+                && control.getConsolePos() != null
+                && accessor.getLevel().getBlockEntity(control.getConsolePos()) instanceof TardisConsoleBlockEntity console) {
+            return JadeUI.item(TardisBlockIconProvider.consoleStack(console));
+        }
         return JadeUI.item(new ItemStack(GCBlocks.TARDIS_CONSOLE));
     }
 

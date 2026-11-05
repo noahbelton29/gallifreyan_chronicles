@@ -1,5 +1,10 @@
 package com.noahtnt2009.gallifreyan_chronicles.client;
 
+import org.jspecify.annotations.Nullable;
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.resources.Identifier;
+import net.minecraft.core.registries.Registries;
+import com.noahtnt2009.gallifreyan_chronicles.compat.portal.TardisPortalBridge;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.core.registries.BuiltInRegistries;
 import com.noahtnt2009.gallifreyan_chronicles.client.sound.OffsetSoundInstance;
@@ -24,16 +29,22 @@ public final class GCClientHooks {
         mc.execute(mc::reloadResourcePacks);
     }
 
-    public static void applyConsoleRotorState(BlockPos pos, String rotorState) {
-        Level level = Minecraft.getInstance().level;
+    private static @Nullable Level clientLevel(Identifier dimension) {
+        Level current = Minecraft.getInstance().level;
+        if (current != null && current.dimension().identifier().equals(dimension)) return current;
+        return TardisPortalBridge.clientLevel(ResourceKey.create(Registries.DIMENSION, dimension));
+    }
+
+    public static void applyConsoleRotorState(Identifier dimension, BlockPos pos, String rotorState) {
+        Level level = clientLevel(dimension);
         if (level == null) return;
         if (level.getBlockEntity(pos) instanceof TardisConsoleBlockEntity console) {
             console.applyRotorStateClient(rotorState);
         }
     }
 
-    public static void applyConsoleAnimation(BlockPos pos, String animationName, String controllerName) {
-        Level level = Minecraft.getInstance().level;
+    public static void applyConsoleAnimation(Identifier dimension, BlockPos pos, String animationName, String controllerName) {
+        Level level = clientLevel(dimension);
         if (level == null) return;
         if (level.getBlockEntity(pos) instanceof TardisConsoleBlockEntity console) {
             console.triggerAnimationClient(animationName, controllerName);
@@ -76,12 +87,13 @@ public final class GCClientHooks {
 
             @Override
             public boolean isInFlight() {
-                return be.isInFlight();
+                Minecraft minecraft = Minecraft.getInstance();
+                return be.isInFlight() && minecraft.player != null && be.getLevel() == minecraft.player.level();
             }
 
             @Override
             public boolean isValid() {
-                return !be.isRemoved() && be.getLevel() != null && be.getLevel() == Minecraft.getInstance().level;
+                return !be.isRemoved() && be.getLevel() != null;
             }
         });
     }

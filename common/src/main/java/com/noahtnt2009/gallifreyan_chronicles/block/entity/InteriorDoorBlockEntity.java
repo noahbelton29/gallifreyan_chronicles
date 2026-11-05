@@ -18,6 +18,7 @@ import com.noahtnt2009.gallifreyan_chronicles.ecs.Entity;
 import com.noahtnt2009.gallifreyan_chronicles.init.GCSounds;
 import com.noahtnt2009.gallifreyan_chronicles.tardis.ecs.TardisComponentTypes;
 import com.noahtnt2009.gallifreyan_chronicles.tardis.door.TardisDoorRegistry;
+import com.noahtnt2009.gallifreyan_chronicles.tardis.door.TardisDoorVariant;
 import com.noahtnt2009.gallifreyan_chronicles.tardis.ecs.component.DoorState;
 import com.noahtnt2009.gallifreyan_chronicles.tardis.ecs.component.DoorVariantComponent;
 import com.noahtnt2009.gallifreyan_chronicles.tardis.ecs.system.DoorSyncSystem;
@@ -60,6 +61,9 @@ public class InteriorDoorBlockEntity extends BlockEntity implements GeoBlockEnti
     private boolean pulledFromExterior = false;
     private @Nullable UUID tardisId = null;
     private long lastLockedFeedbackAt = 0L;
+    private int doorAnimSeq = 0;
+    private String doorAnim = "";
+    private boolean doorAnimSeqKnown = false;
 
     public InteriorDoorBlockEntity(BlockPos pos, BlockState state) {
         super(TYPE.get(), pos, state);
@@ -75,16 +79,36 @@ public class InteriorDoorBlockEntity extends BlockEntity implements GeoBlockEnti
     }
 
     public String getVariant() {
-        return ((InteriorDoorBlock) getBlockState().getBlock()).variant();
+        InteriorDoorBlock block = (InteriorDoorBlock) getBlockState().getBlock();
+        if (block.isLinked()) {
+            TardisDoorVariant variant = TardisDoorRegistry.resolveInterior(storedVariantId());
+            if (variant != null) return TardisDoorRegistry.localId(variant.parent());
+        }
+        return block.variant();
+    }
+
+    private String storedVariantId() {
+        return asEntity().get(TardisComponentTypes.DOOR_VARIANT).variantId();
     }
 
     public String getDoorVariantId() {
         String fixed = ((InteriorDoorBlock) getBlockState().getBlock()).fixedVariantId();
         if (!fixed.isEmpty()) return fixed;
-        return asEntity().get(TardisComponentTypes.DOOR_VARIANT).variantId();
+        if (isLinked()) {
+            TardisDoorVariant variant = TardisDoorRegistry.resolveInterior(storedVariantId());
+            return variant != null ? variant.localId() : storedVariantId();
+        }
+        return storedVariantId();
     }
 
     public void setDoorVariant(String variantId) {
+        if (isLinked()) {
+            String resolved = TardisDoorRegistry.isInteriorVariant(variantId)
+                    ? TardisDoorRegistry.localId(variantId)
+                    : TardisDoorRegistry.defaultInteriorVariantId();
+            asEntity().set(TardisComponentTypes.DOOR_VARIANT, new DoorVariantComponent(resolved));
+            return;
+        }
         String model = getVariant();
         String resolved = TardisDoorRegistry.hasVariant(model, variantId)
                 ? variantId
@@ -131,6 +155,7 @@ public class InteriorDoorBlockEntity extends BlockEntity implements GeoBlockEnti
         if (pulledFromExterior || !(level instanceof ServerLevel serverLevel)) return;
         pulledFromExterior = true;
         if (!isLinked()) return;
+        InteriorDoorBlock.placeBarriers(serverLevel, getBlockPos(), getBlockState());
         tardisId = TardisApi.idOfLevel(serverLevel).orElse(null);
         if (tardisId == null) return;
         DoorSyncSystem.register(tardisId, this);
@@ -139,9 +164,15 @@ public class InteriorDoorBlockEntity extends BlockEntity implements GeoBlockEnti
     }
 
     private void applyInteriorDoorVariant(ServerLevel serverLevel) {
-        if (tardisId == null || !getDoorVariantId().isEmpty()) return;
+        if (tardisId == null || !storedVariantId().isEmpty()) return;
         TardisInterior interior = TardisInteriorSystem.getInteriorDefinition(serverLevel.getServer(), tardisId);
-        interior.doorVariant().ifPresent(this::setDoorVariant);
+        if (interior.doorVariant().isPresent()) {
+            setDoorVariant(interior.doorVariant().get());
+            return;
+        }
+        TardisApi.get(serverLevel.getServer(), tardisId).flatMap(Tardis::exterior)
+                .map(exterior -> TardisDoorRegistry.interiorVariantForExterior(exterior.getExterior().id()))
+                .ifPresent(this::setDoorVariant);
     }
 
     public void interact(boolean sneaking) {
@@ -155,7 +186,7 @@ public class InteriorDoorBlockEntity extends BlockEntity implements GeoBlockEnti
         if (controller != null) {
             controller.setAnimationSpeed(1.0);
         }
-        triggerAnim("anim_controller", result.animationName());
+        playDoorAnimation(result.animationName());
         playDoorSound(result.opening());
         sync();
 
@@ -170,7 +201,7 @@ public class InteriorDoorBlockEntity extends BlockEntity implements GeoBlockEnti
         if (controller != null) {
             controller.setAnimationSpeed(1.0);
         }
-        triggerAnim("anim_controller", animation);
+        playDoorAnimation(animation);
         playDoorSound(opening);
         sync();
     }
@@ -208,8 +239,17 @@ public class InteriorDoorBlockEntity extends BlockEntity implements GeoBlockEnti
     public void snapTo(DoorState state) {
         if (getDoorState() == state) return;
         DoorSystem.snapToState(asEntity(), state);
-        triggerAnim("anim_controller", animationFor(state));
+        playDoorAnimation(animationFor(state));
         sync();
+    }
+
+    private void playDoorAnimation(String animationName) {
+        if (level != null && level.isClientSide()) {
+            triggerAnim("anim_controller", animationName);
+            return;
+        }
+        doorAnimSeq++;
+        doorAnim = animationName;
     }
 
     private static String animationFor(DoorState state) {
@@ -267,12 +307,26 @@ public class InteriorDoorBlockEntity extends BlockEntity implements GeoBlockEnti
     protected void saveAdditional(@NonNull ValueOutput output) {
         super.saveAdditional(output);
         components.save(output, SAVED);
+        output.putInt("DoorAnimSeq", doorAnimSeq);
+        output.putString("DoorAnim", doorAnim);
     }
 
     @Override
     public void loadAdditional(@NonNull ValueInput input) {
         super.loadAdditional(input);
         components.load(input, SAVED);
+        int animSeq = input.getIntOr("DoorAnimSeq", 0);
+        String anim = input.getStringOr("DoorAnim", "");
+        if (doorAnimSeqKnown && animSeq != doorAnimSeq && !anim.isEmpty()
+                && level != null && level.isClientSide()) {
+            if (controller != null) {
+                controller.setAnimationSpeed(1.0);
+            }
+            triggerAnim("anim_controller", anim);
+        }
+        doorAnimSeq = animSeq;
+        doorAnim = anim;
+        doorAnimSeqKnown = true;
     }
 
     @Override

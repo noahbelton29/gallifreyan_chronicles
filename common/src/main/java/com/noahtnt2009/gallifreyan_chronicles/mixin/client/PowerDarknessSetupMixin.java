@@ -24,7 +24,7 @@ public abstract class PowerDarknessSetupMixin {
     @Inject(method = "setupFog", at = @At("HEAD"), cancellable = true)
     private void gcPowerDarkSetup(FogData fog, Camera camera, ClientLevel level, float renderDistance,
                                   DeltaTracker deltaTracker, CallbackInfo ci) {
-        float darkness = GCPowerDarkness.update();
+        float darkness = GCPowerDarkness.darknessOf(level);
         if (darkness <= 0.0F) return;
         if (camera.entity() instanceof LivingEntity living && living.hasEffect(MobEffects.BLINDNESS)) return;
 

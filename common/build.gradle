@@ -48,6 +48,7 @@ dependencies {
     implementation "maven.modrinth:8BmcQJ2H:VukyYOGN"
     compileOnly(files(rootProject.file("libs/essential/essential-fabric-26.3.jar")))
     compileOnly("maven.modrinth:sound-physics-remastered:fabric-${sound_physics_version}")
+    compileOnly("curse.maven:immersive-portal-1511174:${immersive_portals_fabric_file}")
 }
 
 configurations {

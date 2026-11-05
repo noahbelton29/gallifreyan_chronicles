@@ -59,6 +59,7 @@ public class GCBlockLootTableProvider extends BlockLootSubProvider {
         dropSelf(GCBlocks.BRACHACKI_FENCE_2);
         dropSelf(GCBlocks.BRACHACKI_FENCE_GATE_2);
         dropSelf(GCBlocks.BRACHACKI_TUAT_FLOOR_BLOCK);
+        dropSelf(GCBlocks.VOID_BLOCK);
         dropSelf(GCBlocks.BRACHACKI_STAIRS_3);
         add(GCBlocks.BRACHACKI_SLAB_3, this::createSlabItemTable);
         dropSelf(GCBlocks.BRACHACKI_PRESSURE_PLATE_3);

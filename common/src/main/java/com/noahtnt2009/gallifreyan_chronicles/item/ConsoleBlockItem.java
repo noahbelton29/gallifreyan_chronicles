@@ -33,6 +33,7 @@ public class ConsoleBlockItem extends BlockItem implements ScrollSelectable {
 
     private static final List<String> CONSOLE_ORDER = List.of(
             "brachacki_console",
+            "second_doctors_console_alt",
             "inferno_console",
             "ambassadors_of_death_console"
     );

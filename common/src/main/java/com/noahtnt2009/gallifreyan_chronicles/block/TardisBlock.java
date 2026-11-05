@@ -1,5 +1,6 @@
 package com.noahtnt2009.gallifreyan_chronicles.block;
 
+import com.noahtnt2009.gallifreyan_chronicles.compat.portal.TardisPortalBridge;
 import com.noahtnt2009.gallifreyan_chronicles.tardis.api.TardisApi;
 import com.noahtnt2009.gallifreyan_chronicles.Constants;
 import com.noahtnt2009.gallifreyan_chronicles.block.entity.TardisExteriorBlockEntity;
@@ -76,6 +77,7 @@ public class TardisBlock extends BaseEntityBlock {
             blockEntity.spawnKeyEntity();
 
             TardisApi.get(serverLevel.getServer(), record.tardisId()).ifPresent(tardis -> tardis.giveKeyTo(player));
+            TardisPortalBridge.onExteriorPlaced(serverLevel.getServer(), record.tardisId());
 
             Constants.LOG.debug(
                     "Registered TARDIS {} for player {}",

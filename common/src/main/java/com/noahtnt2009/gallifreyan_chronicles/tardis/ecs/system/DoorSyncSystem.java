@@ -1,5 +1,6 @@
 package com.noahtnt2009.gallifreyan_chronicles.tardis.ecs.system;
 
+import com.noahtnt2009.gallifreyan_chronicles.compat.portal.TardisPortalBridge;
 import com.noahtnt2009.gallifreyan_chronicles.block.entity.InteriorDoorBlockEntity;
 import com.noahtnt2009.gallifreyan_chronicles.block.entity.TardisExteriorBlockEntity;
 import com.noahtnt2009.gallifreyan_chronicles.init.GCTardisControls;
@@ -59,6 +60,7 @@ public final class DoorSyncSystem {
             door.applySyncedDoor(state, animation, opening);
         }
         syncDoorControl(server, tardisId, state);
+        TardisPortalBridge.onDoorsChanged(server, tardisId);
     }
 
     public static void onInteriorDoorChanged(MinecraftServer server, UUID tardisId, InteriorDoorBlockEntity source,
@@ -71,6 +73,7 @@ public final class DoorSyncSystem {
             if (door != source) door.applySyncedDoor(state, animation, opening);
         }
         syncDoorControl(server, tardisId, state);
+        TardisPortalBridge.onDoorsChanged(server, tardisId);
     }
 
     public static void syncDoorControl(MinecraftServer server, UUID tardisId, DoorState state) {

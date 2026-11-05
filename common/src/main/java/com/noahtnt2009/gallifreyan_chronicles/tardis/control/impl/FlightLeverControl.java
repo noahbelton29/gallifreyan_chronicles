@@ -291,10 +291,10 @@ public class FlightLeverControl extends BaseControl {
 
             for (TardisConsoleBlockEntity each : live) {
                 if (!(each.getLevel() instanceof ServerLevel eachLevel)) continue;
-                playAt(eachLevel, each.getBlockPos(), GCSounds.TARDIS_LAND_DRUM, 1.0F);
+                playAt(eachLevel, each.getBlockPos(), GCSounds.TARDIS_DRUM, 1.0F);
                 TardisDrumShakePayload.broadcast(eachLevel, Vec3.atCenterOf(each.getBlockPos()), 1.0F);
             }
-            playAtExterior(console, level, GCSounds.TARDIS_LAND_DRUM);
+            playAtExterior(console, level, GCSounds.TARDIS_DRUM);
         });
     }
 }

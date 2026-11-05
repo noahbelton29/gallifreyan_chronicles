@@ -4,23 +4,6 @@
 		"idle": {
 			"loop": "hold_on_last_frame"
 		},
-		"open_right": {
-			"loop": "hold_on_last_frame",
-			"animation_length": 0.75,
-			"bones": {
-				"right_door": {
-					"rotation": {
-						"0.0": {
-							"vector": [0, 0, 0]
-						},
-						"0.75": {
-							"vector": [0, 80, 0],
-							"easing": "easeOutQuint"
-						}
-					}
-				}
-			}
-		},
 		"open_left": {
 			"loop": "hold_on_last_frame",
 			"animation_length": 0.75,
@@ -43,6 +26,23 @@
 				}
 			}
 		},
+		"open_right": {
+			"loop": "hold_on_last_frame",
+			"animation_length": 0.75,
+			"bones": {
+				"right_door": {
+					"rotation": {
+						"0.0": {
+							"vector": [0, 0, 0]
+						},
+						"0.75": {
+							"vector": [0, 80, 0],
+							"easing": "easeOutQuint"
+						}
+					}
+				}
+			}
+		},
 		"close_left": {
 			"loop": "hold_on_last_frame",
 			"animation_length": 0.75,
@@ -55,7 +55,7 @@
 						"0.75": {
 							"vector": [0, 0, 0],
 							"easing": "easeOutBack",
-							"easingArgs": [0.5]
+							"easingArgs": [0]
 						}
 					}
 				}
@@ -72,7 +72,8 @@
 						},
 						"0.75": {
 							"vector": [0, 0, 0],
-							"easing": "easeOutBack"
+							"easing": "easeOutBack",
+							"easingArgs": [0]
 						}
 					}
 				}
@@ -129,7 +130,8 @@
 						},
 						"0.75": {
 							"vector": [0, 0, 0],
-							"easing": "easeOutBack"
+							"easing": "easeOutBack",
+							"easingArgs": [0]
 						}
 					}
 				}

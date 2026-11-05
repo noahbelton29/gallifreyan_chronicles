@@ -47,8 +47,11 @@ public final class GCHudRenderer {
         platformRgb = "NeoForge".equals(platformName) ? NEOFORGE_RGB : FABRIC_RGB;
     }
 
-    public static void render(GuiGraphicsExtractor graphics) {
+    public static void renderBelowHud(GuiGraphicsExtractor graphics) {
         GCPowerDarkness.render(graphics);
+    }
+
+    public static void render(GuiGraphicsExtractor graphics) {
         BuildExpiryOverlay.render(graphics);
         if (!GCConfig.showVersionHud()) return;
 

@@ -5,6 +5,7 @@ import com.mojang.serialization.DataResult;
 import com.noahtnt2009.gallifreyan_chronicles.Constants;
 import com.noahtnt2009.gallifreyan_chronicles.init.GCDataComponents;
 import com.noahtnt2009.gallifreyan_chronicles.tardis.console.TardisConsoleRegistry;
+import com.noahtnt2009.gallifreyan_chronicles.tardis.door.TardisDoorRegistry;
 import com.noahtnt2009.gallifreyan_chronicles.tardis.console.TardisConsoleVariant;
 import com.noahtnt2009.gallifreyan_chronicles.tardis.interior.TardisInteriorOptions;
 import net.minecraft.ChatFormatting;
@@ -22,6 +23,7 @@ public enum ItemInfoTooltip implements TooltipProvider {
     TARDIS,
     CONSOLE,
     DOOR,
+    INTERIOR_DOOR,
     KEY;
 
     public static final Codec<ItemInfoTooltip> CODEC = Codec.STRING.comapFlatMap(
@@ -42,6 +44,7 @@ public enum ItemInfoTooltip implements TooltipProvider {
             case TARDIS -> addTardis(tooltip, flag, components);
             case CONSOLE -> addConsole(tooltip, flag, components);
             case DOOR -> addDoor(tooltip, flag, components);
+            case INTERIOR_DOOR -> addInteriorDoor(tooltip, flag, components);
             case KEY -> addKey(tooltip, flag, components);
         }
     }
@@ -94,6 +97,20 @@ public enum ItemInfoTooltip implements TooltipProvider {
                 SelectionTooltip.highlight(SelectionTooltip.displayName("door_type", Constants.MOD_ID + ":" + type))));
 
         if (flag.isCreative()) {
+            tooltip.accept(SelectionTooltip.scrollHint());
+        }
+    }
+
+    private static void addInteriorDoor(Consumer<Component> tooltip, TooltipFlag flag, DataComponentGetter components) {
+        String type = components.get(GCDataComponents.DOOR_TYPE);
+        if (type == null || !TardisDoorRegistry.isInteriorVariant(type)) type = TardisDoorRegistry.defaultInteriorVariantId();
+        if (!type.isEmpty()) {
+            tooltip.accept(SelectionTooltip.line("tooltip.gallifreyan_chronicles.door.type",
+                    SelectionTooltip.highlight(SelectionTooltip.displayName("door_type",
+                            Constants.MOD_ID + ":" + TardisDoorRegistry.localId(type)))));
+        }
+
+        if (flag.isCreative() && TardisDoorRegistry.interiorVariantIds().size() > 1) {
             tooltip.accept(SelectionTooltip.scrollHint());
         }
     }

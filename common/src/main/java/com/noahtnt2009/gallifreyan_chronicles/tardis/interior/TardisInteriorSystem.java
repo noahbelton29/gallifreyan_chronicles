@@ -1,9 +1,12 @@
 package com.noahtnt2009.gallifreyan_chronicles.tardis.interior;
 
+import com.noahtnt2009.gallifreyan_chronicles.compat.portal.TardisPortalBridge;
 import com.noahtnt2009.gallifreyan_chronicles.tardis.api.TardisApi;
 import com.noahtnt2009.gallifreyan_chronicles.tardis.api.Tardis;
 import com.noahtnt2009.gallifreyan_chronicles.Constants;
+import com.noahtnt2009.gallifreyan_chronicles.block.InteriorDoorBlock;
 import com.noahtnt2009.gallifreyan_chronicles.block.entity.TardisConsoleBlockEntity;
+import com.noahtnt2009.gallifreyan_chronicles.block.entity.InteriorDoorBlockEntity;
 import com.noahtnt2009.gallifreyan_chronicles.block.entity.TardisExteriorBlockEntity;
 import com.noahtnt2009.gallifreyan_chronicles.init.GCBlocks;
 import com.noahtnt2009.gallifreyan_chronicles.tardis.console.TardisConsole;
@@ -12,6 +15,7 @@ import com.noahtnt2009.gallifreyan_chronicles.tardis.ecs.system.ConsoleLinkSyste
 import com.noahtnt2009.gallifreyan_chronicles.tardis.ecs.system.DoorSyncSystem;
 import com.noahtnt2009.gallifreyan_chronicles.tardis.manager.TardisManager;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
 import net.minecraft.core.Vec3i;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.Identifier;
@@ -24,6 +28,7 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.levelgen.structure.templatesystem.StructurePlaceSettings;
 import net.minecraft.world.level.levelgen.structure.templatesystem.StructureTemplate;
@@ -48,6 +53,9 @@ public final class TardisInteriorSystem {
     public static final BlockPos ORIGIN = new BlockPos(0, 64, 0);
 
     private static final double EXIT_DISTANCE = 2.0;
+    private static final double DOOR_EXIT_NEAR = 0.3;
+    private static final double DOOR_EXIT_FAR = 1.5;
+    private static final double DOOR_EXIT_HALF_WIDTH = 1.0;
 
     private static final String INTERIOR_PREFIX = "tardis/";
 
@@ -69,6 +77,7 @@ public final class TardisInteriorSystem {
 
         UUID tardisId = exterior.getTardisId();
         if (tardisId == null) return;
+        if (TardisPortalBridge.isActive(tardisId)) return;
 
         BlockPos pos = exterior.getBlockPos();
         double yawRad = Math.toRadians(exterior.getYaw());
@@ -120,6 +129,11 @@ public final class TardisInteriorSystem {
             if (player.isSpectator()) continue;
 
             UUID tardisId = interiorId.get();
+            if (TardisPortalBridge.isActive(tardisId)) continue;
+            if (isBehindOpenInteriorDoor(player, tardisId)) {
+                exitInterior(server, player, tardisId);
+                continue;
+            }
             AABB exitBox = getInteriorDefinition(server, tardisId).exitBox();
             double dx = player.getX() - ORIGIN.getX();
             double dy = player.getY() - ORIGIN.getY();
@@ -129,6 +143,31 @@ public final class TardisInteriorSystem {
             if (dz < exitBox.minZ || dz > exitBox.maxZ) continue;
             exitInterior(server, player, tardisId);
         }
+    }
+
+    private static boolean isBehindOpenInteriorDoor(ServerPlayer player, UUID tardisId) {
+        for (InteriorDoorBlockEntity door : DoorSyncSystem.doorsOf(tardisId)) {
+            if (door.isRemoved() || door.getLevel() != player.level()) continue;
+            if (door.getDoorState().isClosed()) continue;
+            BlockState state = door.getBlockState();
+            if (!(state.getBlock() instanceof InteriorDoorBlock)) continue;
+            Direction facing = state.getValue(InteriorDoorBlock.FACING);
+            Direction right = InteriorDoorBlock.rightDirectionOf(facing);
+            Direction back = facing.getOpposite();
+            Vec3 centre = Vec3.atBottomCenterOf(door.getBlockPos())
+                    .add(right.getStepX() * 0.5, 0.0, right.getStepZ() * 0.5);
+            double dx = player.getX() - centre.x;
+            double dz = player.getZ() - centre.z;
+            double dy = player.getY() - centre.y;
+            double depth = dx * back.getStepX() + dz * back.getStepZ();
+            double lateral = dx * right.getStepX() + dz * right.getStepZ();
+            if (depth >= DOOR_EXIT_NEAR && depth <= DOOR_EXIT_FAR
+                    && Math.abs(lateral) <= DOOR_EXIT_HALF_WIDTH
+                    && dy >= ZONE_BOTTOM && dy <= InteriorDoorBlock.HEIGHT) {
+                return true;
+            }
+        }
+        return false;
     }
 
     private static void exitInterior(MinecraftServer server, ServerPlayer player, UUID tardisId) {
@@ -169,6 +208,37 @@ public final class TardisInteriorSystem {
 
     public static boolean buildInteriorIfMissing(ServerLevel interior, UUID tardisId) {
         return buildInteriorIfMissing(interior, tardisId, null);
+    }
+
+    public static @Nullable ServerLevel prepareInterior(MinecraftServer server, UUID tardisId) {
+        try {
+            ServerLevel interior = TardisDimensionManager.getOrCreate(server, tardisId);
+            buildInteriorIfMissing(interior, tardisId);
+            return interior;
+        } catch (Exception e) {
+            Constants.LOG.error("failed to prepare tardis interior {}", tardisId, e);
+            return null;
+        }
+    }
+
+    public static @Nullable BlockPos findInteriorDoor(ServerLevel interior, UUID tardisId) {
+        MinecraftServer server = interior.getServer();
+        Identifier templateId = getInteriorDefinition(server, tardisId).structure();
+        Vec3i size = server.getStructureTemplateManager().get(templateId)
+                .map(StructureTemplate::getSize)
+                .orElse(FALLBACK_CLEAR_SIZE);
+        BlockPos stored = TardisManager.get(server).getInteriorOrigin(tardisId);
+        BlockPos origin = stored != null ? stored : ORIGIN;
+        loadInteriorChunks(interior, origin, size);
+
+        BlockPos max = origin.offset(size.getX() - 1, size.getY() - 1, size.getZ() - 1);
+        for (BlockPos p : BlockPos.betweenClosed(origin, max)) {
+            BlockState state = interior.getBlockState(p);
+            if (state.is(GCBlocks.TARDIS_INTERIOR_DOOR) && InteriorDoorBlock.isMaster(state)) {
+                return p.immutable();
+            }
+        }
+        return null;
     }
 
     private static boolean buildInteriorIfMissing(ServerLevel interior, UUID tardisId, @Nullable ConsoleCarryover carry) {

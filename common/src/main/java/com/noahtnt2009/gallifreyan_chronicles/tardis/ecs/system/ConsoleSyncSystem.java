@@ -3,6 +3,7 @@ package com.noahtnt2009.gallifreyan_chronicles.tardis.ecs.system;
 import com.noahtnt2009.gallifreyan_chronicles.tardis.api.TardisApi;
 import com.noahtnt2009.gallifreyan_chronicles.block.entity.TardisConsoleBlockEntity;
 import com.noahtnt2009.gallifreyan_chronicles.tardis.manager.TardisManager;
+import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
 import org.jspecify.annotations.Nullable;
 
@@ -20,6 +21,20 @@ public final class ConsoleSyncSystem {
             id = TardisApi.idOfLevel(console.getLevel()).orElse(null);
         }
         return id;
+    }
+
+    private static final int CONTROL_CHECK_INTERVAL_TICKS = 40;
+
+    public static void tick(MinecraftServer server) {
+        if (server.getTickCount() % CONTROL_CHECK_INTERVAL_TICKS != 0) return;
+        List<TardisConsoleBlockEntity> consoles;
+        synchronized (ConsoleSyncSystem.class) {
+            consoles = new ArrayList<>();
+            for (Set<TardisConsoleBlockEntity> set : CONSOLES.values()) consoles.addAll(set);
+        }
+        for (TardisConsoleBlockEntity console : consoles) {
+            if (!console.isRemoved()) console.ensureControls();
+        }
     }
 
     public static synchronized void register(TardisConsoleBlockEntity console) {

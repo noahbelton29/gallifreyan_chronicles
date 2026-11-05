@@ -7,13 +7,16 @@ import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
+import net.minecraft.resources.Identifier;
 import org.jspecify.annotations.NonNull;
 
-public record TardisConsoleAnimationPayload(BlockPos pos, String animationName, String controllerName) implements CustomPacketPayload {
+public record TardisConsoleAnimationPayload(Identifier dimension, BlockPos pos, String animationName, String controllerName) implements CustomPacketPayload {
     public static final Type<TardisConsoleAnimationPayload> TYPE =
             new Type<>(GCUtils.modIdentifier("tardis_console_animation"));
 
     public static final StreamCodec<RegistryFriendlyByteBuf, TardisConsoleAnimationPayload> STREAM_CODEC = StreamCodec.composite(
+            Identifier.STREAM_CODEC,
+            TardisConsoleAnimationPayload::dimension,
             BlockPos.STREAM_CODEC,
             TardisConsoleAnimationPayload::pos,
             ByteBufCodecs.STRING_UTF8,
@@ -23,12 +26,12 @@ public record TardisConsoleAnimationPayload(BlockPos pos, String animationName, 
             TardisConsoleAnimationPayload::new
     );
 
-    public TardisConsoleAnimationPayload(BlockPos pos, String animationName) {
-        this(pos, animationName, "controls");
+    public TardisConsoleAnimationPayload(Identifier dimension, BlockPos pos, String animationName) {
+        this(dimension, pos, animationName, "controls");
     }
 
     public void apply() {
-        GCClientHooks.applyConsoleAnimation(pos, animationName, controllerName);
+        GCClientHooks.applyConsoleAnimation(dimension, pos, animationName, controllerName);
     }
 
     @Override

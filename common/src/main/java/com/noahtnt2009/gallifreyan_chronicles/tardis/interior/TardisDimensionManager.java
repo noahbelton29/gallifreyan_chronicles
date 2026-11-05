@@ -1,5 +1,6 @@
 package com.noahtnt2009.gallifreyan_chronicles.tardis.interior;
 
+import com.noahtnt2009.gallifreyan_chronicles.compat.portal.TardisPortalBridge;
 import com.noahtnt2009.gallifreyan_chronicles.tardis.api.TardisApi;
 import com.noahtnt2009.gallifreyan_chronicles.tardis.api.Tardis;
 import com.noahtnt2009.gallifreyan_chronicles.Constants;
@@ -68,6 +69,7 @@ public final class TardisDimensionManager {
         server.getPlayerList().addWorldborderListener(level);
 
         Constants.LOG.info("created tardis dimension {}", key.identifier());
+        TardisPortalBridge.onDimensionsChanged(server);
         return level;
     }
 

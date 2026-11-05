@@ -15,6 +15,7 @@
     "client.SkyRendererMixin",
     "client.LevelRendererSkyOverlayMixin",
     "client.IrisDimensionMixin",
+    "client.IrisBlindnessMixin",
     "client.BuildSecurityMixin",
     "client.ClientTickMixin",
     "client.SoundOptionsScreenMixin",

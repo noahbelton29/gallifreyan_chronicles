@@ -26,6 +26,7 @@ final class TardisPortalClient {
 
     static void tintPortalForPowerDarkness(Object object) {
         if (!(object instanceof Portal portal)) return;
+        if (GCPowerDarkness.shaderPackHandlesDarkness()) return;
         Level destination = ClientWorldLoader.peekWorld(portal.getDestDim());
         float darkness = GCPowerDarkness.darknessOf(destination);
         if (darkness <= 0.0F) return;

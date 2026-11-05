@@ -6,8 +6,7 @@
   "mixins": [],
   "client": [
     "LogoRendererMixin",
-    "WindowMixin",
-    "client.IrisBlindnessMixin"
+    "WindowMixin"
   ],
   "server": [],
   "injectors": {

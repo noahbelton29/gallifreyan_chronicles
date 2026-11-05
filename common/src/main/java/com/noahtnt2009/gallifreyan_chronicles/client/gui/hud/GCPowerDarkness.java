@@ -1,5 +1,6 @@
 package com.noahtnt2009.gallifreyan_chronicles.client.gui.hud;
 
+import com.noahtnt2009.gallifreyan_chronicles.block.ConsoleBlock;
 import com.noahtnt2009.gallifreyan_chronicles.block.entity.TardisConsoleBlockEntity;
 import com.noahtnt2009.gallifreyan_chronicles.config.GCConfig;
 import net.minecraft.client.Minecraft;
@@ -7,6 +8,8 @@ import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.world.level.Level;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Set;
 import java.util.List;
 import java.util.Map;
 import java.util.WeakHashMap;
@@ -23,6 +26,7 @@ public final class GCPowerDarkness {
     private static long lastNanos = 0L;
     private static long snapUntilNanos = 0L;
     private static Level lastLevel;
+    private static final Set<Level> NO_CONSOLE_LEVELS = Collections.newSetFromMap(new WeakHashMap<>());
     private static final Map<Level, RemoteDarkness> REMOTE = new WeakHashMap<>();
 
     private static final class RemoteDarkness {
@@ -36,12 +40,14 @@ public final class GCPowerDarkness {
     public static void track(TardisConsoleBlockEntity console) {
         if (!CONSOLES.contains(console)) {
             CONSOLES.add(console);
+            if (console.getLevel() != null) NO_CONSOLE_LEVELS.remove(console.getLevel());
             snapUntilNanos = System.nanoTime() + SNAP_WINDOW_NANOS;
         }
     }
 
     public static void reset() {
         CONSOLES.clear();
+        NO_CONSOLE_LEVELS.clear();
         darkness = 0.0F;
         lastNanos = 0L;
         snapUntilNanos = 0L;
@@ -55,11 +61,24 @@ public final class GCPowerDarkness {
 
     private static boolean shouldBeDark(Level level) {
         boolean dark = false;
-        CONSOLES.removeIf(TardisConsoleBlockEntity::isRemoved);
-        for (TardisConsoleBlockEntity console : CONSOLES) {
-            if (console.getLevel() == level && !console.hasPower()) dark = true;
+        boolean hasConsole = false;
+        for (TardisConsoleBlockEntity console : new ArrayList<>(CONSOLES)) {
+            if (!console.isRemoved()) continue;
+            CONSOLES.remove(console);
+            // only a destroyed console counts, one that was just unloaded with its chunk is still there
+            Level consoleLevel = console.getLevel();
+            if (consoleLevel != null && consoleLevel.hasChunkAt(console.getBlockPos())
+                    && !(consoleLevel.getBlockState(console.getBlockPos()).getBlock() instanceof ConsoleBlock)) {
+                NO_CONSOLE_LEVELS.add(consoleLevel);
+            }
         }
-        return dark;
+        for (TardisConsoleBlockEntity console : CONSOLES) {
+            if (console.getLevel() != level) continue;
+            hasConsole = true;
+            if (!console.hasPower()) dark = true;
+        }
+        if (hasConsole) NO_CONSOLE_LEVELS.remove(level);
+        return dark || (!hasConsole && NO_CONSOLE_LEVELS.contains(level));
     }
 
     public static float powerOffAmount() {

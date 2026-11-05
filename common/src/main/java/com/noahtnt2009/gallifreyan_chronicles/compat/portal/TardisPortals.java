@@ -60,6 +60,7 @@ public final class TardisPortals {
     private static final int SCAN_RETRY_TICKS = 40;
     private static final int MISSING_GRACE_TICKS = 100;
     private static final double EXTERIOR_PLAYER_RANGE = 64.0;
+    private static final double PORTAL_RENDER_DISTANCE = 20.0;
 
     private static final Map<UUID, Link> LINKS = new HashMap<>();
     private static final Map<UUID, DoorLocation> DOORS = new HashMap<>();
@@ -78,6 +79,8 @@ public final class TardisPortals {
         private final Portal exteriorPortal;
         private final Portal interiorPortal;
         private boolean visible;
+        private boolean exteriorShown;
+        private boolean interiorShown;
         private long hideAt = -1L;
         private long missingSince = -1L;
 
@@ -314,10 +317,18 @@ public final class TardisPortals {
             link.hideAt = now + CLOSE_LINGER_TICKS;
         }
         boolean visible = open || (link.hideAt >= 0L && now < link.hideAt);
-        if (visible != link.visible) {
-            link.visible = visible;
-            applyVisibility(link.exteriorPortal, visible);
-            applyVisibility(link.interiorPortal, visible);
+        link.visible = visible;
+
+        // a portal only renders while a player is within 20 blocks of it, further away it is switched off
+        boolean exteriorShown = visible && playerWithinRenderDistance(link.exteriorPortal);
+        if (exteriorShown != link.exteriorShown) {
+            link.exteriorShown = exteriorShown;
+            applyVisibility(link.exteriorPortal, exteriorShown);
+        }
+        boolean interiorShown = visible && playerWithinRenderDistance(link.interiorPortal);
+        if (interiorShown != link.interiorShown) {
+            link.interiorShown = interiorShown;
+            applyVisibility(link.interiorPortal, interiorShown);
         }
 
         exterior.setPortalActive(visible);
@@ -422,6 +433,15 @@ public final class TardisPortals {
         portal.addTag(ownerTag(tardisId));
         portal.setIsVisible(false);
         portal.setTeleportable(false);
+    }
+
+    private static boolean playerWithinRenderDistance(Portal portal) {
+        if (portal.isRemoved() || !(portal.level() instanceof ServerLevel level)) return false;
+        double maxSqr = PORTAL_RENDER_DISTANCE * PORTAL_RENDER_DISTANCE;
+        for (ServerPlayer player : level.players()) {
+            if (player.distanceToSqr(portal) <= maxSqr) return true;
+        }
+        return false;
     }
 
     private static void applyVisibility(Portal portal, boolean visible) {

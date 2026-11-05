@@ -6,7 +6,11 @@ import com.noahtnt2009.gallifreyan_chronicles.init.GCDataComponents;
 import com.noahtnt2009.gallifreyan_chronicles.init.GCSounds;
 import com.noahtnt2009.gallifreyan_chronicles.tardis.console.TardisConsole;
 import com.noahtnt2009.gallifreyan_chronicles.tardis.console.TardisConsoleRegistry;
+import com.noahtnt2009.gallifreyan_chronicles.block.entity.TardisExteriorBlockEntity;
+import com.noahtnt2009.gallifreyan_chronicles.tardis.api.Tardis;
+import com.noahtnt2009.gallifreyan_chronicles.tardis.api.TardisApi;
 import com.noahtnt2009.gallifreyan_chronicles.tardis.ecs.system.ConsoleLinkSystem;
+import com.noahtnt2009.gallifreyan_chronicles.tardis.ecs.system.ConsoleSyncSystem;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.network.protocol.game.ClientboundSetEntityMotionPacket;
@@ -126,6 +130,20 @@ public class ConsoleBlock extends BaseEntityBlock {
         }
 
         ConsoleLinkSystem.onPlaced(console);
+    }
+
+    @Override
+    protected void affectNeighborsAfterRemoval(@NonNull BlockState state, @NonNull ServerLevel level,
+                                               @NonNull BlockPos pos, boolean movedByPiston) {
+        super.affectNeighborsAfterRemoval(state, level, pos, movedByPiston);
+
+        Tardis tardis = TardisApi.ofLevel(level).orElse(null);
+        if (tardis == null) return;
+
+        for (TardisConsoleBlockEntity other : ConsoleSyncSystem.consolesOf(tardis.id())) {
+            if (!other.getBlockPos().equals(pos)) return;
+        }
+        tardis.exteriorIfLoaded().ifPresent(TardisExteriorBlockEntity::cutPower);
     }
 
     @Override

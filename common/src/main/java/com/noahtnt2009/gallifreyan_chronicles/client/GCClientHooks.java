@@ -12,7 +12,7 @@ import com.noahtnt2009.gallifreyan_chronicles.client.sound.SoundResumeStatus;
 import com.noahtnt2009.gallifreyan_chronicles.network.ResumeSoundPayload;
 import com.noahtnt2009.gallifreyan_chronicles.block.entity.TardisConsoleBlockEntity;
 import com.noahtnt2009.gallifreyan_chronicles.client.camera.GCCameraShake;
-import com.noahtnt2009.gallifreyan_chronicles.client.hud.GCPowerDarkness;
+import com.noahtnt2009.gallifreyan_chronicles.client.gui.hud.GCPowerDarkness;
 import com.noahtnt2009.gallifreyan_chronicles.client.security.BuildExpiry;
 import com.noahtnt2009.gallifreyan_chronicles.client.sound.ConsoleHumSounds;
 import com.noahtnt2009.gallifreyan_chronicles.client.sound.GCMusic;

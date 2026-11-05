@@ -1,6 +1,6 @@
 package com.noahtnt2009.gallifreyan_chronicles.world.biome;
 
-import com.noahtnt2009.gallifreyan_chronicles.world.GCPlacedFeatures;
+import com.noahtnt2009.gallifreyan_chronicles.world.feature.GCPlacedFeatures;
 import net.minecraft.core.HolderGetter;
 import net.minecraft.data.worldgen.BiomeDefaultFeatures;
 import net.minecraft.world.attribute.EnvironmentAttributes;

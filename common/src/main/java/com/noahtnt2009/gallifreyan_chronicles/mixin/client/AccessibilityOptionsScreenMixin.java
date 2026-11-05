@@ -1,6 +1,6 @@
 package com.noahtnt2009.gallifreyan_chronicles.mixin.client;
 
-import com.noahtnt2009.gallifreyan_chronicles.client.options.GCOptions;
+import com.noahtnt2009.gallifreyan_chronicles.client.gui.options.GCOptions;
 import net.minecraft.client.Options;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.options.AccessibilityOptionsScreen;

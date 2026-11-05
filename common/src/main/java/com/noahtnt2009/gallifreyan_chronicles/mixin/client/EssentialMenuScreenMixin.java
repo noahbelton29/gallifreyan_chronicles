@@ -1,6 +1,6 @@
 package com.noahtnt2009.gallifreyan_chronicles.mixin.client;
 
-import com.noahtnt2009.gallifreyan_chronicles.compat.EssentialMenuCompat;
+import com.noahtnt2009.gallifreyan_chronicles.compat.essential.EssentialMenuCompat;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.Renderable;
 import net.minecraft.client.gui.components.events.GuiEventListener;

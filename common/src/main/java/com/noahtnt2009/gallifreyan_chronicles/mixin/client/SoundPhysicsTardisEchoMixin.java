@@ -1,6 +1,6 @@
 package com.noahtnt2009.gallifreyan_chronicles.mixin.client;
 
-import com.noahtnt2009.gallifreyan_chronicles.compat.SoundPhysicsCompat;
+import com.noahtnt2009.gallifreyan_chronicles.compat.soundphysics.SoundPhysicsCompat;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Pseudo;
 import org.spongepowered.asm.mixin.Shadow;

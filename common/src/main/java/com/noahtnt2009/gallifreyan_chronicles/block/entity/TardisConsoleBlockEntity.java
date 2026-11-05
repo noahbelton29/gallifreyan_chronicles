@@ -24,8 +24,8 @@ import com.noahtnt2009.gallifreyan_chronicles.tardis.console.animation.ConsoleAn
 import com.noahtnt2009.gallifreyan_chronicles.tardis.console.animation.ConsoleControllers;
 import com.noahtnt2009.gallifreyan_chronicles.client.tardis.ConsoleAnimationCheck;
 import com.noahtnt2009.gallifreyan_chronicles.util.FadingValue;
-import com.noahtnt2009.gallifreyan_chronicles.tardis.console.control.ConsoleControlHost;
-import com.noahtnt2009.gallifreyan_chronicles.tardis.console.control.ConsoleControlManager;
+import com.noahtnt2009.gallifreyan_chronicles.tardis.control.ConsoleControlHost;
+import com.noahtnt2009.gallifreyan_chronicles.tardis.control.ConsoleControlManager;
 import com.noahtnt2009.gallifreyan_chronicles.tardis.console.TardisConsole;
 import com.noahtnt2009.gallifreyan_chronicles.tardis.control.ControlSpec;
 import com.noahtnt2009.gallifreyan_chronicles.tardis.control.TardisControl;

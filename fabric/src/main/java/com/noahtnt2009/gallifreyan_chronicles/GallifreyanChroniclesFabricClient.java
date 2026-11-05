@@ -1,6 +1,6 @@
 package com.noahtnt2009.gallifreyan_chronicles;
 
-import com.noahtnt2009.gallifreyan_chronicles.client.hud.GCHudRenderer;
+import com.noahtnt2009.gallifreyan_chronicles.client.gui.hud.GCHudRenderer;
 import com.noahtnt2009.gallifreyan_chronicles.client.watermark.WatermarkIdentity;
 import com.noahtnt2009.gallifreyan_chronicles.client.watermark.WatermarkOverlay;
 import com.noahtnt2009.gallifreyan_chronicles.client.renderer.TardisConsoleBlockRenderer;

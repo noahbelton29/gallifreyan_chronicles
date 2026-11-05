@@ -17,11 +17,13 @@ public final class GCPowerDarkness {
     public static final float SHADER_BLINDNESS_SCALE = 0.6F;
     private static final float FADE_SECONDS = 1.0F;
     private static final long SNAP_WINDOW_NANOS = 2_000_000_000L;
+    private static final long SHADER_READ_WINDOW_NANOS = 1_000_000_000L;
 
     private static final List<TardisConsoleBlockEntity> CONSOLES = new ArrayList<>();
     private static volatile float darkness = 0.0F;
     private static long lastNanos = 0L;
     private static long snapUntilNanos = 0L;
+    private static volatile long shaderBlindnessReadNanos = 0L;
     private static Level lastLevel;
     private static final Map<Level, RemoteDarkness> REMOTE = new WeakHashMap<>();
 
@@ -46,6 +48,7 @@ public final class GCPowerDarkness {
         lastNanos = 0L;
         snapUntilNanos = 0L;
         lastLevel = null;
+        shaderBlindnessReadNanos = 0L;
         REMOTE.clear();
     }
 
@@ -117,6 +120,15 @@ public final class GCPowerDarkness {
         return darknessOf(Minecraft.getInstance().level);
     }
 
+    public static void noteShaderBlindnessRead() {
+        shaderBlindnessReadNanos = System.nanoTime();
+    }
+
+    public static boolean shaderPackHandlesDarkness() {
+        long read = shaderBlindnessReadNanos;
+        return read != 0L && System.nanoTime() - read < SHADER_READ_WINDOW_NANOS && ShaderPackDetector.isShaderPackInUse();
+    }
+
     public static float overlayMaxAlpha() {
         return ShaderPackDetector.isShaderPackInUse() ? SHADER_MAX_ALPHA : MAX_ALPHA;
     }
@@ -125,6 +137,7 @@ public final class GCPowerDarkness {
         Minecraft minecraft = Minecraft.getInstance();
         float level = update();
         if (level <= 0.0F) return;
+        if (shaderPackHandlesDarkness()) return;
         float maxAlpha = overlayMaxAlpha();
         int alpha = (int) (level * maxAlpha * 255.0F);
         graphics.fill(0, 0, minecraft.getWindow().getGuiScaledWidth(), minecraft.getWindow().getGuiScaledHeight(), alpha << 24);

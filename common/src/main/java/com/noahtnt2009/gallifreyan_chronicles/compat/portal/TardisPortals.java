@@ -16,7 +16,6 @@ import net.minecraft.core.Direction;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
-import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.server.level.TicketType;
 import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.block.state.BlockState;
@@ -37,6 +36,7 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
@@ -78,6 +78,8 @@ public final class TardisPortals {
         private final Portal exteriorPortal;
         private final Portal interiorPortal;
         private boolean visible;
+        private boolean exteriorShown;
+        private boolean interiorShown;
         private long hideAt = -1L;
         private long missingSince = -1L;
 
@@ -207,18 +209,22 @@ public final class TardisPortals {
         }
     }
 
-    private static void forgetMissingDoor(MinecraftServer server, UUID tardisId) {
+    private static boolean forgetMissingDoor(MinecraftServer server, UUID tardisId) {
         DoorLocation door = DOORS.get(tardisId);
-        if (door == null) return;
+        if (door == null) return false;
         ServerLevel level = server.getLevel(door.dimension());
         if (level == null) {
             DOORS.remove(tardisId);
-            return;
+            return false;
         }
-        if (level.hasChunkAt(door.pos()) && !level.getBlockState(door.pos()).is(GCBlocks.TARDIS_INTERIOR_DOOR)) {
+        if (!level.hasChunkAt(door.pos())) return false;
+        BlockState state = level.getBlockState(door.pos());
+        if (!state.is(GCBlocks.TARDIS_INTERIOR_DOOR) || !InteriorDoorBlock.isMaster(state)) {
             DOORS.remove(tardisId);
             NEXT_SCAN.remove(tardisId);
+            return true;
         }
+        return false;
     }
 
     private static void registerDoor(MinecraftServer server, @Nullable DoorLocation location) {
@@ -258,9 +264,8 @@ public final class TardisPortals {
         InteriorDoorBlockEntity door = findDoor(tardisId);
         if (door != null && door.getLevel() instanceof ServerLevel doorLevel) {
             DOORS.put(tardisId, new DoorLocation(doorLevel.dimension(), door.getBlockPos()));
-        } else {
-            forgetMissingDoor(server, tardisId);
         }
+        boolean doorDestroyed = door == null && forgetMissingDoor(server, tardisId);
         TardisExteriorBlockEntity exterior = tardis != null ? tardis.exteriorIfLoaded().orElse(null) : null;
         if (exterior != null && !DOORS.containsKey(tardisId)) {
             locateDoor(server, tardisId, false);
@@ -275,7 +280,8 @@ public final class TardisPortals {
         Link link = LINKS.get(tardisId);
 
         if (placement == null) {
-            boolean definitelyGone = exterior != null && (exterior.isTravelling() || exterior.isFullyInvisible());
+            boolean definitelyGone = doorDestroyed && !DOORS.containsKey(tardisId)
+                    || exterior != null && (exterior.isTravelling() || exterior.isFullyInvisible());
             if (link != null && !definitelyGone && link.isAlive()) {
                 long now = server.getTickCount();
                 if (link.missingSince < 0L) link.missingSince = now;
@@ -314,10 +320,17 @@ public final class TardisPortals {
             link.hideAt = now + CLOSE_LINGER_TICKS;
         }
         boolean visible = open || (link.hideAt >= 0L && now < link.hideAt);
-        if (visible != link.visible) {
-            link.visible = visible;
-            applyVisibility(link.exteriorPortal, visible);
-            applyVisibility(link.interiorPortal, visible);
+        link.visible = visible;
+
+        boolean exteriorShown = visible;
+        if (exteriorShown != link.exteriorShown) {
+            link.exteriorShown = exteriorShown;
+            applyVisibility(link.exteriorPortal, exteriorShown);
+        }
+        boolean interiorShown = visible;
+        if (interiorShown != link.interiorShown) {
+            link.interiorShown = interiorShown;
+            applyVisibility(link.interiorPortal, interiorShown);
         }
 
         exterior.setPortalActive(visible);

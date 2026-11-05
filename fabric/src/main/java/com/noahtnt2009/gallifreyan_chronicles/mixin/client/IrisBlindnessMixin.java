@@ -12,7 +12,8 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 public abstract class IrisBlindnessMixin {
     @Inject(method = "getBlindness", at = @At("RETURN"), cancellable = true, remap = false, require = 0)
     private static void gc$powerDarkness(CallbackInfoReturnable<Float> cir) {
-        float darkness = GCPowerDarkness.update();
+        GCPowerDarkness.noteShaderBlindnessRead();
+        float darkness = GCPowerDarkness.renderLevelDarkness();
         if (darkness > 0.0F) {
             cir.setReturnValue(Math.max(cir.getReturnValueF(), darkness * GCPowerDarkness.SHADER_BLINDNESS_SCALE));
         }

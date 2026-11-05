@@ -33,6 +33,7 @@ import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.BooleanProperty;
+import net.minecraft.world.level.block.state.properties.IntegerProperty;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.Shapes;
@@ -46,16 +47,19 @@ import java.util.UUID;
 public class TardisBlock extends BaseEntityBlock {
     private static final VoxelShape TALL_SHAPE = Block.box(0, 0, 0, 16, 32, 16);
 
+    public static final int MAX_LIGHT = 12;
+    public static final IntegerProperty LIGHT = IntegerProperty.create("light", 0, MAX_LIGHT);
+
     public static final BooleanProperty GLOWING = BooleanProperty.create("glowing");
 
     public TardisBlock(Properties properties) {
         super(properties);
-        this.registerDefaultState(this.stateDefinition.any().setValue(GLOWING, false));
+        this.registerDefaultState(this.stateDefinition.any().setValue(GLOWING, false).setValue(LIGHT, 0));
     }
 
     @Override
     protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
-        builder.add(GLOWING);
+        builder.add(GLOWING, LIGHT);
     }
 
     @Override

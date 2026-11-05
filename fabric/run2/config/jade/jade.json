@@ -127,8 +127,11 @@
       "mod_name": "ON"
     },
     "gallifreyan_chronicles": {
+      "tardis_console_info": true,
       "tardis_owner": true,
-      "tardis_control": true
+      "tardis_block_icon": true,
+      "tardis_control": true,
+      "tardis_exterior_info": true
     }
   },
   "history": {
@@ -138,7 +141,8 @@
     "accessibilityModMemory": false,
     "themesHash": -825076755,
     "usersHash": [
-      -1323773854
+      -1323773854,
+      -1607342741
     ]
   }
 }

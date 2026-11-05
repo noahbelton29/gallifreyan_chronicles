@@ -353,7 +353,7 @@ public class TardisExteriorBlockEntity extends BlockEntity implements GeoBlockEn
     public void setYaw(float yaw) {
         asEntity().set(TardisComponentTypes.TRANSFORM, new TransformComponent(yaw));
     }
-    
+
     public void setInFlight(boolean inFlight) {
         if (level == null || level.isClientSide()) return;
         setInFlight(inFlight, level.getGameTime());
@@ -474,6 +474,7 @@ public class TardisExteriorBlockEntity extends BlockEntity implements GeoBlockEn
         if (level.isClientSide()) return;
         blockEntity.refreshFadeType();
         blockEntity.tickLanding(level);
+        blockEntity.updateLight(level);
         if ((level.getGameTime() + blockEntity.tickOffset) % POWER_CHECK_INTERVAL_TICKS == 0) {
             blockEntity.refreshPowerAndGlow(level);
         }
@@ -486,6 +487,18 @@ public class TardisExteriorBlockEntity extends BlockEntity implements GeoBlockEn
                 LockDamageEffects.tick(serverLevel, blockEntity.getKeyWorldPos(), lockHealth);
             }
             blockEntity.tickTakeoffWind(serverLevel);
+        }
+    }
+
+    // scales the block light with the exterior's opacity, so it fades out as the tardis dematerialises and comes
+    // back as it materialises, it only touches the block state when the level actually changes
+    private void updateLight(Level level) {
+        BlockState current = getBlockState();
+        if (!current.hasProperty(TardisBlock.LIGHT)) return;
+        int target = isGlowing() ? Math.round(TardisBlock.MAX_LIGHT * getOpacity(0.0f)) : 0;
+        target = Math.clamp(target, 0, TardisBlock.MAX_LIGHT);
+        if (current.getValue(TardisBlock.LIGHT) != target) {
+            level.setBlock(getBlockPos(), current.setValue(TardisBlock.LIGHT, target), 3);
         }
     }
 

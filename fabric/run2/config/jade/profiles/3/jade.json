@@ -125,8 +125,11 @@
       "mod_name": "ON"
     },
     "gallifreyan_chronicles": {
+      "tardis_console_info": true,
       "tardis_owner": true,
-      "tardis_control": true
+      "tardis_block_icon": true,
+      "tardis_control": true,
+      "tardis_exterior_info": true
     }
   }
 }

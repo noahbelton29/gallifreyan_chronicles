@@ -1,5 +1,6 @@
 package com.noahtnt2009.gallifreyan_chronicles.block.entity;
 
+import com.noahtnt2009.gallifreyan_chronicles.block.TardisTopBlock;
 import com.noahtnt2009.gallifreyan_chronicles.tardis.door.TardisDoorRegistry;
 import com.noahtnt2009.gallifreyan_chronicles.tardis.api.Tardis;
 import com.noahtnt2009.gallifreyan_chronicles.tardis.api.TardisApi;
@@ -30,15 +31,11 @@ import com.noahtnt2009.gallifreyan_chronicles.tardis.ecs.system.ExteriorSystem;
 import com.noahtnt2009.gallifreyan_chronicles.tardis.ecs.system.GlowSystem;
 import com.noahtnt2009.gallifreyan_chronicles.tardis.ecs.system.SubsystemSystem;
 import com.noahtnt2009.gallifreyan_chronicles.init.GCGameRules;
-import com.noahtnt2009.gallifreyan_chronicles.init.GCSounds;
 import com.noahtnt2009.gallifreyan_chronicles.tardis.exterior.TardisExterior;
 import com.noahtnt2009.gallifreyan_chronicles.tardis.interior.TardisInteriorSystem;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.HolderLookup;
-import net.minecraft.core.particles.BlockParticleOption;
-import net.minecraft.core.particles.ParticleOptions;
-import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.protocol.Packet;
@@ -46,15 +43,12 @@ import net.minecraft.network.protocol.game.ClientGamePacketListener;
 import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
-import net.minecraft.sounds.SoundEvent;
-import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
-import net.minecraft.world.level.block.RenderShape;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.storage.ValueInput;
 import net.minecraft.world.level.storage.ValueOutput;
@@ -70,8 +64,6 @@ import com.noahtnt2009.gallifreyan_chronicles.tardis.exterior.TakeoffWind;
 import com.noahtnt2009.gallifreyan_chronicles.util.FadingValue;
 import com.noahtnt2009.gallifreyan_chronicles.tardis.exterior.fade.CloakFade;
 import com.noahtnt2009.gallifreyan_chronicles.tardis.exterior.fade.FadeType;
-import com.noahtnt2009.gallifreyan_chronicles.tardis.exterior.fade.FadeTypeKinds;
-import com.noahtnt2009.gallifreyan_chronicles.tardis.exterior.fade.FadeTypes;
 import org.jspecify.annotations.NonNull;
 import java.util.UUID;
 import java.util.function.Supplier;
@@ -476,6 +468,9 @@ public class TardisExteriorBlockEntity extends BlockEntity implements GeoBlockEn
     }
 
     public static void serverTick(Level level, TardisExteriorBlockEntity blockEntity) {
+        if (level.getGameTime() % 40L == 0L) {
+            TardisTopBlock.placeAbove(level, blockEntity.getBlockPos());
+        }
         if (level.isClientSide()) return;
         blockEntity.refreshFadeType();
         blockEntity.tickLanding(level);

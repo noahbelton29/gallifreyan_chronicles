@@ -44,6 +44,8 @@ import org.jspecify.annotations.Nullable;
 import java.util.UUID;
 
 public class TardisBlock extends BaseEntityBlock {
+    private static final VoxelShape TALL_SHAPE = Block.box(0, 0, 0, 16, 32, 16);
+
     public static final BooleanProperty GLOWING = BooleanProperty.create("glowing");
 
     public TardisBlock(Properties properties) {
@@ -173,7 +175,16 @@ public class TardisBlock extends BaseEntityBlock {
         if (level.getBlockEntity(pos) instanceof TardisExteriorBlockEntity tardis && tardis.isFullyInvisible()) {
             return Shapes.empty();
         }
-        return super.getShape(state, level, pos, context);
+        return TALL_SHAPE;
+    }
+
+    @Override
+    protected void onPlace(@NonNull BlockState state, @NonNull Level level, @NonNull BlockPos pos,
+                           @NonNull BlockState oldState, boolean movedByPiston) {
+        super.onPlace(state, level, pos, oldState, movedByPiston);
+        if (!level.isClientSide() && !oldState.is(this)) {
+            TardisTopBlock.placeAbove(level, pos);
+        }
     }
 
     @Override
@@ -183,7 +194,7 @@ public class TardisBlock extends BaseEntityBlock {
                 && (tardis.isFullyInvisible() || !tardis.getDoorState().isClosed())) {
             return Shapes.empty();
         }
-        return super.getCollisionShape(state, level, pos, context);
+        return Shapes.block();
     }
 
     @Override

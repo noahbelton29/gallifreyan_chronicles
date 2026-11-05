@@ -3,6 +3,11 @@ package com.noahtnt2009.gallifreyan_chronicles.block;
 import com.noahtnt2009.gallifreyan_chronicles.block.entity.TardisExteriorBlockEntity;
 import com.noahtnt2009.gallifreyan_chronicles.init.GCBlocks;
 import net.minecraft.core.BlockPos;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.ScheduledTickAccess;
+import net.minecraft.world.level.LevelReader;
+import net.minecraft.util.RandomSource;
+import net.minecraft.core.Direction;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.BlockGetter;
@@ -18,6 +23,8 @@ import org.jspecify.annotations.NonNull;
 import org.jetbrains.annotations.NotNull;
 
 public class TardisTopBlock extends Block {
+    private static final VoxelShape SHAPE = Block.box(0, -16, 0, 16, 16, 16);
+
     public TardisTopBlock(Properties properties) {
         super(properties);
     }
@@ -50,13 +57,34 @@ public class TardisTopBlock extends Block {
     }
 
     @Override
+    protected @NonNull VoxelShape getShape(@NonNull BlockState state, @NonNull BlockGetter level,
+                                           @NonNull BlockPos pos, @NonNull CollisionContext context) {
+        if (!(level.getBlockEntity(pos.below()) instanceof TardisExteriorBlockEntity tardis)
+                || tardis.isFullyInvisible()) {
+            return Shapes.empty();
+        }
+        return SHAPE;
+    }
+
+    @Override
+    protected @NonNull BlockState updateShape(@NonNull BlockState state, @NonNull LevelReader level,
+                                              @NonNull ScheduledTickAccess ticks, @NonNull BlockPos pos,
+                                              @NonNull Direction direction, @NonNull BlockPos neighborPos,
+                                              @NonNull BlockState neighborState, @NonNull RandomSource random) {
+        if (direction == Direction.DOWN && !neighborState.is(GCBlocks.TARDIS)) {
+            return Blocks.AIR.defaultBlockState();
+        }
+        return super.updateShape(state, level, ticks, pos, direction, neighborPos, neighborState, random);
+    }
+
+    @Override
     protected @NonNull VoxelShape getCollisionShape(@NonNull BlockState state, @NonNull BlockGetter level,
                                                     @NonNull BlockPos pos, @NonNull CollisionContext context) {
         if (level.getBlockEntity(pos.below()) instanceof TardisExteriorBlockEntity tardis
                 && (tardis.isFullyInvisible() || !tardis.getDoorState().isClosed())) {
             return Shapes.empty();
         }
-        return super.getCollisionShape(state, level, pos, context);
+        return Shapes.block();
     }
 
     @Override

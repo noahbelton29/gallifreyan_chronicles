@@ -75,6 +75,8 @@ public class GCFabricCommands {
                                                                     .then(argument("variant_id", StringArgumentType.greedyString())
                                                                             .suggests(TardisCommand::suggestDoorVariants)
                                                                             .executes(TardisCommand::setDoorVariant)))))
+                                            .then(literal("remove")
+                                                    .executes(TardisCommand::removeTardis))
                                             .then(literal("summon")
                                                     .executes(TardisCommand::summonTardis))
                                             .then(literal("destination")

@@ -1,6 +1,7 @@
 package com.noahtnt2009.gallifreyan_chronicles.compat.portal;
 
 import net.minecraft.server.MinecraftServer;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
@@ -76,6 +77,21 @@ public final class TardisPortalBridge {
     public static void onDimensionsChanged(MinecraftServer server) {
         if (!isAvailable()) return;
         TardisPortals.syncDimensionIds(server);
+    }
+
+    public static void removeTardis(MinecraftServer server, UUID tardisId) {
+        ACTIVE.remove(tardisId);
+        if (!isAvailable()) return;
+        TardisPortals.removeTardis(tardisId);
+    }
+
+    public static void beforeDimensionRemoved(ServerLevel level) {
+        if (!isAvailable()) return;
+        TardisPortals.beforeDimensionRemoved(level);
+    }
+
+    public static @Nullable ServerLevel redirectedActionLevel() {
+        return isAvailable() ? TardisPortals.redirectedActionLevel() : null;
     }
 
     public static void reset() {

@@ -1,6 +1,6 @@
 {
   "model": {
     "type": "minecraft:model",
-    "model": "gallifreyan_chronicles:block/gallifreyan_vine"
+    "model": "gallifreyan_chronicles:item/gallifreyan_vine"
   }
 }

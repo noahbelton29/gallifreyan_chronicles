@@ -4,6 +4,7 @@ import com.noahtnt2009.gallifreyan_chronicles.compat.portal.TardisPortalBridge;
 import com.noahtnt2009.gallifreyan_chronicles.tardis.exterior.TardisKeyLocator;
 import com.noahtnt2009.gallifreyan_chronicles.tardis.ecs.system.ConsoleSyncSystem;
 import com.noahtnt2009.gallifreyan_chronicles.tardis.interior.TardisDimensionManager;
+import com.noahtnt2009.gallifreyan_chronicles.tardis.manager.TardisDeletion;
 import com.noahtnt2009.gallifreyan_chronicles.util.GCScheduler;
 import com.noahtnt2009.gallifreyan_chronicles.util.GCServerState;
 import com.noahtnt2009.gallifreyan_chronicles.tardis.interior.TardisInteriorSystem;
@@ -20,20 +21,23 @@ import java.util.function.BooleanSupplier;
 public abstract class MinecraftServerMixin {
     @Inject(method = "createLevels", at = @At("TAIL"))
     private void gallifreyan_chronicles$restoreInteriors(CallbackInfo ci) {
+        MinecraftServer server = (MinecraftServer) (Object) this;
         GCServerState.onServerStart();
         TardisPortalBridge.reset();
-        TardisDimensionManager.restoreAll((MinecraftServer) (Object) this);
-        TimedSounds.onServerStart((MinecraftServer) (Object) this);
-        TardisPortalBridge.onDimensionsChanged((MinecraftServer) (Object) this);
+        TardisDimensionManager.restoreAll(server);
+        TimedSounds.onServerStart(server);
+        TardisPortalBridge.onDimensionsChanged(server);
     }
 
     @Inject(method = "tickChildren", at = @At("HEAD"))
     private void gallifreyan_chronicles$processEntries(BooleanSupplier haveTime, CallbackInfo ci) {
-        TardisDimensionManager.processPendingEntries((MinecraftServer) (Object) this);
-        TardisInteriorSystem.tickExitZones((MinecraftServer) (Object) this);
-        GCScheduler.tick((MinecraftServer) (Object) this);
-        TardisKeyLocator.tick((MinecraftServer) (Object) this);
-        TardisPortalBridge.tick((MinecraftServer) (Object) this);
-        ConsoleSyncSystem.tick((MinecraftServer) (Object) this);
+        MinecraftServer server = (MinecraftServer) (Object) this;
+        TardisDeletion.tick(server);
+        TardisDimensionManager.processPendingEntries(server);
+        TardisInteriorSystem.tickExitZones(server);
+        GCScheduler.tick(server);
+        TardisKeyLocator.tick(server);
+        TardisPortalBridge.tick(server);
+        ConsoleSyncSystem.tick(server);
     }
 }

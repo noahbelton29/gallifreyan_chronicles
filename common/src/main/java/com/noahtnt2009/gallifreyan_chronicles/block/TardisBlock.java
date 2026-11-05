@@ -11,6 +11,7 @@ import com.noahtnt2009.gallifreyan_chronicles.tardis.ecs.system.TardisLinkSystem
 import com.noahtnt2009.gallifreyan_chronicles.tardis.exterior.TardisExteriorRegistry;
 import com.noahtnt2009.gallifreyan_chronicles.tardis.interior.TardisInterior;
 import com.noahtnt2009.gallifreyan_chronicles.tardis.interior.TardisInteriorRegistry;
+import com.noahtnt2009.gallifreyan_chronicles.tardis.manager.TardisDeletion;
 import com.noahtnt2009.gallifreyan_chronicles.tardis.manager.TardisManager;
 import com.noahtnt2009.gallifreyan_chronicles.tardis.ecs.component.TardisComponent;
 import net.minecraft.core.BlockPos;
@@ -183,6 +184,21 @@ public class TardisBlock extends BaseEntityBlock {
             return Shapes.empty();
         }
         return super.getCollisionShape(state, level, pos, context);
+    }
+
+    @Override
+    public @NotNull BlockState playerWillDestroy(@NotNull Level level, @NotNull BlockPos pos,
+                                                 @NotNull BlockState state, @NotNull Player player) {
+        deleteIfCreative(level, pos, player);
+        return super.playerWillDestroy(level, pos, state, player);
+    }
+
+    public static void deleteIfCreative(Level level, BlockPos pos, Player player) {
+        if (!(level instanceof ServerLevel serverLevel) || !player.isCreative()) return;
+        if (!(level.getBlockEntity(pos) instanceof TardisExteriorBlockEntity exterior)) return;
+        UUID tardisId = exterior.getTardisId();
+        if (tardisId == null) return;
+        TardisDeletion.request(serverLevel.getServer(), tardisId, serverLevel, pos);
     }
 
     @Override

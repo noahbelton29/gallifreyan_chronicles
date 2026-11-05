@@ -112,6 +112,8 @@ public class GCLanguageProvider extends LanguageProvider {
         // Commands: Exteriors
         add("command.gallifreyan_chronicles.unknown_exterior",
                 "Unknown exterior: %s");
+        add("command.gallifreyan_chronicles.remove_tardis",
+                "Removed TARDIS %s, its exterior and its interior dimension");
         add("command.gallifreyan_chronicles.set_exterior",
                 "Set exterior of TARDIS %s to %s");
         add("command.gallifreyan_chronicles.get_exterior",

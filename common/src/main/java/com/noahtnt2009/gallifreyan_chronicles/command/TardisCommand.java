@@ -21,6 +21,7 @@ import com.noahtnt2009.gallifreyan_chronicles.tardis.console.TardisConsoleRegist
 import com.noahtnt2009.gallifreyan_chronicles.entity.TardisControlEntity;
 import com.noahtnt2009.gallifreyan_chronicles.tardis.control.TardisControlRegistry;
 import com.noahtnt2009.gallifreyan_chronicles.tardis.door.TardisDoorRegistry;
+import com.noahtnt2009.gallifreyan_chronicles.tardis.manager.TardisDeletion;
 import com.noahtnt2009.gallifreyan_chronicles.tardis.ecs.component.TardisSubsystem;
 import com.noahtnt2009.gallifreyan_chronicles.tardis.ecs.system.ConsoleLinkSystem;
 import com.noahtnt2009.gallifreyan_chronicles.tardis.ecs.system.DoorSyncSystem;
@@ -95,6 +96,26 @@ public class TardisCommand {
         }
 
         return Optional.empty();
+    }
+
+    public static int removeTardis(CommandContext<CommandSourceStack> ctx) {
+        String tardisIdStr = StringArgumentType.getString(ctx, "id");
+        UUID tardisId = parseTardisId(ctx, tardisIdStr);
+        if (tardisId == null) return 0;
+
+        if (!TardisDeletion.removeCompletely(ctx.getSource().getServer(), tardisId)) {
+            ctx.getSource().sendFailure(Component.translatable(
+                    "command.gallifreyan_chronicles.no_tardis_id",
+                    tardisIdStr
+            ));
+            return 0;
+        }
+
+        ctx.getSource().sendSuccess(
+                () -> Component.translatable("command.gallifreyan_chronicles.remove_tardis", tardisIdStr),
+                true
+        );
+        return 1;
     }
 
     private static final double LOOK_DISTANCE = 8.0;

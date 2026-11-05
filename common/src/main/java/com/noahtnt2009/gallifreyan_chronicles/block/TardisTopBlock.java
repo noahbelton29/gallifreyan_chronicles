@@ -64,6 +64,7 @@ public class TardisTopBlock extends Block {
                                                  @NotNull BlockState state, @NotNull Player player) {
         BlockPos below = pos.below();
         if (!level.isClientSide() && level.getBlockState(below).is(GCBlocks.TARDIS)) {
+            TardisBlock.deleteIfCreative(level, below, player);
             level.removeBlock(below, false);
         }
         return super.playerWillDestroy(level, pos, state, player);

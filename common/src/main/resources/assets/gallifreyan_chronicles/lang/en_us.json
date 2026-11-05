@@ -187,6 +187,7 @@
   "command.gallifreyan_chronicles.set_control": "Turned control %s of TARDIS %s %s",
   "command.gallifreyan_chronicles.set_door_variant": "Set door variant of TARDIS %s to %s (%s doors updated)",
   "command.gallifreyan_chronicles.set_exterior": "Set exterior of TARDIS %s to %s",
+  "command.gallifreyan_chronicles.remove_tardis": "Removed TARDIS %s, its exterior and its interior dimension",
   "command.gallifreyan_chronicles.set_fade_type": "Set fade type of TARDIS %s to %s",
   "command.gallifreyan_chronicles.set_glow": "Set exterior glow of TARDIS %s to %s",
   "command.gallifreyan_chronicles.set_interior": "Set interior of TARDIS %s to %s",

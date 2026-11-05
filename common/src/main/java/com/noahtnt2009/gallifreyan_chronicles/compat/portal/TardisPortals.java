@@ -26,6 +26,9 @@ import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import org.jspecify.annotations.Nullable;
 import qouteall.imm_ptl.core.api.PortalAPI;
+import qouteall.imm_ptl.core.block_manipulation.BlockManipulationServer;
+import qouteall.imm_ptl.core.chunk_loading.ImmPtlChunkTickets;
+import qouteall.imm_ptl.core.chunk_loading.ImmPtlChunkTracking;
 import qouteall.imm_ptl.core.portal.Portal;
 import qouteall.q_misc_util.dimension.DimensionIntId;
 import qouteall.q_misc_util.my_util.DQuaternion;
@@ -97,6 +100,32 @@ public final class TardisPortals {
         DOORS.clear();
         LAST_TICKET.clear();
         NEXT_SCAN.clear();
+    }
+
+    static void removeTardis(UUID tardisId) {
+        Link link = LINKS.remove(tardisId);
+        if (link != null) discard(link);
+        DOORS.remove(tardisId);
+        LAST_TICKET.remove(tardisId);
+        NEXT_SCAN.remove(tardisId);
+    }
+
+    static void beforeDimensionRemoved(ServerLevel level) {
+        try {
+            ImmPtlChunkTracking.onDimensionRemove(level);
+        } catch (RuntimeException e) {
+            Constants.LOG.error("[GC] Failed to clear portal chunk tracking for {}", level.dimension().identifier(), e);
+        }
+        try {
+            ImmPtlChunkTickets.onDimensionRemove(level);
+        } catch (RuntimeException e) {
+            Constants.LOG.error("[GC] Failed to clear portal chunk tickets for {}", level.dimension().identifier(), e);
+        }
+    }
+
+    static @Nullable ServerLevel redirectedActionLevel() {
+        BlockManipulationServer.Context context = BlockManipulationServer.REDIRECT_CONTEXT.get();
+        return context != null ? context.world() : null;
     }
 
     static void syncDimensionIds(MinecraftServer server) {

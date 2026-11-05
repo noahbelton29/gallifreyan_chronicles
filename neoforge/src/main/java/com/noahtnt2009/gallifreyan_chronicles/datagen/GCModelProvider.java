@@ -194,7 +194,8 @@ public class GCModelProvider extends ModelProvider {
 
     public void createCustomVine(BlockModelGenerators blockModelGenerators, Block vineBlock, Item vineItem) {
         blockModelGenerators.createMultifaceBlockStates(vineBlock);
-        blockModelGenerators.createFlatItemModelWithBlockTexture(vineItem, vineBlock);
+        blockModelGenerators.registerSimpleItemModel(vineItem,
+                blockModelGenerators.createFlatItemModelWithBlockTexture(vineItem, vineBlock));
 //        this.registerSimpleTintedItemModel(Blocks.VINE, itemModel, ItemModelUtils.constantTint(-12012264));
     }
 

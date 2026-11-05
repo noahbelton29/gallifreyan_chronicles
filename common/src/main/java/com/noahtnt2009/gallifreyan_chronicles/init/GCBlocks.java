@@ -82,7 +82,7 @@ public class GCBlocks {
             ConsoleBlockItem::new);
 
     public static final Block TARDIS_INTERIOR_DOOR = registerBlock("tardis_interior_door",
-            properties -> new InteriorDoorBlock("first_doctors_interior_doors", properties.strength(-1F, -1F)
+            properties -> new InteriorDoorBlock("first_doctors_interior_doors", properties.strength(-1F, 360000.0F)
                     .sound(SoundType.WOOD)
                     .noOcclusion()
                     .noLootTable()

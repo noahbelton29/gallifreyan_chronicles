@@ -13,6 +13,7 @@ import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
 import net.minecraft.commands.arguments.DimensionArgument;
 import net.minecraft.commands.arguments.coordinates.BlockPosArgument;
 import net.minecraft.network.chat.Component;
+import net.minecraft.server.permissions.Permissions;
 
 import java.util.stream.Collectors;
 
@@ -24,6 +25,15 @@ public class GCFabricCommands {
         CommandRegistrationCallback.EVENT.register((dispatcher, _, _) -> {
             dispatcher.register(
                     literal("gc")
+                            .then(literal("deletion")
+                                    .requires(source -> source.permissions().hasPermission(
+                                            Permissions.COMMANDS_GAMEMASTER))
+                                    .then(literal("on")
+                                            .executes(ctx ->
+                                                    TardisCommand.setDeletionMode(ctx, true)))
+                                    .then(literal("off")
+                                            .executes(ctx ->
+                                                    TardisCommand.setDeletionMode(ctx, false))))
                             .then(literal("tardis")
                                     .then(literal("list")
                                             .executes(TardisCommand::listTardis))

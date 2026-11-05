@@ -537,6 +537,14 @@ public class TardisExteriorBlockEntity extends BlockEntity implements GeoBlockEn
         }
     }
 
+    // called when the interior loses its last console, cuts the exterior's power and glow straight away
+    public void cutPower() {
+        if (level == null || level.isClientSide()) return;
+        powered = false;
+        refreshPowerAndGlow(level);
+        setChanged();
+    }
+
     private void refreshPowerAndGlow(Level level) {
         powered = TardisApi.of(this).flatMap(Tardis::livePower).orElse(powered);
         MinecraftServer server = level.getServer();

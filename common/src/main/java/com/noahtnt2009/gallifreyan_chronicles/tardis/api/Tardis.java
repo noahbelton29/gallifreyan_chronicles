@@ -202,7 +202,7 @@ public final class Tardis {
     }
 
     public boolean hasPower() {
-        return console().map(TardisConsoleBlockEntity::hasPower).orElse(true);
+        return console().map(TardisConsoleBlockEntity::hasPower).orElse(false);
     }
 
     public boolean toggleControl(String controlId) {

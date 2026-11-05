@@ -1,5 +1,6 @@
 package com.noahtnt2009.gallifreyan_chronicles.client.renderer;
 
+import com.noahtnt2009.gallifreyan_chronicles.config.GCConfig;
 import com.geckolib.constant.dataticket.DataTicket;
 import com.geckolib.renderer.GeoBlockRenderer;
 import net.minecraft.world.phys.Vec3;
@@ -64,5 +65,10 @@ public class InteriorDoorBlockRenderer extends GeoBlockRenderer<@NotNull Interio
     public boolean shouldRender(@NonNull InteriorDoorBlockEntity blockEntity, @NonNull Vec3 cameraPos) {
         if (RenderLevelGuard.isForeign(blockEntity.getLevel())) return false;
         return super.shouldRender(blockEntity, cameraPos);
+    }
+
+    @Override
+    public int getViewDistance() {
+        return GCConfig.modelRenderDistance();
     }
 }

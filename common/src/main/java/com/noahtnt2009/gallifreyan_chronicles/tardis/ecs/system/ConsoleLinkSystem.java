@@ -6,6 +6,7 @@ import com.noahtnt2009.gallifreyan_chronicles.Constants;
 import com.noahtnt2009.gallifreyan_chronicles.block.ConsoleBlock;
 import com.noahtnt2009.gallifreyan_chronicles.block.entity.TardisConsoleBlockEntity;
 import com.noahtnt2009.gallifreyan_chronicles.init.GCBlocks;
+import com.noahtnt2009.gallifreyan_chronicles.init.GCTardisControls;
 import com.noahtnt2009.gallifreyan_chronicles.tardis.console.TardisConsole;
 import com.noahtnt2009.gallifreyan_chronicles.tardis.console.TardisConsoleRegistry;
 import com.noahtnt2009.gallifreyan_chronicles.tardis.control.impl.FlightLeverControl;
@@ -94,6 +95,7 @@ public final class ConsoleLinkSystem {
         if (sibling != null) {
             console.applyCarriedControlStates(sibling.copyControlStates());
         } else {
+            console.reconcileControl(GCTardisControls.POWER_LEVER, false);
             if (tardis.isTravelling()) {
                 console.reconcileControl(FlightLeverControl.ID, true);
                 console.triggerRotorAnimation("rotor_flight");

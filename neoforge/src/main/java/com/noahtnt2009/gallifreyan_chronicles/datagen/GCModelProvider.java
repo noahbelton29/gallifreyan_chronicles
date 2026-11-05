@@ -1,6 +1,7 @@
 package com.noahtnt2009.gallifreyan_chronicles.datagen;
 
 import com.noahtnt2009.gallifreyan_chronicles.Constants;
+import com.noahtnt2009.gallifreyan_chronicles.block.TardisBlock;
 import com.noahtnt2009.gallifreyan_chronicles.client.model.ConsoleVariantSelectProperty;
 import com.noahtnt2009.gallifreyan_chronicles.client.model.TardisExteriorSelectProperty;
 import com.noahtnt2009.gallifreyan_chronicles.init.GCDataComponents;
@@ -10,6 +11,8 @@ import net.minecraft.client.data.models.BlockModelGenerators;
 import net.minecraft.client.data.models.ItemModelGenerators;
 import net.minecraft.client.data.models.ModelProvider;
 import net.minecraft.client.data.models.MultiVariant;
+import net.minecraft.client.data.models.blockstates.MultiVariantGenerator;
+import net.minecraft.client.data.models.blockstates.PropertyDispatch;
 import net.minecraft.client.data.models.model.*;
 import net.minecraft.client.renderer.block.dispatch.Variant;
 import net.minecraft.client.renderer.item.ItemModel;
@@ -35,6 +38,14 @@ public class GCModelProvider extends ModelProvider {
             TextureSlot.TOP, TextureSlot.SIDE, TextureSlot.BOTTOM
     );
 
+    private static final ModelTemplate TARDIS_FLYING = new ModelTemplate(
+            Optional.of(
+                    Identifier.fromNamespaceAndPath(Constants.MOD_ID, "block/tardis_base")
+            ),
+            Optional.of("_flying"),
+            TextureSlot.PARTICLE
+    ).extend().ambientOcclusion(false).build();
+
     public GCModelProvider(PackOutput output) {
         super(output, Constants.MOD_ID);
     }
@@ -45,6 +56,22 @@ public class GCModelProvider extends ModelProvider {
         blockModels.createTrivialCube(GCBlocks.MOON_DUST);
         blockModels.createTrivialCube(GCBlocks.LUNAR_REGOLITH);
 
+        TextureMapping tardisTextures = new TextureMapping()
+                .put(TextureSlot.PARTICLE,
+                        new Material(
+                                Identifier.fromNamespaceAndPath(Constants.MOD_ID, "block/tardis")
+                        )
+                );
+
+        Identifier normalModel = Identifier.fromNamespaceAndPath(
+                Constants.MOD_ID, "block/tardis_base"
+        );
+
+        Identifier flyingModel = TARDIS_FLYING.create(
+                GCBlocks.TARDIS,
+                tardisTextures,
+                blockModels.modelOutput
+        );
 
         registerBrachackiSet(blockModels);
 
@@ -105,7 +132,12 @@ public class GCModelProvider extends ModelProvider {
                 ItemModelUtils.constantTint(GALLIFREYAN_GRASS_TINT)
         );
 
-        blockModels.createParticleOnlyBlock(GCBlocks.TARDIS);
+        blockModels.blockStateOutput.accept(
+                MultiVariantGenerator.dispatch(GCBlocks.TARDIS)
+                        .with(PropertyDispatch.initial(TardisBlock.IN_FLIGHT)
+                                .select(false, BlockModelGenerators.plainVariant(normalModel))
+                                .select(true, BlockModelGenerators.plainVariant(flyingModel)))
+        );
         blockModels.createParticleOnlyBlock(GCBlocks.TARDIS_CONSOLE);
         blockModels.createParticleOnlyBlock(GCBlocks.TARDIS_TOP);
         blockModels.createParticleOnlyBlock(GCBlocks.TARDIS_INTERIOR_DOOR, GCBlocks.BRACHACKI_WALL_BLOCK);

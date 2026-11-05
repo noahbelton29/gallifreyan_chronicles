@@ -99,6 +99,14 @@ public class TardisTopBlock extends Block {
     }
 
     @Override
+    protected float getShadeBrightness(@NonNull BlockState state, @NonNull BlockGetter level, @NonNull BlockPos pos) {
+        if (level.getBlockEntity(pos.below()) instanceof TardisExteriorBlockEntity tardis && !tardis.isShadowActive()) {
+            return 1.0f;
+        }
+        return super.getShadeBrightness(state, level, pos);
+    }
+
+    @Override
     public @NotNull RenderShape getRenderShape(@NotNull BlockState state) {
         return RenderShape.INVISIBLE;
     }

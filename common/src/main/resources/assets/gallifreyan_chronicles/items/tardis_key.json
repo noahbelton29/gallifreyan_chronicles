@@ -1,27 +1,27 @@
 {
   "model": {
     "type": "minecraft:select",
-    "property": "minecraft:component",
-    "component": "gallifreyan_chronicles:key_style",
     "cases": [
       {
-        "when": "gallifreyan",
         "model": {
           "type": "minecraft:model",
           "model": "gallifreyan_chronicles:item/gallifreyan_tardis_key"
-        }
+        },
+        "when": "gallifreyan"
       },
       {
-        "when": "yale",
         "model": {
           "type": "minecraft:model",
           "model": "gallifreyan_chronicles:item/yale_tardis_key"
-        }
+        },
+        "when": "yale"
       }
     ],
+    "component": "gallifreyan_chronicles:key_style",
     "fallback": {
       "type": "minecraft:model",
       "model": "gallifreyan_chronicles:item/tardis_key"
-    }
+    },
+    "property": "minecraft:component"
   }
 }

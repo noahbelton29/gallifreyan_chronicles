@@ -2,6 +2,10 @@ package com.noahtnt2009.gallifreyan_chronicles.client.renderer;
 
 import com.geckolib.constant.dataticket.DataTicket;
 import com.geckolib.renderer.GeoBlockRenderer;
+import net.minecraft.world.phys.Vec3;
+import net.minecraft.client.renderer.state.level.CameraRenderState;
+import net.minecraft.client.renderer.SubmitNodeCollector;
+import com.mojang.blaze3d.vertex.PoseStack;
 import com.geckolib.renderer.base.RenderPassInfo;
 import com.mojang.math.Axis;
 import com.noahtnt2009.gallifreyan_chronicles.block.InteriorDoorBlock;
@@ -31,6 +35,7 @@ public class InteriorDoorBlockRenderer extends GeoBlockRenderer<@NotNull Interio
     @Override
     public void addRenderData(InteriorDoorBlockEntity animatable, Void relatedObject,
                               TardisExteriorBlockRenderState renderState, float partialTick) {
+        RenderLevelGuard.tag(renderState, animatable.getLevel());
         renderState.addGeckolibData(VARIANT, animatable.getVariant());
         renderState.addGeckolibData(TEXTURE_ID, animatable.getTextureId());
         renderState.addGeckolibData(YAW, animatable.getFacing().toYRot());
@@ -46,5 +51,18 @@ public class InteriorDoorBlockRenderer extends GeoBlockRenderer<@NotNull Interio
 
         renderPassInfo.poseStack().translate(right.getStepX() * 0.5f, 0f, right.getStepZ() * 0.5f);
         renderPassInfo.poseStack().rotateDegrees(Axis.YP, TardisExterior.modelRotationDegrees(yaw));
+    }
+
+    @Override
+    public void submit(@NonNull TardisExteriorBlockRenderState renderState, @NonNull PoseStack poseStack,
+                       @NonNull SubmitNodeCollector submitNodeCollector, @NonNull CameraRenderState cameraState) {
+        if (RenderLevelGuard.belongsToOtherLevel(renderState)) return;
+        super.submit(renderState, poseStack, submitNodeCollector, cameraState);
+    }
+
+    @Override
+    public boolean shouldRender(@NonNull InteriorDoorBlockEntity blockEntity, @NonNull Vec3 cameraPos) {
+        if (RenderLevelGuard.isForeign(blockEntity.getLevel())) return false;
+        return super.shouldRender(blockEntity, cameraPos);
     }
 }

@@ -2,6 +2,7 @@ package com.noahtnt2009.gallifreyan_chronicles.client.renderer;
 
 import com.geckolib.constant.dataticket.DataTicket;
 import com.geckolib.renderer.GeoBlockRenderer;
+import net.minecraft.client.renderer.state.level.CameraRenderState;
 import com.geckolib.renderer.base.BoneSnapshots;
 import com.geckolib.renderer.base.RenderPassInfo;
 import com.mojang.blaze3d.vertex.PoseStack;
@@ -10,6 +11,9 @@ import com.noahtnt2009.gallifreyan_chronicles.client.model.TardisExteriorBlockMo
 import com.noahtnt2009.gallifreyan_chronicles.block.entity.TardisExteriorBlockEntity;
 import com.noahtnt2009.gallifreyan_chronicles.client.renderer.geo_layer.TardisExteriorGlowLayer;
 import com.noahtnt2009.gallifreyan_chronicles.client.renderer.geo_layer.TardisExteriorKeyLayer;
+import com.noahtnt2009.gallifreyan_chronicles.client.sky.SkyShaderCompat;
+import com.noahtnt2009.gallifreyan_chronicles.compat.portal.TardisPortalBridge;
+import net.minecraft.world.phys.Vec3;
 import com.noahtnt2009.gallifreyan_chronicles.tardis.exterior.TardisExterior;
 import net.minecraft.client.renderer.OrderedSubmitNodeCollector;
 import net.minecraft.client.renderer.SubmitNodeCollector;
@@ -49,10 +53,17 @@ public class TardisExteriorBlockRenderer extends GeoBlockRenderer<@NotNull Tardi
     @Override
     public void addRenderData(TardisExteriorBlockEntity animatable, Void relatedObject,
                               TardisExteriorBlockRenderState renderState, float partialTick) {
+        RenderLevelGuard.tag(renderState, animatable.getLevel());
         renderState.addGeckolibData(EXTERIOR_ID, animatable.getExterior().id());
         renderState.addGeckolibData(YAW, animatable.getYaw());
-        renderState.addGeckolibData(GLOWING, animatable.isGlowing());
-        renderState.addGeckolibData(OPACITY, animatable.getOpacity(partialTick));
+        boolean hiddenFromInterior = isSeenFromItsInterior(animatable);
+        renderState.addGeckolibData(GLOWING, animatable.isGlowing() && !hiddenFromInterior);
+        renderState.addGeckolibData(OPACITY, hiddenFromInterior ? 0.0f : animatable.getOpacity(partialTick));
+    }
+
+    private static boolean isSeenFromItsInterior(TardisExteriorBlockEntity animatable) {
+        if (!animatable.isPortalActive() || !SkyShaderCompat.isShaderPackInUse()) return false;
+        return TardisPortalBridge.isViewingThroughPortalNear(Vec3.atBottomCenterOf(animatable.getBlockPos()), 2.0);
     }
 
     @Override
@@ -117,5 +128,18 @@ public class TardisExteriorBlockRenderer extends GeoBlockRenderer<@NotNull Tardi
                 Axis.YP,
                 TardisExterior.modelRotationDegrees(yaw != null ? yaw : 0f)
         );
+    }
+
+    @Override
+    public void submit(@NonNull TardisExteriorBlockRenderState renderState, @NonNull PoseStack poseStack,
+                       @NonNull SubmitNodeCollector submitNodeCollector, @NonNull CameraRenderState cameraState) {
+        if (RenderLevelGuard.belongsToOtherLevel(renderState)) return;
+        super.submit(renderState, poseStack, submitNodeCollector, cameraState);
+    }
+
+    @Override
+    public boolean shouldRender(@NonNull TardisExteriorBlockEntity blockEntity, @NonNull Vec3 cameraPos) {
+        if (RenderLevelGuard.isForeign(blockEntity.getLevel())) return false;
+        return super.shouldRender(blockEntity, cameraPos);
     }
 }

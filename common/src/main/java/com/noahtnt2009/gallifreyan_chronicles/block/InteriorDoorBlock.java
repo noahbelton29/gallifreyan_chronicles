@@ -1,6 +1,10 @@
 package com.noahtnt2009.gallifreyan_chronicles.block;
 
 import com.noahtnt2009.gallifreyan_chronicles.block.entity.InteriorDoorBlockEntity;
+import com.noahtnt2009.gallifreyan_chronicles.compat.portal.TardisPortalBridge;
+import com.noahtnt2009.gallifreyan_chronicles.init.GCBlocks;
+import com.noahtnt2009.gallifreyan_chronicles.item.InteriorDoorBlockItem;
+import com.noahtnt2009.gallifreyan_chronicles.init.GCDataComponents;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.InteractionResult;
@@ -113,11 +117,53 @@ public class InteriorDoorBlock extends BaseEntityBlock {
         return this.defaultBlockState().setValue(FACING, facing);
     }
 
+    private static BlockPos barrierPos(BlockPos master, Direction facing, int x, int y) {
+        return master.relative(rightDirectionOf(facing), x).above(y).relative(facing.getOpposite());
+    }
+
+    public static void placeBarriers(Level level, BlockPos master, BlockState state) {
+        if (level.isClientSide() || !(state.getBlock() instanceof InteriorDoorBlock door) || !door.isLinked()) return;
+        if (!TardisPortalBridge.isAvailable()) {
+            removeBarriers(level, master, state);
+            return;
+        }
+        Direction facing = state.getValue(FACING);
+        for (int x = 0; x < WIDTH; x++) {
+            for (int y = 0; y < HEIGHT; y++) {
+                BlockPos p = barrierPos(master, facing, x, y);
+                if (level.isOutsideBuildHeight(p)) continue;
+                BlockState existing = level.getBlockState(p);
+                BlockState barrier = GCBlocks.INTERIOR_DOOR_BARRIER.defaultBlockState()
+                        .setValue(InteriorDoorBarrierBlock.FACING, facing);
+                if (existing.equals(barrier)) continue;
+                if (!existing.is(GCBlocks.INTERIOR_DOOR_BARRIER) && !existing.canBeReplaced()) continue;
+                level.setBlock(p, barrier, Block.UPDATE_ALL);
+            }
+        }
+    }
+
+    public static void removeBarriers(Level level, BlockPos master, BlockState state) {
+        if (level.isClientSide()) return;
+        Direction facing = state.getValue(FACING);
+        for (int x = 0; x < WIDTH; x++) {
+            for (int y = 0; y < HEIGHT; y++) {
+                BlockPos p = barrierPos(master, facing, x, y);
+                if (level.getBlockState(p).is(GCBlocks.INTERIOR_DOOR_BARRIER)) {
+                    level.setBlock(p, Blocks.AIR.defaultBlockState(), Block.UPDATE_ALL | Block.UPDATE_SUPPRESS_DROPS);
+                }
+            }
+        }
+    }
+
     @Override
     public void setPlacedBy(@NonNull Level level, @NonNull BlockPos pos, @NonNull BlockState state,
                             @Nullable LivingEntity placer, @NonNull ItemStack stack) {
         super.setPlacedBy(level, pos, state, placer, stack);
         if (level.isClientSide()) return;
+        if (linked && stack.get(GCDataComponents.DOOR_TYPE) != null
+                && level.getBlockEntity(pos) instanceof InteriorDoorBlockEntity door) {
+            door.setDoorVariant(InteriorDoorBlockItem.selectedVariant(stack));
+        }
 
         Direction right = rightDirectionOf(state.getValue(FACING));
         for (int x = 0; x < WIDTH; x++) {
@@ -127,6 +173,7 @@ public class InteriorDoorBlock extends BaseEntityBlock {
                         state.setValue(PART_X, x).setValue(PART_Y, y), Block.UPDATE_ALL);
             }
         }
+        placeBarriers(level, pos, state);
     }
 
     @Override
@@ -145,6 +192,7 @@ public class InteriorDoorBlock extends BaseEntityBlock {
                     }
                 }
             }
+            removeBarriers(level, master, state);
             if (!player.isCreative()) {
                 Block.popResource(level, master, new ItemStack(this));
             }

@@ -15,6 +15,7 @@ import com.noahtnt2009.gallifreyan_chronicles.network.client.GCFabricClientNetwo
 import com.noahtnt2009.gallifreyan_chronicles.util.GCUtils;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.rendering.v1.hud.HudElementRegistry;
+import net.fabricmc.fabric.api.client.rendering.v1.hud.VanillaHudElements;
 import net.fabricmc.fabric.api.item.v1.BlockTransformerHelper;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderers;
 import net.minecraft.client.renderer.entity.EntityRenderers;
@@ -37,6 +38,12 @@ public class GallifreyanChroniclesFabricClient implements ClientModInitializer {
         EntityRenderers.register(GCEntityTypes.TARDIS_CONTROL_ENTITY_TYPE, TardisControlEntityRenderer::new);
         EntityRenderers.register(GCEntityTypes.TARDIS_KEY_ENTITY_TYPE, TardisKeyEntityRenderer::new);
         GCFabricClientNetworking.registerClientNetworking();
+
+        HudElementRegistry.attachElementAfter(
+                VanillaHudElements.MISC_OVERLAYS,
+                GCUtils.modIdentifier("power_darkness"),
+                (graphics, _) -> GCHudRenderer.renderBelowHud(graphics)
+        );
 
         HudElementRegistry.addLast(
                 GCUtils.modIdentifier("hud_overlay"),

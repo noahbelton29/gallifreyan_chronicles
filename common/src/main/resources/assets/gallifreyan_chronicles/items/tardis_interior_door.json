@@ -5,36 +5,22 @@
       {
         "model": {
           "type": "minecraft:model",
-          "model": "gallifreyan_chronicles:item/first_doctors_door"
+          "model": "gallifreyan_chronicles:item/interior_door/first_doctors_interior_doors"
         },
-        "when": "first_doctors_door"
+        "when": "first_doctors_interior_doors"
       },
       {
         "model": {
           "type": "minecraft:model",
-          "model": "gallifreyan_chronicles:item/second_doctors_door"
+          "model": "gallifreyan_chronicles:item/interior_door/second_doctors_interior_doors"
         },
-        "when": "second_doctors_door"
-      },
-      {
-        "model": {
-          "type": "minecraft:model",
-          "model": "gallifreyan_chronicles:item/second_doctors_door_alt"
-        },
-        "when": "second_doctors_door_alt"
-      },
-      {
-        "model": {
-          "type": "minecraft:model",
-          "model": "gallifreyan_chronicles:item/tuat_door"
-        },
-        "when": "tuat_door"
+        "when": "second_doctors_interior_doors"
       }
     ],
     "component": "gallifreyan_chronicles:door_type",
     "fallback": {
       "type": "minecraft:model",
-      "model": "gallifreyan_chronicles:item/first_doctors_door"
+      "model": "gallifreyan_chronicles:item/interior_door/first_doctors_interior_doors"
     },
     "property": "minecraft:component"
   }

@@ -36,9 +36,17 @@ public final class ConsoleHumSounds {
             TardisConsoleBlockEntity console = entry.getKey();
             TardisConsoleHumSoundInstance hum = entry.getValue();
 
-            if (console.isRemoved() || console.getLevel() != minecraft.level) {
+            if (console.isRemoved()) {
                 if (hum != null) sounds.stop(hum);
                 iterator.remove();
+                continue;
+            }
+
+            if (console.getLevel() != minecraft.level) {
+                if (hum != null) {
+                    sounds.stop(hum);
+                    entry.setValue(null);
+                }
                 continue;
             }
 

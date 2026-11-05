@@ -1,0 +1,7 @@
+{
+  "parent": "gallifreyan_chronicles:second_doctors_interior_doors",
+  "texture": "gallifreyan_chronicles:second_doctors_interior_doors",
+  "default": false,
+  "interior": true,
+  "exterior": "gallifreyan_chronicles:second_doctors_exterior"
+}

@@ -11,6 +11,11 @@ import net.neoforged.neoforge.client.event.RenderGuiEvent;
 public class NeoForgeClientHud {
 
     @SubscribeEvent
+    public static void renderBelowHud(RenderGuiEvent.Pre event) {
+        GCHudRenderer.renderBelowHud(event.getGuiGraphics());
+    }
+
+    @SubscribeEvent
     public static void renderHud(RenderGuiEvent.Post event) {
         GCHudRenderer.render(event.getGuiGraphics());
     }

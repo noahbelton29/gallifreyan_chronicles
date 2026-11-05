@@ -22,6 +22,7 @@ public class GCCreativeModeTabs {
                         output.accept(GCItems.TARDIS_KEY);
                         output.accept(GCItems.MASTER_TARDIS_KEY);
                         output.accept(GCBlocks.TARDIS_INTERIOR_DOOR);
+                        output.accept(GCBlocks.FIRST_DOCTORS_DOOR);
                         output.accept(GCBlocks.BRACHACKI_FLOOR_BLOCK);
                         output.accept(GCBlocks.BRACHACKI_WALL_BLOCK);
                         output.accept(GCBlocks.BRACHACKI_ROUNDEL_BLOCK);
@@ -34,6 +35,7 @@ public class GCCreativeModeTabs {
                         output.accept(GCBlocks.BRACHACKI_WALL_BLOCK_3);
                         output.accept(GCBlocks.BRACHACKI_ROUNDEL_BLOCK_3);
                         output.accept(GCBlocks.BRACHACKI_HALF_ROUNDEL_BLOCK_3);
+                        output.accept(GCBlocks.VOID_BLOCK);
                         output.accept(GCBlocks.BRACHACKI_TUAT_FLOOR_BLOCK);
                         output.accept(GCBlocks.BRACHACKI_TUAT_WALL_BLOCK);
                         output.accept(GCBlocks.BRACHACKI_TUAT_ROUNDEL_BLOCK);

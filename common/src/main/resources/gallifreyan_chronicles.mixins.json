@@ -31,6 +31,8 @@
     "client.SoundEngineMixin",
     "client.PowerDarknessApplicableMixin",
     "client.PowerDarknessSetupMixin",
+    "client.CloudRendererTextureMixin",
+    "client.PortalPowerDarknessMixin",
     "client.SelectItemModelPropertiesMixin",
     "client.EssentialMenuScreenMixin",
     "client.SoundPhysicsTardisEchoMixin"

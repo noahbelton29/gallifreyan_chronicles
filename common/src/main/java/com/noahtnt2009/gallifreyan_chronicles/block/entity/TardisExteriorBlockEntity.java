@@ -1,5 +1,6 @@
 package com.noahtnt2009.gallifreyan_chronicles.block.entity;
 
+import com.noahtnt2009.gallifreyan_chronicles.tardis.door.TardisDoorRegistry;
 import com.noahtnt2009.gallifreyan_chronicles.tardis.api.Tardis;
 import com.noahtnt2009.gallifreyan_chronicles.tardis.api.TardisApi;
 import com.geckolib.animatable.GeoBlockEntity;
@@ -87,6 +88,10 @@ public class TardisExteriorBlockEntity extends BlockEntity implements GeoBlockEn
     private static final int POWER_CHECK_INTERVAL_TICKS = 10;
     private static final int ENTRY_ZONE_INTERVAL_TICKS = 2;
     private boolean powered = true;
+    private boolean portalActive = false;
+    private int doorAnimSeq = 0;
+    private String doorAnim = "";
+    private boolean doorAnimSeqKnown = false;
     private final int tickOffset;
     private final ExteriorFlight flight = new ExteriorFlight();
     private final HeldKey heldKey = new HeldKey();
@@ -287,6 +292,13 @@ public class TardisExteriorBlockEntity extends BlockEntity implements GeoBlockEn
     public void setExterior(TardisExterior exterior) {
         ExteriorSystem.setExterior(asEntity(), exterior);
         resetAnimationState();
+        UUID id = getTardisId();
+        if (id == null || level == null || level.isClientSide()) return;
+        String doorVariant = TardisDoorRegistry.interiorVariantForExterior(exterior.id());
+        if (doorVariant == null) return;
+        for (InteriorDoorBlockEntity door : DoorSyncSystem.doorsOf(id)) {
+            if (door.isLinked()) door.setDoorVariant(doorVariant);
+        }
     }
 
     // used by the summon command to move a tardis to a new block
@@ -433,6 +445,16 @@ public class TardisExteriorBlockEntity extends BlockEntity implements GeoBlockEn
 
     public DoorState getDoorState() {
         return DoorSystem.stateOf(asEntity());
+    }
+
+    public boolean isPortalActive() {
+        return portalActive;
+    }
+
+    public void setPortalActive(boolean active) {
+        if (portalActive == active) return;
+        portalActive = active;
+        sync();
     }
 
     public boolean isGlowing() {
@@ -592,7 +614,13 @@ public class TardisExteriorBlockEntity extends BlockEntity implements GeoBlockEn
     }
 
     public void playAnimation(String animationName) {
-        triggerAnim("anim_controller", animationName);
+        if (level != null && level.isClientSide()) {
+            triggerAnim("anim_controller", animationName);
+            return;
+        }
+        doorAnimSeq++;
+        doorAnim = animationName;
+        sync();
     }
 
     @Override
@@ -602,6 +630,8 @@ public class TardisExteriorBlockEntity extends BlockEntity implements GeoBlockEn
         heldKey.save(output);
         output.putBoolean("Powered", powered);
         output.putBoolean("Locked", locked);
+        output.putInt("DoorAnimSeq", doorAnimSeq);
+        output.putString("DoorAnim", doorAnim);
         flight.save(output);
         cloak.save(output);
     }
@@ -615,6 +645,19 @@ public class TardisExteriorBlockEntity extends BlockEntity implements GeoBlockEn
         locked = input.getBooleanOr("Locked", true);
         flight.load(input);
         cloak.load(input);
+        portalActive = input.getBooleanOr("PortalActive", false);
+        int animSeq = input.getIntOr("DoorAnimSeq", 0);
+        String anim = input.getStringOr("DoorAnim", "");
+        if (doorAnimSeqKnown && animSeq != doorAnimSeq && !anim.isEmpty()
+                && level != null && level.isClientSide()) {
+            if (controller != null) {
+                controller.setAnimationSpeed(1.0);
+            }
+            triggerAnim("anim_controller", anim);
+        }
+        doorAnimSeq = animSeq;
+        doorAnim = anim;
+        doorAnimSeqKnown = true;
     }
 
     @Override
@@ -632,7 +675,9 @@ public class TardisExteriorBlockEntity extends BlockEntity implements GeoBlockEn
 
     @Override
     public @NonNull CompoundTag getUpdateTag(HolderLookup.@NonNull Provider registries) {
-        return saveWithoutMetadata(registries);
+        CompoundTag tag = saveWithoutMetadata(registries);
+        tag.putBoolean("PortalActive", portalActive);
+        return tag;
     }
 
     @Override

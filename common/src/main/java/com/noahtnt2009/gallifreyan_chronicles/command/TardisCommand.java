@@ -396,7 +396,9 @@ public class TardisCommand {
         try {
             UUID tardisId = UUID.fromString(StringArgumentType.getString(ctx, "id"));
             DoorSyncSystem.doorsOf(tardisId).stream().findFirst()
-                    .ifPresent(door -> TardisDoorRegistry.variantIds(door.getVariant()).forEach(builder::suggest));
+                    .ifPresent(door -> (door.isLinked()
+                            ? TardisDoorRegistry.interiorVariantIds()
+                            : TardisDoorRegistry.variantIds(door.getVariant())).forEach(builder::suggest));
         } catch (IllegalArgumentException ignored) {
         }
         return builder.buildFuture();
@@ -420,7 +422,10 @@ public class TardisCommand {
 
         int changed = 0;
         for (InteriorDoorBlockEntity door : doors) {
-            if (!TardisDoorRegistry.hasVariant(door.getVariant(), variantId)) {
+            boolean valid = door.isLinked()
+                    ? TardisDoorRegistry.isInteriorVariant(variantId)
+                    : TardisDoorRegistry.hasVariant(door.getVariant(), variantId);
+            if (!valid) {
                 ctx.getSource().sendFailure(Component.translatable(
                         "command.gallifreyan_chronicles.unknown_door_variant",
                         variantId,

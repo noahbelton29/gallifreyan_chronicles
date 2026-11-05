@@ -24,7 +24,7 @@ public abstract class PowerDarknessApplicableMixin {
     @Inject(method = "isApplicable", at = @At("HEAD"), cancellable = true)
     private void gcPowerDarkApplicable(FogType fogType, Entity entity, CallbackInfoReturnable<Boolean> cir) {
         MobEffectFogEnvironment self = (MobEffectFogEnvironment) (Object) this;
-        if (self.getMobEffect() == MobEffects.BLINDNESS && GCPowerDarkness.update() > 0.0F) {
+        if (self.getMobEffect() == MobEffects.BLINDNESS && GCPowerDarkness.renderLevelDarkness() > 0.0F) {
             cir.setReturnValue(true);
         }
     }

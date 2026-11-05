@@ -12,6 +12,7 @@ import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import org.jspecify.annotations.Nullable;
 
@@ -21,6 +22,8 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class ConsoleControlManager {
+    private static final double STRAY_SEARCH_RADIUS = 4.0;
+
     private final ConsoleControlHost host;
     private final ConsoleAnimatable animatable;
 
@@ -98,13 +101,31 @@ public class ConsoleControlManager {
     }
 
     public void respawnControls() {
-        if (!(host.getHostLevel() instanceof ServerLevel)) return;
+        if (!(host.getHostLevel() instanceof ServerLevel serverLevel)) return;
         for (TardisControlEntity existing : controlEntities) {
             existing.discard();
         }
         controlEntities.clear();
+        AABB area = new AABB(host.getHostPos()).inflate(STRAY_SEARCH_RADIUS);
+        for (TardisControlEntity stray : serverLevel.getEntitiesOfClass(TardisControlEntity.class, area,
+                entity -> host.getHostPos().equals(entity.getConsolePos()))) {
+            stray.discard();
+        }
         for (ControlSpec spec : controlSpecs) {
             spawnControl(spec);
+        }
+    }
+
+    public void ensureControls() {
+        if (!(host.getHostLevel() instanceof ServerLevel serverLevel)) return;
+        if (!serverLevel.isPositionEntityTicking(host.getHostPos())) return;
+        boolean broken = controlEntities.size() != controlSpecs.size();
+        for (TardisControlEntity entity : controlEntities) {
+            if (broken) break;
+            broken = entity.isRemoved() || serverLevel.getEntity(entity.getUUID()) != entity;
+        }
+        if (broken) {
+            respawnControls();
         }
     }
 

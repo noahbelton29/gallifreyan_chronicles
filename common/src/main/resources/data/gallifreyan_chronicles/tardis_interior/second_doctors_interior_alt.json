@@ -1,0 +1,12 @@
+{
+  "structure": "gallifreyan_chronicles:second_doctors_alt",
+  "spawn": { "x": 4.5, "y": 1.0, "z": 12 },
+  "facing": "east",
+  "exterior": "second_doctors_exterior",
+  "console": "second_doctors_console_alt",
+  "door_variant": "second_doctors_doors_alt",
+  "exit": {
+    "min": { "x": 6, "y": 0.5, "z": 13 },
+    "max": { "x": 8, "y": 3.5, "z": 14 }
+  }
+}

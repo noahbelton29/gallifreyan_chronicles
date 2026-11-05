@@ -4,6 +4,7 @@ import com.noahtnt2009.gallifreyan_chronicles.Constants;
 import com.noahtnt2009.gallifreyan_chronicles.block.*;
 import com.noahtnt2009.gallifreyan_chronicles.item.ConsoleBlockItem;
 import com.noahtnt2009.gallifreyan_chronicles.item.DoorBlockItem;
+import com.noahtnt2009.gallifreyan_chronicles.item.InteriorDoorBlockItem;
 import com.noahtnt2009.gallifreyan_chronicles.item.TardisBlockItem;
 import com.noahtnt2009.gallifreyan_chronicles.util.GCUtils;
 import com.noahtnt2009.gallifreyan_chronicles.world.tree.GCTreeGrowers;
@@ -65,6 +66,14 @@ public class GCBlocks {
                     .noOcclusion()
                     .noLootTable()));
 
+    public static final Block INTERIOR_DOOR_BARRIER = registerBlockWithoutBlockItem("interior_door_barrier",
+            properties -> new InteriorDoorBarrierBlock(properties.strength(-1F, 3600000F)
+                    .noOcclusion()
+                    .noLootTable()
+                    .isSuffocating(GCBlocks::never)
+                    .isViewBlocking(GCBlocks::neverViewBlocking)
+                    .pushReaction(PushReaction.IMMOVEABLE)));
+
     public static final Block TARDIS_CONSOLE = registerBlock("tardis_console",
             properties -> new ConsoleBlock(properties.strength(-1F)
                     .sound(SoundType.STONE)
@@ -73,13 +82,13 @@ public class GCBlocks {
             ConsoleBlockItem::new);
 
     public static final Block TARDIS_INTERIOR_DOOR = registerBlock("tardis_interior_door",
-            properties -> new InteriorDoorBlock("brachacki_doors", properties.strength(3F, 3F)
-                    .sound(SoundType.STONE)
+            properties -> new InteriorDoorBlock("first_doctors_interior_doors", properties.strength(3F, 3F)
+                    .sound(SoundType.WOOD)
                     .noOcclusion()
                     .noLootTable()
                     .pushReaction(PushReaction.POPPED)),
             Rarity.COMMON,
-            DoorBlockItem::new);
+            InteriorDoorBlockItem::new);
 
     public static final Block FIRST_DOCTORS_DOOR = registerBlock("first_doctors_door",
             properties -> new InteriorDoorBlock("brachacki_doors", "first_doctors_doors", properties.strength(3F, 3F)
@@ -194,6 +203,15 @@ public class GCBlocks {
             properties -> new Block(properties.strength(3F, 3F)
                     .requiresCorrectToolForDrops()
                     .sound(SoundType.STONE)));
+
+    public static final Block VOID_BLOCK = registerBlock("void_block",
+            properties -> new Block(properties.mapColor(MapColor.COLOR_BLACK)
+                    .instrument(NoteBlockInstrument.BASEDRUM)
+                    .strength(1.8F)
+                    .sound(SoundType.STONE)
+                    .noCollision()
+                    .isSuffocating(GCBlocks::never)
+                    .isViewBlocking(GCBlocks::neverViewBlocking)));
 
     public static final Block BRACHACKI_TUAT_FLOOR_BLOCK = registerBlock("brachacki_tuat_floor_block",
             properties -> new Block(properties.strength(3F, 3F)

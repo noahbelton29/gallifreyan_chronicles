@@ -113,6 +113,7 @@ public class GCModelProvider extends ModelProvider {
         blockModels.createParticleOnlyBlock(GCBlocks.SECOND_DOCTORS_DOOR, GCBlocks.BRACHACKI_WALL_BLOCK);
         blockModels.createParticleOnlyBlock(GCBlocks.SECOND_DOCTORS_DOOR_ALT, GCBlocks.BRACHACKI_WALL_BLOCK);
         blockModels.createParticleOnlyBlock(GCBlocks.TUAT_DOOR, GCBlocks.BRACHACKI_WALL_BLOCK);
+        blockModels.createParticleOnlyBlock(GCBlocks.INTERIOR_DOOR_BARRIER, GCBlocks.VOID_BLOCK);
         registerSelectableItems(itemModels);
 
         registerGrassBlock(blockModels);
@@ -157,6 +158,7 @@ public class GCModelProvider extends ModelProvider {
         itemModels.itemModelOutput.accept(GCBlocks.TARDIS_CONSOLE.asItem(), ItemModelUtils.select(new ConsoleVariantSelectProperty(), console,
                 ItemModelUtils.when(List.of("brachacki_console", "first_doctors_console"), console),
                 ItemModelUtils.when("second_doctors_console", flatItem(itemModels, "tardis_console/second_doctors_console")),
+                ItemModelUtils.when("second_doctors_console_alt", flatItem(itemModels, "tardis_console/second_doctors_console_alt")),
                 ItemModelUtils.when("tuat_console", flatItem(itemModels, "tardis_console/tuat_console")),
                 ItemModelUtils.when("inferno_console", flatItem(itemModels, "tardis_console/inferno_console")),
                 ItemModelUtils.when("ambassadors_of_death_console", flatItem(itemModels, "tardis_console/ambassadors_of_death_console"))));
@@ -165,9 +167,13 @@ public class GCModelProvider extends ModelProvider {
         ItemModel.Unbaked secondDoors = ItemModelUtils.plainModel(itemModels.createFlatItemModel(GCBlocks.SECOND_DOCTORS_DOOR.asItem(), ModelTemplates.FLAT_ITEM));
         ItemModel.Unbaked tuatDoors = ItemModelUtils.plainModel(itemModels.createFlatItemModel(GCBlocks.TUAT_DOOR.asItem(), ModelTemplates.FLAT_ITEM));
         ItemModel.Unbaked secondDoorsAlt = ItemModelUtils.plainModel(itemModels.createFlatItemModel(GCBlocks.SECOND_DOCTORS_DOOR_ALT.asItem(), ModelTemplates.FLAT_ITEM));
-        itemModels.createFlatItemModel(GCBlocks.TARDIS_INTERIOR_DOOR.asItem(), ModelTemplates.FLAT_ITEM);
+        ItemModel.Unbaked firstInteriorDoors = flatItem(itemModels, "interior_door/first_doctors_interior_doors");
+        ItemModel.Unbaked secondInteriorDoors = flatItem(itemModels, "interior_door/second_doctors_interior_doors");
+        itemModels.itemModelOutput.accept(GCBlocks.TARDIS_INTERIOR_DOOR.asItem(),
+                ItemModelUtils.select(new ComponentContents<>(GCDataComponents.DOOR_TYPE), firstInteriorDoors,
+                        ItemModelUtils.when("first_doctors_interior_doors", firstInteriorDoors),
+                        ItemModelUtils.when("second_doctors_interior_doors", secondInteriorDoors)));
         Map<Item, ItemModel.Unbaked> doorFallbacks = Map.of(
-                GCBlocks.TARDIS_INTERIOR_DOOR.asItem(), firstDoors,
                 GCBlocks.FIRST_DOCTORS_DOOR.asItem(), firstDoors,
                 GCBlocks.SECOND_DOCTORS_DOOR.asItem(), secondDoors,
                 GCBlocks.SECOND_DOCTORS_DOOR_ALT.asItem(), secondDoorsAlt,
@@ -207,6 +213,7 @@ public class GCModelProvider extends ModelProvider {
         generators.createTrivialCube(GCBlocks.BRACHACKI_ROUNDEL_BLOCK_3);
         generators.createTrivialCube(GCBlocks.BRACHACKI_HALF_ROUNDEL_BLOCK_3);
         generators.createTrivialCube(GCBlocks.BRACHACKI_TUAT_FLOOR_BLOCK);
+        generators.createTrivialCube(GCBlocks.VOID_BLOCK);
         generators.createTrivialCube(GCBlocks.BRACHACKI_TUAT_ROUNDEL_BLOCK);
         generators.createTrivialCube(GCBlocks.BRACHACKI_TUAT_HALF_ROUNDEL_BLOCK);
         generators.createTrivialCube(GCBlocks.BRACHACKI_TUAT_HEXAGONAL_ROUNDEL_BLOCK);

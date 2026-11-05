@@ -1,6 +1,8 @@
 package com.noahtnt2009.gallifreyan_chronicles.mixin;
 
+import com.noahtnt2009.gallifreyan_chronicles.compat.portal.TardisPortalBridge;
 import com.noahtnt2009.gallifreyan_chronicles.tardis.exterior.TardisKeyLocator;
+import com.noahtnt2009.gallifreyan_chronicles.tardis.ecs.system.ConsoleSyncSystem;
 import com.noahtnt2009.gallifreyan_chronicles.tardis.interior.TardisDimensionManager;
 import com.noahtnt2009.gallifreyan_chronicles.util.GCScheduler;
 import com.noahtnt2009.gallifreyan_chronicles.util.GCServerState;
@@ -19,8 +21,10 @@ public abstract class MinecraftServerMixin {
     @Inject(method = "createLevels", at = @At("TAIL"))
     private void gallifreyan_chronicles$restoreInteriors(CallbackInfo ci) {
         GCServerState.onServerStart();
+        TardisPortalBridge.reset();
         TardisDimensionManager.restoreAll((MinecraftServer) (Object) this);
         TimedSounds.onServerStart((MinecraftServer) (Object) this);
+        TardisPortalBridge.onDimensionsChanged((MinecraftServer) (Object) this);
     }
 
     @Inject(method = "tickChildren", at = @At("HEAD"))
@@ -29,5 +33,7 @@ public abstract class MinecraftServerMixin {
         TardisInteriorSystem.tickExitZones((MinecraftServer) (Object) this);
         GCScheduler.tick((MinecraftServer) (Object) this);
         TardisKeyLocator.tick((MinecraftServer) (Object) this);
+        TardisPortalBridge.tick((MinecraftServer) (Object) this);
+        ConsoleSyncSystem.tick((MinecraftServer) (Object) this);
     }
 }

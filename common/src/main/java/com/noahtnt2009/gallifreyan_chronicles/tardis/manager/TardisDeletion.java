@@ -98,7 +98,6 @@ public final class TardisDeletion {
         deleteFolder(((MinecraftServerAccessor) server).gallifreyan_chronicles$getStorageSource().getDimensionPath(key));
 
         TardisManager.get(server).remove(tardisId);
-        TardisPortalBridge.onDimensionsChanged(server);
         Constants.LOG.info("[GC] Deleted TARDIS {} and its dimension", tardisId);
     }
 

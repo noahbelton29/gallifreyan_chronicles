@@ -54,7 +54,8 @@ public final class TardisPortals {
 
     private static final int TICKET_REFRESH_TICKS = 100;
     private static final int TICKET_RADIUS = 2;
-    private static final int SCAN_RETRY_TICKS = 200;
+    private static final int SCAN_RETRY_TICKS = 40;
+    private static final int MISSING_GRACE_TICKS = 100;
     private static final double EXTERIOR_PLAYER_RANGE = 64.0;
 
     private static final Map<UUID, Link> LINKS = new HashMap<>();
@@ -75,6 +76,7 @@ public final class TardisPortals {
         private final Portal interiorPortal;
         private boolean visible;
         private long hideAt = -1L;
+        private long missingSince = -1L;
 
         private Link(Placement placement, Portal exteriorPortal, Portal interiorPortal) {
             this.placement = placement;
@@ -244,6 +246,12 @@ public final class TardisPortals {
         Link link = LINKS.get(tardisId);
 
         if (placement == null) {
+            boolean definitelyGone = exterior != null && (exterior.isTravelling() || exterior.isFullyInvisible());
+            if (link != null && !definitelyGone && link.isAlive()) {
+                long now = server.getTickCount();
+                if (link.missingSince < 0L) link.missingSince = now;
+                if (now - link.missingSince < MISSING_GRACE_TICKS) return;
+            }
             if (link != null) {
                 discard(link);
                 LINKS.remove(tardisId);
@@ -252,10 +260,11 @@ public final class TardisPortals {
             if (exterior != null) exterior.setPortalActive(false);
             return;
         }
+        if (link != null) link.missingSince = -1L;
 
         if (link == null || !link.isAlive() || !link.placement.equals(placement)) {
             if (link != null) discard(link);
-            link = spawn(server, placement);
+            link = spawn(server, tardisId, placement);
             if (link == null) {
                 LINKS.remove(tardisId);
                 TardisPortalBridge.setActive(tardisId, false);
@@ -286,8 +295,8 @@ public final class TardisPortals {
         TardisPortalBridge.setActive(tardisId, true);
 
         if (now % PURGE_INTERVAL_TICKS == 0) {
-            purgeStrays(link.exteriorPortal);
-            purgeStrays(link.interiorPortal);
+            purgeStrays(link.exteriorPortal, tardisId);
+            purgeStrays(link.interiorPortal, tardisId);
         }
     }
 
@@ -312,7 +321,7 @@ public final class TardisPortals {
                 interiorLevel.dimension(), door.pos(), state.getValue(InteriorDoorBlock.FACING));
     }
 
-    private static @Nullable Link spawn(MinecraftServer server, Placement placement) {
+    private static @Nullable Link spawn(MinecraftServer server, UUID tardisId, Placement placement) {
         ServerLevel exteriorLevel = server.getLevel(placement.exteriorDimension());
         ServerLevel interiorLevel = server.getLevel(placement.interiorDimension());
         if (exteriorLevel == null || interiorLevel == null) return null;
@@ -336,7 +345,7 @@ public final class TardisPortals {
         exteriorPortal.setOrientationAndSize(axisW, UP, PORTAL_WIDTH, PORTAL_HEIGHT);
         PortalAPI.setPortalTransformation(exteriorPortal, placement.interiorDimension(), destination,
                 DQuaternion.rotationByDegrees(UP, interiorRotation + 180.0 - exteriorRotation), 1.0);
-        configure(exteriorPortal);
+        configure(exteriorPortal, tardisId);
 
         Vec3 interiorViewOffset = new Vec3(0.0, INTERIOR_PORTAL_OFFSET.y, INTERIOR_VIEW_Z);
         Vec3 exteriorReturnOffset = new Vec3(0.0,
@@ -352,10 +361,10 @@ public final class TardisPortals {
         interiorPortal.setOrientationAndSize(UP.cross(interiorNormal), UP, PORTAL_WIDTH, PORTAL_HEIGHT);
         PortalAPI.setPortalTransformation(interiorPortal, placement.exteriorDimension(), interiorDestination,
                 DQuaternion.rotationByDegrees(UP, exteriorRotation + 180.0 - interiorRotation), 1.0);
-        configure(interiorPortal);
+        configure(interiorPortal, tardisId);
 
-        purgeNear(exteriorLevel, origin, null);
-        purgeNear(interiorLevel, interiorOrigin, null);
+        purgeNear(exteriorLevel, origin, null, tardisId);
+        purgeNear(interiorLevel, interiorOrigin, null, tardisId);
 
         if (!exteriorLevel.addFreshEntity(exteriorPortal)) return null;
         if (!interiorLevel.addFreshEntity(interiorPortal)) {
@@ -365,8 +374,23 @@ public final class TardisPortals {
         return new Link(placement, exteriorPortal, interiorPortal);
     }
 
-    private static void configure(Portal portal) {
+    private static String ownerTag(UUID tardisId) {
+        return PORTAL_TAG + "." + tardisId;
+    }
+
+    private static boolean belongsTo(Portal portal, UUID tardisId) {
+        Set<String> tags = portal.entityTags();
+        if (!tags.contains(PORTAL_TAG)) return false;
+        if (tags.contains(ownerTag(tardisId))) return true;
+        for (String tag : tags) {
+            if (tag.startsWith(PORTAL_TAG + ".")) return false;
+        }
+        return true;
+    }
+
+    private static void configure(Portal portal, UUID tardisId) {
         portal.addTag(PORTAL_TAG);
+        portal.addTag(ownerTag(tardisId));
         portal.setIsVisible(false);
         portal.setTeleportable(false);
     }
@@ -383,15 +407,15 @@ public final class TardisPortals {
         if (!link.interiorPortal.isRemoved()) link.interiorPortal.discard();
     }
 
-    private static void purgeStrays(Portal keep) {
+    private static void purgeStrays(Portal keep, UUID tardisId) {
         if (keep.isRemoved() || !(keep.level() instanceof ServerLevel level)) return;
-        purgeNear(level, keep.getOriginPos(), keep);
+        purgeNear(level, keep.getOriginPos(), keep, tardisId);
     }
 
-    private static void purgeNear(ServerLevel level, Vec3 center, @Nullable Portal keep) {
+    private static void purgeNear(ServerLevel level, Vec3 center, @Nullable Portal keep, UUID tardisId) {
         AABB area = new AABB(center, center).inflate(PURGE_RADIUS);
         for (Portal stray : level.getEntitiesOfClass(Portal.class, area,
-                portal -> portal != keep && portal.entityTags().contains(PORTAL_TAG))) {
+                portal -> portal != keep && belongsTo(portal, tardisId))) {
             stray.discard();
         }
     }

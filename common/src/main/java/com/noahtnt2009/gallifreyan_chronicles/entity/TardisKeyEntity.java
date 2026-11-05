@@ -206,16 +206,16 @@ public class TardisKeyEntity extends Entity {
         }
 
         if (!isMasterKey) {
-            boolean alreadyInserted = Boolean.TRUE.equals(held.get(GCDataComponents.KEY_INSERTED));
-            if (alreadyInserted) {
-                return InteractionResult.FAIL;
-            }
-
             UUID keyTardisId = held.get(GCDataComponents.TARDIS_ID);
             UUID exteriorTardisId = exterior.getTardisId();
 
             if (keyTardisId == null || !keyTardisId.equals(exteriorTardisId)) {
-                return exterior.tryInsertWrongKey(player, hand, held) ? InteractionResult.CONSUME : InteractionResult.FAIL;
+                return InteractionResult.FAIL;
+            }
+
+            boolean alreadyInserted = Boolean.TRUE.equals(held.get(GCDataComponents.KEY_INSERTED));
+            if (alreadyInserted) {
+                return InteractionResult.FAIL;
             }
         }
 

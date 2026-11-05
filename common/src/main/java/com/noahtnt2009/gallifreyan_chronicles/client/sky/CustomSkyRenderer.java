@@ -35,6 +35,8 @@ import org.jspecify.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.IdentityHashMap;
+import java.util.Map;
 import java.util.List;
 import java.util.Optional;
 import java.util.OptionalDouble;
@@ -47,12 +49,12 @@ public final class CustomSkyRenderer {
     private static final float TWO_PI = (float) (Math.PI * 2.0);
     private static final float DAY_FADE = 0.12F;
 
-    private static @Nullable DimensionSky meshOwner;
     private static @Nullable StarDensity meshDensity;
-    private static @Nullable SkyMeshes meshes;
+    private static final Map<DimensionSky, SkyMeshes> MESHES = new IdentityHashMap<>();
     private static final Set<Identifier> MISSING_BODIES = new HashSet<>();
     private static @Nullable SkyRenderState overlayState;
     private static @Nullable GpuBufferSlice overlayFog;
+    private static @Nullable ClientLevel overlayLevel;
     private static final float OVERLAY_DISTANCE = 0.5F;
     private static final float CUBE_DIAGONAL = 1.7320508F;
     private static final int FOG_SHELLS = 48;
@@ -75,6 +77,7 @@ public final class CustomSkyRenderer {
         if (sky.shaderSky() == ShaderSky.OVERLAY && SkyShaderCompat.isShaderPackInUse()) {
             overlayState = state;
             overlayFog = skyFog;
+            overlayLevel = level;
             return true;
         }
 
@@ -110,12 +113,14 @@ public final class CustomSkyRenderer {
     public static void renderOverlay(float depthFar) {
         SkyRenderState state = overlayState;
         GpuBufferSlice fog = overlayFog;
-        overlayState = null;
-        overlayFog = null;
         if (state == null) return;
 
         ClientLevel level = Minecraft.getInstance().level;
         if (level == null) return;
+        if (overlayLevel != level) return;
+        overlayState = null;
+        overlayFog = null;
+        overlayLevel = null;
         DimensionSky sky = DimensionSkyRegistry.getForDimension(level.dimension().identifier());
         if (sky == null || sky.shaderSky() != ShaderSky.OVERLAY) return;
 
@@ -187,14 +192,27 @@ public final class CustomSkyRenderer {
 
     private static SkyMeshes meshesFor(DimensionSky sky) {
         StarDensity density = StarDensity.byName(GCConfig.starDensity());
-        if (meshes == null || meshOwner != sky || meshDensity != density) {
-            if (meshes != null) meshes.close();
-            if (meshOwner != sky) SkyGlowTextures.clear();
-            meshes = SkyMeshes.build(sky.stars().orElse(null), density.multiplier());
-            meshOwner = sky;
+        if (meshDensity != density) {
+            closeMeshes();
             meshDensity = density;
         }
-        return meshes;
+        SkyMeshes cached = MESHES.get(sky);
+        if (cached == null) {
+            var registered = DimensionSkyRegistry.getAll();
+            MESHES.entrySet().removeIf(entry -> {
+                boolean stale = registered.stream().noneMatch(known -> known == entry.getKey());
+                if (stale) entry.getValue().close();
+                return stale;
+            });
+            cached = SkyMeshes.build(sky.stars().orElse(null), density.multiplier());
+            MESHES.put(sky, cached);
+        }
+        return cached;
+    }
+
+    private static void closeMeshes() {
+        for (SkyMeshes built : MESHES.values()) built.close();
+        MESHES.clear();
     }
 
     private static List<PreparedBody> prepareBodies(DimensionSky sky) {

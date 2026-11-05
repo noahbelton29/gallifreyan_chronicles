@@ -44,7 +44,7 @@ public final class TardisPortals {
     private static final double PORTAL_WIDTH = 1.0;
     private static final double PORTAL_HEIGHT = 34.0 / 16.0;
     private static final Vec3 EXTERIOR_PORTAL_OFFSET = new Vec3(0.0, 18.0 / 16.0, -10.05 / 16.0);
-    private static final Vec3 INTERIOR_PORTAL_OFFSET = new Vec3(0.0, 16.0 / 16.0, 8.05 / 16.0);
+    private static final Vec3 INTERIOR_PORTAL_OFFSET = new Vec3(0.0, 1.0, 8.05 / 16.0);
     private static final double INTERIOR_VIEW_Z = 7.95 / 16.0;
     private static final Vec3 UP = new Vec3(0.0, 1.0, 0.0);
     private static final int CLOSE_LINGER_TICKS = 12;

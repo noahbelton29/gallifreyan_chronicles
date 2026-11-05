@@ -1,5 +1,6 @@
 package com.noahtnt2009.gallifreyan_chronicles.compat.portal;
 
+import com.noahtnt2009.gallifreyan_chronicles.config.GCConfig;
 import com.noahtnt2009.gallifreyan_chronicles.block.InteriorDoorBlock;
 import com.noahtnt2009.gallifreyan_chronicles.block.entity.InteriorDoorBlockEntity;
 import com.noahtnt2009.gallifreyan_chronicles.block.entity.TardisExteriorBlockEntity;
@@ -37,6 +38,10 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.IdentityHashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
@@ -60,9 +65,9 @@ public final class TardisPortals {
     private static final int SCAN_RETRY_TICKS = 40;
     private static final int MISSING_GRACE_TICKS = 100;
     private static final double EXTERIOR_PLAYER_RANGE = 64.0;
-    private static final double PORTAL_RENDER_DISTANCE = 20.0;
 
     private static final Map<UUID, Link> LINKS = new HashMap<>();
+    private static final Set<Portal> ALLOWED = Collections.newSetFromMap(new IdentityHashMap<>());
     private static final Map<UUID, DoorLocation> DOORS = new HashMap<>();
     private static final Map<UUID, Long> LAST_TICKET = new HashMap<>();
     private static final Map<UUID, Long> NEXT_SCAN = new HashMap<>();
@@ -99,6 +104,7 @@ public final class TardisPortals {
     }
 
     static void reset() {
+        ALLOWED.clear();
         LINKS.clear();
         DOORS.clear();
         LAST_TICKET.clear();
@@ -169,6 +175,7 @@ public final class TardisPortals {
             syncDimensionIds(server);
         }
         Set<UUID> ids = new HashSet<>(TardisManager.get(server).getAllIds());
+        updateAllowedPortals(server);
         for (UUID tardisId : ids) {
             tickTardis(server, tardisId);
         }
@@ -319,13 +326,12 @@ public final class TardisPortals {
         boolean visible = open || (link.hideAt >= 0L && now < link.hideAt);
         link.visible = visible;
 
-        // a portal only renders while a player is within 20 blocks of it, further away it is switched off
-        boolean exteriorShown = visible && playerWithinRenderDistance(link.exteriorPortal);
+        boolean exteriorShown = visible && ALLOWED.contains(link.exteriorPortal);
         if (exteriorShown != link.exteriorShown) {
             link.exteriorShown = exteriorShown;
             applyVisibility(link.exteriorPortal, exteriorShown);
         }
-        boolean interiorShown = visible && playerWithinRenderDistance(link.interiorPortal);
+        boolean interiorShown = visible && ALLOWED.contains(link.interiorPortal);
         if (interiorShown != link.interiorShown) {
             link.interiorShown = interiorShown;
             applyVisibility(link.interiorPortal, interiorShown);
@@ -435,13 +441,30 @@ public final class TardisPortals {
         portal.setTeleportable(false);
     }
 
-    private static boolean playerWithinRenderDistance(Portal portal) {
-        if (portal.isRemoved() || !(portal.level() instanceof ServerLevel level)) return false;
-        double maxSqr = PORTAL_RENDER_DISTANCE * PORTAL_RENDER_DISTANCE;
-        for (ServerPlayer player : level.players()) {
-            if (player.distanceToSqr(portal) <= maxSqr) return true;
+    // works out which portals may render this tick, each player gets the nearest few open portals that are within
+    // the portal render distance, the limit stops a crowd of open doors in one spot from all rendering at once
+    private static void updateAllowedPortals(MinecraftServer server) {
+        ALLOWED.clear();
+        double distance = GCConfig.portalRenderDistance();
+        double maxSqr = distance * distance;
+        int limit = GCConfig.maxRenderedPortals();
+
+        List<Portal> open = new ArrayList<>();
+        for (Link link : LINKS.values()) {
+            if (!link.visible || !link.isAlive()) continue;
+            open.add(link.exteriorPortal);
+            open.add(link.interiorPortal);
         }
-        return false;
+        if (open.isEmpty()) return;
+
+        for (ServerPlayer player : server.getPlayerList().getPlayers()) {
+            List<Portal> near = new ArrayList<>();
+            for (Portal portal : open) {
+                if (portal.level() == player.level() && player.distanceToSqr(portal) <= maxSqr) near.add(portal);
+            }
+            near.sort(Comparator.comparingDouble(player::distanceToSqr));
+            for (int i = 0; i < Math.min(limit, near.size()); i++) ALLOWED.add(near.get(i));
+        }
     }
 
     private static void applyVisibility(Portal portal, boolean visible) {

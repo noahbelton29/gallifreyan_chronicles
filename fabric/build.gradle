@@ -47,6 +47,7 @@ dependencies {
     runtimeOnly("maven.modrinth:modmenu:${modmenu_version}")
 //    implementation(include("foundry.imguimc:imguimc-fabric-${providers.gradleProperty("minecraft_version").get()}:${providers.gradleProperty("imguimc_version").get()}"))
 
+    compileOnly("maven.modrinth:sodium:${providers.gradleProperty("sodium_version").get()}")
     runtimeOnly("maven.modrinth:sodium:${providers.gradleProperty("sodium_version").get()}")
     runtimeOnly("maven.modrinth:iris:${providers.gradleProperty("iris_version").get()}")
 }

@@ -1,5 +1,6 @@
 package com.noahtnt2009.gallifreyan_chronicles.client.renderer;
 
+import com.noahtnt2009.gallifreyan_chronicles.config.GCConfig;
 import com.geckolib.constant.dataticket.DataTicket;
 import com.geckolib.renderer.GeoBlockRenderer;
 import com.geckolib.renderer.base.RenderPassInfo;
@@ -53,5 +54,10 @@ public class TardisConsoleBlockRenderer extends GeoBlockRenderer<@NotNull Tardis
         poseStack.translate(0d, 0.5d, 0d);
         poseStack.rotateDegrees(Axis.ZP, 180f);
         poseStack.translate(0d, -0.5d, 0d);
+    }
+
+    @Override
+    public int getViewDistance() {
+        return GCConfig.modelRenderDistance();
     }
 }

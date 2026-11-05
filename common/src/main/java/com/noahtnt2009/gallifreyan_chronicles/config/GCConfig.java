@@ -25,6 +25,9 @@ public final class GCConfig {
         double camera_shake_intensity = 1.0;
         double power_darkness_strength = 1.0;
         String star_density = "normal";
+        int model_render_distance = 64;
+        int portal_render_distance = 20;
+        int max_rendered_portals = 8;
     }
 
     private static Data data = new Data();
@@ -54,6 +57,9 @@ public final class GCConfig {
         data.camera_shake_intensity = clampVolume(data.camera_shake_intensity);
         data.power_darkness_strength = clampVolume(data.power_darkness_strength);
         if (isBlank(data.star_density)) data.star_density = "normal";
+        data.model_render_distance = clampRenderDistance(data.model_render_distance);
+        data.portal_render_distance = clampPortalDistance(data.portal_render_distance);
+        data.max_rendered_portals = clampMaxPortals(data.max_rendered_portals);
         save();
     }
 
@@ -121,6 +127,54 @@ public final class GCConfig {
 
     public static void setPowerDarknessStrength(double strength) {
         data.power_darkness_strength = clampVolume(strength);
+    }
+
+    public static final int MIN_MODEL_RENDER_DISTANCE = 16;
+    public static final int MAX_MODEL_RENDER_DISTANCE = 256;
+
+    private static int clampRenderDistance(int distance) {
+        if (distance <= 0) return 64;
+        return Math.max(MIN_MODEL_RENDER_DISTANCE, Math.min(MAX_MODEL_RENDER_DISTANCE, distance));
+    }
+
+    public static final int MIN_PORTAL_RENDER_DISTANCE = 4;
+    public static final int MAX_PORTAL_RENDER_DISTANCE = 128;
+
+    private static int clampPortalDistance(int distance) {
+        if (distance <= 0) return 20;
+        return Math.max(MIN_PORTAL_RENDER_DISTANCE, Math.min(MAX_PORTAL_RENDER_DISTANCE, distance));
+    }
+
+    public static final int MIN_RENDERED_PORTALS = 1;
+    public static final int MAX_RENDERED_PORTALS = 24;
+
+    private static int clampMaxPortals(int count) {
+        if (count <= 0) return 8;
+        return Math.max(MIN_RENDERED_PORTALS, Math.min(MAX_RENDERED_PORTALS, count));
+    }
+
+    public static int maxRenderedPortals() {
+        return data.max_rendered_portals;
+    }
+
+    public static void setMaxRenderedPortals(int count) {
+        data.max_rendered_portals = clampMaxPortals(count);
+    }
+
+    public static int portalRenderDistance() {
+        return data.portal_render_distance;
+    }
+
+    public static void setPortalRenderDistance(int distance) {
+        data.portal_render_distance = clampPortalDistance(distance);
+    }
+
+    public static int modelRenderDistance() {
+        return data.model_render_distance;
+    }
+
+    public static void setModelRenderDistance(int distance) {
+        data.model_render_distance = clampRenderDistance(distance);
     }
 
     public static String starDensity() {

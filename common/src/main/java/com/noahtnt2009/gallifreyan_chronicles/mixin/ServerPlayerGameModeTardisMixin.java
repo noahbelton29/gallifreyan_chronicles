@@ -5,7 +5,10 @@ import com.noahtnt2009.gallifreyan_chronicles.block.InteriorDoorBlock;
 import com.noahtnt2009.gallifreyan_chronicles.block.TardisBlock;
 import com.noahtnt2009.gallifreyan_chronicles.block.TardisTopBlock;
 import com.noahtnt2009.gallifreyan_chronicles.compat.portal.TardisPortalBridge;
+import com.noahtnt2009.gallifreyan_chronicles.init.GCBlocks;
+import com.noahtnt2009.gallifreyan_chronicles.tardis.manager.TardisDeletionMode;
 import net.minecraft.core.BlockPos;
+import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.server.level.ServerPlayerGameMode;
@@ -40,6 +43,25 @@ public abstract class ServerPlayerGameModeTardisMixin {
                 || block instanceof InteriorDoorBlock door && door.isLinked();
         if (!protectedBlock) return;
         target.sendBlockUpdated(pos, state, state, Block.UPDATE_ALL);
+        cir.setReturnValue(false);
+    }
+
+    @Inject(method = "destroyBlock", at = @At("HEAD"), cancellable = true)
+    private void gc$blockTardisDeletionWithoutDeletionMode(BlockPos pos, CallbackInfoReturnable<Boolean> cir) {
+        if (!player.isCreative()) return;
+        if (TardisDeletionMode.isEnabled(player.getUUID())) return;
+
+        ServerLevel redirected = TardisPortalBridge.redirectedActionLevel();
+        ServerLevel target = redirected != null ? redirected : level;
+        BlockState state = target.getBlockState(pos);
+        Block block = state.getBlock();
+
+        boolean isExterior = block instanceof TardisBlock;
+        boolean isTopOfExterior = block instanceof TardisTopBlock && target.getBlockState(pos.below()).is(GCBlocks.TARDIS);
+        if (!isExterior && !isTopOfExterior) return;
+
+        target.sendBlockUpdated(pos, state, state, Block.UPDATE_ALL);
+        player.sendSystemMessage(Component.translatable("message.gallifreyan_chronicles.deletion_mode_required"));
         cir.setReturnValue(false);
     }
 }

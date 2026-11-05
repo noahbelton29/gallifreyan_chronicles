@@ -22,6 +22,7 @@ import com.noahtnt2009.gallifreyan_chronicles.entity.TardisControlEntity;
 import com.noahtnt2009.gallifreyan_chronicles.tardis.control.TardisControlRegistry;
 import com.noahtnt2009.gallifreyan_chronicles.tardis.door.TardisDoorRegistry;
 import com.noahtnt2009.gallifreyan_chronicles.tardis.manager.TardisDeletion;
+import com.noahtnt2009.gallifreyan_chronicles.tardis.manager.TardisDeletionMode;
 import com.noahtnt2009.gallifreyan_chronicles.tardis.ecs.component.TardisSubsystem;
 import com.noahtnt2009.gallifreyan_chronicles.tardis.ecs.system.ConsoleLinkSystem;
 import com.noahtnt2009.gallifreyan_chronicles.tardis.ecs.system.DoorSyncSystem;
@@ -96,6 +97,28 @@ public class TardisCommand {
         }
 
         return Optional.empty();
+    }
+
+    public static int setDeletionMode(CommandContext<CommandSourceStack> ctx, boolean enabled) {
+        ServerPlayer player;
+        try {
+            player = ctx.getSource().getPlayerOrException();
+        } catch (CommandSyntaxException e) {
+            ctx.getSource().sendFailure(Component.translatable("command.gallifreyan_chronicles.player_only"));
+            return 0;
+        }
+
+        TardisDeletionMode.setEnabled(player.getUUID(), enabled);
+
+        ctx.getSource().sendSuccess(
+                () -> Component.translatable(
+                        enabled
+                                ? "command.gallifreyan_chronicles.deletion_mode_on"
+                                : "command.gallifreyan_chronicles.deletion_mode_off"
+                ),
+                false
+        );
+        return 1;
     }
 
     public static int removeTardis(CommandContext<CommandSourceStack> ctx) {

@@ -12,6 +12,7 @@ import com.noahtnt2009.gallifreyan_chronicles.tardis.exterior.TardisExteriorRegi
 import net.minecraft.commands.arguments.DimensionArgument;
 import net.minecraft.commands.arguments.coordinates.BlockPosArgument;
 import net.minecraft.network.chat.Component;
+import net.minecraft.server.permissions.Permissions;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.event.RegisterCommandsEvent;
@@ -27,6 +28,15 @@ public class GCNeoForgeCommands {
     public static void onRegisterCommands(RegisterCommandsEvent event) {
         event.getDispatcher().register(
                 literal("gc")
+                        .then(literal("deletion")
+                                .requires(source -> source.permissions().hasPermission(
+                                        Permissions.COMMANDS_GAMEMASTER))
+                                .then(literal("on")
+                                        .executes(ctx ->
+                                                TardisCommand.setDeletionMode(ctx, true)))
+                                .then(literal("off")
+                                        .executes(ctx ->
+                                                TardisCommand.setDeletionMode(ctx, false))))
                         .then(literal("tardis")
                                 .then(literal("list")
                                         .executes(TardisCommand::listTardis))

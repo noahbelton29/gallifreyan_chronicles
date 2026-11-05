@@ -27,7 +27,10 @@
         "modmenu": [
             "com.noahtnt2009.gallifreyan_chronicles.compat.modmenu.GCModMenuIntegration"
         ],
-        "jade": ["com.noahtnt2009.gallifreyan_chronicles.compat.jade.GCJadePlugin"]
+        "jade": ["com.noahtnt2009.gallifreyan_chronicles.compat.jade.GCJadePlugin"],
+        "sodium:config_api_user": [
+            "com.noahtnt2009.gallifreyan_chronicles.compat.sodium.GCSodiumConfig"
+        ]
     },
     "mixins": [
         "${mod_id}.mixins.json",

@@ -33,6 +33,47 @@ public final class GCOptions {
                 GCConfig.powerDarknessStrength(), GCConfig::setPowerDarknessStrength);
     }
 
+    public static OptionInstance<Integer> modelRenderDistance() {
+        return new OptionInstance<>(
+                "options.gallifreyan_chronicles.model_render_distance",
+                OptionInstance.cachedConstantTooltip(Component.translatable("options.gallifreyan_chronicles.model_render_distance.tooltip")),
+                (caption, value) -> Options.genericValueLabel(caption,
+                        Component.translatable("options.gallifreyan_chronicles.model_render_distance.value", value)),
+                new OptionInstance.IntRange(GCConfig.MIN_MODEL_RENDER_DISTANCE, GCConfig.MAX_MODEL_RENDER_DISTANCE),
+                GCConfig.modelRenderDistance(),
+                value -> {
+                    GCConfig.setModelRenderDistance(value);
+                    GCConfig.save();
+                });
+    }
+
+    public static OptionInstance<Integer> portalRenderDistance() {
+        return new OptionInstance<>(
+                "options.gallifreyan_chronicles.portal_render_distance",
+                OptionInstance.cachedConstantTooltip(Component.translatable("options.gallifreyan_chronicles.portal_render_distance.tooltip")),
+                (caption, value) -> Options.genericValueLabel(caption,
+                        Component.translatable("options.gallifreyan_chronicles.model_render_distance.value", value)),
+                new OptionInstance.IntRange(GCConfig.MIN_PORTAL_RENDER_DISTANCE, GCConfig.MAX_PORTAL_RENDER_DISTANCE),
+                GCConfig.portalRenderDistance(),
+                value -> {
+                    GCConfig.setPortalRenderDistance(value);
+                    GCConfig.save();
+                });
+    }
+
+    public static OptionInstance<Integer> maxRenderedPortals() {
+        return new OptionInstance<>(
+                "options.gallifreyan_chronicles.max_rendered_portals",
+                OptionInstance.cachedConstantTooltip(Component.translatable("options.gallifreyan_chronicles.max_rendered_portals.tooltip")),
+                (caption, value) -> Options.genericValueLabel(caption, Component.literal(Integer.toString(value))),
+                new OptionInstance.IntRange(GCConfig.MIN_RENDERED_PORTALS, GCConfig.MAX_RENDERED_PORTALS),
+                GCConfig.maxRenderedPortals(),
+                value -> {
+                    GCConfig.setMaxRenderedPortals(value);
+                    GCConfig.save();
+                });
+    }
+
     public static OptionInstance<StarDensity> starDensity() {
         return new OptionInstance<>(
                 "options.gallifreyan_chronicles.star_density",

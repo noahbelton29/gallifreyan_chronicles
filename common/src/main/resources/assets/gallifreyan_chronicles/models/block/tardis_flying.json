@@ -1,0 +1,7 @@
+{
+  "parent": "gallifreyan_chronicles:block/tardis_base",
+  "ambientocclusion": false,
+  "textures": {
+    "particle": "gallifreyan_chronicles:block/tardis"
+  }
+}

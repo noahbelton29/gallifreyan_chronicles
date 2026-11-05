@@ -13,7 +13,7 @@ import net.minecraft.core.Direction;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.block.Block;
-
+import net.minecraft.world.level.block.Blocks;
 import java.util.UUID;
 
 public final class TardisLandingSystem {
@@ -87,10 +87,12 @@ public final class TardisLandingSystem {
 
         boolean glowing = old.getBlockState().getValue(TardisBlock.GLOWING);
 
-        oldLevel.removeBlock(oldPos, false);
-        if (oldLevel.getBlockState(oldPos.above()).is(GCBlocks.TARDIS_TOP)) {
-            oldLevel.removeBlock(oldPos.above(), false);
+        BlockPos oldTopPos = oldPos.above();
+        if (oldLevel.getBlockState(oldTopPos).is(GCBlocks.TARDIS_TOP)) {
+            oldLevel.setBlock(oldTopPos, Blocks.AIR.defaultBlockState(),
+                    Block.UPDATE_CLIENTS | Block.UPDATE_SUPPRESS_DROPS);
         }
+        oldLevel.removeBlock(oldPos, false);
 
         newLevel.setBlock(
                 pos,

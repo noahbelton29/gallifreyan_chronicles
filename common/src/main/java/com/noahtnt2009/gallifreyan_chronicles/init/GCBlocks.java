@@ -53,21 +53,21 @@ public class GCBlocks {
     }
 
     public static final Block TARDIS = registerBlock("tardis",
-            properties -> new TardisBlock(properties.strength(-1F)
+            properties -> new TardisBlock(properties.strength(-1F, 3600000.0F)
                     .sound(SoundType.STONE)
                     .noOcclusion()
-                    .lightLevel(state -> state.getValue(TardisBlock.GLOWING) ? 12 : 0)),
+                    .lightLevel(state -> state.getValue(TardisBlock.LIGHT))),
             Rarity.EPIC,
             TardisBlockItem::new);
 
     public static final Block TARDIS_TOP = registerBlockWithoutBlockItem("tardis_top",
-            properties -> new TardisTopBlock(properties.strength(-1F)
+            properties -> new TardisTopBlock(properties.strength(-1F, 3600000.0F)
                     .sound(SoundType.STONE)
                     .noOcclusion()
                     .noLootTable()));
 
     public static final Block INTERIOR_DOOR_BARRIER = registerBlockWithoutBlockItem("interior_door_barrier",
-            properties -> new InteriorDoorBarrierBlock(properties.strength(-1F, 3600000F)
+            properties -> new InteriorDoorBarrierBlock(properties.strength(-1F, -1F)
                     .noOcclusion()
                     .noLootTable()
                     .isSuffocating(GCBlocks::never)
@@ -75,14 +75,14 @@ public class GCBlocks {
                     .pushReaction(PushReaction.IMMOVEABLE)));
 
     public static final Block TARDIS_CONSOLE = registerBlock("tardis_console",
-            properties -> new ConsoleBlock(properties.strength(-1F)
+            properties -> new ConsoleBlock(properties.strength(-1F, -1F)
                     .sound(SoundType.STONE)
                     .noOcclusion()),
             Rarity.EPIC,
             ConsoleBlockItem::new);
 
     public static final Block TARDIS_INTERIOR_DOOR = registerBlock("tardis_interior_door",
-            properties -> new InteriorDoorBlock("first_doctors_interior_doors", properties.strength(3F, 3F)
+            properties -> new InteriorDoorBlock("first_doctors_interior_doors", properties.strength(-1F, -1F)
                     .sound(SoundType.WOOD)
                     .noOcclusion()
                     .noLootTable()
@@ -91,7 +91,7 @@ public class GCBlocks {
             InteriorDoorBlockItem::new);
 
     public static final Block FIRST_DOCTORS_DOOR = registerBlock("first_doctors_door",
-            properties -> new InteriorDoorBlock("brachacki_doors", "first_doctors_doors", properties.strength(3F, 3F)
+            properties -> new InteriorDoorBlock("brachacki_doors", "first_doctors_doors", properties.strength( 3F,  3F)
                     .sound(SoundType.STONE)
                     .noOcclusion()
                     .noLootTable()
@@ -100,7 +100,7 @@ public class GCBlocks {
             DoorBlockItem::new);
 
     public static final Block SECOND_DOCTORS_DOOR = registerBlock("second_doctors_door",
-            properties -> new InteriorDoorBlock("brachacki_doors", "second_doctors_doors", properties.strength(3F, 3F)
+            properties -> new InteriorDoorBlock("brachacki_doors", "second_doctors_doors", properties.strength(  3F,  3F)
                     .sound(SoundType.STONE)
                     .noOcclusion()
                     .noLootTable()
@@ -109,7 +109,7 @@ public class GCBlocks {
             DoorBlockItem::new);
 
     public static final Block TUAT_DOOR = registerBlock("tuat_door",
-            properties -> new InteriorDoorBlock("brachacki_doors", "tuat_doors", properties.strength(3F, 3F)
+            properties -> new InteriorDoorBlock("brachacki_doors", "tuat_doors", properties.strength( 3F,  3F)
                     .sound(SoundType.STONE)
                     .noOcclusion()
                     .noLootTable()
@@ -118,7 +118,7 @@ public class GCBlocks {
             DoorBlockItem::new);
 
     public static final Block SECOND_DOCTORS_DOOR_ALT = registerBlock("second_doctors_door_alt",
-            properties -> new InteriorDoorBlock("brachacki_doors", "second_doctors_doors_alt", properties.strength(3F, 3F)
+            properties -> new InteriorDoorBlock("brachacki_doors", "second_doctors_doors_alt", properties.strength( 3F,  3F)
                     .sound(SoundType.STONE)
                     .noOcclusion()
                     .noLootTable()

@@ -33,6 +33,7 @@ import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.BooleanProperty;
+import net.minecraft.world.level.block.state.properties.IntegerProperty;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.Shapes;
@@ -46,16 +47,22 @@ import java.util.UUID;
 public class TardisBlock extends BaseEntityBlock {
     private static final VoxelShape TALL_SHAPE = Block.box(0, 0, 0, 16, 32, 16);
 
+    public static final int MAX_LIGHT = 12;
+    public static final IntegerProperty LIGHT = IntegerProperty.create("light", 0, MAX_LIGHT);
+
     public static final BooleanProperty GLOWING = BooleanProperty.create("glowing");
+    public static final BooleanProperty IN_FLIGHT = BooleanProperty.create("in_flight");
 
     public TardisBlock(Properties properties) {
         super(properties);
-        this.registerDefaultState(this.stateDefinition.any().setValue(GLOWING, false));
+        this.registerDefaultState(this.stateDefinition.any().setValue(GLOWING, false).setValue(LIGHT, 0));
+        this.registerDefaultState(this.stateDefinition.any()
+                .setValue(IN_FLIGHT, false));
     }
 
     @Override
     protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
-        builder.add(GLOWING);
+        builder.add(GLOWING, LIGHT, IN_FLIGHT);
     }
 
     @Override
@@ -213,6 +220,14 @@ public class TardisBlock extends BaseEntityBlock {
     }
 
     @Override
+    protected float getShadeBrightness(@NonNull BlockState state, @NonNull BlockGetter level, @NonNull BlockPos pos) {
+        if (level.getBlockEntity(pos) instanceof TardisExteriorBlockEntity tardis && !tardis.isShadowActive()) {
+            return 1.0f;
+        }
+        return super.getShadeBrightness(state, level, pos);
+    }
+
+    @Override
     public @NotNull RenderShape getRenderShape(@NotNull BlockState state) {
         return RenderShape.INVISIBLE;
     }
@@ -225,9 +240,10 @@ public class TardisBlock extends BaseEntityBlock {
     @Override
     public @Nullable <T extends BlockEntity> BlockEntityTicker<T> getTicker(
             @NotNull Level level, @NotNull BlockState state, @NotNull BlockEntityType<T> type) {
-        if (level.isClientSide()) return null;
-        return type == TardisExteriorBlockEntity.TYPE.get()
-                ? (lvl, _, _, be) -> TardisExteriorBlockEntity.serverTick(lvl, (TardisExteriorBlockEntity) be)
-                : null;
+        if (type != TardisExteriorBlockEntity.TYPE.get()) return null;
+        if (level.isClientSide()) {
+            return (lvl, _, _, be) -> TardisExteriorBlockEntity.clientTick(lvl, (TardisExteriorBlockEntity) be);
+        }
+        return (lvl, _, _, be) -> TardisExteriorBlockEntity.serverTick(lvl, (TardisExteriorBlockEntity) be);
     }
 }

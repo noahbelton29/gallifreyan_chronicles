@@ -49,6 +49,7 @@ import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
@@ -93,6 +94,7 @@ public class TardisExteriorBlockEntity extends BlockEntity implements GeoBlockEn
     private boolean doorAnimSeqKnown = false;
     private final int tickOffset;
     private final ExteriorFlight flight = new ExteriorFlight();
+    private boolean lastShadowActive = true;
     private final HeldKey heldKey = new HeldKey();
     private final CloakFade cloak = new CloakFade();
     private static final float KEY_REVEAL_OPACITY = 0.2f;
@@ -412,8 +414,24 @@ public class TardisExteriorBlockEntity extends BlockEntity implements GeoBlockEn
     }
 
     public void setInFlight(boolean inFlight) {
-        if (level == null || level.isClientSide()) return;
-        setInFlight(inFlight, level.getGameTime());
+        long now = level != null ? level.getGameTime() : 0L;
+
+        this.flight.setInFlight(inFlight, now);
+
+        if (level != null && !level.isClientSide()) {
+            BlockState state = getBlockState();
+
+            if (state.hasProperty(TardisBlock.IN_FLIGHT)
+                    && state.getValue(TardisBlock.IN_FLIGHT) != inFlight) {
+                level.setBlock(
+                        worldPosition,
+                        state.setValue(TardisBlock.IN_FLIGHT, inFlight),
+                        Block.UPDATE_ALL
+                );
+            }
+        }
+
+        setChanged();
     }
 
     private void setInFlight(boolean inFlight, long atTick) {
@@ -464,6 +482,11 @@ public class TardisExteriorBlockEntity extends BlockEntity implements GeoBlockEn
     private float cloakOpacity(float partialTick) {
         if (level == null) return cloak.restingOpacity();
         return cloak.opacity(level.getGameTime(), partialTick);
+    }
+
+    public boolean isShadowActive() {
+        if (level == null) return true;
+        return !flight.inFlight() && flight.opacity(level.getGameTime(), 0.0f) >= 1.0f;
     }
 
     public boolean isFullyInvisible() {
@@ -525,6 +548,18 @@ public class TardisExteriorBlockEntity extends BlockEntity implements GeoBlockEn
         }
     }
 
+    // client side, re-meshes the surrounding chunk sections whenever the shadow toggles, so the baked ambient
+    // occlusion on neighbouring blocks is refreshed
+    public static void clientTick(Level level, TardisExteriorBlockEntity blockEntity) {
+        boolean active = blockEntity.isShadowActive();
+        if (active == blockEntity.lastShadowActive) return;
+        blockEntity.lastShadowActive = active;
+        BlockPos pos = blockEntity.getBlockPos();
+        BlockState state = blockEntity.getBlockState();
+        level.sendBlockUpdated(pos, state, state, Block.UPDATE_IMMEDIATE);
+        level.sendBlockUpdated(pos.above(), state, state, Block.UPDATE_IMMEDIATE);
+    }
+
     public static void serverTick(Level level, TardisExteriorBlockEntity blockEntity) {
         if (level.getGameTime() % 40L == 0L) {
             TardisTopBlock.placeAbove(level, blockEntity.getBlockPos());
@@ -533,6 +568,7 @@ public class TardisExteriorBlockEntity extends BlockEntity implements GeoBlockEn
         blockEntity.tickWrongKey(level);
         blockEntity.refreshFadeType();
         blockEntity.tickLanding(level);
+        blockEntity.updateLight(level);
         if ((level.getGameTime() + blockEntity.tickOffset) % POWER_CHECK_INTERVAL_TICKS == 0) {
             blockEntity.refreshPowerAndGlow(level);
         }
@@ -545,6 +581,18 @@ public class TardisExteriorBlockEntity extends BlockEntity implements GeoBlockEn
                 LockDamageEffects.tick(serverLevel, blockEntity.getKeyWorldPos(), lockHealth);
             }
             blockEntity.tickTakeoffWind(serverLevel);
+        }
+    }
+
+    // scales the block light with the exterior's opacity, so it fades out as the tardis dematerialises and comes
+    // back as it materialises, it only touches the block state when the level actually changes
+    private void updateLight(Level level) {
+        BlockState current = getBlockState();
+        if (!current.hasProperty(TardisBlock.LIGHT)) return;
+        int target = isGlowing() ? Math.round(TardisBlock.MAX_LIGHT * getOpacity(0.0f)) : 0;
+        target = Math.clamp(target, 0, TardisBlock.MAX_LIGHT);
+        if (current.getValue(TardisBlock.LIGHT) != target) {
+            level.setBlock(getBlockPos(), current.setValue(TardisBlock.LIGHT, target), 3);
         }
     }
 

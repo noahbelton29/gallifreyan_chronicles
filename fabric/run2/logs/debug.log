@@ -703,7 +703,7 @@
 [16:23:54] [main/INFO] (Essential Logger - Plugin) Java: OpenJDK 64-Bit Server VM (v25.0.4.1) by Eclipse Adoptium (Eclipse Adoptium)
 [16:23:54] [main/INFO] (Essential Logger - Plugin) Java Path: C:\Users\Twisted Machine\.gradle\jdks\eclipse_adoptium-25-amd64-windows.2\bin
 [16:23:54] [main/INFO] (Essential Logger - Plugin) Java Info: mixed mode, sharing
-[16:23:54] [main/INFO] (Essential Logger - Plugin) JVM Arguments: 
+[16:23:54] [main/INFO] (Essential Logger - Plugin) JVM Arguments:
   - -Dfabric.dli.config=C:\Users\Twisted@@0020Machine\IdeaProjects\gallifreyan_chronicles\.gradle\loom-cache\projects\fabric\launch.cfg
   - -Dfabric.dli.env=client
   - -Dfabric.dli.main=net.fabricmc.loader.impl.launch.knot.KnotClient
@@ -4637,7 +4637,7 @@ gg.essential.gui.menu.AccountManager$UnknownAccountException: Unknown account
 [16:24:03] [Render thread/DEBUG] (FabricLoader/Mixin) mixins.iris.json:MixinScreenEffectRenderer from mod iris->@Inject::iris$disableUnderWaterOverlayRendering(Lnet/minecraft/client/renderer/state/level/PlayerRenderState$WaterOverlay;Lcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/client/renderer/SubmitNodeCollector;Lorg/spongepowered/asm/mixin/injection/callback/CallbackInfo;)V does use it's CallbackInfo
 [16:24:03] [Render thread/INFO] (seamlessportals) [SEAMLESS STENCIL] Changed depth format: DEPTH32F -> DEPTH24_STENCIL8
 [16:24:03] [Render thread/INFO] (Iris) Hardware information:
-[16:24:03] [Render thread/INFO] (Iris) CPU: 16x AMD Ryzen 7 7800X3D 8-Core Processor 
+[16:24:03] [Render thread/INFO] (Iris) CPU: 16x AMD Ryzen 7 7800X3D 8-Core Processor
 [16:24:03] [Render thread/INFO] (Iris) GPU: AMD Radeon RX 9070 XT (Supports OpenGL 3.3.0 Core Profile Context 26.10.1.261008)
 [16:24:03] [Render thread/INFO] (Iris) OS: Windows 11 (10.0)
 [16:24:03] [Render thread/DEBUG] (FabricLoader/Mixin) Mixing state_tracking.MixinPostChain from mixins.iris.json into net.minecraft.client.renderer.PostChain

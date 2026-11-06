@@ -87,11 +87,20 @@ public class TardisKeyItem extends Item implements ScrollSelectable {
         UUID keyTardisId = stack.get(GCDataComponents.TARDIS_ID);
         UUID exteriorTardisId = exterior.getTardisId();
 
-        if (keyTardisId == null || !keyTardisId.equals(exteriorTardisId)) {
-            return InteractionResult.FAIL;
-        }
-
         if (level.isClientSide()) return InteractionResult.SUCCESS;
+
+        if (keyTardisId == null || !keyTardisId.equals(exteriorTardisId)) {
+            if (Boolean.TRUE.equals(stack.get(GCDataComponents.KEY_INSERTED)) || exterior.hasKeyRendered()) {
+                return InteractionResult.FAIL;
+            }
+            if (exterior.isWrongKeyLockedOut(player, stack)) return InteractionResult.FAIL;
+            if (!exterior.areDoorsFullyClosed()) {
+                player.sendOverlayMessage(Component.translatable("message.gallifreyan_chronicles.close_doors_to_insert_key"));
+                return InteractionResult.FAIL;
+            }
+            exterior.insertWrongKey(player, context.getHand(), stack);
+            return InteractionResult.CONSUME;
+        }
 
         boolean inserted = Boolean.TRUE.equals(stack.get(GCDataComponents.KEY_INSERTED));
 

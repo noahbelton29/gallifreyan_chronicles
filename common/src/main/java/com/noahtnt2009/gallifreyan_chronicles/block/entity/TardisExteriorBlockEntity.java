@@ -43,6 +43,9 @@ import net.minecraft.network.protocol.game.ClientGamePacketListener;
 import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.level.ServerPlayer;
+import com.noahtnt2009.gallifreyan_chronicles.util.GCScheduler;
+import net.minecraft.util.Prediction;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
@@ -62,6 +65,8 @@ import com.noahtnt2009.gallifreyan_chronicles.tardis.exterior.fade.CloakFade;
 import com.noahtnt2009.gallifreyan_chronicles.tardis.exterior.fade.FadeType;
 import org.jspecify.annotations.NonNull;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.UUID;
 import java.util.function.Supplier;
 
@@ -94,6 +99,11 @@ public class TardisExteriorBlockEntity extends BlockEntity implements GeoBlockEn
     private boolean needsStateSync = false;
     private TardisKeyEntity keyEntity = null;
     private volatile Vec3 cachedKeyBoneWorldPos = null;
+    private static final long WRONG_KEY_LOCKOUT_TICKS = 20L * 60L;
+    private static final int WRONG_KEY_JAM_DELAY_TICKS = 10;
+    private static final int WRONG_KEY_RETURN_DELAY_TICKS = 30;
+    private static final UUID UNLINKED_KEY = new UUID(0L, 0L);
+    private final Map<UUID, Long> wrongKeyLockouts = new HashMap<>();
 
     public void setCachedKeyBoneWorldPos(Vec3 pos) {
         this.cachedKeyBoneWorldPos = pos;
@@ -558,6 +568,65 @@ public class TardisExteriorBlockEntity extends BlockEntity implements GeoBlockEn
     private void tickTakeoffWind(ServerLevel serverLevel) {
         if (cloak.isCloaked()) return;
         TakeoffWind.tick(serverLevel, getBlockPos(), flight.inFlight(), isFullyInvisible(), flight.fadeStartTick(), flight.duration());
+    }
+
+    private static UUID keyIdOf(ItemStack key) {
+        UUID linked = key.get(GCDataComponents.TARDIS_ID);
+        return linked != null ? linked : UNLINKED_KEY;
+    }
+
+    public boolean isWrongKeyLockedOut(Player player, ItemStack key) {
+        if (level == null || level.isClientSide()) return false;
+        Long until = wrongKeyLockouts.get(keyIdOf(key));
+        if (until == null) return false;
+
+        long remaining = until - level.getGameTime();
+        if (remaining <= 0L) {
+            wrongKeyLockouts.remove(keyIdOf(key));
+            return false;
+        }
+        player.sendOverlayMessage(Component.translatable("message.gallifreyan_chronicles.key_lockout",
+                (remaining + 19L) / 20L).withStyle(ChatFormatting.RED));
+        return true;
+    }
+
+    public void insertWrongKey(Player player, InteractionHand hand, ItemStack held) {
+        if (!(level instanceof ServerLevel serverLevel)) return;
+
+        UUID keyId = keyIdOf(held);
+        long now = serverLevel.getGameTime();
+        wrongKeyLockouts.values().removeIf(until -> until <= now);
+        wrongKeyLockouts.put(keyId, now + WRONG_KEY_LOCKOUT_TICKS);
+
+        insertKey(player, hand, held);
+
+        UUID playerId = player.getUUID();
+        net.minecraft.server.MinecraftServer server = serverLevel.getServer();
+        GCScheduler.runLater(server, WRONG_KEY_JAM_DELAY_TICKS, () -> {
+            if (isRemoved() || !isWrongKeyStillInside(playerId, keyId)) return;
+            triggerAnim("key_controller", "key_jammed");
+            ExteriorSounds.keyJammed(level, getBlockPos());
+        });
+        GCScheduler.runLater(server, WRONG_KEY_RETURN_DELAY_TICKS, () -> {
+            if (isRemoved() || !isWrongKeyStillInside(playerId, keyId)) return;
+            ItemStack returned = clearHeldKey();
+            returned.set(GCDataComponents.KEY_INSERTED, false);
+            ServerPlayer owner = server.getPlayerList().getPlayer(playerId);
+            if (owner == null) {
+                Block.popResource(serverLevel, getBlockPos(), returned);
+                return;
+            }
+            if (!owner.getInventory().add(returned)) {
+                owner.drop(returned, false, Prediction.SERVER_ONLY);
+            }
+            owner.sendOverlayMessage(
+                    Component.translatable("message.gallifreyan_chronicles.wrong_key").withStyle(ChatFormatting.RED));
+        });
+    }
+
+    private boolean isWrongKeyStillInside(UUID playerId, UUID keyId) {
+        ItemStack inside = heldKey.stack();
+        return hasKeyRendered() && playerId.equals(heldKey.owner()) && inside != null && keyIdOf(inside).equals(keyId);
     }
 
     public boolean rejectKeyIfLockBroken(@Nullable Player player) {

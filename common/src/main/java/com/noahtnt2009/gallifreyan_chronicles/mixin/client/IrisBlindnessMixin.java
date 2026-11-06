@@ -12,10 +12,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 public abstract class IrisBlindnessMixin {
     @Inject(method = "getBlindness", at = @At("RETURN"), cancellable = true, remap = false, require = 0)
     private static void gc$powerDarkness(CallbackInfoReturnable<Float> cir) {
-        // Iris only evaluates this when the pack actually reads the `blindness` uniform
         GCPowerDarkness.noteShaderBlindnessRead();
-        // darkness of the level being rendered right now: with Immersive Portals that is the portal's
-        // destination while its view is drawn, not the level the player is standing in
         float darkness = GCPowerDarkness.renderLevelDarkness();
         if (darkness > 0.0F) {
             cir.setReturnValue(Math.max(cir.getReturnValueF(), darkness * GCPowerDarkness.SHADER_BLINDNESS_SCALE));

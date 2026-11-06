@@ -9,6 +9,7 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import com.geckolib.renderer.base.RenderPassInfo;
 import com.mojang.math.Axis;
 import com.noahtnt2009.gallifreyan_chronicles.block.InteriorDoorBlock;
+import com.noahtnt2009.gallifreyan_chronicles.config.GCConfig;
 import com.noahtnt2009.gallifreyan_chronicles.client.model.InteriorDoorBlockModel;
 import com.noahtnt2009.gallifreyan_chronicles.block.entity.InteriorDoorBlockEntity;
 import com.noahtnt2009.gallifreyan_chronicles.tardis.exterior.TardisExterior;
@@ -83,6 +84,12 @@ public class InteriorDoorBlockRenderer extends GeoBlockRenderer<@NotNull Interio
     @Override
     public boolean shouldRender(@NonNull InteriorDoorBlockEntity blockEntity, @NonNull Vec3 cameraPos) {
         if (RenderLevelGuard.isForeign(blockEntity.getLevel())) return false;
-        return super.shouldRender(blockEntity, cameraPos);
+        double range = GCConfig.modelRenderDistance();
+        return Vec3.atCenterOf(blockEntity.getBlockPos()).distanceToSqr(cameraPos) < range * range;
+    }
+
+    @Override
+    public int getViewDistance() {
+        return GCConfig.modelRenderDistance();
     }
 }

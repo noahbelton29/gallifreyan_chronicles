@@ -29,7 +29,7 @@ import org.jspecify.annotations.Nullable;
 
 public class TardisExteriorBlockRenderer extends GeoBlockRenderer<@NotNull TardisExteriorBlockEntity, @NotNull TardisExteriorBlockRenderState> {
     public static final DataTicket<String> EXTERIOR_ID = DataTicket.create("exterior_id", String.class);
-    public static final DataTicket<Float>  YAW = DataTicket.create("tardis_yaw", Float.class);
+    public static final DataTicket<Float> YAW = DataTicket.create("tardis_yaw", Float.class);
     public static final DataTicket<Boolean> GLOWING = DataTicket.create("tardis_glowing", Boolean.class);
     public static final DataTicket<Float> OPACITY = DataTicket.create("tardis_opacity", Float.class);
 
@@ -141,7 +141,8 @@ public class TardisExteriorBlockRenderer extends GeoBlockRenderer<@NotNull Tardi
     @Override
     public boolean shouldRender(@NonNull TardisExteriorBlockEntity blockEntity, @NonNull Vec3 cameraPos) {
         if (RenderLevelGuard.isForeign(blockEntity.getLevel())) return false;
-        return super.shouldRender(blockEntity, cameraPos);
+        double range = GCConfig.modelRenderDistance();
+        return Vec3.atCenterOf(blockEntity.getBlockPos()).distanceToSqr(cameraPos) < range * range;
     }
 
     @Override

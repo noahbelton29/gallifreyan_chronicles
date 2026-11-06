@@ -54,6 +54,10 @@ public final class TardisPortalBridge {
         return isAvailable() ? TardisPortalClient.clientLevel(dimension) : null;
     }
 
+    public static boolean shouldSkipPortalRendering(Object portal) {
+        return isAvailable() && TardisPortalClient.shouldSkipRendering(portal);
+    }
+
     public static void tintPortalForPowerDarkness(Object portal) {
         if (!isAvailable()) return;
         TardisPortalClient.tintPortalForPowerDarkness(portal);

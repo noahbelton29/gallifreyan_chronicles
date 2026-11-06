@@ -10,6 +10,7 @@ import com.noahtnt2009.gallifreyan_chronicles.client.model.TardisConsoleBlockMod
 import com.noahtnt2009.gallifreyan_chronicles.block.entity.TardisConsoleBlockEntity;
 import com.noahtnt2009.gallifreyan_chronicles.client.renderer.geo_layer.TardisConsoleGlowLayer;
 import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
+import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.NotNull;
 import org.jspecify.annotations.Nullable;
 
@@ -54,6 +55,12 @@ public class TardisConsoleBlockRenderer extends GeoBlockRenderer<@NotNull Tardis
         poseStack.translate(0d, 0.5d, 0d);
         poseStack.rotateDegrees(Axis.ZP, 180f);
         poseStack.translate(0d, -0.5d, 0d);
+    }
+
+    @Override
+    public boolean shouldRender(@NotNull TardisConsoleBlockEntity blockEntity, @NotNull Vec3 cameraPos) {
+        double range = GCConfig.modelRenderDistance();
+        return Vec3.atCenterOf(blockEntity.getBlockPos()).distanceToSqr(cameraPos) < range * range;
     }
 
     @Override

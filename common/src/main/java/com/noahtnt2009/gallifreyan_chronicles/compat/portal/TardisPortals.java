@@ -499,6 +499,7 @@ public final class TardisPortals {
     private static void configure(Portal portal, UUID tardisId) {
         portal.addTag(PORTAL_TAG);
         portal.addTag(ownerTag(tardisId));
+        portal.portalTag = PORTAL_TAG;
         portal.setIsVisible(false);
         portal.setTeleportable(false);
     }

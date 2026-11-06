@@ -36,6 +36,7 @@
     "client.PowerDarknessSetupMixin",
     "client.CloudRendererTextureMixin",
     "client.PortalPowerDarknessMixin",
+    "client.PortalRenderLimitMixin",
     "client.SelectItemModelPropertiesMixin",
     "client.EssentialMenuScreenMixin",
     "client.SoundPhysicsTardisEchoMixin"

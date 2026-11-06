@@ -22,6 +22,7 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
+@SuppressWarnings("unused")
 @Mixin(ServerPlayerGameMode.class)
 public abstract class ServerPlayerGameModeTardisMixin {
     @Shadow
@@ -31,6 +32,7 @@ public abstract class ServerPlayerGameModeTardisMixin {
     @Final
     protected ServerPlayer player;
 
+    @SuppressWarnings({"unused", "resource"})
     @Inject(method = "destroyBlock", at = @At("HEAD"), cancellable = true)
     private void gc$protectTardisThroughPortal(BlockPos pos, CallbackInfoReturnable<Boolean> cir) {
         ServerLevel redirected = TardisPortalBridge.redirectedActionLevel();
@@ -46,6 +48,7 @@ public abstract class ServerPlayerGameModeTardisMixin {
         cir.setReturnValue(false);
     }
 
+    @SuppressWarnings({"unused", "resource"})
     @Inject(method = "destroyBlock", at = @At("HEAD"), cancellable = true)
     private void gc$blockTardisDeletionWithoutDeletionMode(BlockPos pos, CallbackInfoReturnable<Boolean> cir) {
         if (!player.isCreative()) return;

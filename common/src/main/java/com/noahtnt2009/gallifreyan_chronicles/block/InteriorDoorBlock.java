@@ -1,7 +1,6 @@
 package com.noahtnt2009.gallifreyan_chronicles.block;
 
 import com.noahtnt2009.gallifreyan_chronicles.block.entity.InteriorDoorBlockEntity;
-import com.noahtnt2009.gallifreyan_chronicles.compat.portal.TardisPortalBridge;
 import com.noahtnt2009.gallifreyan_chronicles.init.GCBlocks;
 import com.noahtnt2009.gallifreyan_chronicles.item.InteriorDoorBlockItem;
 import com.noahtnt2009.gallifreyan_chronicles.init.GCDataComponents;
@@ -97,10 +96,6 @@ public class InteriorDoorBlock extends BaseEntityBlock {
         return state.getValue(PART_X) == 0 && state.getValue(PART_Y) == 0;
     }
 
-    public static Direction rightDirectionOf(Direction facing) {
-        return facing.getCounterClockWise();
-    }
-
     public static Direction rightDirectionOf(Direction facing, boolean flipped) {
         return flipped ? facing.getClockWise() : facing.getCounterClockWise();
     }
@@ -176,26 +171,8 @@ public class InteriorDoorBlock extends BaseEntityBlock {
     }
 
     public static void placeBarriers(Level level, BlockPos master, BlockState state) {
-        if (level.isClientSide() || !(state.getBlock() instanceof InteriorDoorBlock door) || !door.isLinked()) return;
-        if (isFlush(state)) return;
-        if (!TardisPortalBridge.isAvailable()) {
-            removeBarriers(level, master, state);
-            return;
-        }
-        Direction facing = state.getValue(FACING);
-        boolean flipped = isFlipped(state);
-        for (int x = 0; x < WIDTH; x++) {
-            for (int y = 0; y < HEIGHT; y++) {
-                BlockPos p = barrierPos(master, facing, flipped, x, y);
-                if (level.isOutsideBuildHeight(p)) continue;
-                BlockState existing = level.getBlockState(p);
-                BlockState barrier = GCBlocks.INTERIOR_DOOR_BARRIER.defaultBlockState()
-                        .setValue(InteriorDoorBarrierBlock.FACING, facing);
-                if (existing.equals(barrier)) continue;
-                if (!existing.is(GCBlocks.INTERIOR_DOOR_BARRIER) && !existing.canBeReplaced()) continue;
-                level.setBlock(p, barrier, Block.UPDATE_ALL);
-            }
-        }
+        // The invisible barrier body behind the door is disabled; just clean up any left from older versions.
+        removeBarriers(level, master, state);
     }
 
     public static void removeBarriers(Level level, BlockPos master, BlockState state) {

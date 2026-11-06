@@ -1,5 +1,6 @@
 package com.noahtnt2009.gallifreyan_chronicles.compat.portal;
 
+import com.noahtnt2009.gallifreyan_chronicles.Constants;
 import com.noahtnt2009.gallifreyan_chronicles.config.GCConfig;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.resources.ResourceKey;
@@ -12,6 +13,7 @@ import java.util.Comparator;
 import java.util.IdentityHashMap;
 import java.util.List;
 import java.util.Set;
+
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
 import org.jspecify.annotations.Nullable;
@@ -33,6 +35,12 @@ final class TardisPortalClient {
     static boolean isViewingThroughPortalNear(Vec3 pos, double range) {
         if (!PortalRendering.isRendering()) return false;
         return PortalRendering.getRenderingPortal().getDestPos().distanceToSqr(pos) <= range * range;
+    }
+
+    static boolean isRenderingTardisPortal() {
+        if (!PortalRendering.isRendering()) return false;
+        var dim = PortalRendering.getRenderingPortal().getDestDim().identifier();
+        return dim.getNamespace().equals(Constants.MOD_ID) && dim.getPath().startsWith("tardis/");
     }
 
     private record Scored(Portal portal, double distance) {

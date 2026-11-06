@@ -11,6 +11,7 @@ import com.geckolib.animation.RawAnimation;
 import com.geckolib.animation.object.PlayState;
 import com.geckolib.util.GeckoLibUtil;
 import com.noahtnt2009.gallifreyan_chronicles.block.InteriorDoorBlock;
+import com.noahtnt2009.gallifreyan_chronicles.compat.portal.TardisPortalBridge;
 import com.noahtnt2009.gallifreyan_chronicles.ecs.ComponentHolder;
 import com.noahtnt2009.gallifreyan_chronicles.ecs.ComponentStore;
 import com.noahtnt2009.gallifreyan_chronicles.ecs.ComponentType;
@@ -34,12 +35,14 @@ import net.minecraft.network.protocol.game.ClientGamePacketListener;
 import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.level.storage.ValueInput;
 import net.minecraft.world.level.storage.ValueOutput;
 import org.jetbrains.annotations.NotNull;
@@ -65,6 +68,12 @@ public class InteriorDoorBlockEntity extends BlockEntity implements GeoBlockEnti
     private int doorAnimSeq = 0;
     private String doorAnim = "";
     private boolean doorAnimSeqKnown = false;
+
+    private static final int EXIT_CHECK_INTERVAL_TICKS = 4;
+    private static final double EXIT_NEAR = -0.5;
+    private static final double EXIT_FAR = 0.5;
+    private static final double EXIT_HALF_WIDTH = 1.0;
+    private static final double EXIT_BOTTOM = -0.5;
 
     public InteriorDoorBlockEntity(BlockPos pos, BlockState state) {
         super(TYPE.get(), pos, state);
@@ -161,15 +170,82 @@ public class InteriorDoorBlockEntity extends BlockEntity implements GeoBlockEnti
     }
 
     public void serverTick() {
-        if (pulledFromExterior || !(level instanceof ServerLevel serverLevel)) return;
-        pulledFromExterior = true;
-        if (!isLinked()) return;
-        InteriorDoorBlock.placeBarriers(serverLevel, getBlockPos(), getBlockState());
-        tardisId = TardisApi.idOfLevel(serverLevel).orElse(null);
-        if (tardisId == null) return;
-        DoorSyncSystem.register(tardisId, this);
-        applyInteriorDoorVariant(serverLevel);
-        DoorSyncSystem.pullFromExterior(serverLevel.getServer(), tardisId, this);
+        if (!(level instanceof ServerLevel serverLevel)) return;
+        if (!pulledFromExterior) {
+            pulledFromExterior = true;
+            if (!isLinked()) return;
+            InteriorDoorBlock.placeBarriers(serverLevel, getBlockPos(), getBlockState());
+            tardisId = TardisApi.idOfLevel(serverLevel).orElse(null);
+            if (tardisId == null) return;
+            DoorSyncSystem.register(tardisId, this);
+            applyInteriorDoorVariant(serverLevel);
+            DoorSyncSystem.pullFromExterior(serverLevel.getServer(), tardisId, this);
+        }
+        tickExit(serverLevel);
+    }
+
+    private void tickExit(ServerLevel serverLevel) {
+        if (tardisId == null || !isLinked()) return;
+        if (serverLevel.getGameTime() % EXIT_CHECK_INTERVAL_TICKS != 0) return;
+        if (getDoorState().isClosed()) return;
+        if (TardisPortalBridge.isActive(tardisId)) return;
+
+        MinecraftServer server = serverLevel.getServer();
+        Tardis tardis = TardisApi.get(server, tardisId).orElse(null);
+        if (tardis == null || tardis.isTravelling()) return;
+
+        for (ServerPlayer player : List.copyOf(serverLevel.players())) {
+            if (player.isSpectator()) continue;
+            boolean inZone = isInExitZone(player);
+            if (TardisInteriorSystem.isArriving(player)) {
+                if (!inZone && (isFlush() || frontDepth(player) > EXIT_FAR)) {
+                    TardisInteriorSystem.clearArriving(player);
+                }
+                continue;
+            }
+            if (inZone) TardisInteriorSystem.exitInterior(server, player, tardisId);
+        }
+    }
+
+    private double frontDepth(ServerPlayer player) {
+        BlockState state = getBlockState();
+        Direction facing = state.getValue(InteriorDoorBlock.FACING);
+        Direction right = InteriorDoorBlock.rightDirectionOf(facing, InteriorDoorBlock.isFlipped(state));
+        BlockPos bottom = InteriorDoorBlock.isFlipped(state)
+                ? getBlockPos().below(InteriorDoorBlock.HEIGHT - 1) : getBlockPos();
+        Vec3 centre = Vec3.atBottomCenterOf(bottom).add(right.getStepX() * 0.5, 0.0, right.getStepZ() * 0.5);
+        return (player.getX() - centre.x) * facing.getStepX() + (player.getZ() - centre.z) * facing.getStepZ();
+    }
+
+    private boolean isInExitZone(ServerPlayer player) {
+        BlockPos pos = getBlockPos();
+        BlockState state = getBlockState();
+        Direction facing = state.getValue(InteriorDoorBlock.FACING);
+
+        if (InteriorDoorBlock.isFlush(state)) {
+            Direction right = InteriorDoorBlock.rightDirectionOf(facing, false);
+            Vec3 centre = Vec3.atBottomCenterOf(pos)
+                    .add(right.getStepX() * 0.5 + facing.getStepX(), 0.0, right.getStepZ() * 0.5 + facing.getStepZ());
+            double dx = player.getX() - centre.x;
+            double dz = player.getZ() - centre.z;
+            double lateral = dx * right.getStepX() + dz * right.getStepZ();
+            double along = dx * facing.getStepX() + dz * facing.getStepZ();
+            double eye = player.getEyeY() - pos.getY();
+            return Math.abs(lateral) <= EXIT_HALF_WIDTH && Math.abs(along) <= 1.0 && eye >= 0.3 && eye <= 1.5;
+        }
+
+        boolean flipped = InteriorDoorBlock.isFlipped(state);
+        Direction right = InteriorDoorBlock.rightDirectionOf(facing, flipped);
+        BlockPos bottom = flipped ? pos.below(InteriorDoorBlock.HEIGHT - 1) : pos;
+        Vec3 centre = Vec3.atBottomCenterOf(bottom).add(right.getStepX() * 0.5, 0.0, right.getStepZ() * 0.5);
+        double dx = player.getX() - centre.x;
+        double dz = player.getZ() - centre.z;
+        double dy = player.getY() - centre.y;
+        double depth = dx * facing.getStepX() + dz * facing.getStepZ();
+        double lateral = dx * right.getStepX() + dz * right.getStepZ();
+        return depth >= EXIT_NEAR && depth <= EXIT_FAR
+                && Math.abs(lateral) <= EXIT_HALF_WIDTH
+                && dy >= EXIT_BOTTOM && dy <= InteriorDoorBlock.HEIGHT;
     }
 
     private void applyInteriorDoorVariant(ServerLevel serverLevel) {
@@ -179,16 +255,8 @@ public class InteriorDoorBlockEntity extends BlockEntity implements GeoBlockEnti
 
     public void matchTardis(MinecraftServer server, UUID id) {
         if (!isLinked()) return;
-        String fromExterior = TardisApi.get(server, id).flatMap(Tardis::exterior)
+        TardisApi.get(server, id).flatMap(Tardis::exterior)
                 .map(exterior -> TardisDoorRegistry.interiorVariantForExterior(exterior.getExterior().id()))
-                .orElse(null);
-        if (fromExterior != null) {
-            setDoorVariant(fromExterior);
-            return;
-        }
-        TardisInterior interior = TardisInteriorSystem.getInteriorDefinition(server, id);
-        interior.doorVariant()
-                .filter(TardisDoorRegistry::isInteriorVariant)
                 .ifPresent(this::setDoorVariant);
     }
 

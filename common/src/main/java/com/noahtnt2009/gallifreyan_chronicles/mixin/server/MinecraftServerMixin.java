@@ -7,7 +7,6 @@ import com.noahtnt2009.gallifreyan_chronicles.tardis.interior.TardisDimensionMan
 import com.noahtnt2009.gallifreyan_chronicles.tardis.manager.TardisDeletion;
 import com.noahtnt2009.gallifreyan_chronicles.util.GCScheduler;
 import com.noahtnt2009.gallifreyan_chronicles.util.GCServerState;
-import com.noahtnt2009.gallifreyan_chronicles.tardis.interior.TardisInteriorSystem;
 import com.noahtnt2009.gallifreyan_chronicles.sound.TimedSounds;
 import net.minecraft.server.MinecraftServer;
 import org.spongepowered.asm.mixin.Mixin;
@@ -34,7 +33,6 @@ public abstract class MinecraftServerMixin {
         MinecraftServer server = (MinecraftServer) (Object) this;
         TardisDeletion.tick(server);
         TardisDimensionManager.processPendingEntries(server);
-        TardisInteriorSystem.tickExitZones(server);
         GCScheduler.tick(server);
         TardisKeyLocator.tick(server);
         TardisPortalBridge.tick(server);

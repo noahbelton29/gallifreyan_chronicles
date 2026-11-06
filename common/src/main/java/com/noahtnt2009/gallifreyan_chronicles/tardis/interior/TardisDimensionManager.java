@@ -120,10 +120,10 @@ public final class TardisDimensionManager {
 
     private static void teleportPlayerIntoInterior(ServerPlayer player, ServerLevel interior, UUID tardisId) {
         boolean firstEntry = TardisInteriorSystem.buildInteriorIfMissing(interior, tardisId);
-        TardisInterior definition = TardisInteriorSystem.getInteriorDefinition(interior.getServer(), tardisId);
-        Vec3 target = TardisInteriorSystem.arrivalPoint(definition);
-        player.teleportTo(interior, target.x, target.y, target.z, Set.of(),
-                definition.spawnYaw(), 0.0f, true);
+        TardisInteriorSystem.Arrival arrival = TardisInteriorSystem.arrival(interior, tardisId);
+        TardisInteriorSystem.markArriving(player);
+        player.teleportTo(interior, arrival.pos().x, arrival.pos().y, arrival.pos().z, Set.of(),
+                arrival.yaw(), 0.0f, true);
 
         if (firstEntry) {
             PLACE_CONTROLS.put(tardisId, CONTROL_PLACE_DELAY_TICKS);

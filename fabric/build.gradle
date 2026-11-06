@@ -38,7 +38,6 @@ repositories {
 }
 
 
-
 dependencies {
     minecraft("com.mojang:minecraft:${minecraft_version}")
     implementation("net.fabricmc:fabric-loader:${fabric_loader_version}")
@@ -106,7 +105,7 @@ dependencies {
     compileOnly("maven.modrinth:sound-physics-remastered:fabric-${sound_physics_version}")
     runtimeOnly("maven.modrinth:sound-physics-remastered:fabric-${sound_physics_version}")
     compileOnly("curse.maven:immersive-portal-1511174:${immersive_portals_fabric_file}")
-    runtimeOnly("curse.maven:immersive-portal-1511174:${immersive_portals_fabric_file}")
+//    runtimeOnly("curse.maven:immersive-portal-1511174:${immersive_portals_fabric_file}")
 //    implementation("foundry.imguimc:imguimc-fabric-${project.minecraft_version}:${project.imguimc_version}")
 //    runtimeOnly("foundry.imguimc:imguimc-fabric-${project.minecraft_version}:${project.imguimc_version}")
 }
@@ -121,7 +120,7 @@ def loaderAttribute = Attribute.of('io.github.mcgradleconventions.loader', Strin
     }
 }
 sourceSets.configureEach {
-    [it.compileClasspathConfigurationName, it.runtimeClasspathConfigurationName].each { variant->
+    [it.compileClasspathConfigurationName, it.runtimeClasspathConfigurationName].each { variant ->
         configurations.named(variant) {
             attributes {
                 attribute(loaderAttribute, 'fabric')

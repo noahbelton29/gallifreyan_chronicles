@@ -21,6 +21,7 @@ import com.noahtnt2009.gallifreyan_chronicles.entity.TardisKeyEntity;
 import com.noahtnt2009.gallifreyan_chronicles.init.GCDataComponents;
 import com.noahtnt2009.gallifreyan_chronicles.tardis.ecs.TardisLinkable;
 import com.noahtnt2009.gallifreyan_chronicles.tardis.ecs.component.DoorState;
+import com.noahtnt2009.gallifreyan_chronicles.tardis.exterior.*;
 import com.noahtnt2009.gallifreyan_chronicles.tardis.flight.TardisFlightState;
 import com.noahtnt2009.gallifreyan_chronicles.tardis.ecs.TardisComponentTypes;
 import com.noahtnt2009.gallifreyan_chronicles.tardis.ecs.component.TardisSubsystem;
@@ -31,7 +32,6 @@ import com.noahtnt2009.gallifreyan_chronicles.tardis.ecs.system.ExteriorSystem;
 import com.noahtnt2009.gallifreyan_chronicles.tardis.ecs.system.GlowSystem;
 import com.noahtnt2009.gallifreyan_chronicles.tardis.ecs.system.SubsystemSystem;
 import com.noahtnt2009.gallifreyan_chronicles.init.GCGameRules;
-import com.noahtnt2009.gallifreyan_chronicles.tardis.exterior.TardisExterior;
 import com.noahtnt2009.gallifreyan_chronicles.tardis.interior.TardisInteriorSystem;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
@@ -57,15 +57,11 @@ import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import com.noahtnt2009.gallifreyan_chronicles.client.renderer.CloakKeyReveal;
-import com.noahtnt2009.gallifreyan_chronicles.tardis.exterior.ExteriorFlight;
-import com.noahtnt2009.gallifreyan_chronicles.tardis.exterior.ExteriorSounds;
-import com.noahtnt2009.gallifreyan_chronicles.tardis.exterior.HeldKey;
-import com.noahtnt2009.gallifreyan_chronicles.tardis.exterior.LockDamageEffects;
-import com.noahtnt2009.gallifreyan_chronicles.tardis.exterior.TakeoffWind;
 import com.noahtnt2009.gallifreyan_chronicles.util.FadingValue;
 import com.noahtnt2009.gallifreyan_chronicles.tardis.exterior.fade.CloakFade;
 import com.noahtnt2009.gallifreyan_chronicles.tardis.exterior.fade.FadeType;
 import org.jspecify.annotations.NonNull;
+
 import java.util.UUID;
 import java.util.function.Supplier;
 
@@ -288,6 +284,9 @@ public class TardisExteriorBlockEntity extends BlockEntity implements GeoBlockEn
         resetAnimationState();
         UUID id = getTardisId();
         if (id == null || level == null || level.isClientSide()) return;
+        if (level.getServer() != null) {
+            TardisKeyLocator.refresh(level.getServer(), id);
+        }
         String doorVariant = TardisDoorRegistry.interiorVariantForExterior(exterior.id());
         if (doorVariant == null) return;
         for (InteriorDoorBlockEntity door : DoorSyncSystem.doorsOf(id)) {
@@ -295,7 +294,6 @@ public class TardisExteriorBlockEntity extends BlockEntity implements GeoBlockEn
         }
     }
 
-    // used by the summon command to move a tardis to a new block
     @SuppressWarnings({"unchecked", "rawtypes"})
     public void copyStateFrom(TardisExteriorBlockEntity other) {
         for (ComponentType<?> type : TardisComponentTypes.ALL) {
@@ -327,7 +325,8 @@ public class TardisExteriorBlockEntity extends BlockEntity implements GeoBlockEn
                 if (controller != null) {
                     controller.setAnimationSpeed(1.0);
                 }
-            } catch (InterruptedException ignored) {}
+            } catch (InterruptedException ignored) {
+            }
         }).start();
     }
 

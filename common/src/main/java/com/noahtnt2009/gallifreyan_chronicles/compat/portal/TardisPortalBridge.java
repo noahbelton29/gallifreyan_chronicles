@@ -53,6 +53,14 @@ public final class TardisPortalBridge {
     public static boolean isRenderingTardisPortal() {
         return isAvailable() && TardisPortalClient.isRenderingTardisPortal();
     }
+
+    public static boolean isNearTardisPortal(double range) {
+        return isAvailable() && TardisPortalClient.isNearTardisPortal(range);
+    }
+
+    public static boolean isInteriorDoorAtInAnyTardisLevel(net.minecraft.core.BlockPos pos) {
+        return isAvailable() && TardisPortalClient.isInteriorDoorAtInAnyTardisLevel(pos);
+    }
     public static @Nullable Level clientLevel(ResourceKey<Level> dimension) {
         return isAvailable() ? TardisPortalClient.clientLevel(dimension) : null;
     }

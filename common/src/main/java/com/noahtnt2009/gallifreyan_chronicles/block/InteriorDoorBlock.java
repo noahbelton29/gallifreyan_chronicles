@@ -31,6 +31,8 @@ import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
+import java.util.EnumMap;
+import java.util.Map;
 import org.jetbrains.annotations.NotNull;
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
@@ -46,9 +48,35 @@ public class InteriorDoorBlock extends BaseEntityBlock {
     public static final IntegerProperty PART_X = IntegerProperty.create("part_x", 0, WIDTH - 1);
     public static final IntegerProperty PART_Y = IntegerProperty.create("part_y", 0, HEIGHT - 1);
 
-    private static final VoxelShape SHAPE_Z = Block.box(0, 0, 4, 16, 16, 12);
-    private static final VoxelShape SHAPE_X = Block.box(4, 0, 0, 12, 16, 16);
     private static final VoxelShape SHAPE_FLUSH = Block.box(0, 8, 0, 16, 16, 16);
+
+    private static final int[] DEFAULT_DEPTH = {4, 12};
+    private static final Map<String, int[]> MODEL_DEPTH = Map.of(
+            "first_doctors_interior_doors", new int[]{12, 16}
+    );
+    private static final Map<Integer, EnumMap<Direction, VoxelShape>> SLABS = new java.util.concurrent.ConcurrentHashMap<>();
+
+    private static VoxelShape slab(Direction facing, int[] depth) {
+        EnumMap<Direction, VoxelShape> shapes = SLABS.computeIfAbsent(depth[0] * 100 + depth[1], k -> {
+            int t0 = depth[0];
+            int t1 = depth[1];
+            EnumMap<Direction, VoxelShape> m = new EnumMap<>(Direction.class);
+            m.put(Direction.NORTH, Block.box(0, 0, t0, 16, 16, t1));
+            m.put(Direction.SOUTH, Block.box(0, 0, 16 - t1, 16, 16, 16 - t0));
+            m.put(Direction.WEST, Block.box(t0, 0, 0, t1, 16, 16));
+            m.put(Direction.EAST, Block.box(16 - t1, 0, 0, 16 - t0, 16, 16));
+            return m;
+        });
+        return shapes.get(facing);
+    }
+
+    private int[] depthOf(BlockGetter level, BlockState state, BlockPos pos) {
+        String model = this.variant;
+        if (level.getBlockEntity(masterBlockPos(state, pos)) instanceof InteriorDoorBlockEntity door) {
+            model = door.getVariant();
+        }
+        return MODEL_DEPTH.getOrDefault(model, DEFAULT_DEPTH);
+    }
 
     private final String variant;
     private final boolean linked;
@@ -137,15 +165,20 @@ public class InteriorDoorBlock extends BaseEntityBlock {
         Level level = context.getLevel();
         BlockPos origin = context.getClickedPos();
 
+        BlockState placed = this.defaultBlockState().setValue(FACING, facing).setValue(FLIPPED, flipped).setValue(FLUSH, flush);
         for (int x = 0; x < WIDTH; x++) {
             for (int y = 0; y < HEIGHT; y++) {
                 BlockPos p = origin.relative(right, x).relative(up, y);
                 if (level.isOutsideBuildHeight(p) || !level.getBlockState(p).canBeReplaced()) {
                     return null;
                 }
+
+                if (!level.isUnobstructed(placed, p, CollisionContext.empty())) {
+                    return null;
+                }
             }
         }
-        return this.defaultBlockState().setValue(FACING, facing).setValue(FLIPPED, flipped).setValue(FLUSH, flush);
+        return placed;
     }
 
     private static BlockPos barrierPos(BlockPos master, Direction facing, boolean flipped, int x, int y) {
@@ -171,7 +204,7 @@ public class InteriorDoorBlock extends BaseEntityBlock {
     }
 
     public static void placeBarriers(Level level, BlockPos master, BlockState state) {
-        // The invisible barrier body behind the door is disabled; just clean up any left from older versions.
+
         removeBarriers(level, master, state);
     }
 
@@ -250,7 +283,7 @@ public class InteriorDoorBlock extends BaseEntityBlock {
     protected @NonNull VoxelShape getShape(@NonNull BlockState state, @NonNull BlockGetter level,
                                            @NonNull BlockPos pos, @NonNull CollisionContext context) {
         if (isFlush(state)) return SHAPE_FLUSH;
-        return state.getValue(FACING).getAxis() == Direction.Axis.Z ? SHAPE_Z : SHAPE_X;
+        return slab(state.getValue(FACING), depthOf(level, state, pos));
     }
 
     @Override

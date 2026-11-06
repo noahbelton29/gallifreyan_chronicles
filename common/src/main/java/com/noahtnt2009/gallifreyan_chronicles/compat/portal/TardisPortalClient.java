@@ -1,8 +1,12 @@
 package com.noahtnt2009.gallifreyan_chronicles.compat.portal;
 
 import com.noahtnt2009.gallifreyan_chronicles.Constants;
+import com.noahtnt2009.gallifreyan_chronicles.block.InteriorDoorBarrierBlock;
+import com.noahtnt2009.gallifreyan_chronicles.block.InteriorDoorBlock;
 import com.noahtnt2009.gallifreyan_chronicles.config.GCConfig;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientLevel;
+import net.minecraft.core.BlockPos;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.entity.Entity;
 import qouteall.imm_ptl.core.CHelper;
@@ -11,10 +15,12 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.IdentityHashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Block;
 import net.minecraft.world.phys.Vec3;
 import org.jspecify.annotations.Nullable;
 import com.noahtnt2009.gallifreyan_chronicles.client.gui.hud.GCPowerDarkness;
@@ -92,6 +98,36 @@ final class TardisPortalClient {
         int limit = Math.min(GCConfig.maxRenderedPortals(), candidates.size());
         for (int i = 0; i < limit; i++) result.allowed.add(candidates.get(i).portal());
         return result;
+    }
+
+    static boolean isNearTardisPortal(double range) {
+        Minecraft mc = Minecraft.getInstance();
+        if (mc.level == null) return false;
+        Vec3 camera = CHelper.getCurrentCameraPos();
+        for (Entity entity : mc.level.entitiesForRendering()) {
+            if (!(entity instanceof Portal portal) || !TardisPortalBridge.PORTAL_TAG.equals(portal.portalTag)) continue;
+            if (!portal.isVisible()) continue;
+            if (portal.getDistanceToNearestPointInPortal(camera) <= range) return true;
+        }
+        return false;
+    }
+
+    static boolean isInteriorDoorAtInAnyTardisLevel(BlockPos pos) {
+        Minecraft mc = Minecraft.getInstance();
+        if (mc.level == null) return false;
+        Set<ResourceKey<Level>> checked = new HashSet<>();
+        for (Entity entity : mc.level.entitiesForRendering()) {
+            if (!(entity instanceof Portal portal)) continue;
+            ResourceKey<Level> destDim = portal.getDestDim();
+            var id = destDim.identifier();
+            if (!id.getNamespace().equals(Constants.MOD_ID) || !id.getPath().startsWith("tardis/")) continue;
+            if (!checked.add(destDim)) continue;
+            Level dest = ClientWorldLoader.peekWorld(destDim);
+            if (dest == null) continue;
+            Block block = dest.getBlockState(pos).getBlock();
+            if (block instanceof InteriorDoorBlock || block instanceof InteriorDoorBarrierBlock) return true;
+        }
+        return false;
     }
 
     static void tintPortalForPowerDarkness(Object object) {

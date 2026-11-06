@@ -15,17 +15,19 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
+@SuppressWarnings("unused")
 @Mixin(MultiPlayerGameMode.class)
 public abstract class CreativeTardisBreakMixin {
+    @SuppressWarnings({"unused", "resource"})
     @Inject(method = "destroyBlock", at = @At("HEAD"), cancellable = true)
     private void gc$leaveTardisBreakToServer(BlockPos pos, CallbackInfoReturnable<Boolean> cir) {
         Minecraft mc = Minecraft.getInstance();
         if (mc.player == null || mc.level == null) return;
 
-        // Inside the TARDIS: break normally so the player gets the sound and particles
         var dim = mc.level.dimension().identifier();
         boolean insideTardis = dim.getNamespace().equals(Constants.MOD_ID) && dim.getPath().startsWith("tardis/");
-        if (insideTardis) return;
+        boolean remoteContext = !mc.player.level().dimension().equals(mc.level.dimension());
+        if (insideTardis && !remoteContext) return;
 
         Block block = mc.level.getBlockState(pos).getBlock();
         boolean interiorDoor = block instanceof InteriorDoorBarrierBlock

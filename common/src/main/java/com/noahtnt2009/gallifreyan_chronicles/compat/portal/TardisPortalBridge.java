@@ -50,6 +50,9 @@ public final class TardisPortalBridge {
         return isAvailable() && TardisPortalClient.isViewingThroughPortalNear(pos, range);
     }
 
+    public static boolean isRenderingTardisPortal() {
+        return isAvailable() && TardisPortalClient.isRenderingTardisPortal();
+    }
     public static @Nullable Level clientLevel(ResourceKey<Level> dimension) {
         return isAvailable() ? TardisPortalClient.clientLevel(dimension) : null;
     }

@@ -15,11 +15,6 @@ import org.jspecify.annotations.NonNull;
 
 public class InteriorDoorBarrierBlock extends Block {
     public static final EnumProperty<Direction> FACING = InteriorDoorBlock.FACING;
-    private static final double DOOR_SIDE_GAP = 6.0;
-    private static final VoxelShape NORTH = Block.box(0, 0, DOOR_SIDE_GAP, 16, 16, 16);
-    private static final VoxelShape SOUTH = Block.box(0, 0, 0, 16, 16, 16 - DOOR_SIDE_GAP);
-    private static final VoxelShape WEST = Block.box(DOOR_SIDE_GAP, 0, 0, 16, 16, 16);
-    private static final VoxelShape EAST = Block.box(0, 0, 0, 16 - DOOR_SIDE_GAP, 16, 16);
 
     public InteriorDoorBarrierBlock(Properties properties) {
         super(properties);
@@ -40,12 +35,7 @@ public class InteriorDoorBarrierBlock extends Block {
     @Override
     protected @NonNull VoxelShape getCollisionShape(@NonNull BlockState state, @NonNull BlockGetter level,
                                                     @NonNull BlockPos pos, @NonNull CollisionContext context) {
-        return switch (state.getValue(FACING)) {
-            case SOUTH -> SOUTH;
-            case WEST -> WEST;
-            case EAST -> EAST;
-            default -> NORTH;
-        };
+        return Shapes.empty();
     }
 
     @Override

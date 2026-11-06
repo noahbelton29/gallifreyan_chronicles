@@ -1,5 +1,6 @@
 package com.noahtnt2009.gallifreyan_chronicles.compat.portal;
 
+import com.noahtnt2009.gallifreyan_chronicles.Constants;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
@@ -22,6 +23,12 @@ final class TardisPortalClient {
     static boolean isViewingThroughPortalNear(Vec3 pos, double range) {
         if (!PortalRendering.isRendering()) return false;
         return PortalRendering.getRenderingPortal().getDestPos().distanceToSqr(pos) <= range * range;
+    }
+
+    static boolean isRenderingTardisPortal() {
+        if (!PortalRendering.isRendering()) return false;
+        var dim = PortalRendering.getRenderingPortal().getDestDim().identifier();
+        return dim.getNamespace().equals(Constants.MOD_ID) && dim.getPath().startsWith("tardis/");
     }
 
     static void tintPortalForPowerDarkness(Object object) {

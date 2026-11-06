@@ -6,7 +6,7 @@ import com.noahtnt2009.gallifreyan_chronicles.tardis.api.Tardis;
 import com.noahtnt2009.gallifreyan_chronicles.Constants;
 import com.noahtnt2009.gallifreyan_chronicles.block.entity.TardisConsoleBlockEntity;
 import com.noahtnt2009.gallifreyan_chronicles.init.GCDimensions;
-import com.noahtnt2009.gallifreyan_chronicles.mixin.MinecraftServerAccessor;
+import com.noahtnt2009.gallifreyan_chronicles.mixin.server.MinecraftServerAccessor;
 import com.noahtnt2009.gallifreyan_chronicles.tardis.manager.TardisManager;
 import com.noahtnt2009.gallifreyan_chronicles.util.GCUtils;
 import net.minecraft.core.registries.Registries;

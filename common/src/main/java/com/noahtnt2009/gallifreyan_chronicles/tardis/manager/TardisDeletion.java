@@ -3,7 +3,7 @@ package com.noahtnt2009.gallifreyan_chronicles.tardis.manager;
 import com.noahtnt2009.gallifreyan_chronicles.Constants;
 import com.noahtnt2009.gallifreyan_chronicles.compat.portal.TardisPortalBridge;
 import com.noahtnt2009.gallifreyan_chronicles.init.GCBlocks;
-import com.noahtnt2009.gallifreyan_chronicles.mixin.MinecraftServerAccessor;
+import com.noahtnt2009.gallifreyan_chronicles.mixin.server.MinecraftServerAccessor;
 import com.noahtnt2009.gallifreyan_chronicles.tardis.interior.TardisDimensionManager;
 import net.minecraft.core.BlockPos;
 import net.minecraft.resources.ResourceKey;

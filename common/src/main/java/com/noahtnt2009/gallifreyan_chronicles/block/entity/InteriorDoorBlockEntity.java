@@ -125,6 +125,14 @@ public class InteriorDoorBlockEntity extends BlockEntity implements GeoBlockEnti
         return ((InteriorDoorBlock) getBlockState().getBlock()).isLinked();
     }
 
+    public boolean isFlush() {
+        return InteriorDoorBlock.isFlush(getBlockState());
+    }
+
+    public boolean isFlipped() {
+        return InteriorDoorBlock.isFlipped(getBlockState());
+    }
+
     public Direction getFacing() {
         return getBlockState().getValue(InteriorDoorBlock.FACING);
     }

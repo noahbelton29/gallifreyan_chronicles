@@ -25,6 +25,7 @@ import net.minecraft.world.level.block.entity.BlockEntityTicker;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
+import net.minecraft.world.level.block.state.properties.BooleanProperty;
 import net.minecraft.world.level.block.state.properties.EnumProperty;
 import net.minecraft.world.level.block.state.properties.IntegerProperty;
 import net.minecraft.world.phys.BlockHitResult;
@@ -38,6 +39,8 @@ import org.jspecify.annotations.Nullable;
 public class InteriorDoorBlock extends BaseEntityBlock {
     public static final EnumProperty<Direction> FACING =
             EnumProperty.create("door_facing", Direction.class, Direction.Plane.HORIZONTAL);
+    public static final BooleanProperty FLIPPED = BooleanProperty.create("door_flipped");
+    public static final BooleanProperty FLUSH = BooleanProperty.create("door_flush");
     public static final int WIDTH = 2;
     public static final int HEIGHT = 3;
     public static final IntegerProperty PART_X = IntegerProperty.create("part_x", 0, WIDTH - 1);
@@ -45,6 +48,7 @@ public class InteriorDoorBlock extends BaseEntityBlock {
 
     private static final VoxelShape SHAPE_Z = Block.box(0, 0, 4, 16, 16, 12);
     private static final VoxelShape SHAPE_X = Block.box(4, 0, 0, 12, 16, 16);
+    private static final VoxelShape SHAPE_FLUSH = Block.box(0, 8, 0, 16, 16, 16);
 
     private final String variant;
     private final boolean linked;
@@ -65,6 +69,8 @@ public class InteriorDoorBlock extends BaseEntityBlock {
         this.fixedVariantId = fixedVariantId;
         this.registerDefaultState(this.stateDefinition.any()
                 .setValue(FACING, Direction.NORTH)
+                .setValue(FLIPPED, false)
+                .setValue(FLUSH, false)
                 .setValue(PART_X, 0)
                 .setValue(PART_Y, 0));
     }
@@ -83,7 +89,7 @@ public class InteriorDoorBlock extends BaseEntityBlock {
 
     @Override
     protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
-        builder.add(FACING, PART_X, PART_Y);
+        builder.add(FACING, FLIPPED, FLUSH, PART_X, PART_Y);
     }
 
     public static boolean isMaster(BlockState state) {
@@ -94,43 +100,79 @@ public class InteriorDoorBlock extends BaseEntityBlock {
         return facing.getCounterClockWise();
     }
 
+    // a door hung upside down is rolled 180 degrees around its facing axis, so its right side points the other
+    // way and the parts above the master become parts below it
+    public static Direction rightDirectionOf(Direction facing, boolean flipped) {
+        return flipped ? facing.getClockWise() : facing.getCounterClockWise();
+    }
+
+    public static Direction rightDirectionOf(BlockState state) {
+        return rightDirectionOf(state.getValue(FACING), isFlipped(state));
+    }
+
+    // a door lying flush against a ceiling faces down, its top points the way it is facing and its three
+    // parts run along that direction instead of upwards
+    public static Direction upDirectionOf(Direction facing, boolean flipped, boolean flush) {
+        if (flush) return facing;
+        return flipped ? Direction.DOWN : Direction.UP;
+    }
+
+    public static Direction upDirectionOf(BlockState state) {
+        return upDirectionOf(state.getValue(FACING), isFlipped(state), isFlush(state));
+    }
+
+    public static boolean isFlush(BlockState state) {
+        return state.hasProperty(FLUSH) && state.getValue(FLUSH);
+    }
+
+    public static boolean isFlipped(BlockState state) {
+        return state.hasProperty(FLIPPED) && state.getValue(FLIPPED);
+    }
+
     public static BlockPos masterBlockPos(BlockState state, BlockPos pos) {
-        return pos.relative(rightDirectionOf(state.getValue(FACING)), -state.getValue(PART_X))
-                .below(state.getValue(PART_Y));
+        return pos.relative(rightDirectionOf(state), -state.getValue(PART_X))
+                .relative(upDirectionOf(state), -state.getValue(PART_Y));
     }
 
     @Override
     public @Nullable BlockState getStateForPlacement(BlockPlaceContext context) {
         Direction facing = context.getHorizontalDirection().getOpposite();
-        Direction right = rightDirectionOf(facing);
+        boolean ceiling = context.getClickedFace() == Direction.DOWN;
+        boolean flush = ceiling && context.isSecondaryUseActive();
+        boolean flipped = ceiling && !flush;
+        Direction right = rightDirectionOf(facing, flipped);
+        Direction up = upDirectionOf(facing, flipped, flush);
         Level level = context.getLevel();
         BlockPos origin = context.getClickedPos();
 
         for (int x = 0; x < WIDTH; x++) {
             for (int y = 0; y < HEIGHT; y++) {
-                BlockPos p = origin.relative(right, x).above(y);
+                BlockPos p = origin.relative(right, x).relative(up, y);
                 if (level.isOutsideBuildHeight(p) || !level.getBlockState(p).canBeReplaced()) {
                     return null;
                 }
             }
         }
-        return this.defaultBlockState().setValue(FACING, facing);
+        return this.defaultBlockState().setValue(FACING, facing).setValue(FLIPPED, flipped).setValue(FLUSH, flush);
     }
 
-    private static BlockPos barrierPos(BlockPos master, Direction facing, int x, int y) {
-        return master.relative(rightDirectionOf(facing), x).above(y).relative(facing.getOpposite());
+    private static BlockPos barrierPos(BlockPos master, Direction facing, boolean flipped, int x, int y) {
+        return master.relative(rightDirectionOf(facing, flipped), x).relative(upDirectionOf(facing, flipped, false), y)
+                .relative(facing.getOpposite());
     }
 
     public static void placeBarriers(Level level, BlockPos master, BlockState state) {
         if (level.isClientSide() || !(state.getBlock() instanceof InteriorDoorBlock door) || !door.isLinked()) return;
+        if (isFlush(state)) return;
         if (!TardisPortalBridge.isAvailable()) {
             removeBarriers(level, master, state);
             return;
         }
         Direction facing = state.getValue(FACING);
+        boolean flipped = isFlipped(state);
         for (int x = 0; x < WIDTH; x++) {
             for (int y = 0; y < HEIGHT; y++) {
-                BlockPos p = barrierPos(master, facing, x, y);
+                BlockPos p = barrierPos(master, facing, flipped, x, y);
                 if (level.isOutsideBuildHeight(p)) continue;
                 BlockState existing = level.getBlockState(p);
                 BlockState barrier = GCBlocks.INTERIOR_DOOR_BARRIER.defaultBlockState()
@@ -143,11 +185,12 @@ public class InteriorDoorBlock extends BaseEntityBlock {
     }
 
     public static void removeBarriers(Level level, BlockPos master, BlockState state) {
-        if (level.isClientSide()) return;
+        if (level.isClientSide() || isFlush(state)) return;
         Direction facing = state.getValue(FACING);
+        boolean flipped = isFlipped(state);
         for (int x = 0; x < WIDTH; x++) {
             for (int y = 0; y < HEIGHT; y++) {
-                BlockPos p = barrierPos(master, facing, x, y);
+                BlockPos p = barrierPos(master, facing, flipped, x, y);
                 if (level.getBlockState(p).is(GCBlocks.INTERIOR_DOOR_BARRIER)) {
                     level.setBlock(p, Blocks.AIR.defaultBlockState(), Block.UPDATE_ALL | Block.UPDATE_SUPPRESS_DROPS);
                 }
@@ -165,11 +208,12 @@ public class InteriorDoorBlock extends BaseEntityBlock {
             door.setDoorVariant(InteriorDoorBlockItem.selectedVariant(stack));
         }
 
-        Direction right = rightDirectionOf(state.getValue(FACING));
+        Direction right = rightDirectionOf(state);
+        Direction up = upDirectionOf(state);
         for (int x = 0; x < WIDTH; x++) {
             for (int y = 0; y < HEIGHT; y++) {
                 if (x == 0 && y == 0) continue;
-                level.setBlock(pos.relative(right, x).above(y),
+                level.setBlock(pos.relative(right, x).relative(up, y),
                         state.setValue(PART_X, x).setValue(PART_Y, y), Block.UPDATE_ALL);
             }
         }
@@ -181,10 +225,11 @@ public class InteriorDoorBlock extends BaseEntityBlock {
                                                  @NotNull BlockState state, @NotNull Player player) {
         if (!level.isClientSide()) {
             BlockPos master = masterBlockPos(state, pos);
-            Direction right = rightDirectionOf(state.getValue(FACING));
+            Direction right = rightDirectionOf(state);
+            Direction up = upDirectionOf(state);
             for (int x = 0; x < WIDTH; x++) {
                 for (int y = 0; y < HEIGHT; y++) {
-                    BlockPos p = master.relative(right, x).above(y);
+                    BlockPos p = master.relative(right, x).relative(up, y);
                     if (p.equals(pos)) continue;
                     if (level.getBlockState(p).is(this)) {
                         level.setBlock(p, Blocks.AIR.defaultBlockState(),
@@ -213,6 +258,7 @@ public class InteriorDoorBlock extends BaseEntityBlock {
     @Override
     protected @NonNull VoxelShape getShape(@NonNull BlockState state, @NonNull BlockGetter level,
                                            @NonNull BlockPos pos, @NonNull CollisionContext context) {
+        if (isFlush(state)) return SHAPE_FLUSH;
         return state.getValue(FACING).getAxis() == Direction.Axis.Z ? SHAPE_Z : SHAPE_X;
     }
 

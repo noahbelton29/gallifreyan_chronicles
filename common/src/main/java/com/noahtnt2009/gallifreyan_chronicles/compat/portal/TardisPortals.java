@@ -50,6 +50,10 @@ public final class TardisPortals {
     private static final Vec3 INTERIOR_PORTAL_OFFSET = new Vec3(0.0, 1.0, 8.05 / 16.0);
     private static final double INTERIOR_VIEW_Z = 7.95 / 16.0;
     private static final Vec3 UP = new Vec3(0.0, 1.0, 0.0);
+    private static final Vec3 DOWN = new Vec3(0.0, -1.0, 0.0);
+    private static final double FLUSH_DOOR_HEIGHT = 0.75;
+    private static final double FLUSH_PORTAL_Z = 0.253;
+    private static final double FLUSH_VIEW_Z = 0.247;
     private static final int CLOSE_LINGER_TICKS = 12;
     private static final int PURGE_INTERVAL_TICKS = 20;
     private static final double PURGE_RADIUS = 2.0;
@@ -70,7 +74,8 @@ public final class TardisPortals {
     }
 
     private record Placement(ResourceKey<Level> exteriorDimension, BlockPos exteriorPos, float exteriorYaw,
-                             ResourceKey<Level> interiorDimension, BlockPos doorPos, Direction doorFacing) {
+                             ResourceKey<Level> interiorDimension, BlockPos doorPos, Direction doorFacing, boolean doorFlipped,
+                             boolean doorFlush) {
     }
 
     private static final class Link {
@@ -209,6 +214,7 @@ public final class TardisPortals {
         }
     }
 
+    /** @return true when the remembered interior door was confirmed destroyed (its chunk is loaded and the door is gone) */
     private static boolean forgetMissingDoor(MinecraftServer server, UUID tardisId) {
         DoorLocation door = DOORS.get(tardisId);
         if (door == null) return false;
@@ -360,7 +366,8 @@ public final class TardisPortals {
         BlockState state = interiorLevel.getBlockState(door.pos());
         if (!state.is(GCBlocks.TARDIS_INTERIOR_DOOR) || !InteriorDoorBlock.isMaster(state)) return null;
         return new Placement(exteriorLevel.dimension(), exterior.getBlockPos(), exterior.getYaw(),
-                interiorLevel.dimension(), door.pos(), state.getValue(InteriorDoorBlock.FACING));
+                interiorLevel.dimension(), door.pos(), state.getValue(InteriorDoorBlock.FACING),
+                InteriorDoorBlock.isFlipped(state), InteriorDoorBlock.isFlush(state));
     }
 
     private static @Nullable Link spawn(MinecraftServer server, UUID tardisId, Placement placement) {
@@ -371,38 +378,75 @@ public final class TardisPortals {
         float exteriorRotation = TardisExterior.modelRotationDegrees(placement.exteriorYaw());
         float interiorRotation = TardisExterior.modelRotationDegrees(placement.doorFacing().toYRot());
 
+        boolean flipped = placement.doorFlipped();
+        boolean flush = placement.doorFlush();
+        Direction right = InteriorDoorBlock.rightDirectionOf(placement.doorFacing(), flipped);
+        Direction facing = placement.doorFacing();
+
         Vec3 exteriorCenter = Vec3.atBottomCenterOf(placement.exteriorPos());
-        Direction right = InteriorDoorBlock.rightDirectionOf(placement.doorFacing());
-        Vec3 interiorCenter = Vec3.atBottomCenterOf(placement.doorPos())
-                .add(right.getStepX() * 0.5, 0.0, right.getStepZ() * 0.5);
+        Vec3 interiorCenter;
+        double portalZ;
+        double viewZ;
+        Vec3 interiorPortalOffset;
+        if (flush) {
+            // lying flat against the ceiling, the model's origin is the middle of its bottom edge, tipped so that
+            // its local up runs along the facing direction and its back points at the ceiling
+            interiorCenter = Vec3.atBottomCenterOf(placement.doorPos())
+                    .add(right.getStepX() * 0.5 - facing.getStepX() * 0.5, FLUSH_DOOR_HEIGHT,
+                            right.getStepZ() * 0.5 - facing.getStepZ() * 0.5);
+            portalZ = FLUSH_PORTAL_Z;
+            viewZ = FLUSH_VIEW_Z;
+            interiorPortalOffset = new Vec3(0.0, INTERIOR_PORTAL_OFFSET.y, portalZ);
+        } else {
+            interiorCenter = Vec3.atBottomCenterOf(placement.doorPos())
+                    .add(right.getStepX() * 0.5, 0.0, right.getStepZ() * 0.5);
+            portalZ = INTERIOR_PORTAL_OFFSET.z;
+            viewZ = INTERIOR_VIEW_Z;
+            // a door hanging from a ceiling has its master block on top, so the doorway mirrors downwards from it
+            interiorPortalOffset = flipped ? flipY(INTERIOR_PORTAL_OFFSET) : INTERIOR_PORTAL_OFFSET;
+        }
 
         Vec3 origin = exteriorCenter.add(rotate(EXTERIOR_PORTAL_OFFSET, exteriorRotation));
-        Vec3 destination = interiorCenter.add(rotate(INTERIOR_PORTAL_OFFSET, interiorRotation));
+        Vec3 destination = interiorCenter.add(doorOffset(interiorPortalOffset, interiorRotation, flush));
         Vec3 normal = rotate(new Vec3(0.0, 0.0, -1.0), exteriorRotation);
         Vec3 axisW = UP.cross(normal);
+
+        // portal frames: right, up, normal, with right = up x normal
+        Vec3[] exteriorFrame = {axisW, UP, normal};
+        Vec3 interiorFront = rotate(new Vec3(0.0, 0.0, -1.0), interiorRotation);
+        Vec3[] interiorFrame;
+        if (flush) {
+            interiorFrame = frame(interiorFront, DOWN);
+        } else {
+            interiorFrame = frame(UP.scale(flipped ? -1.0 : 1.0), interiorFront);
+        }
 
         Portal exteriorPortal = Portal.ENTITY_TYPE.create(exteriorLevel, EntitySpawnReason.TRIGGERED);
         if (exteriorPortal == null) return null;
         exteriorPortal.setOriginPos(origin);
         exteriorPortal.setOrientationAndSize(axisW, UP, PORTAL_WIDTH, PORTAL_HEIGHT);
         PortalAPI.setPortalTransformation(exteriorPortal, placement.interiorDimension(), destination,
-                DQuaternion.rotationByDegrees(UP, interiorRotation + 180.0 - exteriorRotation), 1.0);
+                flipped || flush
+                        ? transformation(exteriorFrame, interiorFrame)
+                        : DQuaternion.rotationByDegrees(UP, interiorRotation + 180.0 - exteriorRotation), 1.0);
         configure(exteriorPortal, tardisId);
 
-        Vec3 interiorViewOffset = new Vec3(0.0, INTERIOR_PORTAL_OFFSET.y, INTERIOR_VIEW_Z);
+        Vec3 interiorViewOffset = new Vec3(0.0, interiorPortalOffset.y, viewZ);
         Vec3 exteriorReturnOffset = new Vec3(0.0,
-                EXTERIOR_PORTAL_OFFSET.y + (interiorViewOffset.y - INTERIOR_PORTAL_OFFSET.y),
-                EXTERIOR_PORTAL_OFFSET.z + INTERIOR_PORTAL_OFFSET.z - interiorViewOffset.z);
-        Vec3 interiorOrigin = interiorCenter.add(rotate(interiorViewOffset, interiorRotation));
+                EXTERIOR_PORTAL_OFFSET.y + (interiorViewOffset.y - interiorPortalOffset.y),
+                EXTERIOR_PORTAL_OFFSET.z + portalZ - viewZ);
+        Vec3 interiorOrigin = interiorCenter.add(doorOffset(interiorViewOffset, interiorRotation, flush));
         Vec3 interiorDestination = exteriorCenter.add(rotate(exteriorReturnOffset, exteriorRotation));
-        Vec3 interiorNormal = rotate(new Vec3(0.0, 0.0, -1.0), interiorRotation);
 
         Portal interiorPortal = Portal.ENTITY_TYPE.create(interiorLevel, EntitySpawnReason.TRIGGERED);
         if (interiorPortal == null) return null;
         interiorPortal.setOriginPos(interiorOrigin);
-        interiorPortal.setOrientationAndSize(UP.cross(interiorNormal), UP, PORTAL_WIDTH, PORTAL_HEIGHT);
+        // the portal quad is symmetric, only its centre and normal matter, a hanging door is turned by its transformation
+        interiorPortal.setOrientationAndSize(interiorFrame[0], interiorFrame[1], PORTAL_WIDTH, PORTAL_HEIGHT);
         PortalAPI.setPortalTransformation(interiorPortal, placement.exteriorDimension(), interiorDestination,
-                DQuaternion.rotationByDegrees(UP, exteriorRotation + 180.0 - interiorRotation), 1.0);
+                flipped || flush
+                        ? transformation(interiorFrame, exteriorFrame)
+                        : DQuaternion.rotationByDegrees(UP, exteriorRotation + 180.0 - interiorRotation), 1.0);
         configure(interiorPortal, tardisId);
 
         purgeNear(exteriorLevel, origin, null, tardisId);
@@ -460,6 +504,55 @@ public final class TardisPortals {
                 portal -> portal != keep && belongsTo(portal, tardisId))) {
             stray.discard();
         }
+    }
+
+    private static Vec3 flipY(Vec3 offset) {
+        return new Vec3(offset.x, 1.0 - offset.y, offset.z);
+    }
+
+    // an offset in the door model's own space (x right, y up, z towards the back) as a world offset, a door lying
+    // against the ceiling is first tipped over so its up points along its facing and its back points up
+    private static Vec3 doorOffset(Vec3 local, float rotation, boolean flush) {
+        Vec3 tipped = flush ? new Vec3(local.x, local.z, -local.y) : local;
+        return rotate(tipped, rotation);
+    }
+
+    // frame of a portal from its up and its front normal, right = up x normal
+    private static Vec3[] frame(Vec3 up, Vec3 normal) {
+        return new Vec3[]{up.cross(normal), up, normal};
+    }
+
+    /**
+     * The turn a portal applies to what is seen through it. Going in through the source portal's front you come out
+     * of the destination portal's front: normal -> -normal, up -> up, right -> -right. Written for any frames so that
+     * doors that are upside down or lie against a ceiling come out right too. Frames are {right, up, normal}.
+     */
+    private static DQuaternion transformation(Vec3[] source, Vec3[] destination) {
+        Vec3[] target = {destination[0].scale(-1.0), destination[1], destination[2].scale(-1.0)};
+        double[][] m = new double[3][3];
+        for (int k = 0; k < 3; k++) {
+            double[] d = {target[k].x, target[k].y, target[k].z};
+            double[] sv = {source[k].x, source[k].y, source[k].z};
+            for (int i = 0; i < 3; i++) {
+                for (int j = 0; j < 3; j++) m[i][j] += d[i] * sv[j];
+            }
+        }
+        double cos = Math.max(-1.0, Math.min(1.0, (m[0][0] + m[1][1] + m[2][2] - 1.0) / 2.0));
+        double angle = Math.acos(cos);
+        if (angle < 1.0e-6) return DQuaternion.rotationByDegrees(UP, 0.0);
+        Vec3 axis;
+        if (Math.PI - angle < 1.0e-6) {
+            // half turn: the axis is the column of (m + 1) / 2 with the biggest diagonal
+            int best = 0;
+            for (int i = 1; i < 3; i++) if (m[i][i] > m[best][best]) best = i;
+            double x = (m[0][best] + (best == 0 ? 1.0 : 0.0)) / 2.0;
+            double y = (m[1][best] + (best == 1 ? 1.0 : 0.0)) / 2.0;
+            double z = (m[2][best] + (best == 2 ? 1.0 : 0.0)) / 2.0;
+            axis = new Vec3(x, y, z).normalize();
+        } else {
+            axis = new Vec3(m[2][1] - m[1][2], m[0][2] - m[2][0], m[1][0] - m[0][1]).normalize();
+        }
+        return DQuaternion.rotationByDegrees(axis, Math.toDegrees(angle));
     }
 
     private static Vec3 rotate(Vec3 offset, float degrees) {

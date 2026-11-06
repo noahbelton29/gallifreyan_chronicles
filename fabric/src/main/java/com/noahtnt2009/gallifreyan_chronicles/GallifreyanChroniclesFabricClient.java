@@ -3,6 +3,7 @@ package com.noahtnt2009.gallifreyan_chronicles;
 import com.noahtnt2009.gallifreyan_chronicles.client.gui.hud.GCHudRenderer;
 import com.noahtnt2009.gallifreyan_chronicles.client.watermark.WatermarkIdentity;
 import com.noahtnt2009.gallifreyan_chronicles.client.watermark.WatermarkOverlay;
+import com.noahtnt2009.gallifreyan_chronicles.client.renderer.OutlineHider;
 import com.noahtnt2009.gallifreyan_chronicles.client.renderer.TardisConsoleBlockRenderer;
 import com.noahtnt2009.gallifreyan_chronicles.client.renderer.TardisControlEntityRenderer;
 import com.noahtnt2009.gallifreyan_chronicles.client.renderer.TardisKeyEntityRenderer;
@@ -16,6 +17,7 @@ import com.noahtnt2009.gallifreyan_chronicles.util.GCUtils;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.rendering.v1.hud.HudElementRegistry;
 import net.fabricmc.fabric.api.client.rendering.v1.hud.VanillaHudElements;
+import net.fabricmc.fabric.api.client.rendering.v1.level.LevelRenderEvents;
 import net.fabricmc.fabric.api.item.v1.BlockTransformerHelper;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderers;
 import net.minecraft.client.renderer.entity.EntityRenderers;
@@ -38,6 +40,10 @@ public class GallifreyanChroniclesFabricClient implements ClientModInitializer {
         EntityRenderers.register(GCEntityTypes.TARDIS_CONTROL_ENTITY_TYPE, TardisControlEntityRenderer::new);
         EntityRenderers.register(GCEntityTypes.TARDIS_KEY_ENTITY_TYPE, TardisKeyEntityRenderer::new);
         GCFabricClientNetworking.registerClientNetworking();
+
+        // Hide the selection outline on interior doors (returning false cancels the outline)
+        LevelRenderEvents.BEFORE_BLOCK_OUTLINE.register((_, hit) ->
+                !OutlineHider.shouldHide(hit.pos()));
 
         HudElementRegistry.attachElementAfter(
                 VanillaHudElements.MISC_OVERLAYS,

@@ -26,6 +26,7 @@
     "client.CameraShakeMixin",
     "client.AbstractContainerScreenAccessor",
     "client.CreativeTardisScrollMixin",
+    "client.CreativeTardisBreakMixin",
     "client.ScreenshotMixin",
     "client.NativeImageSaveMixin",
     "client.HiddenGuiBannerMixin",

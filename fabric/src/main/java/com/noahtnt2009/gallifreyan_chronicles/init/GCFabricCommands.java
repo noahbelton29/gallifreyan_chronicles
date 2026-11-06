@@ -25,18 +25,18 @@ public class GCFabricCommands {
         CommandRegistrationCallback.EVENT.register((dispatcher, _, _) -> {
             dispatcher.register(
                     literal("gc")
-                            .then(literal("deletion")
-                                    .requires(source -> source.permissions().hasPermission(
-                                            Permissions.COMMANDS_GAMEMASTER))
-                                    .then(literal("on")
-                                            .executes(ctx ->
-                                                    TardisCommand.setDeletionMode(ctx, true)))
-                                    .then(literal("off")
-                                            .executes(ctx ->
-                                                    TardisCommand.setDeletionMode(ctx, false))))
                             .then(literal("tardis")
                                     .then(literal("list")
                                             .executes(TardisCommand::listTardis))
+                                    .then(literal("deletion")
+                                            .requires(source -> source.permissions().hasPermission(
+                                                    Permissions.COMMANDS_GAMEMASTER))
+                                            .then(literal("on")
+                                                    .executes(ctx ->
+                                                            TardisCommand.setDeletionMode(ctx, true)))
+                                            .then(literal("off")
+                                                    .executes(ctx ->
+                                                            TardisCommand.setDeletionMode(ctx, false))))
                                     .then(argument("id", StringArgumentType.string())
                                             .suggests((ctx, builder) -> {
                                                 TardisManager.get(ctx.getSource().getServer())

@@ -1,11 +1,14 @@
 package com.noahtnt2009.gallifreyan_chronicles.tardis.manager;
 
+import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
 public final class TardisDeletionMode {
     private static final Set<UUID> ENABLED = ConcurrentHashMap.newKeySet();
+    private static final Map<UUID, Long> LAST_WARNING = new ConcurrentHashMap<>();
+    private static final long WARNING_COOLDOWN_TICKS = 200L;
 
     private TardisDeletionMode() {
     }
@@ -23,8 +26,17 @@ public final class TardisDeletionMode {
         }
     }
 
+    public static boolean shouldWarn(UUID playerId, long gameTime) {
+        if (playerId == null) return false;
+        Long last = LAST_WARNING.get(playerId);
+        if (last != null && gameTime >= last && gameTime - last < WARNING_COOLDOWN_TICKS) return false;
+        LAST_WARNING.put(playerId, gameTime);
+        return true;
+    }
+
     public static void clear(UUID playerId) {
         if (playerId == null) return;
         ENABLED.remove(playerId);
+        LAST_WARNING.remove(playerId);
     }
 }

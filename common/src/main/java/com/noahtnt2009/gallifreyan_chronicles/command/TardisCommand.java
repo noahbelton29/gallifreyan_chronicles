@@ -35,6 +35,7 @@ import com.noahtnt2009.gallifreyan_chronicles.tardis.exterior.TardisExteriorRegi
 import com.noahtnt2009.gallifreyan_chronicles.tardis.exterior.fade.FadeType;
 import com.noahtnt2009.gallifreyan_chronicles.tardis.exterior.fade.FadeTypes;
 import com.noahtnt2009.gallifreyan_chronicles.tardis.flight.LandingTarget;
+import net.minecraft.ChatFormatting;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.SharedSuggestionProvider;
 import net.minecraft.commands.arguments.DimensionArgument;
@@ -115,7 +116,7 @@ public class TardisCommand {
                         enabled
                                 ? "command.gallifreyan_chronicles.deletion_mode_on"
                                 : "command.gallifreyan_chronicles.deletion_mode_off"
-                ),
+                ).withStyle(enabled ? ChatFormatting.RED : ChatFormatting.GREEN),
                 false
         );
         return 1;

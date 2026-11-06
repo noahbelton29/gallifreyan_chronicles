@@ -7,6 +7,7 @@ import com.noahtnt2009.gallifreyan_chronicles.block.TardisTopBlock;
 import com.noahtnt2009.gallifreyan_chronicles.compat.portal.TardisPortalBridge;
 import com.noahtnt2009.gallifreyan_chronicles.init.GCBlocks;
 import com.noahtnt2009.gallifreyan_chronicles.tardis.manager.TardisDeletionMode;
+import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
@@ -42,7 +43,6 @@ public abstract class ServerPlayerGameModeTardisMixin {
                 || block instanceof InteriorDoorBarrierBlock
                 || block instanceof InteriorDoorBlock door && door.isLinked();
         if (!protectedBlock) return;
-        target.sendBlockUpdated(pos, state, state, Block.UPDATE_ALL);
         cir.setReturnValue(false);
     }
 
@@ -60,8 +60,13 @@ public abstract class ServerPlayerGameModeTardisMixin {
         boolean isTopOfExterior = block instanceof TardisTopBlock && target.getBlockState(pos.below()).is(GCBlocks.TARDIS);
         if (!isExterior && !isTopOfExterior) return;
 
-        target.sendBlockUpdated(pos, state, state, Block.UPDATE_ALL);
-        player.sendSystemMessage(Component.translatable("message.gallifreyan_chronicles.deletion_mode_required"));
+        if (TardisDeletionMode.shouldWarn(player.getUUID(), level.getGameTime())) {
+            player.sendSystemMessage(Component.translatable(
+                    "message.gallifreyan_chronicles.deletion_mode_required",
+                    Component.literal("TARDIS PROTECTED").withStyle(ChatFormatting.RED, ChatFormatting.BOLD),
+                    Component.literal("/gc tardis deletion on").withStyle(ChatFormatting.YELLOW)
+            ).withStyle(ChatFormatting.GRAY));
+        }
         cir.setReturnValue(false);
     }
 }

@@ -28,18 +28,18 @@ public class GCNeoForgeCommands {
     public static void onRegisterCommands(RegisterCommandsEvent event) {
         event.getDispatcher().register(
                 literal("gc")
-                        .then(literal("deletion")
-                                .requires(source -> source.permissions().hasPermission(
-                                        Permissions.COMMANDS_GAMEMASTER))
-                                .then(literal("on")
-                                        .executes(ctx ->
-                                                TardisCommand.setDeletionMode(ctx, true)))
-                                .then(literal("off")
-                                        .executes(ctx ->
-                                                TardisCommand.setDeletionMode(ctx, false))))
                         .then(literal("tardis")
                                 .then(literal("list")
                                         .executes(TardisCommand::listTardis))
+                                .then(literal("deletion")
+                                        .requires(source -> source.permissions().hasPermission(
+                                                Permissions.COMMANDS_GAMEMASTER))
+                                        .then(literal("on")
+                                                .executes(ctx ->
+                                                        TardisCommand.setDeletionMode(ctx, true)))
+                                        .then(literal("off")
+                                                .executes(ctx ->
+                                                        TardisCommand.setDeletionMode(ctx, false))))
                                 .then(literal("controls")
                                         .then(argument("control", StringArgumentType.word())
                                                 .suggests(TardisCommand::suggestControls)

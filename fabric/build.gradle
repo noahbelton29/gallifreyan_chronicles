@@ -105,7 +105,7 @@ dependencies {
     compileOnly("maven.modrinth:sound-physics-remastered:fabric-${sound_physics_version}")
     runtimeOnly("maven.modrinth:sound-physics-remastered:fabric-${sound_physics_version}")
     compileOnly("curse.maven:immersive-portal-1511174:${immersive_portals_fabric_file}")
-//    runtimeOnly("curse.maven:immersive-portal-1511174:${immersive_portals_fabric_file}")
+    runtimeOnly("curse.maven:immersive-portal-1511174:${immersive_portals_fabric_file}")
 //    implementation("foundry.imguimc:imguimc-fabric-${project.minecraft_version}:${project.imguimc_version}")
 //    runtimeOnly("foundry.imguimc:imguimc-fabric-${project.minecraft_version}:${project.imguimc_version}")
 }

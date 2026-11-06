@@ -32,6 +32,7 @@ import qouteall.imm_ptl.core.portal.Portal;
 import qouteall.q_misc_util.dimension.DimensionIntId;
 import qouteall.q_misc_util.my_util.DQuaternion;
 
+import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -69,6 +70,8 @@ public final class TardisPortals {
     private static final Map<UUID, DoorLocation> DOORS = new HashMap<>();
     private static final Map<UUID, Long> LAST_TICKET = new HashMap<>();
     private static final Map<UUID, Long> NEXT_SCAN = new HashMap<>();
+    private static final int FULL_TICK_INTERVAL_TICKS = 10;
+    private static final Set<UUID> HOT = new HashSet<>();
 
     private record DoorLocation(ResourceKey<Level> dimension, BlockPos pos) {
     }
@@ -111,6 +114,7 @@ public final class TardisPortals {
         DOORS.clear();
         LAST_TICKET.clear();
         NEXT_SCAN.clear();
+        HOT.clear();
     }
 
     static void removeTardis(UUID tardisId) {
@@ -119,6 +123,7 @@ public final class TardisPortals {
         DOORS.remove(tardisId);
         LAST_TICKET.remove(tardisId);
         NEXT_SCAN.remove(tardisId);
+        HOT.remove(tardisId);
     }
 
     static void beforeDimensionRemoved(ServerLevel level) {
@@ -173,12 +178,25 @@ public final class TardisPortals {
     }
 
     static void tick(MinecraftServer server) {
-        if (server.getTickCount() % DIMENSION_CHECK_INTERVAL_TICKS == 0 && dimensionIdsMissing(server)) {
+        long now = server.getTickCount();
+        if (now % DIMENSION_CHECK_INTERVAL_TICKS == 0 && dimensionIdsMissing(server)) {
             syncDimensionIds(server);
         }
+        if (now % FULL_TICK_INTERVAL_TICKS == 0) {
+            fullTick(server);
+            return;
+        }
+        for (UUID tardisId : new ArrayList<>(HOT)) {
+            tickTardis(server, tardisId);
+        }
+    }
+
+    private static void fullTick(MinecraftServer server) {
         Set<UUID> ids = new HashSet<>(TardisManager.get(server).getAllIds());
+        HOT.clear();
         for (UUID tardisId : ids) {
             tickTardis(server, tardisId);
+            if (isHot(server, tardisId)) HOT.add(tardisId);
         }
         Iterator<Map.Entry<UUID, Link>> iterator = LINKS.entrySet().iterator();
         while (iterator.hasNext()) {
@@ -193,17 +211,33 @@ public final class TardisPortals {
         NEXT_SCAN.keySet().retainAll(ids);
     }
 
+    private static boolean isHot(MinecraftServer server, UUID tardisId) {
+        Link link = LINKS.get(tardisId);
+        if (link != null && (link.visible || link.hideAt >= 0L || link.exteriorShown || link.interiorShown)) {
+            return true;
+        }
+        Tardis tardis = TardisApi.get(server, tardisId).orElse(null);
+        if (tardis == null) return false;
+        DoorLocation door = DOORS.get(tardisId);
+        return hasPlayersNearby(tardis.exteriorLevel().orElse(null), tardis.exteriorPos().orElse(null),
+                door != null ? server.getLevel(door.dimension()) : null);
+    }
+
+    private static boolean hasPlayersNearby(@Nullable ServerLevel exteriorLevel, @Nullable BlockPos exteriorPos,
+                                            @Nullable ServerLevel interiorLevel) {
+        if (interiorLevel != null && !interiorLevel.players().isEmpty()) return true;
+        return exteriorLevel != null && exteriorPos != null
+                && exteriorLevel.getNearestPlayer(exteriorPos.getX() + 0.5, exteriorPos.getY(), exteriorPos.getZ() + 0.5,
+                EXTERIOR_PLAYER_RANGE, false) != null;
+    }
+
     private static void keepLinkedChunksLoaded(MinecraftServer server, UUID tardisId, Tardis tardis) {
         ServerLevel exteriorLevel = tardis.exteriorLevel().orElse(null);
         BlockPos exteriorPos = tardis.exteriorPos().orElse(null);
         DoorLocation door = DOORS.get(tardisId);
         ServerLevel interiorLevel = door != null ? server.getLevel(door.dimension()) : null;
 
-        boolean playersInside = interiorLevel != null && !interiorLevel.players().isEmpty();
-        boolean playersOutside = exteriorLevel != null && exteriorPos != null
-                && exteriorLevel.getNearestPlayer(exteriorPos.getX() + 0.5, exteriorPos.getY(), exteriorPos.getZ() + 0.5,
-                EXTERIOR_PLAYER_RANGE, false) != null;
-        if (!playersInside && !playersOutside) return;
+        if (!hasPlayersNearby(exteriorLevel, exteriorPos, interiorLevel)) return;
 
         long now = server.getTickCount();
         Long last = LAST_TICKET.get(tardisId);

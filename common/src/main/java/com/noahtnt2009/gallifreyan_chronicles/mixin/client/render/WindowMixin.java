@@ -34,12 +34,12 @@ public abstract class WindowMixin {
     @Unique
     private static final Logger GC_LOG = LogUtils.getLogger();
 
-    @ModifyVariable(method = "createWindow", at = @At("HEAD"), argsOnly = true)
+    @ModifyVariable(method = "createWindow", at = @At("HEAD"), argsOnly = true, name = "title")
     private String gc$initialTitle(String title) {
         return gc$rename(title);
     }
 
-    @ModifyVariable(method = "setTitle", at = @At("HEAD"), argsOnly = true)
+    @ModifyVariable(method = "setTitle", at = @At("HEAD"), argsOnly = true, name = "title")
     private String gc$newTitle(String title) {
         return gc$rename(title);
     }

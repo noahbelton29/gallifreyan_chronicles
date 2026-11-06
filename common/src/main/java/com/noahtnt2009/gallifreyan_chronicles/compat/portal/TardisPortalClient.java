@@ -5,6 +5,13 @@ import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.entity.Entity;
 import qouteall.imm_ptl.core.CHelper;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.IdentityHashMap;
+import java.util.List;
+import java.util.Set;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
 import org.jspecify.annotations.Nullable;
@@ -28,25 +35,55 @@ final class TardisPortalClient {
         return PortalRendering.getRenderingPortal().getDestPos().distanceToSqr(pos) <= range * range;
     }
 
+    private record Scored(Portal portal, double distance) {
+    }
+
+    private static final class Ranking {
+        private final Level level;
+        private final Vec3 camera;
+        private final long tick;
+        private final Set<Portal> scanned = Collections.newSetFromMap(new IdentityHashMap<>());
+        private final Set<Portal> allowed = Collections.newSetFromMap(new IdentityHashMap<>());
+
+        private Ranking(Level level, Vec3 camera, long tick) {
+            this.level = level;
+            this.camera = camera;
+            this.tick = tick;
+        }
+    }
+
+    private static @Nullable Ranking ranking;
+
     static boolean shouldSkipRendering(Object object) {
         if (!(object instanceof Portal portal)) return false;
         if (!TardisPortalBridge.PORTAL_TAG.equals(portal.portalTag)) return false;
+        if (!(portal.level() instanceof ClientLevel level)) return false;
 
         Vec3 camera = CHelper.getCurrentCameraPos();
-        double distance = portal.getDistanceToNearestPointInPortal(camera);
-        if (distance > GCConfig.portalRenderDistance()) return true;
-
-        if (!(portal.level() instanceof ClientLevel level)) return false;
-        int limit = GCConfig.maxRenderedPortals();
-        int closer = 0;
-        for (Entity entity : level.entitiesForRendering()) {
-            if (entity == portal || !(entity instanceof Portal other)) continue;
-            if (!other.isVisible() || !TardisPortalBridge.PORTAL_TAG.equals(other.portalTag)) continue;
-            double otherDistance = other.getDistanceToNearestPointInPortal(camera);
-            if (otherDistance > GCConfig.portalRenderDistance()) continue;
-            if (otherDistance < distance && ++closer >= limit) return true;
+        Ranking current = ranking;
+        if (current == null || current.level != level || current.tick != level.getGameTime()
+                || !current.camera.equals(camera) || !current.scanned.contains(portal)) {
+            current = rank(level, camera);
+            ranking = current;
         }
-        return false;
+        return current.scanned.contains(portal) && !current.allowed.contains(portal);
+    }
+
+    private static Ranking rank(ClientLevel level, Vec3 camera) {
+        Ranking result = new Ranking(level, camera, level.getGameTime());
+        double range = GCConfig.portalRenderDistance();
+        List<Scored> candidates = new ArrayList<>();
+        for (Entity entity : level.entitiesForRendering()) {
+            if (!(entity instanceof Portal portal) || !TardisPortalBridge.PORTAL_TAG.equals(portal.portalTag)) continue;
+            result.scanned.add(portal);
+            if (!portal.isVisible()) continue;
+            double distance = portal.getDistanceToNearestPointInPortal(camera);
+            if (distance <= range) candidates.add(new Scored(portal, distance));
+        }
+        candidates.sort(Comparator.comparingDouble(Scored::distance));
+        int limit = Math.min(GCConfig.maxRenderedPortals(), candidates.size());
+        for (int i = 0; i < limit; i++) result.allowed.add(candidates.get(i).portal());
+        return result;
     }
 
     static void tintPortalForPowerDarkness(Object object) {

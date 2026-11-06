@@ -5,6 +5,7 @@ import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.Identifier;
 import net.minecraft.core.registries.Registries;
 import com.noahtnt2009.gallifreyan_chronicles.compat.portal.TardisPortalBridge;
+import com.noahtnt2009.gallifreyan_chronicles.config.GCConfig;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.core.registries.BuiltInRegistries;
 import com.noahtnt2009.gallifreyan_chronicles.client.sound.OffsetSoundInstance;
@@ -67,6 +68,7 @@ public final class GCClientHooks {
 
     public static void clientTick() {
         Minecraft minecraft = Minecraft.getInstance();
+        GCConfig.flushPending(false);
         BuildExpiry.tick(minecraft);
         ConsoleHumSounds.tick();
         GCMusic.tick(minecraft);

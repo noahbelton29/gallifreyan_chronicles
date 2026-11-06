@@ -43,7 +43,7 @@ public final class GCOptions {
                 GCConfig.modelRenderDistance(),
                 value -> {
                     GCConfig.setModelRenderDistance(value);
-                    GCConfig.save();
+                    GCConfig.saveSoon();
                 });
     }
 
@@ -57,7 +57,7 @@ public final class GCOptions {
                 GCConfig.portalRenderDistance(),
                 value -> {
                     GCConfig.setPortalRenderDistance(value);
-                    GCConfig.save();
+                    GCConfig.saveSoon();
                 });
     }
 
@@ -70,7 +70,7 @@ public final class GCOptions {
                 GCConfig.maxRenderedPortals(),
                 value -> {
                     GCConfig.setMaxRenderedPortals(value);
-                    GCConfig.save();
+                    GCConfig.saveSoon();
                 });
     }
 
@@ -83,7 +83,7 @@ public final class GCOptions {
                 StarDensity.byName(GCConfig.starDensity()),
                 value -> {
                     GCConfig.setStarDensity(value.getSerializedName());
-                    GCConfig.save();
+                    GCConfig.saveSoon();
                 });
     }
 
@@ -96,7 +96,7 @@ public final class GCOptions {
                 initial,
                 value -> {
                     setter.accept(value);
-                    GCConfig.save();
+                    GCConfig.saveSoon();
                 });
     }
 

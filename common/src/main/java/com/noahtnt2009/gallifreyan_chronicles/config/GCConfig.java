@@ -13,6 +13,10 @@ public final class GCConfig {
     public static final String BUILT_IN_EXTERIOR = Constants.MOD_ID + ":first_doctors_exterior";
     public static final String BUILT_IN_CONSOLE = Constants.MOD_ID + ":brachacki_console";
     public static final String BUILT_IN_INTERIOR = Constants.MOD_ID + ":first_doctors_interior";
+    private static final long SAVE_DELAY_NANOS = 1_000_000_000L;
+    private static boolean dirty;
+    private static boolean shutdownHookAdded;
+    private static long dirtyAt;
 
     private static final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
 
@@ -63,7 +67,23 @@ public final class GCConfig {
         save();
     }
 
-    public static void save() {
+    public static synchronized void saveSoon() {
+        if (!shutdownHookAdded) {
+            shutdownHookAdded = true;
+            Runtime.getRuntime().addShutdownHook(new Thread(() -> flushPending(true), "gc-config-save"));
+        }
+        dirty = true;
+        dirtyAt = System.nanoTime();
+    }
+
+    public static synchronized void flushPending(boolean force) {
+        if (!dirty) return;
+        if (!force && System.nanoTime() - dirtyAt < SAVE_DELAY_NANOS) return;
+        save();
+    }
+
+    public static synchronized void save() {
+        dirty = false;
         Path file = configFile();
         try {
             Files.createDirectories(file.getParent());

@@ -41,6 +41,7 @@ public class InteriorDoorBlock extends BaseEntityBlock {
             EnumProperty.create("door_facing", Direction.class, Direction.Plane.HORIZONTAL);
     public static final BooleanProperty FLIPPED = BooleanProperty.create("door_flipped");
     public static final BooleanProperty FLUSH = BooleanProperty.create("door_flush");
+    public static final double WALL_ARRIVAL_SHIFT = 0.013;
     public static final int WIDTH = 2;
     public static final int HEIGHT = 3;
     public static final IntegerProperty PART_X = IntegerProperty.create("part_x", 0, WIDTH - 1);
@@ -100,8 +101,6 @@ public class InteriorDoorBlock extends BaseEntityBlock {
         return facing.getCounterClockWise();
     }
 
-    // a door hung upside down is rolled 180 degrees around its facing axis, so its right side points the other
-    // way and the parts above the master become parts below it
     public static Direction rightDirectionOf(Direction facing, boolean flipped) {
         return flipped ? facing.getClockWise() : facing.getCounterClockWise();
     }
@@ -110,8 +109,6 @@ public class InteriorDoorBlock extends BaseEntityBlock {
         return rightDirectionOf(state.getValue(FACING), isFlipped(state));
     }
 
-    // a door lying flush against a ceiling faces down, its top points the way it is facing and its three
-    // parts run along that direction instead of upwards
     public static Direction upDirectionOf(Direction facing, boolean flipped, boolean flush) {
         if (flush) return facing;
         return flipped ? Direction.DOWN : Direction.UP;
@@ -159,6 +156,23 @@ public class InteriorDoorBlock extends BaseEntityBlock {
     private static BlockPos barrierPos(BlockPos master, Direction facing, boolean flipped, int x, int y) {
         return master.relative(rightDirectionOf(facing, flipped), x).relative(upDirectionOf(facing, flipped, false), y)
                 .relative(facing.getOpposite());
+    }
+
+    public static boolean isBackBlocked(Level level, BlockPos master, BlockState state) {
+        if (isFlush(state)) return false;
+        Direction facing = state.getValue(FACING);
+        boolean flipped = isFlipped(state);
+        for (int x = 0; x < WIDTH; x++) {
+            for (int y = 0; y < HEIGHT; y++) {
+                BlockPos p = barrierPos(master, facing, flipped, x, y);
+                if (level.isOutsideBuildHeight(p)) continue;
+                BlockState existing = level.getBlockState(p);
+                if (existing.is(GCBlocks.INTERIOR_DOOR_BARRIER) || existing.canBeReplaced()) continue;
+                if (existing.getCollisionShape(level, p).isEmpty()) continue;
+                return true;
+            }
+        }
+        return false;
     }
 
     public static void placeBarriers(Level level, BlockPos master, BlockState state) {

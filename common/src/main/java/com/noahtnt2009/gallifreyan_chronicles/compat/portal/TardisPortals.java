@@ -74,28 +74,32 @@ public final class TardisPortals {
     }
 
     private record Placement(ResourceKey<Level> exteriorDimension, BlockPos exteriorPos, float exteriorYaw,
-                             ResourceKey<Level> interiorDimension, BlockPos doorPos, Direction doorFacing, boolean doorFlipped,
-                             boolean doorFlush) {
+                             ResourceKey<Level> interiorDimension, BlockPos doorPos, Direction doorFacing,
+                             boolean doorFlipped,
+                             boolean doorFlush, boolean doorBackBlocked) {
     }
 
     private static final class Link {
         private final Placement placement;
         private final Portal exteriorPortal;
         private final Portal interiorPortal;
+        private final @Nullable Portal arrivalPortal;
         private boolean visible;
         private boolean exteriorShown;
         private boolean interiorShown;
         private long hideAt = -1L;
         private long missingSince = -1L;
 
-        private Link(Placement placement, Portal exteriorPortal, Portal interiorPortal) {
+        private Link(Placement placement, Portal exteriorPortal, Portal interiorPortal, @Nullable Portal arrivalPortal) {
             this.placement = placement;
             this.exteriorPortal = exteriorPortal;
             this.interiorPortal = interiorPortal;
+            this.arrivalPortal = arrivalPortal;
         }
 
         private boolean isAlive() {
-            return !exteriorPortal.isRemoved() && !interiorPortal.isRemoved();
+            return !exteriorPortal.isRemoved() && !interiorPortal.isRemoved()
+                    && (arrivalPortal == null || !arrivalPortal.isRemoved());
         }
     }
 
@@ -214,7 +218,6 @@ public final class TardisPortals {
         }
     }
 
-    /** @return true when the remembered interior door was confirmed destroyed (its chunk is loaded and the door is gone) */
     private static boolean forgetMissingDoor(MinecraftServer server, UUID tardisId) {
         DoorLocation door = DOORS.get(tardisId);
         if (door == null) return false;
@@ -331,20 +334,21 @@ public final class TardisPortals {
         boolean exteriorShown = visible;
         if (exteriorShown != link.exteriorShown) {
             link.exteriorShown = exteriorShown;
-            applyVisibility(link.exteriorPortal, exteriorShown);
+            applyVisibility(link.exteriorPortal, exteriorShown, exteriorShown && link.arrivalPortal == null);
+            if (link.arrivalPortal != null) applyVisibility(link.arrivalPortal, false, exteriorShown);
         }
         boolean interiorShown = visible;
         if (interiorShown != link.interiorShown) {
             link.interiorShown = interiorShown;
-            applyVisibility(link.interiorPortal, interiorShown);
+            applyVisibility(link.interiorPortal, interiorShown, interiorShown);
         }
 
         exterior.setPortalActive(visible);
         TardisPortalBridge.setActive(tardisId, true);
 
         if (now % PURGE_INTERVAL_TICKS == 0) {
-            purgeStrays(link.exteriorPortal, tardisId);
-            purgeStrays(link.interiorPortal, tardisId);
+            purgeStrays(link.exteriorPortal, link.arrivalPortal, tardisId);
+            purgeStrays(link.interiorPortal, null, tardisId);
         }
     }
 
@@ -367,7 +371,8 @@ public final class TardisPortals {
         if (!state.is(GCBlocks.TARDIS_INTERIOR_DOOR) || !InteriorDoorBlock.isMaster(state)) return null;
         return new Placement(exteriorLevel.dimension(), exterior.getBlockPos(), exterior.getYaw(),
                 interiorLevel.dimension(), door.pos(), state.getValue(InteriorDoorBlock.FACING),
-                InteriorDoorBlock.isFlipped(state), InteriorDoorBlock.isFlush(state));
+                InteriorDoorBlock.isFlipped(state), InteriorDoorBlock.isFlush(state),
+                InteriorDoorBlock.isBackBlocked(interiorLevel, door.pos(), state));
     }
 
     private static @Nullable Link spawn(MinecraftServer server, UUID tardisId, Placement placement) {
@@ -388,30 +393,31 @@ public final class TardisPortals {
         double portalZ;
         double viewZ;
         Vec3 interiorPortalOffset;
+        Vec3 arrivalOffset;
         if (flush) {
-            // lying flat against the ceiling, the model's origin is the middle of its bottom edge, tipped so that
-            // its local up runs along the facing direction and its back points at the ceiling
             interiorCenter = Vec3.atBottomCenterOf(placement.doorPos())
                     .add(right.getStepX() * 0.5 - facing.getStepX() * 0.5, FLUSH_DOOR_HEIGHT,
                             right.getStepZ() * 0.5 - facing.getStepZ() * 0.5);
             portalZ = FLUSH_PORTAL_Z;
             viewZ = FLUSH_VIEW_Z;
             interiorPortalOffset = new Vec3(0.0, INTERIOR_PORTAL_OFFSET.y, portalZ);
+            arrivalOffset = interiorPortalOffset;
         } else {
             interiorCenter = Vec3.atBottomCenterOf(placement.doorPos())
                     .add(right.getStepX() * 0.5, 0.0, right.getStepZ() * 0.5);
             portalZ = INTERIOR_PORTAL_OFFSET.z;
             viewZ = INTERIOR_VIEW_Z;
-            // a door hanging from a ceiling has its master block on top, so the doorway mirrors downwards from it
             interiorPortalOffset = flipped ? flipY(INTERIOR_PORTAL_OFFSET) : INTERIOR_PORTAL_OFFSET;
+            double shift = placement.doorBackBlocked() ? InteriorDoorBlock.WALL_ARRIVAL_SHIFT : 0.0;
+            arrivalOffset = new Vec3(interiorPortalOffset.x, interiorPortalOffset.y, interiorPortalOffset.z - shift);
         }
 
         Vec3 origin = exteriorCenter.add(rotate(EXTERIOR_PORTAL_OFFSET, exteriorRotation));
         Vec3 destination = interiorCenter.add(doorOffset(interiorPortalOffset, interiorRotation, flush));
+        Vec3 arrivalDestination = interiorCenter.add(doorOffset(arrivalOffset, interiorRotation, flush));
         Vec3 normal = rotate(new Vec3(0.0, 0.0, -1.0), exteriorRotation);
         Vec3 axisW = UP.cross(normal);
 
-        // portal frames: right, up, normal, with right = up x normal
         Vec3[] exteriorFrame = {axisW, UP, normal};
         Vec3 interiorFront = rotate(new Vec3(0.0, 0.0, -1.0), interiorRotation);
         Vec3[] interiorFrame;
@@ -421,15 +427,27 @@ public final class TardisPortals {
             interiorFrame = frame(UP.scale(flipped ? -1.0 : 1.0), interiorFront);
         }
 
+        DQuaternion exteriorTurn = flipped || flush
+                ? transformation(exteriorFrame, interiorFrame)
+                : DQuaternion.rotationByDegrees(UP, interiorRotation + 180.0 - exteriorRotation);
+
         Portal exteriorPortal = Portal.ENTITY_TYPE.create(exteriorLevel, EntitySpawnReason.TRIGGERED);
         if (exteriorPortal == null) return null;
         exteriorPortal.setOriginPos(origin);
         exteriorPortal.setOrientationAndSize(axisW, UP, PORTAL_WIDTH, PORTAL_HEIGHT);
-        PortalAPI.setPortalTransformation(exteriorPortal, placement.interiorDimension(), destination,
-                flipped || flush
-                        ? transformation(exteriorFrame, interiorFrame)
-                        : DQuaternion.rotationByDegrees(UP, interiorRotation + 180.0 - exteriorRotation), 1.0);
+        PortalAPI.setPortalTransformation(exteriorPortal, placement.interiorDimension(), destination, exteriorTurn, 1.0);
         configure(exteriorPortal, tardisId);
+
+        Portal arrivalPortal = null;
+        if (!arrivalDestination.equals(destination)) {
+            arrivalPortal = Portal.ENTITY_TYPE.create(exteriorLevel, EntitySpawnReason.TRIGGERED);
+            if (arrivalPortal == null) return null;
+            arrivalPortal.setOriginPos(origin);
+            arrivalPortal.setOrientationAndSize(axisW, UP, PORTAL_WIDTH, PORTAL_HEIGHT);
+            PortalAPI.setPortalTransformation(arrivalPortal, placement.interiorDimension(), arrivalDestination,
+                    exteriorTurn, 1.0);
+            configure(arrivalPortal, tardisId);
+        }
 
         Vec3 interiorViewOffset = new Vec3(0.0, interiorPortalOffset.y, viewZ);
         Vec3 exteriorReturnOffset = new Vec3(0.0,
@@ -441,7 +459,6 @@ public final class TardisPortals {
         Portal interiorPortal = Portal.ENTITY_TYPE.create(interiorLevel, EntitySpawnReason.TRIGGERED);
         if (interiorPortal == null) return null;
         interiorPortal.setOriginPos(interiorOrigin);
-        // the portal quad is symmetric, only its centre and normal matter, a hanging door is turned by its transformation
         interiorPortal.setOrientationAndSize(interiorFrame[0], interiorFrame[1], PORTAL_WIDTH, PORTAL_HEIGHT);
         PortalAPI.setPortalTransformation(interiorPortal, placement.exteriorDimension(), interiorDestination,
                 flipped || flush
@@ -449,15 +466,20 @@ public final class TardisPortals {
                         : DQuaternion.rotationByDegrees(UP, exteriorRotation + 180.0 - interiorRotation), 1.0);
         configure(interiorPortal, tardisId);
 
-        purgeNear(exteriorLevel, origin, null, tardisId);
-        purgeNear(interiorLevel, interiorOrigin, null, tardisId);
+        purgeNear(exteriorLevel, origin, null, null, tardisId);
+        purgeNear(interiorLevel, interiorOrigin, null, null, tardisId);
 
         if (!exteriorLevel.addFreshEntity(exteriorPortal)) return null;
-        if (!interiorLevel.addFreshEntity(interiorPortal)) {
+        if (arrivalPortal != null && !exteriorLevel.addFreshEntity(arrivalPortal)) {
             exteriorPortal.discard();
             return null;
         }
-        return new Link(placement, exteriorPortal, interiorPortal);
+        if (!interiorLevel.addFreshEntity(interiorPortal)) {
+            exteriorPortal.discard();
+            if (arrivalPortal != null) arrivalPortal.discard();
+            return null;
+        }
+        return new Link(placement, exteriorPortal, interiorPortal, arrivalPortal);
     }
 
     private static String ownerTag(UUID tardisId) {
@@ -481,27 +503,29 @@ public final class TardisPortals {
         portal.setTeleportable(false);
     }
 
-    private static void applyVisibility(Portal portal, boolean visible) {
+    private static void applyVisibility(Portal portal, boolean visible, boolean teleportable) {
         if (portal.isRemoved()) return;
         portal.setIsVisible(visible);
-        portal.setTeleportable(visible);
+        portal.setTeleportable(teleportable);
         portal.reloadAndSyncToClient();
     }
 
     private static void discard(Link link) {
         if (!link.exteriorPortal.isRemoved()) link.exteriorPortal.discard();
         if (!link.interiorPortal.isRemoved()) link.interiorPortal.discard();
+        if (link.arrivalPortal != null && !link.arrivalPortal.isRemoved()) link.arrivalPortal.discard();
     }
 
-    private static void purgeStrays(Portal keep, UUID tardisId) {
+    private static void purgeStrays(Portal keep, @Nullable Portal alsoKeep, UUID tardisId) {
         if (keep.isRemoved() || !(keep.level() instanceof ServerLevel level)) return;
-        purgeNear(level, keep.getOriginPos(), keep, tardisId);
+        purgeNear(level, keep.getOriginPos(), keep, alsoKeep, tardisId);
     }
 
-    private static void purgeNear(ServerLevel level, Vec3 center, @Nullable Portal keep, UUID tardisId) {
+    private static void purgeNear(ServerLevel level, Vec3 center, @Nullable Portal keep, @Nullable Portal alsoKeep,
+                                  UUID tardisId) {
         AABB area = new AABB(center, center).inflate(PURGE_RADIUS);
         for (Portal stray : level.getEntitiesOfClass(Portal.class, area,
-                portal -> portal != keep && belongsTo(portal, tardisId))) {
+                portal -> portal != keep && portal != alsoKeep && belongsTo(portal, tardisId))) {
             stray.discard();
         }
     }
@@ -510,23 +534,15 @@ public final class TardisPortals {
         return new Vec3(offset.x, 1.0 - offset.y, offset.z);
     }
 
-    // an offset in the door model's own space (x right, y up, z towards the back) as a world offset, a door lying
-    // against the ceiling is first tipped over so its up points along its facing and its back points up
     private static Vec3 doorOffset(Vec3 local, float rotation, boolean flush) {
         Vec3 tipped = flush ? new Vec3(local.x, local.z, -local.y) : local;
         return rotate(tipped, rotation);
     }
 
-    // frame of a portal from its up and its front normal, right = up x normal
     private static Vec3[] frame(Vec3 up, Vec3 normal) {
         return new Vec3[]{up.cross(normal), up, normal};
     }
 
-    /**
-     * The turn a portal applies to what is seen through it. Going in through the source portal's front you come out
-     * of the destination portal's front: normal -> -normal, up -> up, right -> -right. Written for any frames so that
-     * doors that are upside down or lie against a ceiling come out right too. Frames are {right, up, normal}.
-     */
     private static DQuaternion transformation(Vec3[] source, Vec3[] destination) {
         Vec3[] target = {destination[0].scale(-1.0), destination[1], destination[2].scale(-1.0)};
         double[][] m = new double[3][3];
@@ -537,12 +553,11 @@ public final class TardisPortals {
                 for (int j = 0; j < 3; j++) m[i][j] += d[i] * sv[j];
             }
         }
-        double cos = Math.max(-1.0, Math.min(1.0, (m[0][0] + m[1][1] + m[2][2] - 1.0) / 2.0));
+        double cos = Math.clamp((m[0][0] + m[1][1] + m[2][2] - 1.0) / 2.0, -1.0, 1.0);
         double angle = Math.acos(cos);
         if (angle < 1.0e-6) return DQuaternion.rotationByDegrees(UP, 0.0);
         Vec3 axis;
         if (Math.PI - angle < 1.0e-6) {
-            // half turn: the axis is the column of (m + 1) / 2 with the biggest diagonal
             int best = 0;
             for (int i = 1; i < 3; i++) if (m[i][i] > m[best][best]) best = i;
             double x = (m[0][best] + (best == 0 ? 1.0 : 0.0)) / 2.0;

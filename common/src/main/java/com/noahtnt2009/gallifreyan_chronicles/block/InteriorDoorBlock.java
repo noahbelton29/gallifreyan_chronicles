@@ -282,6 +282,12 @@ public class InteriorDoorBlock extends BaseEntityBlock {
     @Override
     protected @NonNull VoxelShape getShape(@NonNull BlockState state, @NonNull BlockGetter level,
                                            @NonNull BlockPos pos, @NonNull CollisionContext context) {
+        // Seen from outside through the exterior's portal: no selection shape, so no outline (and the
+        // targeting ray passes through the door instead of selecting it).
+        if (level instanceof Level l && l.isClientSide()
+                && com.noahtnt2009.gallifreyan_chronicles.client.renderer.RemoteDoorView.isSeenThroughPortal(l)) {
+            return Shapes.empty();
+        }
         if (isFlush(state)) return SHAPE_FLUSH;
         return slab(state.getValue(FACING), depthOf(level, state, pos));
     }

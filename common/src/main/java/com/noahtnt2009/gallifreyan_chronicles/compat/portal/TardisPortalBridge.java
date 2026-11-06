@@ -61,6 +61,18 @@ public final class TardisPortalBridge {
     public static boolean isInteriorDoorAtInAnyTardisLevel(net.minecraft.core.BlockPos pos) {
         return isAvailable() && TardisPortalClient.isInteriorDoorAtInAnyTardisLevel(pos);
     }
+    public static boolean isInDoorFootprintOfAnyTardisPortal(net.minecraft.core.BlockPos pos) {
+        return isAvailable() && TardisPortalClient.isInDoorFootprintOfAnyTardisPortal(pos);
+    }
+
+    public static boolean isDoorBackBlocked(Object portal) {
+        return isAvailable() && TardisPortalClient.isDoorBackBlocked(portal);
+    }
+
+    public static net.minecraft.core.@Nullable BlockPos exteriorBaseOf(Object portal) {
+        return isAvailable() ? TardisPortalClient.exteriorBaseOf(portal) : null;
+    }
+
     public static @Nullable Level clientLevel(ResourceKey<Level> dimension) {
         return isAvailable() ? TardisPortalClient.clientLevel(dimension) : null;
     }

@@ -6,6 +6,7 @@ import com.noahtnt2009.gallifreyan_chronicles.block.TardisBlock;
 import com.noahtnt2009.gallifreyan_chronicles.block.TardisTopBlock;
 import com.noahtnt2009.gallifreyan_chronicles.block.entity.TardisExteriorBlockEntity;
 import com.noahtnt2009.gallifreyan_chronicles.compat.portal.TardisPortalBridge;
+import com.noahtnt2009.gallifreyan_chronicles.init.GCBlocks;
 import net.minecraft.client.Minecraft;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.Level;
@@ -13,9 +14,6 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.phys.Vec3;
 
 public final class OutlineHider {
-
-    private static final boolean ALWAYS_HIDE_TARDIS_EXTERIOR = true;
-
     private OutlineHider() {
     }
 
@@ -26,14 +24,43 @@ public final class OutlineHider {
 
     private static boolean isOpenTardisExterior(Level level, BlockPos pos) {
         Block block = level.getBlockState(pos).getBlock();
-        if (!(block instanceof TardisBlock) && !(block instanceof TardisTopBlock)) return false;
-        if (ALWAYS_HIDE_TARDIS_EXTERIOR) return true;
+
+        if (!(block instanceof TardisBlock) && !(block instanceof TardisTopBlock)) {
+            return false;
+        }
+
         BlockPos base = TardisTopBlock.baseOf(level, pos);
-        return level.getBlockEntity(base) instanceof TardisExteriorBlockEntity tardis
-                && !tardis.areDoorsFullyClosed();
+
+        if (!(level.getBlockEntity(base) instanceof TardisExteriorBlockEntity tardis)) {
+            return false;
+        }
+
+        return !tardis.areDoorsFullyClosed();
+    }
+
+    private static long lastLogMs;
+
+    private static void debugLog(Level level, BlockPos pos, boolean result) {
+        long now = System.currentTimeMillis();
+        if (now - lastLogMs < 500) return;
+        lastLogMs = now;
+        Minecraft mc = Minecraft.getInstance();
+        com.noahtnt2009.gallifreyan_chronicles.Constants.LOG.info(
+                "[OutlineHider] level={} mc.level={} pos={} block={} hide={}",
+                level == null ? "null" : level.dimension().identifier(),
+                mc.level == null ? "null" : mc.level.dimension().identifier(),
+                pos,
+                level == null ? "null" : level.getBlockState(pos).getBlock(),
+                result);
     }
 
     public static boolean shouldHide(Level level, BlockPos pos) {
+        boolean result = shouldHideInner(level, pos);
+        debugLog(level, pos, result);
+        return result;
+    }
+
+    private static boolean shouldHideInner(Level level, BlockPos pos) {
         if (level != null) {
 
             if (isDoorBlock(level.getBlockState(pos).getBlock())) return true;
@@ -53,7 +80,10 @@ public final class OutlineHider {
         if (TardisPortalBridge.isAvailable() && level != null && level.getBlockState(pos).isAir()) return true;
 
 
-        return TardisPortalBridge.isInteriorDoorAtInAnyTardisLevel(pos);
+        if (TardisPortalBridge.isInteriorDoorAtInAnyTardisLevel(pos)) return true;
+
+        // The door may have been replaced by another block; its old footprint must stay outline-free.
+        return TardisPortalBridge.isInDoorFootprintOfAnyTardisPortal(pos);
     }
 
     private static boolean isBeyondReach(BlockPos pos) {

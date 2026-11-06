@@ -130,6 +130,96 @@ final class TardisPortalClient {
         return false;
     }
 
+    // Horizontal / vertical reach (in blocks) from a portal's destination centre that still counts as the
+    // interior door zone: the 2x3 door, its barrier row and the blocks right around them (a re-placed door can sit
+    // a block or two off the old one). Measured to block centres.
+    private static final double DOOR_FOOTPRINT_HORIZONTAL = 2.6;
+    private static final double DOOR_FOOTPRINT_VERTICAL = 3.0;
+
+    /**
+     * Doorway centres seen so far, per TARDIS interior dimension. Immersive Portals draws the outline of the
+     * remote hit while the client level is swapped to the destination dimension, where the entry portal is not
+     * listed, and the portal itself can disappear once the door is replaced. So the centres are remembered
+     * instead of being looked up from the current level.
+     */
+    private static final java.util.Map<ResourceKey<Level>, Set<Vec3>> DOOR_CENTRES = new java.util.HashMap<>();
+
+    private static void rememberDoorCentres(Level playerLevel) {
+        for (Entity entity : ((ClientLevel) playerLevel).entitiesForRendering()) {
+            if (!(entity instanceof Portal portal)) continue;
+            ResourceKey<Level> destDim = portal.getDestDim();
+            var id = destDim.identifier();
+            if (!id.getNamespace().equals(Constants.MOD_ID) || !id.getPath().startsWith("tardis/")) continue;
+            Set<Vec3> centres = DOOR_CENTRES.computeIfAbsent(destDim, k -> new HashSet<>());
+            if (centres.size() > 8) centres.clear();
+            centres.add(portal.getDestPos());
+        }
+    }
+
+    /**
+     * True when {@code pos} lies inside the doorway footprint of a TARDIS interior seen through a portal,
+     * whatever block currently occupies it. This keeps the outline hidden after the interior door (or its
+     * barriers) has been replaced by another block.
+     */
+    static boolean isInDoorFootprintOfAnyTardisPortal(BlockPos pos) {
+        Minecraft mc = Minecraft.getInstance();
+        if (mc.level == null || mc.player == null) {
+            DOOR_CENTRES.clear();
+            return false;
+        }
+        Level playerLevel = mc.player.level();
+        if (playerLevel instanceof ClientLevel) rememberDoorCentres(playerLevel);
+        if (DOOR_CENTRES.isEmpty()) return false;
+
+        double x = pos.getX() + 0.5;
+        double y = pos.getY() + 0.5;
+        double z = pos.getZ() + 0.5;
+        for (var entry : DOOR_CENTRES.entrySet()) {
+            // Standing inside that TARDIS: the door area is ordinary, targetable space.
+            if (entry.getKey().equals(playerLevel.dimension())) continue;
+            for (Vec3 dest : entry.getValue()) {
+                double dx = x - dest.x;
+                double dz = z - dest.z;
+                if (dx * dx + dz * dz <= DOOR_FOOTPRINT_HORIZONTAL * DOOR_FOOTPRINT_HORIZONTAL
+                        && Math.abs(y - dest.y) <= DOOR_FOOTPRINT_VERTICAL) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    /**
+     * True when the interior door behind {@code object} (a Portal) has a block flush against its back. Unknown
+     * (door or level not loaded) counts as not blocked.
+     */
+    static boolean isDoorBackBlocked(Object object) {
+        if (!(object instanceof Portal portal)) return false;
+        Level dest = ClientWorldLoader.peekWorld(portal.getDestDim());
+        if (dest == null) return false;
+        BlockPos center = BlockPos.containing(portal.getDestPos());
+        for (BlockPos p : BlockPos.betweenClosed(center.offset(-2, -3, -2), center.offset(2, 3, 2))) {
+            var state = dest.getBlockState(p);
+            if (state.getBlock() instanceof InteriorDoorBlock && InteriorDoorBlock.isMaster(state)) {
+                return InteriorDoorBlock.isBackBlocked(dest, p.immutable(), state);
+            }
+        }
+        return false;
+    }
+
+    /** Base block of the exterior TARDIS this portal sits in, or null when it cannot be found. */
+    static @Nullable BlockPos exteriorBaseOf(Object object) {
+        if (!(object instanceof Portal portal)) return null;
+        Level level = portal.level();
+        BlockPos at = BlockPos.containing(portal.getOriginPos());
+        for (BlockPos p : new BlockPos[]{at, at.below(), at.above()}) {
+            Block block = level.getBlockState(p).getBlock();
+            if (block instanceof com.noahtnt2009.gallifreyan_chronicles.block.TardisBlock) return p;
+            if (block instanceof com.noahtnt2009.gallifreyan_chronicles.block.TardisTopBlock) return p.below();
+        }
+        return null;
+    }
+
     static void tintPortalForPowerDarkness(Object object) {
         if (!(object instanceof Portal portal)) return;
         if (GCPowerDarkness.shaderPackHandlesDarkness()) return;

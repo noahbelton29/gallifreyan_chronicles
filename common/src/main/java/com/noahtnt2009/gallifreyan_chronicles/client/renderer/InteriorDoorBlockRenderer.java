@@ -1,6 +1,5 @@
 package com.noahtnt2009.gallifreyan_chronicles.client.renderer;
 
-import com.noahtnt2009.gallifreyan_chronicles.config.GCConfig;
 import com.geckolib.constant.dataticket.DataTicket;
 import com.geckolib.renderer.GeoBlockRenderer;
 import net.minecraft.world.phys.Vec3;
@@ -21,6 +20,8 @@ import org.jspecify.annotations.NonNull;
 public class InteriorDoorBlockRenderer extends GeoBlockRenderer<@NotNull InteriorDoorBlockEntity, @NotNull TardisExteriorBlockRenderState> {
     public static final DataTicket<String> VARIANT = DataTicket.create("interior_door_variant", String.class);
     public static final DataTicket<String> TEXTURE_ID = DataTicket.create("interior_door_texture_id", String.class);
+    public static final DataTicket<Boolean> FLIPPED = DataTicket.create("interior_door_flipped", Boolean.class);
+    public static final DataTicket<Boolean> FLUSH = DataTicket.create("interior_door_flush", Boolean.class);
     public static final DataTicket<Float> YAW = DataTicket.create("interior_door_yaw", Float.class);
 
     public InteriorDoorBlockRenderer(BlockEntityRendererProvider.Context context) {
@@ -40,6 +41,8 @@ public class InteriorDoorBlockRenderer extends GeoBlockRenderer<@NotNull Interio
         renderState.addGeckolibData(VARIANT, animatable.getVariant());
         renderState.addGeckolibData(TEXTURE_ID, animatable.getTextureId());
         renderState.addGeckolibData(YAW, animatable.getFacing().toYRot());
+        renderState.addGeckolibData(FLIPPED, animatable.isFlipped());
+        renderState.addGeckolibData(FLUSH, animatable.isFlush());
     }
 
     @Override
@@ -48,10 +51,26 @@ public class InteriorDoorBlockRenderer extends GeoBlockRenderer<@NotNull Interio
 
         Float yawValue = renderPassInfo.renderState().getGeckolibData(YAW);
         float yaw = yawValue != null ? yawValue : 0f;
-        Direction right = InteriorDoorBlock.rightDirectionOf(Direction.fromYRot(yaw));
+        boolean flipped = Boolean.TRUE.equals(renderPassInfo.renderState().getGeckolibData(FLIPPED));
+        boolean flush = Boolean.TRUE.equals(renderPassInfo.renderState().getGeckolibData(FLUSH));
+        Direction facing = Direction.fromYRot(yaw);
+        Direction right = InteriorDoorBlock.rightDirectionOf(facing, flipped);
+
+        if (flush) {
+            renderPassInfo.poseStack().translate(right.getStepX() * 0.5f - facing.getStepX() * 0.5f, 0.75f,
+                    right.getStepZ() * 0.5f - facing.getStepZ() * 0.5f);
+            renderPassInfo.poseStack().rotateDegrees(Axis.YP, TardisExterior.modelRotationDegrees(yaw));
+            renderPassInfo.poseStack().rotateDegrees(Axis.XP, -90f);
+            return;
+        }
 
         renderPassInfo.poseStack().translate(right.getStepX() * 0.5f, 0f, right.getStepZ() * 0.5f);
         renderPassInfo.poseStack().rotateDegrees(Axis.YP, TardisExterior.modelRotationDegrees(yaw));
+        if (flipped) {
+            renderPassInfo.poseStack().translate(0f, -0.5f, 0f);
+            renderPassInfo.poseStack().rotateDegrees(Axis.ZP, 180f);
+            renderPassInfo.poseStack().translate(0f, -1.5f, 0f);
+        }
     }
 
     @Override
@@ -65,10 +84,5 @@ public class InteriorDoorBlockRenderer extends GeoBlockRenderer<@NotNull Interio
     public boolean shouldRender(@NonNull InteriorDoorBlockEntity blockEntity, @NonNull Vec3 cameraPos) {
         if (RenderLevelGuard.isForeign(blockEntity.getLevel())) return false;
         return super.shouldRender(blockEntity, cameraPos);
-    }
-
-    @Override
-    public int getViewDistance() {
-        return GCConfig.modelRenderDistance();
     }
 }

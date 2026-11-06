@@ -152,9 +152,15 @@ public final class TardisInteriorSystem {
             BlockState state = door.getBlockState();
             if (!(state.getBlock() instanceof InteriorDoorBlock)) continue;
             Direction facing = state.getValue(InteriorDoorBlock.FACING);
-            Direction right = InteriorDoorBlock.rightDirectionOf(facing);
+            if (InteriorDoorBlock.isFlush(state)) {
+                if (isUnderFlushDoor(player, door.getBlockPos(), facing)) return true;
+                continue;
+            }
+            boolean flipped = InteriorDoorBlock.isFlipped(state);
+            Direction right = InteriorDoorBlock.rightDirectionOf(facing, flipped);
             Direction back = facing.getOpposite();
-            Vec3 centre = Vec3.atBottomCenterOf(door.getBlockPos())
+            BlockPos bottom = flipped ? door.getBlockPos().below(InteriorDoorBlock.HEIGHT - 1) : door.getBlockPos();
+            Vec3 centre = Vec3.atBottomCenterOf(bottom)
                     .add(right.getStepX() * 0.5, 0.0, right.getStepZ() * 0.5);
             double dx = player.getX() - centre.x;
             double dz = player.getZ() - centre.z;
@@ -168,6 +174,18 @@ public final class TardisInteriorSystem {
             }
         }
         return false;
+    }
+
+    private static boolean isUnderFlushDoor(ServerPlayer player, BlockPos master, Direction facing) {
+        Direction right = InteriorDoorBlock.rightDirectionOf(facing, false);
+        Vec3 centre = Vec3.atBottomCenterOf(master)
+                .add(right.getStepX() * 0.5 + facing.getStepX(), 0.0, right.getStepZ() * 0.5 + facing.getStepZ());
+        double dx = player.getX() - centre.x;
+        double dz = player.getZ() - centre.z;
+        double lateral = dx * right.getStepX() + dz * right.getStepZ();
+        double along = dx * facing.getStepX() + dz * facing.getStepZ();
+        double eye = player.getEyeY() - master.getY();
+        return Math.abs(lateral) <= DOOR_EXIT_HALF_WIDTH && Math.abs(along) <= 1.0 && eye >= 0.3 && eye <= 1.5;
     }
 
     private static void exitInterior(MinecraftServer server, ServerPlayer player, UUID tardisId) {

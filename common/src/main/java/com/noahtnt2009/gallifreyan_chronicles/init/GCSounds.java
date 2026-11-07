@@ -24,6 +24,7 @@ public class GCSounds {
     public static final SoundEvent TARDIS_CLOAK = registerFixedRange("cloak", HEARING_RANGE);
     public static final SoundEvent TARDIS_UNCLOAK = registerFixedRange("uncloak", HEARING_RANGE);
     public static final SoundEvent HARTNELL_DOOR = registerFixedRange("hartnell_door", HEARING_RANGE);
+    public static final SoundEvent STOP_DEMAT = registerFixedRange("stop_demat", HEARING_RANGE);
 
     public static final SoundEvent TITLE_THEME = register("title_theme");
 

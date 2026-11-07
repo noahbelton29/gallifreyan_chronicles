@@ -175,6 +175,14 @@
       }
     ]
   },
+  "stop_demat": {
+    "sounds": [
+      {
+        "name": "gallifreyan_chronicles:block_entity/tardis/stop_demat",
+        "attenuation_distance": 16
+      }
+    ]
+  },
   "title_theme": {
     "sounds": [
       {

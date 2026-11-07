@@ -1,7 +1,9 @@
 package com.noahtnt2009.gallifreyan_chronicles.tardis.control.impl;
 
 import com.noahtnt2009.gallifreyan_chronicles.sound.TimedSounds;
+
 import java.util.Optional;
+
 import net.minecraft.core.BlockPos;
 import com.noahtnt2009.gallifreyan_chronicles.tardis.api.TardisEvents;
 import com.noahtnt2009.gallifreyan_chronicles.tardis.api.TardisApi;
@@ -26,6 +28,7 @@ import net.minecraft.network.protocol.game.ClientboundStopSoundPacket;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
@@ -34,8 +37,10 @@ import net.minecraft.world.phys.Vec3;
 import org.jspecify.annotations.Nullable;
 
 import java.util.HashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
 
 public class FlightLeverControl extends BaseControl {
@@ -44,8 +49,13 @@ public class FlightLeverControl extends BaseControl {
     public static final MapCodec<FlightLeverControl> CODEC = codec(DEFAULT_ANIMATIONS,
             FlightLeverControl::new);
 
-    public FlightLeverControl() { this(DEFAULT_ANIMATIONS); }
-    public FlightLeverControl(ControlAnimations animations) { super(animations); }
+    public FlightLeverControl() {
+        this(DEFAULT_ANIMATIONS);
+    }
+
+    public FlightLeverControl(ControlAnimations animations) {
+        super(animations);
+    }
 
     private static final float VWORP_VOLUME = 0.35F;
     private static final int TAKEOFF_SOUND_DELAY_TICKS = 0;
@@ -56,6 +66,7 @@ public class FlightLeverControl extends BaseControl {
     private static final int QUEUED_TAKEOFF_POLL_TICKS = 2;
     private static final int LAND_FADE_DELAY_TICKS = 130;
     private static final int LAND_SOUND_LENGTH_TICKS = 393;
+    private static final int ABORT_FADE_IN_TICKS = 30;
 
     public static void resetState() {
         QUEUED_TAKEOFFS.clear();
@@ -220,15 +231,63 @@ public class FlightLeverControl extends BaseControl {
     }
 
     private static void stopVworp(ServerLevel level) {
-        TimedSounds.stop(level, GCSounds.TARDIS_VWORP);
-        ClientboundStopSoundPacket packet = new ClientboundStopSoundPacket(GCSounds.TARDIS_VWORP.location(), SoundSource.BLOCKS);
+        stopSound(level, GCSounds.TARDIS_VWORP);
+    }
+
+    private static void stopSound(ServerLevel level, SoundEvent sound) {
+        TimedSounds.stop(level, sound);
+        ClientboundStopSoundPacket packet = new ClientboundStopSoundPacket(sound.location(), SoundSource.BLOCKS);
         for (ServerPlayer player : level.players()) {
             player.connection.send(packet);
         }
     }
 
+    public static boolean abortTakeoff(TardisConsoleBlockEntity console) {
+        if (!(console.getLevel() instanceof ServerLevel level)) return false;
+        Optional<Tardis> tardis = tardis(console);
+        TardisExteriorBlockEntity exterior = tardis.flatMap(Tardis::exterior).orElse(null);
+        if (exterior == null || exterior.getFlightState() != TardisFlightState.TAKING_OFF) return false;
+
+        QUEUED_TAKEOFFS.remove(tardis.get().id());
+        List<TardisConsoleBlockEntity> consoles = ConsoleSyncSystem.liveConsolesWith(console);
+
+        Set<ServerLevel> levels = new LinkedHashSet<>();
+        levels.add(level);
+        for (TardisConsoleBlockEntity each : consoles) {
+            if (each.getLevel() instanceof ServerLevel eachLevel) levels.add(eachLevel);
+        }
+        if (exterior.getLevel() instanceof ServerLevel exteriorLevel) levels.add(exteriorLevel);
+        for (ServerLevel each : levels) {
+            stopSound(each, GCSounds.TARDIS_TAKEOFF);
+            stopSound(each, GCSounds.TARDIS_VWORP);
+        }
+
+        playEverywhere(console, level, GCSounds.STOP_DEMAT);
+        exterior.abortTakeoff(ABORT_FADE_IN_TICKS);
+
+        for (TardisConsoleBlockEntity each : consoles) {
+            each.setControlActivated(ID, false);
+            each.triggerRotorAnimation("rotor_idle");
+        }
+
+        GCScheduler.runLater(level.getServer(), ABORT_FADE_IN_TICKS, () -> {
+            List<TardisConsoleBlockEntity> live = ConsoleSyncSystem.liveConsolesWith(console);
+            if (live.isEmpty() || live.stream().anyMatch(each -> each.getControlState(ID))) return;
+
+            for (TardisConsoleBlockEntity each : live) {
+                if (!(each.getLevel() instanceof ServerLevel eachLevel)) continue;
+                playAt(eachLevel, each.getBlockPos(), GCSounds.TARDIS_DRUM, 1.0F);
+                TardisDrumShakePayload.broadcast(eachLevel, Vec3.atCenterOf(each.getBlockPos()), 1.0F);
+            }
+            playAtExterior(console, level, GCSounds.TARDIS_DRUM);
+        });
+        return true;
+    }
+
     @Override
-    public MapCodec<FlightLeverControl> codec() { return CODEC; }
+    public MapCodec<FlightLeverControl> codec() {
+        return CODEC;
+    }
 
     @Override
     public void onStateChanged(TardisConsoleBlockEntity console, boolean activated) {

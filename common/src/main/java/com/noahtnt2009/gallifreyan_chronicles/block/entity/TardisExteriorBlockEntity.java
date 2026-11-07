@@ -307,7 +307,7 @@ public class TardisExteriorBlockEntity extends BlockEntity implements GeoBlockEn
     @SuppressWarnings({"unchecked", "rawtypes"})
     public void copyStateFrom(TardisExteriorBlockEntity other) {
         for (ComponentType<?> type : TardisComponentTypes.ALL) {
-            com.noahtnt2009.gallifreyan_chronicles.ecs.Component value = other.components.getOrNull((ComponentType) type);
+            Component value = other.components.getOrNull((ComponentType) type);
             if (value != null) {
                 components.set((ComponentType) type, value);
             }
@@ -394,6 +394,15 @@ public class TardisExteriorBlockEntity extends BlockEntity implements GeoBlockEn
     public void scheduleLanding(int delayTicks) {
         if (level == null || level.isClientSide()) return;
         if (flight.scheduleLanding(level.getGameTime(), delayTicks)) setChanged();
+    }
+
+    public void abortTakeoff(int fadeInTicks) {
+        if (level == null || level.isClientSide()) return;
+        flight.cancelLanding();
+        flight.setQuickFadeIn(fadeInTicks);
+        setInFlight(false);
+        setFlightState(TardisFlightState.LANDING, fadeInTicks);
+        sync();
     }
 
     public void cancelLanding() {

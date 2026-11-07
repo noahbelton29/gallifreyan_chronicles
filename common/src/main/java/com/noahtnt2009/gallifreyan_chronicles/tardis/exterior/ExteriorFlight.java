@@ -9,6 +9,7 @@ import net.minecraft.world.level.storage.ValueOutput;
 
 public final class ExteriorFlight {
     private static final long NO_FADE_START_TICK = Long.MIN_VALUE / 4;
+    private static final float QUICK_FADE_PULSE_DEPTH = 0.65f;
 
     private boolean inFlight = false;
     private long fadeStartTick = NO_FADE_START_TICK;
@@ -17,6 +18,7 @@ public final class ExteriorFlight {
     private int seenFadeGeneration = -1;
     private TardisFlightState state = TardisFlightState.IDLE;
     private long stateEndTick = 0L;
+    private int quickFadeInTicks = 0;
 
     public boolean inFlight() {
         return inFlight;
@@ -35,7 +37,12 @@ public final class ExteriorFlight {
     }
 
     public long duration() {
-        return inFlight ? fadeType.timing().fadeOutTicks() : fadeType.timing().fadeInTicks();
+        if (inFlight) return fadeType.timing().fadeOutTicks();
+        return quickFadeInTicks > 0 ? quickFadeInTicks : fadeType.timing().fadeInTicks();
+    }
+
+    public void setQuickFadeIn(int ticks) {
+        this.quickFadeInTicks = Math.max(0, ticks);
     }
 
     public boolean isFullyInvisible(long now) {
@@ -51,12 +58,18 @@ public final class ExteriorFlight {
         float progress = Math.clamp(elapsed / duration(), 0.0f, 1.0f);
         if (progress >= 1.0f) return restingOpacity();
 
+        if (!inFlight && quickFadeInTicks > 0) {
+            float dip = (float) Math.sin(Math.PI * progress);
+            return progress * (1.0f - QUICK_FADE_PULSE_DEPTH * dip * dip);
+        }
+
         float gone = inFlight ? progress : 1.0f - progress;
         return fadeType.opacity(gone, elapsed);
     }
 
     public boolean setInFlight(boolean inFlight, long now) {
         if (this.inFlight == inFlight) return false;
+        if (inFlight) this.quickFadeInTicks = 0;
 
         float oldProgress = Math.clamp((now - fadeStartTick) / (float) duration(), 0.0f, 1.0f);
         float gone = this.inFlight ? oldProgress : 1.0f - oldProgress;
@@ -129,6 +142,7 @@ public final class ExteriorFlight {
         this.landAtTick = other.landAtTick;
         this.state = other.state;
         this.stateEndTick = other.stateEndTick;
+        this.quickFadeInTicks = other.quickFadeInTicks;
         this.fadeType = other.fadeType;
     }
 
@@ -138,6 +152,7 @@ public final class ExteriorFlight {
         output.putLong("LandAtTick", landAtTick);
         output.putString("FlightState", state.name());
         output.putLong("FlightStateEnd", stateEndTick);
+        output.putInt("QuickFadeIn", quickFadeInTicks);
         output.putString("FadeType", fadeType.id());
         output.store("Fade", FadeTypeKinds.CODEC, fadeType);
     }
@@ -149,6 +164,7 @@ public final class ExteriorFlight {
         state = TardisFlightState.parse(input.getStringOr("FlightState", ""),
                 inFlight ? TardisFlightState.IN_VORTEX : TardisFlightState.IDLE);
         stateEndTick = input.getLongOr("FlightStateEnd", 0L);
+        quickFadeInTicks = input.getIntOr("QuickFadeIn", 0);
         String fadeId = input.getStringOr("FadeType", FadeTypes.DEFAULT.id());
         fadeType = input.read("Fade", FadeTypeKinds.CODEC)
                 .map(fade -> fade.withId(fadeId))

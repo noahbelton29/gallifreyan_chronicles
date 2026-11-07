@@ -25,6 +25,7 @@ public class GCTardisControls {
     public static final String ISOMORPHIC_CONTROL = "isomorphic_control";
     public static final String DIRECTION_CONTROL = "direction_control";
     public static final String CLOAK_CONTROL = "cloak_control";
+    public static final String INTERIOR_DOOR_CONTROL = "interior_door_control";
 
     public static void registerTardisControls() {
         TardisControlTypes.register(NOOP_CONTROL, NoopControl.CODEC);
@@ -41,6 +42,7 @@ public class GCTardisControls {
         control(ISOMORPHIC_CONTROL, IsomorphicControl.CODEC, new IsomorphicControl());
         control(DIRECTION_CONTROL, DirectionControl.CODEC, new DirectionControl());
         control(CLOAK_CONTROL, CloakControl.CODEC, new CloakControl());
+        control(INTERIOR_DOOR_CONTROL, InteriorDoorControl.CODEC, new InteriorDoorControl());
 
         verifyCodecs();
         ControlPower.validate();

@@ -13,16 +13,16 @@
 			"bones": [
 				{
 					"name": "left_door",
-					"pivot": [16, 24, 0],
+					"pivot": [16, 24, -8],
 					"cubes": [
-						{"origin": [16, 0, -4], "size": [16, 48, 8], "pivot": [16, 24, 0], "rotation": [0, 180, 0], "uv": [0, 0]}
+						{"origin": [16, 0, 0], "size": [16, 48, 8], "pivot": [16, 24, 0], "rotation": [0, 180, 0], "uv": [0, 0]}
 					]
 				},
 				{
 					"name": "right_door",
-					"pivot": [-16, 24, 0],
+					"pivot": [-16, 24, -8],
 					"cubes": [
-						{"origin": [-32, 0, -4], "size": [16, 48, 8], "pivot": [-16, 24, 0], "rotation": [0, 180, 0], "uv": [48, 0]}
+						{"origin": [-32, 0, -8], "size": [16, 48, 8], "pivot": [-16, 24, -4], "rotation": [0, 180, 0], "uv": [48, 0]}
 					]
 				}
 			]

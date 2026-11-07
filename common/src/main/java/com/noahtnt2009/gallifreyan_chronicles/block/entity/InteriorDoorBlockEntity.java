@@ -1,6 +1,7 @@
 package com.noahtnt2009.gallifreyan_chronicles.block.entity;
 
 import java.util.Optional;
+
 import com.noahtnt2009.gallifreyan_chronicles.tardis.api.TardisApi;
 import com.noahtnt2009.gallifreyan_chronicles.tardis.api.Tardis;
 import com.geckolib.animatable.GeoBlockEntity;
@@ -36,6 +37,8 @@ import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.resources.Identifier;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.level.Level;
@@ -74,6 +77,8 @@ public class InteriorDoorBlockEntity extends BlockEntity implements GeoBlockEnti
     private static final double EXIT_FAR = 0.5;
     private static final double EXIT_HALF_WIDTH = 1.0;
     private static final double EXIT_BOTTOM = -0.5;
+
+    private boolean primary;
 
     public InteriorDoorBlockEntity(BlockPos pos, BlockState state) {
         super(TYPE.get(), pos, state);
@@ -126,6 +131,16 @@ public class InteriorDoorBlockEntity extends BlockEntity implements GeoBlockEnti
         asEntity().set(TardisComponentTypes.DOOR_VARIANT, new DoorVariantComponent(resolved));
     }
 
+    public boolean isPrimary() {
+        return primary;
+    }
+
+    public void setPrimary(boolean primary) {
+        if (this.primary == primary) return;
+        this.primary = primary;
+        sync();
+    }
+
     public String getTextureId() {
         return TardisDoorRegistry.textureIdFor(getVariant(), getDoorVariantId());
     }
@@ -173,13 +188,18 @@ public class InteriorDoorBlockEntity extends BlockEntity implements GeoBlockEnti
         if (!(level instanceof ServerLevel serverLevel)) return;
         if (!pulledFromExterior) {
             pulledFromExterior = true;
-            if (!isLinked()) return;
+            if (!isLinked()) {
+                if (!primary) return;
+                tardisId = TardisApi.idOfLevel(serverLevel).orElse(null);
+                if (tardisId != null) DoorSyncSystem.register(tardisId, this);
+                return;
+            }
             InteriorDoorBlock.placeBarriers(serverLevel, getBlockPos(), getBlockState());
             tardisId = TardisApi.idOfLevel(serverLevel).orElse(null);
             if (tardisId == null) return;
             DoorSyncSystem.register(tardisId, this);
             applyInteriorDoorVariant(serverLevel);
-            DoorSyncSystem.pullFromExterior(serverLevel.getServer(), tardisId, this);
+            if (!primary) DoorSyncSystem.pullFromExterior(serverLevel.getServer(), tardisId, this);
         }
         tickExit(serverLevel);
     }
@@ -193,6 +213,7 @@ public class InteriorDoorBlockEntity extends BlockEntity implements GeoBlockEnti
         MinecraftServer server = serverLevel.getServer();
         Tardis tardis = TardisApi.get(server, tardisId).orElse(null);
         if (tardis == null || tardis.isTravelling()) return;
+        if (primary && tardis.exterior().map(e -> e.getDoorState().isClosed()).orElse(true)) return;
 
         for (ServerPlayer player : List.copyOf(serverLevel.players())) {
             if (player.isSpectator()) continue;
@@ -266,7 +287,7 @@ public class InteriorDoorBlockEntity extends BlockEntity implements GeoBlockEnti
             return;
         }
         DoorSystem.InteractionResult result =
-                DoorSystem.interact(asEntity(), sneaking, System.currentTimeMillis());
+                DoorSystem.interact(asEntity(), sneaking, System.currentTimeMillis(), openAllOnly());
         if (result.hasNoAnimation()) return;
         if (controller != null) {
             controller.setAnimationSpeed(1.0);
@@ -276,12 +297,24 @@ public class InteriorDoorBlockEntity extends BlockEntity implements GeoBlockEnti
         sync();
 
         if (tardisId != null && level instanceof ServerLevel serverLevel) {
-            DoorSyncSystem.onInteriorDoorChanged(serverLevel.getServer(), tardisId, this,
-                    result.state(), result.animationName(), result.opening());
+            if (primary) {
+                DoorSyncSystem.syncInteriorDoorControl(serverLevel.getServer(), tardisId, result.state());
+            } else {
+                DoorSyncSystem.onInteriorDoorChanged(serverLevel.getServer(), tardisId, this,
+                        result.state(), result.animationName(), result.opening());
+            }
         }
     }
 
     public void applySyncedDoor(DoorState state, String animation, boolean opening) {
+        if (primary) return;
+        if (openAllOnly()) {
+            boolean open = !state.isClosed();
+            if (open != getDoorState().isClosed()) return;
+            state = open ? DoorState.BOTH_OPEN : DoorState.CLOSED;
+            animation = open ? "open_all" : "close_all";
+            opening = open;
+        }
         DoorSystem.applyRemoteDoorState(asEntity(), state, opening, System.currentTimeMillis());
         if (controller != null) {
             controller.setAnimationSpeed(1.0);
@@ -322,6 +355,7 @@ public class InteriorDoorBlockEntity extends BlockEntity implements GeoBlockEnti
     }
 
     public void snapTo(DoorState state) {
+        if (openAllOnly() && !state.isClosed()) state = DoorState.BOTH_OPEN;
         if (getDoorState() == state) return;
         DoorSystem.snapToState(asEntity(), state);
         playDoorAnimation(animationFor(state));
@@ -356,9 +390,27 @@ public class InteriorDoorBlockEntity extends BlockEntity implements GeoBlockEnti
 
     private void playDoorSound(boolean opening) {
         if (level == null) return;
-        SoundEvent sound = opening ? GCSounds.TARDIS_DOOR_OPEN : GCSounds.TARDIS_DOOR_CLOSE;
+        SoundEvent sound = doorSound(opening);
         level.playSound(null, getBlockPos(), sound, SoundSource.BLOCKS, 1.0f, 1.0f);
         level.playSound(null, soundPos(), sound, SoundSource.BLOCKS, 1.0f, 1.0f);
+    }
+
+    private boolean openAllOnly() {
+        TardisDoorVariant variant = TardisDoorRegistry.resolve(getVariant(), getDoorVariantId());
+        return variant != null && variant.openAllOnly();
+    }
+
+    private SoundEvent doorSound(boolean opening) {
+        SoundEvent fallback = opening ? GCSounds.TARDIS_DOOR_OPEN : GCSounds.TARDIS_DOOR_CLOSE;
+        TardisDoorVariant variant = TardisDoorRegistry.resolve(getVariant(), getDoorVariantId());
+        if (variant == null) return fallback;
+
+        String configured = opening ? variant.openSound() : variant.closeSound();
+        if (configured.isEmpty()) return fallback;
+
+        Identifier id = Identifier.tryParse(configured);
+        if (id == null) return fallback;
+        return BuiltInRegistries.SOUND_EVENT.getOptional(id).orElseGet(() -> SoundEvent.createVariableRangeEvent(id));
     }
 
     private void playLockSound(boolean locked) {
@@ -377,7 +429,8 @@ public class InteriorDoorBlockEntity extends BlockEntity implements GeoBlockEnti
                 if (controller != null) {
                     controller.setAnimationSpeed(1.0);
                 }
-            } catch (InterruptedException ignored) {}
+            } catch (InterruptedException ignored) {
+            }
         }).start();
     }
 
@@ -394,12 +447,14 @@ public class InteriorDoorBlockEntity extends BlockEntity implements GeoBlockEnti
         components.save(output, SAVED);
         output.putInt("DoorAnimSeq", doorAnimSeq);
         output.putString("DoorAnim", doorAnim);
+        output.putBoolean("Primary", primary);
     }
 
     @Override
     public void loadAdditional(@NonNull ValueInput input) {
         super.loadAdditional(input);
         components.load(input, SAVED);
+        primary = input.getBooleanOr("Primary", false);
         int animSeq = input.getIntOr("DoorAnimSeq", 0);
         String anim = input.getStringOr("DoorAnim", "");
         if (doorAnimSeqKnown && animSeq != doorAnimSeq && !anim.isEmpty()

@@ -37,6 +37,13 @@ public final class DoorSystem {
     }
 
     public static InteractionResult interact(Entity entity, boolean sneaking, long now) {
+        return interact(entity, sneaking, now, false);
+    }
+
+    /**
+     * @param openAllOnly a door with no left/right panels: every click just toggles closed and fully open
+     */
+    public static InteractionResult interact(Entity entity, boolean sneaking, long now, boolean openAllOnly) {
         DoorComponent door = entity.get(TardisComponentTypes.DOOR);
         if (door.isAnimating(now)) {
             return new InteractionResult(null, false, door.state());
@@ -48,7 +55,19 @@ public final class DoorSystem {
         long duration;
         boolean opening;
 
-        if (sneaking) {
+        if (openAllOnly) {
+            if (current == DoorState.CLOSED) {
+                next = DoorState.BOTH_OPEN;
+                animation = "open_all";
+                duration = OPEN_DURATION_MS;
+                opening = true;
+            } else {
+                next = DoorState.CLOSED;
+                animation = "close_all";
+                duration = CLOSE_DURATION_MS;
+                opening = false;
+            }
+        } else if (sneaking) {
             switch (current) {
                 case CLOSED -> {
                     next = DoorState.BOTH_OPEN;

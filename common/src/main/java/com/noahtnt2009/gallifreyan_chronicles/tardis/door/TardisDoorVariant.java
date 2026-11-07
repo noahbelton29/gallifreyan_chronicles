@@ -7,7 +7,9 @@ import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
 
-public record TardisDoorVariant(String id, String parent, String texture, boolean isDefault, boolean interior, String exterior)
+public record TardisDoorVariant(String id, String parent, String texture, boolean isDefault, boolean interior,
+                                String exterior,
+                                String openSound, String closeSound, boolean openAllOnly)
         implements IdentifiableData<TardisDoorVariant> {
 
     public static final Codec<TardisDoorVariant> CODEC = RecordCodecBuilder.create(inst -> inst.group(
@@ -16,17 +18,35 @@ public record TardisDoorVariant(String id, String parent, String texture, boolea
             Codec.STRING.fieldOf("texture").forGetter(TardisDoorVariant::texture),
             Codec.BOOL.optionalFieldOf("default", false).forGetter(TardisDoorVariant::isDefault),
             Codec.BOOL.optionalFieldOf("interior", false).forGetter(TardisDoorVariant::interior),
-            Codec.STRING.optionalFieldOf("exterior", "").forGetter(TardisDoorVariant::exterior)
+            Codec.STRING.optionalFieldOf("exterior", "").forGetter(TardisDoorVariant::exterior),
+            Codec.STRING.optionalFieldOf("open_sound", "").forGetter(TardisDoorVariant::openSound),
+            Codec.STRING.optionalFieldOf("close_sound", "").forGetter(TardisDoorVariant::closeSound),
+            Codec.BOOL.optionalFieldOf("open_all_only", false).forGetter(TardisDoorVariant::openAllOnly)
     ).apply(inst, TardisDoorVariant::new));
 
-    public static final StreamCodec<FriendlyByteBuf, TardisDoorVariant> STREAM_CODEC = StreamCodec.composite(
-            ByteBufCodecs.STRING_UTF8, TardisDoorVariant::id,
-            ByteBufCodecs.STRING_UTF8, TardisDoorVariant::parent,
-            ByteBufCodecs.STRING_UTF8, TardisDoorVariant::texture,
-            ByteBufCodecs.BOOL, TardisDoorVariant::isDefault,
-            ByteBufCodecs.BOOL, TardisDoorVariant::interior,
-            ByteBufCodecs.STRING_UTF8, TardisDoorVariant::exterior,
-            TardisDoorVariant::new
+    public static final StreamCodec<FriendlyByteBuf, TardisDoorVariant> STREAM_CODEC = StreamCodec.of(
+            (buf, v) -> {
+                ByteBufCodecs.STRING_UTF8.encode(buf, v.id());
+                ByteBufCodecs.STRING_UTF8.encode(buf, v.parent());
+                ByteBufCodecs.STRING_UTF8.encode(buf, v.texture());
+                ByteBufCodecs.BOOL.encode(buf, v.isDefault());
+                ByteBufCodecs.BOOL.encode(buf, v.interior());
+                ByteBufCodecs.STRING_UTF8.encode(buf, v.exterior());
+                ByteBufCodecs.STRING_UTF8.encode(buf, v.openSound());
+                ByteBufCodecs.STRING_UTF8.encode(buf, v.closeSound());
+                ByteBufCodecs.BOOL.encode(buf, v.openAllOnly());
+            },
+            buf -> new TardisDoorVariant(
+                    ByteBufCodecs.STRING_UTF8.decode(buf),
+                    ByteBufCodecs.STRING_UTF8.decode(buf),
+                    ByteBufCodecs.STRING_UTF8.decode(buf),
+                    ByteBufCodecs.BOOL.decode(buf),
+                    ByteBufCodecs.BOOL.decode(buf),
+                    ByteBufCodecs.STRING_UTF8.decode(buf),
+                    ByteBufCodecs.STRING_UTF8.decode(buf),
+                    ByteBufCodecs.STRING_UTF8.decode(buf),
+                    ByteBufCodecs.BOOL.decode(buf)
+            )
     );
 
     public String localId() {
@@ -36,6 +56,6 @@ public record TardisDoorVariant(String id, String parent, String texture, boolea
 
     @Override
     public TardisDoorVariant withId(String id) {
-        return new TardisDoorVariant(id, parent, texture, isDefault, interior, exterior);
+        return new TardisDoorVariant(id, parent, texture, isDefault, interior, exterior, openSound, closeSound, openAllOnly);
     }
 }

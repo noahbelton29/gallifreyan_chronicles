@@ -1,7 +1,10 @@
 {
   "variants": {
-    "": {
-      "model": "gallifreyan_chronicles:block/tardis"
+    "in_flight=false": {
+      "model": "gallifreyan_chronicles:block/tardis_base"
+    },
+    "in_flight=true": {
+      "model": "gallifreyan_chronicles:block/tardis_flying"
     }
   }
 }

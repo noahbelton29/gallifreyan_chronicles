@@ -54,6 +54,17 @@ public final class DoorSyncSystem {
         return live;
     }
 
+    public static @Nullable InteriorDoorBlockEntity primaryDoor(UUID tardisId) {
+        for (InteriorDoorBlockEntity door : doorsOf(tardisId)) {
+            if (door.isPrimary()) return door;
+        }
+        return null;
+    }
+
+    public static void syncInteriorDoorControl(MinecraftServer server, UUID tardisId, DoorState state) {
+        applyControl(server, tardisId, GCTardisControls.INTERIOR_DOOR_CONTROL, !state.isClosed(), false);
+    }
+
     public static void onExteriorDoorChanged(MinecraftServer server, UUID tardisId, DoorState state,
                                        String animation, boolean opening) {
         for (InteriorDoorBlockEntity door : doorsOf(tardisId)) {
@@ -132,6 +143,10 @@ public final class DoorSyncSystem {
         if (exterior == null) return;
         applyDoorControl(server, tardisId, exterior.getDoorState(), true);
         applyLockControl(server, tardisId, exterior.isLocked(), true);
+        InteriorDoorBlockEntity primary = primaryDoor(tardisId);
+        if (primary != null) {
+            applyControl(server, tardisId, GCTardisControls.INTERIOR_DOOR_CONTROL, !primary.getDoorState().isClosed(), true);
+        }
     }
 
     public static void pullFromExterior(MinecraftServer server, UUID tardisId, InteriorDoorBlockEntity door) {

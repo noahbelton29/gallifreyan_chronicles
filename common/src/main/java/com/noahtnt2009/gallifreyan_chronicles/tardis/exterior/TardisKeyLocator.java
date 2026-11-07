@@ -34,6 +34,7 @@ public final class TardisKeyLocator {
     private static final int COLOR = 0xFFFFFFFF;
     private static final ResourceKey<WaypointStyleAsset> FIRST_DOCTORS_STYLE = style("tardis");
     private static final ResourceKey<WaypointStyleAsset> SECOND_DOCTORS_STYLE = style("second_doctors_tardis");
+    private static final ResourceKey<WaypointStyleAsset> TUAT_STYLE = style("tuat_tardis");
     private static final Map<ServerPlayer, Map<UUID, Tracked>> TRACKED = new WeakHashMap<>();
 
     private record Tracked(UUID tardisId, BlockPos pos, ResourceKey<Level> dimension,
@@ -153,9 +154,9 @@ public final class TardisKeyLocator {
         if (exteriorId == null) {
             exteriorId = TardisInteriorRegistry.get(manager.getInteriorId(tardisId)).resolveExteriorId();
         }
-        return exteriorId != null && exteriorId.endsWith("second_doctors_exterior")
-                ? SECOND_DOCTORS_STYLE
-                : FIRST_DOCTORS_STYLE;
+        if (exteriorId != null && exteriorId.endsWith("second_doctors_exterior")) return SECOND_DOCTORS_STYLE;
+        if (exteriorId != null && exteriorId.endsWith("tuat_exterior")) return TUAT_STYLE;
+        return FIRST_DOCTORS_STYLE;
     }
 
     private static ResourceKey<WaypointStyleAsset> style(String name) {

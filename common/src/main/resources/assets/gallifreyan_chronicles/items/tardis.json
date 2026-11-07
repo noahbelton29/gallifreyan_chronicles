@@ -15,6 +15,13 @@
           "model": "gallifreyan_chronicles:item/second_doctors_tardis"
         },
         "when": "gallifreyan_chronicles:second_doctors_exterior"
+      },
+      {
+        "model": {
+          "type": "minecraft:model",
+          "model": "gallifreyan_chronicles:item/tuat_tardis"
+        },
+        "when": "gallifreyan_chronicles:tuat_exterior"
       }
     ],
     "fallback": {

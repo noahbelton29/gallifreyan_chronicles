@@ -79,6 +79,7 @@ public class GCLanguageProvider extends LanguageProvider {
         add("door_type.gallifreyan_chronicles.tuat_door", "TUAT Door");
         add("door_type.gallifreyan_chronicles.first_doctors_interior_doors", "First Doctor's Interior Doors");
         add("door_type.gallifreyan_chronicles.second_doctors_interior_doors", "Second Doctor's Interior Doors");
+        add("door_type.gallifreyan_chronicles.tuat_interior_doors", "TUAT Interior Doors");
         add("tooltip.gallifreyan_chronicles.scroll", "Scroll to change");
         add("tooltip.gallifreyan_chronicles.key.linked", "Linked to TARDIS ID");
         add("tooltip.gallifreyan_chronicles.key.unlinked", "Not linked to a TARDIS");

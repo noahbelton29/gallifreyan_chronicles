@@ -15,6 +15,13 @@
           "model": "gallifreyan_chronicles:item/interior_door/second_doctors_interior_doors"
         },
         "when": "second_doctors_interior_doors"
+      },
+      {
+        "model": {
+          "type": "minecraft:model",
+          "model": "gallifreyan_chronicles:item/interior_door/tuat_interior_doors"
+        },
+        "when": "tuat_interior_doors"
       }
     ],
     "component": "gallifreyan_chronicles:door_type",

@@ -184,7 +184,8 @@ public class GCModelProvider extends ModelProvider {
         ItemModel.Unbaked tardis = ItemModelUtils.plainModel(itemModels.createFlatItemModel(GCBlocks.TARDIS.asItem(), ModelTemplates.FLAT_ITEM));
         itemModels.itemModelOutput.accept(GCBlocks.TARDIS.asItem(), ItemModelUtils.select(new TardisExteriorSelectProperty(), tardis,
                 ItemModelUtils.when(Constants.MOD_ID + ":first_doctors_exterior", flatItem(itemModels, "first_doctors_tardis")),
-                ItemModelUtils.when(Constants.MOD_ID + ":second_doctors_exterior", flatItem(itemModels, "second_doctors_tardis"))));
+                ItemModelUtils.when(Constants.MOD_ID + ":second_doctors_exterior", flatItem(itemModels, "second_doctors_tardis")),
+                ItemModelUtils.when(Constants.MOD_ID + ":tuat_exterior", flatItem(itemModels, "tuat_tardis"))));
 
         ItemModel.Unbaked console = ItemModelUtils.plainModel(itemModels.createFlatItemModel(GCBlocks.TARDIS_CONSOLE.asItem(), ModelTemplates.FLAT_ITEM));
         itemModels.itemModelOutput.accept(GCBlocks.TARDIS_CONSOLE.asItem(), ItemModelUtils.select(new ConsoleVariantSelectProperty(), console,
@@ -201,10 +202,12 @@ public class GCModelProvider extends ModelProvider {
         ItemModel.Unbaked secondDoorsAlt = ItemModelUtils.plainModel(itemModels.createFlatItemModel(GCBlocks.SECOND_DOCTORS_DOOR_ALT.asItem(), ModelTemplates.FLAT_ITEM));
         ItemModel.Unbaked firstInteriorDoors = flatItem(itemModels, "interior_door/first_doctors_interior_doors");
         ItemModel.Unbaked secondInteriorDoors = flatItem(itemModels, "interior_door/second_doctors_interior_doors");
+        ItemModel.Unbaked tuatInteriorDoors = flatItem(itemModels, "interior_door/tuat_interior_doors");
         itemModels.itemModelOutput.accept(GCBlocks.TARDIS_INTERIOR_DOOR.asItem(),
                 ItemModelUtils.select(new ComponentContents<>(GCDataComponents.DOOR_TYPE), firstInteriorDoors,
                         ItemModelUtils.when("first_doctors_interior_doors", firstInteriorDoors),
-                        ItemModelUtils.when("second_doctors_interior_doors", secondInteriorDoors)));
+                        ItemModelUtils.when("second_doctors_interior_doors", secondInteriorDoors),
+                        ItemModelUtils.when("tuat_interior_doors", tuatInteriorDoors)));
         Map<Item, ItemModel.Unbaked> doorFallbacks = Map.of(
                 GCBlocks.FIRST_DOCTORS_DOOR.asItem(), firstDoors,
                 GCBlocks.SECOND_DOCTORS_DOOR.asItem(), secondDoors,

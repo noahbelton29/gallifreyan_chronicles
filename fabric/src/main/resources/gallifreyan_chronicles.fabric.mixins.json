@@ -6,7 +6,8 @@
   "mixins": [],
   "client": [
     "client.screen.LogoRendererMixin",
-    "client.render.WindowMixin"
+    "client.render.WindowMixin",
+    "client.compat.ReplayModPortalRecordingMixin"
   ],
   "server": [],
   "injectors": {

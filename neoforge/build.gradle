@@ -47,6 +47,14 @@ neoForge {
 
 repositories {
     maven {
+        name = "BlameJared"
+        url = uri("https://maven.blamejared.com/")
+        content {
+            includeGroup("mezz.jei")
+            includeGroup("net.mezzdev.config")
+        }
+    }
+    maven {
         url = uri("https://maven.minecraftforge.net/")
     }
     maven {
@@ -85,6 +93,7 @@ dependencies {
     runtimeOnly("maven.modrinth:sound-physics-remastered:neoforge-${sound_physics_version}")
     compileOnly("curse.maven:immersive-portal-1511174:${immersive_portals_neoforge_file}")
     runtimeOnly("curse.maven:immersive-portal-1511174:${immersive_portals_neoforge_file}")
+    runtimeOnly("mezz.jei:jei-${minecraft_version}-neoforge:${jei_version}")
 //    implementation("foundry.imguimc:imguimc-neoforge-${project.minecraft_version}:${project.imguimc_version}")
 //    runtimeOnly("foundry.imguimc:imguimc-neoforge-${project.minecraft_version}:${project.imguimc_version}")
 //    runtimeOnly("maven.modrinth:sodium:${providers.gradleProperty("sodium_version").get()}")

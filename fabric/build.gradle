@@ -17,6 +17,14 @@ repositories {
         }
     }
     maven {
+        name = "BlameJared"
+        url = uri("https://maven.blamejared.com/")
+        content {
+            includeGroup("mezz.jei")
+            includeGroup("net.mezzdev.config")
+        }
+    }
+    maven {
         name = "Modrinth"
         url = uri("https://api.modrinth.com/maven")
         content {
@@ -49,6 +57,12 @@ dependencies {
     compileOnly("maven.modrinth:sodium:${providers.gradleProperty("sodium_version").get()}")
     runtimeOnly("maven.modrinth:sodium:${providers.gradleProperty("sodium_version").get()}")
     runtimeOnly("maven.modrinth:iris:${providers.gradleProperty("iris_version").get()}")
+    compileOnly("maven.modrinth:voxy:${providers.gradleProperty("voxy_version").get()}")
+    runtimeOnly("maven.modrinth:voxy:${providers.gradleProperty("voxy_version").get()}")
+    runtimeOnly("maven.modrinth:voxy-worldgen:${providers.gradleProperty("voxy_worldgen_version").get()}")
+    runtimeOnly("mezz.jei:jei-${minecraft_version}-fabric:${jei_version}")
+    compileOnly("maven.modrinth:replaymod:${providers.gradleProperty("replaymod_version").get()}")
+    runtimeOnly("maven.modrinth:replaymod:${providers.gradleProperty("replaymod_version").get()}")
 }
 
 loom {
@@ -206,3 +220,5 @@ def generateBuildId = tasks.register('generateBuildId') {
 
 sourceSets.main.resources.srcDir(gcBuildIdDir)
 tasks.named('processResources') { dependsOn(generateBuildId) }
+
+tasks.matching { it.name == 'sourcesJar' }.configureEach { dependsOn(generateBuildId) }

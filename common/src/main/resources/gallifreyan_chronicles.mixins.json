@@ -37,6 +37,7 @@
     "client.sky.CloudRendererTextureMixin",
     "client.compat.PortalPowerDarknessMixin",
     "client.compat.PortalRenderLimitMixin",
+    "client.compat.VoxyTardisLodMixin",
     "client.compat.PortalTardisClickMixin",
     "client.compat.LevelExtractorOutlineMixin",
     "client.render.SelectItemModelPropertiesMixin",

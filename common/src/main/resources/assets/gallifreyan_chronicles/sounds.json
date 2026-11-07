@@ -167,6 +167,14 @@
       }
     ]
   },
+  "hartnell_door": {
+    "sounds": [
+      {
+        "name": "gallifreyan_chronicles:block_entity/tardis/door/hartnell_door",
+        "attenuation_distance": 24
+      }
+    ]
+  },
   "title_theme": {
     "sounds": [
       {

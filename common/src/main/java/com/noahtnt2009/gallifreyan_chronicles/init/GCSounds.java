@@ -1,6 +1,10 @@
 package com.noahtnt2009.gallifreyan_chronicles.init;
 
-import com.noahtnt2009.gallifreyan_chronicles.util.GCUtils; import net.minecraft.core.Registry; import net.minecraft.core.registries.BuiltInRegistries; import net.minecraft.resources.Identifier; import net.minecraft.sounds.SoundEvent;
+import com.noahtnt2009.gallifreyan_chronicles.util.GCUtils;
+import net.minecraft.core.Registry;
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.resources.Identifier;
+import net.minecraft.sounds.SoundEvent;
 
 public class GCSounds {
     public static final float HEARING_RANGE = 10.0F;
@@ -19,6 +23,7 @@ public class GCSounds {
     public static final SoundEvent TARDIS_POWER_OFF = registerFixedRange("power_off", HEARING_RANGE);
     public static final SoundEvent TARDIS_CLOAK = registerFixedRange("cloak", HEARING_RANGE);
     public static final SoundEvent TARDIS_UNCLOAK = registerFixedRange("uncloak", HEARING_RANGE);
+    public static final SoundEvent HARTNELL_DOOR = registerFixedRange("hartnell_door", HEARING_RANGE);
 
     public static final SoundEvent TITLE_THEME = register("title_theme");
 
@@ -53,7 +58,8 @@ public class GCSounds {
         );
     }
 
-    public static void registerSounds() {}
+    public static void registerSounds() {
+    }
 
 
 }

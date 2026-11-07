@@ -1,6 +1,7 @@
 package com.noahtnt2009.gallifreyan_chronicles.block.entity;
 
 import java.util.Optional;
+
 import com.noahtnt2009.gallifreyan_chronicles.tardis.api.TardisApi;
 import com.noahtnt2009.gallifreyan_chronicles.tardis.api.Tardis;
 import com.geckolib.animatable.GeoBlockEntity;
@@ -36,6 +37,8 @@ import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.resources.Identifier;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.level.Level;
@@ -266,7 +269,7 @@ public class InteriorDoorBlockEntity extends BlockEntity implements GeoBlockEnti
             return;
         }
         DoorSystem.InteractionResult result =
-                DoorSystem.interact(asEntity(), sneaking, System.currentTimeMillis());
+                DoorSystem.interact(asEntity(), sneaking, System.currentTimeMillis(), openAllOnly());
         if (result.hasNoAnimation()) return;
         if (controller != null) {
             controller.setAnimationSpeed(1.0);
@@ -282,6 +285,13 @@ public class InteriorDoorBlockEntity extends BlockEntity implements GeoBlockEnti
     }
 
     public void applySyncedDoor(DoorState state, String animation, boolean opening) {
+        if (openAllOnly()) {
+            boolean open = !state.isClosed();
+            if (open != getDoorState().isClosed()) return;
+            state = open ? DoorState.BOTH_OPEN : DoorState.CLOSED;
+            animation = open ? "open_all" : "close_all";
+            opening = open;
+        }
         DoorSystem.applyRemoteDoorState(asEntity(), state, opening, System.currentTimeMillis());
         if (controller != null) {
             controller.setAnimationSpeed(1.0);
@@ -322,6 +332,7 @@ public class InteriorDoorBlockEntity extends BlockEntity implements GeoBlockEnti
     }
 
     public void snapTo(DoorState state) {
+        if (openAllOnly() && !state.isClosed()) state = DoorState.BOTH_OPEN;
         if (getDoorState() == state) return;
         DoorSystem.snapToState(asEntity(), state);
         playDoorAnimation(animationFor(state));
@@ -356,9 +367,27 @@ public class InteriorDoorBlockEntity extends BlockEntity implements GeoBlockEnti
 
     private void playDoorSound(boolean opening) {
         if (level == null) return;
-        SoundEvent sound = opening ? GCSounds.TARDIS_DOOR_OPEN : GCSounds.TARDIS_DOOR_CLOSE;
+        SoundEvent sound = doorSound(opening);
         level.playSound(null, getBlockPos(), sound, SoundSource.BLOCKS, 1.0f, 1.0f);
         level.playSound(null, soundPos(), sound, SoundSource.BLOCKS, 1.0f, 1.0f);
+    }
+
+    private boolean openAllOnly() {
+        TardisDoorVariant variant = TardisDoorRegistry.resolve(getVariant(), getDoorVariantId());
+        return variant != null && variant.openAllOnly();
+    }
+
+    private SoundEvent doorSound(boolean opening) {
+        SoundEvent fallback = opening ? GCSounds.TARDIS_DOOR_OPEN : GCSounds.TARDIS_DOOR_CLOSE;
+        TardisDoorVariant variant = TardisDoorRegistry.resolve(getVariant(), getDoorVariantId());
+        if (variant == null) return fallback;
+
+        String configured = opening ? variant.openSound() : variant.closeSound();
+        if (configured.isEmpty()) return fallback;
+
+        Identifier id = Identifier.tryParse(configured);
+        if (id == null) return fallback;
+        return BuiltInRegistries.SOUND_EVENT.getOptional(id).orElseGet(() -> SoundEvent.createVariableRangeEvent(id));
     }
 
     private void playLockSound(boolean locked) {
@@ -377,7 +406,8 @@ public class InteriorDoorBlockEntity extends BlockEntity implements GeoBlockEnti
                 if (controller != null) {
                     controller.setAnimationSpeed(1.0);
                 }
-            } catch (InterruptedException ignored) {}
+            } catch (InterruptedException ignored) {
+            }
         }).start();
     }
 

@@ -1,6 +1,5 @@
 package com.noahtnt2009.gallifreyan_chronicles.block;
 
-import com.noahtnt2009.gallifreyan_chronicles.Constants;
 import com.noahtnt2009.gallifreyan_chronicles.block.entity.TardisConsoleBlockEntity;
 import com.noahtnt2009.gallifreyan_chronicles.init.GCDataComponents;
 import com.noahtnt2009.gallifreyan_chronicles.init.GCSounds;
@@ -33,7 +32,6 @@ import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.level.block.state.properties.EnumProperty;
 import net.minecraft.world.level.block.state.properties.Half;
-import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.NotNull;
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
@@ -53,12 +51,14 @@ public class ConsoleBlock extends BaseEntityBlock {
     }
 
     @Override
-    public void fallOn(Level level, BlockState state, BlockPos pos, Entity entity, double fallDistance) {
+    public void fallOn(@NonNull Level level, @NonNull BlockState state, @NonNull BlockPos pos,
+                       @NonNull Entity entity, double fallDistance) {
         repel(level, pos, entity);
     }
 
     @Override
-    public void stepOn(Level level, BlockPos pos, BlockState onState, Entity entity) {
+    public void stepOn(@NonNull Level level, @NonNull BlockPos pos, @NonNull BlockState onState,
+                       @NonNull Entity entity) {
         repel(level, pos, entity);
     }
 

@@ -22,7 +22,9 @@ import net.fabricmc.fabric.api.item.v1.BlockTransformerHelper;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderers;
 import net.minecraft.client.renderer.entity.EntityRenderers;
 
+@SuppressWarnings("unused")
 public class GallifreyanChroniclesFabricClient implements ClientModInitializer {
+    @SuppressWarnings("CommentedOutCode")
     @Override
     public void onInitializeClient() {
         WatermarkIdentity.enabled();

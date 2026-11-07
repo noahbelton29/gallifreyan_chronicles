@@ -24,6 +24,8 @@ public class GCCreditsScreen extends Screen {
     private static final Component SECTION_HEADING = Component.literal("============").withStyle(ChatFormatting.WHITE);
     private static final String NAME_PREFIX = "           ";
     private static final String AUTHOR = "NoahTNT2009";
+    private static final String CODER = "Misper_YT";
+    private static final String TITLE_THEME = "mr_ChameleonCircuit on YouTube";
 
     private static final int LOGO_WIDTH = 256;
     private static final int LOGO_HEIGHT = LOGO_WIDTH * 399 / 2027;
@@ -58,14 +60,20 @@ public class GCCreditsScreen extends Screen {
     protected void init() {
         if (!this.lines.isEmpty()) return;
 
-        this.addTitle("menu.gallifreyan_chronicles.credits.coding", AUTHOR);
+        this.addTitle("menu.gallifreyan_chronicles.credits.coding", AUTHOR, CODER);
         this.addTitle("menu.gallifreyan_chronicles.credits.models", AUTHOR);
         this.addTitle("menu.gallifreyan_chronicles.credits.textures", AUTHOR);
         this.addTitle("menu.gallifreyan_chronicles.credits.interiors", "Fredbear1983");
+        this.addTitle("menu.gallifreyan_chronicles.credits.title_theme", TITLE_THEME);
 
         this.addSection(Component.translatable("menu.gallifreyan_chronicles.credits.special_thanks"));
         this.addTitle("menu.gallifreyan_chronicles.credits.texturing_tips", "westankrang");
         this.addTitle("menu.gallifreyan_chronicles.credits.suggestions", "SpartanGamezFTB");
+
+        this.addSection(Component.translatable("menu.gallifreyan_chronicles.credits.disclaimer"));
+        this.addNotice("menu.gallifreyan_chronicles.credits.disclaimer.ownership",
+                "menu.gallifreyan_chronicles.credits.disclaimer.credit",
+                "menu.gallifreyan_chronicles.credits.disclaimer.unofficial");
 
         this.totalScrollLength = this.lines.size() * LINE_HEIGHT;
     }
@@ -78,11 +86,21 @@ public class GCCreditsScreen extends Screen {
         this.addLine(Component.empty(), false);
     }
 
-    private void addTitle(String titleKey, String name) {
+    private void addTitle(String titleKey, String... names) {
         this.addLine(Component.translatable(titleKey).withStyle(ChatFormatting.GRAY), false);
-        this.addLine(Component.literal(NAME_PREFIX).append(name).withStyle(ChatFormatting.WHITE), false);
+        for (String name : names) {
+            this.addLine(Component.literal(NAME_PREFIX).append(name).withStyle(ChatFormatting.WHITE), false);
+        }
         this.addLine(Component.empty(), false);
         this.addLine(Component.empty(), false);
+    }
+
+    // centred paragraphs, one line each, for notices that aren't a name under a heading
+    private void addNotice(String... lineKeys) {
+        for (String key : lineKeys) {
+            this.addLine(Component.translatable(key).withStyle(ChatFormatting.WHITE), true);
+            this.addLine(Component.empty(), false);
+        }
     }
 
     private void addLine(Component line, boolean centered) {

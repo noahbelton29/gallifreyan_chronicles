@@ -307,7 +307,7 @@ public class TardisExteriorBlockEntity extends BlockEntity implements GeoBlockEn
     @SuppressWarnings({"unchecked", "rawtypes"})
     public void copyStateFrom(TardisExteriorBlockEntity other) {
         for (ComponentType<?> type : TardisComponentTypes.ALL) {
-            Component value = other.components.getOrNull((ComponentType) type);
+            com.noahtnt2009.gallifreyan_chronicles.ecs.Component value = other.components.getOrNull((ComponentType) type);
             if (value != null) {
                 components.set((ComponentType) type, value);
             }

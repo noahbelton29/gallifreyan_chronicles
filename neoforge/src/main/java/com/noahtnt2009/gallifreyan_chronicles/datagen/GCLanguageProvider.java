@@ -93,11 +93,16 @@ public class GCLanguageProvider extends LanguageProvider {
         add("menu.gallifreyan_chronicles.game_version", "Minecraft %s %s");
         add("menu.gallifreyan_chronicles.mods", "Mods");
         add("menu.gallifreyan_chronicles.credits.coding", "Coding");
+        add("menu.gallifreyan_chronicles.credits.disclaimer", "Disclaimer");
+        add("menu.gallifreyan_chronicles.credits.disclaimer.ownership", "Doctor Who and the TARDIS belong to the BBC.");
+        add("menu.gallifreyan_chronicles.credits.disclaimer.credit", "All credit for the Doctor Who assets goes to the BBC.");
+        add("menu.gallifreyan_chronicles.credits.disclaimer.unofficial", "This is an unofficial fan project, not affiliated with or endorsed by the BBC.");
         add("menu.gallifreyan_chronicles.credits.interiors", "Interior Builds");
         add("menu.gallifreyan_chronicles.credits.models", "Assets/Models");
         add("menu.gallifreyan_chronicles.credits.special_thanks", "Special Thanks");
         add("menu.gallifreyan_chronicles.credits.suggestions", "Suggestions");
         add("menu.gallifreyan_chronicles.credits.textures", "Textures");
+        add("menu.gallifreyan_chronicles.credits.title_theme", "Title Theme");
         add("menu.gallifreyan_chronicles.credits.texturing_tips", "Tips and Tricks on Texturing");
         add("menu.gallifreyan_chronicles.options", "Options");
         add("menu.gallifreyan_chronicles.game_options", "Game Options");

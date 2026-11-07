@@ -1,0 +1,7 @@
+{
+  "parent": "gallifreyan_chronicles:tuat_interior_doors",
+  "texture": "gallifreyan_chronicles:tuat_interior_doors",
+  "default": false,
+  "interior": true,
+  "exterior": "gallifreyan_chronicles:tuat_exterior"
+}

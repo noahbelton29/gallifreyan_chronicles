@@ -23,6 +23,7 @@ public abstract class VideoSettingsScreenMixin extends OptionsSubScreen {
             this.list.addHeader(GCOptions.HEADER);
             this.list.addBig(GCOptions.starDensity());
             this.list.addBig(GCOptions.modelRenderDistance());
+            this.list.addBig(GCOptions.immersivePortals());
             this.list.addBig(GCOptions.portalRenderDistance());
             this.list.addBig(GCOptions.maxRenderedPortals());
         }

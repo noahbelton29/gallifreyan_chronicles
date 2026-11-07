@@ -334,6 +334,8 @@
   "options.gallifreyan_chronicles.camera_shake": "TARDIS Camera Shake",
   "options.gallifreyan_chronicles.camera_shake.tooltip": "How strongly the camera shakes during TARDIS takeoff, flight and landing.",
   "options.gallifreyan_chronicles.header": "Gallifreyan Chronicles",
+  "options.gallifreyan_chronicles.immersive_portals": "Immersive Portals",
+  "options.gallifreyan_chronicles.immersive_portals.tooltip": "Use Immersive Portals for TARDIS doors. When off, doors use the plain teleport instead. Applies to worlds you host.",
   "options.gallifreyan_chronicles.max_rendered_portals": "Max Rendered Portals",
   "options.gallifreyan_chronicles.max_rendered_portals.tooltip": "The most TARDIS door portals that can be rendered at once.",
   "options.gallifreyan_chronicles.model_render_distance": "Model Render Distance",

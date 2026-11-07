@@ -33,6 +33,17 @@ public final class GCOptions {
                 GCConfig.powerDarknessStrength(), GCConfig::setPowerDarknessStrength);
     }
 
+    public static OptionInstance<Boolean> immersivePortals() {
+        return OptionInstance.createBoolean(
+                "options.gallifreyan_chronicles.immersive_portals",
+                OptionInstance.cachedConstantTooltip(Component.translatable("options.gallifreyan_chronicles.immersive_portals.tooltip")),
+                GCConfig.immersivePortals(),
+                value -> {
+                    GCConfig.setImmersivePortals(value);
+                    GCConfig.saveSoon();
+                });
+    }
+
     public static OptionInstance<Integer> modelRenderDistance() {
         return new OptionInstance<>(
                 "options.gallifreyan_chronicles.model_render_distance",

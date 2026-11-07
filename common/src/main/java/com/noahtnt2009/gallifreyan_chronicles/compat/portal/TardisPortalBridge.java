@@ -1,5 +1,6 @@
 package com.noahtnt2009.gallifreyan_chronicles.compat.portal;
 
+import com.noahtnt2009.gallifreyan_chronicles.config.GCConfig;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.resources.ResourceKey;
@@ -88,16 +89,20 @@ public final class TardisPortalBridge {
 
     public static void tick(MinecraftServer server) {
         if (!isAvailable()) return;
+        if (!GCConfig.immersivePortals()) {
+            TardisPortals.disableAll();
+            return;
+        }
         TardisPortals.tick(server);
     }
 
     public static void onDoorsChanged(MinecraftServer server, UUID tardisId) {
-        if (!isAvailable()) return;
+        if (!isAvailable() || !GCConfig.immersivePortals()) return;
         TardisPortals.onDoorsChanged(server, tardisId);
     }
 
     public static void onExteriorPlaced(MinecraftServer server, UUID tardisId) {
-        if (!isAvailable()) return;
+        if (!isAvailable() || !GCConfig.immersivePortals()) return;
         TardisPortals.onExteriorPlaced(server, tardisId);
     }
 

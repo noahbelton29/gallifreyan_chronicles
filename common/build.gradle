@@ -43,7 +43,7 @@ repositories {
 
 
 dependencies {
-    compileOnly(files(rootProject.file("libs/voicechat/voicechat-fabric-2.6.27+26.3.jar")))
+    compileOnly("maven.modrinth:simple-voice-chat:${voicechat_version}")
     // Fabric and NeoForge both bundle Fabric Mixin, so it is safe to use it in common
     // If you need to update, check what version they are using to see what is compatible
     // https://github.com/neoforged/NeoForge/blob/26.1.x/gradle.properties#L37
@@ -54,7 +54,7 @@ dependencies {
     compileOnly("maven.modrinth:jade:${jade_neoforge_version}")
 //    compileOnly("foundry.imguimc:imguimc-common-${project.minecraft_version}:${project.imguimc_version}")
     implementation "maven.modrinth:8BmcQJ2H:VukyYOGN"
-    compileOnly(files(rootProject.file("libs/essential/essential-fabric-26.3.jar")))
+    compileOnly("maven.modrinth:k2ZPuTBm:${essential_version}")
     compileOnly("maven.modrinth:sound-physics-remastered:fabric-${sound_physics_version}")
     compileOnly("curse.maven:immersive-portal-1511174:${immersive_portals_fabric_file}")
     compileOnly("net.fabricmc:fabric-loader:${fabric_loader_version}")

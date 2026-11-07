@@ -9,10 +9,6 @@ import net.caffeinemc.mods.sodium.api.config.structure.OptionGroupBuilder;
 import net.caffeinemc.mods.sodium.api.config.structure.OptionPageBuilder;
 import net.minecraft.network.chat.Component;
 
-/**
- * Puts the mod's settings in Sodium's video settings screen. Only Sodium loads this class, through the
- * "sodium:config_api_user" entrypoint, so it is never touched when Sodium is not installed.
- */
 public final class GCSodiumConfig implements ConfigEntryPoint {
     @Override
     public void registerConfigLate(ConfigBuilder builder) {
@@ -26,6 +22,12 @@ public final class GCSodiumConfig implements ConfigEntryPoint {
                                 "options.gallifreyan_chronicles.model_render_distance.value", value))
                         .setStorageHandler(GCConfig::save)
                         .setBinding(GCConfig::setModelRenderDistance, GCConfig::modelRenderDistance))
+                .addOption(builder.createBooleanOption(GCUtils.modIdentifier("immersive_portals"))
+                        .setName(Component.translatable("options.gallifreyan_chronicles.immersive_portals"))
+                        .setTooltip(Component.translatable("options.gallifreyan_chronicles.immersive_portals.tooltip"))
+                        .setDefaultValue(true)
+                        .setStorageHandler(GCConfig::save)
+                        .setBinding(GCConfig::setImmersivePortals, GCConfig::immersivePortals))
                 .addOption(builder.createIntegerOption(GCUtils.modIdentifier("portal_render_distance"))
                         .setName(Component.translatable("options.gallifreyan_chronicles.portal_render_distance"))
                         .setTooltip(Component.translatable("options.gallifreyan_chronicles.portal_render_distance.tooltip"))

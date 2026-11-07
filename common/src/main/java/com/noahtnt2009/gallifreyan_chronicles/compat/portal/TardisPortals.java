@@ -117,6 +117,15 @@ public final class TardisPortals {
         HOT.clear();
     }
 
+    static void disableAll() {
+        if (LINKS.isEmpty() && HOT.isEmpty()) return;
+        for (Map.Entry<UUID, Link> entry : LINKS.entrySet()) {
+            discard(entry.getValue());
+            TardisPortalBridge.setActive(entry.getKey(), false);
+        }
+        reset();
+    }
+
     static void removeTardis(UUID tardisId) {
         Link link = LINKS.remove(tardisId);
         if (link != null) discard(link);

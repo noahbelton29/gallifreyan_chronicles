@@ -296,6 +296,8 @@ public class GCLanguageProvider extends LanguageProvider {
         add("options.gallifreyan_chronicles.camera_shake", "TARDIS Camera Shake");
         add("options.gallifreyan_chronicles.camera_shake.tooltip", "How strongly the camera shakes during TARDIS takeoff, flight and landing.");
         add("options.gallifreyan_chronicles.header", "Gallifreyan Chronicles");
+        add("options.gallifreyan_chronicles.immersive_portals", "Immersive Portals");
+        add("options.gallifreyan_chronicles.immersive_portals.tooltip", "Use Immersive Portals for TARDIS doors. When off, doors use the plain teleport instead. Applies to worlds you host.");
         add("options.gallifreyan_chronicles.model_render_distance", "Model Render Distance");
         add("options.gallifreyan_chronicles.model_render_distance.tooltip", "How far away TARDIS models are rendered, in blocks.");
         add("options.gallifreyan_chronicles.model_render_distance.value", "%s blocks");

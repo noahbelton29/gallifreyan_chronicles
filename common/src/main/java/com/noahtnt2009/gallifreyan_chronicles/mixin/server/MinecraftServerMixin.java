@@ -1,5 +1,6 @@
 package com.noahtnt2009.gallifreyan_chronicles.mixin.server;
 
+import com.noahtnt2009.gallifreyan_chronicles.compat.voicechat.TardisVoiceLinks;
 import com.noahtnt2009.gallifreyan_chronicles.compat.portal.TardisPortalBridge;
 import com.noahtnt2009.gallifreyan_chronicles.tardis.exterior.TardisKeyLocator;
 import com.noahtnt2009.gallifreyan_chronicles.tardis.ecs.system.ConsoleSyncSystem;
@@ -37,5 +38,6 @@ public abstract class MinecraftServerMixin {
         TardisKeyLocator.tick(server);
         TardisPortalBridge.tick(server);
         ConsoleSyncSystem.tick(server);
+        TardisVoiceLinks.tick(server);
     }
 }

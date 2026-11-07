@@ -42,12 +42,16 @@ public class GCOptionsMenuScreen extends Screen {
         return rows == 0 ? 0 : SECTION_GAP + rows * BUTTON_STEP;
     }
 
+    private int mainRows() {
+        return ReplayViewerHook.available() ? 4 : 3;
+    }
+
     private int top() {
-        return (this.height - (BUTTON_STEP * 3 + this.essentialHeight() + DONE_GAP + BUTTON_HEIGHT)) / 2;
+        return (this.height - (BUTTON_STEP * this.mainRows() + this.essentialHeight() + DONE_GAP + BUTTON_HEIGHT)) / 2;
     }
 
     private int essentialHeadingY() {
-        return this.top() + BUTTON_STEP * 3 + SECTION_GAP - 12;
+        return this.top() + BUTTON_STEP * this.mainRows() + SECTION_GAP - 12;
     }
 
     @Override
@@ -69,6 +73,16 @@ public class GCOptionsMenuScreen extends Screen {
                 Component.translatable("options.accessibility"),
                 button -> this.minecraft.gui.setScreen(new AccessibilityOptionsScreen(this, this.minecraft.options))));
         y += BUTTON_STEP;
+
+        if (ReplayViewerHook.available()) {
+            this.addRenderableWidget(new GCButton(x, y, BUTTON_WIDTH, BUTTON_HEIGHT,
+                    Component.translatableWithFallback("replaymod.gui.replayviewer", "Replay Viewer"),
+                    button -> {
+                        Runnable opener = ReplayViewerHook.opener;
+                        if (opener != null) opener.run();
+                    }));
+            y += BUTTON_STEP;
+        }
 
         List<String> ids = this.essentialIds();
         if (!ids.isEmpty()) {

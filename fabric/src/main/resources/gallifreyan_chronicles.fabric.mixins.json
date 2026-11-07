@@ -7,7 +7,9 @@
   "client": [
     "client.screen.LogoRendererMixin",
     "client.render.WindowMixin",
-    "client.compat.ReplayModPortalRecordingMixin"
+    "client.compat.ReplayModPortalRecordingMixin",
+    "client.compat.ReplayModInteriorSoundMixin",
+    "client.compat.ReplayModMainMenuButtonMixin"
   ],
   "server": [],
   "injectors": {

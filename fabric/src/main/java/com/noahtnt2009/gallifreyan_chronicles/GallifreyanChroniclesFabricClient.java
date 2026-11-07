@@ -14,7 +14,9 @@ import com.noahtnt2009.gallifreyan_chronicles.init.GCBlocks;
 import com.noahtnt2009.gallifreyan_chronicles.init.GCEntityTypes;
 import com.noahtnt2009.gallifreyan_chronicles.network.client.GCFabricClientNetworking;
 import com.noahtnt2009.gallifreyan_chronicles.util.GCUtils;
+import com.noahtnt2009.gallifreyan_chronicles.compat.replaymod.ReplayModOptionsButton;
 import net.fabricmc.api.ClientModInitializer;
+import net.fabricmc.loader.api.FabricLoader;
 import net.fabricmc.fabric.api.client.rendering.v1.hud.HudElementRegistry;
 import net.fabricmc.fabric.api.client.rendering.v1.hud.VanillaHudElements;
 import net.fabricmc.fabric.api.client.rendering.v1.level.LevelRenderEvents;
@@ -40,6 +42,10 @@ public class GallifreyanChroniclesFabricClient implements ClientModInitializer {
         EntityRenderers.register(GCEntityTypes.TARDIS_CONTROL_ENTITY_TYPE, TardisControlEntityRenderer::new);
         EntityRenderers.register(GCEntityTypes.TARDIS_KEY_ENTITY_TYPE, TardisKeyEntityRenderer::new);
         GCFabricClientNetworking.registerClientNetworking();
+
+        if (FabricLoader.getInstance().isModLoaded("replaymod")) {
+            ReplayModOptionsButton.register();
+        }
 
         // Hide the selection outline on interior doors (returning false cancels the outline)
         LevelRenderEvents.BEFORE_BLOCK_OUTLINE.register((_, hit) ->

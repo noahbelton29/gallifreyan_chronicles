@@ -18,6 +18,9 @@
     "icon": "${mod_id}.png",
     "environment": "*",
     "entrypoints": {
+        "voicechat": [
+            "com.noahtnt2009.gallifreyan_chronicles.compat.voicechat.TardisVoicePlugin"
+        ],
         "main": [
             "com.noahtnt2009.gallifreyan_chronicles.GallifreyanChroniclesFabric"
         ],

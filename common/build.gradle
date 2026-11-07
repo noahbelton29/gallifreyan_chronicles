@@ -43,6 +43,7 @@ repositories {
 
 
 dependencies {
+    compileOnly(files(rootProject.file("libs/voicechat/voicechat-fabric-2.6.27+26.3.jar")))
     // Fabric and NeoForge both bundle Fabric Mixin, so it is safe to use it in common
     // If you need to update, check what version they are using to see what is compatible
     // https://github.com/neoforged/NeoForge/blob/26.1.x/gradle.properties#L37

@@ -76,7 +76,7 @@ public class GCOptionsMenuScreen extends Screen {
 
         if (ReplayViewerHook.available()) {
             this.addRenderableWidget(new GCButton(x, y, BUTTON_WIDTH, BUTTON_HEIGHT,
-                    Component.translatableWithFallback("replaymod.gui.replayviewer", "Replay Viewer"),
+                    Component.translatableWithFallback("menu.gallifreyan_chronicles.replay_viewer", "Replay Viewer"),
                     button -> {
                         Runnable opener = ReplayViewerHook.opener;
                         if (opener != null) opener.run();

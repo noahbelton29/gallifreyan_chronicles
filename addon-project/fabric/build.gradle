@@ -4,7 +4,7 @@ plugins {
 }
 
 // A Fabric dev game with the mod and your addon. Nothing here is shipped.
-//   ./gradlew :fabric:runClient
+// ./gradlew :fabric:runClient
 
 repositories {
     mavenCentral()
@@ -16,11 +16,11 @@ java {
     toolchain.languageVersion = JavaLanguageVersion.of(java_version as int)
 }
 
-def modJar = rootProject.file(gc_fabric_jar)
+def modJar = rootProject.findModJar('fabric')
 // only checked when you actually run this loader, so building just the addon needs only the common jar
 tasks.register('checkModJar') {
     doLast {
-        if (!modJar.exists()) throw new GradleException("Put the mod's Fabric jar at ${gc_fabric_jar}, see libs/README.txt")
+        if (!modJar.exists()) throw new GradleException("Put the mod's Fabric jar at libs/, see libs/README.txt")
     }
 }
 
@@ -41,10 +41,10 @@ loom {
     }
 }
 
-// the game only loads addons from gc_addons, so build your addon jar and put it there first
+// an addon is a mod, so the dev game loads it from run/mods: build the jar and put it there first
 tasks.register('installAddon', Copy) {
     dependsOn ':addon:jar'
     from project(':addon').tasks.named('jar').flatMap { it.archiveFile }
-    into layout.projectDirectory.dir('run/gc_addons')
+    into layout.projectDirectory.dir('run/mods')
 }
 tasks.matching { it.name == 'runClient' }.configureEach { dependsOn 'installAddon', 'checkModJar' }

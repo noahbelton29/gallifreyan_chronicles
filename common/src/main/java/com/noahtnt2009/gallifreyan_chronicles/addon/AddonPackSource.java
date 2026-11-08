@@ -15,11 +15,7 @@ import java.nio.file.Files;
 import java.util.Optional;
 import java.util.function.Consumer;
 
-/**
- * Gives every enabled addon to a pack repository as a required pack, so an addon that is switched on is always loaded
- * and one that is switched off is simply not offered. Added to the resource pack repository and to every datapack
- * repository by {@code PackRepositoryMixin}.
- */
+/* offers the enabled addons as required packs */
 public final class AddonPackSource implements RepositorySource {
     public static final String ID_PREFIX = "gc_addon/";
 

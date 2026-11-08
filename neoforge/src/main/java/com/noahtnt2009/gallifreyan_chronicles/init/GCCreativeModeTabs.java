@@ -1,6 +1,7 @@
 package com.noahtnt2009.gallifreyan_chronicles.init;
 
 import com.noahtnt2009.gallifreyan_chronicles.Constants;
+import com.noahtnt2009.gallifreyan_chronicles.addon.AddonContent;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.CreativeModeTab;
@@ -155,6 +156,13 @@ public class GCCreativeModeTabs {
                         output.accept(GCItems.TARANIUM_LEGGINGS);
                         output.accept(GCItems.TARANIUM_BOOTS);
                     }).build());
+
+    /** Everything addons registered through the addon API. Read when the tab is built, after addons have started. */
+    public static final Supplier<CreativeModeTab> ADDONS_TAB = CREATIVE_MODE_TABS.register("addons",
+            () -> CreativeModeTab.builder().icon(() -> new ItemStack(GCItems.TARANIUM_INGOT))
+                    .title(Component.translatable("creativetab.gallifreyan_chronicles.addons"))
+                    .displayItems((params, output) -> AddonContent.tabItems().forEach(output::accept))
+                    .build());
 
     public static void registerNeoForgeCreativeModeTabs(IEventBus eventBus) {
         CREATIVE_MODE_TABS.register(eventBus);

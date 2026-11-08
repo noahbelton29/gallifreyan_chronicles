@@ -7,7 +7,6 @@ import com.noahtnt2009.gallifreyan_chronicles.addon.AddonProblem;
 import com.noahtnt2009.gallifreyan_chronicles.client.gui.title.GCButton;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.Button;
-import net.minecraft.client.gui.screens.ConfirmScreen;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.network.chat.Component;
@@ -166,26 +165,7 @@ public class GCAddonsScreen extends Screen {
     }
 
     private void onToggle(AddonInfo info) {
-        if (AddonManager.isActive(info)) {
-            AddonManager.setEnabled(info.id(), false);
-            if (info.hasData()) dataChanged = true;
-            this.rebuildWidgets();
-            return;
-        }
-        AddonProblem problem = AddonManager.problem(info);
-        if (problem != null && problem.kind() == AddonProblem.Kind.NEEDS_APPROVAL) {
-            String shortHash = info.sha256() == null ? "" : info.sha256().substring(0, 12);
-            this.minecraft.gui.setScreen(new ConfirmScreen(approved -> {
-                if (approved) {
-                    AddonManager.approve(info);
-                    if (info.hasData()) dataChanged = true;
-                }
-                this.minecraft.gui.setScreen(this);
-            }, Component.translatable("addons.gallifreyan_chronicles.approve.title", info.name()),
-                    Component.translatable("addons.gallifreyan_chronicles.approve.message", shortHash)));
-            return;
-        }
-        AddonManager.setEnabled(info.id(), true);
+        AddonManager.setEnabled(info, !AddonManager.isActive(info));
         if (info.hasData()) dataChanged = true;
         this.rebuildWidgets();
     }
@@ -348,7 +328,7 @@ public class GCAddonsScreen extends Screen {
         }
 
         if (problem != null) {
-            int color = problem.kind() == AddonProblem.Kind.NEEDS_APPROVAL ? ORANGE : RED;
+            int color = RED;
             graphics.text(this.font, trim(problemText(problem).getString(), textWidth), textX, y + 20, color);
         } else {
             graphics.text(this.font, trim(firstLine(info.description()), textWidth), textX, y + 20, active ? GRAY : DARK_GRAY);
@@ -356,7 +336,7 @@ public class GCAddonsScreen extends Screen {
     }
 
     private static int stateColor(AddonInfo info, boolean active, @Nullable AddonProblem problem) {
-        if (problem != null) return problem.kind() == AddonProblem.Kind.NEEDS_APPROVAL ? ORANGE : RED;
+        if (problem != null) return RED;
         if (info.hasJava() && AddonManager.isRunning(info.id()) != active) return ORANGE;
         return active ? GREEN : 0xFF444444;
     }
@@ -398,7 +378,7 @@ public class GCAddonsScreen extends Screen {
         int y = headerY + 32 + 8;
         int limit = factsTop - 6;
         if (problem != null) {
-            int color = problem.kind() == AddonProblem.Kind.NEEDS_APPROVAL ? ORANGE : RED;
+            int color = RED;
             y = drawWrapped(graphics, problemText(problem).getString(), x, y, inner, color, limit);
             y = drawWrapped(graphics, Component.translatable("addons.gallifreyan_chronicles.hint." + problem.kind().name().toLowerCase()).getString(),
                     x, y + 2, inner, DARK_GRAY, limit);
@@ -464,7 +444,6 @@ public class GCAddonsScreen extends Screen {
                     Component.translatable(key, parts[0], parts.length > 1 ? parts[1] : "");
             case WRONG_REQUIREMENT_VERSION ->
                     Component.translatable(key, parts[0], parts.length > 1 ? parts[1] : "", parts.length > 2 ? parts[2] : "");
-            case NEEDS_APPROVAL -> Component.translatable(key);
         };
     }
 

@@ -5,9 +5,14 @@ plugins {
 
 // A loader-neutral addon project. It is separate from the mod's own Gradle build.
 //
-// It compiles against plain Minecraft (no Fabric, no NeoForge) plus the mod's COMMON jar, which holds the
-// addon API and the TARDIS API. Because it uses no loader code, the jar it builds loads on Fabric and NeoForge.
-// The mod jar is compileOnly: it is never put inside your addon.
+// An addon is a real mod. It carries both fabric.mod.json and neoforge.mods.toml, compiles against plain Minecraft
+// (no Fabric, no NeoForge code) plus the mod's COMMON jar, and so one jar works on both loaders. The mod jar is
+// compileOnly: it is never put inside your addon. Mixins work because the loader loads the jar itself.
+
+repositories {
+    mavenCentral()
+    maven { url = uri('https://maven.fabricmc.net') }
+}
 
 neoForge {
     neoFormVersion = neo_form_version
@@ -19,17 +24,18 @@ java {
     }
 }
 
-def gcJar = [rootProject.file(gc_common_jar), rootProject.file('libs/gallifreyan_chronicles.jar')].find { it.exists() }
-        ?: rootProject.file(gc_common_jar)
+def gcJar = rootProject.findModJar('common')
 
 tasks.named('compileJava') {
     doFirst {
-        if (!gcJar.exists()) throw new GradleException("Put the Gallifreyan Chronicles common jar at ${gc_common_jar} first, see libs/README.txt")
+        if (!gcJar.exists()) throw new GradleException("Put the Gallifreyan Chronicles common jar in libs/ first, see libs/README.txt")
     }
 }
 
 dependencies {
     compileOnly files(gcJar)
+    // only the mixin annotations, which Fabric and NeoForge both provide at run time
+    compileOnly 'net.fabricmc:sponge-mixin:0.17.3+mixin.0.8.7'
 }
 
 jar {

@@ -1,5 +1,17 @@
-// Root project: only shared settings. See addon/, fabric/ and neoforge/.
+// Root project: shared settings and the helper that finds the mod's jars in libs/.
 allprojects {
     group = 'com.example.gcaddon'
     version = addon_version
+}
+
+// Finds the newest jar for a kind ('common', 'fabric' or 'neoforge'). Accepted names:
+//   gc-<kind>-<version>.jar       (what the mod's own build produces)
+//   gallifreyan_chronicles-<kind>.jar
+// -sources and -javadoc jars are ignored.
+ext.findModJar = { String kind ->
+    def found = (file('libs').listFiles() ?: []).findAll {
+        it.name.endsWith('.jar') && !it.name.endsWith('-sources.jar') && !it.name.endsWith('-javadoc.jar') &&
+                (it.name == "gallifreyan_chronicles-${kind}.jar" || it.name.startsWith("gc-${kind}-"))
+    }.sort { -it.lastModified() }
+    return found ? found.first() : file("libs/gallifreyan_chronicles-${kind}.jar")
 }

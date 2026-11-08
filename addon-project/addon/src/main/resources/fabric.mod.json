@@ -1,0 +1,18 @@
+{
+  "schemaVersion": 1,
+  "id": "example_java_addon",
+  "version": "1.0.0",
+  "name": "Example Java Addon",
+  "description": "An addon for Gallifreyan Chronicles.",
+  "authors": ["NoahTNT2009"],
+  "license": "MIT",
+  "environment": "*",
+  "custom": {
+    "gallifreyan_chronicles:addon": "com.example.gcaddon.ExampleJavaAddon"
+  },
+  "mixins": ["example_java_addon.mixins.json"],
+  "depends": {
+    "gallifreyan_chronicles": "*",
+    "minecraft": "~26.3"
+  }
+}

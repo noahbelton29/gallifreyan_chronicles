@@ -1,6 +1,9 @@
 package com.noahtnt2009.gallifreyan_chronicles.platform.services;
 
+import com.noahtnt2009.gallifreyan_chronicles.addon.ModAddonEntry;
+
 import java.nio.file.Path;
+import java.util.List;
 
 public interface IPlatformHelper {
 
@@ -46,4 +49,13 @@ public interface IPlatformHelper {
 
         return isDevelopmentEnvironment() ? "development" : "production";
     }
+
+    /**
+     * Finds every loaded mod that declares itself a Gallifreyan Chronicles addon, using the loader's own metadata:
+     * a {@code "gallifreyan_chronicles:addon"} custom value in {@code fabric.mod.json}, or the same key as a mod
+     * property in {@code neoforge.mods.toml}. The value is the name of the addon's {@code GCAddon} class.
+     *
+     * @return the addons, in no particular order
+     */
+    List<ModAddonEntry> findModAddons();
 }

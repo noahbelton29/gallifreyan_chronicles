@@ -2,6 +2,7 @@ package com.example.gcaddon;
 
 import com.noahtnt2009.gallifreyan_chronicles.addon.api.AddonContext;
 import com.noahtnt2009.gallifreyan_chronicles.addon.api.GCAddon;
+import net.minecraft.world.item.Item;
 
 public class ExampleJavaAddon implements GCAddon {
     private AddonContext context;
@@ -10,7 +11,8 @@ public class ExampleJavaAddon implements GCAddon {
     @Override
     public void onInitialize(AddonContext context) {
         this.context = context;
-        context.logger().info("Example Java addon started. Its data folder is {}", context.dataFolder());
+
+        context.registerItem("example_gem", Item::new);
 
         context.onTakeOff(tardis -> {
             takeOffs++;

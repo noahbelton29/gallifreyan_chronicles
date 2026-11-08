@@ -113,7 +113,7 @@ public final class VersionRange {
                     bounds.add(new Bound(version, true, true));
                     bounds.add(new Bound(Version.parse(version.part(0) + "." + (version.part(1) + 1)), false, false));
                     break;
-                default: // "=" or nothing: exactly this version
+                default: /* exactly this version */
                     bounds.add(new Bound(version, true, true));
                     bounds.add(new Bound(version, false, true));
                     break;

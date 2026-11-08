@@ -6,84 +6,71 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
-import com.mojang.serialization.MapCodec;
 import com.noahtnt2009.gallifreyan_chronicles.Constants;
 import com.noahtnt2009.gallifreyan_chronicles.addon.api.AddonApi;
-import com.noahtnt2009.gallifreyan_chronicles.addon.api.AddonContext;
-import com.noahtnt2009.gallifreyan_chronicles.addon.api.GCAddon;
 import com.noahtnt2009.gallifreyan_chronicles.platform.Services;
-import com.noahtnt2009.gallifreyan_chronicles.tardis.api.Tardis;
-import com.noahtnt2009.gallifreyan_chronicles.tardis.api.TardisEvents;
-import com.noahtnt2009.gallifreyan_chronicles.tardis.control.TardisControl;
-import com.noahtnt2009.gallifreyan_chronicles.tardis.control.TardisControlRegistry;
-import com.noahtnt2009.gallifreyan_chronicles.tardis.control.TardisControlTypes;
-import com.noahtnt2009.gallifreyan_chronicles.util.GCScheduler;
-import net.minecraft.server.MinecraftServer;
 import org.jspecify.annotations.Nullable;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.Reader;
-import java.net.URL;
-import java.net.URLClassLoader;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.HexFormat;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.function.Consumer;
 import java.util.regex.Pattern;
 import java.util.stream.Stream;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
+/* Runs the addon system.
+   Data addons: zip or folder in gc_addons, no code.
+   Java addons: mod jars in mods, the loader loads them.
+   Turning a java addon on or off needs a restart. */
 public final class AddonManager {
     public static final String FOLDER_NAME = "gc_addons";
     public static final String DESCRIPTOR = "addon.json";
+    private static final String DISABLED_SUFFIX = ".disabled";
     private static final String STATE_FILE = Constants.MOD_ID + "_addons.json";
     private static final int MAX_ICON_BYTES = 512 * 1024;
-    private static final int MAX_LISTENER_FAILURES = 5;
     private static final Pattern VALID_ID = Pattern.compile("[a-z0-9_.-]+");
-    private static final Pattern CONTROL_ID = Pattern.compile("[a-z0-9_]+");
     private static final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
 
     private static volatile List<AddonInfo> addons = List.of();
     private static volatile Map<String, AddonProblem> problems = Map.of();
+    /* data addons the player turned off */
     private static final Set<String> DISABLED = Collections.synchronizedSet(new LinkedHashSet<>());
-    private static final Map<String, String> APPROVED = Collections.synchronizedMap(new LinkedHashMap<>());
-    private static final Map<String, String> FAILURES = new HashMap<>();
-    private static final Map<String, LoadedJava> LOADED = new LinkedHashMap<>();
+    /* java addons the player toggled, and what they picked */
+    private static final Map<String, Boolean> MOD_STATE = Collections.synchronizedMap(new LinkedHashMap<>());
     private static boolean scanned;
     private static boolean initialised;
 
     private AddonManager() {
     }
 
-    private record LoadedJava(GCAddon addon, URLClassLoader loader) {
-    }
-
     public static Path folder() {
         return Services.PLATFORM.getConfigDir().resolveSibling(FOLDER_NAME);
+    }
+
+    private static Path modsFolder() {
+        return Services.PLATFORM.getConfigDir().resolveSibling("mods");
     }
 
     private static Path stateFile() {
         return Services.PLATFORM.getConfigDir().resolve(STATE_FILE);
     }
 
+    /* load saved state and scan the folders, once */
     private static synchronized void ensureScanned() {
         if (scanned) return;
         scanned = true;
@@ -91,13 +78,15 @@ public final class AddonManager {
         scan();
     }
 
+    /* start java addons, after our own stuff is registered */
     public static synchronized void init() {
         if (initialised) return;
         initialised = true;
         ensureScanned();
-        loadJava();
+        ModAddonLoader.load();
+        refreshProblems();
         logReport();
-        Runtime.getRuntime().addShutdownHook(new Thread(AddonManager::shutdown, "GC addon shutdown"));
+        Runtime.getRuntime().addShutdownHook(new Thread(AddonManager::applyModFileStates, "GC addon files"));
     }
 
     public static List<AddonInfo> all() {
@@ -105,71 +94,79 @@ public final class AddonManager {
         return addons;
     }
 
+    /* our mod's version */
     public static String modVersion() {
         return Services.PLATFORM.getModVersion(Constants.MOD_ID);
     }
 
-    public static boolean isEnabled(String id) {
+    static @Nullable AddonInfo infoFor(String id) {
         ensureScanned();
-        return !DISABLED.contains(id);
+        for (AddonInfo info : addons) {
+            if (info.id().equals(id)) return info;
+        }
+        return null;
     }
 
+    /* is it switched on? it can still have a problem */
+    public static boolean isEnabled(AddonInfo info) {
+        ensureScanned();
+        if (info.hasJava()) {
+            Boolean wanted = MOD_STATE.get(info.id());
+            return wanted != null ? wanted : !info.path().getFileName().toString().endsWith(DISABLED_SUFFIX);
+        }
+        return !DISABLED.contains(info.id());
+    }
+
+    /* what's wrong, or null */
     public static @Nullable AddonProblem problem(AddonInfo info) {
         ensureScanned();
         return problems.get(info.id());
     }
 
+    /* on and nothing wrong */
     public static boolean isActive(AddonInfo info) {
-        return isEnabled(info.id()) && problem(info) == null;
+        return isEnabled(info) && problem(info) == null;
     }
 
+    /* data addons to offer as packs */
     public static List<AddonInfo> enabledData() {
         ensureScanned();
         List<AddonInfo> result = new ArrayList<>();
         for (AddonInfo info : addons) {
-            if (info.hasData() && isActive(info)) result.add(info);
+            if (info.hasData() && !info.hasJava() && isActive(info)) result.add(info);
         }
         return result;
     }
 
-    public static synchronized boolean restartRequired() {
+    /* a java addon was toggled, needs a restart */
+    public static boolean restartRequired() {
+        ensureScanned();
         for (AddonInfo info : addons) {
-            if (info.hasJava() && isActive(info) != LOADED.containsKey(info.id())
-                    && !FAILURES.containsKey(info.id())) {
-                return true;
-            }
-        }
-        for (String id : LOADED.keySet()) {
-            if (addons.stream().noneMatch(info -> info.id().equals(id))) return true;
+            if (info.hasJava() && isActive(info) != ModAddonLoader.isRunning(info.id())) return true;
         }
         return false;
     }
 
-    public static synchronized boolean isRunning(String id) {
-        return LOADED.containsKey(id);
+    /* did the game start it? */
+    public static boolean isRunning(String id) {
+        return ModAddonLoader.isRunning(id);
     }
 
-    public static void setEnabled(String id, boolean enabled) {
-        if (enabled) DISABLED.remove(id);
-        else DISABLED.add(id);
+    public static void setEnabled(AddonInfo info, boolean enabled) {
+        if (info.hasJava()) {
+            MOD_STATE.put(info.id(), enabled);
+        } else if (enabled) {
+            DISABLED.remove(info.id());
+        } else {
+            DISABLED.add(info.id());
+        }
         saveState();
         refreshProblems();
-    }
-
-    public static void approve(AddonInfo info) {
-        if (info.sha256() != null) APPROVED.put(info.id(), info.sha256());
-        DISABLED.remove(info.id());
-        saveState();
-        refreshProblems();
-    }
-
-    private static boolean isApproved(AddonInfo info) {
-        return !info.hasJava() || (info.sha256() != null && info.sha256().equals(APPROVED.get(info.id())));
     }
 
     private static void loadState() {
         DISABLED.clear();
-        APPROVED.clear();
+        MOD_STATE.clear();
         Path file = stateFile();
         if (!Files.exists(file)) return;
         try (Reader reader = Files.newBufferedReader(file)) {
@@ -177,13 +174,13 @@ public final class AddonManager {
             if (root.has("disabled")) {
                 for (JsonElement element : root.getAsJsonArray("disabled")) DISABLED.add(element.getAsString());
             }
-            if (root.has("approved")) {
-                for (Map.Entry<String, JsonElement> entry : root.getAsJsonObject("approved").entrySet()) {
-                    APPROVED.put(entry.getKey(), entry.getValue().getAsString());
+            if (root.has("java")) {
+                for (Map.Entry<String, JsonElement> entry : root.getAsJsonObject("java").entrySet()) {
+                    MOD_STATE.put(entry.getKey(), entry.getValue().getAsBoolean());
                 }
             }
         } catch (IOException | RuntimeException e) {
-            Constants.LOG.warn("Could not read {}, every addon will start enabled and Java addons need approving again", file, e);
+            Constants.LOG.warn("Could not read {}, every addon will start as it is on disk", file, e);
         }
     }
 
@@ -194,11 +191,11 @@ public final class AddonManager {
             DISABLED.forEach(disabled::add);
         }
         root.add("disabled", disabled);
-        JsonObject approved = new JsonObject();
-        synchronized (APPROVED) {
-            APPROVED.forEach(approved::addProperty);
+        JsonObject java = new JsonObject();
+        synchronized (MOD_STATE) {
+            MOD_STATE.forEach(java::addProperty);
         }
-        root.add("approved", approved);
+        root.add("java", java);
         try {
             Files.createDirectories(stateFile().getParent());
             Files.writeString(stateFile(), GSON.toJson(root), StandardCharsets.UTF_8);
@@ -207,16 +204,22 @@ public final class AddonManager {
         }
     }
 
+    /* work out the problems for every addon */
     private static synchronized void refreshProblems() {
         Map<String, AddonProblem> found = new HashMap<>();
         for (AddonInfo info : addons) {
-            AddonProblem problem = check(info);
+            AddonProblem problem = blockingProblem(info);
+            if (problem == null && info.hasJava()) {
+                String failure = ModAddonLoader.failure(info.id());
+                if (failure != null) problem = new AddonProblem(AddonProblem.Kind.FAILED_TO_START, failure);
+            }
             if (problem != null) found.put(info.id(), problem);
         }
         problems = Map.copyOf(found);
     }
 
-    private static @Nullable AddonProblem check(AddonInfo info) {
+    /* why it can't run */
+    static @Nullable AddonProblem blockingProblem(AddonInfo info) {
         if (info.isInvalid()) return new AddonProblem(AddonProblem.Kind.INVALID, info.error());
         if (info.apiVersion() > AddonApi.VERSION) {
             return new AddonProblem(AddonProblem.Kind.INCOMPATIBLE_API, info.apiVersion() + "|" + AddonApi.VERSION);
@@ -243,7 +246,7 @@ public final class AddonManager {
                 found = Services.PLATFORM.getModVersion(target);
             } else {
                 AddonInfo other = addons.stream().filter(candidate -> candidate.id().equals(target)).findFirst().orElse(null);
-                if (other == null || !isEnabled(other.id())) {
+                if (other == null || !isEnabled(other)) {
                     return new AddonProblem(AddonProblem.Kind.MISSING_REQUIREMENT, target + "|" + range);
                 }
                 found = other.version();
@@ -252,10 +255,6 @@ public final class AddonManager {
                 return new AddonProblem(AddonProblem.Kind.WRONG_REQUIREMENT_VERSION, target + "|" + range + "|" + found);
             }
         }
-
-        if (!isApproved(info)) return new AddonProblem(AddonProblem.Kind.NEEDS_APPROVAL, "");
-        String failure = FAILURES.get(info.id());
-        if (failure != null) return new AddonProblem(AddonProblem.Kind.FAILED_TO_START, failure);
         return null;
     }
 
@@ -263,18 +262,29 @@ public final class AddonManager {
         try {
             return range.matches(Version.parse(version));
         } catch (IllegalArgumentException e) {
+            /* no numbers in the version, only * passes */
             return range.toString().equals("*");
         }
     }
 
     public static synchronized void scan() {
-        Path folder = folder();
+        List<AddonInfo> found = new ArrayList<>();
+        Set<String> ids = new HashSet<>();
+
+        scanFolder(folder(), false, found, ids);
+        scanFolder(modsFolder(), true, found, ids);
+
+        addons = List.copyOf(found);
+        refreshProblems();
+        Constants.LOG.info("Found {} addon(s)", found.size());
+    }
+
+    private static void scanFolder(Path folder, boolean modsFolder, List<AddonInfo> found, Set<String> ids) {
         try {
             Files.createDirectories(folder);
+            if (!modsFolder) writeReadme(folder);
         } catch (IOException e) {
-            Constants.LOG.warn("Could not create the addons folder {}", folder, e);
-            addons = List.of();
-            refreshProblems();
+            Constants.LOG.warn("Could not create the folder {}", folder, e);
             return;
         }
 
@@ -282,26 +292,28 @@ public final class AddonManager {
         try (Stream<Path> stream = Files.list(folder)) {
             entries = stream.sorted(Comparator.comparing(path -> path.getFileName().toString().toLowerCase())).toList();
         } catch (IOException e) {
-            Constants.LOG.warn("Could not list the addons folder {}", folder, e);
-            addons = List.of();
-            refreshProblems();
+            Constants.LOG.warn("Could not list the folder {}", folder, e);
             return;
         }
 
-        List<AddonInfo> found = new ArrayList<>();
-        Set<String> ids = new HashSet<>();
         for (Path entry : entries) {
             String fileName = entry.getFileName().toString();
+            String lower = fileName.toLowerCase();
             if (fileName.startsWith(".")) continue;
             boolean folderAddon = Files.isDirectory(entry);
-            String lower = fileName.toLowerCase();
-            if (!folderAddon && !lower.endsWith(".zip") && !lower.endsWith(".jar")) continue;
+            boolean modJar = lower.endsWith(".jar") || lower.endsWith(".jar" + DISABLED_SUFFIX);
+            if (modsFolder) {
+                /* skip jars that aren't addons */
+                if (!modJar) continue;
+            } else if (!folderAddon && !lower.endsWith(".zip") && !lower.endsWith(".jar")) {
+                continue;
+            }
 
             AddonInfo info;
             try {
-                info = describe(entry);
+                info = describe(entry, modsFolder);
             } catch (IOException | RuntimeException e) {
-                // show it in the list with the reason, instead of silently hiding it
+                if (modsFolder) continue; /* not ours, skip it */
                 Constants.LOG.warn("Addon {} could not be read: {}", fileName, e.getMessage());
                 info = broken(entry, String.valueOf(e.getMessage()));
             }
@@ -312,11 +324,26 @@ public final class AddonManager {
             }
             found.add(info);
         }
-        addons = List.copyOf(found);
-        refreshProblems();
-        Constants.LOG.info("Found {} addon(s) in {}", found.size(), folder);
     }
 
+    private static void writeReadme(Path folder) throws IOException {
+        Path readme = folder.resolve("README.txt");
+        if (Files.exists(readme)) return;
+        Files.writeString(readme, """
+                Gallifreyan Chronicles addons
+                =============================
+                Drag addon files onto the Addons screen on the title screen, or put them here yourself.
+                Switch them on and off from that screen.
+
+                Data addons (datapack style: .zip or folder) go in this folder. They have an addon.json and a pack.mcmeta.
+                Java addons are real mods (.jar) and go in the mods folder, not here. The Addons screen puts them there for you.
+                They can do anything a mod can, so only install ones you trust.
+
+                The full guide is in docs/ADDONS.md in the mod's repository.
+                """, StandardCharsets.UTF_8);
+    }
+
+    /* couldn't read it, show the error */
     private static AddonInfo broken(Path path, String error) {
         String fileName = path.getFileName().toString();
         String base = fileName.contains(".") && !Files.isDirectory(path) ? fileName.substring(0, fileName.lastIndexOf('.')) : fileName;
@@ -324,7 +351,7 @@ public final class AddonManager {
                 false, null, null, 1, Map.of(), null, error);
     }
 
-    private static @Nullable AddonInfo describe(Path path) throws IOException {
+    private static @Nullable AddonInfo describe(Path path, boolean inModsFolder) throws IOException {
         byte[] descriptor = read(path, DESCRIPTOR);
         boolean hasData = read(path, "pack.mcmeta") != null;
         String fileName = path.getFileName().toString();
@@ -332,7 +359,8 @@ public final class AddonManager {
                 ? fileName.substring(0, fileName.lastIndexOf('.')) : fileName;
 
         if (descriptor == null && !hasData) {
-            if (fileName.toLowerCase().endsWith(".zip") || Files.isDirectory(path)) {
+            /* just another mod, or an empty zip */
+            if (!inModsFolder && (fileName.toLowerCase().endsWith(".zip") || Files.isDirectory(path))) {
                 return broken(path, "no addon.json or pack.mcmeta found");
             }
             return null;
@@ -345,6 +373,15 @@ public final class AddonManager {
                     : new JsonObject();
         } catch (RuntimeException e) {
             throw new IOException("addon.json is not valid JSON: " + e.getMessage(), e);
+        }
+
+        String javaMain = null;
+        if (json.has("java") && json.get("java").isJsonObject() && json.getAsJsonObject("java").has("main")) {
+            javaMain = json.getAsJsonObject("java").get("main").getAsString();
+        }
+        if (inModsFolder && javaMain == null) return null; /* not our mod */
+        if (!inModsFolder && javaMain != null) {
+            throw new IOException("this is a Java addon, which belongs in the mods folder, not gc_addons");
         }
 
         String id = string(json, "id", baseName.toLowerCase().replaceAll("[^a-z0-9_.-]+", "_"));
@@ -376,21 +413,10 @@ public final class AddonManager {
 
         Map<String, String> requires = new LinkedHashMap<>();
         if (json.has("requires")) {
-            if (!json.get("requires").isJsonObject())
-                throw new IOException("\"requires\" must be an object like {\"gallifreyan_chronicles\": \">=1.0.0\"}");
+            if (!json.get("requires").isJsonObject()) throw new IOException("\"requires\" must be an object like {\"gallifreyan_chronicles\": \">=1.0.0\"}");
             for (Map.Entry<String, JsonElement> entry : json.getAsJsonObject("requires").entrySet()) {
                 requires.put(entry.getKey(), entry.getValue().getAsString());
             }
-        }
-
-        String javaMain = null;
-        String sha256 = null;
-        if (json.has("java") && json.get("java").isJsonObject() && json.getAsJsonObject("java").has("main")) {
-            javaMain = json.getAsJsonObject("java").get("main").getAsString();
-            if (!fileName.toLowerCase().endsWith(".jar")) {
-                throw new IOException("a Java addon has to be a .jar file");
-            }
-            sha256 = sha256(path);
         }
 
         byte[] icon = read(path, string(json, "icon", "icon.png"));
@@ -399,28 +425,16 @@ public final class AddonManager {
             icon = null;
         }
 
-        return new AddonInfo(id, name, version, description, List.copyOf(authors), website, path, hasData, javaMain,
-                icon, api, Map.copyOf(requires), sha256, null);
-    }
-
-    private static String sha256(Path file) throws IOException {
-        try {
-            MessageDigest digest = MessageDigest.getInstance("SHA-256");
-            try (InputStream in = Files.newInputStream(file)) {
-                byte[] buffer = new byte[8192];
-                int read;
-                while ((read = in.read(buffer)) > 0) digest.update(buffer, 0, read);
-            }
-            return HexFormat.of().formatHex(digest.digest());
-        } catch (NoSuchAlgorithmException e) {
-            throw new IOException("SHA-256 is not available", e);
-        }
+        /* java addon data is loaded by the loader */
+        return new AddonInfo(id, name, version, description, List.copyOf(authors), website, path,
+                hasData && javaMain == null, javaMain, icon, api, Map.copyOf(requires), null, null);
     }
 
     private static String string(JsonObject json, String key, String fallback) {
         return json.has(key) && json.get(key).isJsonPrimitive() ? json.get(key).getAsString() : fallback;
     }
 
+    /* read one file from a zip, jar or folder */
     private static byte @Nullable [] read(Path container, String entry) throws IOException {
         if (Files.isDirectory(container)) {
             Path file = container.resolve(entry).normalize();
@@ -436,40 +450,52 @@ public final class AddonManager {
         }
     }
 
+    /* quick fingerprint of both folders */
     public static long folderSignature() {
         long signature = 17;
-        try (Stream<Path> stream = Files.list(folder())) {
-            for (Path path : (Iterable<Path>) stream::iterator) {
-                String name = path.getFileName().toString();
-                if (name.startsWith(".")) continue;
-                signature += name.hashCode() * 31L + Files.size(path) * 7L + Files.getLastModifiedTime(path).toMillis();
+        for (Path folder : List.of(folder(), modsFolder())) {
+            try (Stream<Path> stream = Files.list(folder)) {
+                for (Path path : (Iterable<Path>) stream::iterator) {
+                    String name = path.getFileName().toString();
+                    if (name.startsWith(".")) continue;
+                    signature += name.hashCode() * 31L + Files.size(path) * 7L + Files.getLastModifiedTime(path).toMillis();
+                }
+            } catch (IOException | RuntimeException ignored) {
+                /* missing folder, so a different fingerprint */
             }
-        } catch (IOException | RuntimeException ignored) {
-            // an unreadable or missing folder just gives a different fingerprint
         }
         return signature;
     }
 
+    /* copy dropped files in: java jars to mods, the rest to gc_addons */
     public static synchronized List<String> install(List<Path> dropped) {
         List<String> added = new ArrayList<>();
-        Path folder = folder();
-        try {
-            Files.createDirectories(folder);
-        } catch (IOException e) {
-            Constants.LOG.warn("Could not create the addons folder {}", folder, e);
-            return added;
-        }
         for (Path source : dropped) {
             String name = source.getFileName().toString();
             String lower = name.toLowerCase();
             boolean directory = Files.isDirectory(source);
             if (!directory && !lower.endsWith(".zip") && !lower.endsWith(".jar")) continue;
-            Path target = folder.resolve(name);
+
+            boolean javaAddon = false;
+            if (!directory) {
+                try {
+                    byte[] descriptor = read(source, DESCRIPTOR);
+                    if (descriptor != null) {
+                        JsonObject json = JsonParser.parseString(new String(descriptor, StandardCharsets.UTF_8)).getAsJsonObject();
+                        javaAddon = json.has("java");
+                    }
+                } catch (IOException | RuntimeException ignored) {
+                    /* can't read it, so it goes to gc_addons */
+                }
+            }
+
+            Path target = (javaAddon ? modsFolder() : folder()).resolve(name);
             if (Files.exists(target)) {
                 Constants.LOG.warn("An addon called {} is already installed, not overwriting it", name);
                 continue;
             }
             try {
+                Files.createDirectories(target.getParent());
                 if (directory) copyTree(source, target);
                 else Files.copy(source, target, StandardCopyOption.COPY_ATTRIBUTES);
                 added.add(name);
@@ -491,175 +517,50 @@ public final class AddonManager {
         }
     }
 
-    // Java addons
-    private static synchronized void loadJava() {
+    /* open jars can't be renamed on Windows,
+       so a helper renames them after the game closes.
+       Might not work, rename by hand then. */
+    private static void applyModFileStates() {
+        List<String[]> moves = new ArrayList<>();
         for (AddonInfo info : addons) {
-            if (!info.hasJava() || !isActive(info)) continue;
-            URLClassLoader loader = null;
-            try {
-                URL url = info.path().toUri().toURL();
-                loader = new URLClassLoader(new URL[]{url}, AddonManager.class.getClassLoader());
-                Class<?> type = Class.forName(info.javaMain(), true, loader);
-                if (!GCAddon.class.isAssignableFrom(type)) {
-                    throw new IllegalStateException(info.javaMain() + " does not implement GCAddon");
-                }
-                GCAddon addon = (GCAddon) type.getDeclaredConstructor().newInstance();
-                addon.onInitialize(new Context(info));
-                LOADED.put(info.id(), new LoadedJava(addon, loader));
-                Constants.LOG.info("Started Java addon '{}' {}", info.id(), info.version());
-            } catch (Throwable t) {
-                if (t instanceof VirtualMachineError error) throw error;
-                Throwable cause = t instanceof java.lang.reflect.InvocationTargetException && t.getCause() != null ? t.getCause() : t;
-                Constants.LOG.error("Java addon '{}' failed to start and was skipped", info.id(), cause);
-                FAILURES.put(info.id(), cause.getClass().getSimpleName() + ": " + cause.getMessage());
-                if (loader != null) {
-                    try {
-                        loader.close();
-                    } catch (IOException ignored) {
-                    }
-                }
+            if (!info.hasJava() || !MOD_STATE.containsKey(info.id())) continue;
+            Path path = info.path();
+            String name = path.getFileName().toString();
+            boolean wanted = MOD_STATE.get(info.id());
+            if (wanted && name.endsWith(DISABLED_SUFFIX)) {
+                moves.add(new String[]{path.toString(), path.resolveSibling(name.substring(0, name.length() - DISABLED_SUFFIX.length())).toString()});
+            } else if (!wanted && !name.endsWith(DISABLED_SUFFIX)) {
+                moves.add(new String[]{path.toString(), path.resolveSibling(name + DISABLED_SUFFIX).toString()});
             }
         }
-        refreshProblems();
-    }
-
-    private static synchronized void shutdown() {
-        for (Map.Entry<String, LoadedJava> entry : LOADED.entrySet()) {
-            try {
-                entry.getValue().addon().onShutdown();
-            } catch (Throwable t) {
-                Constants.LOG.warn("Java addon '{}' failed during shutdown", entry.getKey(), t);
+        if (moves.isEmpty()) return;
+        try {
+            boolean windows = System.getProperty("os.name", "").toLowerCase().contains("win");
+            if (windows) {
+                StringBuilder script = new StringBuilder("@echo off\r\nping -n 4 127.0.0.1 >nul\r\n");
+                for (String[] move : moves) script.append("move /y \"").append(move[0]).append("\" \"").append(move[1]).append("\" >nul\r\n");
+                script.append("del \"%~f0\"\r\n");
+                Path file = Files.createTempFile("gc_addon_files", ".bat");
+                Files.writeString(file, script.toString(), StandardCharsets.UTF_8);
+                new ProcessBuilder("cmd", "/c", "start", "/min", "", file.toString()).start();
+            } else {
+                StringBuilder script = new StringBuilder("sleep 3");
+                for (String[] move : moves) script.append("; mv -f '").append(move[0].replace("'", "'\\''")).append("' '")
+                        .append(move[1].replace("'", "'\\''")).append("'");
+                new ProcessBuilder("sh", "-c", "nohup sh -c \"" + script.toString().replace("\"", "\\\"") + "\" >/dev/null 2>&1 &").start();
             }
+        } catch (IOException e) {
+            Constants.LOG.warn("Could not schedule renaming the Java addon jars; rename them by hand ({} .jar <-> .jar.disabled)", moves.size(), e);
         }
     }
 
+    /* one summary in the log */
     private static void logReport() {
         for (AddonInfo info : addons) {
             AddonProblem problem = problem(info);
             String state = problem != null ? "NOT LOADED (" + problem.kind() + (problem.detail().isEmpty() ? "" : ": " + problem.detail()) + ")"
-                    : isEnabled(info.id()) ? "enabled" : "disabled";
-            Constants.LOG.info("Addon '{}' {} [{}{}]: {}", info.id(), info.version(), info.hasData() ? "data" : "",
-                    info.hasJava() ? (info.hasData() ? "+java" : "java") : "", state);
-        }
-    }
-
-    private static final class Context implements AddonContext {
-        private final AddonInfo info;
-        private final Logger logger;
-        private final String controlPrefix;
-
-        private Context(AddonInfo info) {
-            this.info = info;
-            this.logger = LoggerFactory.getLogger("GC Addon/" + info.id());
-            this.controlPrefix = info.id().replace('.', '_').replace('-', '_') + "_";
-        }
-
-        @Override
-        public String addonId() {
-            return info.id();
-        }
-
-        @Override
-        public Logger logger() {
-            return logger;
-        }
-
-        @Override
-        public String modVersion() {
-            return AddonManager.modVersion();
-        }
-
-        @Override
-        public boolean isModLoaded(String modId) {
-            return Services.PLATFORM.isModLoaded(modId);
-        }
-
-        @Override
-        public Path dataFolder() {
-            Path path = Services.PLATFORM.getConfigDir().resolve(Constants.MOD_ID).resolve("addons").resolve(info.id());
-            try {
-                Files.createDirectories(path);
-            } catch (IOException e) {
-                logger.warn("Could not create {}", path, e);
-            }
-            return path;
-        }
-
-        @Override
-        public JsonObject loadConfig() {
-            Path file = dataFolder().resolve("config.json");
-            if (!Files.exists(file)) return new JsonObject();
-            try (Reader reader = Files.newBufferedReader(file)) {
-                return JsonParser.parseReader(reader).getAsJsonObject();
-            } catch (IOException | RuntimeException e) {
-                logger.warn("Could not read {}, using an empty config", file, e);
-                return new JsonObject();
-            }
-        }
-
-        @Override
-        public void saveConfig(JsonObject config) {
-            Path file = dataFolder().resolve("config.json");
-            try {
-                Files.writeString(file, GSON.toJson(config), StandardCharsets.UTF_8);
-            } catch (IOException e) {
-                logger.warn("Could not save {}", file, e);
-            }
-        }
-
-        @Override
-        public <T extends TardisControl> void registerControl(String id, MapCodec<T> codec, T control) {
-            if (!CONTROL_ID.matcher(id).matches() || !id.startsWith(controlPrefix) || id.length() == controlPrefix.length()) {
-                throw new IllegalArgumentException("Control id '" + id + "' must be lower case letters, digits and underscores, "
-                        + "and start with '" + controlPrefix + "'");
-            }
-            if (TardisControlRegistry.isRegistered(id)) {
-                throw new IllegalStateException("A control called '" + id + "' is already registered");
-            }
-            TardisControlTypes.register(id, codec);
-            TardisControlRegistry.register(id, control);
-        }
-
-        @Override
-        public void onTakeOff(Consumer<Tardis> listener) {
-            TardisEvents.TAKE_OFF.register(guard("take off", listener, TardisEvents.TAKE_OFF));
-        }
-
-        @Override
-        public void onLand(Consumer<Tardis> listener) {
-            TardisEvents.LAND.register(guard("land", listener, TardisEvents.LAND));
-        }
-
-        @Override
-        public void runLater(MinecraftServer server, int delayTicks, Runnable action) {
-            GCScheduler.runLater(server, delayTicks, () -> {
-                try {
-                    action.run();
-                } catch (Throwable t) {
-                    if (t instanceof VirtualMachineError error) throw error;
-                    logger.error("A delayed task failed", t);
-                }
-            });
-        }
-
-        private Consumer<Tardis> guard(String eventName, Consumer<Tardis> listener, TardisEvents.Event event) {
-            return new Consumer<>() {
-                private int failures;
-
-                @Override
-                public void accept(Tardis tardis) {
-                    try {
-                        listener.accept(tardis);
-                    } catch (Throwable t) {
-                        if (t instanceof VirtualMachineError error) throw error;
-                        logger.error("A {} listener failed", eventName, t);
-                        if (++failures >= MAX_LISTENER_FAILURES) {
-                            event.unregister(this);
-                            logger.warn("Removed a {} listener after {} failures", eventName, MAX_LISTENER_FAILURES);
-                        }
-                    }
-                }
-            };
+                    : isRunning(info.id()) ? "running" : isEnabled(info) ? "enabled" : "disabled";
+            Constants.LOG.info("Addon '{}' {} [{}]: {}", info.id(), info.version(), info.hasJava() ? "java" : "data", state);
         }
     }
 }

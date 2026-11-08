@@ -1,0 +1,30 @@
+modLoader = "javafml"
+loaderVersion = "[4,)"
+license = "MIT"
+
+[[mods]]
+modId = "example_java_addon"
+version = "1.0.0"
+displayName = "Example Java Addon"
+authors = "NoahTNT2009"
+description = '''An addon for Gallifreyan Chronicles.'''
+
+[modproperties.example_java_addon]
+"gallifreyan_chronicles:addon" = "com.example.gcaddon.ExampleJavaAddon"
+
+[[mixins]]
+config = "example_java_addon.mixins.json"
+
+[[dependencies.example_java_addon]]
+modId = "gallifreyan_chronicles"
+type = "required"
+versionRange = "[0,)"
+ordering = "AFTER"
+side = "BOTH"
+
+[[dependencies.example_java_addon]]
+modId = "minecraft"
+type = "required"
+versionRange = "[26.3,26.4)"
+ordering = "NONE"
+side = "BOTH"

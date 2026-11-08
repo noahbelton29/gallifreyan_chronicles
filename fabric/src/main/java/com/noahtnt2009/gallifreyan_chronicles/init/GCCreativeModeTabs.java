@@ -3,6 +3,7 @@ package com.noahtnt2009.gallifreyan_chronicles.init;
 import com.noahtnt2009.gallifreyan_chronicles.Constants;
 import com.noahtnt2009.gallifreyan_chronicles.util.GCUtils;
 import net.fabricmc.fabric.api.creativetab.v1.FabricCreativeModeTab;
+import com.noahtnt2009.gallifreyan_chronicles.addon.AddonContent;
 import net.minecraft.core.Registry;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.chat.Component;
@@ -156,6 +157,14 @@ public class GCCreativeModeTabs {
                         output.accept(GCItems.TARANIUM_LEGGINGS);
                         output.accept(GCItems.TARANIUM_BOOTS);
                     }).build());
+
+    /** Everything addons registered through the addon API. Read when the tab is built, after addons have started. */
+    public static final CreativeModeTab ADDONS_TAB = Registry.register(BuiltInRegistries.CREATIVE_MODE_TAB,
+            GCUtils.modIdentifier("addons"),
+            FabricCreativeModeTab.builder().icon(() -> new ItemStack(GCItems.TARANIUM_INGOT))
+                    .title(Component.translatable("creativetab.gallifreyan_chronicles.addons"))
+                    .displayItems((parameters, output) -> AddonContent.tabItems().forEach(output::accept))
+                    .build());
 
     public static void registerFabricCreativeModeTabs() {
         Constants.LOG.info("Registering GC Creative Mode Tabs (Fabric)");

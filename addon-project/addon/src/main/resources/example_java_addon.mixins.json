@@ -1,0 +1,12 @@
+{
+  "required": true,
+  "minVersion": "0.8",
+  "package": "com.example.gcaddon.mixin",
+  "compatibilityLevel": "JAVA_21",
+  "mixins": [
+    "ExampleServerMixin"
+  ],
+  "injectors": {
+    "defaultRequire": 0
+  }
+}

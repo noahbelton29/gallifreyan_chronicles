@@ -16,11 +16,11 @@ java {
     toolchain.languageVersion = JavaLanguageVersion.of(java_version as int)
 }
 
-def modJar = rootProject.file(gc_neoforge_jar)
+def modJar = rootProject.findModJar('neoforge')
 // only checked when you actually run this loader, so building just the addon needs only the common jar
 tasks.register('checkModJar') {
     doLast {
-        if (!modJar.exists()) throw new GradleException("Put the mod's NeoForge jar at ${gc_neoforge_jar}, see libs/README.txt")
+        if (!modJar.exists()) throw new GradleException("Put the mod's NeoForge jar at libs/, see libs/README.txt")
     }
 }
 
@@ -42,6 +42,6 @@ dependencies {
 tasks.register('installAddon', Copy) {
     dependsOn ':addon:jar'
     from project(':addon').tasks.named('jar').flatMap { it.archiveFile }
-    into layout.projectDirectory.dir('run/gc_addons')
+    into layout.projectDirectory.dir('run/mods')
 }
 tasks.matching { it.name == 'runClient' }.configureEach { dependsOn 'installAddon', 'checkModJar' }

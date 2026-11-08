@@ -1,0 +1,6 @@
+{
+  "model": {
+    "type": "minecraft:model",
+    "model": "example_java_addon:item/example_gem"
+  }
+}

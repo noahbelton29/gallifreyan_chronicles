@@ -32,7 +32,7 @@ public class TardisConsoleHumSoundInstance extends AbstractTickableSoundInstance
         this.powered = powered;
         this.known = known;
         this.settled = known.getAsBoolean();
-        this.fade = settled && powered.getAsBoolean() ? 1.0F : 0.0F;
+        this.fade = 0.0F;
         this.x = pos.getX() + 0.5;
         this.y = pos.getY() + 0.5;
         this.z = pos.getZ() + 0.5;
@@ -60,7 +60,6 @@ public class TardisConsoleHumSoundInstance extends AbstractTickableSoundInstance
                 return;
             }
             settled = true;
-            fade = powered.getAsBoolean() ? 1.0F : 0.0F;
         }
 
         float target = powered.getAsBoolean() ? 1.0F : 0.0F;

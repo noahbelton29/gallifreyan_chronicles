@@ -1,5 +1,6 @@
 package com.noahtnt2009.gallifreyan_chronicles.client.gui.hud;
 
+import com.noahtnt2009.gallifreyan_chronicles.Constants;
 import com.noahtnt2009.gallifreyan_chronicles.block.ConsoleBlock;
 import com.noahtnt2009.gallifreyan_chronicles.block.entity.TardisConsoleBlockEntity;
 import com.noahtnt2009.gallifreyan_chronicles.config.GCConfig;
@@ -24,14 +25,12 @@ public final class GCPowerDarkness {
 
     private static final List<TardisConsoleBlockEntity> CONSOLES = new ArrayList<>();
     private static volatile float darkness = 0.0F;
-    private static long lastNanos = 0L;
     private static long snapUntilNanos = 0L;
     private static volatile long shaderBlindnessReadNanos = 0L;
-    private static Level lastLevel;
     private static final Set<Level> NO_CONSOLE_LEVELS = Collections.newSetFromMap(new WeakHashMap<>());
-    private static final Map<Level, RemoteDarkness> REMOTE = new WeakHashMap<>();
+    private static final Map<Level, LevelDarkness> STATES = new WeakHashMap<>();
 
-    private static final class RemoteDarkness {
+    private static final class LevelDarkness {
         private float darkness;
         private long lastNanos;
     }
@@ -51,18 +50,24 @@ public final class GCPowerDarkness {
         CONSOLES.clear();
         NO_CONSOLE_LEVELS.clear();
         darkness = 0.0F;
-        lastNanos = 0L;
         snapUntilNanos = 0L;
-        lastLevel = null;
         shaderBlindnessReadNanos = 0L;
-        REMOTE.clear();
+        STATES.clear();
     }
 
     private static Level playerLevel(Minecraft minecraft) {
         return minecraft.player != null ? minecraft.player.level() : minecraft.level;
     }
 
+    /* only tardis interiors go dark. a console placed and broken outside
+       (or left unpowered outside) must not darken the normal world */
+    private static boolean isTardisLevel(Level level) {
+        var id = level.dimension().identifier();
+        return id.getNamespace().equals(Constants.MOD_ID) && id.getPath().startsWith("tardis/");
+    }
+
     private static boolean shouldBeDark(Level level) {
+        if (!isTardisLevel(level)) return false;
         boolean dark = false;
         boolean hasConsole = false;
         for (TardisConsoleBlockEntity console : new ArrayList<>(CONSOLES)) {
@@ -71,6 +76,7 @@ public final class GCPowerDarkness {
             // only a destroyed console counts, one that was just unloaded with its chunk is still there
             Level consoleLevel = console.getLevel();
             if (consoleLevel != null && consoleLevel.hasChunkAt(console.getBlockPos())
+                    && isTardisLevel(consoleLevel)
                     && !(consoleLevel.getBlockState(console.getBlockPos()).getBlock() instanceof ConsoleBlock)) {
                 NO_CONSOLE_LEVELS.add(consoleLevel);
             }
@@ -88,51 +94,42 @@ public final class GCPowerDarkness {
         return darkness;
     }
 
-    public static float update() {
+    /* moves the fade for one world along by the real time that passed */
+    private static float step(Level level, long now) {
         Minecraft minecraft = Minecraft.getInstance();
-        long now = System.nanoTime();
-        float seconds = lastNanos == 0L ? 0.0F : Math.min((now - lastNanos) / 1.0E9F, 0.1F);
-        lastNanos = now;
-
-        Level level = playerLevel(minecraft);
-        if (level != lastLevel) {
-            lastLevel = level;
-            darkness = 0.0F;
-            snapUntilNanos = now + SNAP_WINDOW_NANOS;
+        float target = minecraft.player != null && shouldBeDark(level) ? 1.0F : 0.0F;
+        LevelDarkness state = STATES.get(level);
+        if (state == null) {
+            /* first look at this world: start where it should be, no fade */
+            state = new LevelDarkness();
+            state.darkness = target;
+            state.lastNanos = now;
+            STATES.put(level, state);
+            return state.darkness;
         }
-
-        float target = level != null && minecraft.player != null && shouldBeDark(level) ? 1.0F : 0.0F;
-        if (target < darkness || now >= snapUntilNanos) {
-            float step = seconds / FADE_SECONDS;
-            darkness = darkness < target ? Math.min(target, darkness + step) : Math.max(target, darkness - step);
+        if (now < snapUntilNanos && target > state.darkness) {
+            /* a console just loaded in (joining the world): go dark straight away */
+            state.darkness = target;
         } else {
-            darkness = target;
+            float seconds = Math.min((now - state.lastNanos) / 1.0E9F, FADE_SECONDS);
+            float stepSize = seconds / FADE_SECONDS;
+            state.darkness = state.darkness < target
+                    ? Math.min(target, state.darkness + stepSize)
+                    : Math.max(target, state.darkness - stepSize);
         }
+        state.lastNanos = now;
+        return state.darkness;
+    }
 
+    public static float update() {
+        Level level = playerLevel(Minecraft.getInstance());
+        darkness = level == null ? 0.0F : step(level, System.nanoTime());
         return darkness * (float) GCConfig.powerDarknessStrength();
     }
 
     public static float darknessOf(Level level) {
         if (level == null) return 0.0F;
-        Minecraft minecraft = Minecraft.getInstance();
-        if (level == playerLevel(minecraft)) return update();
-
-        long now = System.nanoTime();
-        float target = minecraft.player != null && shouldBeDark(level) ? 1.0F : 0.0F;
-        RemoteDarkness remote = REMOTE.get(level);
-        if (remote == null) {
-            remote = new RemoteDarkness();
-            remote.darkness = target;
-            REMOTE.put(level, remote);
-        } else {
-            float seconds = Math.min((now - remote.lastNanos) / 1.0E9F, 0.1F);
-            float step = seconds / FADE_SECONDS;
-            remote.darkness = remote.darkness < target
-                    ? Math.min(target, remote.darkness + step)
-                    : Math.max(target, remote.darkness - step);
-        }
-        remote.lastNanos = now;
-        return remote.darkness * (float) GCConfig.powerDarknessStrength();
+        return step(level, System.nanoTime()) * (float) GCConfig.powerDarknessStrength();
     }
 
     public static float renderLevelDarkness() {

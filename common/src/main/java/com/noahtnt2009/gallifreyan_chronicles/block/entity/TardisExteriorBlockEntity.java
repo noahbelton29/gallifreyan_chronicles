@@ -1,5 +1,6 @@
 package com.noahtnt2009.gallifreyan_chronicles.block.entity;
 
+import com.noahtnt2009.gallifreyan_chronicles.client.GCClientHooks;
 import com.noahtnt2009.gallifreyan_chronicles.block.TardisTopBlock;
 import com.noahtnt2009.gallifreyan_chronicles.tardis.door.TardisDoorRegistry;
 import com.noahtnt2009.gallifreyan_chronicles.tardis.api.Tardis;
@@ -159,6 +160,10 @@ public class TardisExteriorBlockEntity extends BlockEntity implements GeoBlockEn
 
     public boolean hasKeyRendered() {
         return heldKey.isPresent();
+    }
+
+    public boolean isPowered() {
+        return powered;
     }
 
     public boolean areDoorsFullyClosed() {
@@ -511,6 +516,7 @@ public class TardisExteriorBlockEntity extends BlockEntity implements GeoBlockEn
     // client side, re-meshes the surrounding chunk sections whenever the shadow toggles, so the baked ambient
     // occlusion on neighbouring blocks is refreshed
     public static void clientTick(Level level, TardisExteriorBlockEntity blockEntity) {
+        GCClientHooks.trackExteriorHum(blockEntity);
         boolean active = blockEntity.isShadowActive();
         if (active == blockEntity.lastShadowActive) return;
         blockEntity.lastShadowActive = active;
@@ -564,12 +570,16 @@ public class TardisExteriorBlockEntity extends BlockEntity implements GeoBlockEn
     }
 
     private void refreshPowerAndGlow(Level level) {
+        boolean wasPowered = powered;
         powered = TardisApi.of(this).flatMap(Tardis::livePower).orElse(powered);
         MinecraftServer server = level.getServer();
         boolean daylightAffectsGlow = server == null
                 || server.getGameRules().get(GCGameRules.DAYLIGHT_CYCLE_AFFECTS_GLOW);
         if (GlowSystem.tick(asEntity(), level.getDefaultClockTime(), daylightAffectsGlow, powered)) {
             applyGlowToBlockState(isGlowing());
+            sync();
+        } else if (powered != wasPowered) {
+            /* tell the client right away, the outside hum fades with the power */
             sync();
         }
     }

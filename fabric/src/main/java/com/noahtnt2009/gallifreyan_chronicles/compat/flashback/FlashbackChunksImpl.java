@@ -79,13 +79,11 @@ final class FlashbackChunksImpl {
                 /* tag the chunk with its world, using the client's numbers, so a
                    tardis chunk can't end up in the overworld */
                 int dimId = clientDimId(level);
-                if (dimId == Integer.MIN_VALUE) {
-                    /* client doesn't know the numbers yet, send it plain */
-                    viewer.connection.send(packet);
-                } else {
-                    viewer.connection.send(new ClientboundCustomPayloadPacket(
-                            new PacketRedirection.Payload(dimId, packet)));
-                }
+                /* if the client doesn't know this world yet, skip it. sending it
+                   plain put tardis chunks into the overworld (holes in the ground) */
+                if (dimId == Integer.MIN_VALUE) continue;
+                viewer.connection.send(new ClientboundCustomPayloadPacket(
+                        new PacketRedirection.Payload(dimId, packet)));
             }
         }
     }

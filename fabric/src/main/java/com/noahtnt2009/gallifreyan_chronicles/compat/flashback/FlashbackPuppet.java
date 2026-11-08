@@ -17,6 +17,9 @@ import qouteall.imm_ptl.core.ClientWorldLoader;
 import com.moulberry.flashback.Flashback;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.minecraft.world.phys.Vec3;
+import net.minecraft.core.SectionPos;
+import qouteall.imm_ptl.core.chunk_loading.ImmPtlClientChunkMap;
+import qouteall.imm_ptl.core.portal.Portal;
 
 /* when the recorded player goes into a tardis, the replay server doesn't have
    that world, so flashback can't move them. instead we read their recorded
@@ -66,6 +69,12 @@ public final class FlashbackPuppet {
         }
         if (waitTicks < 0 || --waitTicks > 0) return;
         if (step == 0) {
+            /* only needed when a door leads to an empty world. each reload also
+               restarts voxy, so don't do it for nothing */
+            if (!portalLeadsNowhere(Minecraft.getInstance())) {
+                waitTicks = -1;
+                return;
+            }
             /* flashback only reloads when going backwards, so step one tick
                forward first, then back a few ticks later */
             backTo = server.getReplayTick();
@@ -82,6 +91,31 @@ public final class FlashbackPuppet {
         }
     }
 
+    /* mark every chunk section around the camera to be built again. like F3+A,
+       but F3+A also restarts voxy's renderer, and this doesn't */
+    private static void rebuildSections(Minecraft client) {
+        ClientLevel level = client.level;
+        SectionPos camera = SectionPos.of(client.gameRenderer.mainCamera().position());
+        int radius = client.options.getEffectiveRenderDistance() + 1;
+        client.levelExtractor.setSectionRangeDirty(
+                camera.x() - radius, level.getMinSectionY(), camera.z() - radius,
+                camera.x() + radius, level.getMaxSectionY(), camera.z() + radius);
+    }
+
+    /* true if a portal here leads to a world with no chunks (the black door) */
+    private static boolean portalLeadsNowhere(Minecraft client) {
+        if (client.level == null) return false;
+        for (Entity entity : client.level.entitiesForRendering()) {
+            if (!(entity instanceof Portal portal) || portal.getAxisW() == null) continue;
+            ResourceKey<Level> dest = portal.getDestDim();
+            if (dest == null || dest.equals(client.level.dimension())) continue;
+            ClientLevel destLevel = ClientWorldLoader.peekWorld(dest);
+            if (destLevel == null) return true;
+            if (destLevel.getChunkSource() instanceof ImmPtlClientChunkMap map && map.getCopiedChunkList().isEmpty()) return true;
+        }
+        return false;
+    }
+
     static void registerClient() {
         ClientTickEvents.END_CLIENT_TICK.register(client -> {
             tickFirstPlayReload();
@@ -91,9 +125,7 @@ public final class FlashbackPuppet {
             }
             if (rebuildIn > 0 && --rebuildIn == 0) {
                 rebuildIn = -1;
-                if (client.level != null && FlashbackChunksImpl.inReplay()) {
-                    client.levelExtractor.allChanged();
-                }
+                if (client.level != null && FlashbackChunksImpl.inReplay()) rebuildSections(client);
             }
             if (puppet == null || puppet.isRemoved()) return;
             /* copy sprinting and sneaking from the hidden real one, so the copy

@@ -11,8 +11,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(ClientLevel.class)
 public abstract class ReplayModInteriorSoundMixin {
-
-    @Inject(method = {"playSeededSound", "playLocalSound", "playPlayerSound"}, at = @At("HEAD"), require = 0)
+    @Inject(method = {"playSeededSound*", "playLocalSound*", "playPlayerSound"}, at = @At("HEAD"), require = 0)
     private void gc$muteInteriorInReplay(CallbackInfo ci) {
         if (FabricLoader.getInstance().isModLoaded("replaymod")) {
             ReplayModSoundGate.shouldMute((Level) (Object) this);

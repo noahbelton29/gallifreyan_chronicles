@@ -7,6 +7,7 @@ import net.minecraft.server.MinecraftServer;
 import net.minecraft.world.level.Level;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Pseudo;
+import org.spongepowered.asm.mixin.Unique;
 import qouteall.q_misc_util.dimension.DimIntIdMap;
 import qouteall.q_misc_util.dimension.DimensionIntId;
 
@@ -27,7 +28,23 @@ public abstract class ReplayDimIdMixin {
         /* only the server list. telling the client would renumber the recorded
            packets and put tardis blocks in the overworld */
         DimIntIdMap map = DimensionIntId.getServerMap(server);
-        if (!map.containsDimId(dim)) map.add(dim, map.getNextIntegerId());
+        if (!map.containsDimId(dim)) map.add(dim, gc$pickId(map, dim));
         return map.toIntegerId(dim);
+    }
+
+    /* use the same number the recording used (the client already knows it from
+       the recording). a different number made recorded tardis chunks land in the
+       wrong world after jumping back, so the interior had the wrong blocks */
+    @Unique
+    private static int gc$pickId(DimIntIdMap serverMap, ResourceKey<Level> dim) {
+        DimIntIdMap clientMap = DimensionIntId.getClientMap();
+        if (clientMap.containsDimId(dim)) {
+            int id = clientMap.toIntegerId(dim);
+            if (!serverMap.containsIntId(id)) return id;
+        }
+        /* not known from the recording: pick a number the recording doesn't use either */
+        int id = serverMap.getNextIntegerId();
+        while (serverMap.containsIntId(id) || clientMap.containsIntId(id)) id++;
+        return id;
     }
 }

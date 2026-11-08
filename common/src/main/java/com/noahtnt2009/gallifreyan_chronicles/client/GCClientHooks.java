@@ -15,7 +15,9 @@ import com.noahtnt2009.gallifreyan_chronicles.block.entity.TardisConsoleBlockEnt
 import com.noahtnt2009.gallifreyan_chronicles.client.camera.GCCameraShake;
 import com.noahtnt2009.gallifreyan_chronicles.client.gui.hud.GCPowerDarkness;
 import com.noahtnt2009.gallifreyan_chronicles.client.security.BuildExpiry;
+import com.noahtnt2009.gallifreyan_chronicles.block.entity.TardisExteriorBlockEntity;
 import com.noahtnt2009.gallifreyan_chronicles.client.sound.ConsoleHumSounds;
+import com.noahtnt2009.gallifreyan_chronicles.client.sound.ExteriorHumSounds;
 import com.noahtnt2009.gallifreyan_chronicles.client.sound.GCMusic;
 import net.minecraft.client.Minecraft;
 import net.minecraft.core.BlockPos;
@@ -71,7 +73,12 @@ public final class GCClientHooks {
         GCConfig.flushPending(false);
         BuildExpiry.tick(minecraft);
         ConsoleHumSounds.tick();
+        ExteriorHumSounds.tick();
         GCMusic.tick(minecraft);
+    }
+
+    public static void trackExteriorHum(TardisExteriorBlockEntity be) {
+        ExteriorHumSounds.track(be);
     }
 
     public static void startConsoleClientEffects(TardisConsoleBlockEntity be) {

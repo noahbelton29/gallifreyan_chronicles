@@ -34,6 +34,10 @@ public final class BuildLock {
         return allowed;
     }
 
+    public static boolean isOwner(UUID account) {
+        return OWNER.equals(account);
+    }
+
     public static void enforce(UUID account) {
         Set<UUID> allowed = allowedAccounts();
         if (allowed.isEmpty()) return;

@@ -48,6 +48,7 @@
     "client.compat.PortalReplayTickMixin",
     "client.compat.VoxyTardisLodMixin",
     "client.compat.VoxyReplayIngestMixin",
+    "client.compat.VoxyPortalPassMixin",
     "client.compat.EntityCullingCompatMixin",
     "client.compat.PortalTardisClickMixin",
     "client.compat.LevelExtractorOutlineMixin",

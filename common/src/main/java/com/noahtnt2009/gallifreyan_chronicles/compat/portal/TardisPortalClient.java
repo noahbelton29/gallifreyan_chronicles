@@ -27,8 +27,8 @@ import com.noahtnt2009.gallifreyan_chronicles.client.gui.hud.GCPowerDarkness;
 import com.noahtnt2009.gallifreyan_chronicles.client.gui.hud.PowerDarknessTint;
 import qouteall.imm_ptl.core.ClientWorldLoader;
 import qouteall.imm_ptl.core.portal.Portal;
-import qouteall.imm_ptl.core.render.renderer.RendererUsingStencil;
 import qouteall.imm_ptl.core.render.context_management.PortalRendering;
+import qouteall.imm_ptl.core.render.renderer.RendererUsingStencil;
 
 final class TardisPortalClient {
     private TardisPortalClient() {
@@ -41,6 +41,10 @@ final class TardisPortalClient {
     static boolean isViewingThroughPortalNear(Vec3 pos, double range) {
         if (!PortalRendering.isRendering()) return false;
         return PortalRendering.getRenderingPortal().getDestPos().distanceToSqr(pos) <= range * range;
+    }
+
+    static boolean isRenderingAnyPortal() {
+        return PortalRendering.isRendering();
     }
 
     static boolean isRenderingTardisPortal() {

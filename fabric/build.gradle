@@ -64,7 +64,9 @@ dependencies {
     runtimeOnly("maven.modrinth:voxy-worldgen:${providers.gradleProperty("voxy_worldgen_version").get()}")
     runtimeOnly("mezz.jei:jei-${minecraft_version}-fabric:${jei_version}")
     compileOnly("maven.modrinth:replaymod:${providers.gradleProperty("replaymod_version").get()}")
-    runtimeOnly("maven.modrinth:replaymod:${providers.gradleProperty("replaymod_version").get()}")
+//    runtimeOnly("maven.modrinth:replaymod:${providers.gradleProperty("replaymod_version").get()}")
+    compileOnly("maven.modrinth:flashback:${flashback_version}")
+    runtimeOnly("maven.modrinth:flashback:${flashback_version}")
     runtimeOnly("maven.modrinth:entityculling:${entityculling_fabric_version}")
     runtimeOnly("maven.modrinth:lithium:${lithium_version}")
 }

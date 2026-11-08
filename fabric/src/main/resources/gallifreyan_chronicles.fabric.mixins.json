@@ -9,7 +9,21 @@
     "client.render.WindowMixin",
     "client.compat.ReplayModPortalRecordingMixin",
     "client.compat.ReplayModInteriorSoundMixin",
-    "client.compat.ReplayModMainMenuButtonMixin"
+    "client.compat.ReplayModMainMenuButtonMixin",
+    "client.compat.ReplayChunkForwardMixin",
+    "client.compat.FlashbackRecordChunksMixin",
+    "client.compat.ImmPtlReplayKeepChunksMixin",
+    "client.compat.ReplayForgetChunkMixin",
+    "client.compat.ReplayEntityDataMixin",
+    "client.compat.ReplayShapelessPortalMixin",
+    "client.compat.ReplayPlayerRemovedMixin",
+    "client.compat.ReplayPlayerDimensionMixin",
+    "client.compat.ReplayNoCameraTeleportMixin",
+    "client.compat.FlashbackClearEntitiesMixin",
+    "client.compat.FlashbackSnapshotPortalsMixin",
+    "client.compat.ReplaySprintParticlesMixin",
+    "client.compat.ReplayServerEntityDataMixin",
+    "client.compat.ReplayDimSyncMergeMixin"
   ],
   "server": [],
   "injectors": {

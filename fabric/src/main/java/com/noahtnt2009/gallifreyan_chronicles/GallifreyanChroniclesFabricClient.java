@@ -14,6 +14,7 @@ import com.noahtnt2009.gallifreyan_chronicles.init.GCBlocks;
 import com.noahtnt2009.gallifreyan_chronicles.init.GCEntityTypes;
 import com.noahtnt2009.gallifreyan_chronicles.network.client.GCFabricClientNetworking;
 import com.noahtnt2009.gallifreyan_chronicles.util.GCUtils;
+import com.noahtnt2009.gallifreyan_chronicles.compat.flashback.FlashbackOptionsButton;
 import com.noahtnt2009.gallifreyan_chronicles.compat.replaymod.ReplayModOptionsButton;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.loader.api.FabricLoader;
@@ -45,6 +46,9 @@ public class GallifreyanChroniclesFabricClient implements ClientModInitializer {
 
         if (FabricLoader.getInstance().isModLoaded("replaymod")) {
             ReplayModOptionsButton.register();
+        }
+        if (FabricLoader.getInstance().isModLoaded("flashback")) {
+            FlashbackOptionsButton.register();
         }
 
         // Hide the selection outline on interior doors (returning false cancels the outline)

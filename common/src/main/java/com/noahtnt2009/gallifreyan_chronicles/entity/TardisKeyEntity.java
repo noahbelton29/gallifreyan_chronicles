@@ -48,6 +48,8 @@ public class TardisKeyEntity extends Entity {
     public static final float DEFAULT_HEIGHT = 0.1f;
     public static final float DEFAULT_DEPTH = DEFAULT_WIDTH;
 
+    private boolean warnedNoExterior;
+
     public TardisKeyEntity(EntityType<? extends TardisKeyEntity> type, Level level) {
         super(type, level);
         this.noPhysics = true;
@@ -124,9 +126,11 @@ public class TardisKeyEntity extends Entity {
     public float getKeyWidth() {
         return this.entityData.get(KEY_WIDTH);
     }
+
     public float getKeyHeight() {
         return this.entityData.get(KEY_HEIGHT);
     }
+
     public float getKeyDepth() {
         return this.entityData.get(KEY_DEPTH);
     }
@@ -161,7 +165,10 @@ public class TardisKeyEntity extends Entity {
         if (pos == null) return null;
         BlockEntity be = this.level().getBlockEntity(pos);
         if (be instanceof TardisExteriorBlockEntity exterior) return exterior;
-        Constants.LOG.warn("Key entity at {} has no exterior block entity at {}", this.position(), pos);
+        if (!this.warnedNoExterior) {
+            this.warnedNoExterior = true;
+            Constants.LOG.warn("Key entity at {} has no exterior block entity at {}", this.position(), pos);
+        }
         return null;
     }
 

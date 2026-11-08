@@ -7,6 +7,9 @@
     "server.MinecraftServerMixin",
     "server.MinecraftServerAccessor",
     "server.ServerPlayerGameModeTardisMixin",
+    "compat.PortalReplayServerMixin",
+    "compat.ReplayDimIdMixin",
+    "compat.ReplayKeepViewerTrackingMixin",
     "addon.FolderRepositorySourceAccessor",
     "addon.PackRepositoryMixin"
   ],
@@ -39,6 +42,8 @@
     "client.sky.CloudRendererTextureMixin",
     "client.compat.PortalPowerDarknessMixin",
     "client.compat.PortalRenderLimitMixin",
+    "client.compat.PortalReplayDimensionMixin",
+    "client.compat.PortalReplayTickMixin",
     "client.compat.VoxyTardisLodMixin",
     "client.compat.EntityCullingCompatMixin",
     "client.compat.PortalTardisClickMixin",

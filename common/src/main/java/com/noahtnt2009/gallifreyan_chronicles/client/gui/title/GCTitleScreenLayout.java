@@ -1,6 +1,7 @@
 package com.noahtnt2009.gallifreyan_chronicles.client.gui.title;
 
 import com.noahtnt2009.gallifreyan_chronicles.Constants;
+import com.noahtnt2009.gallifreyan_chronicles.client.gui.screen.GCAddonsScreen;
 import com.noahtnt2009.gallifreyan_chronicles.client.gui.screen.GCConfigScreen;
 import com.noahtnt2009.gallifreyan_chronicles.client.gui.screen.GCCreditsScreen;
 import com.noahtnt2009.gallifreyan_chronicles.platform.Services;
@@ -101,8 +102,11 @@ public final class GCTitleScreenLayout {
             y += BUTTON_STEP;
         }
 
-        add.accept(new GCButton(PADDING, y, buttonWidth, BUTTON_HEIGHT, Component.translatable("menu.gallifreyan_chronicles.settings"),
+        add.accept(new GCButton(PADDING, y, halfWidth, BUTTON_HEIGHT, Component.translatable("menu.gallifreyan_chronicles.settings"),
                 button -> minecraft.gui.setScreen(new GCConfigScreen(screen))));
+        add.accept(new GCButton(PADDING + buttonWidth - halfWidth, y, halfWidth, BUTTON_HEIGHT,
+                Component.translatable("menu.gallifreyan_chronicles.addons"),
+                button -> minecraft.gui.setScreen(new GCAddonsScreen(screen))));
         y += BUTTON_STEP;
 
         add.accept(new GCButton(PADDING, y, buttonWidth, BUTTON_HEIGHT, Component.translatable("menu.gallifreyan_chronicles.credits"),

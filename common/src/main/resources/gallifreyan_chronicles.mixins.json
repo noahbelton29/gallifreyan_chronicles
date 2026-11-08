@@ -6,7 +6,9 @@
   "mixins": [
     "server.MinecraftServerMixin",
     "server.MinecraftServerAccessor",
-    "server.ServerPlayerGameModeTardisMixin"
+    "server.ServerPlayerGameModeTardisMixin",
+    "addon.FolderRepositorySourceAccessor",
+    "addon.PackRepositoryMixin"
   ],
   "client": [
     "client.screen.LogoRendererMixin",

@@ -1,0 +1,16 @@
+pluginManagement {
+    repositories {
+        gradlePluginPortal()
+        mavenCentral()
+        maven { url = uri('https://maven.fabricmc.net') }
+        maven { url = uri('https://maven.neoforged.net/releases') }
+    }
+}
+
+plugins {
+    id 'org.gradle.toolchains.foojay-resolver-convention' version '1.0.0'
+}
+
+rootProject.name = 'example_java_addon'
+
+include 'addon', 'fabric', 'neoforge'

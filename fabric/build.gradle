@@ -154,6 +154,9 @@ def gcWatermarkOff = providers.gradleProperty('watermark')
         .orElse(false)
 def gcLedgerFile = rootProject.layout.projectDirectory.file('build-ledger.csv')
 def gcLockUuids = providers.gradleProperty('lockUuid').orElse(providers.environmentVariable('GC_LOCK_UUID')).orElse('')
+def gcLockOff = providers.gradleProperty('lock')
+        .map { it.equalsIgnoreCase('off') || it.equalsIgnoreCase('false') }
+        .orElse(false)
 def gcUnassignedLock = '00000000-0000-0000-0000-000000000000'
 def gcExpiresIn = providers.gradleProperty('expiresIn').orElse('')
 def gcLedgerHeader = 'timestamp,build_id,tester,jar,locked_to,expires_at'
@@ -173,7 +176,11 @@ def generateBuildId = tasks.register('generateBuildId') {
             }
             java.util.UUID.fromString(text.replaceFirst(/(.{8})(.{4})(.{4})(.{4})(.{12})/, '$1-$2-$3-$4-$5')).toString()
         }
-        if (lockIds.isEmpty()) {
+        if (gcLockOff.get()) {
+            // -Plock=off: no account lock at all, anyone can use this jar (for example the jar an addon project builds against)
+            lockIds = []
+            logger.lifecycle('Account lock disabled for this build')
+        } else if (lockIds.isEmpty()) {
             lockIds = [gcUnassignedLock]
         }
 

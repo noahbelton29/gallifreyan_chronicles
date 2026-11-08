@@ -1,5 +1,6 @@
 package com.noahtnt2009.gallifreyan_chronicles;
 
+import com.noahtnt2009.gallifreyan_chronicles.addon.AddonManager;
 import com.noahtnt2009.gallifreyan_chronicles.config.GCConfig;
 import com.noahtnt2009.gallifreyan_chronicles.init.*;
 
@@ -23,5 +24,6 @@ public class CommonClass {
         GCFeatures.registerFeatures();
         GCTreeDecoratorTypes.registerTreeDecoratorTypes();
         GCSounds.registerSounds();
+        AddonManager.init();
     }
 }

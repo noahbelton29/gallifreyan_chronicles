@@ -1,0 +1,5 @@
+// Root project: only shared settings. See addon/, fabric/ and neoforge/.
+allprojects {
+    group = 'com.example.gcaddon'
+    version = addon_version
+}

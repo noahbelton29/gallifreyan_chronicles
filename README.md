@@ -2,7 +2,8 @@
 
 ## Source Code
 
-All source code in the `common/src/main/java`, `neoforge/src/main/java`, `fabric/src/main/java` directories are licensed under the GNU Lesser
+All source code in the `common/src/main/java`, `neoforge/src/main/java`, `fabric/src/main/java` directories are licensed
+under the GNU Lesser
 General Public License v3.0 (LGPL-3.0). See the `LICENSE` file.
 
 ## Assets
@@ -10,10 +11,17 @@ General Public License v3.0 (LGPL-3.0). See the `LICENSE` file.
 All artwork, textures, models, sounds, music, and other non-code assets are
 Copyright © 2026 noahbelton29.
 
-These assets are **All Rights Reserved** unless otherwise noted, these are in `common/main/resources/assets`, `neoforge/main/resources/assets`, and `fabric/main/resources/assets`.
+These assets are **All Rights Reserved** unless otherwise noted, these are in `common/main/resources/assets`,
+`neoforge/main/resources/assets`, and `fabric/main/resources/assets`.
 
 You may not copy, modify, redistribute, or reuse these assets outside this
 project without explicit written permission.
+
+## Addons
+
+Drop addon `.zip` or `.jar` files into the `gc_addons` folder, or drag them onto the **Addons** screen (the button next
+to **Mod Settings** on the title screen), and switch them on or off there. Addons can be datapack-style (data and
+assets) or Java.
 
 ## Doctor Who and the BBC
 

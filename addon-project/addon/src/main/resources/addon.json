@@ -1,0 +1,16 @@
+{
+  "id": "example_java_addon",
+  "name": "Example Java Addon",
+  "version": "1.0.0",
+  "description": "A Java addon. Logs takeoffs and landings and adds an example console control.",
+  "authors": [
+    "NoahTNT2009"
+  ],
+  "api": 1,
+  "requires": {
+    "gallifreyan_chronicles": ">=0.1.0 <1.0.0"
+  },
+  "java": {
+    "main": "com.example.gcaddon.ExampleJavaAddon"
+  }
+}

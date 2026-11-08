@@ -1,0 +1,38 @@
+plugins {
+    id 'java'
+    id 'net.neoforged.moddev' version '2.0.147'
+}
+
+// A loader-neutral addon project. It is separate from the mod's own Gradle build.
+//
+// It compiles against plain Minecraft (no Fabric, no NeoForge) plus the mod's COMMON jar, which holds the
+// addon API and the TARDIS API. Because it uses no loader code, the jar it builds loads on Fabric and NeoForge.
+// The mod jar is compileOnly: it is never put inside your addon.
+
+neoForge {
+    neoFormVersion = neo_form_version
+}
+
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(java_version as int)
+    }
+}
+
+def gcJar = [rootProject.file(gc_common_jar), rootProject.file('libs/gallifreyan_chronicles.jar')].find { it.exists() }
+        ?: rootProject.file(gc_common_jar)
+
+tasks.named('compileJava') {
+    doFirst {
+        if (!gcJar.exists()) throw new GradleException("Put the Gallifreyan Chronicles common jar at ${gc_common_jar} first, see libs/README.txt")
+    }
+}
+
+dependencies {
+    compileOnly files(gcJar)
+}
+
+jar {
+    archiveBaseName = addon_id
+    archiveVersion = addon_version
+}

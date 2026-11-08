@@ -1,0 +1,47 @@
+plugins {
+    id 'java'
+    id 'net.neoforged.moddev' version '2.0.147'
+}
+
+// A NeoForge dev game with the mod and your addon. Nothing here is shipped.
+//   ./gradlew :neoforge:runClient
+
+repositories {
+    mavenCentral()
+    maven { url = uri('https://maven.neoforged.net/releases') }
+    maven { url = uri('https://dl.cloudsmith.io/public/geckolib3/geckolib/maven/') }
+}
+
+java {
+    toolchain.languageVersion = JavaLanguageVersion.of(java_version as int)
+}
+
+def modJar = rootProject.file(gc_neoforge_jar)
+// only checked when you actually run this loader, so building just the addon needs only the common jar
+tasks.register('checkModJar') {
+    doLast {
+        if (!modJar.exists()) throw new GradleException("Put the mod's NeoForge jar at ${gc_neoforge_jar}, see libs/README.txt")
+    }
+}
+
+neoForge {
+    version = neoforge_version
+    runs {
+        client {
+            client()
+            gameDirectory = layout.projectDirectory.dir('run')
+        }
+    }
+}
+
+dependencies {
+    runtimeOnly files(modJar)
+    runtimeOnly "com.geckolib:geckolib-neoforge-${minecraft_version}:${geckolib_version}"
+}
+
+tasks.register('installAddon', Copy) {
+    dependsOn ':addon:jar'
+    from project(':addon').tasks.named('jar').flatMap { it.archiveFile }
+    into layout.projectDirectory.dir('run/gc_addons')
+}
+tasks.matching { it.name == 'runClient' }.configureEach { dependsOn 'installAddon', 'checkModJar' }

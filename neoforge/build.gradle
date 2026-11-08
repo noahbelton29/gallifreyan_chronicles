@@ -151,6 +151,9 @@ sourceSets.configureEach {
     }
 }
 def gcLockDir = layout.buildDirectory.dir('generated/gc-build-lock')
+def gcNeoLockOff = providers.gradleProperty('lock')
+        .map { it.equalsIgnoreCase('off') || it.equalsIgnoreCase('false') }
+        .orElse(false)
 def gcNeoLockUuids = providers.gradleProperty('lockUuid').orElse(providers.environmentVariable('GC_LOCK_UUID')).orElse('')
 
 def generateBuildLock = tasks.register('generateBuildLock') {
@@ -164,7 +167,11 @@ def generateBuildLock = tasks.register('generateBuildLock') {
             }
             java.util.UUID.fromString(text.replaceFirst(/(.{8})(.{4})(.{4})(.{4})(.{12})/, '$1-$2-$3-$4-$5')).toString()
         }
-        if (lockIds.isEmpty()) {
+        if (gcNeoLockOff.get()) {
+            // -Plock=off: no account lock at all
+            lockIds = []
+            logger.lifecycle('Account lock disabled for this build')
+        } else if (lockIds.isEmpty()) {
             lockIds = ['00000000-0000-0000-0000-000000000000']
         } else {
             logger.lifecycle("Build locked to Minecraft account(s): ${lockIds.join(', ')}")
@@ -177,3 +184,5 @@ def generateBuildLock = tasks.register('generateBuildLock') {
 
 sourceSets.main.resources.srcDir(gcLockDir)
 tasks.named('processResources') { dependsOn(generateBuildLock) }
+// the sources jar also reads the generated folder, so it must wait for the task that writes it
+tasks.matching { it.name == 'sourcesJar' }.configureEach { dependsOn(generateBuildLock) }

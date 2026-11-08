@@ -1,5 +1,6 @@
 package com.noahtnt2009.gallifreyan_chronicles.client.sound;
 
+import com.noahtnt2009.gallifreyan_chronicles.Constants;
 import com.noahtnt2009.gallifreyan_chronicles.block.entity.TardisConsoleBlockEntity;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.sounds.SoundManager;
@@ -17,6 +18,12 @@ public final class ConsoleHumSounds {
     private static int ticks;
 
     private ConsoleHumSounds() {
+    }
+
+    private static boolean isTardisLevel(TardisConsoleBlockEntity console) {
+        if (console.getLevel() == null) return false;
+        var id = console.getLevel().dimension().identifier();
+        return id.getNamespace().equals(Constants.MOD_ID) && id.getPath().startsWith("tardis/");
     }
 
     public static void track(TardisConsoleBlockEntity console) {
@@ -43,6 +50,15 @@ public final class ConsoleHumSounds {
             }
 
             if (console.getLevel() != minecraft.level) {
+                if (hum != null) {
+                    sounds.stop(hum);
+                    entry.setValue(null);
+                }
+                continue;
+            }
+
+            /* a console placed outside a tardis doesn't hum */
+            if (!isTardisLevel(console)) {
                 if (hum != null) {
                     sounds.stop(hum);
                     entry.setValue(null);

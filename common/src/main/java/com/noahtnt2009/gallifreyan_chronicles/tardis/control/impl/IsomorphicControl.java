@@ -23,18 +23,19 @@ public class IsomorphicControl extends BaseControl {
     public IsomorphicControl(ControlAnimations animations) { super(animations); }
 
     @Override
-    public InteractionResult onRightClick(TardisControlEntity entity, Player player, InteractionHand hand) {
-        TardisConsoleBlockEntity console = entity.getConsole();
-        if (console == null) return InteractionResult.FAIL;
-
+    public void playClickSound(TardisControlEntity entity) {
+        var console = entity.getConsole();
+        if (console == null || !(entity.level() instanceof ServerLevel level)) return;
         float pitch = console.getControlState(entity.getControlId()) ? 1.0F : 0.8F;
         BlockPos pos = entity.blockPosition();
-        if (entity.level() instanceof ServerLevel level) {
-            playAt(level, pos, GCSounds.SWITCH, pitch);
-            GCScheduler.runLater(level.getServer(), SECOND_SOUND_DELAY_TICKS,
-                    () -> playAt(level, pos, GCSounds.SWITCH, pitch));
-        }
-        return InteractionResult.SUCCESS;
+        playAt(level, pos, GCSounds.SWITCH, pitch);
+        GCScheduler.runLater(level.getServer(), SECOND_SOUND_DELAY_TICKS,
+                () -> playAt(level, pos, GCSounds.SWITCH, pitch));
+    }
+
+    @Override
+    public InteractionResult onRightClick(TardisControlEntity entity, Player player, InteractionHand hand) {
+        return entity.getConsole() == null ? InteractionResult.FAIL : InteractionResult.SUCCESS;
     }
 
     @Override

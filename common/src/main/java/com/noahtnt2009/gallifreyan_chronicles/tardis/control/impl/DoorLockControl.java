@@ -22,6 +22,11 @@ public class DoorLockControl extends BaseControl {
     public DoorLockControl(ControlAnimations animations) { super(animations); }
 
     @Override
+    public void playClickSound(TardisControlEntity entity) {
+        playSound(entity, GCSounds.SWITCH, 0.8f);
+    }
+
+    @Override
     public InteractionResult onRightClick(TardisControlEntity entity, Player player, InteractionHand hand) {
         var console = entity.getConsole();
         if (console == null || !(entity.level() instanceof ServerLevel level)) return InteractionResult.FAIL;
@@ -38,8 +43,6 @@ public class DoorLockControl extends BaseControl {
             tell(player, "message.gallifreyan_chronicles.close_doors_to_lock");
             return InteractionResult.FAIL;
         }
-
-        playSound(entity, GCSounds.SWITCH, 0.8f);
         return InteractionResult.SUCCESS;
     }
 

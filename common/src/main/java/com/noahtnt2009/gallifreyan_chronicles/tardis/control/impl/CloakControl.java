@@ -28,6 +28,11 @@ public class CloakControl extends BaseControl {
     }
 
     @Override
+    public void playClickSound(TardisControlEntity entity) {
+        playSound(entity, GCSounds.LEVER, 0.8f);
+    }
+
+    @Override
     public InteractionResult onRightClick(TardisControlEntity entity, Player player, InteractionHand hand) {
         if (!(entity.level() instanceof ServerLevel serverLevel)) {
             return InteractionResult.FAIL;
@@ -36,9 +41,6 @@ public class CloakControl extends BaseControl {
         if (console == null) {
             return InteractionResult.FAIL;
         }
-        SoundEvent sound = GCSounds.LEVER;
-        playSound(entity, sound, 0.8f);
-
         SoundEvent cloakSound = console.getControlState(GCTardisControls.CLOAK_CONTROL) ? GCSounds.TARDIS_UNCLOAK : GCSounds.TARDIS_CLOAK;
         playEverywhere(console, serverLevel, cloakSound);
         return InteractionResult.SUCCESS;

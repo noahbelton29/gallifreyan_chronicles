@@ -29,6 +29,11 @@ public class InteriorDoorControl extends BaseControl {
     }
 
     @Override
+    public void playClickSound(TardisControlEntity entity) {
+        playSound(entity, GCSounds.SWITCH, 0.8f);
+    }
+
+    @Override
     public InteractionResult onRightClick(TardisControlEntity entity, Player player, InteractionHand hand) {
         var console = entity.getConsole();
         if (console == null) {
@@ -49,7 +54,6 @@ public class InteriorDoorControl extends BaseControl {
                 return InteractionResult.FAIL;
             }
         }
-        playSound(entity, GCSounds.SWITCH, 0.8f);
         return InteractionResult.SUCCESS;
     }
 

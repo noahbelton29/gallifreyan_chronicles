@@ -55,8 +55,12 @@ public abstract class BaseControl implements TardisControl {
     @Override
     public InteractionResult onRightClick(TardisControlEntity entity, Player player, InteractionHand hand) {
         if (entity.getConsole() == null) return InteractionResult.FAIL;
-        playSound(entity, GCSounds.SLIDER, 0.9f);
         return InteractionResult.SUCCESS;
+    }
+
+    @Override
+    public void playClickSound(TardisControlEntity entity) {
+        playSound(entity, GCSounds.SLIDER, 0.9f);
     }
 
     protected static void playSound(TardisControlEntity entity, SoundEvent sound, float offPitch) {

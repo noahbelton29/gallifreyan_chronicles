@@ -1,5 +1,6 @@
 package com.noahtnt2009.gallifreyan_chronicles.block.entity;
 
+import com.noahtnt2009.gallifreyan_chronicles.Constants;
 import com.noahtnt2009.gallifreyan_chronicles.tardis.flight.TardisFlightState;
 import com.noahtnt2009.gallifreyan_chronicles.tardis.api.Tardis;
 import com.noahtnt2009.gallifreyan_chronicles.tardis.api.TardisApi;
@@ -86,7 +87,8 @@ public class TardisConsoleBlockEntity extends BlockEntity implements GeoBlockEnt
     }
     @Override
     public void registerControllers(AnimatableManager.@NonNull ControllerRegistrar controllerRegistrar) {
-        controllers.register(controllerRegistrar, this::hasPower, () -> this.currentRotorState);
+        /* the rotor stays still on a console outside a tardis */
+        controllers.register(controllerRegistrar, () -> hasPower() && isInTardis(), () -> this.currentRotorState);
     }
 
 
@@ -149,7 +151,22 @@ public class TardisConsoleBlockEntity extends BlockEntity implements GeoBlockEnt
     }
 
     public float glowLevel() {
-        return glowFade.update(hasPower() ? 1.0F : 0.0F);
+        /* no lights on a console that isn't inside a tardis */
+        return glowFade.update(hasPower() && isInTardis() ? 1.0F : 0.0F);
+    }
+
+    /* true when this console is inside a tardis interior. one placed anywhere
+       else is just decoration: controls only animate, no lights, no hum */
+    public boolean isInTardis() {
+        if (level == null) return false;
+        var id = level.dimension().identifier();
+        return id.getNamespace().equals(Constants.MOD_ID) && id.getPath().startsWith("tardis/");
+    }
+
+    /* outside a tardis: move the control and play its animation, nothing else */
+    public void animateControlOnly(String id, boolean activated, @Nullable Player triggeringPlayer) {
+        controls.setControlState(id, activated);
+        controls.playControlAnimation(id, activated, triggeringPlayer);
     }
 
     @Override

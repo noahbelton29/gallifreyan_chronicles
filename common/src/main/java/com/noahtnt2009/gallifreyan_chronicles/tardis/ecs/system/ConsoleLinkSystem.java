@@ -74,7 +74,13 @@ public final class ConsoleLinkSystem {
         if (!(console.getLevel() instanceof ServerLevel level)) return;
 
         Tardis tardis = TardisApi.ofLevel(level).orElse(null);
-        if (tardis == null) return;
+        if (tardis == null) {
+            /* placed outside a tardis: still give it its control hitboxes, they
+               only animate (see TardisControlEntity) */
+            spawnDefaultControls(console);
+            console.sync();
+            return;
+        }
         UUID tardisId = tardis.id();
 
         TardisManager manager = tardis.data();

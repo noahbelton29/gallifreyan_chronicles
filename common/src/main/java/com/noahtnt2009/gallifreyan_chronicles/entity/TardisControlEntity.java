@@ -1,5 +1,6 @@
 package com.noahtnt2009.gallifreyan_chronicles.entity;
 
+import com.noahtnt2009.gallifreyan_chronicles.init.GCSounds;
 import com.noahtnt2009.gallifreyan_chronicles.tardis.console.TardisConsole;
 import com.noahtnt2009.gallifreyan_chronicles.tardis.control.ControlPower;
 import com.noahtnt2009.gallifreyan_chronicles.Constants;
@@ -96,6 +97,8 @@ public class TardisControlEntity extends Entity {
     public boolean hurtServer(@NonNull ServerLevel serverLevel, DamageSource damageSource, float v) {
         if (damageSource.getEntity() instanceof Player player) {
             TardisConsoleBlockEntity console = this.getConsole();
+            /* console outside a tardis: punching a control does nothing */
+            if (console != null && !console.isInTardis()) return false;
             if (console != null && !TardisApi.canUseControls(console, player)) {
                 IsomorphicPunishment.punish(player, console);
                 return false;
@@ -209,6 +212,15 @@ public class TardisControlEntity extends Entity {
         }
 
         TardisConsoleBlockEntity console = this.getConsole();
+        if (console != null && !console.isInTardis()) {
+            /* console outside a tardis: the control just moves, it does nothing */
+            if (isOnCooldown(console)) return InteractionResult.FAIL;
+            /* sound first, like the real control (it reads the state before it flips) */
+            TardisControlRegistry.get(this.getControlId()).playClickSound(this);
+            boolean newState = !console.getControlState(this.getControlId());
+            console.animateControlOnly(this.getControlId(), newState, player);
+            return InteractionResult.SUCCESS;
+        }
         if (console != null && !TardisApi.canUseControls(console, player)) {
             IsomorphicPunishment.punish(player, console);
             return InteractionResult.FAIL;
@@ -242,6 +254,8 @@ public class TardisControlEntity extends Entity {
         InteractionResult result = control.onRightClick(this, player, hand);
 
         if (result == InteractionResult.SUCCESS) {
+            /* the control's own sound, before its state flips (pitch reads the old state) */
+            control.playClickSound(this);
             TardisConsoleBlockEntity console = this.getConsole();
             if (console != null) {
                 boolean currentState = console.getControlState(this.getControlId());

@@ -26,6 +26,11 @@ public abstract class DestinationControl extends BaseControl {
     }
 
     @Override
+    public void playClickSound(TardisControlEntity entity) {
+        if (playsSound()) playSound(entity, GCSounds.SWITCH, 0.8f);
+    }
+
+    @Override
     public InteractionResult onRightClick(TardisControlEntity entity, Player player, InteractionHand hand) {
         TardisConsoleBlockEntity console = entity.getConsole();
         if (console == null) return InteractionResult.FAIL;
@@ -37,7 +42,6 @@ public abstract class DestinationControl extends BaseControl {
             return InteractionResult.FAIL;
         }
 
-        if (playsSound()) playSound(entity, GCSounds.SWITCH, 0.8f);
         return InteractionResult.SUCCESS;
     }
 }

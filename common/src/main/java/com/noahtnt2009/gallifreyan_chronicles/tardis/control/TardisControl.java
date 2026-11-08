@@ -8,14 +8,16 @@ import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
 
 public interface TardisControl {
-    /**
-     * The codec for this kind of control's settings. Must be registered in {@link TardisControlTypes}, which is how a
-     * control is saved and read as {@code { "type": ..., <its fields> }}.
-     */
     MapCodec<? extends TardisControl> codec();
 
     default InteractionResult onRightClick(TardisControlEntity entity, Player player, InteractionHand hand) {
         return InteractionResult.PASS;
+    }
+
+    /* the sound this control makes when it's used. played for you after a
+       successful right click (and on consoles outside a tardis, which only animate),
+       so onRightClick doesn't need to play it */
+    default void playClickSound(TardisControlEntity entity) {
     }
 
     default boolean onLeftClick(TardisControlEntity entity, Player player) {

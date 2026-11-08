@@ -78,6 +78,8 @@ public class ConsoleBlock extends BaseEntityBlock {
 
     public static void repel(Level level, BlockPos pos, Entity entity) {
         if (!(level instanceof ServerLevel)) return;
+        /* only a console inside a tardis throws you off */
+        if (level.getBlockEntity(pos) instanceof TardisConsoleBlockEntity console && !console.isInTardis()) return;
         if (!(entity instanceof LivingEntity livingEntity)) return;
 
         float yaw = livingEntity.getYRot() * ((float) Math.PI / 180F);

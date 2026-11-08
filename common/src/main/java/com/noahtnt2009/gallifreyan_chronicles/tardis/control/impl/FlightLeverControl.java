@@ -89,8 +89,6 @@ public class FlightLeverControl extends BaseControl {
                 return InteractionResult.FAIL;
             }
 
-            playSound(entity, GCSounds.SLIDER, 0.9f);
-
             if (takingOff) {
                 beginTakeoffEffects(level, console, controlId, entity.position());
             } else {
@@ -99,7 +97,6 @@ public class FlightLeverControl extends BaseControl {
             return InteractionResult.SUCCESS;
         }
 
-        playSound(entity, GCSounds.SLIDER, 0.9f);
         return InteractionResult.SUCCESS;
     }
 

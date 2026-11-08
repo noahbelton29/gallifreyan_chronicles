@@ -19,16 +19,17 @@ public class PowerLeverControl extends BaseControl {
     public PowerLeverControl(ControlAnimations animations) { super(animations); }
 
     @Override
-    public InteractionResult onRightClick(TardisControlEntity entity, Player player, InteractionHand hand) {
-        super.onRightClick(entity, player, hand);
+    public void playClickSound(TardisControlEntity entity) {
+        super.playClickSound(entity);
         var console = entity.getConsole();
-        if (console == null) {
-            return InteractionResult.FAIL;
-        }
-        boolean controlState = console.getControlState(GCTardisControls.POWER_LEVER);
-        SoundEvent sound = controlState ? GCSounds.TARDIS_POWER_OFF : GCSounds.TARDIS_POWER_ON;
-        playSound(entity, sound, 1.0f);
-        return InteractionResult.SUCCESS;
+        if (console == null) return;
+        playSound(entity, console.getControlState(GCTardisControls.POWER_LEVER)
+                ? GCSounds.TARDIS_POWER_OFF : GCSounds.TARDIS_POWER_ON, 1.0f);
+    }
+
+    @Override
+    public InteractionResult onRightClick(TardisControlEntity entity, Player player, InteractionHand hand) {
+        return entity.getConsole() == null ? InteractionResult.FAIL : InteractionResult.SUCCESS;
     }
 
     @Override

@@ -1,5 +1,6 @@
 package com.noahtnt2009.gallifreyan_chronicles.mixin.client.render;
 
+import net.minecraft.client.player.LocalPlayer;
 import org.jspecify.annotations.Nullable;
 import net.minecraft.client.renderer.texture.UvMapping;
 import net.minecraft.client.renderer.SubmitNodeCollector;
@@ -30,7 +31,12 @@ public abstract class LivingEntityRendererRematMixin {
     @Inject(method = "extractRenderState(Lnet/minecraft/world/entity/LivingEntity;Lnet/minecraft/client/renderer/entity/state/LivingEntityRenderState;F)V",
             at = @At("TAIL"))
     private void gc$rematAlpha(LivingEntity entity, LivingEntityRenderState state, float partialTicks, CallbackInfo ci) {
-        float alpha = entity instanceof Player ? RematCatchClient.playerAlpha(entity.getUUID(), partialTicks) : 1.0f;
+        float alpha = 1.0f;
+        if (entity instanceof Player player && !(player instanceof LocalPlayer)) {
+            /* they fade in for others, and fade with the interior for someone it's materialising around */
+            alpha = Math.min(RematCatchClient.playerAlpha(entity.getUUID(), partialTicks),
+                    RematCatchClient.opacityIn(entity.level()));
+        }
         ((RematAlpha) state).gc$setRematAlpha(alpha);
     }
 

@@ -1,5 +1,6 @@
 package com.noahtnt2009.gallifreyan_chronicles.client.tardis;
 
+import com.noahtnt2009.gallifreyan_chronicles.block.InteriorDoorBlock;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.QuadInstance;
 import com.noahtnt2009.gallifreyan_chronicles.network.RematCatchPayload;
@@ -136,6 +137,8 @@ public final class RematCatchClient {
             if (pos.getY() < payload.floorY()) continue;
             BlockState state = level.getBlockState(pos);
             if (state.isAir() || !state.getFluidState().isEmpty()) continue;
+            /* doors stay, their renderer fades them. the console is hidden and pops in once landed */
+            if (state.getBlock() instanceof InteriorDoorBlock) continue;
             BlockPos fixed = pos.immutable();
             if (state.getRenderShape() == RenderShape.MODEL) {
                 BlockStateModel model = mc.getModelManager().getBlockStateModelSet().get(state);
@@ -191,6 +194,15 @@ public final class RematCatchClient {
     /* true while the picked player's interior is hidden for the fade */
     public static boolean hidesBlocksIn(@Nullable Level level) {
         return level != null && !HIDDEN.isEmpty() && level.dimension().equals(selfDim);
+    }
+
+    /* how solid things in this world are for you right now: 1 normally, the remat fade
+       while the interior is materialising around you (console, doors, other players) */
+    public static float opacityIn(@Nullable Level level) {
+        Fade fade = self;
+        Minecraft mc = Minecraft.getInstance();
+        if (fade == null || mc.level == null || !hidesBlocksIn(level)) return 1.0f;
+        return fade.opacity(mc.level.getGameTime(), mc.getDeltaTracker().getGameTimeDeltaPartialTick(false));
     }
 
     /* every frame, from the level renderer */

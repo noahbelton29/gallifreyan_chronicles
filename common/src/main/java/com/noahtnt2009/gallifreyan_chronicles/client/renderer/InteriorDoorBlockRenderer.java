@@ -1,5 +1,12 @@
 package com.noahtnt2009.gallifreyan_chronicles.client.renderer;
 
+import org.jspecify.annotations.Nullable;
+import net.minecraft.util.ARGB;
+import net.minecraft.resources.Identifier;
+import net.minecraft.client.renderer.rendertype.RenderTypes;
+import net.minecraft.client.renderer.rendertype.RenderType;
+import net.minecraft.client.renderer.OrderedSubmitNodeCollector;
+import com.noahtnt2009.gallifreyan_chronicles.client.tardis.RematCatchClient;
 import com.geckolib.constant.dataticket.DataTicket;
 import com.geckolib.renderer.GeoBlockRenderer;
 import net.minecraft.world.phys.Vec3;
@@ -26,6 +33,7 @@ public class InteriorDoorBlockRenderer extends GeoBlockRenderer<@NotNull Interio
     public static final DataTicket<Boolean> FLIPPED = DataTicket.create("interior_door_flipped", Boolean.class);
     public static final DataTicket<Boolean> FLUSH = DataTicket.create("interior_door_flush", Boolean.class);
     public static final DataTicket<Float> YAW = DataTicket.create("interior_door_yaw", Float.class);
+    public static final DataTicket<Float> REMAT = DataTicket.create("interior_door_remat_opacity", Float.class);
 
     public InteriorDoorBlockRenderer(BlockEntityRendererProvider.Context context) {
         super(context, new InteriorDoorBlockModel());
@@ -46,6 +54,7 @@ public class InteriorDoorBlockRenderer extends GeoBlockRenderer<@NotNull Interio
         renderState.addGeckolibData(YAW, animatable.getFacing().toYRot());
         renderState.addGeckolibData(FLIPPED, animatable.isFlipped());
         renderState.addGeckolibData(FLUSH, animatable.isFlush());
+        renderState.addGeckolibData(REMAT, RematCatchClient.opacityIn(animatable.getLevel()));
     }
 
     @Override
@@ -100,5 +109,38 @@ public class InteriorDoorBlockRenderer extends GeoBlockRenderer<@NotNull Interio
         super.adjustModelBonesForRender(renderPassInfo, snapshots);
         /* portal bone is only a marker */
         snapshots.ifPresent(PortalBone.BONE_NAME, snapshot -> snapshot.skipRender(true));
+    }
+
+    /* fades with the interior while it materialises around you, like the exterior does */
+    @Override
+    public int getRenderColor(InteriorDoorBlockEntity animatable, @Nullable Void relatedObject, float partialTick) {
+        int color = super.getRenderColor(animatable, relatedObject, partialTick);
+        float opacity = RematCatchClient.opacityIn(animatable.getLevel());
+        return opacity < 1.0f ? ARGB.multiply(color, RematCatchClient.fadeTint(opacity)) : color;
+    }
+
+    @Override
+    public @Nullable RenderType getRenderType(TardisExteriorBlockRenderState renderState, Identifier texture) {
+        float opacity = renderState.getOrDefaultGeckolibData(REMAT, 1.0f);
+        if (opacity <= 0.0f) return null;
+        if (opacity < 1.0f) return RenderTypes.entityTranslucentCull(texture);
+        return super.getRenderType(renderState, texture);
+    }
+
+    @Override
+    public void submitRenderTasks(RenderPassInfo<TardisExteriorBlockRenderState> renderPassInfo,
+                                  OrderedSubmitNodeCollector renderTasks, @Nullable RenderType renderType) {
+        float opacity = renderPassInfo.renderState().getOrDefaultGeckolibData(REMAT, 1.0f);
+        if (renderType != null && opacity < 1.0f) {
+            OrderedSubmitNodeCollector maskTasks = renderTasks instanceof SubmitNodeCollector collector
+                    ? collector.order(RematCatchClient.MASK_ORDER)
+                    : renderTasks;
+            PoseStack poseStack = renderPassInfo.poseStack();
+            poseStack.pushPose();
+            poseStack.last().pose().scaleLocal(RematCatchClient.MASK_PUSH, RematCatchClient.MASK_PUSH, RematCatchClient.MASK_PUSH);
+            super.submitRenderTasks(renderPassInfo, maskTasks, RenderTypes.waterMask());
+            poseStack.popPose();
+        }
+        super.submitRenderTasks(renderPassInfo, renderTasks, renderType);
     }
 }

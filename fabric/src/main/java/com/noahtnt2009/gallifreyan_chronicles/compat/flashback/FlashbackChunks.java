@@ -62,10 +62,10 @@ public final class FlashbackChunks {
 
     /* the replay server is about to unwrap a packet meant for another world.
        true = we passed it on to the camera instead. see ReplayRedirectForwardMixin */
-    public static boolean passOnFromReplayServer(Object listener, Packet<?> packet) {
+    public static boolean passOnFromReplayServer(Object listener, int dimId, Packet<?> packet) {
         if (!ACTIVE || !listener.getClass().getName().startsWith("com.moulberry.flashback.")) return false;
         try {
-            return FlashbackChunksImpl.passOn(packet);
+            return FlashbackChunksImpl.passOn(dimId, packet);
         } catch (Throwable t) {
             failed("passing other-world packets on", t);
             return false;

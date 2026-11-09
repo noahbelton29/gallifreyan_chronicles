@@ -5,6 +5,7 @@ import com.geckolib.constant.dataticket.DataTicket;
 import com.geckolib.renderer.GeoBlockRenderer;
 import net.minecraft.client.renderer.state.level.CameraRenderState;
 import com.geckolib.renderer.base.BoneSnapshots;
+import com.noahtnt2009.gallifreyan_chronicles.compat.portal.PortalBone;
 import com.geckolib.renderer.base.RenderPassInfo;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.math.Axis;
@@ -113,6 +114,8 @@ public class TardisExteriorBlockRenderer extends GeoBlockRenderer<@NotNull Tardi
     @Override
     public void adjustModelBonesForRender(@NonNull RenderPassInfo<TardisExteriorBlockRenderState> renderPassInfo, @NonNull BoneSnapshots snapshots) {
         super.adjustModelBonesForRender(renderPassInfo, snapshots);
+        /* portal bone is only a marker */
+        snapshots.ifPresent(PortalBone.BONE_NAME, snapshot -> snapshot.skipRender(true));
 
         float opacity = renderPassInfo.renderState().getOrDefaultGeckolibData(OPACITY, 1.0f);
         if (opacity < 1.0f) {

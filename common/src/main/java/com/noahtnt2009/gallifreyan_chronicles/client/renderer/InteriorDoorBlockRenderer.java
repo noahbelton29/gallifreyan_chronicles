@@ -7,6 +7,8 @@ import net.minecraft.client.renderer.state.level.CameraRenderState;
 import net.minecraft.client.renderer.SubmitNodeCollector;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.geckolib.renderer.base.RenderPassInfo;
+import com.geckolib.renderer.base.BoneSnapshots;
+import com.noahtnt2009.gallifreyan_chronicles.compat.portal.PortalBone;
 import com.mojang.math.Axis;
 import com.noahtnt2009.gallifreyan_chronicles.block.InteriorDoorBlock;
 import com.noahtnt2009.gallifreyan_chronicles.config.GCConfig;
@@ -91,5 +93,12 @@ public class InteriorDoorBlockRenderer extends GeoBlockRenderer<@NotNull Interio
     @Override
     public int getViewDistance() {
         return GCConfig.modelRenderDistance();
+    }
+
+    @Override
+    public void adjustModelBonesForRender(@NonNull RenderPassInfo<TardisExteriorBlockRenderState> renderPassInfo, @NonNull BoneSnapshots snapshots) {
+        super.adjustModelBonesForRender(renderPassInfo, snapshots);
+        /* portal bone is only a marker */
+        snapshots.ifPresent(PortalBone.BONE_NAME, snapshot -> snapshot.skipRender(true));
     }
 }

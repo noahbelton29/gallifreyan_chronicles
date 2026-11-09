@@ -1,0 +1,58 @@
+{
+	"format_version": "1.12.0",
+	"minecraft:geometry": [
+		{
+			"description": {
+				"identifier": "geometry.unknown",
+				"texture_width": 256,
+				"texture_height": 256,
+				"visible_bounds_width": 3,
+				"visible_bounds_height": 4.5,
+				"visible_bounds_offset": [0, 1.75, 0]
+			},
+			"bones": [
+				{
+					"name": "bb_main",
+					"pivot": [0, 0, 0],
+					"cubes": [
+						{"origin": [-10, 0, -10], "size": [20, 4, 20], "pivot": [0, 0, 0], "rotation": [0, 90, 0], "uv": [0, 28]},
+						{"origin": [-9, 4, 8], "size": [18, 36, 1], "pivot": [0, 0, 0], "rotation": [0, 90, 0], "uv": [36, 52]},
+						{"origin": [-8, 4, -9], "size": [17, 36, 1], "pivot": [0, 0, 0], "rotation": [0, 90, 0], "uv": [74, 52]},
+						{"origin": [-9, 4, -9], "size": [1, 36, 17], "pivot": [0, 0, 0], "rotation": [0, 90, 0], "uv": [0, 52]},
+						{"origin": [-10, 40, -10], "size": [20, 8, 20], "pivot": [0, 0, 0], "rotation": [0, 90, 0], "uv": [0, 0]}
+					]
+				},
+				{
+					"name": "left_door",
+					"pivot": [-8, 22, -6],
+					"cubes": [
+						{"origin": [6, 4, -8], "size": [1, 36, 8], "pivot": [0, 0, 0], "rotation": [0, 90, 0], "uv": [80, 0]}
+					]
+				},
+				{
+					"name": "right_door",
+					"pivot": [8, 22, -6],
+					"cubes": [
+						{"origin": [6, 4, 0], "size": [1, 36, 8], "pivot": [0, 0, 0], "rotation": [0, 90, 0], "uv": [36, 89]}
+					]
+				},
+				{
+					"name": "key_to_render",
+					"parent": "right_door",
+					"pivot": [0.5, 20.46274, -7.02427],
+					"rotation": [-45, 0, 0],
+					"cubes": [
+						{"origin": [0, 19.95563, -9.01716], "size": [1, 1, 2], "uv": [0, 0]}
+					]
+				},
+				{
+					"name": "portal",
+					"pivot": [0, 0, 0],
+					"cubes": [
+						{"origin": [6, 4, -8], "size": [1, 36, 16], "pivot": [0, 0, 0], "rotation": [0, 90, 0], "uv": [138, 76]}
+					]
+				}
+			]
+		}
+	]
+}

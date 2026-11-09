@@ -21,6 +21,8 @@ import qouteall.imm_ptl.core.portal.Portal;
 import org.joml.Vector3d;
 import com.noahtnt2009.gallifreyan_chronicles.client.sound.SoundListener;
 import net.minecraft.world.level.Level;
+import net.minecraft.resources.ResourceKey;
+import org.jspecify.annotations.Nullable;
 import net.minecraft.world.phys.Vec3;
 import java.util.ArrayList;
 import qouteall.imm_ptl.core.render.context_management.RenderStates;
@@ -51,11 +53,23 @@ final class FlashbackChunksImpl {
         return FlashbackPuppet.isHiddenReal(entity);
     }
 
-    static boolean passOn(Packet<?> packet) {
+    /* only packets for other worlds. ones for the replay's own world (the overworld
+       chunks while the player was in the tardis) must go into the replay server,
+       or it never has them and the world is void */
+    static boolean passOn(int dimId, Packet<?> packet) {
         ReplayServer server = Flashback.getReplayServer();
         if (server == null) return false;
+        ResourceKey<Level> dim = DimensionIntId.getClientMap().fromIntegerIdNullable(dimId);
+        if (dim == null || dim.equals(replayDim(server))) return false;
         for (ReplayPlayer viewer : server.getReplayViewers()) viewer.connection.send(packet);
         return true;
+    }
+
+    /* the world the replay server is playing in */
+    private static @Nullable ResourceKey<Level> replayDim(ReplayServer server) {
+        for (ReplayPlayer viewer : server.getReplayViewers()) return viewer.level().dimension();
+        for (ServerLevel level : server.getAllLevels()) return level.dimension();
+        return null;
     }
 
     static void writeSnapshotFromOutside(Runnable original) {

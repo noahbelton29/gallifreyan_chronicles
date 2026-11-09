@@ -20,6 +20,6 @@ public abstract class ReplayRedirectForwardMixin {
     @Inject(method = "handleAtPacketHandle", at = @At("HEAD"), cancellable = true, remap = false, require = 0)
     private static void gc$passOn(PacketRedirection.Payload payload, ClientCommonPacketListener listener,
                                   Packet<ClientCommonPacketListener> packet, CallbackInfo ci) {
-        if (FlashbackChunks.passOnFromReplayServer(listener, packet)) ci.cancel();
+        if (FlashbackChunks.passOnFromReplayServer(listener, payload.dimensionIntId(), packet)) ci.cancel();
     }
 }

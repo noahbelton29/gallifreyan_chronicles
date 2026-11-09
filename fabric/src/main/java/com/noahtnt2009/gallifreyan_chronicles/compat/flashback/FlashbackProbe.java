@@ -1,5 +1,8 @@
 package com.noahtnt2009.gallifreyan_chronicles.compat.flashback;
 
+import com.moulberry.flashback.Flashback;
+import com.moulberry.flashback.playback.ReplayPlayer;
+import com.moulberry.flashback.playback.ReplayServer;
 import com.noahtnt2009.gallifreyan_chronicles.Constants;
 import com.noahtnt2009.gallifreyan_chronicles.config.GCConfig;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
@@ -26,7 +29,11 @@ final class FlashbackProbe {
             StringBuilder sb = new StringBuilder();
             sb.append("main=").append(name(client.level))
                     .append(" cam=").append(client.gameRenderer.mainCamera().blockPosition().toShortString())
-                    .append(" drawnPortals=").append(RenderStates.getRenderedPortalNum());
+                    .append(" drawnPortals=").append(RenderStates.getRenderedPortalNum())
+                    .append(" player=").append(client.player != null ? name((ClientLevel) client.player.level()) : "none")
+                    .append(" serverDim=").append(ReplayVirtualDimension.serverDim())
+                    .append(" away=").append(ReplayVirtualDimension.isAway())
+                    .append(" viewer=").append(viewerPos());
             for (ClientLevel world : ClientWorldLoader.getClientWorlds()) {
                 int portals = 0;
                 StringBuilder p = new StringBuilder();
@@ -50,6 +57,14 @@ final class FlashbackProbe {
                 Constants.LOG.info("[replay debug] tick {} {}", ticks, line);
             }
         });
+    }
+
+    /* where the replay server has the camera, it sends chunks around this */
+    private static String viewerPos() {
+        ReplayServer server = Flashback.getReplayServer();
+        if (server == null) return "none";
+        for (ReplayPlayer viewer : server.getReplayViewers()) return viewer.blockPosition().toShortString();
+        return "none";
     }
 
     private static String name(ClientLevel level) {

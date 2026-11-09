@@ -50,6 +50,7 @@ public final class TardisPortals {
     private static final Vec3 EXTERIOR_PORTAL_OFFSET = new Vec3(0.0, 18.0 / 16.0, -10.05 / 16.0);
     private static final Vec3 INTERIOR_PORTAL_OFFSET = new Vec3(0.0, 1.0, 8.05 / 16.0);
     private static final double INTERIOR_VIEW_Z = 7.95 / 16.0;
+    private static final double PORTAL_GAP = 0.05 / 16.0;
     private static final Vec3 UP = new Vec3(0.0, 1.0, 0.0);
     private static final Vec3 DOWN = new Vec3(0.0, -1.0, 0.0);
     private static final double FLUSH_DOOR_HEIGHT = 0.75;
@@ -79,7 +80,8 @@ public final class TardisPortals {
     private record Placement(ResourceKey<Level> exteriorDimension, BlockPos exteriorPos, float exteriorYaw,
                              ResourceKey<Level> interiorDimension, BlockPos doorPos, Direction doorFacing,
                              boolean doorFlipped,
-                             boolean doorFlush, boolean doorBackBlocked) {
+                             boolean doorFlush, boolean doorBackBlocked,
+                             String exteriorModel, String doorModel) {
     }
 
     private static final class Link {
@@ -110,6 +112,7 @@ public final class TardisPortals {
     }
 
     static void reset() {
+        PortalBone.clearCache();
         LINKS.clear();
         DOORS.clear();
         LAST_TICKET.clear();
@@ -412,10 +415,13 @@ public final class TardisPortals {
         if (interiorLevel == null || !interiorLevel.hasChunkAt(door.pos())) return null;
         BlockState state = interiorLevel.getBlockState(door.pos());
         if (!state.is(GCBlocks.TARDIS_INTERIOR_DOOR) || !InteriorDoorBlock.isMaster(state)) return null;
+        String doorModel = interiorLevel.getBlockEntity(door.pos()) instanceof InteriorDoorBlockEntity doorEntity
+                ? doorEntity.getVariant() : "";
         return new Placement(exteriorLevel.dimension(), exterior.getBlockPos(), exterior.getYaw(),
                 interiorLevel.dimension(), door.pos(), state.getValue(InteriorDoorBlock.FACING),
                 InteriorDoorBlock.isFlipped(state), InteriorDoorBlock.isFlush(state),
-                InteriorDoorBlock.isBackBlocked(interiorLevel, door.pos(), state));
+                InteriorDoorBlock.isBackBlocked(interiorLevel, door.pos(), state),
+                exterior.getExterior().id(), doorModel);
     }
 
     private static @Nullable Link spawn(MinecraftServer server, UUID tardisId, Placement placement) {
@@ -431,6 +437,20 @@ public final class TardisPortals {
         Direction right = InteriorDoorBlock.rightDirectionOf(placement.doorFacing(), flipped);
         Direction facing = placement.doorFacing();
 
+        /* portal bones from the models, old numbers if a model has none */
+        PortalBone exteriorBone = PortalBone.of(placement.exteriorModel());
+        PortalBone doorBone = PortalBone.of(placement.doorModel());
+        double width = exteriorBone != null ? exteriorBone.width() : PORTAL_WIDTH;
+        double height = exteriorBone != null ? exteriorBone.height() : PORTAL_HEIGHT;
+        Vec3 exteriorOffset = exteriorBone != null
+                ? new Vec3(exteriorBone.x(), exteriorBone.centerY(), exteriorBone.front() - PORTAL_GAP)
+                : EXTERIOR_PORTAL_OFFSET;
+        /* same size both ends, interior lines up on its bottom */
+        Vec3 doorLocal = doorBone != null
+                ? new Vec3(doorBone.x(), doorBone.bottom() + height / 2.0, doorBone.back() + PORTAL_GAP)
+                : INTERIOR_PORTAL_OFFSET;
+        double doorViewZ = doorBone != null ? doorBone.back() - PORTAL_GAP : INTERIOR_VIEW_Z;
+
         Vec3 exteriorCenter = Vec3.atBottomCenterOf(placement.exteriorPos());
         Vec3 interiorCenter;
         double portalZ;
@@ -443,19 +463,19 @@ public final class TardisPortals {
                             right.getStepZ() * 0.5 - facing.getStepZ() * 0.5);
             portalZ = FLUSH_PORTAL_Z;
             viewZ = FLUSH_VIEW_Z;
-            interiorPortalOffset = new Vec3(0.0, INTERIOR_PORTAL_OFFSET.y, portalZ);
+            interiorPortalOffset = new Vec3(doorLocal.x, INTERIOR_PORTAL_OFFSET.y, portalZ);
             arrivalOffset = interiorPortalOffset;
         } else {
             interiorCenter = Vec3.atBottomCenterOf(placement.doorPos())
                     .add(right.getStepX() * 0.5, 0.0, right.getStepZ() * 0.5);
-            portalZ = INTERIOR_PORTAL_OFFSET.z;
-            viewZ = INTERIOR_VIEW_Z;
-            interiorPortalOffset = flipped ? flipY(INTERIOR_PORTAL_OFFSET) : INTERIOR_PORTAL_OFFSET;
+            portalZ = doorLocal.z;
+            viewZ = doorViewZ;
+            interiorPortalOffset = flipped ? flipY(doorLocal) : doorLocal;
             double shift = placement.doorBackBlocked() ? InteriorDoorBlock.WALL_ARRIVAL_SHIFT : 0.0;
             arrivalOffset = new Vec3(interiorPortalOffset.x, interiorPortalOffset.y, interiorPortalOffset.z - shift);
         }
 
-        Vec3 origin = exteriorCenter.add(rotate(EXTERIOR_PORTAL_OFFSET, exteriorRotation));
+        Vec3 origin = exteriorCenter.add(rotate(exteriorOffset, exteriorRotation));
         Vec3 destination = interiorCenter.add(doorOffset(interiorPortalOffset, interiorRotation, flush));
         Vec3 arrivalDestination = interiorCenter.add(doorOffset(arrivalOffset, interiorRotation, flush));
         Vec3 normal = rotate(new Vec3(0.0, 0.0, -1.0), exteriorRotation);
@@ -477,7 +497,7 @@ public final class TardisPortals {
         Portal exteriorPortal = Portal.ENTITY_TYPE.create(exteriorLevel, EntitySpawnReason.TRIGGERED);
         if (exteriorPortal == null) return null;
         exteriorPortal.setOriginPos(origin);
-        exteriorPortal.setOrientationAndSize(axisW, UP, PORTAL_WIDTH, PORTAL_HEIGHT);
+        exteriorPortal.setOrientationAndSize(axisW, UP, width, height);
         PortalAPI.setPortalTransformation(exteriorPortal, placement.interiorDimension(), destination, exteriorTurn, 1.0);
         configure(exteriorPortal, tardisId);
 
@@ -486,23 +506,23 @@ public final class TardisPortals {
             arrivalPortal = Portal.ENTITY_TYPE.create(exteriorLevel, EntitySpawnReason.TRIGGERED);
             if (arrivalPortal == null) return null;
             arrivalPortal.setOriginPos(origin);
-            arrivalPortal.setOrientationAndSize(axisW, UP, PORTAL_WIDTH, PORTAL_HEIGHT);
+            arrivalPortal.setOrientationAndSize(axisW, UP, width, height);
             PortalAPI.setPortalTransformation(arrivalPortal, placement.interiorDimension(), arrivalDestination,
                     exteriorTurn, 1.0);
             configure(arrivalPortal, tardisId);
         }
 
-        Vec3 interiorViewOffset = new Vec3(0.0, interiorPortalOffset.y, viewZ);
-        Vec3 exteriorReturnOffset = new Vec3(0.0,
-                EXTERIOR_PORTAL_OFFSET.y + (interiorViewOffset.y - interiorPortalOffset.y),
-                EXTERIOR_PORTAL_OFFSET.z + portalZ - viewZ);
+        Vec3 interiorViewOffset = new Vec3(interiorPortalOffset.x, interiorPortalOffset.y, viewZ);
+        Vec3 exteriorReturnOffset = new Vec3(exteriorOffset.x,
+                exteriorOffset.y + (interiorViewOffset.y - interiorPortalOffset.y),
+                exteriorOffset.z + portalZ - viewZ);
         Vec3 interiorOrigin = interiorCenter.add(doorOffset(interiorViewOffset, interiorRotation, flush));
         Vec3 interiorDestination = exteriorCenter.add(rotate(exteriorReturnOffset, exteriorRotation));
 
         Portal interiorPortal = Portal.ENTITY_TYPE.create(interiorLevel, EntitySpawnReason.TRIGGERED);
         if (interiorPortal == null) return null;
         interiorPortal.setOriginPos(interiorOrigin);
-        interiorPortal.setOrientationAndSize(interiorFrame[0], interiorFrame[1], PORTAL_WIDTH, PORTAL_HEIGHT);
+        interiorPortal.setOrientationAndSize(interiorFrame[0], interiorFrame[1], width, height);
         PortalAPI.setPortalTransformation(interiorPortal, placement.exteriorDimension(), interiorDestination,
                 flipped || flush
                         ? transformation(interiorFrame, exteriorFrame)

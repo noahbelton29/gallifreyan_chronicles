@@ -16,11 +16,7 @@ import qouteall.imm_ptl.core.portal.Portal;
 import qouteall.q_misc_util.MiscNetworking;
 import qouteall.q_misc_util.dimension.DimIntIdMap;
 import qouteall.q_misc_util.dimension.DimensionIntId;
-import java.util.HashSet;
-import java.util.Set;
 import net.minecraft.network.protocol.game.ClientboundLevelChunkWithLightPacket;
-import net.minecraft.resources.ResourceKey;
-import net.minecraft.world.level.Level;
 import net.minecraft.world.level.chunk.LevelChunk;
 import qouteall.imm_ptl.core.ClientWorldLoader;
 import qouteall.imm_ptl.core.chunk_loading.ImmPtlClientChunkMap;
@@ -49,38 +45,35 @@ final class FlashbackPortalSnapshot {
 
             DimIntIdMap map = DimensionIntId.getClientMap();
             if (map == null || !map.containsDimId(level.dimension())) return;
-            int dimId = map.toIntegerId(level.dimension());
 
-            /* the worlds the portals lead to (the tardis inside). flashback only
-               saves the world you stand in, so the door led to an empty world */
-            Set<ResourceKey<Level>> done = new HashSet<>();
-            int chunks = 0;
-            for (Entity entity : level.entitiesForRendering()) {
-                if (!(entity instanceof Portal portal) || portal.getAxisW() == null) continue;
-                var dest = portal.getDestDim();
-                if (dest == null || dest.equals(level.dimension()) || !done.add(dest)) continue;
-                if (!map.containsDimId(dest)) continue;
-                ClientLevel destLevel = ClientWorldLoader.peekWorld(dest);
-                if (destLevel == null || !(destLevel.getChunkSource() instanceof ImmPtlClientChunkMap chunkMap)) continue;
-                int destId = map.toIntegerId(dest);
+            /* every other loaded world (the tardis inside, or the overworld when you
+               stand inside the tardis). flashback only saves the world you stand in.
+               it also takes a new snapshot when you walk through the door, and an
+               export plays those, so the outside portal has to be in it too */
+            for (ClientLevel other : ClientWorldLoader.getClientWorlds()) {
+                if (other == level || !map.containsDimId(other.dimension())) continue;
+                if (!(other.getChunkSource() instanceof ImmPtlClientChunkMap chunkMap)) continue;
+                int otherId = map.toIntegerId(other.dimension());
                 for (LevelChunk chunk : chunkMap.getCopiedChunkList()) {
                     var chunkPacket = new ClientboundLevelChunkWithLightPacket(
-                            chunk, destLevel.getLightEngine(), null, null);
+                            chunk, other.getLightEngine(), null, null);
                     out.accept(new ClientboundCustomPayloadPacket(
-                            new PacketRedirection.Payload(destId, chunkPacket)));
-                    chunks++;
+                            new PacketRedirection.Payload(otherId, chunkPacket)));
                 }
             }
 
-            int count = 0;
-            for (Entity entity : level.entitiesForRendering()) {
-                if (!(entity instanceof Portal portal) || portal.getAxisW() == null) continue;
-                CompoundTag tag = new CompoundTag();
-                save(portal, tag);
-                out.accept(new ClientboundCustomPayloadPacket(new ImmPtlNetworking.PortalSyncPacket(
-                        portal.getId(), portal.getUUID(), portal.getType(), dimId,
-                        portal.getX(), portal.getY(), portal.getZ(), tag)));
-                count++;
+            /* the portals in every loaded world, with the world they're in */
+            for (ClientLevel world : ClientWorldLoader.getClientWorlds()) {
+                if (!map.containsDimId(world.dimension())) continue;
+                int worldId = map.toIntegerId(world.dimension());
+                for (Entity entity : world.entitiesForRendering()) {
+                    if (!(entity instanceof Portal portal) || portal.getAxisW() == null) continue;
+                    CompoundTag tag = new CompoundTag();
+                    save(portal, tag);
+                    out.accept(new ClientboundCustomPayloadPacket(new ImmPtlNetworking.PortalSyncPacket(
+                            portal.getId(), portal.getUUID(), portal.getType(), worldId,
+                            portal.getX(), portal.getY(), portal.getZ(), tag)));
+                }
             }
         } catch (Exception e) {
             if (++errors <= 3) Constants.LOG.warn("[replay] couldn't save portals in the snapshot: {}", e.toString());

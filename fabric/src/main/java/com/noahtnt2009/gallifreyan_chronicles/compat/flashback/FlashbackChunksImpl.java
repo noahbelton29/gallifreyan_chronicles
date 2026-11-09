@@ -18,6 +18,7 @@ import net.minecraft.network.protocol.game.ClientGamePacketListener;
 import net.minecraft.world.entity.Entity;
 import qouteall.imm_ptl.core.network.PacketRedirectionClient;
 import qouteall.imm_ptl.core.portal.Portal;
+import qouteall.imm_ptl.core.render.context_management.RenderStates;
 
 final class FlashbackChunksImpl {
 
@@ -45,8 +46,18 @@ final class FlashbackChunksImpl {
         return FlashbackPuppet.isHiddenReal(entity);
     }
 
-    static void afterDimSync(Object packet) {
-        FlashbackDimMerge.afterSync(packet);
+    static void newExportFrame() {
+        if (!Flashback.isInReplay()) return;
+        RenderStates.portalRenderInfos = new java.util.ArrayList<>();
+        RenderStates.portalsRenderedThisFrame = 0;
+    }
+
+    static boolean clientKnowsDim(int dimId) {
+        return DimensionIntId.getClientMap().containsIntId(dimId);
+    }
+
+    static boolean mergeDimSync(Object packet) {
+        return FlashbackDimMerge.merge(packet);
     }
 
     static void registerClient() {

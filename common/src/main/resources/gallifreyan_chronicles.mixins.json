@@ -11,7 +11,8 @@
     "compat.ReplayDimIdMixin",
     "compat.ReplayKeepViewerTrackingMixin",
     "addon.FolderRepositorySourceAccessor",
-    "addon.PackRepositoryMixin"
+    "addon.PackRepositoryMixin",
+    "worldgen.StructurePaletteCacheMixin"
   ],
   "client": [
     "client.screen.LogoRendererMixin",
@@ -49,6 +50,7 @@
     "client.compat.VoxyTardisLodMixin",
     "client.compat.VoxyReplayIngestMixin",
     "client.compat.VoxyPortalPassMixin",
+    "client.compat.PortalNoSyncRebuildMixin",
     "client.compat.EntityCullingCompatMixin",
     "client.compat.PortalTardisClickMixin",
     "client.compat.LevelExtractorOutlineMixin",

@@ -15,6 +15,6 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 public abstract class VoxyPortalPassMixin {
     @Inject(method = "renderOpaque", at = @At("HEAD"), cancellable = true, remap = false, require = 0)
     private void gc$skipInPortalView(CallbackInfo ci) {
-        if (TardisPortalBridge.isRenderingAnyPortal()) ci.cancel();
+//        if (TardisPortalBridge.isRenderingAnyPortal()) ci.cancel();
     }
 }

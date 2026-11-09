@@ -23,7 +23,10 @@
     "client.compat.FlashbackSnapshotPortalsMixin",
     "client.compat.ReplaySprintParticlesMixin",
     "client.compat.ReplayServerEntityDataMixin",
-    "client.compat.ReplayDimSyncMergeMixin"
+    "client.compat.ReplayDimSyncMergeMixin",
+    "client.compat.ReplayUnknownDimPacketMixin",
+    "client.compat.SeamlessReplayKeepChunksMixin",
+    "client.compat.ExportPortalCountMixin"
   ],
   "server": [],
   "injectors": {

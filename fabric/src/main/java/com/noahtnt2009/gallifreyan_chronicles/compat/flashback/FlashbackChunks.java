@@ -33,6 +33,16 @@ public final class FlashbackChunks {
     }
 
     /* true when a "forget chunk" packet should be skipped (only in a replay) */
+    /* in a replay, a packet for a dimension the client doesn't know yet gets dropped
+       instead of kicking you out of the replay */
+    public static boolean dropUnknownDim(int dimId) {
+        return inReplay() && !FlashbackChunksImpl.clientKnowsDim(dimId);
+    }
+
+    public static void newExportFrame() {
+        if (ACTIVE) FlashbackChunksImpl.newExportFrame();
+    }
+
     public static boolean skipForget() {
         return inReplay();
     }
@@ -67,8 +77,9 @@ public final class FlashbackChunks {
     }
 
     /* immersive portals' dimension list just arrived */
-    public static void afterDimSync(Object packet) {
-        if (ACTIVE) FlashbackChunksImpl.afterDimSync(packet);
+    /* true when the packet was handled merged, so the original should be skipped */
+    public static boolean mergeDimSync(Object packet) {
+        return ACTIVE && FlashbackChunksImpl.mergeDimSync(packet);
     }
 
     public static void registerClient() {

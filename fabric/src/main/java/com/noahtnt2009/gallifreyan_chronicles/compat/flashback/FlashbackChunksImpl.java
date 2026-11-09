@@ -18,6 +18,11 @@ import net.minecraft.network.protocol.game.ClientGamePacketListener;
 import net.minecraft.world.entity.Entity;
 import qouteall.imm_ptl.core.network.PacketRedirectionClient;
 import qouteall.imm_ptl.core.portal.Portal;
+import org.joml.Vector3d;
+import com.noahtnt2009.gallifreyan_chronicles.client.sound.SoundListener;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.phys.Vec3;
+import java.util.ArrayList;
 import qouteall.imm_ptl.core.render.context_management.RenderStates;
 
 final class FlashbackChunksImpl {
@@ -46,9 +51,44 @@ final class FlashbackChunksImpl {
         return FlashbackPuppet.isHiddenReal(entity);
     }
 
+    static boolean passOn(Packet<?> packet) {
+        ReplayServer server = Flashback.getReplayServer();
+        if (server == null) return false;
+        for (ReplayPlayer viewer : server.getReplayViewers()) viewer.connection.send(packet);
+        return true;
+    }
+
+    static void writeSnapshotFromOutside(Runnable original) {
+        FlashbackSnapshotRoot.write(original);
+    }
+
+    static void onCameraTeleport(Object portal) {
+        if (portal instanceof Portal p) ReplayKeyframePortal.onTeleport(p);
+    }
+
+    static boolean keyframesMovingCamera() {
+        return ReplayKeyframePortal.keyframesMovingCamera();
+    }
+
+    static double[] keyframeCamera(double x, double y, double z, float yaw, float pitch) {
+        return ReplayKeyframePortal.apply(x, y, z, yaw, pitch);
+    }
+
+    static void onKeyframeCreated(Vector3d position, float[] yawPitch) {
+        ReplayKeyframePortal.onKeyframeCreated(position, yawPitch);
+    }
+
+    static boolean dropOutgoing(Packet<?> packet) {
+        return ReplayVirtualDimension.dropOutgoing(packet);
+    }
+
+    static boolean handleIncoming(Packet<?> packet, Runnable original) {
+        return ReplayVirtualDimension.handleIncoming(packet, original);
+    }
+
     static void newExportFrame() {
         if (!Flashback.isInReplay()) return;
-        RenderStates.portalRenderInfos = new java.util.ArrayList<>();
+        RenderStates.portalRenderInfos = new ArrayList<>();
         RenderStates.portalsRenderedThisFrame = 0;
     }
 
@@ -62,6 +102,20 @@ final class FlashbackChunksImpl {
 
     static void registerClient() {
         FlashbackPuppet.registerClient();
+        FlashbackProbe.register();
+        FlashbackSnapshotRoot.register();
+        ReplayVirtualDimension.register();
+        SoundListener.setOverride(new SoundListener.Override() {
+            @Override
+            public Level level() {
+                return Flashback.isInReplay() ? ReplayVirtualDimension.heardLevel() : null;
+            }
+
+            @Override
+            public Vec3 pos() {
+                return ReplayVirtualDimension.heardPos();
+            }
+        });
     }
 
     /* jumping on the timeline */

@@ -7,6 +7,7 @@ import com.noahtnt2009.gallifreyan_chronicles.data.GCJsonReloadListener;
 import com.noahtnt2009.gallifreyan_chronicles.util.GCServerState;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 import net.fabricmc.fabric.api.networking.v1.PayloadTypeRegistry;
+import com.noahtnt2009.gallifreyan_chronicles.compat.flashback.ReplayComponentIds;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayConnectionEvents;
 
 public final class GCFabricNetworking {
@@ -22,6 +23,7 @@ public final class GCFabricNetworking {
         PayloadTypeRegistry.clientboundPlay().register(TardisConsoleRotorStatePayload.TYPE, TardisConsoleRotorStatePayload.STREAM_CODEC);
         PayloadTypeRegistry.clientboundPlay().register(TardisDrumShakePayload.TYPE, TardisDrumShakePayload.STREAM_CODEC);
         PayloadTypeRegistry.clientboundPlay().register(ResumeSoundPayload.TYPE, ResumeSoundPayload.STREAM_CODEC);
+        PayloadTypeRegistry.clientboundPlay().register(ReplayComponentIds.Payload.TYPE, ReplayComponentIds.Payload.STREAM_CODEC);
 
         ServerLifecycleEvents.SERVER_STARTED.register(GCJsonReloadListener::setCurrentServer);
         ServerLifecycleEvents.SERVER_STOPPED.register(_ -> GCServerState.onServerStop());

@@ -18,7 +18,7 @@ public abstract class ReplayChunkForwardMixin {
     @Shadow
     public abstract ServerLevel level();
 
-    @Inject(method = "handleLevelChunkWithLight", at = @At("TAIL"), remap = false, require = 1)
+    @Inject(method = "handleLevelChunkWithLight", at = @At("TAIL"), remap = false, require = 0)
     private void gc$forwardChunk(ClientboundLevelChunkWithLightPacket packet, CallbackInfo ci) {
         FlashbackChunks.forward(this.level(), packet);
     }

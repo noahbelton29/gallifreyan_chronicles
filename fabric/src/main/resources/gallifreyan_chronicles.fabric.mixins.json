@@ -18,7 +18,6 @@
     "client.compat.ReplayShapelessPortalMixin",
     "client.compat.ReplayPlayerRemovedMixin",
     "client.compat.ReplayPlayerDimensionMixin",
-    "client.compat.ReplayNoCameraTeleportMixin",
     "client.compat.FlashbackClearEntitiesMixin",
     "client.compat.FlashbackSnapshotPortalsMixin",
     "client.compat.ReplaySprintParticlesMixin",
@@ -26,7 +25,17 @@
     "client.compat.ReplayDimSyncMergeMixin",
     "client.compat.ReplayUnknownDimPacketMixin",
     "client.compat.SeamlessReplayKeepChunksMixin",
-    "client.compat.ExportPortalCountMixin"
+    "client.compat.ExportPortalCountMixin",
+    "client.compat.ReplayComponentIdsMixin",
+    "client.compat.ReplayReadPacketsMixin",
+    "client.compat.ReplayComponentIdsPayloadMixin",
+    "client.compat.ReplayCameraTeleportMixin",
+    "client.compat.ReplayVirtualIncomingMixin",
+    "client.compat.ReplayVirtualOutgoingMixin",
+    "client.compat.ReplayKeyframeApplyMixin",
+    "client.compat.ReplayKeyframeCreateMixin",
+    "client.compat.FlashbackSnapshotRootMixin",
+    "client.compat.ReplayRedirectForwardMixin"
   ],
   "server": [],
   "injectors": {

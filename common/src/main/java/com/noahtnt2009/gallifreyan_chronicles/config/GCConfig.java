@@ -33,6 +33,8 @@ public final class GCConfig {
         int portal_render_distance = 20;
         int max_rendered_portals = 8;
         boolean immersive_portals = true;
+        /* logs replay state every second while a flashback replay plays. for finding replay bugs */
+        boolean debug_replay = false;
     }
 
     private static Data data = new Data();
@@ -172,6 +174,10 @@ public final class GCConfig {
     private static int clampMaxPortals(int count) {
         if (count <= 0) return 8;
         return Math.max(MIN_RENDERED_PORTALS, Math.min(MAX_RENDERED_PORTALS, count));
+    }
+
+    public static boolean debugReplay() {
+        return data.debug_replay;
     }
 
     public static boolean immersivePortals() {

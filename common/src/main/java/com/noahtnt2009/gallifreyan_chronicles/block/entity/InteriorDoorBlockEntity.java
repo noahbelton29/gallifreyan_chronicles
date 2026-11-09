@@ -29,6 +29,7 @@ import com.noahtnt2009.gallifreyan_chronicles.tardis.interior.TardisInterior;
 import com.noahtnt2009.gallifreyan_chronicles.tardis.interior.TardisInteriorSystem;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.core.Holder;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.protocol.Packet;
@@ -393,6 +394,24 @@ public class InteriorDoorBlockEntity extends BlockEntity implements GeoBlockEnti
         SoundEvent sound = doorSound(opening);
         level.playSound(null, getBlockPos(), sound, SoundSource.BLOCKS, 1.0f, 1.0f);
         level.playSound(null, soundPos(), sound, SoundSource.BLOCKS, 1.0f, 1.0f);
+        playThroughExterior(sound);
+    }
+
+    /* same as the outside hum's open range (ExteriorHumSoundInstance.OPEN_RANGE) */
+    private static final float HEARD_OUTSIDE_RANGE = 6.0f;
+
+    /* the main interior door opening or shutting is also heard outside, at the
+       exterior's doorway, within the same range as the hum. it only ever plays while
+       the doors are open or just shutting, so with them shut you hear nothing.
+       it's a normal sound in the overworld, so flashback records and plays it too */
+    private void playThroughExterior(SoundEvent sound) {
+        if (!primary || !(level instanceof ServerLevel)) return;
+        TardisExteriorBlockEntity exterior = tardisApi().flatMap(Tardis::exterior).orElse(null);
+        if (exterior == null || !(exterior.getLevel() instanceof ServerLevel outside)) return;
+        Vec3 door = Vec3.atBottomCenterOf(exterior.getBlockPos()).add(0.0, 1.0, 0.0);
+        Holder<SoundEvent> heard = Holder.direct(SoundEvent.createFixedRangeEvent(sound.location(), HEARD_OUTSIDE_RANGE));
+        outside.playSeededSound(null, door.x, door.y, door.z, heard, SoundSource.BLOCKS, 1.0f, 1.0f,
+                outside.getRandom().nextLong());
     }
 
     private boolean openAllOnly() {

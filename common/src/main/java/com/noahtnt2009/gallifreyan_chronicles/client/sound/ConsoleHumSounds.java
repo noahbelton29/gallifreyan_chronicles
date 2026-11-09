@@ -49,7 +49,7 @@ public final class ConsoleHumSounds {
                 continue;
             }
 
-            if (console.getLevel() != minecraft.level) {
+            if (console.getLevel() != SoundListener.level()) {
                 if (hum != null) {
                     sounds.stop(hum);
                     entry.setValue(null);
@@ -67,7 +67,7 @@ public final class ConsoleHumSounds {
             }
 
             if (hum != null && sounds.isActive(hum)) continue;
-            if (minecraft.player.position().distanceToSqr(Vec3.atCenterOf(console.getBlockPos())) > START_RANGE_SQR) continue;
+            if (SoundListener.pos().distanceToSqr(Vec3.atCenterOf(console.getBlockPos())) > START_RANGE_SQR) continue;
 
             TardisConsoleHumSoundInstance fresh = new TardisConsoleHumSoundInstance(console.getBlockPos(),
                     () -> !console.isRemoved() && console.getLevel() != null && console.getLevel().isClientSide(),

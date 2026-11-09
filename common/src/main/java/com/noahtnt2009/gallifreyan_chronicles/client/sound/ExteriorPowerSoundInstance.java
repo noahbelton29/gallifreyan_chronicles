@@ -35,7 +35,7 @@ public class ExteriorPowerSoundInstance extends AbstractTickableSoundInstance {
     @Override
     public void tick() {
         LocalPlayer player = Minecraft.getInstance().player;
-        if (player == null || exterior.isRemoved() || exterior.getLevel() != player.level()) {
+        if (player == null || exterior.isRemoved() || exterior.getLevel() != SoundListener.level()) {
             this.volume = 0.0F;
             this.stop();
             return;
@@ -53,7 +53,7 @@ public class ExteriorPowerSoundInstance extends AbstractTickableSoundInstance {
         if (player == null) return 0.0F;
         double range = ExteriorHumSoundInstance.CLOSED_RANGE
                 + (ExteriorHumSoundInstance.OPEN_RANGE - ExteriorHumSoundInstance.CLOSED_RANGE) * openness;
-        double distance = player.position().distanceTo(new Vec3(x, y, z));
+        double distance = SoundListener.pos().distanceTo(new Vec3(x, y, z));
         float falloff = distance >= range ? 0.0F : (float) (1.0 - distance / range);
         return (CLOSED_VOLUME + (OPEN_VOLUME - CLOSED_VOLUME) * openness) * falloff;
     }

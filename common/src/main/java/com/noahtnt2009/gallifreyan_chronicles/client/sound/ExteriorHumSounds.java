@@ -27,14 +27,14 @@ public final class ExteriorHumSounds {
     private static void checkPowerChanges(Minecraft minecraft) {
         double maxRangeSqr = ExteriorHumSoundInstance.OPEN_RANGE * ExteriorHumSoundInstance.OPEN_RANGE;
         for (TardisExteriorBlockEntity exterior : HUMS.keySet()) {
-            if (exterior.isRemoved() || exterior.getLevel() != minecraft.level) {
+            if (exterior.isRemoved() || exterior.getLevel() != SoundListener.level()) {
                 LAST_POWER.remove(exterior);
                 continue;
             }
             boolean powered = exterior.isPowered();
             Boolean last = LAST_POWER.put(exterior, powered);
             if (last == null || last == powered) continue;
-            if (minecraft.player.position().distanceToSqr(Vec3.atCenterOf(exterior.getBlockPos())) > maxRangeSqr) continue;
+            if (SoundListener.pos().distanceToSqr(Vec3.atCenterOf(exterior.getBlockPos())) > maxRangeSqr) continue;
             ExteriorPowerSoundInstance sound = new ExteriorPowerSoundInstance(exterior,
                     powered ? GCSounds.TARDIS_POWER_ON : GCSounds.TARDIS_POWER_OFF);
             minecraft.getSoundManager().play(sound);
@@ -66,7 +66,7 @@ public final class ExteriorHumSounds {
                 iterator.remove();
                 continue;
             }
-            if (exterior.getLevel() != minecraft.level) {
+            if (exterior.getLevel() != SoundListener.level()) {
                 if (hum != null) {
                     hum.fadeOut();
                     entry.setValue(null);
@@ -75,7 +75,7 @@ public final class ExteriorHumSounds {
             }
             if (hum != null && sounds.isActive(hum)) continue;
             if (!exterior.isPowered()) continue;
-            if (minecraft.player.position().distanceToSqr(Vec3.atCenterOf(exterior.getBlockPos())) > START_RANGE_SQR) continue;
+            if (SoundListener.pos().distanceToSqr(Vec3.atCenterOf(exterior.getBlockPos())) > START_RANGE_SQR) continue;
 
             ExteriorHumSoundInstance fresh = new ExteriorHumSoundInstance(exterior);
             sounds.play(fresh);

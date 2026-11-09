@@ -57,6 +57,11 @@ public final class FlashbackPuppet {
     private static int backTo;
 
     private static void tickFirstPlayReload() {
+        /* never jump the timeline in the middle of an export */
+        if (Flashback.isExporting()) {
+            waitTicks = -1;
+            return;
+        }
         ReplayServer server = Flashback.getReplayServer();
         if (server == null) {
             lastReplayServer = null;

@@ -11,6 +11,7 @@ import net.minecraft.core.registries.BuiltInRegistries;
 import com.noahtnt2009.gallifreyan_chronicles.client.sound.OffsetSoundInstance;
 import com.noahtnt2009.gallifreyan_chronicles.client.sound.SoundResumeStatus;
 import com.noahtnt2009.gallifreyan_chronicles.network.ResumeSoundPayload;
+import com.noahtnt2009.gallifreyan_chronicles.client.sound.SoundListener;
 import com.noahtnt2009.gallifreyan_chronicles.block.entity.TardisConsoleBlockEntity;
 import com.noahtnt2009.gallifreyan_chronicles.client.camera.GCCameraShake;
 import com.noahtnt2009.gallifreyan_chronicles.client.gui.hud.GCPowerDarkness;
@@ -57,6 +58,9 @@ public final class GCClientHooks {
     public static void playResumedSound(ResumeSoundPayload payload) {
         Minecraft minecraft = Minecraft.getInstance();
         if (minecraft.level == null) return;
+        /* these restart flight loops for whoever just joined. a replay plays them again
+           on every timeline jump, and they don't say which world they're in */
+        if (SoundListener.inReplay()) return;
         SoundEvent event = BuiltInRegistries.SOUND_EVENT.getOptional(payload.sound())
                 .orElseGet(() -> SoundEvent.createVariableRangeEvent(payload.sound()));
         SoundResumeStatus.warnIfEngineUnhooked();
@@ -65,6 +69,8 @@ public final class GCClientHooks {
     }
 
     public static void triggerCameraShake(Vec3 origin, float strength) {
+        /* in a replay, only shake when the camera is inside the tardis */
+        if (SoundListener.inReplay() && !SoundListener.isTardisLevel(SoundListener.level())) return;
         GCCameraShake.trigger(origin, strength);
     }
 

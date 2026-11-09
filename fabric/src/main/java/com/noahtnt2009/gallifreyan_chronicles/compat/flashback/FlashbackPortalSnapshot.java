@@ -40,6 +40,9 @@ final class FlashbackPortalSnapshot {
 
             /* the dimension list first, so the client knows the tardis worlds.
                only possible in singleplayer, where the server is right here */
+            /* the recording's item component numbers, see ReplayComponentIds */
+            out.accept(new ClientboundCustomPayloadPacket(ReplayComponentIds.current()));
+
             MinecraftServer server = mc.getSingleplayerServer();
             if (server != null) out.accept(MiscNetworking.DimIdSyncPacket.createPacket(server));
 

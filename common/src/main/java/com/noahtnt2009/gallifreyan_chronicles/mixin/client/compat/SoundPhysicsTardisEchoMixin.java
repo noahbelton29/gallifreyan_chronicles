@@ -22,7 +22,7 @@ public abstract class SoundPhysicsTardisEchoMixin {
         throw new AssertionError();
     }
 
-    @Inject(method = "setEnvironment", at = @At("HEAD"), cancellable = true, remap = false)
+    @Inject(method = "setEnvironment", at = @At("HEAD"), cancellable = true, remap = false, require = 0)
     private static void gc$tardisEcho(int sourceID, float sendGain0, float sendGain1, float sendGain2, float sendGain3,
                                       float sendCutoff0, float sendCutoff1, float sendCutoff2, float sendCutoff3,
                                       float directCutoff, float directGain, CallbackInfo ci) {

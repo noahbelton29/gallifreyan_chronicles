@@ -58,7 +58,7 @@ public class ExteriorHumSoundInstance extends AbstractTickableSoundInstance {
             this.stop();
             return;
         }
-        if (fadingOut || exterior.isRemoved() || exterior.getLevel() != player.level()) {
+        if (fadingOut || exterior.isRemoved() || exterior.getLevel() != SoundListener.level()) {
             /* went through the door (or the tardis left): fade out instead of cutting off */
             if (!fadingOut) {
                 fadingOut = true;
@@ -73,7 +73,7 @@ public class ExteriorHumSoundInstance extends AbstractTickableSoundInstance {
         power = approach(power, exterior.isPowered() ? 1.0F : 0.0F, POWER_FADE_PER_TICK);
 
         double range = CLOSED_RANGE + (OPEN_RANGE - CLOSED_RANGE) * openness;
-        double distance = player.position().distanceTo(new Vec3(x, y, z));
+        double distance = SoundListener.pos().distanceTo(new Vec3(x, y, z));
         float falloff = distance >= range ? 0.0F : (float) (1.0 - distance / range);
         float loudness = CLOSED_VOLUME + (OPEN_VOLUME - CLOSED_VOLUME) * openness;
         this.volume = loudness * falloff * power * (float) GCConfig.tardisHumVolume();

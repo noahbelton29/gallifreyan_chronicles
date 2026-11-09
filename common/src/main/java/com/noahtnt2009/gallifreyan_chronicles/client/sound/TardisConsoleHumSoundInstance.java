@@ -66,7 +66,7 @@ public class TardisConsoleHumSoundInstance extends AbstractTickableSoundInstance
         if (fade < target) fade = Math.min(target, fade + FADE_PER_TICK);
         else if (fade > target) fade = Math.max(target, fade - FADE_PER_TICK);
 
-        double distance = player.position().distanceTo(
+        double distance = SoundListener.pos().distanceTo(
                 new Vec3(this.x, this.y, this.z)
         );
 

@@ -1,5 +1,6 @@
 package com.noahtnt2009.gallifreyan_chronicles.client;
 
+import com.noahtnt2009.gallifreyan_chronicles.util.GameClock;
 import com.noahtnt2009.gallifreyan_chronicles.client.tardis.RematCatchClient;
 import org.jspecify.annotations.Nullable;
 import net.minecraft.resources.ResourceKey;
@@ -28,6 +29,14 @@ import net.minecraft.world.phys.Vec3;
 
 public final class GCClientHooks {
     private GCClientHooks() {}
+
+    static {
+        /* fades use the time of the world you're standing in, the one the server keeps right */
+        GameClock.setClient(() -> {
+            Minecraft minecraft = Minecraft.getInstance();
+            return minecraft.player != null ? minecraft.player.level().getGameTime() : -1L;
+        });
+    }
 
     public static void reloadResourcePacks() {
         Minecraft mc = Minecraft.getInstance();

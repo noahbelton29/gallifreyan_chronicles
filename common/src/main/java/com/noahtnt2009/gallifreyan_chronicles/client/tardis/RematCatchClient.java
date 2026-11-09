@@ -36,7 +36,6 @@ import java.util.concurrent.ConcurrentHashMap;
    - that player keeps the floor, and the rest of the interior fades in around them */
 public final class RematCatchClient {
     private static final int HIDE_FLAGS = Block.UPDATE_KNOWN_SHAPE | Block.UPDATE_SUPPRESS_DROPS;
-    /* give up if the interior never loads */
     private static final int CAPTURE_TIMEOUT_TICKS = 100;
 
     private record Fade(String fadeId, long start, int duration) {
@@ -46,6 +45,10 @@ public final class RematCatchClient {
             if (progress >= 1.0f) return 1.0f;
             FadeType type = FadeTypes.get(fadeId);
             return Math.clamp(type.opacity(1.0f - progress, elapsed), 0.0f, 1.0f);
+        }
+
+        float progress(long now, float partialTick) {
+            return Math.clamp(((now - start) + partialTick) / duration, 0.0f, 1.0f);
         }
 
         boolean done(long now) {
@@ -66,6 +69,10 @@ public final class RematCatchClient {
     private static final List<GhostQuad> QUADS = new ArrayList<>();
     private static final Map<BlockPos, BlockState> HIDDEN = new ConcurrentHashMap<>();
     private static final QuadInstance DRAW = new QuadInstance();
+    private static final float SWEEP = 0.35f;
+    private static final float MIN_ALPHA = 0.02f;
+    private static float bottomY;
+    private static float spanY = 1.0f;
 
     private RematCatchClient() {
     }
@@ -154,6 +161,10 @@ public final class RematCatchClient {
             }
             hide.add(fixed);
         }
+        float top = payload.floorY();
+        for (GhostQuad quad : QUADS) top = Math.max(top, quad.y());
+        bottomY = payload.floorY();
+        spanY = Math.max(1.0f, top - bottomY + 1.0f);
         BlockState air = Blocks.AIR.defaultBlockState();
         for (BlockPos pos : hide) {
             HIDDEN.put(pos, level.getBlockState(pos));
@@ -206,21 +217,31 @@ public final class RematCatchClient {
     }
 
     /* every frame, from the level renderer */
+    /* how far the build has got at this height: 0 not started, 1 done */
+    private static float built(float progress, float y) {
+        float height = Math.clamp((y - bottomY) / spanY, 0.0f, 1.0f);
+        return Math.clamp((progress * (1.0f + SWEEP) - height) / SWEEP, 0.0f, 1.0f);
+    }
+
     public static void submit(PoseStack poseStack, SubmitNodeCollector collector, Vec3 camera, @Nullable Level drawing) {
         Fade fade = self;
         Minecraft mc = Minecraft.getInstance();
         if (fade == null || QUADS.isEmpty() || mc.level == null || drawing == null) return;
         if (!drawing.dimension().equals(selfDim)) return;
-        float alpha = fade.opacity(mc.level.getGameTime(), mc.getDeltaTracker().getGameTimeDeltaPartialTick(false));
-        if (alpha <= 0.003f) return;
-        int tint = fadeTint(alpha);
+        float partial = mc.getDeltaTracker().getGameTimeDeltaPartialTick(false);
+        long now = mc.level.getGameTime();
+        float opacity = fade.opacity(now, partial);
+        float progress = fade.progress(now, partial);
+        if (opacity <= 0.003f) return;
         double cx = camera.x;
         double cy = camera.y;
         double cz = camera.z;
 
-        /* depth first (pushed a hair back), so only the front faces show, like the exterior */
+        /* depth first (pushed a hair back), so only the front faces show, like the exterior.
+           layers that haven't started yet are skipped so they don't hide anything */
         collector.order(MASK_ORDER).submitCustomGeometry(poseStack, RenderTypes.waterMask(), (pose, buffer) -> {
             for (GhostQuad ghost : QUADS) {
+                if (opacity * built(progress, ghost.y()) < MIN_ALPHA) continue;
                 float ox = (float) (ghost.x() - cx);
                 float oy = (float) (ghost.y() - cy);
                 float oz = (float) (ghost.z() - cz);
@@ -232,6 +253,9 @@ public final class RematCatchClient {
         });
         collector.submitCustomGeometry(poseStack, RenderTypes.translucentMovingBlock(), (pose, buffer) -> {
             for (GhostQuad ghost : QUADS) {
+                float alpha = opacity * built(progress, ghost.y());
+                if (alpha < MIN_ALPHA) continue;
+                int tint = fadeTint(alpha);
                 for (int v = 0; v < 4; v++) {
                     DRAW.setColor(v, ARGB.multiply(ghost.colors()[v], tint));
                     DRAW.setLightCoords(v, ghost.lights()[v]);

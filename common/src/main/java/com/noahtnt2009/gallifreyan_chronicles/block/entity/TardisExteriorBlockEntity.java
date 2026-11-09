@@ -1,5 +1,6 @@
 package com.noahtnt2009.gallifreyan_chronicles.block.entity;
 
+import com.noahtnt2009.gallifreyan_chronicles.util.GameClock;
 import com.noahtnt2009.gallifreyan_chronicles.tardis.exterior.RematCatch;
 import com.noahtnt2009.gallifreyan_chronicles.client.GCClientHooks;
 import com.noahtnt2009.gallifreyan_chronicles.block.TardisTopBlock;
@@ -94,6 +95,7 @@ public class TardisExteriorBlockEntity extends BlockEntity implements GeoBlockEn
     private final HeldKey heldKey = new HeldKey();
     private final CloakFade cloak = new CloakFade();
     private static final float KEY_REVEAL_OPACITY = 0.2f;
+    private static final int TRAVEL_RESYNC_TICKS = 20;
     private final FadingValue keyReveal = new FadingValue(0.5f, 0.0f);
     private final ComponentStore components = new ComponentStore();
     private final Entity ecsEntity = Entity.of(this, this::sync);
@@ -173,7 +175,7 @@ public class TardisExteriorBlockEntity extends BlockEntity implements GeoBlockEn
     }
 
     public TardisFlightState getFlightState() {
-        if (level != null && !level.isClientSide() && flight.expireState(level.getGameTime())) {
+        if (level != null && !level.isClientSide() && flight.expireState(GameClock.now(level))) {
             setChanged();
         }
         return flight.state();
@@ -181,7 +183,7 @@ public class TardisExteriorBlockEntity extends BlockEntity implements GeoBlockEn
 
     public void setFlightState(TardisFlightState state, long durationTicks) {
         if (level == null || level.isClientSide()) return;
-        flight.setState(state, level.getGameTime(), durationTicks);
+        flight.setState(state, GameClock.now(level), durationTicks);
         setChanged();
     }
 
@@ -202,7 +204,7 @@ public class TardisExteriorBlockEntity extends BlockEntity implements GeoBlockEn
             return;
         }
         if (level != null && !level.isClientSide()) {
-            long now = level.getGameTime();
+            long now = GameClock.now(level);
             if (now < keyCooldownUntil) {
                 return;
             }
@@ -372,7 +374,7 @@ public class TardisExteriorBlockEntity extends BlockEntity implements GeoBlockEn
     }
 
     public void setInFlight(boolean inFlight) {
-        long now = level != null ? level.getGameTime() : 0L;
+        long now = level != null ? GameClock.now(level) : 0L;
 
         this.flight.setInFlight(inFlight, now);
 
@@ -403,7 +405,7 @@ public class TardisExteriorBlockEntity extends BlockEntity implements GeoBlockEn
 
     public void scheduleLanding(int delayTicks) {
         if (level == null || level.isClientSide()) return;
-        if (flight.scheduleLanding(level.getGameTime(), delayTicks)) setChanged();
+        if (flight.scheduleLanding(GameClock.now(level), delayTicks)) setChanged();
     }
 
     public void abortTakeoff(int fadeInTicks) {
@@ -420,7 +422,7 @@ public class TardisExteriorBlockEntity extends BlockEntity implements GeoBlockEn
     }
 
     private void tickLanding(Level level) {
-        long dueTick = flight.consumeDueLanding(level.getGameTime());
+        long dueTick = flight.consumeDueLanding(GameClock.now(level));
         if (dueTick < 0L) return;
         setInFlight(false, dueTick);
         setChanged();
@@ -432,12 +434,12 @@ public class TardisExteriorBlockEntity extends BlockEntity implements GeoBlockEn
 
     public void setFadeType(FadeType fadeType) {
         boolean serverSide = level != null && !level.isClientSide();
-        long now = serverSide ? level.getGameTime() : 0L;
+        long now = serverSide ? GameClock.now(level) : 0L;
         if (flight.setFadeType(fadeType, now, serverSide)) sync();
     }
 
     private void refreshFadeType() {
-        if (level != null && flight.refreshFadeType(level.getGameTime())) sync();
+        if (level != null && flight.refreshFadeType(GameClock.now(level))) sync();
     }
 
     public boolean isCloaked() {
@@ -446,22 +448,22 @@ public class TardisExteriorBlockEntity extends BlockEntity implements GeoBlockEn
 
     public void setCloaked(boolean cloaked) {
         if (level == null || level.isClientSide()) return;
-        if (cloak.set(cloaked, level.getGameTime())) sync();
+        if (cloak.set(cloaked, GameClock.now(level))) sync();
     }
 
     private float cloakOpacity(float partialTick) {
         if (level == null) return cloak.restingOpacity();
-        return cloak.opacity(level.getGameTime(), partialTick);
+        return cloak.opacity(GameClock.now(level), partialTick);
     }
 
     public boolean isShadowActive() {
         if (level == null) return true;
-        return !flight.inFlight() && flight.opacity(level.getGameTime(), 0.0f) >= 1.0f;
+        return !flight.inFlight() && flight.opacity(GameClock.now(level), 0.0f) >= 1.0f;
     }
 
     public boolean isFullyInvisible() {
         if (level == null) return false;
-        return flight.isFullyInvisible(level.getGameTime());
+        return flight.isFullyInvisible(GameClock.now(level));
     }
 
     public float getOpacity(float partialTick) {
@@ -479,7 +481,7 @@ public class TardisExteriorBlockEntity extends BlockEntity implements GeoBlockEn
 
     private float flightOpacity(float partialTick) {
         if (level == null) return flight.restingOpacity();
-        return flight.opacity(level.getGameTime(), partialTick);
+        return flight.opacity(GameClock.now(level), partialTick);
     }
 
     public @Nullable UUID getTardisId() {
@@ -532,17 +534,22 @@ public class TardisExteriorBlockEntity extends BlockEntity implements GeoBlockEn
     }
 
     public static void serverTick(Level level, TardisExteriorBlockEntity blockEntity) {
-        if (level.getGameTime() % 40L == 0L) {
+        if (GameClock.now(level) % 40L == 0L) {
             TardisTopBlock.placeAbove(level, blockEntity.getBlockPos());
         }
         if (level.isClientSide()) return;
         blockEntity.refreshFadeType();
         blockEntity.tickLanding(level);
+        /* players whose view of this chunk changed (left the interior, came back through
+           a portal) may have missed an update, so resend while it travels */
+        if (blockEntity.isTravelling() && (GameClock.now(level) + blockEntity.tickOffset) % TRAVEL_RESYNC_TICKS == 0) {
+            blockEntity.sync();
+        }
         blockEntity.updateLight(level);
-        if ((level.getGameTime() + blockEntity.tickOffset) % POWER_CHECK_INTERVAL_TICKS == 0) {
+        if ((GameClock.now(level) + blockEntity.tickOffset) % POWER_CHECK_INTERVAL_TICKS == 0) {
             blockEntity.refreshPowerAndGlow(level);
         }
-        if ((level.getGameTime() + blockEntity.tickOffset) % ENTRY_ZONE_INTERVAL_TICKS == 0) {
+        if ((GameClock.now(level) + blockEntity.tickOffset) % ENTRY_ZONE_INTERVAL_TICKS == 0) {
             TardisInteriorSystem.tickEntryZone(level, blockEntity);
         }
         if (level instanceof ServerLevel serverLevel) {
@@ -604,7 +611,7 @@ public class TardisExteriorBlockEntity extends BlockEntity implements GeoBlockEn
         Long until = wrongKeyLockouts.get(keyIdOf(key));
         if (until == null) return false;
 
-        long remaining = until - level.getGameTime();
+        long remaining = until - GameClock.now(level);
         if (remaining <= 0L) {
             wrongKeyLockouts.remove(keyIdOf(key));
             return false;
@@ -618,7 +625,7 @@ public class TardisExteriorBlockEntity extends BlockEntity implements GeoBlockEn
         if (!(level instanceof ServerLevel serverLevel)) return;
 
         UUID keyId = keyIdOf(held);
-        long now = serverLevel.getGameTime();
+        long now = GameClock.now(serverLevel);
         wrongKeyLockouts.values().removeIf(until -> until <= now);
         wrongKeyLockouts.put(keyId, now + WRONG_KEY_LOCKOUT_TICKS);
 

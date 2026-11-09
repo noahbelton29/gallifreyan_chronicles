@@ -1,6 +1,8 @@
 package com.noahtnt2009.gallifreyan_chronicles.init;
 
+import java.util.List;
 import java.util.UUID;
+
 import com.noahtnt2009.gallifreyan_chronicles.item.ItemInfoTooltip;
 import net.minecraft.core.UUIDUtil;
 import com.mojang.serialization.Codec;
@@ -9,6 +11,7 @@ import net.minecraft.core.Registry;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.component.DataComponentType;
 import com.noahtnt2009.gallifreyan_chronicles.Constants;
+
 import java.util.function.Supplier;
 
 public class GCDataComponents {
@@ -61,6 +64,11 @@ public class GCDataComponents {
     public static final DataComponentType<Boolean> MASTER_KEY = register(
             "master_key",
             () -> DataComponentType.<Boolean>builder().persistent(Codec.BOOL).build()
+    );
+
+    public static final DataComponentType<List<String>> KEY_TRUSTED = register(
+            "key_trusted",
+            () -> DataComponentType.<List<String>>builder().persistent(Codec.STRING.listOf()).build()
     );
 
     private static <T> DataComponentType<T> register(String name, Supplier<DataComponentType<T>> supplier) {

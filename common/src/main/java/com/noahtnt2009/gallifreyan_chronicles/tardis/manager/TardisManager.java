@@ -148,6 +148,10 @@ public class TardisManager extends SavedData {
         return trustedById.getOrDefault(tardisId, Set.of()).contains(playerId);
     }
 
+    public Set<UUID> trustedOf(UUID tardisId) {
+        return Set.copyOf(trustedById.getOrDefault(tardisId, Set.of()));
+    }
+
     public boolean setTrusted(UUID tardisId, UUID playerId, boolean trusted) {
         if (!byTardisId.containsKey(tardisId)) return false;
         Set<UUID> players = trustedById.computeIfAbsent(tardisId, ignored -> new HashSet<>());

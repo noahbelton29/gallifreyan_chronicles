@@ -26,7 +26,7 @@ public class MasterTardisKeyItem extends Item implements ScrollSelectable {
     }
 
     public MasterTardisKeyItem(Properties properties) {
-        super(properties);
+        super(properties.component(GCDataComponents.ITEM_INFO, ItemInfoTooltip.MASTER_KEY));
     }
 
     @Override

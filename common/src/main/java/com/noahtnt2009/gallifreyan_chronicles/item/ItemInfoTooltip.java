@@ -1,5 +1,7 @@
 package com.noahtnt2009.gallifreyan_chronicles.item;
 
+import java.util.List;
+
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.DataResult;
 import com.noahtnt2009.gallifreyan_chronicles.Constants;
@@ -24,7 +26,8 @@ public enum ItemInfoTooltip implements TooltipProvider {
     CONSOLE,
     DOOR,
     INTERIOR_DOOR,
-    KEY;
+    KEY,
+    MASTER_KEY;
 
     public static final Codec<ItemInfoTooltip> CODEC = Codec.STRING.comapFlatMap(
             name -> {
@@ -46,6 +49,7 @@ public enum ItemInfoTooltip implements TooltipProvider {
             case DOOR -> addDoor(tooltip, flag, components);
             case INTERIOR_DOOR -> addInteriorDoor(tooltip, flag, components);
             case KEY -> addKey(tooltip, flag, components);
+            case MASTER_KEY -> addMasterKey(tooltip, flag, components);
         }
     }
 
@@ -103,7 +107,8 @@ public enum ItemInfoTooltip implements TooltipProvider {
 
     private static void addInteriorDoor(Consumer<Component> tooltip, TooltipFlag flag, DataComponentGetter components) {
         String type = components.get(GCDataComponents.DOOR_TYPE);
-        if (type == null || !TardisDoorRegistry.isInteriorVariant(type)) type = TardisDoorRegistry.defaultInteriorVariantId();
+        if (type == null || !TardisDoorRegistry.isInteriorVariant(type))
+            type = TardisDoorRegistry.defaultInteriorVariantId();
         if (!type.isEmpty()) {
             tooltip.accept(SelectionTooltip.line("tooltip.gallifreyan_chronicles.door.type",
                     SelectionTooltip.highlight(SelectionTooltip.displayName("door_type",
@@ -115,13 +120,17 @@ public enum ItemInfoTooltip implements TooltipProvider {
         }
     }
 
-    private static void addKey(Consumer<Component> tooltip, TooltipFlag flag, DataComponentGetter components) {
+    private static void addKeyStyle(Consumer<Component> tooltip, TooltipFlag flag, DataComponentGetter components) {
         String style = TardisKeyItem.styleOf(components.get(GCDataComponents.KEY_STYLE));
         tooltip.accept(SelectionTooltip.line("tooltip.gallifreyan_chronicles.key.style",
                 SelectionTooltip.highlight(SelectionTooltip.displayName("key_style", Constants.MOD_ID + ":" + style))));
         if (flag.isCreative()) {
             tooltip.accept(SelectionTooltip.scrollHint());
         }
+    }
+
+    private static void addKey(Consumer<Component> tooltip, TooltipFlag flag, DataComponentGetter components) {
+        addKeyStyle(tooltip, flag, components);
 
         UUID tardisId = components.get(GCDataComponents.TARDIS_ID);
         if (tardisId == null) {
@@ -130,6 +139,20 @@ public enum ItemInfoTooltip implements TooltipProvider {
         } else {
             tooltip.accept(SelectionTooltip.line("tooltip.gallifreyan_chronicles.key.linked",
                     SelectionTooltip.highlight(Component.literal(tardisId.toString()))));
+            List<String> trusted = components.get(GCDataComponents.KEY_TRUSTED);
+            if (trusted == null || trusted.isEmpty()) {
+                tooltip.accept(Component.translatable("tooltip.gallifreyan_chronicles.key.no_trusted")
+                        .withStyle(ChatFormatting.DARK_GRAY));
+            } else {
+                tooltip.accept(SelectionTooltip.line("tooltip.gallifreyan_chronicles.key.trusted",
+                        SelectionTooltip.highlight(Component.literal(TardisKeyItem.trustedLine(trusted)))));
+            }
         }
+    }
+
+    private static void addMasterKey(Consumer<Component> tooltip, TooltipFlag flag, DataComponentGetter components) {
+        addKeyStyle(tooltip, flag, components);
+        tooltip.accept(Component.translatable("tooltip.gallifreyan_chronicles.key.master")
+                .withStyle(ChatFormatting.GOLD));
     }
 }

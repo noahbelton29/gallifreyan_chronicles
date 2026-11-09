@@ -82,6 +82,9 @@ public class GCLanguageProvider extends LanguageProvider {
         add("door_type.gallifreyan_chronicles.tuat_interior_doors", "TUAT Interior Doors");
         add("tooltip.gallifreyan_chronicles.scroll", "Scroll to change");
         add("tooltip.gallifreyan_chronicles.key.linked", "Linked to TARDIS ID");
+        add("tooltip.gallifreyan_chronicles.key.master", "Works on every TARDIS");
+        add("tooltip.gallifreyan_chronicles.key.no_trusted", "No trusted players");
+        add("tooltip.gallifreyan_chronicles.key.trusted", "Trusted");
         add("tooltip.gallifreyan_chronicles.key.unlinked", "Not linked to a TARDIS");
         add("creativetab.gallifreyan_chronicles.natural_blocks", "GC: Natural Blocks");
         add("creativetab.gallifreyan_chronicles.building_blocks", "GC: Building Blocks");

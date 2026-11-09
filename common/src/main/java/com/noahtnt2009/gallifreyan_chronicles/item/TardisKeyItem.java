@@ -1,5 +1,14 @@
 package com.noahtnt2009.gallifreyan_chronicles.item;
 
+import com.noahtnt2009.gallifreyan_chronicles.tardis.manager.TardisManager;
+import net.minecraft.world.entity.EquipmentSlot;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.server.players.NameAndId;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.MinecraftServer;
+
+import java.util.ArrayList;
+
 import com.noahtnt2009.gallifreyan_chronicles.tardis.api.TardisApi;
 import com.noahtnt2009.gallifreyan_chronicles.block.entity.TardisConsoleBlockEntity;
 import com.noahtnt2009.gallifreyan_chronicles.block.entity.TardisExteriorBlockEntity;
@@ -21,6 +30,8 @@ import java.util.UUID;
 
 public class TardisKeyItem extends Item implements ScrollSelectable {
     public static final List<String> STYLES = List.of("tardis", "gallifreyan", "yale");
+    private static final int TRUSTED_REFRESH_TICKS = 40;
+    private static final int TRUSTED_SHOWN = 5;
 
     public static String styleOf(@Nullable String stored) {
         return stored != null && STYLES.contains(stored) ? stored : STYLES.getFirst();
@@ -62,6 +73,32 @@ public class TardisKeyItem extends Item implements ScrollSelectable {
 
         player.sendOverlayMessage(Component.translatable("message.gallifreyan_chronicles.key_linked"));
         return InteractionResult.CONSUME;
+    }
+
+    @Override
+    public void inventoryTick(ItemStack stack, ServerLevel level, Entity owner, @Nullable EquipmentSlot slot) {
+        super.inventoryTick(stack, level, owner, slot);
+        if (level.getGameTime() % TRUSTED_REFRESH_TICKS != 0) return;
+        UUID tardisId = stack.get(GCDataComponents.TARDIS_ID);
+        if (tardisId == null) return;
+        MinecraftServer server = level.getServer();
+        List<String> names = new ArrayList<>();
+        for (UUID player : TardisManager.get(server).trustedOf(tardisId)) {
+            names.add(server.services().nameToIdCache().get(player)
+                    .map(NameAndId::name)
+                    .orElse(player.toString().substring(0, 8)));
+        }
+        names.sort(String.CASE_INSENSITIVE_ORDER);
+        if (names.isEmpty()) {
+            if (stack.has(GCDataComponents.KEY_TRUSTED)) stack.remove(GCDataComponents.KEY_TRUSTED);
+        } else if (!names.equals(stack.get(GCDataComponents.KEY_TRUSTED))) {
+            stack.set(GCDataComponents.KEY_TRUSTED, List.copyOf(names));
+        }
+    }
+
+    public static String trustedLine(List<String> names) {
+        if (names.size() <= TRUSTED_SHOWN) return String.join(", ", names);
+        return String.join(", ", names.subList(0, TRUSTED_SHOWN)) + " +" + (names.size() - TRUSTED_SHOWN);
     }
 
     public TardisKeyItem(Properties properties) {

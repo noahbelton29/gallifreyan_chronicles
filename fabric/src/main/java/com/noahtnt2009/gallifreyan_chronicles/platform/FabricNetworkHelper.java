@@ -1,5 +1,6 @@
 package com.noahtnt2009.gallifreyan_chronicles.platform;
 
+import com.noahtnt2009.gallifreyan_chronicles.network.RematCatchPayload;
 import com.noahtnt2009.gallifreyan_chronicles.network.ResumeSoundPayload;
 import com.noahtnt2009.gallifreyan_chronicles.network.DimensionSkySyncPayload;
 import com.noahtnt2009.gallifreyan_chronicles.network.TardisConsoleAnimationPayload;
@@ -97,6 +98,11 @@ public class FabricNetworkHelper implements INetworkHelper {
 
     @Override
     public void sendTardisDrumShake(ServerPlayer player, TardisDrumShakePayload payload) {
+        ServerPlayNetworking.send(player, payload);
+    }
+
+    @Override
+    public void sendRematCatch(ServerPlayer player, RematCatchPayload payload) {
         ServerPlayNetworking.send(player, payload);
     }
 

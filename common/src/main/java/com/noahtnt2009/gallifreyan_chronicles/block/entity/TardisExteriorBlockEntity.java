@@ -1,5 +1,6 @@
 package com.noahtnt2009.gallifreyan_chronicles.block.entity;
 
+import com.noahtnt2009.gallifreyan_chronicles.tardis.exterior.RematCatch;
 import com.noahtnt2009.gallifreyan_chronicles.client.GCClientHooks;
 import com.noahtnt2009.gallifreyan_chronicles.block.TardisTopBlock;
 import com.noahtnt2009.gallifreyan_chronicles.tardis.door.TardisDoorRegistry;
@@ -393,7 +394,11 @@ public class TardisExteriorBlockEntity extends BlockEntity implements GeoBlockEn
 
     private void setInFlight(boolean inFlight, long atTick) {
         if (level == null || level.isClientSide()) return;
-        if (flight.setInFlight(inFlight, atTick)) sync();
+        if (flight.setInFlight(inFlight, atTick)) {
+            sync();
+            /* landing on top of someone pulls them inside */
+            if (!inFlight) RematCatch.onRemat(this, atTick);
+        }
     }
 
     public void scheduleLanding(int delayTicks) {

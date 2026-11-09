@@ -1,5 +1,6 @@
 package com.noahtnt2009.gallifreyan_chronicles.network.client;
 
+import com.noahtnt2009.gallifreyan_chronicles.network.RematCatchPayload;
 import com.noahtnt2009.gallifreyan_chronicles.network.ResumeSoundPayload;
 import com.noahtnt2009.gallifreyan_chronicles.Constants;
 import com.noahtnt2009.gallifreyan_chronicles.network.DimensionSkySyncPayload;
@@ -35,6 +36,9 @@ public final class GCFabricClientNetworking {
                 (payload, context) -> context.client().execute(payload::apply));
 
         ClientPlayNetworking.registerGlobalReceiver(TardisDrumShakePayload.TYPE,
+                (payload, context) -> context.client().execute(payload::apply));
+
+        ClientPlayNetworking.registerGlobalReceiver(RematCatchPayload.TYPE,
                 (payload, context) -> context.client().execute(payload::apply));
 
         ClientPlayNetworking.registerGlobalReceiver(ResumeSoundPayload.TYPE,

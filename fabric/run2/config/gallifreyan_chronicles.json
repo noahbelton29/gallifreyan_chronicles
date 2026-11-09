@@ -9,5 +9,7 @@
   "star_density": "normal",
   "model_render_distance": 64,
   "portal_render_distance": 20,
-  "max_rendered_portals": 8
+  "max_rendered_portals": 8,
+  "immersive_portals": true,
+  "debug_replay": false
 }

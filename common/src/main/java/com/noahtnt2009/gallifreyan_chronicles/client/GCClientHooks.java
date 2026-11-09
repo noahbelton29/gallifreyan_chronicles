@@ -1,5 +1,6 @@
 package com.noahtnt2009.gallifreyan_chronicles.client;
 
+import com.noahtnt2009.gallifreyan_chronicles.client.tardis.RematCatchClient;
 import org.jspecify.annotations.Nullable;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.Identifier;
@@ -79,6 +80,7 @@ public final class GCClientHooks {
         GCConfig.flushPending(false);
         BuildExpiry.tick(minecraft);
         ConsoleHumSounds.tick();
+        RematCatchClient.tick();
         ExteriorHumSounds.tick();
         GCMusic.tick(minecraft);
     }

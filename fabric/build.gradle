@@ -120,7 +120,7 @@ dependencies {
     compileOnly("maven.modrinth:jade:${jade_fabric_version}")
     runtimeOnly("maven.modrinth:jade:${jade_fabric_version}")
     compileOnly("maven.modrinth:essential:${essential_version}")
-    runtimeOnly("maven.modrinth:essential:${essential_version}")
+//    runtimeOnly("maven.modrinth:essential:${essential_version}")
     runtimeOnly(files(essentialDevDir).builtBy(essentialDevSetup))
     compileOnly("maven.modrinth:sound-physics-remastered:fabric-${sound_physics_version}")
     runtimeOnly("maven.modrinth:sound-physics-remastered:fabric-${sound_physics_version}")

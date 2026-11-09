@@ -1,5 +1,6 @@
 package com.noahtnt2009.gallifreyan_chronicles.client.gui.hud;
 
+import com.noahtnt2009.gallifreyan_chronicles.client.tardis.RematCatchClient;
 import com.noahtnt2009.gallifreyan_chronicles.Constants;
 import com.noahtnt2009.gallifreyan_chronicles.block.ConsoleBlock;
 import com.noahtnt2009.gallifreyan_chronicles.block.entity.TardisConsoleBlockEntity;
@@ -68,6 +69,8 @@ public final class GCPowerDarkness {
 
     private static boolean shouldBeDark(Level level) {
         if (!isTardisLevel(level)) return false;
+        /* materialising around you hides the console for a moment */
+        if (RematCatchClient.hidesBlocksIn(level)) return false;
         boolean dark = false;
         boolean hasConsole = false;
         for (TardisConsoleBlockEntity console : new ArrayList<>(CONSOLES)) {

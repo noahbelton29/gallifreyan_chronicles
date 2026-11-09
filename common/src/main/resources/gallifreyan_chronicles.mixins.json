@@ -17,6 +17,9 @@
   "client": [
     "client.screen.LogoRendererMixin",
     "client.render.WindowMixin",
+    "client.render.LevelRendererRematMixin",
+    "client.render.LivingEntityRendererRematMixin",
+    "client.render.LivingEntityRenderStateRematMixin",
     "client.render.DebugRendererMixin",
     "client.sky.SkyRendererMixin",
     "client.sky.LevelRendererSkyOverlayMixin",

@@ -48,6 +48,7 @@ final class FlashbackProbe {
                 }
                 sb.append(" | ").append(name(world))
                         .append(" chunks=").append(world.getChunkSource().getLoadedChunksCount())
+                        .append(sections(world))
                         .append(" entities=").append(world.getEntityCount())
                         .append(" portals=").append(portals).append(p);
             }
@@ -70,5 +71,25 @@ final class FlashbackProbe {
     private static String name(ClientLevel level) {
         String n = level.dimension().identifier().getPath();
         return n.startsWith("tardis/") ? "tardis" : n;
+    }
+
+    /* how many chunk sections actually hold blocks, to tell "chunk is there but
+       empty" apart from "chunk is there but not drawn" */
+    private static String sections(net.minecraft.client.multiplayer.ClientLevel world) {
+        try {
+            if (!(world.getChunkSource() instanceof qouteall.imm_ptl.core.chunk_loading.ImmPtlClientChunkMap map)) return "";
+            int total = 0, solid = 0, emptyChunks = 0;
+            for (net.minecraft.world.level.chunk.LevelChunk c : map.getCopiedChunkList()) {
+                int before = solid;
+                for (var sec : c.getSections()) {
+                    total++;
+                    if (!sec.hasOnlyAir()) solid++;
+                }
+                if (solid == before) emptyChunks++;
+            }
+            return " sections=" + solid + "/" + total + " airChunks=" + emptyChunks;
+        } catch (Throwable t) {
+            return " sections=?";
+        }
     }
 }

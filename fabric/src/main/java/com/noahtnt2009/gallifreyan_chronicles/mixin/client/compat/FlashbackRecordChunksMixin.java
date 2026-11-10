@@ -5,6 +5,7 @@ import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.world.level.chunk.LevelChunk;
+import org.slf4j.LoggerFactory;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Pseudo;
 import org.spongepowered.asm.mixin.injection.At;
@@ -30,6 +31,18 @@ public abstract class FlashbackRecordChunksMixin {
         ClientLevel level = Minecraft.getInstance().level;
         if (level != null && level.getChunkSource() instanceof ImmPtlClientChunkMap map) {
             List<LevelChunk> chunks = map.getCopiedChunkList();
+            int air = 0;
+            for (LevelChunk c : chunks) {
+                boolean solid = false;
+                for (var sec : c.getSections())
+                    if (!sec.hasOnlyAir()) {
+                        solid = true;
+                        break;
+                    }
+                if (!solid) air++;
+            }
+            LoggerFactory.getLogger("gallifreyan_chronicles/record")
+                    .info("[record snapshot] {} chunks, {} all-air, level={}", chunks.size(), air, level.dimension().identifier());
             AtomicReferenceArray<LevelChunk> array = new AtomicReferenceArray<>(chunks.size());
             for (int i = 0; i < chunks.size(); i++) array.set(i, chunks.get(i));
             return array;

@@ -1,4 +1,6 @@
 {
   "parent": "gallifreyan_chronicles:brachacki_doors",
-  "texture": "gallifreyan_chronicles:brachacki_doors/second_doctors_doors_alt"
+  "texture": "gallifreyan_chronicles:brachacki_doors/second_doctors_doors_alt",
+  "block": "gallifreyan_chronicles:second_doctors_door_alt",
+  "priority": 3
 }

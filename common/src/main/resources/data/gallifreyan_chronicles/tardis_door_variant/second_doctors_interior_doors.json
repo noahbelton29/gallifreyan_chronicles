@@ -3,5 +3,6 @@
   "texture": "gallifreyan_chronicles:second_doctors_interior_doors",
   "default": false,
   "interior": true,
-  "exterior": "gallifreyan_chronicles:second_doctors_exterior"
+  "exterior": "gallifreyan_chronicles:second_doctors_exterior",
+  "priority": 2
 }

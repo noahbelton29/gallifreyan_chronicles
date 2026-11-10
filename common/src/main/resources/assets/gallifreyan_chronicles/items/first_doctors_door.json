@@ -29,6 +29,13 @@
           "model": "gallifreyan_chronicles:item/tuat_door"
         },
         "when": "tuat_door"
+      },
+      {
+        "model": {
+          "type": "minecraft:model",
+          "model": "gallifreyan_chronicles:item/hellbent_door"
+        },
+        "when": "hellbent_door"
       }
     ],
     "component": "gallifreyan_chronicles:door_type",

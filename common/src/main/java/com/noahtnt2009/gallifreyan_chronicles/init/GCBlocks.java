@@ -6,6 +6,7 @@ import com.noahtnt2009.gallifreyan_chronicles.item.ConsoleBlockItem;
 import com.noahtnt2009.gallifreyan_chronicles.item.DoorBlockItem;
 import com.noahtnt2009.gallifreyan_chronicles.item.InteriorDoorBlockItem;
 import com.noahtnt2009.gallifreyan_chronicles.item.TardisBlockItem;
+import com.noahtnt2009.gallifreyan_chronicles.tardis.door.DoorBlockJson;
 import com.noahtnt2009.gallifreyan_chronicles.util.GCUtils;
 import com.noahtnt2009.gallifreyan_chronicles.world.tree.GCTreeGrowers;
 import net.minecraft.core.BlockPos;
@@ -42,6 +43,7 @@ import java.util.function.Function;
 
 public class GCBlocks {
     public static final List<Block> BLOCKS = new ArrayList<>();
+    private static final List<Block> PICKABLE_DOORS = new ArrayList<>();
 
     private static boolean neverViewBlocking(
             BlockState state,
@@ -90,41 +92,18 @@ public class GCBlocks {
             Rarity.COMMON,
             InteriorDoorBlockItem::new);
 
-    public static final Block FIRST_DOCTORS_DOOR = registerBlock("first_doctors_door",
-            properties -> new InteriorDoorBlock("brachacki_doors", "first_doctors_doors", properties.strength( 3F,  3F)
-                    .sound(SoundType.STONE)
-                    .noOcclusion()
-                    .noLootTable()
-                    .pushReaction(PushReaction.POPPED)),
-            Rarity.COMMON,
-            DoorBlockItem::new);
-
-    public static final Block SECOND_DOCTORS_DOOR = registerBlock("second_doctors_door",
-            properties -> new InteriorDoorBlock("brachacki_doors", "second_doctors_doors", properties.strength(  3F,  3F)
-                    .sound(SoundType.STONE)
-                    .noOcclusion()
-                    .noLootTable()
-                    .pushReaction(PushReaction.POPPED)),
-            Rarity.COMMON,
-            DoorBlockItem::new);
-
-    public static final Block TUAT_DOOR = registerBlock("tuat_door",
-            properties -> new InteriorDoorBlock("brachacki_doors", "tuat_doors", properties.strength( 3F,  3F)
-                    .sound(SoundType.STONE)
-                    .noOcclusion()
-                    .noLootTable()
-                    .pushReaction(PushReaction.POPPED)),
-            Rarity.COMMON,
-            DoorBlockItem::new);
-
-    public static final Block SECOND_DOCTORS_DOOR_ALT = registerBlock("second_doctors_door_alt",
-            properties -> new InteriorDoorBlock("brachacki_doors", "second_doctors_doors_alt", properties.strength( 3F,  3F)
-                    .sound(SoundType.STONE)
-                    .noOcclusion()
-                    .noLootTable()
-                    .pushReaction(PushReaction.POPPED)),
-            Rarity.COMMON,
-            DoorBlockItem::new);
+    static {
+        for (DoorBlockJson.Entry door : DoorBlockJson.entries()) {
+            registerBlock(door.block(),
+                    properties -> new InteriorDoorBlock(door.model(), door.variant(), properties.strength(3F, 3F)
+                            .sound(SoundType.STONE)
+                            .noOcclusion()
+                            .noLootTable()
+                            .pushReaction(PushReaction.POPPED)),
+                    Rarity.COMMON,
+                    DoorBlockItem::new);
+        }
+    }
 
     public static final Block GALLIFREYAN_SAND = registerBlock("gallifreyan_sand",
             properties -> new GCFallingBlock(properties.strength(1.25F)
@@ -194,12 +173,32 @@ public class GCBlocks {
                     .requiresCorrectToolForDrops()
                     .sound(SoundType.STONE)));
 
+    public static final Block BRACHACKI_WALL_BLOCK_4 = registerBlock("brachacki_wall_block_4",
+            properties -> new Block(properties.strength(3F, 3F)
+                    .requiresCorrectToolForDrops()
+                    .sound(SoundType.STONE)));
+
     public static final Block BRACHACKI_ROUNDEL_BLOCK_3 = registerBlock("brachacki_roundel_block_3",
             properties -> new Block(properties.strength(3F, 3F)
                     .requiresCorrectToolForDrops()
                     .sound(SoundType.STONE)));
 
+    public static final Block BRACHACKI_ROUNDEL_BLOCK_4 = registerBlock("brachacki_roundel_block_4",
+            properties -> new Block(properties.strength(3F, 3F)
+                    .requiresCorrectToolForDrops()
+                    .sound(SoundType.STONE)));
+
     public static final Block BRACHACKI_HALF_ROUNDEL_BLOCK_3 = registerBlock("brachacki_half_roundel_block_3",
+            properties -> new Block(properties.strength(3F, 3F)
+                    .requiresCorrectToolForDrops()
+                    .sound(SoundType.STONE)));
+
+    public static final Block BRACHACKI_HALF_ROUNDEL_BLOCK_4 = registerBlock("brachacki_half_roundel_block_4",
+            properties -> new Block(properties.strength(3F, 3F)
+                    .requiresCorrectToolForDrops()
+                    .sound(SoundType.STONE)));
+
+    public static final Block BRACHACKI_LIGHT_STRIP_BLOCK = registerBlock("brachacki_light_strip_block",
             properties -> new Block(properties.strength(3F, 3F)
                     .requiresCorrectToolForDrops()
                     .sound(SoundType.STONE)));
@@ -323,7 +322,18 @@ public class GCBlocks {
                             .requiresCorrectToolForDrops()
                             .sound(SoundType.STONE)));
 
+    public static final Block BRACHACKI_STAIRS_4 = registerBlock("brachacki_stairs_4",
+            properties -> new StairBlock(BRACHACKI_WALL_BLOCK_4.defaultBlockState(),
+                    properties.strength(3F, 3F)
+                            .requiresCorrectToolForDrops()
+                            .sound(SoundType.STONE)));
+
     public static final Block BRACHACKI_SLAB_3 = registerBlock("brachacki_slab_3",
+            properties -> new SlabBlock(properties.strength(3F, 3F)
+                    .requiresCorrectToolForDrops()
+                    .sound(SoundType.STONE)));
+
+    public static final Block BRACHACKI_SLAB_4 = registerBlock("brachacki_slab_4",
             properties -> new SlabBlock(properties.strength(3F, 3F)
                     .requiresCorrectToolForDrops()
                     .sound(SoundType.STONE)));
@@ -337,7 +347,21 @@ public class GCBlocks {
                             .noCollision()
                             .pushReaction(PushReaction.POPPED)));
 
+    public static final Block BRACHACKI_PRESSURE_PLATE_4 = registerBlock("brachacki_pressure_plate_4",
+            properties -> new PressurePlateBlock(BlockSetType.STONE,
+                    properties.strength(0.5F)
+                            .requiresCorrectToolForDrops()
+                            .sound(SoundType.STONE)
+                            .forceSolidOn()
+                            .noCollision()
+                            .pushReaction(PushReaction.POPPED)));
+
     public static final Block BRACHACKI_WALL_3 = registerBlock("brachacki_wall_3",
+            properties -> new WallBlock(properties.strength(3F, 3F)
+                    .requiresCorrectToolForDrops()
+                    .sound(SoundType.STONE)));
+
+    public static final Block BRACHACKI_WALL_4 = registerBlock("brachacki_wall_4",
             properties -> new WallBlock(properties.strength(3F, 3F)
                     .requiresCorrectToolForDrops()
                     .sound(SoundType.STONE)));
@@ -347,7 +371,19 @@ public class GCBlocks {
                     .requiresCorrectToolForDrops()
                     .sound(SoundType.STONE)));
 
+    public static final Block BRACHACKI_FENCE_4 = registerBlock("brachacki_fence_4",
+            properties -> new FenceBlock(properties.strength(3F, 3F)
+                    .requiresCorrectToolForDrops()
+                    .sound(SoundType.STONE)));
+
     public static final Block BRACHACKI_FENCE_GATE_3 = registerBlock("brachacki_fence_gate_3",
+            properties -> new FenceGateBlock(WoodType.ACACIA,
+                    properties.strength(3F, 3F)
+                            .forceSolidOn()
+                            .requiresCorrectToolForDrops()
+                            .sound(SoundType.STONE)));
+
+    public static final Block BRACHACKI_FENCE_GATE_4 = registerBlock("brachacki_fence_gate_4",
             properties -> new FenceGateBlock(WoodType.ACACIA,
                     properties.strength(3F, 3F)
                             .forceSolidOn()
@@ -744,8 +780,9 @@ public class GCBlocks {
         Block toRegister = function.apply(BlockBehaviour.Properties.of()
                 .setId(ResourceKey.create(Registries.BLOCK, GCUtils.modIdentifier(name))));
 
-        registerBlockItem(name, toRegister, rarity, itemFactory);
+        Item item = registerBlockItem(name, toRegister, rarity, itemFactory);
         BLOCKS.add(toRegister);
+        if (item instanceof DoorBlockItem) PICKABLE_DOORS.add(toRegister);
 
         return Registry.register(BuiltInRegistries.BLOCK, GCUtils.modIdentifier(name), toRegister);
     }
@@ -769,13 +806,23 @@ public class GCBlocks {
         return Registry.register(BuiltInRegistries.BLOCK, GCUtils.modIdentifier(name), toRegister);
     }
 
-    private static void registerBlockItem(String name, Block block, Rarity rarity,
+    private static Item registerBlockItem(String name, Block block, Rarity rarity,
                                           BiFunction<Block, Item.Properties, Item> itemFactory) {
-        Registry.register(BuiltInRegistries.ITEM, GCUtils.modIdentifier(name),
+        return Registry.register(BuiltInRegistries.ITEM, GCUtils.modIdentifier(name),
                 itemFactory.apply(block, new Item.Properties()
                         .useBlockDescriptionPrefix()
                         .rarity(rarity)
                         .setId(ResourceKey.create(Registries.ITEM, GCUtils.modIdentifier(name)))));
+    }
+
+    /* every interior door block (the tardis one and the plain ones) */
+    public static Block[] interiorDoorBlocks() {
+        return BLOCKS.stream().filter(block -> block instanceof InteriorDoorBlock).toArray(Block[]::new);
+    }
+
+    /* the plain doors one door item scrolls between, in json priority order */
+    public static List<Block> pickableDoors() {
+        return List.copyOf(PICKABLE_DOORS);
     }
 
     public static void registerBlocks() {

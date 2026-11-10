@@ -3,5 +3,7 @@
   "texture": "gallifreyan_chronicles:brachacki_doors/tuat_doors",
   "open_sound": "gallifreyan_chronicles:hartnell_door",
   "close_sound": "gallifreyan_chronicles:hartnell_door",
-  "open_all_only": true
+  "open_all_only": true,
+  "block": "gallifreyan_chronicles:tuat_door",
+  "priority": 4
 }

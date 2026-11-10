@@ -3,5 +3,6 @@
   "texture": "gallifreyan_chronicles:tuat_interior_doors",
   "default": false,
   "interior": true,
-  "exterior": "gallifreyan_chronicles:tuat_exterior"
+  "exterior": "gallifreyan_chronicles:tuat_exterior",
+  "priority": 3
 }

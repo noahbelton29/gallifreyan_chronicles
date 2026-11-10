@@ -44,9 +44,9 @@ public class GCModpackDataProvider {
                     .add(GCRecipeProvider.bootstrap());
 
     public static DatapackBuiltinEntriesProvider create(
-            net.minecraft.data.PackOutput output,
-            java.util.concurrent.CompletableFuture<
-                    net.minecraft.core.HolderLookup.Provider> registries) {
+            PackOutput output,
+            CompletableFuture<
+                    HolderLookup.Provider> registries) {
 
         return DatapackBuiltinEntriesProvider.forWorldLayer(
                 output,

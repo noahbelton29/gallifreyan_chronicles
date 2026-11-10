@@ -96,7 +96,9 @@ public enum ItemInfoTooltip implements TooltipProvider {
 
     private static void addDoor(Consumer<Component> tooltip, TooltipFlag flag, DataComponentGetter components) {
         String type = components.get(GCDataComponents.DOOR_TYPE);
-        if (type == null || !DoorBlockItem.DOOR_IDS.contains(type)) type = DoorBlockItem.DOOR_IDS.getFirst();
+        List<String> ids = DoorBlockItem.doorIds();
+        if ((type == null || !ids.contains(type)) && !ids.isEmpty()) type = ids.getFirst();
+        if (type == null) return;
         tooltip.accept(SelectionTooltip.line("tooltip.gallifreyan_chronicles.door.type",
                 SelectionTooltip.highlight(SelectionTooltip.displayName("door_type", Constants.MOD_ID + ":" + type))));
 

@@ -3,5 +3,6 @@
   "texture": "gallifreyan_chronicles:first_doctors_interior_doors",
   "default": true,
   "interior": true,
-  "exterior": "gallifreyan_chronicles:first_doctors_exterior"
+  "exterior": "gallifreyan_chronicles:first_doctors_exterior",
+  "priority": 1
 }

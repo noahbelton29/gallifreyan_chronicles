@@ -1,0 +1,10 @@
+{
+  "parent": "gallifreyan_chronicles:brachacki_doors",
+  "texture": "gallifreyan_chronicles:brachacki_doors/hellbent_doors",
+  "open_sound": "gallifreyan_chronicles:hartnell_door",
+  "close_sound": "gallifreyan_chronicles:hartnell_door",
+  "open_all_only": true,
+  "block": "gallifreyan_chronicles:hellbent_door",
+  "priority": 5,
+  "particle": "gallifreyan_chronicles:brachacki_wall_block_4"
+}

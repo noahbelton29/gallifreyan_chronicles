@@ -3,6 +3,7 @@ package com.noahtnt2009.gallifreyan_chronicles.tardis.door;
 import com.noahtnt2009.gallifreyan_chronicles.Constants;
 import org.jspecify.annotations.Nullable;
 
+import java.util.Comparator;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
@@ -73,7 +74,11 @@ public final class TardisDoorRegistry {
     }
 
     public static List<TardisDoorVariant> interiorVariants() {
-        return VARIANTS.values().stream().filter(TardisDoorVariant::interior).toList();
+        return VARIANTS.values().stream()
+                .filter(TardisDoorVariant::interior)
+                .sorted(Comparator.comparingInt(TardisDoorVariant::priority)
+                        .thenComparing(TardisDoorVariant::localId))
+                .toList();
     }
 
     public static List<String> interiorVariantIds() {

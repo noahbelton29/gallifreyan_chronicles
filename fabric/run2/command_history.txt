@@ -2,3 +2,5 @@
 /gc tardis f4b823f0-e1cf-4aa0-826a-412b38ee8b00 exterior set gallifreyan_chronicles:second_doctors_exterior
 /gc tardis 1f97ad2d-0374-4181-b287-98053a6d2c45 destination here
 /gc tardis ac63981b-b1f0-4ba2-9415-6233a49c2136 destination here
+/gc tardis ac63981b-b1f0-4ba2-9415-6233a49c2136 exterior set gallifreyan_chronicles:hellbent_exterior
+/gc tardis ac63981b-b1f0-4ba2-9415-6233a49c2136 destination here

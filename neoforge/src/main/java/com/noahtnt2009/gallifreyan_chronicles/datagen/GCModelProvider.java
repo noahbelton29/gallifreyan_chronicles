@@ -1,11 +1,27 @@
 package com.noahtnt2009.gallifreyan_chronicles.datagen;
 
+
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.ArrayList;
+
+
+
+
+
+
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.client.renderer.item.SelectItemModel;
+
+
 import com.noahtnt2009.gallifreyan_chronicles.Constants;
 import com.noahtnt2009.gallifreyan_chronicles.block.TardisBlock;
 import com.noahtnt2009.gallifreyan_chronicles.client.model.ConsoleVariantSelectProperty;
 import com.noahtnt2009.gallifreyan_chronicles.client.model.TardisExteriorSelectProperty;
 import com.noahtnt2009.gallifreyan_chronicles.init.GCDataComponents;
 import com.noahtnt2009.gallifreyan_chronicles.init.GCBlocks;
+import com.noahtnt2009.gallifreyan_chronicles.tardis.door.DoorBlockJson;
+import com.noahtnt2009.gallifreyan_chronicles.tardis.door.TardisDoorVariant;
 import com.noahtnt2009.gallifreyan_chronicles.init.GCItems;
 import net.minecraft.client.data.models.BlockModelGenerators;
 import net.minecraft.client.data.models.ItemModelGenerators;
@@ -140,11 +156,16 @@ public class GCModelProvider extends ModelProvider {
         );
         blockModels.createParticleOnlyBlock(GCBlocks.TARDIS_CONSOLE);
         blockModels.createParticleOnlyBlock(GCBlocks.TARDIS_TOP);
-        blockModels.createParticleOnlyBlock(GCBlocks.TARDIS_INTERIOR_DOOR, GCBlocks.BRACHACKI_WALL_BLOCK);
-        blockModels.createParticleOnlyBlock(GCBlocks.FIRST_DOCTORS_DOOR, GCBlocks.BRACHACKI_WALL_BLOCK);
-        blockModels.createParticleOnlyBlock(GCBlocks.SECOND_DOCTORS_DOOR, GCBlocks.BRACHACKI_WALL_BLOCK);
-        blockModels.createParticleOnlyBlock(GCBlocks.SECOND_DOCTORS_DOOR_ALT, GCBlocks.BRACHACKI_WALL_BLOCK);
-        blockModels.createParticleOnlyBlock(GCBlocks.TUAT_DOOR, GCBlocks.BRACHACKI_WALL_BLOCK);
+        /* every door block just needs a particle, the wall it's set in */
+        Map<String, String> doorParticles = new HashMap<>();
+        for (DoorBlockJson.Entry door : DoorBlockJson.entries()) doorParticles.put(door.block(), door.particle());
+        for (Block door : GCBlocks.interiorDoorBlocks()) {
+            String particle = doorParticles.get(BuiltInRegistries.BLOCK.getKey(door).getPath());
+            Block particleBlock = particle != null
+                    ? BuiltInRegistries.BLOCK.getValue(Identifier.parse(particle))
+                    : GCBlocks.BRACHACKI_WALL_BLOCK;
+            blockModels.createParticleOnlyBlock(door, particleBlock);
+        }
         blockModels.createParticleOnlyBlock(GCBlocks.INTERIOR_DOOR_BARRIER, GCBlocks.VOID_BLOCK);
         registerSelectableItems(itemModels);
 
@@ -196,29 +217,38 @@ public class GCModelProvider extends ModelProvider {
                 ItemModelUtils.when("inferno_console", flatItem(itemModels, "tardis_console/inferno_console")),
                 ItemModelUtils.when("ambassadors_of_death_console", flatItem(itemModels, "tardis_console/ambassadors_of_death_console"))));
 
-        ItemModel.Unbaked firstDoors = ItemModelUtils.plainModel(itemModels.createFlatItemModel(GCBlocks.FIRST_DOCTORS_DOOR.asItem(), ModelTemplates.FLAT_ITEM));
-        ItemModel.Unbaked secondDoors = ItemModelUtils.plainModel(itemModels.createFlatItemModel(GCBlocks.SECOND_DOCTORS_DOOR.asItem(), ModelTemplates.FLAT_ITEM));
-        ItemModel.Unbaked tuatDoors = ItemModelUtils.plainModel(itemModels.createFlatItemModel(GCBlocks.TUAT_DOOR.asItem(), ModelTemplates.FLAT_ITEM));
-        ItemModel.Unbaked secondDoorsAlt = ItemModelUtils.plainModel(itemModels.createFlatItemModel(GCBlocks.SECOND_DOCTORS_DOOR_ALT.asItem(), ModelTemplates.FLAT_ITEM));
-        ItemModel.Unbaked firstInteriorDoors = flatItem(itemModels, "interior_door/first_doctors_interior_doors");
-        ItemModel.Unbaked secondInteriorDoors = flatItem(itemModels, "interior_door/second_doctors_interior_doors");
-        ItemModel.Unbaked tuatInteriorDoors = flatItem(itemModels, "interior_door/tuat_interior_doors");
-        itemModels.itemModelOutput.accept(GCBlocks.TARDIS_INTERIOR_DOOR.asItem(),
-                ItemModelUtils.select(new ComponentContents<>(GCDataComponents.DOOR_TYPE), firstInteriorDoors,
-                        ItemModelUtils.when("first_doctors_interior_doors", firstInteriorDoors),
-                        ItemModelUtils.when("second_doctors_interior_doors", secondInteriorDoors),
-                        ItemModelUtils.when("tuat_interior_doors", tuatInteriorDoors)));
-        Map<Item, ItemModel.Unbaked> doorFallbacks = Map.of(
-                GCBlocks.FIRST_DOCTORS_DOOR.asItem(), firstDoors,
-                GCBlocks.SECOND_DOCTORS_DOOR.asItem(), secondDoors,
-                GCBlocks.SECOND_DOCTORS_DOOR_ALT.asItem(), secondDoorsAlt,
-                GCBlocks.TUAT_DOOR.asItem(), tuatDoors);
-        doorFallbacks.forEach((item, fallback) -> itemModels.itemModelOutput.accept(item,
-                ItemModelUtils.select(new ComponentContents<>(GCDataComponents.DOOR_TYPE), fallback,
-                        ItemModelUtils.when("first_doctors_door", firstDoors),
-                        ItemModelUtils.when("second_doctors_door", secondDoors),
-                        ItemModelUtils.when("second_doctors_door_alt", secondDoorsAlt),
-                        ItemModelUtils.when("tuat_door", tuatDoors))));
+        /* tardis interior doors: one item, a model per interior door variant in the data */
+        List<String> interiorVariants = interiorDoorVariants();
+        if (!interiorVariants.isEmpty()) {
+            List<SelectItemModel.SwitchCase<String>> interiorCases = new ArrayList<>();
+            ItemModel.Unbaked interiorFallback = null;
+            for (String variant : interiorVariants) {
+                ItemModel.Unbaked model = flatItem(itemModels, "interior_door/" + variant);
+                if (interiorFallback == null) interiorFallback = model;
+                interiorCases.add(ItemModelUtils.when(variant, model));
+            }
+            itemModels.itemModelOutput.accept(GCBlocks.TARDIS_INTERIOR_DOOR.asItem(),
+                    ItemModelUtils.select(new ComponentContents<>(GCDataComponents.DOOR_TYPE), interiorFallback, interiorCases));
+        }
+
+        /* plain doors: every door item can show every door type */
+        Map<Block, ItemModel.Unbaked> doorModels = new LinkedHashMap<>();
+        for (Block door : GCBlocks.pickableDoors()) {
+            doorModels.put(door, ItemModelUtils.plainModel(itemModels.createFlatItemModel(door.asItem(), ModelTemplates.FLAT_ITEM)));
+        }
+        List<SelectItemModel.SwitchCase<String>> doorCases = new ArrayList<>();
+        doorModels.forEach((door, model) ->
+                doorCases.add(ItemModelUtils.when(BuiltInRegistries.BLOCK.getKey(door).getPath(), model)));
+        doorModels.forEach((door, fallback) -> itemModels.itemModelOutput.accept(door.asItem(),
+                ItemModelUtils.select(new ComponentContents<>(GCDataComponents.DOOR_TYPE), fallback, doorCases)));
+    }
+
+    /* interior door variant ids, from the same codec-read files the game uses, in priority order */
+    private static List<String> interiorDoorVariants() {
+        return DoorBlockJson.bundledVariants().stream()
+                .filter(TardisDoorVariant::interior)
+                .map(TardisDoorVariant::localId)
+                .toList();
     }
 
     private static ItemModel.Unbaked flatItem(ItemModelGenerators itemModels, String path) {
@@ -247,7 +277,10 @@ public class GCModelProvider extends ModelProvider {
         generators.createTrivialCube(GCBlocks.BRACHACKI_ROUNDEL_BLOCK_2);
         generators.createTrivialCube(GCBlocks.BRACHACKI_HALF_ROUNDEL_BLOCK_2);
         generators.createTrivialCube(GCBlocks.BRACHACKI_ROUNDEL_BLOCK_3);
+        generators.createTrivialCube(GCBlocks.BRACHACKI_ROUNDEL_BLOCK_4);
         generators.createTrivialCube(GCBlocks.BRACHACKI_HALF_ROUNDEL_BLOCK_3);
+        generators.createTrivialCube(GCBlocks.BRACHACKI_HALF_ROUNDEL_BLOCK_4);
+        generators.createTrivialCube(GCBlocks.BRACHACKI_LIGHT_STRIP_BLOCK);
         generators.createTrivialCube(GCBlocks.BRACHACKI_TUAT_FLOOR_BLOCK);
         generators.createTrivialCube(GCBlocks.VOID_BLOCK);
         generators.createTrivialCube(GCBlocks.BRACHACKI_TUAT_ROUNDEL_BLOCK);
@@ -270,6 +303,13 @@ public class GCModelProvider extends ModelProvider {
                 .wall(GCBlocks.BRACHACKI_WALL_3)
                 .fence(GCBlocks.BRACHACKI_FENCE_3)
                 .fenceGate(GCBlocks.BRACHACKI_FENCE_GATE_3);
+        generators.family(GCBlocks.BRACHACKI_WALL_BLOCK_4)
+                .stairs(GCBlocks.BRACHACKI_STAIRS_4)
+                .slab(GCBlocks.BRACHACKI_SLAB_4)
+                .pressurePlate(GCBlocks.BRACHACKI_PRESSURE_PLATE_4)
+                .wall(GCBlocks.BRACHACKI_WALL_4)
+                .fence(GCBlocks.BRACHACKI_FENCE_4)
+                .fenceGate(GCBlocks.BRACHACKI_FENCE_GATE_4);
 
         generators.family(GCBlocks.BRACHACKI_TUAT_WALL_BLOCK)
                 .stairs(GCBlocks.BRACHACKI_TUAT_STAIRS)

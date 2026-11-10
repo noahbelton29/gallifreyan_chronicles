@@ -64,12 +64,8 @@ public class GCBlockTagProvider extends BlockTagsProvider {
                 GCBlocks.ARCADIAN_SHALE,
                 GCBlocks.GALLIFREYAN_MUDSTONE,
                 GCBlocks.MOONSLATE,
-                GCBlocks.LUNAR_REGOLITH,
-                GCBlocks.TARDIS_INTERIOR_DOOR,
-                GCBlocks.FIRST_DOCTORS_DOOR,
-                GCBlocks.SECOND_DOCTORS_DOOR,
-                GCBlocks.SECOND_DOCTORS_DOOR_ALT,
-                GCBlocks.TUAT_DOOR);
+                GCBlocks.LUNAR_REGOLITH);
+        tagAdd(BlockTags.MINEABLE_WITH_PICKAXE, GCBlocks.interiorDoorBlocks());
 
         tagAdd(BlockTags.MINEABLE_WITH_SHOVEL,
                 GCBlocks.GALLIFREYAN_DIRT,
@@ -142,6 +138,7 @@ public class GCBlockTagProvider extends BlockTagsProvider {
                 GCBlocks.BRACHACKI_SLAB,
                 GCBlocks.BRACHACKI_STAIRS_2,
                 GCBlocks.BRACHACKI_STAIRS_3,
+                GCBlocks.BRACHACKI_STAIRS_4,
                 GCBlocks.BRACHACKI_TUAT_STAIRS);
 
         tagAdd(BlockTags.SLABS,
@@ -149,6 +146,7 @@ public class GCBlockTagProvider extends BlockTagsProvider {
                 GCBlocks.BRACHACKI_SLAB,
                 GCBlocks.BRACHACKI_SLAB_2,
                 GCBlocks.BRACHACKI_SLAB_3,
+                GCBlocks.BRACHACKI_SLAB_4,
                 GCBlocks.BRACHACKI_TUAT_SLAB);
 
         tagAdd(BlockTags.PRESSURE_PLATES,
@@ -156,6 +154,7 @@ public class GCBlockTagProvider extends BlockTagsProvider {
                 GCBlocks.BRACHACKI_PRESSURE_PLATE,
                 GCBlocks.BRACHACKI_PRESSURE_PLATE_2,
                 GCBlocks.BRACHACKI_PRESSURE_PLATE_3,
+                GCBlocks.BRACHACKI_PRESSURE_PLATE_4,
                 GCBlocks.BRACHACKI_TUAT_PRESSURE_PLATE);
 
         tagAdd(BlockTags.BUTTONS,
@@ -166,6 +165,7 @@ public class GCBlockTagProvider extends BlockTagsProvider {
                 GCBlocks.BRACHACKI_FENCE,
                 GCBlocks.BRACHACKI_FENCE_2,
                 GCBlocks.BRACHACKI_FENCE_3,
+                GCBlocks.BRACHACKI_FENCE_4,
                 GCBlocks.BRACHACKI_TUAT_FENCE);
 
         tagAdd(BlockTags.FENCE_GATES,
@@ -173,6 +173,7 @@ public class GCBlockTagProvider extends BlockTagsProvider {
                 GCBlocks.BRACHACKI_FENCE_GATE,
                 GCBlocks.BRACHACKI_FENCE_GATE_2,
                 GCBlocks.BRACHACKI_FENCE_GATE_3,
+                GCBlocks.BRACHACKI_FENCE_GATE_4,
                 GCBlocks.BRACHACKI_TUAT_FENCE_GATE);
 
         tagAdd(BlockTags.WALLS,
@@ -180,6 +181,7 @@ public class GCBlockTagProvider extends BlockTagsProvider {
                 GCBlocks.BRACHACKI_WALL,
                 GCBlocks.BRACHACKI_WALL_2,
                 GCBlocks.BRACHACKI_WALL_3,
+                GCBlocks.BRACHACKI_WALL_4,
                 GCBlocks.BRACHACKI_TUAT_WALL);
     }
 }

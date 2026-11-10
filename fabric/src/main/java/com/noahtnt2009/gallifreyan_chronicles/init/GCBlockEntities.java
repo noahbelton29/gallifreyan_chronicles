@@ -39,11 +39,7 @@ public class GCBlockEntities {
                 GCUtils.modIdentifier("interior_door_block_entity"),
                 FabricBlockEntityTypeBuilder.create(
                         InteriorDoorBlockEntity::new,
-                        GCBlocks.TARDIS_INTERIOR_DOOR,
-                        GCBlocks.FIRST_DOCTORS_DOOR,
-                        GCBlocks.SECOND_DOCTORS_DOOR,
-                        GCBlocks.SECOND_DOCTORS_DOOR_ALT,
-                        GCBlocks.TUAT_DOOR
+                        GCBlocks.interiorDoorBlocks()
                 ).build()
         );
 

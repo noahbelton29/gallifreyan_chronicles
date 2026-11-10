@@ -1,6 +1,7 @@
 package com.noahtnt2009.gallifreyan_chronicles.item;
 
 import com.noahtnt2009.gallifreyan_chronicles.block.InteriorDoorBlock;
+import com.noahtnt2009.gallifreyan_chronicles.init.GCBlocks;
 import com.noahtnt2009.gallifreyan_chronicles.init.GCDataComponents;
 import com.noahtnt2009.gallifreyan_chronicles.util.GCUtils;
 import net.minecraft.core.registries.BuiltInRegistries;
@@ -14,12 +15,11 @@ import org.jspecify.annotations.Nullable;
 import java.util.List;
 
 public class DoorBlockItem extends BlockItem implements ScrollSelectable {
-    public static final List<String> DOOR_IDS = List.of(
-            "first_doctors_door",
-            "second_doctors_door",
-            "second_doctors_door_alt",
-            "tuat_door"
-    );
+    public static List<String> doorIds() {
+        return GCBlocks.pickableDoors().stream()
+                .map(block -> BuiltInRegistries.BLOCK.getKey(block).getPath())
+                .toList();
+    }
 
     public DoorBlockItem(Block block, Properties properties) {
         super(block, properties.component(GCDataComponents.ITEM_INFO, ItemInfoTooltip.DOOR));
@@ -30,9 +30,10 @@ public class DoorBlockItem extends BlockItem implements ScrollSelectable {
     }
 
     public static String selectedId(ItemStack stack, String fallback) {
+        List<String> ids = doorIds();
         String id = stack.get(GCDataComponents.DOOR_TYPE);
-        if (id != null && DOOR_IDS.contains(id)) return id;
-        return DOOR_IDS.contains(fallback) ? fallback : DOOR_IDS.getFirst();
+        if (id != null && ids.contains(id)) return id;
+        return ids.contains(fallback) || ids.isEmpty() ? fallback : ids.getFirst();
     }
 
     public String selectedId(ItemStack stack) {
@@ -41,8 +42,10 @@ public class DoorBlockItem extends BlockItem implements ScrollSelectable {
 
     @Override
     public boolean cycleSelection(ItemStack stack, int step) {
-        int index = Math.max(0, DOOR_IDS.indexOf(selectedId(stack)));
-        String next = DOOR_IDS.get(Math.floorMod(index + step, DOOR_IDS.size()));
+        List<String> ids = doorIds();
+        if (ids.isEmpty()) return false;
+        int index = Math.max(0, ids.indexOf(selectedId(stack)));
+        String next = ids.get(Math.floorMod(index + step, ids.size()));
         stack.set(GCDataComponents.DOOR_TYPE, next);
         return true;
     }

@@ -1,5 +1,7 @@
 package com.noahtnt2009.gallifreyan_chronicles.init;
 
+import java.util.function.Function;
+
 import com.noahtnt2009.gallifreyan_chronicles.util.GCUtils;
 import net.minecraft.core.Registry;
 import net.minecraft.core.registries.BuiltInRegistries;
@@ -24,7 +26,7 @@ public class GCSounds {
     public static final SoundEvent TARDIS_CLOAK = registerFixedRange("cloak", HEARING_RANGE);
     public static final SoundEvent TARDIS_UNCLOAK = registerFixedRange("uncloak", HEARING_RANGE);
     public static final SoundEvent HARTNELL_DOOR = registerFixedRange("hartnell_door", HEARING_RANGE);
-    public static final SoundEvent STOP_DEMAT = registerFixedRange("stop_demat", HEARING_RANGE);
+    public static final SoundEvent TARDIS_STOP_DEMAT = registerFixedRange("stop_demat", HEARING_RANGE);
 
     public static final SoundEvent TITLE_THEME = register("title_theme");
 
@@ -42,21 +44,16 @@ public class GCSounds {
             registerFixedRange("tardis_vworp", TAKEOFF_HEARING_RANGE);
 
     private static SoundEvent register(String name) {
-        Identifier id = GCUtils.modIdentifier(name);
-        return Registry.register(
-                BuiltInRegistries.SOUND_EVENT,
-                id,
-                SoundEvent.createVariableRangeEvent(id)
-        );
+        return register(name, SoundEvent::createVariableRangeEvent);
     }
 
     private static SoundEvent registerFixedRange(String name, float range) {
+        return register(name, id -> SoundEvent.createFixedRangeEvent(id, range));
+    }
+
+    private static SoundEvent register(String name, Function<Identifier, SoundEvent> factory) {
         Identifier id = GCUtils.modIdentifier(name);
-        return Registry.register(
-                BuiltInRegistries.SOUND_EVENT,
-                id,
-                SoundEvent.createFixedRangeEvent(id, range)
-        );
+        return Registry.register(BuiltInRegistries.SOUND_EVENT, id, factory.apply(id));
     }
 
     public static void registerSounds() {

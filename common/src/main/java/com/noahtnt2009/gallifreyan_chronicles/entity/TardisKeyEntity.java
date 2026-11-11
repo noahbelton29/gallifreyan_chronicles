@@ -1,5 +1,6 @@
 package com.noahtnt2009.gallifreyan_chronicles.entity;
 
+import com.noahtnt2009.gallifreyan_chronicles.util.Messages;
 import com.noahtnt2009.gallifreyan_chronicles.Constants;
 import com.noahtnt2009.gallifreyan_chronicles.block.entity.TardisExteriorBlockEntity;
 import com.noahtnt2009.gallifreyan_chronicles.init.GCDataComponents;
@@ -186,7 +187,7 @@ public class TardisKeyEntity extends Entity {
 
         if (!exterior.areDoorsFullyClosed()) {
             if (!this.level().isClientSide()) {
-                player.sendOverlayMessage(Component.translatable("message.gallifreyan_chronicles.close_doors_to_insert_key"));
+                Messages.overlay(player, "close_doors_to_insert_key");
             }
             return InteractionResult.FAIL;
         }

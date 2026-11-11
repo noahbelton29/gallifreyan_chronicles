@@ -27,27 +27,24 @@ public class GCGallifreyBiomes {
         biomeBuilder.addFeature(GenerationStep.Decoration.UNDERGROUND_ORES, GCPlacedFeatures.COBBLED_LIMESTONE_GALLIFREY_ORES_KEY);
     }
 
+    private static BiomeGenerationSettings.Builder undergroundBuilder(HolderGetter<PlacedFeature> placedFeatureGetter,
+                                                                     HolderGetter<WorldCarver> carverGetter) {
+        BiomeGenerationSettings.Builder biomeBuilder = new BiomeGenerationSettings.Builder(placedFeatureGetter, carverGetter);
+        BiomeDefaultFeatures.addDefaultMonsterRoom(biomeBuilder);
+        BiomeDefaultFeatures.addDefaultUndergroundVariety(biomeBuilder);
+        BiomeDefaultFeatures.addDefaultOres(biomeBuilder);
+        return biomeBuilder;
+    }
+
     public static Biome gallifreyanDesert(
             HolderGetter<PlacedFeature> placedFeatureGetter,
             HolderGetter<WorldCarver> carverGetter
     ) {
         MobSpawnSettings.Builder spawnBuilder = new MobSpawnSettings.Builder();
-        BiomeGenerationSettings.Builder biomeBuilder =
-                new BiomeGenerationSettings.Builder(placedFeatureGetter, carverGetter);
-        BiomeDefaultFeatures.addDefaultMonsterRoom(biomeBuilder);
-        BiomeDefaultFeatures.addDefaultUndergroundVariety(biomeBuilder);
-        BiomeDefaultFeatures.addDefaultOres(biomeBuilder);
+        BiomeGenerationSettings.Builder biomeBuilder = undergroundBuilder(placedFeatureGetter, carverGetter);
 
         biomeBuilder.addFeature(GenerationStep.Decoration.VEGETAL_DECORATION, GCPlacedFeatures.PATCH_GALLIFREY_DRY_GRASS);
-        biomeBuilder.addFeature(GenerationStep.Decoration.UNDERGROUND_ORES, GCPlacedFeatures.IRON_GALLIFREY_ORES_UPPER_KEY);
-        biomeBuilder.addFeature(GenerationStep.Decoration.UNDERGROUND_ORES, GCPlacedFeatures.IRON_GALLIFREY_ORES_MIDDLE_KEY);
-        biomeBuilder.addFeature(GenerationStep.Decoration.UNDERGROUND_ORES, GCPlacedFeatures.IRON_GALLIFREY_ORES_SMALL_KEY);
-
-        biomeBuilder.addFeature(GenerationStep.Decoration.UNDERGROUND_ORES, GCPlacedFeatures.COAL_GALLIFREY_ORES_LOWER_KEY);
-        biomeBuilder.addFeature(GenerationStep.Decoration.UNDERGROUND_ORES, GCPlacedFeatures.COAL_GALLIFREY_ORES_UPPER_KEY);
-
-        biomeBuilder.addFeature(GenerationStep.Decoration.UNDERGROUND_ORES, GCPlacedFeatures.GRAVEL_GALLIFREY_ORES_KEY);
-        biomeBuilder.addFeature(GenerationStep.Decoration.UNDERGROUND_ORES, GCPlacedFeatures.COBBLED_LIMESTONE_GALLIFREY_ORES_KEY);
+        addOres(biomeBuilder);
         biomeBuilder.addFeature(GenerationStep.Decoration.TOP_LAYER_MODIFICATION, GCPlacedFeatures.GALLIFREYAN_STONE_BOULDER);
         biomeBuilder.addFeature(GenerationStep.Decoration.TOP_LAYER_MODIFICATION, GCPlacedFeatures.GALLIFREYAN_STONE_PATCH);
 
@@ -75,11 +72,7 @@ public class GCGallifreyBiomes {
             HolderGetter<WorldCarver> carverGetter
     ) {
         MobSpawnSettings.Builder spawnBuilder = new MobSpawnSettings.Builder();
-        BiomeGenerationSettings.Builder biomeBuilder =
-                new BiomeGenerationSettings.Builder(placedFeatureGetter, carverGetter);
-        BiomeDefaultFeatures.addDefaultMonsterRoom(biomeBuilder);
-        BiomeDefaultFeatures.addDefaultUndergroundVariety(biomeBuilder);
-        BiomeDefaultFeatures.addDefaultOres(biomeBuilder);
+        BiomeGenerationSettings.Builder biomeBuilder = undergroundBuilder(placedFeatureGetter, carverGetter);
 
         biomeBuilder.addFeature(GenerationStep.Decoration.VEGETAL_DECORATION,
                 GCPlacedFeatures.CADONWOOD_TREE_PLACED);
@@ -96,15 +89,7 @@ public class GCGallifreyBiomes {
         biomeBuilder.addFeature(GenerationStep.Decoration.VEGETAL_DECORATION,
                 GCPlacedFeatures.PATCH_GALLIFREY_GRASS_PLAIN);
 
-        biomeBuilder.addFeature(GenerationStep.Decoration.UNDERGROUND_ORES, GCPlacedFeatures.IRON_GALLIFREY_ORES_UPPER_KEY);
-        biomeBuilder.addFeature(GenerationStep.Decoration.UNDERGROUND_ORES, GCPlacedFeatures.IRON_GALLIFREY_ORES_MIDDLE_KEY);
-        biomeBuilder.addFeature(GenerationStep.Decoration.UNDERGROUND_ORES, GCPlacedFeatures.IRON_GALLIFREY_ORES_SMALL_KEY);
-
-        biomeBuilder.addFeature(GenerationStep.Decoration.UNDERGROUND_ORES, GCPlacedFeatures.COAL_GALLIFREY_ORES_LOWER_KEY);
-        biomeBuilder.addFeature(GenerationStep.Decoration.UNDERGROUND_ORES, GCPlacedFeatures.COAL_GALLIFREY_ORES_UPPER_KEY);
-
-        biomeBuilder.addFeature(GenerationStep.Decoration.UNDERGROUND_ORES, GCPlacedFeatures.GRAVEL_GALLIFREY_ORES_KEY);
-        biomeBuilder.addFeature(GenerationStep.Decoration.UNDERGROUND_ORES, GCPlacedFeatures.COBBLED_LIMESTONE_GALLIFREY_ORES_KEY);
+        addOres(biomeBuilder);
 
         return new Biome.BiomeBuilder()
                 .hasPrecipitation(false)
@@ -129,11 +114,7 @@ public class GCGallifreyBiomes {
             HolderGetter<WorldCarver> carverGetter
     ) {
         MobSpawnSettings.Builder spawnBuilder = new MobSpawnSettings.Builder();
-        BiomeGenerationSettings.Builder biomeBuilder =
-                new BiomeGenerationSettings.Builder(placedFeatureGetter, carverGetter);
-        BiomeDefaultFeatures.addDefaultMonsterRoom(biomeBuilder);
-        BiomeDefaultFeatures.addDefaultUndergroundVariety(biomeBuilder);
-        BiomeDefaultFeatures.addDefaultOres(biomeBuilder);
+        BiomeGenerationSettings.Builder biomeBuilder = undergroundBuilder(placedFeatureGetter, carverGetter);
 
         addOres(biomeBuilder);
 

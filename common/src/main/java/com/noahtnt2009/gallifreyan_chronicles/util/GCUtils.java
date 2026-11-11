@@ -17,6 +17,11 @@ public class GCUtils {
         return Identifier.fromNamespaceAndPath(Constants.MOD_ID, name);
     }
 
+    public static String localPath(String id) {
+        int colon = id.indexOf(':');
+        return colon < 0 ? id : id.substring(colon + 1);
+    }
+
     public static String withModIdPrefix(String name) {
         return String.format(Constants.MOD_ID.concat(": ".concat(name)));
     }

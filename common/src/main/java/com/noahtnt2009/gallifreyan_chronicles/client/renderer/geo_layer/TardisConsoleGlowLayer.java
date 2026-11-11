@@ -1,5 +1,6 @@
 package com.noahtnt2009.gallifreyan_chronicles.client.renderer.geo_layer;
 
+import com.noahtnt2009.gallifreyan_chronicles.client.tardis.GeoAssets;
 import com.geckolib.animatable.GeoAnimatable;
 import com.geckolib.constant.DataTickets;
 import com.geckolib.constant.dataticket.DataTicket;
@@ -9,7 +10,6 @@ import com.geckolib.renderer.base.RenderPassInfo;
 import com.geckolib.renderer.layer.builtin.AutoGlowingGeoLayer;
 import com.noahtnt2009.gallifreyan_chronicles.client.renderer.GCRenderTypes;
 import com.noahtnt2009.gallifreyan_chronicles.client.renderer.TardisConsoleBlockRenderer;
-import com.noahtnt2009.gallifreyan_chronicles.client.tardis.TardisConsoleAssets;
 import com.noahtnt2009.gallifreyan_chronicles.tardis.console.GlowGroup;
 import com.noahtnt2009.gallifreyan_chronicles.tardis.console.TardisConsole;
 import com.noahtnt2009.gallifreyan_chronicles.tardis.console.TardisConsoleRegistry;
@@ -121,7 +121,7 @@ public class TardisConsoleGlowLayer<T extends GeoAnimatable, O, R extends GeoRen
 
     private static Identifier groupBase(Identifier variantBase, @Nullable TardisConsoleVariant variant, GlowGroup group) {
         String override = variant == null ? null : variant.glowTexture(group.name());
-        return override == null ? variantBase : TardisConsoleAssets.texture(override);
+        return override == null ? variantBase : GeoAssets.CONSOLE.texture(override);
     }
 
     private static boolean hasGroupTextures(Identifier variantBase, @Nullable TardisConsoleVariant variant, List<GlowGroup> groups) {

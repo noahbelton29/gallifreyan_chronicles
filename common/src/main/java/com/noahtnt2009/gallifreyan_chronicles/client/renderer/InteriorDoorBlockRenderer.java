@@ -1,5 +1,9 @@
 package com.noahtnt2009.gallifreyan_chronicles.client.renderer;
 
+import com.noahtnt2009.gallifreyan_chronicles.client.util.FadeTint;
+
+import com.noahtnt2009.gallifreyan_chronicles.client.util.ModelRenderRange;
+
 import org.jspecify.annotations.Nullable;
 import net.minecraft.util.ARGB;
 import net.minecraft.resources.Identifier;
@@ -94,9 +98,7 @@ public class InteriorDoorBlockRenderer extends GeoBlockRenderer<@NotNull Interio
 
     @Override
     public boolean shouldRender(@NonNull InteriorDoorBlockEntity blockEntity, @NonNull Vec3 cameraPos) {
-        if (RenderLevelGuard.isForeign(blockEntity.getLevel())) return false;
-        double range = GCConfig.modelRenderDistance();
-        return Vec3.atCenterOf(blockEntity.getBlockPos()).distanceToSqr(cameraPos) < range * range;
+        return ModelRenderRange.inRangeAndLocal(blockEntity, cameraPos);
     }
 
     @Override
@@ -116,7 +118,7 @@ public class InteriorDoorBlockRenderer extends GeoBlockRenderer<@NotNull Interio
     public int getRenderColor(InteriorDoorBlockEntity animatable, @Nullable Void relatedObject, float partialTick) {
         int color = super.getRenderColor(animatable, relatedObject, partialTick);
         float opacity = RematCatchClient.opacityIn(animatable.getLevel());
-        return opacity < 1.0f ? ARGB.multiply(color, RematCatchClient.fadeTint(opacity)) : color;
+        return opacity < 1.0f ? ARGB.multiply(color, FadeTint.of(opacity)) : color;
     }
 
     @Override

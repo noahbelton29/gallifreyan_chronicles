@@ -1,5 +1,6 @@
 package com.noahtnt2009.gallifreyan_chronicles.tardis.security;
 
+import com.noahtnt2009.gallifreyan_chronicles.util.Messages;
 import com.noahtnt2009.gallifreyan_chronicles.init.GCDataComponents;
 import com.noahtnt2009.gallifreyan_chronicles.init.GCItems;
 import com.noahtnt2009.gallifreyan_chronicles.tardis.api.Tardis;
@@ -35,7 +36,7 @@ public final class TardisTrust {
 
         Tardis tardis = held.get();
         if (!tardis.isOwner(owner)) {
-            owner.sendOverlayMessage(Component.translatable("message.gallifreyan_chronicles.trust_not_yours"));
+            Messages.overlay(owner, "trust_not_yours");
             return InteractionResult.SUCCESS;
         }
 
@@ -44,23 +45,23 @@ public final class TardisTrust {
 
     private static InteractionResult trust(Tardis tardis, ServerPlayer owner, ServerPlayer target) {
         if (!tardis.trust(target.getUUID())) {
-            owner.sendOverlayMessage(Component.translatable("message.gallifreyan_chronicles.trust_already", target.getDisplayName()));
+            Messages.overlay(owner, "trust_already", target.getDisplayName());
             return InteractionResult.SUCCESS;
         }
 
-        owner.sendOverlayMessage(Component.translatable("message.gallifreyan_chronicles.trust_added", target.getDisplayName()));
-        target.sendOverlayMessage(Component.translatable("message.gallifreyan_chronicles.trust_granted", owner.getDisplayName()));
+        Messages.overlay(owner, "trust_added", target.getDisplayName());
+        Messages.overlay(target, "trust_granted", owner.getDisplayName());
         return InteractionResult.SUCCESS;
     }
 
     private static InteractionResult untrust(Tardis tardis, ServerPlayer owner, ServerPlayer target) {
         if (!tardis.untrust(target.getUUID())) {
-            owner.sendOverlayMessage(Component.translatable("message.gallifreyan_chronicles.trust_not_trusted", target.getDisplayName()));
+            Messages.overlay(owner, "trust_not_trusted", target.getDisplayName());
             return InteractionResult.SUCCESS;
         }
 
-        owner.sendOverlayMessage(Component.translatable("message.gallifreyan_chronicles.trust_removed", target.getDisplayName()));
-        target.sendOverlayMessage(Component.translatable("message.gallifreyan_chronicles.trust_revoked", owner.getDisplayName()));
+        Messages.overlay(owner, "trust_removed", target.getDisplayName());
+        Messages.overlay(target, "trust_revoked", owner.getDisplayName());
         return InteractionResult.SUCCESS;
     }
 

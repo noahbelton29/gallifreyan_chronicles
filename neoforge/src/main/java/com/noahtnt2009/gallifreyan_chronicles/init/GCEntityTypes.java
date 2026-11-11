@@ -19,22 +19,10 @@ public class GCEntityTypes {
             DeferredRegister.create(BuiltInRegistries.ENTITY_TYPE, Constants.MOD_ID);
 
     public static final Supplier<EntityType<TardisControlEntity>> TARDIS_CONTROL_ENTITY_TYPE =
-            ENTITY_TYPES.register("tardis_control", () ->
-                    EntityType.Builder.of(TardisControlEntity::new, MobCategory.MISC)
-                            .sized(TardisControlEntity.DEFAULT_WIDTH, TardisControlEntity.DEFAULT_HEIGHT)
-                            .noSummon()
-                            .noSave()
-                            .build(ResourceKey.create(Registries.ENTITY_TYPE,
-                                    GCUtils.modIdentifier("tardis_control"))));
+            ENTITY_TYPES.register("tardis_control", GCEntityTypeBuilders::tardisControl);
 
     public static final Supplier<EntityType<TardisKeyEntity>> TARDIS_KEY_ENTITY_TYPE =
-            ENTITY_TYPES.register("tardis_key", () ->
-                    EntityType.Builder.of(TardisKeyEntity::new, MobCategory.MISC)
-                            .sized(TardisKeyEntity.DEFAULT_WIDTH, TardisKeyEntity.DEFAULT_HEIGHT)
-                            .noSummon()
-                            .noSave()
-                            .build(ResourceKey.create(Registries.ENTITY_TYPE,
-                                    GCUtils.modIdentifier("tardis_key"))));
+            ENTITY_TYPES.register("tardis_key", GCEntityTypeBuilders::tardisKey);
 
     public static void registerEntityTypes(IEventBus eventBus) {
         Constants.LOG.info("Registered GC Entity Types (NeoForge)");

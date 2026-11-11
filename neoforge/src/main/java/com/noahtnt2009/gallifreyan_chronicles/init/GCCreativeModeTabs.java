@@ -18,154 +18,32 @@ public class GCCreativeModeTabs {
     public static final Supplier<CreativeModeTab> TARDIS_TAB = CREATIVE_MODE_TABS.register("tardis",
             () -> CreativeModeTab.builder().icon(() -> new ItemStack(GCBlocks.TARDIS))
                     .title(Component.translatable("creativetab.gallifreyan_chronicles.tardis"))
-                    .displayItems((params, output) -> {
-                        output.accept(GCBlocks.TARDIS);
-                        ItemStack brachackiConsole = new ItemStack(GCBlocks.TARDIS_CONSOLE);
-                        brachackiConsole.set(GCDataComponents.CONSOLE_ID, Constants.MOD_ID + ":brachacki_console");
-                        output.accept(brachackiConsole);
-                        output.accept(GCItems.TARDIS_KEY);
-                        output.accept(GCItems.MASTER_TARDIS_KEY);
-                        output.accept(GCBlocks.TARDIS_INTERIOR_DOOR);
-                        GCBlocks.pickableDoors().stream().findFirst().ifPresent(output::accept);
-                        output.accept(GCBlocks.BRACHACKI_FLOOR_BLOCK);
-                        output.accept(GCBlocks.BRACHACKI_WALL_BLOCK);
-                        output.accept(GCBlocks.BRACHACKI_ROUNDEL_BLOCK);
-                        output.accept(GCBlocks.BRACHACKI_HALF_ROUNDEL_BLOCK);
-                        output.accept(GCBlocks.BRACHACKI_ROUNDEL_ALT_BLOCK);
-                        output.accept(GCBlocks.BRACHACKI_HALF_ROUNDEL_ALT_BLOCK);
-                        output.accept(GCBlocks.BRACHACKI_WALL_BLOCK_2);
-                        output.accept(GCBlocks.BRACHACKI_ROUNDEL_BLOCK_2);
-                        output.accept(GCBlocks.BRACHACKI_HALF_ROUNDEL_BLOCK_2);
-                        output.accept(GCBlocks.BRACHACKI_WALL_BLOCK_3);
-                        output.accept(GCBlocks.BRACHACKI_WALL_BLOCK_4);
-                        output.accept(GCBlocks.BRACHACKI_ROUNDEL_BLOCK_3);
-                        output.accept(GCBlocks.BRACHACKI_ROUNDEL_BLOCK_4);
-                        output.accept(GCBlocks.BRACHACKI_HALF_ROUNDEL_BLOCK_3);
-                        output.accept(GCBlocks.BRACHACKI_HALF_ROUNDEL_BLOCK_4);
-                        output.accept(GCBlocks.BRACHACKI_LIGHT_STRIP_BLOCK);
-                        output.accept(GCBlocks.VOID_BLOCK);
-                        output.accept(GCBlocks.BRACHACKI_TUAT_FLOOR_BLOCK);
-                        output.accept(GCBlocks.BRACHACKI_TUAT_WALL_BLOCK);
-                        output.accept(GCBlocks.BRACHACKI_TUAT_ROUNDEL_BLOCK);
-                        output.accept(GCBlocks.BRACHACKI_TUAT_HALF_ROUNDEL_BLOCK);
-                        output.accept(GCBlocks.BRACHACKI_TUAT_HEXAGONAL_ROUNDEL_BLOCK);
-                        output.accept(GCBlocks.BRACHACKI_TUAT_HALF_HEXAGONAL_ROUNDEL_BLOCK);
-                        output.accept(GCBlocks.BRACHACKI_STAIRS);
-                        output.accept(GCBlocks.BRACHACKI_SLAB);
-                        output.accept(GCBlocks.BRACHACKI_PRESSURE_PLATE);
-                        output.accept(GCBlocks.BRACHACKI_WALL);
-                        output.accept(GCBlocks.BRACHACKI_FENCE);
-                        output.accept(GCBlocks.BRACHACKI_FENCE_GATE);
-                        output.accept(GCBlocks.BRACHACKI_STAIRS_2);
-                        output.accept(GCBlocks.BRACHACKI_SLAB_2);
-                        output.accept(GCBlocks.BRACHACKI_PRESSURE_PLATE_2);
-                        output.accept(GCBlocks.BRACHACKI_WALL_2);
-                        output.accept(GCBlocks.BRACHACKI_FENCE_2);
-                        output.accept(GCBlocks.BRACHACKI_FENCE_GATE_2);
-                        output.accept(GCBlocks.BRACHACKI_STAIRS_3);
-                        output.accept(GCBlocks.BRACHACKI_STAIRS_4);
-                        output.accept(GCBlocks.BRACHACKI_SLAB_3);
-                        output.accept(GCBlocks.BRACHACKI_SLAB_4);
-                        output.accept(GCBlocks.BRACHACKI_PRESSURE_PLATE_3);
-                        output.accept(GCBlocks.BRACHACKI_PRESSURE_PLATE_4);
-                        output.accept(GCBlocks.BRACHACKI_WALL_3);
-                        output.accept(GCBlocks.BRACHACKI_WALL_4);
-                        output.accept(GCBlocks.BRACHACKI_FENCE_3);
-                        output.accept(GCBlocks.BRACHACKI_FENCE_4);
-                        output.accept(GCBlocks.BRACHACKI_FENCE_GATE_3);
-                        output.accept(GCBlocks.BRACHACKI_FENCE_GATE_4);
-                        output.accept(GCBlocks.BRACHACKI_TUAT_STAIRS);
-                        output.accept(GCBlocks.BRACHACKI_TUAT_SLAB);
-                        output.accept(GCBlocks.BRACHACKI_TUAT_PRESSURE_PLATE);
-                        output.accept(GCBlocks.BRACHACKI_TUAT_WALL);
-                        output.accept(GCBlocks.BRACHACKI_TUAT_FENCE);
-                        output.accept(GCBlocks.BRACHACKI_TUAT_FENCE_GATE);
-                    }).build());
+                    .displayItems((params, output) -> GCCreativeTabContents.tardis(output::accept))
+                    .build());
 
     public static final Supplier<CreativeModeTab> NATURAL_BLOCKS_TAB = CREATIVE_MODE_TABS.register("natural_blocks",
             () -> CreativeModeTab.builder().icon(() -> new ItemStack(GCBlocks.GALLIFREYAN_GRASS_BLOCK))
                     .title(Component.translatable("creativetab.gallifreyan_chronicles.natural_blocks"))
-                    .displayItems((params, output) -> {
-                        output.accept(GCBlocks.GALLIFREYAN_GRASS_BLOCK);
-                        output.accept(GCBlocks.GALLIFREYAN_DIRT);
-                        output.accept(GCBlocks.GALLIFREYAN_MUD);
-                        output.accept(GCBlocks.GALLIFREYAN_MUDSTONE);
-                        output.accept(GCBlocks.GALLIFREYAN_SAND);
-                        output.accept(GCBlocks.GALLIFREYAN_GRAVEL);
-
-                        output.accept(GCBlocks.GALLIFREYAN_STONE);
-                        output.accept(GCBlocks.GALLIFREYAN_COBBLESTONE);
-                        output.accept(GCBlocks.COBBLED_LIMESTONE);
-                        output.accept(GCBlocks.ARCADIAN_SHALE);
-
-                        output.accept(GCBlocks.GALLIFREYAN_STONE_COAL_ORE);
-                        output.accept(GCBlocks.GALLIFREYAN_STONE_IRON_ORE);
-                        output.accept(GCBlocks.ARCADIAN_SHALE_TARANIUM_ORE);
-                    }).build());
+                    .displayItems((params, output) -> GCCreativeTabContents.naturalBlocks(output::accept))
+                    .build());
 
     public static final Supplier<CreativeModeTab> BUILDING_BLOCKS_TAB = CREATIVE_MODE_TABS.register("building_blocks",
             () -> CreativeModeTab.builder().icon(() -> new ItemStack(GCBlocks.CADONWOOD_PLANKS))
                     .title(Component.translatable("creativetab.gallifreyan_chronicles.building_blocks"))
-                    .displayItems((params, output) -> {
-                        output.accept(GCBlocks.CADONWOOD_LOG);
-                        output.accept(GCBlocks.CADONWOOD_WOOD);
-                        output.accept(GCBlocks.STRIPPED_CADONWOOD_LOG);
-                        output.accept(GCBlocks.STRIPPED_CADONWOOD_WOOD);
-                        output.accept(GCBlocks.CADONWOOD_PLANKS);
-                        output.accept(GCBlocks.CADONWOOD_STAIRS);
-                        output.accept(GCBlocks.CADONWOOD_SLAB);
-                        output.accept(GCBlocks.CADONWOOD_FENCE);
-                        output.accept(GCBlocks.CADONWOOD_FENCE_GATE);
-                        output.accept(GCBlocks.CADONWOOD_WALL);
-                        output.accept(GCBlocks.CADONWOOD_PRESSURE_PLATE);
-                        output.accept(GCBlocks.CADONWOOD_BUTTON);
-                        for (String wood : GCBlocks.ROUNDEL_WOODS) {
-                            output.accept(GCBlocks.WOOD_ROUNDELS.get(wood));
-                            output.accept(GCBlocks.WOOD_HALF_ROUNDELS.get(wood));
-                        }
-                        for (String colour : GCBlocks.ROUNDEL_CONCRETES) {
-                            output.accept(GCBlocks.CONCRETE_ROUNDELS.get(colour));
-                            output.accept(GCBlocks.CONCRETE_HALF_ROUNDELS.get(colour));
-                        }
-                    }).build());
+                    .displayItems((params, output) -> GCCreativeTabContents.buildingBlocks(output::accept))
+                    .build());
 
     public static final Supplier<CreativeModeTab> FLORA_TAB = CREATIVE_MODE_TABS.register("flora",
             () -> CreativeModeTab.builder().icon(() -> new ItemStack(GCBlocks.CADONWOOD_LEAVES))
                     .title(Component.translatable("creativetab.gallifreyan_chronicles.flora"))
-                    .displayItems((params, output) -> {
-                        output.accept(GCBlocks.CADONWOOD_SAPLING);
-                        output.accept(GCBlocks.CADONWOOD_LEAVES);
-                        output.accept(GCBlocks.GALLIFREYAN_VINE);
-                        output.accept(GCBlocks.SHORT_GALLIFREYAN_GRASS);
-                        output.accept(GCBlocks.TALL_GALLIFREYAN_GRASS);
-                        output.accept(GCBlocks.SHORT_GALLIFREYAN_DRY_GRASS);
-                        output.accept(GCBlocks.TALL_GALLIFREYAN_DRY_GRASS);
-                        output.accept(GCBlocks.THORIVINE);
-                        output.accept(GCBlocks.THORIVINE_FLOWER);
-                    }).build());
+                    .displayItems((params, output) -> GCCreativeTabContents.flora(output::accept))
+                    .build());
 
     public static final Supplier<CreativeModeTab> TOOLS_AND_ARMOR_TAB = CREATIVE_MODE_TABS.register("tools_and_armor",
             () -> CreativeModeTab.builder().icon(() -> new ItemStack(GCItems.TARANIUM_PICKAXE))
                     .title(Component.translatable("creativetab.gallifreyan_chronicles.tools_and_armor"))
-                    .displayItems((params, output) -> {
-                        output.accept(GCItems.RAW_TIN);
-
-                        output.accept(GCItems.TARANIUM_SCRAP);
-                        output.accept(GCItems.TARANIUM_CRYSTAL);
-                        output.accept(GCItems.REFINED_TARANIUM_CRYSTAL);
-                        output.accept(GCItems.TARANIUM_INGOT);
-
-                        output.accept(GCItems.TARANIUM_SWORD);
-                        output.accept(GCItems.TARANIUM_PICKAXE);
-                        output.accept(GCItems.TARANIUM_AXE);
-                        output.accept(GCItems.TARANIUM_SHOVEL);
-                        output.accept(GCItems.TARANIUM_HOE);
-
-                        output.accept(GCItems.TARANIUM_HELMET);
-                        output.accept(GCItems.TARANIUM_CHESTPLATE);
-                        output.accept(GCItems.TARANIUM_LEGGINGS);
-                        output.accept(GCItems.TARANIUM_BOOTS);
-                    }).build());
+                    .displayItems((params, output) -> GCCreativeTabContents.toolsAndArmor(output::accept))
+                    .build());
 
     /** Everything addons registered through the addon API. Read when the tab is built, after addons have started. */
     public static final Supplier<CreativeModeTab> ADDONS_TAB = CREATIVE_MODE_TABS.register("addons",

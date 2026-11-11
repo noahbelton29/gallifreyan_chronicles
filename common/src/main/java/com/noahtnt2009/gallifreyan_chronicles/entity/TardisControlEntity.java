@@ -1,5 +1,6 @@
 package com.noahtnt2009.gallifreyan_chronicles.entity;
 
+import com.noahtnt2009.gallifreyan_chronicles.tardis.mind.refusal.TardisWariness;
 import com.noahtnt2009.gallifreyan_chronicles.init.GCSounds;
 import com.noahtnt2009.gallifreyan_chronicles.tardis.console.TardisConsole;
 import com.noahtnt2009.gallifreyan_chronicles.tardis.control.ControlPower;
@@ -231,6 +232,10 @@ public class TardisControlEntity extends Entity {
         }
 
         if (isOnCooldown(console)) {
+            return InteractionResult.FAIL;
+        }
+
+        if (console != null && TardisWariness.jams(this, console, player)) {
             return InteractionResult.FAIL;
         }
 

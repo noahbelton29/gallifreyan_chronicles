@@ -1,5 +1,7 @@
 package com.noahtnt2009.gallifreyan_chronicles.mixin.client.render;
 
+import com.noahtnt2009.gallifreyan_chronicles.client.util.FadeTint;
+
 import net.minecraft.client.player.LocalPlayer;
 import org.jspecify.annotations.Nullable;
 import net.minecraft.client.renderer.texture.UvMapping;
@@ -77,7 +79,7 @@ public abstract class LivingEntityRendererRematMixin {
         gc$submitMask(collector, model, modelState, poseStack, light, overlay, uv);
         poseStack.popPose();
         original.call(collector, model, modelState, poseStack, renderType, light, overlay,
-                ARGB.multiply(color, RematCatchClient.fadeTint(alpha)), uv, outline);
+                ARGB.multiply(color, FadeTint.of(alpha)), uv, outline);
     }
 
     @SuppressWarnings({"unchecked", "rawtypes"})

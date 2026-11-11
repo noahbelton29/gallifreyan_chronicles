@@ -1,5 +1,6 @@
 package com.noahtnt2009.gallifreyan_chronicles.tardis.api;
 
+import com.noahtnt2009.gallifreyan_chronicles.util.Messages;
 import com.noahtnt2009.gallifreyan_chronicles.init.GCItems;
 import com.noahtnt2009.gallifreyan_chronicles.tardis.control.impl.FlightLeverControl;
 import net.minecraft.world.item.ItemStack;
@@ -276,7 +277,7 @@ public final class Tardis {
         TardisExteriorBlockEntity exterior = exterior().orElse(null);
         if (exterior == null) return false;
         if (!exterior.canRemoveKey(player)) {
-            player.sendOverlayMessage(Component.translatable("message.gallifreyan_chronicles.not_your_key"));
+            Messages.overlay(player, "not_your_key");
             return false;
         }
         ItemStack returned = exterior.clearHeldKey();

@@ -1,5 +1,7 @@
 package com.noahtnt2009.gallifreyan_chronicles.tardis.control;
 
+import com.noahtnt2009.gallifreyan_chronicles.tardis.ecs.system.DoorSyncSystem;
+
 import com.noahtnt2009.gallifreyan_chronicles.sound.TimedSounds;
 import com.mojang.serialization.MapCodec;
 import com.noahtnt2009.gallifreyan_chronicles.block.entity.TardisConsoleBlockEntity;
@@ -103,6 +105,19 @@ public abstract class BaseControl implements TardisControl {
 
     protected static void tell(@Nullable Player player, String translationKey) {
         if (player != null) player.sendOverlayMessage(Component.translatable(translationKey).withStyle(ChatFormatting.RED));
+    }
+
+    protected static boolean doorsBlocked(Tardis tardis, @Nullable Player player) {
+        if (tardis.isLocked()) {
+            tell(player, "message.gallifreyan_chronicles.doors_locked");
+            return true;
+        }
+        if (tardis.areDoorsSealedForTravel()) {
+            DoorSyncSystem.announceSealed(tardis.id());
+            tell(player, "message.gallifreyan_chronicles.doors_sealed");
+            return true;
+        }
+        return false;
     }
 
     protected static Optional<Tardis> tardis(TardisConsoleBlockEntity console) {

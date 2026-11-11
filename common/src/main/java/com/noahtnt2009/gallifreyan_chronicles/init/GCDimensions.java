@@ -18,7 +18,10 @@ import net.minecraft.world.attribute.AmbientSounds;
 import net.minecraft.world.attribute.BackgroundMusic;
 import net.minecraft.world.attribute.EnvironmentAttributeMap;
 import net.minecraft.world.attribute.EnvironmentAttributes;
+import net.minecraft.world.clock.WorldClock;
 import net.minecraft.world.clock.WorldClocks;
+import net.minecraft.world.timeline.Timeline;
+import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.CardinalLighting;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.biome.Climate;
@@ -65,20 +68,7 @@ public class GCDimensions {
         var clocks = context.lookup(Registries.WORLD_CLOCK);
         var blocks = context.lookup(Registries.BLOCK);
 
-        context.register(GALLIFREY_TYPE_KEY, new DimensionType(
-                false,
-                true,
-                false,
-                false,
-                1.0,
-                -64,
-                384,
-                384,
-                blocks.getOrThrow(BlockTags.INFINIBURN_OVERWORLD),
-                0.0f,
-                new DimensionType.MonsterSettings(ConstantInt.of(0), 0),
-                DimensionType.Skybox.OVERWORLD,
-                CardinalLighting.Type.DEFAULT,
+        context.register(GALLIFREY_TYPE_KEY, surfaceType(blocks,
                 EnvironmentAttributeMap.builder()
                         .set(EnvironmentAttributes.STAR_BRIGHTNESS, 0.0f)
                         .set(EnvironmentAttributes.FOG_COLOR, rgb(0xFF9944))
@@ -95,20 +85,7 @@ public class GCDimensions {
                 timelines.getOrThrow(TimelineTags.IN_OVERWORLD),
                 Optional.of(clocks.getOrThrow(WorldClocks.OVERWORLD))));
 
-        context.register(MOON_TYPE_KEY, new DimensionType(
-                false,
-                true,
-                false,
-                false,
-                1.0,
-                -64,
-                384,
-                384,
-                blocks.getOrThrow(BlockTags.INFINIBURN_OVERWORLD),
-                0.0f,
-                new DimensionType.MonsterSettings(ConstantInt.of(0), 0),
-                DimensionType.Skybox.OVERWORLD,
-                CardinalLighting.Type.DEFAULT,
+        context.register(MOON_TYPE_KEY, surfaceType(blocks,
                 EnvironmentAttributeMap.builder()
                         .set(EnvironmentAttributes.STAR_BRIGHTNESS, 1.0f)
                         .set(EnvironmentAttributes.SKY_COLOR, rgb(0x000000))
@@ -122,6 +99,27 @@ public class GCDimensions {
                         .build(),
                 HolderSet.empty(),
                 Optional.empty()));
+    }
+
+    private static DimensionType surfaceType(HolderGetter<Block> blocks, EnvironmentAttributeMap attributes,
+                                             HolderSet<Timeline> timelines, Optional<Holder<WorldClock>> clock) {
+        return new DimensionType(
+                false,
+                true,
+                false,
+                false,
+                1.0,
+                -64,
+                384,
+                384,
+                blocks.getOrThrow(BlockTags.INFINIBURN_OVERWORLD),
+                0.0f,
+                new DimensionType.MonsterSettings(ConstantInt.of(0), 0),
+                DimensionType.Skybox.OVERWORLD,
+                CardinalLighting.Type.DEFAULT,
+                attributes,
+                timelines,
+                clock);
     }
 
     public static void bootstrapNoise(BootstrapContext<NoiseGeneratorSettings> context) {
@@ -169,6 +167,16 @@ public class GCDimensions {
         ));
     }
 
+    private static final Climate.ParameterPoint DRY_CLIMATE = Climate.parameters(
+            Climate.Parameter.span(-0.9f, 0.1f),
+            Climate.Parameter.span(0.2f, 1.0f),
+            Climate.Parameter.span(-1.0f, -0.2f),
+            Climate.Parameter.span(-0.4f, 0.4f),
+            Climate.Parameter.span(-0.3f, 0.3f),
+            Climate.Parameter.span(-1.0f, 1.0f),
+            0.0f
+    );
+
     public static void bootstrapStem(BootstrapContext<LevelStem> context) {
         var biomes = context.lookup(Registries.BIOME);
         var dimensionTypes = context.lookup(Registries.DIMENSION_TYPE);
@@ -178,15 +186,7 @@ public class GCDimensions {
                 MultiNoiseBiomeSource.createFromList(
                         new Climate.ParameterList<>(List.of(
                                 Pair.of(
-                                        Climate.parameters(
-                                                Climate.Parameter.span(-0.9f, 0.1f),
-                                                Climate.Parameter.span(0.2f, 1.0f),
-                                                Climate.Parameter.span(-1.0f, -0.2f),
-                                                Climate.Parameter.span(-0.4f, 0.4f),
-                                                Climate.Parameter.span(-0.3f, 0.3f),
-                                                Climate.Parameter.span(-1.0f, 1.0f),
-                                                0.0f
-                                        ),
+                                        DRY_CLIMATE,
                                         biomes.getOrThrow(GCBiomes.GALLIFREYAN_DESERT)
                                 ),
                                 Pair.of(
@@ -217,15 +217,7 @@ public class GCDimensions {
                 MultiNoiseBiomeSource.createFromList(
                         new Climate.ParameterList<>(List.of(
                                 Pair.of(
-                                        Climate.parameters(
-                                                Climate.Parameter.span(-0.9f, 0.1f),
-                                                Climate.Parameter.span(0.2f, 1.0f),
-                                                Climate.Parameter.span(-1.0f, -0.2f),
-                                                Climate.Parameter.span(-0.4f, 0.4f),
-                                                Climate.Parameter.span(-0.3f, 0.3f),
-                                                Climate.Parameter.span(-1.0f, 1.0f),
-                                                0.0f
-                                        ),
+                                        DRY_CLIMATE,
                                         biomes.getOrThrow(GCBiomes.MOON)
                                 )
                         ))),

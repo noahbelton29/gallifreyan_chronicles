@@ -1,5 +1,6 @@
 package com.noahtnt2009.gallifreyan_chronicles.compat.portal;
 
+import com.noahtnt2009.gallifreyan_chronicles.util.TardisDimensions;
 import com.noahtnt2009.gallifreyan_chronicles.Constants;
 import com.noahtnt2009.gallifreyan_chronicles.block.InteriorDoorBarrierBlock;
 import com.noahtnt2009.gallifreyan_chronicles.block.InteriorDoorBlock;
@@ -49,8 +50,7 @@ final class TardisPortalClient {
 
     static boolean isRenderingTardisPortal() {
         if (!PortalRendering.isRendering()) return false;
-        var dim = PortalRendering.getRenderingPortal().getDestDim().identifier();
-        return dim.getNamespace().equals(Constants.MOD_ID) && dim.getPath().startsWith("tardis/");
+        return TardisDimensions.isInterior(PortalRendering.getRenderingPortal().getDestDim());
     }
 
     private record Scored(Portal portal, double distance) {
@@ -116,15 +116,22 @@ final class TardisPortalClient {
         return false;
     }
 
+    private static List<Portal> tardisPortals(ClientLevel level) {
+        List<Portal> portals = new ArrayList<>();
+        for (Entity entity : level.entitiesForRendering()) {
+            if (entity instanceof Portal portal && TardisDimensions.isInterior(portal.getDestDim())) {
+                portals.add(portal);
+            }
+        }
+        return portals;
+    }
+
     static boolean isInteriorDoorAtInAnyTardisLevel(BlockPos pos) {
         Minecraft mc = Minecraft.getInstance();
         if (mc.level == null) return false;
         Set<ResourceKey<Level>> checked = new HashSet<>();
-        for (Entity entity : mc.level.entitiesForRendering()) {
-            if (!(entity instanceof Portal portal)) continue;
+        for (Portal portal : tardisPortals(mc.level)) {
             ResourceKey<Level> destDim = portal.getDestDim();
-            var id = destDim.identifier();
-            if (!id.getNamespace().equals(Constants.MOD_ID) || !id.getPath().startsWith("tardis/")) continue;
             if (!checked.add(destDim)) continue;
             Level dest = ClientWorldLoader.peekWorld(destDim);
             if (dest == null) continue;
@@ -149,12 +156,8 @@ final class TardisPortalClient {
     private static final java.util.Map<ResourceKey<Level>, Set<Vec3>> DOOR_CENTRES = new java.util.HashMap<>();
 
     private static void rememberDoorCentres(Level playerLevel) {
-        for (Entity entity : ((ClientLevel) playerLevel).entitiesForRendering()) {
-            if (!(entity instanceof Portal portal)) continue;
-            ResourceKey<Level> destDim = portal.getDestDim();
-            var id = destDim.identifier();
-            if (!id.getNamespace().equals(Constants.MOD_ID) || !id.getPath().startsWith("tardis/")) continue;
-            Set<Vec3> centres = DOOR_CENTRES.computeIfAbsent(destDim, k -> new HashSet<>());
+        for (Portal portal : tardisPortals((ClientLevel) playerLevel)) {
+            Set<Vec3> centres = DOOR_CENTRES.computeIfAbsent(portal.getDestDim(), k -> new HashSet<>());
             if (centres.size() > 8) centres.clear();
             centres.add(portal.getDestPos());
         }
@@ -228,9 +231,14 @@ final class TardisPortalClient {
         if (!(object instanceof Portal portal)) return;
         if (GCPowerDarkness.shaderPackHandlesDarkness()) return;
         Level destination = ClientWorldLoader.peekWorld(portal.getDestDim());
-        float darkness = GCPowerDarkness.darknessOf(destination);
-        if (darkness <= 0.0F) return;
+        float power = GCPowerDarkness.powerDarknessOf(destination);
+        float alarm = GCPowerDarkness.alarmOf(destination);
+        if (power <= 0.0F && alarm <= 0.0F) return;
         RendererUsingStencil.setStencilLimitation(PortalRendering.getPortalLayer() + 1);
-        PowerDarknessTint.draw(darkness * GCPowerDarkness.overlayMaxAlpha());
+        if (alarm > power) {
+            PowerDarknessTint.draw(alarm * GCPowerDarkness.ALARM_MAX_ALPHA, GCPowerDarkness.ALARM_RED);
+        } else {
+            PowerDarknessTint.draw(power * GCPowerDarkness.overlayMaxAlpha());
+        }
     }
 }

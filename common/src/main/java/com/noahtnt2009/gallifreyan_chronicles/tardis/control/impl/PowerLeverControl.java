@@ -1,5 +1,7 @@
 package com.noahtnt2009.gallifreyan_chronicles.tardis.control.impl;
 
+import com.noahtnt2009.gallifreyan_chronicles.tardis.flight.TardisCrash;
+
 import com.mojang.serialization.MapCodec;
 import com.noahtnt2009.gallifreyan_chronicles.entity.TardisControlEntity;
 import com.noahtnt2009.gallifreyan_chronicles.init.GCSounds;
@@ -29,7 +31,13 @@ public class PowerLeverControl extends BaseControl {
 
     @Override
     public InteractionResult onRightClick(TardisControlEntity entity, Player player, InteractionHand hand) {
-        return entity.getConsole() == null ? InteractionResult.FAIL : InteractionResult.SUCCESS;
+        var console = entity.getConsole();
+        if (console == null) return InteractionResult.FAIL;
+        if (tardis(console).map(TardisCrash::isCrashing).orElse(false)) {
+            tell(player, "message.gallifreyan_chronicles.power_locked_crashing");
+            return InteractionResult.FAIL;
+        }
+        return InteractionResult.SUCCESS;
     }
 
     @Override

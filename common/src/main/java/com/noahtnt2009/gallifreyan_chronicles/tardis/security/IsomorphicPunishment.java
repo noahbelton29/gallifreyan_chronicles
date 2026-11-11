@@ -1,5 +1,6 @@
 package com.noahtnt2009.gallifreyan_chronicles.tardis.security;
 
+import com.noahtnt2009.gallifreyan_chronicles.util.Messages;
 import com.noahtnt2009.gallifreyan_chronicles.block.ConsoleBlock;
 import com.noahtnt2009.gallifreyan_chronicles.block.entity.TardisConsoleBlockEntity;
 import net.minecraft.ChatFormatting;
@@ -56,8 +57,7 @@ public final class IsomorphicPunishment {
         strikes++;
         RECORDS.put(player.getUUID(), new Record(strikes, now, deaths));
 
-        serverPlayer.sendOverlayMessage(Component.translatable("message.gallifreyan_chronicles.isomorphic_denied")
-                .withStyle(ChatFormatting.RED));
+        Messages.overlay(serverPlayer, ChatFormatting.RED, "isomorphic_denied");
 
         float damage = FIRST_DAMAGE + EXTRA_DAMAGE_PER_STRIKE * (strikes - 1);
         serverPlayer.hurtServer(level, level.damageSources().magic(), damage);

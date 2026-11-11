@@ -1,6 +1,9 @@
 package com.noahtnt2009.gallifreyan_chronicles.tardis.console;
 
+import com.noahtnt2009.gallifreyan_chronicles.init.GCCodecs;
+
 import java.util.Optional;
+
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.DataResult;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
@@ -20,11 +23,7 @@ public record TardisConsole(String id, List<ControlEntry> controls, String defau
                                ControlAnimationSetting animation) {
         public static final float DEFAULT_COOLDOWN_SECONDS = 1.5F;
 
-        private static final Codec<Vec3> VEC3_CODEC = RecordCodecBuilder.create(inst -> inst.group(
-                Codec.DOUBLE.fieldOf("x").forGetter(Vec3::x),
-                Codec.DOUBLE.fieldOf("y").forGetter(Vec3::y),
-                Codec.DOUBLE.fieldOf("z").forGetter(Vec3::z)
-        ).apply(inst, Vec3::new));
+        private static final Codec<Vec3> VEC3_CODEC = GCCodecs.VEC3;
 
         private record Raw(String id, Optional<List<Double>> position, Optional<Vec3> offset,
                            Optional<List<Float>> size, Optional<Float> width, Optional<Float> height,

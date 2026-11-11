@@ -26,6 +26,10 @@ public class GCRecipeProvider extends RecipeProvider {
         super(recipes, advancements);
     }
 
+    private void unlockAndSave(RecipeBuilder builder, ItemLike unlockItem) {
+        builder.unlockedBy(getHasName(unlockItem), has(unlockItem)).save(output);
+    }
+
     public static MultiRegistryBootstrap bootstrap() {
         return RecipeProvider.asBootstrap(GCRecipeProvider::new);
     }
@@ -59,141 +63,107 @@ public class GCRecipeProvider extends RecipeProvider {
         for (String wood : GCBlocks.ROUNDEL_WOODS) {
             ItemLike planks = GCBlocks.woodPlanks(wood);
             ItemLike roundel = GCBlocks.WOOD_ROUNDELS.get(wood);
-            shaped(RecipeCategory.BUILDING_BLOCKS, roundel, 8)
+            unlockAndSave(shaped(RecipeCategory.BUILDING_BLOCKS, roundel, 8)
                     .pattern("PPP")
                     .pattern("PSP")
                     .pattern("PPP")
                     .define('P', planks)
-                    .define('S', Items.STICK)
-                    .unlockedBy(getHasName(planks), has(planks))
-                    .save(output);
-            shapeless(RecipeCategory.BUILDING_BLOCKS, GCBlocks.WOOD_HALF_ROUNDELS.get(wood), 2)
+                    .define('S', Items.STICK), planks);
+            unlockAndSave(shapeless(RecipeCategory.BUILDING_BLOCKS, GCBlocks.WOOD_HALF_ROUNDELS.get(wood), 2)
                     .requires(roundel)
-                    .requires(planks)
-                    .unlockedBy(getHasName(roundel), has(roundel))
-                    .save(output);
+                    .requires(planks), roundel);
         }
 
         for (String colour : GCBlocks.ROUNDEL_CONCRETES) {
             ItemLike concrete = GCBlocks.concrete(colour);
             ItemLike roundel = GCBlocks.CONCRETE_ROUNDELS.get(colour);
-            shaped(RecipeCategory.BUILDING_BLOCKS, roundel, 8)
+            unlockAndSave(shaped(RecipeCategory.BUILDING_BLOCKS, roundel, 8)
                     .pattern("CCC")
                     .pattern("C C")
                     .pattern("CCC")
-                    .define('C', concrete)
-                    .unlockedBy(getHasName(concrete), has(concrete))
-                    .save(output);
-            shapeless(RecipeCategory.BUILDING_BLOCKS, GCBlocks.CONCRETE_HALF_ROUNDELS.get(colour), 2)
+                    .define('C', concrete), concrete);
+            unlockAndSave(shapeless(RecipeCategory.BUILDING_BLOCKS, GCBlocks.CONCRETE_HALF_ROUNDELS.get(colour), 2)
                     .requires(roundel)
-                    .requires(concrete)
-                    .unlockedBy(getHasName(roundel), has(roundel))
-                    .save(output);
+                    .requires(concrete), roundel);
         }
 
-        shaped(RecipeCategory.BUILDING_BLOCKS, GCBlocks.CADONWOOD_PLANKS, 4)
+        unlockAndSave(shaped(RecipeCategory.BUILDING_BLOCKS, GCBlocks.CADONWOOD_PLANKS, 4)
                 .pattern("L")
-                .define('L', GCBlocks.CADONWOOD_LOG)
-                .unlockedBy(getHasName(GCBlocks.CADONWOOD_LOG), has(GCBlocks.CADONWOOD_LOG))
-                .save(output);
+                .define('L', GCBlocks.CADONWOOD_LOG), GCBlocks.CADONWOOD_LOG);
 
-        shaped(RecipeCategory.BUILDING_BLOCKS, GCBlocks.CADONWOOD_WOOD, 3)
+        unlockAndSave(shaped(RecipeCategory.BUILDING_BLOCKS, GCBlocks.CADONWOOD_WOOD, 3)
                 .pattern("LL")
                 .pattern("LL")
-                .define('L', GCBlocks.CADONWOOD_LOG)
-                .unlockedBy(getHasName(GCBlocks.CADONWOOD_LOG), has(GCBlocks.CADONWOOD_LOG))
-                .save(output);
+                .define('L', GCBlocks.CADONWOOD_LOG), GCBlocks.CADONWOOD_LOG);
 
-        shaped(RecipeCategory.BUILDING_BLOCKS, GCBlocks.STRIPPED_CADONWOOD_WOOD, 3)
+        unlockAndSave(shaped(RecipeCategory.BUILDING_BLOCKS, GCBlocks.STRIPPED_CADONWOOD_WOOD, 3)
                 .pattern("LL")
                 .pattern("LL")
-                .define('L', GCBlocks.STRIPPED_CADONWOOD_LOG)
-                .unlockedBy(getHasName(GCBlocks.STRIPPED_CADONWOOD_LOG), has(GCBlocks.STRIPPED_CADONWOOD_LOG))
-                .save(output);
+                .define('L', GCBlocks.STRIPPED_CADONWOOD_LOG), GCBlocks.STRIPPED_CADONWOOD_LOG);
 
-        shaped(RecipeCategory.BUILDING_BLOCKS, GCBlocks.CADONWOOD_STAIRS, 4)
+        unlockAndSave(shaped(RecipeCategory.BUILDING_BLOCKS, GCBlocks.CADONWOOD_STAIRS, 4)
                 .pattern("P  ")
                 .pattern("PP ")
                 .pattern("PPP")
-                .define('P', GCBlocks.CADONWOOD_PLANKS)
-                .unlockedBy(getHasName(GCBlocks.CADONWOOD_PLANKS), has(GCBlocks.CADONWOOD_PLANKS))
-                .save(output);
+                .define('P', GCBlocks.CADONWOOD_PLANKS), GCBlocks.CADONWOOD_PLANKS);
 
         slab(RecipeCategory.BUILDING_BLOCKS, GCBlocks.CADONWOOD_SLAB, GCBlocks.CADONWOOD_PLANKS);
 
-        shaped(RecipeCategory.DECORATIONS, GCBlocks.CADONWOOD_FENCE, 3)
+        unlockAndSave(shaped(RecipeCategory.DECORATIONS, GCBlocks.CADONWOOD_FENCE, 3)
                 .pattern("PSP")
                 .pattern("PSP")
                 .define('P', GCBlocks.CADONWOOD_PLANKS)
-                .define('S', Items.STICK)
-                .unlockedBy(getHasName(GCBlocks.CADONWOOD_PLANKS), has(GCBlocks.CADONWOOD_PLANKS))
-                .save(output);
+                .define('S', Items.STICK), GCBlocks.CADONWOOD_PLANKS);
 
-        shaped(RecipeCategory.DECORATIONS, GCBlocks.CADONWOOD_FENCE_GATE)
+        unlockAndSave(shaped(RecipeCategory.DECORATIONS, GCBlocks.CADONWOOD_FENCE_GATE)
                 .pattern("SPS")
                 .pattern("SPS")
                 .define('P', GCBlocks.CADONWOOD_PLANKS)
-                .define('S', Items.STICK)
-                .unlockedBy(getHasName(GCBlocks.CADONWOOD_PLANKS), has(GCBlocks.CADONWOOD_PLANKS))
-                .save(output);
+                .define('S', Items.STICK), GCBlocks.CADONWOOD_PLANKS);
 
-        shaped(RecipeCategory.DECORATIONS, GCBlocks.CADONWOOD_WALL, 6)
+        unlockAndSave(shaped(RecipeCategory.DECORATIONS, GCBlocks.CADONWOOD_WALL, 6)
                 .pattern("PPP")
                 .pattern("PPP")
-                .define('P', GCBlocks.CADONWOOD_PLANKS)
-                .unlockedBy(getHasName(GCBlocks.CADONWOOD_PLANKS), has(GCBlocks.CADONWOOD_PLANKS))
-                .save(output);
+                .define('P', GCBlocks.CADONWOOD_PLANKS), GCBlocks.CADONWOOD_PLANKS);
 
         pressurePlate(GCBlocks.CADONWOOD_PRESSURE_PLATE, GCBlocks.CADONWOOD_PLANKS);
 
-        buttonBuilder(GCBlocks.CADONWOOD_BUTTON, Ingredient.of(GCBlocks.CADONWOOD_PLANKS))
-                .unlockedBy(getHasName(GCBlocks.CADONWOOD_PLANKS), has(GCBlocks.CADONWOOD_PLANKS))
-                .save(output);
+        unlockAndSave(buttonBuilder(GCBlocks.CADONWOOD_BUTTON, Ingredient.of(GCBlocks.CADONWOOD_PLANKS)), GCBlocks.CADONWOOD_PLANKS);
 
-        shaped(RecipeCategory.COMBAT, GCItems.TARANIUM_SWORD)
+        unlockAndSave(shaped(RecipeCategory.COMBAT, GCItems.TARANIUM_SWORD)
                 .pattern("T")
                 .pattern("T")
                 .pattern("S")
                 .define('T', GCItems.TARANIUM_INGOT)
-                .define('S', Items.STICK)
-                .unlockedBy(getHasName(GCItems.TARANIUM_INGOT), has(GCItems.TARANIUM_INGOT))
-                .save(output);
+                .define('S', Items.STICK), GCItems.TARANIUM_INGOT);
 
-        shaped(RecipeCategory.TOOLS, GCItems.TARANIUM_PICKAXE)
+        unlockAndSave(shaped(RecipeCategory.TOOLS, GCItems.TARANIUM_PICKAXE)
                 .pattern("TTT")
                 .pattern(" S ")
                 .pattern(" S ")
                 .define('T', GCItems.TARANIUM_INGOT)
-                .define('S', Items.STICK)
-                .unlockedBy(getHasName(GCItems.TARANIUM_INGOT), has(GCItems.TARANIUM_INGOT))
-                .save(output);
+                .define('S', Items.STICK), GCItems.TARANIUM_INGOT);
 
-        shaped(RecipeCategory.TOOLS, GCItems.TARANIUM_AXE)
+        unlockAndSave(shaped(RecipeCategory.TOOLS, GCItems.TARANIUM_AXE)
                 .pattern("TT")
                 .pattern("TS")
                 .pattern(" S")
                 .define('T', GCItems.TARANIUM_INGOT)
-                .define('S', Items.STICK)
-                .unlockedBy(getHasName(GCItems.TARANIUM_INGOT), has(GCItems.TARANIUM_INGOT))
-                .save(output);
+                .define('S', Items.STICK), GCItems.TARANIUM_INGOT);
 
-        shaped(RecipeCategory.TOOLS, GCItems.TARANIUM_SHOVEL)
+        unlockAndSave(shaped(RecipeCategory.TOOLS, GCItems.TARANIUM_SHOVEL)
                 .pattern("T")
                 .pattern("S")
                 .pattern("S")
                 .define('T', GCItems.TARANIUM_INGOT)
-                .define('S', Items.STICK)
-                .unlockedBy(getHasName(GCItems.TARANIUM_INGOT), has(GCItems.TARANIUM_INGOT))
-                .save(output);
+                .define('S', Items.STICK), GCItems.TARANIUM_INGOT);
 
-        shaped(RecipeCategory.TOOLS, GCItems.TARANIUM_HOE)
+        unlockAndSave(shaped(RecipeCategory.TOOLS, GCItems.TARANIUM_HOE)
                 .pattern("TT")
                 .pattern(" S")
                 .pattern(" S")
                 .define('T', GCItems.TARANIUM_INGOT)
-                .define('S', Items.STICK)
-                .unlockedBy(getHasName(GCItems.TARANIUM_INGOT), has(GCItems.TARANIUM_INGOT))
-                .save(output);
+                .define('S', Items.STICK), GCItems.TARANIUM_INGOT);
 
         shaped(RecipeCategory.TOOLS, Items.STONE_PICKAXE)
                 .pattern("GGG")
@@ -206,35 +176,27 @@ public class GCRecipeProvider extends RecipeProvider {
                         Registries.RECIPE,
                         GCUtils.modIdentifier("stone_pickaxe_from_gallifreyan_stone")));
 
-        shaped(RecipeCategory.COMBAT, GCItems.TARANIUM_HELMET)
+        unlockAndSave(shaped(RecipeCategory.COMBAT, GCItems.TARANIUM_HELMET)
                 .pattern("TTT")
                 .pattern("T T")
-                .define('T', GCItems.TARANIUM_INGOT)
-                .unlockedBy(getHasName(GCItems.TARANIUM_INGOT), has(GCItems.TARANIUM_INGOT))
-                .save(output);
+                .define('T', GCItems.TARANIUM_INGOT), GCItems.TARANIUM_INGOT);
 
-        shaped(RecipeCategory.COMBAT, GCItems.TARANIUM_CHESTPLATE)
+        unlockAndSave(shaped(RecipeCategory.COMBAT, GCItems.TARANIUM_CHESTPLATE)
                 .pattern("T T")
                 .pattern("TTT")
                 .pattern("TTT")
-                .define('T', GCItems.TARANIUM_INGOT)
-                .unlockedBy(getHasName(GCItems.TARANIUM_INGOT), has(GCItems.TARANIUM_INGOT))
-                .save(output);
+                .define('T', GCItems.TARANIUM_INGOT), GCItems.TARANIUM_INGOT);
 
-        shaped(RecipeCategory.COMBAT, GCItems.TARANIUM_LEGGINGS)
+        unlockAndSave(shaped(RecipeCategory.COMBAT, GCItems.TARANIUM_LEGGINGS)
                 .pattern("TTT")
                 .pattern("T T")
                 .pattern("T T")
-                .define('T', GCItems.TARANIUM_INGOT)
-                .unlockedBy(getHasName(GCItems.TARANIUM_INGOT), has(GCItems.TARANIUM_INGOT))
-                .save(output);
+                .define('T', GCItems.TARANIUM_INGOT), GCItems.TARANIUM_INGOT);
 
-        shaped(RecipeCategory.COMBAT, GCItems.TARANIUM_BOOTS)
+        unlockAndSave(shaped(RecipeCategory.COMBAT, GCItems.TARANIUM_BOOTS)
                 .pattern("T T")
                 .pattern("T T")
-                .define('T', GCItems.TARANIUM_INGOT)
-                .unlockedBy(getHasName(GCItems.TARANIUM_INGOT), has(GCItems.TARANIUM_INGOT))
-                .save(output);
+                .define('T', GCItems.TARANIUM_INGOT), GCItems.TARANIUM_INGOT);
     }
 
     @Override

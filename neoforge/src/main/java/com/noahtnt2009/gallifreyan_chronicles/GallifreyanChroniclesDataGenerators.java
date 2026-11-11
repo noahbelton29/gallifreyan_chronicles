@@ -29,5 +29,6 @@ public class GallifreyanChroniclesDataGenerators {
         event.addProvider(new GCItemTagProvider(packOutput, reloadableLookup));
         event.addProvider(new GCEquipmentAssetProvider(packOutput));
         event.addProvider(new GCDimensionSkyProvider(packOutput));
+        event.addProvider(new GCSoundsProvider(packOutput));
     }
 }

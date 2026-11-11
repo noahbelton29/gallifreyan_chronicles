@@ -1,5 +1,6 @@
 package com.noahtnt2009.gallifreyan_chronicles.mixin.client.gameplay;
 
+import com.noahtnt2009.gallifreyan_chronicles.util.TardisDimensions;
 import com.noahtnt2009.gallifreyan_chronicles.Constants;
 import com.noahtnt2009.gallifreyan_chronicles.block.InteriorDoorBarrierBlock;
 import com.noahtnt2009.gallifreyan_chronicles.block.InteriorDoorBlock;
@@ -24,8 +25,7 @@ public abstract class CreativeTardisBreakMixin {
         Minecraft mc = Minecraft.getInstance();
         if (mc.player == null || mc.level == null) return;
 
-        var dim = mc.level.dimension().identifier();
-        boolean insideTardis = dim.getNamespace().equals(Constants.MOD_ID) && dim.getPath().startsWith("tardis/");
+        boolean insideTardis = TardisDimensions.isInterior(mc.level);
         boolean remoteContext = !mc.player.level().dimension().equals(mc.level.dimension());
         if (insideTardis && !remoteContext) return;
 

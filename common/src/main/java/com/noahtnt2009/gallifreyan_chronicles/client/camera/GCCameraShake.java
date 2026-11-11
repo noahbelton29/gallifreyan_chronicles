@@ -39,6 +39,25 @@ public final class GCCameraShake {
     private static final double[] RUMBLE_WEIGHTS = {0.5, 0.3, 0.2};
     private static final double RUMBLE_SWELL_HZ = 0.4;
 
+    private static boolean active = false;
+    private static long startNanos = 0L;
+    private static float strength = 1.0F;
+    private static Wave pitchWave = Wave.random(ThreadLocalRandom.current());
+    private static Wave yawWave = pitchWave;
+    private static Wave rollWave = pitchWave;
+
+    private static final float CRASH_PITCH_DEGREES = 2.6F;
+    private static final float CRASH_YAW_DEGREES = 1.8F;
+    private static final float CRASH_ROLL_DEGREES = 3.4F;
+    private static final double[] CRASH_PITCH_HZ = {9.3, 15.7, 23.1};
+    private static final double[] CRASH_YAW_HZ = {8.1, 13.9, 21.7};
+    private static final double[] CRASH_ROLL_HZ = {7.4, 12.2, 19.3};
+    private static final double CRASH_FADE_IN = 0.3;
+    private static final double CRASH_FADE_OUT = 0.8;
+    private static @Nullable Vec3 crashOrigin;
+    private static long crashStartNanos;
+    private static double crashSeconds;
+
     public interface FlightSource {
         Vec3 position();
 
@@ -76,13 +95,6 @@ public final class GCCameraShake {
         }
     }
 
-    private static boolean active = false;
-    private static long startNanos = 0L;
-    private static float strength = 1.0F;
-    private static Wave pitchWave = Wave.random(ThreadLocalRandom.current());
-    private static Wave yawWave = pitchWave;
-    private static Wave rollWave = pitchWave;
-
     private GCCameraShake() {}
 
     public static void trigger(Vec3 origin, float strengthMultiplier) {
@@ -116,11 +128,40 @@ public final class GCCameraShake {
     }
 
     private static @Nullable Sample combined() {
-        Sample drum = drumSample();
-        Sample rumble = rumbleSample();
-        if (drum == null) return rumble;
-        if (rumble == null) return drum;
-        return new Sample(drum.pitch() + rumble.pitch(), drum.yaw() + rumble.yaw(), drum.roll() + rumble.roll());
+        return add(add(drumSample(), rumbleSample()), crashSample());
+    }
+
+    private static @Nullable Sample add(@Nullable Sample a, @Nullable Sample b) {
+        if (a == null) return b;
+        if (b == null) return a;
+        return new Sample(a.pitch() + b.pitch(), a.yaw() + b.yaw(), a.roll() + b.roll());
+    }
+
+    public static void crashRumble(Vec3 origin, int ticks) {
+        crashOrigin = origin;
+        crashStartNanos = System.nanoTime();
+        crashSeconds = ticks / 20.0;
+    }
+
+    private static @Nullable Sample crashSample() {
+        if (crashOrigin == null) return null;
+        double t = (System.nanoTime() - crashStartNanos) / 1.0E9;
+        if (t >= crashSeconds) {
+            crashOrigin = null;
+            return null;
+        }
+        LocalPlayer player = Minecraft.getInstance().player;
+        if (player == null) return null;
+
+        double attenuation = Math.clamp(1.0 - player.getEyePosition().distanceTo(crashOrigin) / RUMBLE_RANGE, 0.0, 1.0);
+        double fade = Math.min(Math.min(t / CRASH_FADE_IN, (crashSeconds - t) / CRASH_FADE_OUT), 1.0);
+        double amount = attenuation * fade;
+        double clock = System.nanoTime() / 1.0E9;
+        return new Sample(
+                (float) (rumbleWave(CRASH_PITCH_HZ, clock) * amount * CRASH_PITCH_DEGREES),
+                (float) (rumbleWave(CRASH_YAW_HZ, clock + 2.9) * amount * CRASH_YAW_DEGREES),
+                (float) (rumbleWave(CRASH_ROLL_HZ, clock + 6.1) * amount * CRASH_ROLL_DEGREES)
+        );
     }
 
     private static @Nullable Sample rumbleSample() {

@@ -1,5 +1,6 @@
 package com.noahtnt2009.gallifreyan_chronicles.client.sound;
 
+import com.noahtnt2009.gallifreyan_chronicles.util.TardisDimensions;
 import com.noahtnt2009.gallifreyan_chronicles.Constants;
 import net.minecraft.client.Minecraft;
 import net.minecraft.world.level.Level;
@@ -47,8 +48,6 @@ public final class SoundListener {
     }
 
     public static boolean isTardisLevel(@Nullable Level level) {
-        if (level == null) return false;
-        var id = level.dimension().identifier();
-        return id.getNamespace().equals(Constants.MOD_ID) && id.getPath().startsWith("tardis/");
+        return TardisDimensions.isInterior(level);
     }
 }

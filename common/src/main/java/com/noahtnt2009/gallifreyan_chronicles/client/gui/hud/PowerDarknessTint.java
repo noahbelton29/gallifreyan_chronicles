@@ -28,7 +28,7 @@ public final class PowerDarknessTint {
     private static @Nullable RenderPipeline pipeline;
     private static @Nullable GpuTexture texture;
     private static @Nullable GpuTextureView textureView;
-    private static int uploadedAlpha = -1;
+    private static int uploadedArgb = 0;
     private static boolean failed;
 
     private PowerDarknessTint() {
@@ -56,33 +56,38 @@ public final class PowerDarknessTint {
         return pipeline;
     }
 
-    private static GpuTextureView textureFor(int alpha) {
+    private static GpuTextureView textureFor(int alpha, int rgb) {
         GpuDevice device = RenderSystem.getDevice();
         if (texture == null) {
             texture = device.createTexture(Constants.MOD_ID + " power darkness tint",
                     GpuTexture.USAGE_TEXTURE_BINDING | GpuTexture.USAGE_COPY_DST,
                     GpuFormat.RGBA8_UNORM, 1, 1, 1, 1);
             textureView = device.createTextureView(texture);
-            uploadedAlpha = -1;
+            uploadedArgb = 0;
         }
-        if (uploadedAlpha != alpha) {
+        int argb = alpha << 24 | rgb & 0xFFFFFF;
+        if (uploadedArgb != argb) {
             ByteBuffer pixel = ByteBuffer.allocateDirect(4);
-            pixel.put((byte) 0).put((byte) 0).put((byte) 0).put((byte) alpha);
+            pixel.put((byte) (rgb >> 16)).put((byte) (rgb >> 8)).put((byte) rgb).put((byte) alpha);
             pixel.flip();
             device.createCommandEncoder().writeToTexture(texture, pixel, 0, 0, 0, 0, 1, 1);
-            uploadedAlpha = alpha;
+            uploadedArgb = argb;
         }
         return textureView;
     }
 
     public static void draw(float opacity) {
+        draw(opacity, 0);
+    }
+
+    public static void draw(float opacity, int rgb) {
         int alpha = Mth.clamp(Math.round(opacity * 255.0F), 0, 255);
         if (alpha <= 0) return;
         RenderPipeline tintPipeline = pipeline();
         if (tintPipeline == null) return;
         RenderTarget target = Minecraft.getInstance().gameRenderer.mainRenderTarget();
         if (target.getColorTextureView() == null || target.getDepthTextureView() == null) return;
-        GpuTextureView view = textureFor(alpha);
+        GpuTextureView view = textureFor(alpha, rgb);
 
         try (RenderPass pass = RenderSystem.getDevice().createCommandEncoder().createRenderPass(
                 () -> Constants.MOD_ID + " power darkness tint",

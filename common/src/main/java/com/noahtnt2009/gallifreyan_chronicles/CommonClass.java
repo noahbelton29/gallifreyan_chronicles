@@ -3,6 +3,8 @@ package com.noahtnt2009.gallifreyan_chronicles;
 import com.noahtnt2009.gallifreyan_chronicles.addon.AddonManager;
 import com.noahtnt2009.gallifreyan_chronicles.config.GCConfig;
 import com.noahtnt2009.gallifreyan_chronicles.init.*;
+import com.noahtnt2009.gallifreyan_chronicles.tardis.mind.TardisMindSystem;
+import com.noahtnt2009.gallifreyan_chronicles.tardis.flight.TardisTravel;
 
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -24,6 +26,8 @@ public class CommonClass {
         GCFeatures.registerFeatures();
         GCTreeDecoratorTypes.registerTreeDecoratorTypes();
         GCSounds.registerSounds();
+        TardisMindSystem.init();
+        TardisTravel.init();
         AddonManager.init();
     }
 }

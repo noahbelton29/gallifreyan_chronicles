@@ -45,9 +45,7 @@ public record TardisConsoleSyncPayload(List<TardisConsole> consoles, List<Tardis
     }
 
     public void apply() {
-        Set<String> previousIds = TardisConsoleRegistry.getAll().stream()
-                .map(TardisConsole::id)
-                .collect(Collectors.toSet());
+        Set<String> previousIds = GCSyncPayload.idsOf(TardisConsoleRegistry.getAll());
 
         GCSyncPayload.apply(consoles, TardisConsoleRegistry::clear, TardisConsoleRegistry::register, "TARDIS Console");
         GCSyncPayload.apply(variants, TardisConsoleRegistry::clearVariants, TardisConsoleRegistry::registerVariant, "TARDIS Console Variant");
@@ -56,13 +54,7 @@ public record TardisConsoleSyncPayload(List<TardisConsole> consoles, List<Tardis
             TardisConsoleRegistry.setDefault(TardisConsoleRegistry.get(defaultId));
         }
 
-        Set<String> newIds = consoles.stream()
-                .map(TardisConsole::id)
-                .collect(Collectors.toSet());
-
-        if (!newIds.equals(previousIds)) {
-            GCClientHooks.reloadResourcePacks();
-        }
+        GCSyncPayload.reloadIfChanged(previousIds, consoles);
     }
 
     @Override

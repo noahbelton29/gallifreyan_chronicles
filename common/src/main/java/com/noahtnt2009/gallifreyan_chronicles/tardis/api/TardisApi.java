@@ -1,5 +1,7 @@
 package com.noahtnt2009.gallifreyan_chronicles.tardis.api;
 
+import com.noahtnt2009.gallifreyan_chronicles.util.TardisDimensions;
+
 import com.noahtnt2009.gallifreyan_chronicles.Constants;
 import com.noahtnt2009.gallifreyan_chronicles.tardis.ecs.TardisLinkable;
 import com.noahtnt2009.gallifreyan_chronicles.tardis.manager.TardisManager;
@@ -16,7 +18,7 @@ import java.util.Optional;
 import java.util.UUID;
 
 public final class TardisApi {
-    private static final String INTERIOR_PREFIX = "tardis/";
+    private static final String INTERIOR_PREFIX = TardisDimensions.INTERIOR_PREFIX;
 
     private TardisApi() {
     }
@@ -41,6 +43,7 @@ public final class TardisApi {
         return of(console).map(tardis -> tardis.canUseControls(player)).orElse(true);
     }
 
+    // Returns a list of each TARDIS owned by a player
     public static List<Tardis> ownedBy(MinecraftServer server, UUID ownerId) {
         return TardisManager.get(server).getByOwner(ownerId).stream()
                 .map(record -> new Tardis(server, record.tardisId()))

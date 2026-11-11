@@ -1,5 +1,7 @@
 package com.noahtnt2009.gallifreyan_chronicles.client.tardis;
 
+import com.noahtnt2009.gallifreyan_chronicles.client.util.FadeTint;
+
 import com.noahtnt2009.gallifreyan_chronicles.block.InteriorDoorBlock;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.QuadInstance;
@@ -193,15 +195,6 @@ public final class RematCatchClient {
     public static final int MASK_ORDER = -1;
     public static final float MASK_PUSH = 1.00005f;
 
-    /* the exterior's fade colour: a little blue while see-through, alpha = opacity */
-    public static int fadeTint(float opacity) {
-        float faded = 1.0f - opacity;
-        int alpha = Math.round(opacity * 255.0f);
-        int red = Math.round((1.0f - 0.25f * faded) * 255.0f);
-        int green = Math.round((1.0f - 0.08f * faded) * 255.0f);
-        return (alpha << 24) | (red << 16) | (green << 8) | 0xFF;
-    }
-
     /* true while the picked player's interior is hidden for the fade */
     public static boolean hidesBlocksIn(@Nullable Level level) {
         return level != null && !HIDDEN.isEmpty() && level.dimension().equals(selfDim);
@@ -255,7 +248,7 @@ public final class RematCatchClient {
             for (GhostQuad ghost : QUADS) {
                 float alpha = opacity * built(progress, ghost.y());
                 if (alpha < MIN_ALPHA) continue;
-                int tint = fadeTint(alpha);
+                int tint = FadeTint.of(alpha);
                 for (int v = 0; v < 4; v++) {
                     DRAW.setColor(v, ARGB.multiply(ghost.colors()[v], tint));
                     DRAW.setLightCoords(v, ghost.lights()[v]);

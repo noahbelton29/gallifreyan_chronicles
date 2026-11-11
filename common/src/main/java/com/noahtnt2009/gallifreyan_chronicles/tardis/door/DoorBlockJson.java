@@ -1,5 +1,7 @@
 package com.noahtnt2009.gallifreyan_chronicles.tardis.door;
 
+import com.noahtnt2009.gallifreyan_chronicles.util.GCUtils;
+
 import com.google.gson.JsonElement;
 import com.google.gson.JsonParser;
 import com.mojang.serialization.JsonOps;
@@ -21,6 +23,7 @@ import java.util.stream.Stream;
 
 public final class DoorBlockJson {
     public static final String FOLDER = "/data/" + Constants.MOD_ID + "/tardis_door_variant";
+    private static final String MARKER = "first_doctors_doors.json";
     private static final String DEFAULT_PARTICLE = Constants.MOD_ID + ":brachacki_wall_block";
 
     public record Entry(String block, String variant, String model, int priority, String particle) {
@@ -54,7 +57,7 @@ public final class DoorBlockJson {
         if (variants != null) return variants;
         List<TardisDoorVariant> found = new ArrayList<>();
         try {
-            URL url = DoorBlockJson.class.getResource(FOLDER);
+            URL url = folderUrl();
             if (url == null) {
                 Constants.LOG.warn("[GC] no door variant folder found, no door blocks registered");
                 return variants = List.of();
@@ -84,6 +87,27 @@ public final class DoorBlockJson {
         return variants = List.copyOf(found);
     }
 
+    /* datagen can't look up folders, only files, so find a shipped file and use its folder */
+    private static @Nullable URL folderUrl() throws Exception {
+        URL url = DoorBlockJson.class.getResource(FOLDER);
+        if (url != null) return url;
+        URL marker = DoorBlockJson.class.getResource(FOLDER + "/" + MARKER);
+        if (marker != null) {
+            String text = marker.toString();
+            return URI.create(text.substring(0, text.lastIndexOf('/'))).toURL();
+        }
+        return sourceFolderUrl();
+    }
+
+    /* last resort in dev: walk up from the run folder to common's resources */
+    private static @Nullable URL sourceFolderUrl() throws Exception {
+        for (Path dir = Path.of("").toAbsolutePath(); dir != null; dir = dir.getParent()) {
+            Path folder = dir.resolve("common/src/main/resources" + FOLDER);
+            if (Files.isDirectory(folder)) return folder.toUri().toURL();
+        }
+        return null;
+    }
+
     private static void read(Path folder, List<TardisDoorVariant> out) throws Exception {
         try (Stream<Path> files = Files.list(folder)) {
             for (Path file : files.toList()) {
@@ -99,7 +123,6 @@ public final class DoorBlockJson {
     }
 
     private static String local(String id) {
-        int colon = id.indexOf(':');
-        return colon < 0 ? id : id.substring(colon + 1);
+        return GCUtils.localPath(id);
     }
 }

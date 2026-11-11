@@ -1,5 +1,7 @@
 package com.noahtnt2009.gallifreyan_chronicles.client.renderer;
 
+import com.noahtnt2009.gallifreyan_chronicles.client.util.ModelRenderRange;
+
 import com.noahtnt2009.gallifreyan_chronicles.config.GCConfig;
 import com.geckolib.constant.dataticket.DataTicket;
 import com.geckolib.renderer.GeoBlockRenderer;
@@ -59,8 +61,7 @@ public class TardisConsoleBlockRenderer extends GeoBlockRenderer<@NotNull Tardis
 
     @Override
     public boolean shouldRender(@NotNull TardisConsoleBlockEntity blockEntity, @NotNull Vec3 cameraPos) {
-        double range = GCConfig.modelRenderDistance();
-        return Vec3.atCenterOf(blockEntity.getBlockPos()).distanceToSqr(cameraPos) < range * range;
+        return ModelRenderRange.inRange(blockEntity, cameraPos);
     }
 
     @Override

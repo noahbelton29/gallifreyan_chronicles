@@ -1,5 +1,6 @@
 package com.noahtnt2009.gallifreyan_chronicles.compat.replaymod;
 
+import com.noahtnt2009.gallifreyan_chronicles.util.TardisDimensions;
 import com.noahtnt2009.gallifreyan_chronicles.Constants;
 import com.replaymod.replay.ReplayModReplay;
 import net.minecraft.client.Minecraft;
@@ -15,8 +16,7 @@ public final class ReplayModSoundGate {
         if (soundLevel == null || ReplayModReplay.instance == null || ReplayModReplay.instance.getReplayHandler() == null) {
             return false;
         }
-        Identifier dimension = soundLevel.dimension().identifier();
-        if (!dimension.getNamespace().equals(Constants.MOD_ID) || !dimension.getPath().startsWith("tardis/")) {
+        if (!TardisDimensions.isInterior(soundLevel)) {
             return false;
         }
         Entity viewer = Minecraft.getInstance().getCameraEntity();

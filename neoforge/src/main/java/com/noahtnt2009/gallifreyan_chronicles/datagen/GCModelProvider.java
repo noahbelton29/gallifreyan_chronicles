@@ -6,10 +6,6 @@ import java.util.LinkedHashMap;
 import java.util.ArrayList;
 
 
-
-
-
-
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.client.renderer.item.SelectItemModel;
 
@@ -46,8 +42,6 @@ import java.util.Optional;
 public class GCModelProvider extends ModelProvider {
     private static final int GALLIFREYAN_GRASS_TINT = 0xFFE0E0E0;
 
-    // Cactus-shaped parent shipped in common resources (models/block/thorivine_base.json).
-    // Kept in our own namespace so vanilla changes to the cactus model can't break Thorivine.
     private static final ModelTemplate THORIVINE_TEMPLATE = new ModelTemplate(
             Optional.of(Identifier.fromNamespaceAndPath(Constants.MOD_ID, "block/thorivine_base")),
             Optional.empty(),
@@ -187,6 +181,8 @@ public class GCModelProvider extends ModelProvider {
         itemModels.generateFlatItem(GCItems.TARANIUM_INGOT, ModelTemplates.FLAT_ITEM);
         itemModels.generateFlatItem(GCItems.RAW_TIN, ModelTemplates.FLAT_ITEM);
         itemModels.generateFlatItem(GCItems.TARANIUM_SWORD, ModelTemplates.FLAT_HANDHELD_ITEM);
+        itemModels.generateFlatItem(GCItems.MALLET, ModelTemplates.FLAT_HANDHELD_ITEM);
+        itemModels.generateFlatItem(GCItems.STATTENHEIM_REMOTE, ModelTemplates.FLAT_ITEM);
         itemModels.generateFlatItem(GCItems.TARANIUM_PICKAXE, ModelTemplates.FLAT_HANDHELD_ITEM);
         itemModels.generateFlatItem(GCItems.TARANIUM_SHOVEL, ModelTemplates.FLAT_HANDHELD_ITEM);
         itemModels.generateFlatItem(GCItems.TARANIUM_AXE, ModelTemplates.FLAT_HANDHELD_ITEM);
@@ -344,15 +340,16 @@ public class GCModelProvider extends ModelProvider {
         generators.registerSimpleItemModel(GCBlocks.THORIVINE, model);
     }
 
-    private void registerGrassBlock(BlockModelGenerators generators) {
-        TextureMapping normalMapping = new TextureMapping()
-                .put(TextureSlot.BOTTOM,
-                        TextureMapping.getBlockTexture(GCBlocks.GALLIFREYAN_DIRT))
+    private static TextureMapping grassMapping(String sideSuffix) {
+        return new TextureMapping()
+                .put(TextureSlot.BOTTOM, TextureMapping.getBlockTexture(GCBlocks.GALLIFREYAN_DIRT))
                 .copyForced(TextureSlot.BOTTOM, TextureSlot.PARTICLE)
-                .put(TextureSlot.TOP,
-                        TextureMapping.getBlockTexture(GCBlocks.GALLIFREYAN_GRASS_BLOCK, "_top"))
-                .put(TextureSlot.SIDE,
-                        TextureMapping.getBlockTexture(GCBlocks.GALLIFREYAN_GRASS_BLOCK, "_side"));
+                .put(TextureSlot.TOP, TextureMapping.getBlockTexture(GCBlocks.GALLIFREYAN_GRASS_BLOCK, "_top"))
+                .put(TextureSlot.SIDE, TextureMapping.getBlockTexture(GCBlocks.GALLIFREYAN_GRASS_BLOCK, sideSuffix));
+    }
+
+    private void registerGrassBlock(BlockModelGenerators generators) {
+        TextureMapping normalMapping = grassMapping("_side");
 
         Identifier normalModel = ModelTemplates.CUBE_BOTTOM_TOP.create(
                 GCBlocks.GALLIFREYAN_GRASS_BLOCK,
@@ -360,14 +357,7 @@ public class GCModelProvider extends ModelProvider {
                 generators.modelOutput
         );
 
-        TextureMapping snowyMapping = new TextureMapping()
-                .put(TextureSlot.BOTTOM,
-                        TextureMapping.getBlockTexture(GCBlocks.GALLIFREYAN_DIRT))
-                .copyForced(TextureSlot.BOTTOM, TextureSlot.PARTICLE)
-                .put(TextureSlot.TOP,
-                        TextureMapping.getBlockTexture(GCBlocks.GALLIFREYAN_GRASS_BLOCK, "_top"))
-                .put(TextureSlot.SIDE,
-                        TextureMapping.getBlockTexture(GCBlocks.GALLIFREYAN_GRASS_BLOCK, "_snow"));
+        TextureMapping snowyMapping = grassMapping("_snow");
 
         MultiVariant snowyVariant = BlockModelGenerators.plainVariant(
                 ModelTemplates.CUBE_BOTTOM_TOP.createWithSuffix(

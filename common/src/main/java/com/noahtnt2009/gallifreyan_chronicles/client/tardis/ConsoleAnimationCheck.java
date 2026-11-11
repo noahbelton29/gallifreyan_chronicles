@@ -24,7 +24,7 @@ public final class ConsoleAnimationCheck {
         }
 
         BakedAnimations animations = GeckoLibResources.getBakedAnimations().cache()
-                .get(TardisConsoleAssets.animation(consoleId));
+                .get(GeoAssets.CONSOLE.animation(consoleId));
         if (animations == null) {
             return true;
         }

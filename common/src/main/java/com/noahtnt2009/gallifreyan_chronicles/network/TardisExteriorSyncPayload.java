@@ -35,22 +35,14 @@ public record TardisExteriorSyncPayload(List<TardisExterior> exteriors, String d
     }
 
     public void apply() {
-        Set<String> previousIds = TardisExteriorRegistry.getAll().stream()
-                .map(TardisExterior::id)
-                .collect(Collectors.toSet());
+        Set<String> previousIds = GCSyncPayload.idsOf(TardisExteriorRegistry.getAll());
 
         GCSyncPayload.apply(exteriors, TardisExteriorRegistry::clear, TardisExteriorRegistry::register, "TARDIS Exterior");
         if (defaultId != null && TardisExteriorRegistry.contains(defaultId)) {
             TardisExteriorRegistry.setDefault(TardisExteriorRegistry.get(defaultId));
         }
 
-        Set<String> newIds = exteriors.stream()
-                .map(TardisExterior::id)
-                .collect(Collectors.toSet());
-
-        if (!newIds.equals(previousIds)) {
-            GCClientHooks.reloadResourcePacks();
-        }
+        GCSyncPayload.reloadIfChanged(previousIds, exteriors);
     }
 
     @Override

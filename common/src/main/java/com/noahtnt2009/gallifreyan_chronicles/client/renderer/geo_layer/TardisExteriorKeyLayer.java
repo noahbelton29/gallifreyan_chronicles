@@ -63,17 +63,19 @@ public class TardisExteriorKeyLayer<T extends GeoAnimatable & TardisExteriorKeyL
         renderState.addGeckolibData(KEY_RENDER_STATE, itemRenderState);
     }
 
+    private @Nullable ItemStackRenderState keyRenderState(R renderState) {
+        if (!renderState.hasGeckolibData(KEY_RENDER_STATE)) return null;
+        ItemStackRenderState itemRenderState = renderState.getGeckolibData(KEY_RENDER_STATE);
+        if (itemRenderState == null || itemRenderState.isEmpty()) return null;
+        return itemRenderState;
+    }
+
     @Override
     public void addPerBoneRender(RenderPassInfo<R> renderPassInfo, @NonNull BiConsumer<GeoBone, PerBoneRender<R>> consumer) {
         if (!renderPassInfo.willRender()) return;
 
-        R renderState = renderPassInfo.renderState();
-
-        if (!renderState.hasGeckolibData(KEY_RENDER_STATE)) return;
-
-        ItemStackRenderState itemRenderState = renderState.getGeckolibData(KEY_RENDER_STATE);
-
-        if (itemRenderState == null || itemRenderState.isEmpty()) return;
+        ItemStackRenderState itemRenderState = keyRenderState(renderPassInfo.renderState());
+        if (itemRenderState == null) return;
 
         BakedGeoModel model = renderPassInfo.model();
 
@@ -85,13 +87,8 @@ public class TardisExteriorKeyLayer<T extends GeoAnimatable & TardisExteriorKeyL
     }
 
     private void submitKeyRender(RenderPassInfo<R> renderPassInfo, GeoBone bone, SubmitNodeCollector renderTasks) {
-        R renderState = renderPassInfo.renderState();
-
-        if (!renderState.hasGeckolibData(KEY_RENDER_STATE)) return;
-
-        ItemStackRenderState itemRenderState = renderState.getGeckolibData(KEY_RENDER_STATE);
-
-        if (itemRenderState == null || itemRenderState.isEmpty()) return;
+        ItemStackRenderState itemRenderState = keyRenderState(renderPassInfo.renderState());
+        if (itemRenderState == null) return;
 
         cacheKeyBoneWorldPosition(renderPassInfo, bone);
 

@@ -1,5 +1,7 @@
 package com.noahtnt2009.gallifreyan_chronicles.network;
 
+import com.noahtnt2009.gallifreyan_chronicles.network.DiscoveryToastPayload;
+import com.noahtnt2009.gallifreyan_chronicles.network.TardisCrashRumblePayload;
 import com.noahtnt2009.gallifreyan_chronicles.network.RematCatchPayload;
 import com.noahtnt2009.gallifreyan_chronicles.sound.TimedSounds;
 import com.noahtnt2009.gallifreyan_chronicles.Constants;
@@ -56,6 +58,21 @@ public final class GCNeoForgeNetworking {
         registrar.playToClient(
                 TardisDrumShakePayload.TYPE,
                 TardisDrumShakePayload.STREAM_CODEC,
+                (payload, context) -> context.enqueueWork(payload::apply)
+        );
+        registrar.playToClient(
+                TardisAlarmPayload.TYPE,
+                TardisAlarmPayload.STREAM_CODEC,
+                (payload, context) -> context.enqueueWork(payload::apply)
+        );
+        registrar.playToClient(
+                DiscoveryToastPayload.TYPE,
+                DiscoveryToastPayload.STREAM_CODEC,
+                (payload, context) -> context.enqueueWork(payload::apply)
+        );
+        registrar.playToClient(
+                TardisCrashRumblePayload.TYPE,
+                TardisCrashRumblePayload.STREAM_CODEC,
                 (payload, context) -> context.enqueueWork(payload::apply)
         );
         registrar.playToClient(

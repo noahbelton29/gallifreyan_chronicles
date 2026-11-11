@@ -7,6 +7,9 @@ import com.noahtnt2009.gallifreyan_chronicles.network.TardisConsoleAnimationPayl
 import com.noahtnt2009.gallifreyan_chronicles.network.TardisConsoleRotorStatePayload;
 import com.noahtnt2009.gallifreyan_chronicles.network.TardisConsoleSyncPayload;
 import com.noahtnt2009.gallifreyan_chronicles.network.TardisDrumShakePayload;
+import com.noahtnt2009.gallifreyan_chronicles.network.TardisAlarmPayload;
+import com.noahtnt2009.gallifreyan_chronicles.network.DiscoveryToastPayload;
+import com.noahtnt2009.gallifreyan_chronicles.network.TardisCrashRumblePayload;
 import com.noahtnt2009.gallifreyan_chronicles.network.TardisExteriorSyncPayload;
 import com.noahtnt2009.gallifreyan_chronicles.network.TardisInteriorSyncPayload;
 import com.noahtnt2009.gallifreyan_chronicles.platform.services.INetworkHelper;
@@ -98,6 +101,21 @@ public class FabricNetworkHelper implements INetworkHelper {
 
     @Override
     public void sendTardisDrumShake(ServerPlayer player, TardisDrumShakePayload payload) {
+        ServerPlayNetworking.send(player, payload);
+    }
+
+    @Override
+    public void sendTardisAlarm(ServerPlayer player, TardisAlarmPayload payload) {
+        ServerPlayNetworking.send(player, payload);
+    }
+
+    @Override
+    public void sendDiscoveryToast(ServerPlayer player, DiscoveryToastPayload payload) {
+        ServerPlayNetworking.send(player, payload);
+    }
+
+    @Override
+    public void sendTardisCrashRumble(ServerPlayer player, TardisCrashRumblePayload payload) {
         ServerPlayNetworking.send(player, payload);
     }
 

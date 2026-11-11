@@ -83,6 +83,12 @@ public final class ExteriorFlight {
         return true;
     }
 
+    public void vanish(long now) {
+        this.inFlight = true;
+        this.quickFadeInTicks = 0;
+        this.fadeStartTick = now - fadeType.timing().fadeOutTicks();
+    }
+
     public boolean scheduleLanding(long now, int delayTicks) {
         if (!inFlight) return false;
         landAtTick = now + delayTicks;

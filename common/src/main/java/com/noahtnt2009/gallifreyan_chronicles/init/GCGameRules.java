@@ -20,6 +20,12 @@ public class GCGameRules {
             true
     );
 
+    public static final GameRule<Boolean> TARDIS_GRIEFING = register(
+            "gc_tardis_griefing",
+            GCGameRuleCategories.GALLIFREYAN_CHRONICLES,
+            true
+    );
+
     private static GameRule<Boolean> register(String id, GameRuleCategory category, boolean defaultValue) {
         Identifier identifier = GCUtils.modIdentifier(id);
 

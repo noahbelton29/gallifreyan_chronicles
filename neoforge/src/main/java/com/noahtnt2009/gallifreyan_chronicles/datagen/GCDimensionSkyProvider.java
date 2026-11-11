@@ -93,7 +93,7 @@ public class GCDimensionSkyProvider implements DataProvider {
     private static <T extends IdentifiableData<T>> void save(CachedOutput cache, List<CompletableFuture<?>> futures, List<T> values,
                                                             Codec<T> codec, PackOutput.PathProvider pathProvider, String label) {
         for (T value : values) {
-            String filePath = value.id().contains(":") ? value.id().substring(value.id().indexOf(':') + 1) : value.id();
+            String filePath = GCUtils.localPath(value.id());
             Identifier fileId = GCUtils.modIdentifier(filePath);
             var encodeResult = codec.encodeStart(JsonOps.INSTANCE, value);
             encodeResult.ifSuccess(json -> futures.add(DataProvider.saveStable(cache, json, pathProvider.json(fileId))));

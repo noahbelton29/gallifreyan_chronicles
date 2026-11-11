@@ -34,31 +34,20 @@ public class TardisControlHitboxDebugRenderer implements DebugRenderer.SimpleDeb
 
         for (Entity entity : this.minecraft.level.entitiesForRendering()) {
             if (entity instanceof TardisControlEntity control) {
-                if (!frustum.isVisible(entity.getBoundingBox())) {
-                    continue;
-                }
-
-                Vec3 latestPosition = entity.position();
-                Vec3 currentPosition = entity.getPosition(partialTicks);
-                Vec3 offset = currentPosition.subtract(latestPosition);
-
-                int color = colorFor(control.getControlId());
-                Gizmos.cuboid(entity.getBoundingBox().move(offset), GizmoStyle.stroke(color));
-                Gizmos.point(currentPosition, color, 2.0F);
-            } else if (entity instanceof TardisKeyEntity keyEntity) {
-                if (!frustum.isVisible(entity.getBoundingBox())) {
-                    continue;
-                }
-
-                Vec3 latestPosition = entity.position();
-                Vec3 currentPosition = entity.getPosition(partialTicks);
-                Vec3 offset = currentPosition.subtract(latestPosition);
-
-                int color = colorFor("tardis_key");
-                Gizmos.cuboid(entity.getBoundingBox().move(offset), GizmoStyle.stroke(color));
-                Gizmos.point(currentPosition, color, 2.0F);
+                drawHitbox(entity, frustum, partialTicks, colorFor(control.getControlId()));
+            } else if (entity instanceof TardisKeyEntity) {
+                drawHitbox(entity, frustum, partialTicks, colorFor("tardis_key"));
             }
         }
+    }
+
+    private static void drawHitbox(Entity entity, Frustum frustum, float partialTicks, int color) {
+        if (!frustum.isVisible(entity.getBoundingBox())) return;
+
+        Vec3 currentPosition = entity.getPosition(partialTicks);
+        Vec3 offset = currentPosition.subtract(entity.position());
+        Gizmos.cuboid(entity.getBoundingBox().move(offset), GizmoStyle.stroke(color));
+        Gizmos.point(currentPosition, color, 2.0F);
     }
 
     private static int colorFor(String controlId) {

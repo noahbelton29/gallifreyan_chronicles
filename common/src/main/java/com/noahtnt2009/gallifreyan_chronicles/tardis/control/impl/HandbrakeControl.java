@@ -24,6 +24,6 @@ public class HandbrakeControl extends BaseControl {
 
     @Override
     public void onStateChanged(TardisConsoleBlockEntity console, boolean activated) {
-        if (activated) FlightLeverControl.abortTakeoff(console);
+        if (activated && !FlightLeverControl.abortTakeoff(console)) FlightLeverControl.crashLand(console);
     }
 }

@@ -1,10 +1,10 @@
 package com.noahtnt2009.gallifreyan_chronicles.client.model;
 
+import com.noahtnt2009.gallifreyan_chronicles.client.tardis.GeoAssets;
 import com.geckolib.model.GeoModel;
 import com.geckolib.renderer.base.GeoRenderState;
 import com.noahtnt2009.gallifreyan_chronicles.block.entity.InteriorDoorBlockEntity;
 import com.noahtnt2009.gallifreyan_chronicles.client.renderer.InteriorDoorBlockRenderer;
-import com.noahtnt2009.gallifreyan_chronicles.client.tardis.InteriorDoorAssets;
 import com.noahtnt2009.gallifreyan_chronicles.util.GCUtils;
 import net.minecraft.resources.Identifier;
 import org.jspecify.annotations.NonNull;
@@ -14,7 +14,7 @@ public class InteriorDoorBlockModel extends GeoModel<InteriorDoorBlockEntity> {
 
     @Override
     public @NonNull Identifier getModelResource(@NonNull GeoRenderState renderState) {
-        return InteriorDoorAssets.model(getVariantId(renderState));
+        return GeoAssets.INTERIOR_DOOR.model(getVariantId(renderState));
     }
 
     @Override
@@ -22,15 +22,15 @@ public class InteriorDoorBlockModel extends GeoModel<InteriorDoorBlockEntity> {
         if (renderState.hasGeckolibData(InteriorDoorBlockRenderer.TEXTURE_ID)) {
             String textureId = renderState.getGeckolibData(InteriorDoorBlockRenderer.TEXTURE_ID);
             if (textureId != null && !textureId.isEmpty()) {
-                return InteriorDoorAssets.texture(textureId);
+                return GeoAssets.INTERIOR_DOOR.texture(textureId);
             }
         }
-        return InteriorDoorAssets.texture(getVariantId(renderState));
+        return GeoAssets.INTERIOR_DOOR.texture(getVariantId(renderState));
     }
 
     @Override
     public @NonNull Identifier getAnimationResource(InteriorDoorBlockEntity animatable) {
-        return InteriorDoorAssets.animation(GCUtils.modIdentifier(animatable.getVariant()));
+        return GeoAssets.INTERIOR_DOOR.animation(GCUtils.modIdentifier(animatable.getVariant()));
     }
 
     private Identifier getVariantId(GeoRenderState renderState) {

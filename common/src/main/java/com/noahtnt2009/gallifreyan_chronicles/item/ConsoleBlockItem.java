@@ -1,5 +1,7 @@
 package com.noahtnt2009.gallifreyan_chronicles.item;
 
+import com.noahtnt2009.gallifreyan_chronicles.util.GCUtils;
+
 import com.noahtnt2009.gallifreyan_chronicles.init.GCDataComponents;
 import com.noahtnt2009.gallifreyan_chronicles.tardis.console.TardisConsole;
 import com.noahtnt2009.gallifreyan_chronicles.tardis.console.TardisConsoleRegistry;
@@ -45,8 +47,7 @@ public class ConsoleBlockItem extends BlockItem implements ScrollSelectable {
     );
 
     private static String localId(String id) {
-        int colon = id.indexOf(':');
-        return colon < 0 ? id : id.substring(colon + 1);
+        return GCUtils.localPath(id);
     }
 
     private static int orderIndex(List<String> order, String localId) {

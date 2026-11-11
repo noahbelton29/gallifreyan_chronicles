@@ -46,6 +46,7 @@
     "client.audio.ReplaySoundWorldMixin",
     "client.darkness.PowerDarknessApplicableMixin",
     "client.darkness.PowerDarknessSetupMixin",
+    "client.darkness.AlarmFogColourMixin",
     "client.sky.CloudRendererTextureMixin",
     "client.compat.PortalPowerDarknessMixin",
     "client.compat.PortalRenderLimitMixin",

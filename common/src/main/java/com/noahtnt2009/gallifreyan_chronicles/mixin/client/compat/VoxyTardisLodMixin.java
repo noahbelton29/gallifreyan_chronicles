@@ -1,5 +1,6 @@
 package com.noahtnt2009.gallifreyan_chronicles.mixin.client.compat;
 
+import com.noahtnt2009.gallifreyan_chronicles.util.TardisDimensions;
 import com.noahtnt2009.gallifreyan_chronicles.Constants;
 import net.minecraft.resources.Identifier;
 import net.minecraft.world.level.Level;
@@ -16,9 +17,7 @@ public abstract class VoxyTardisLodMixin {
     @Inject(method = "of(Lnet/minecraft/world/level/Level;)Lme/cortex/voxy/commonImpl/WorldIdentifier;",
             at = @At("HEAD"), cancellable = true, remap = false, require = 0)
     private static void gc$noTardisLods(Level level, CallbackInfoReturnable<Object> cir) {
-        if (level == null) return;
-        Identifier dimension = level.dimension().identifier();
-        if (dimension.getNamespace().equals(Constants.MOD_ID) && dimension.getPath().startsWith("tardis/")) {
+        if (TardisDimensions.isInterior(level)) {
             cir.setReturnValue(null);
         }
     }

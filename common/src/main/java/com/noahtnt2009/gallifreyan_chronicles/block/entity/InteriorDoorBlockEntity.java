@@ -1,5 +1,7 @@
 package com.noahtnt2009.gallifreyan_chronicles.block.entity;
 
+import com.noahtnt2009.gallifreyan_chronicles.util.BlockEntitySync;
+
 import java.util.Optional;
 
 import com.noahtnt2009.gallifreyan_chronicles.tardis.api.TardisApi;
@@ -454,10 +456,7 @@ public class InteriorDoorBlockEntity extends BlockEntity implements GeoBlockEnti
     }
 
     public void sync() {
-        if (level != null) {
-            setChanged();
-            level.sendBlockUpdated(getBlockPos(), getBlockState(), getBlockState(), 3);
-        }
+        BlockEntitySync.sendToClients(this);
     }
 
     @Override

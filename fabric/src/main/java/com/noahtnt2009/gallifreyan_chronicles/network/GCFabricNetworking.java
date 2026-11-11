@@ -1,5 +1,7 @@
 package com.noahtnt2009.gallifreyan_chronicles.network;
 
+import com.noahtnt2009.gallifreyan_chronicles.network.DiscoveryToastPayload;
+import com.noahtnt2009.gallifreyan_chronicles.network.TardisCrashRumblePayload;
 import com.noahtnt2009.gallifreyan_chronicles.network.RematCatchPayload;
 import net.fabricmc.fabric.api.entity.event.v1.ServerEntityLevelChangeEvents;
 import com.noahtnt2009.gallifreyan_chronicles.sound.TimedSounds;
@@ -23,6 +25,9 @@ public final class GCFabricNetworking {
         PayloadTypeRegistry.clientboundPlay().register(TardisConsoleAnimationPayload.TYPE, TardisConsoleAnimationPayload.STREAM_CODEC);
         PayloadTypeRegistry.clientboundPlay().register(TardisConsoleRotorStatePayload.TYPE, TardisConsoleRotorStatePayload.STREAM_CODEC);
         PayloadTypeRegistry.clientboundPlay().register(TardisDrumShakePayload.TYPE, TardisDrumShakePayload.STREAM_CODEC);
+        PayloadTypeRegistry.clientboundPlay().register(TardisAlarmPayload.TYPE, TardisAlarmPayload.STREAM_CODEC);
+        PayloadTypeRegistry.clientboundPlay().register(DiscoveryToastPayload.TYPE, DiscoveryToastPayload.STREAM_CODEC);
+        PayloadTypeRegistry.clientboundPlay().register(TardisCrashRumblePayload.TYPE, TardisCrashRumblePayload.STREAM_CODEC);
         PayloadTypeRegistry.clientboundPlay().register(RematCatchPayload.TYPE, RematCatchPayload.STREAM_CODEC);
         PayloadTypeRegistry.clientboundPlay().register(ResumeSoundPayload.TYPE, ResumeSoundPayload.STREAM_CODEC);
         PayloadTypeRegistry.clientboundPlay().register(ReplayComponentIds.Payload.TYPE, ReplayComponentIds.Payload.STREAM_CODEC);

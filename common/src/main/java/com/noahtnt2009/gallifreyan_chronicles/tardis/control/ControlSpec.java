@@ -1,5 +1,7 @@
 package com.noahtnt2009.gallifreyan_chronicles.tardis.control;
 
+import com.noahtnt2009.gallifreyan_chronicles.init.GCCodecs;
+
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import net.minecraft.world.phys.Vec3;
@@ -9,11 +11,7 @@ import java.util.Optional;
 public record ControlSpec(String id, Vec3 offset, float width, float height, float depth,
                           float rotX, float rotY, float rotZ) {
 
-    private static final Codec<Vec3> VEC3_CODEC = RecordCodecBuilder.create(inst -> inst.group(
-            Codec.DOUBLE.fieldOf("x").forGetter(Vec3::x),
-            Codec.DOUBLE.fieldOf("y").forGetter(Vec3::y),
-            Codec.DOUBLE.fieldOf("z").forGetter(Vec3::z)
-    ).apply(inst, Vec3::new));
+    private static final Codec<Vec3> VEC3_CODEC = GCCodecs.VEC3;
 
     private record Rotation(float x, float y, float z) {
         private static final Codec<Rotation> CODEC = RecordCodecBuilder.create(inst -> inst.group(

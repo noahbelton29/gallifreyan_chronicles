@@ -65,6 +65,8 @@ public class GCLanguageProvider extends LanguageProvider {
                 "Gallifreyan Chronicles");
         add("gamerule.gallifreyan_chronicles.gc_daylight_cycle_affects_glow",
                 "Daylight Cycle Affects Exterior Glow");
+        add("gamerule.gallifreyan_chronicles.gc_tardis_griefing",
+                "Crashing TARDISes Make Craters");
 
         // Creative tabs
         add("creativetab.gallifreyan_chronicles.tardis", "GC: TARDIS");
@@ -215,6 +217,32 @@ public class GCLanguageProvider extends LanguageProvider {
         add("command.gallifreyan_chronicles.get_subsystem_health",
                 "Health of subsystem %s in TARDIS %s: %s");
 
+        // Commands: Mind
+        add("command.gallifreyan_chronicles.mind.willing", "Willing to fly");
+        add("command.gallifreyan_chronicles.mind.unwilling", "Doesn't want to fly");
+        add("command.gallifreyan_chronicles.get_mind", "%s of TARDIS %s: %s");
+        add("command.gallifreyan_chronicles.unknown_personality", "Unknown personality: %s");
+        add("command.gallifreyan_chronicles.unknown_trait", "Unknown trait: %s");
+        add("command.gallifreyan_chronicles.unknown_disability", "Unknown disability: %s");
+        add("command.gallifreyan_chronicles.disability_already", "It already has the disability %s");
+        add("command.gallifreyan_chronicles.disability_missing", "It doesn't have the disability %s");
+        add("command.gallifreyan_chronicles.trait_already", "It already has the trait %s");
+        add("command.gallifreyan_chronicles.trait_doesnt_fit", "The trait %s doesn't suit a %s TARDIS");
+        add("command.gallifreyan_chronicles.trait_clashes", "The trait %s clashes with %s");
+        add("command.gallifreyan_chronicles.trait_missing", "It doesn't have the trait %s");
+        add("command.gallifreyan_chronicles.traits_full", "A TARDIS can only have %s traits");
+        add("command.gallifreyan_chronicles.repaired", "Repaired TARDIS %s");
+        add("command.gallifreyan_chronicles.not_crashed", "TARDIS %s isn't damaged");
+        add("command.gallifreyan_chronicles.data_header", "TARDIS %s data:");
+        add("command.gallifreyan_chronicles.data_line", "  %s: %s");
+        add("command.gallifreyan_chronicles.data_set", "Set %s of TARDIS %s to %s");
+        add("command.gallifreyan_chronicles.data_remat", "TARDIS %s rematerialised at its target");
+        add("command.gallifreyan_chronicles.data_vanish", "TARDIS %s vanished into the vortex");
+        add("command.gallifreyan_chronicles.data_no_target", "TARDIS %s has no target to rematerialise at");
+        add("command.gallifreyan_chronicles.data_bad_value", "Unknown value: %s");
+        add("command.gallifreyan_chronicles.set_mind",
+                "Set %s of TARDIS %s to %s");
+
         // Commands: TARDIS listing
         add("command.gallifreyan_chronicles.no_tardises",
                 "No TARDISes found.");
@@ -278,6 +306,103 @@ public class GCLanguageProvider extends LanguageProvider {
                 "Facing: %s");
 
         // Messages
+        add("message.gallifreyan_chronicles.tardis_balks.stressed", "The TARDIS is stressed and doesn't want to take off... pull it again to make it");
+        add("message.gallifreyan_chronicles.tardis_balks.distrust", "The TARDIS doesn't trust you enough to take off... pull it again to make it");
+        add("message.gallifreyan_chronicles.tardis_refuses.stressed", "The TARDIS is too stressed, it's refusing to take off!");
+        add("message.gallifreyan_chronicles.tardis_refuses.distrust", "The TARDIS doesn't trust you, it's refusing to take off!");
+        add("message.gallifreyan_chronicles.tardis_worked_up", "You left it too long, the TARDIS is getting more stressed and really doesn't want to go now...");
+        add("message.gallifreyan_chronicles.tardis_warning", "The TARDIS is getting angry... stop pushing it");
+        add("message.gallifreyan_chronicles.tardis_lashes_out", "The TARDIS lashes out at you!");
+        add("message.gallifreyan_chronicles.tardis_furious", "The TARDIS is furious, it's trying to hurt you!");
+        add("message.gallifreyan_chronicles.still_travelling", "Still in the vortex, %s seconds until you can land");
+        add("message.gallifreyan_chronicles.crash_landing", "Handbrake on in the vortex, the TARDIS is crashing!");
+        add("message.gallifreyan_chronicles.power_locked_crashing", "The TARDIS is crashing, the power won't budge!");
+        add("message.gallifreyan_chronicles.mallet_shudders", "The TARDIS shudders...");
+        add("message.gallifreyan_chronicles.mallet_flinches", "The TARDIS flinches away from you...");
+        add("message.gallifreyan_chronicles.mallet_cowers", "The TARDIS cowers...");
+        add("message.gallifreyan_chronicles.tardis_cowed", "The TARDIS doesn't want to go, but it's too scared of you to refuse...");
+        add("message.gallifreyan_chronicles.mallet_fights_back", "The TARDIS lashes back at you!");
+        add("message.gallifreyan_chronicles.tardis_controls_frozen", "The controls won't budge. The TARDIS doesn't trust you");
+        add("message.gallifreyan_chronicles.tardis_control_sticks", "The control sticks... the TARDIS is wary of you");
+        add("message.gallifreyan_chronicles.tardis_betrayed", "The TARDIS will never forget this betrayal");
+        add("discovery.gallifreyan_chronicles.trait.distrusting", "Distrusting");
+        add("discovery.gallifreyan_chronicles.trait.distrusting.desc", "It doesn't trust you yet. Its controls will stick until you earn its trust, which comes slowly, but once earned it holds on to it. Don't abuse it.");
+        add("message.gallifreyan_chronicles.mallet_seen_flinch", "The TARDIS flinches at the sight of the mallet");
+        add("message.gallifreyan_chronicles.mallet_seen_braces", "The TARDIS braces itself and locks up tight");
+        add("message.gallifreyan_chronicles.mallet_seen_threatens", "The TARDIS crackles threateningly. It remembers that mallet");
+        add("discovery.gallifreyan_chronicles.disability.ptsd", "PTSD");
+        add("discovery.gallifreyan_chronicles.disability.ptsd.desc", "You hurt it too many times. It's always a little scared of you now, it gets stressed easily, and it'll flinch whenever it sees that mallet. Kindness can ease it, but it'll never fully forget.");
+        add("advancement.gallifreyan_chronicles.tardis_mind.ptsd.title", "What Have You Done?");
+        add("advancement.gallifreyan_chronicles.tardis_mind.ptsd.description", "Abuse your TARDIS until it develops PTSD");
+        add("message.gallifreyan_chronicles.tardis_terrified", "The TARDIS is frozen in terror. The controls won't budge");
+        add("message.gallifreyan_chronicles.tardis_terror_resists", "It's still frozen... it needs more convincing");
+        add("message.gallifreyan_chronicles.tardis_terror_complies", "The TARDIS gives in, trembling");
+        add("message.gallifreyan_chronicles.tardis_terror_savage", "The TARDIS fights for its life!");
+        add("message.gallifreyan_chronicles.tardis_muddled", "The TARDIS got its numbers muddled up...");
+        add("advancement.gallifreyan_chronicles.tardis_mind.root.title", "TARDIS Minds");
+        add("advancement.gallifreyan_chronicles.tardis_mind.root.description", "No two TARDISes are quite the same");
+        add("advancement.gallifreyan_chronicles.tardis_mind.personality.title", "A Mind of Its Own");
+        add("advancement.gallifreyan_chronicles.tardis_mind.personality.description", "Discover your TARDIS's personality");
+        add("advancement.gallifreyan_chronicles.tardis_mind.trait.title", "Getting to Know You");
+        add("advancement.gallifreyan_chronicles.tardis_mind.trait.description", "Discover one of your TARDIS's traits");
+        add("advancement.gallifreyan_chronicles.tardis_mind.dyslexic.title", "Wait, Where Are We?");
+        add("advancement.gallifreyan_chronicles.tardis_mind.dyslexic.description", "Your TARDIS is dyslexic! It mixed up its numbers and took you somewhere else entirely");
+        add("discovery.gallifreyan_chronicles.personality.intro", "Every TARDIS has a mind of its own, and yours is starting to show it...");
+        add("discovery.gallifreyan_chronicles.personality.found", "Personality Discovered!");
+        add("discovery.gallifreyan_chronicles.personality.obedient", "Obedient");
+        add("discovery.gallifreyan_chronicles.personality.obedient.desc", "It'll go wherever you ask, whenever you ask. No arguments, no sulking. Treasure it.");
+        add("discovery.gallifreyan_chronicles.personality.submissive", "Submissive");
+        add("discovery.gallifreyan_chronicles.personality.submissive.desc", "When it's unhappy it balks at the lever, but push it again and it'll give in. It remembers that you did, though.");
+        add("discovery.gallifreyan_chronicles.personality.defensive", "Defensive");
+        add("discovery.gallifreyan_chronicles.personality.defensive.desc", "If it's stressed or doesn't trust you, it simply won't fly. Keep it calm and earn its trust.");
+        add("discovery.gallifreyan_chronicles.personality.aggressive", "Aggressive");
+        add("discovery.gallifreyan_chronicles.personality.aggressive.desc", "Keep forcing it when it doesn't want to go and it will fight back. It can and will hurt you.");
+        add("discovery.gallifreyan_chronicles.trait.found", "Trait Discovered!");
+        add("discovery.gallifreyan_chronicles.trait.skittish", "Skittish");
+        add("discovery.gallifreyan_chronicles.trait.skittish.desc", "It gets stressed quickly, but calms down just as fast.");
+        add("discovery.gallifreyan_chronicles.trait.loyal", "Loyal");
+        add("discovery.gallifreyan_chronicles.trait.loyal.desc", "It learns to trust you quickly and doesn't lose faith in you easily.");
+        add("discovery.gallifreyan_chronicles.trait.stubborn", "Stubborn");
+        add("discovery.gallifreyan_chronicles.trait.stubborn.desc", "It digs its heels in and says no sooner than most TARDISes.");
+        add("discovery.gallifreyan_chronicles.trait.forgiving", "Forgiving");
+        add("discovery.gallifreyan_chronicles.trait.forgiving.desc", "Fear and stress fade from it twice as fast as normal.");
+        add("discovery.gallifreyan_chronicles.trait.grudge_holder", "Grudge-holder");
+        add("discovery.gallifreyan_chronicles.trait.grudge_holder.desc", "It doesn't forget. Fear and stress take twice as long to fade.");
+        add("discovery.gallifreyan_chronicles.trait.protective", "Protective");
+        add("discovery.gallifreyan_chronicles.trait.protective.desc", "It braces itself to shield you. Crashes hit the people inside half as hard.");
+        add("discovery.gallifreyan_chronicles.trait.possessive", "Possessive");
+        add("discovery.gallifreyan_chronicles.trait.possessive.desc", "It really only listens to its owner. Anyone else will find it much harder to fly.");
+        add("discovery.gallifreyan_chronicles.trait.welcoming", "Welcoming");
+        add("discovery.gallifreyan_chronicles.trait.welcoming.desc", "It's happy to fly for anyone, not just its owner.");
+        add("discovery.gallifreyan_chronicles.disability.found", "Quirk Discovered!");
+        add("discovery.gallifreyan_chronicles.disability.dyslexic", "Dyslexic");
+        add("discovery.gallifreyan_chronicles.disability.dyslexic.desc", "It sometimes mixes up its coordinates, especially when stressed. It gets better with practice, but it never fully goes away.");
+        add("command.gallifreyan_chronicles.mind", "Personality: %s | Traits: %s | Disabilities: %s | Skill: %s | Stress: %s | Trust: %s | Fear: %s | %s");
+        // Sound subtitles
+        add("sound.gallifreyan_chronicles.first_doctors_hum", "TARDIS hums");
+        add("sound.gallifreyan_chronicles.hartnell_door", "TARDIS doors move");
+        add("sound.gallifreyan_chronicles.tardis_door_open", "TARDIS doors open");
+        add("sound.gallifreyan_chronicles.tardis_door_close", "TARDIS doors close");
+        add("sound.gallifreyan_chronicles.tardis_door_lock", "TARDIS locks");
+        add("sound.gallifreyan_chronicles.tardis_door_unlock", "TARDIS unlocks");
+        add("sound.gallifreyan_chronicles.tardis_is_locked", "TARDIS is locked");
+        add("sound.gallifreyan_chronicles.tardis_key_jammed", "TARDIS key jams");
+        add("sound.gallifreyan_chronicles.tardis_drum", "TARDIS engines thrum");
+        add("sound.gallifreyan_chronicles.tardis_takeoff", "TARDIS dematerialises");
+        add("sound.gallifreyan_chronicles.tardis_land", "TARDIS materialises");
+        add("sound.gallifreyan_chronicles.tardis_land_drum", "TARDIS lands");
+        add("sound.gallifreyan_chronicles.tardis_vworp", "TARDIS travels");
+        add("sound.gallifreyan_chronicles.cloister", "Cloister bell rings");
+        add("sound.gallifreyan_chronicles.power_on", "TARDIS powers up");
+        add("sound.gallifreyan_chronicles.power_off", "TARDIS powers down");
+        add("sound.gallifreyan_chronicles.cloak", "TARDIS cloaks");
+        add("sound.gallifreyan_chronicles.uncloak", "TARDIS uncloaks");
+        add("sound.gallifreyan_chronicles.stop_demat", "TARDIS takeoff aborted");
+        add("sound.gallifreyan_chronicles.slider_sound", "Console slider moves");
+        add("sound.gallifreyan_chronicles.switch", "Console switch flicks");
+        add("sound.gallifreyan_chronicles.lever", "Console lever pulled");
+        add("sound.gallifreyan_chronicles.title_theme", "Music plays");
+
         add("message.gallifreyan_chronicles.lock_too_damaged", "The lock is too damaged to take the key!");
         add("message.gallifreyan_chronicles.lock_jammed", "The lock is jammed!");
         add("message.gallifreyan_chronicles.wrong_key", "That is the wrong key!");

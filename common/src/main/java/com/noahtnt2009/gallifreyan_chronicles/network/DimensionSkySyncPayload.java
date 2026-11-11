@@ -31,20 +31,12 @@ public record DimensionSkySyncPayload(List<CelestialBody> bodies, List<Dimension
     }
 
     public void apply() {
-        Set<String> previousIds = DimensionSkyRegistry.getAll().stream()
-                .map(DimensionSky::id)
-                .collect(Collectors.toSet());
+        Set<String> previousIds = GCSyncPayload.idsOf(DimensionSkyRegistry.getAll());
 
         GCSyncPayload.apply(bodies, CelestialBodyRegistry::clear, CelestialBodyRegistry::register, "Celestial Body");
         GCSyncPayload.apply(skies, DimensionSkyRegistry::clear, DimensionSkyRegistry::register, "Dimension Sky");
 
-        Set<String> newIds = skies.stream()
-                .map(DimensionSky::id)
-                .collect(Collectors.toSet());
-
-        if (!newIds.equals(previousIds)) {
-            GCClientHooks.reloadResourcePacks();
-        }
+        GCSyncPayload.reloadIfChanged(previousIds, skies);
     }
 
     @Override

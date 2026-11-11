@@ -4,6 +4,7 @@ import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import com.noahtnt2009.gallifreyan_chronicles.tardis.ecs.component.TardisComponent;
 import com.noahtnt2009.gallifreyan_chronicles.tardis.flight.LandingTarget;
+import com.noahtnt2009.gallifreyan_chronicles.tardis.mind.TardisMind;
 import com.noahtnt2009.gallifreyan_chronicles.util.GCUtils;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.registries.Registries;
@@ -24,7 +25,8 @@ public class TardisManager extends SavedData {
                          Optional<BlockPos> interiorOrigin, Optional<Identifier> exteriorDimension,
                          Optional<String> interiorId, Optional<LandingTarget> landingTarget,
                          Optional<Integer> coordIncrement, Optional<Boolean> coordIncrementNegative,
-                         Optional<List<UUID>> trusted) {
+                         Optional<List<UUID>> trusted, Optional<TardisMind> mind,
+                         Optional<Long> flightStart, Optional<Boolean> crashed) {
     }
 
     private static final Codec<Entry> ENTRY_CODEC = RecordCodecBuilder.create(inst -> inst.group(
@@ -38,7 +40,10 @@ public class TardisManager extends SavedData {
             LandingTarget.CODEC.optionalFieldOf("landing_target").forGetter(Entry::landingTarget),
             Codec.INT.optionalFieldOf("coord_increment").forGetter(Entry::coordIncrement),
             Codec.BOOL.optionalFieldOf("coord_increment_negative").forGetter(Entry::coordIncrementNegative),
-            TardisComponent.UUID_CODEC.listOf().optionalFieldOf("trusted").forGetter(Entry::trusted)
+            TardisComponent.UUID_CODEC.listOf().optionalFieldOf("trusted").forGetter(Entry::trusted),
+            TardisMind.CODEC.optionalFieldOf("mind").forGetter(Entry::mind),
+            Codec.LONG.optionalFieldOf("flight_start").forGetter(Entry::flightStart),
+            Codec.BOOL.optionalFieldOf("crashed").forGetter(Entry::crashed)
     ).apply(inst, Entry::new));
 
     public static final Codec<TardisManager> CODEC = RecordCodecBuilder.create(inst -> inst.group(
@@ -59,7 +64,10 @@ public class TardisManager extends SavedData {
                             manager.negativeIncrements.contains(id) ? Optional.of(true) : Optional.empty(),
                             manager.trustedById.containsKey(id)
                                     ? Optional.of(List.copyOf(manager.trustedById.get(id)))
-                                    : Optional.empty()
+                                    : Optional.empty(),
+                            Optional.ofNullable(manager.mindById.get(id)),
+                            Optional.ofNullable(manager.flightStartById.get(id)),
+                            manager.crashed.contains(id) ? Optional.of(true) : Optional.empty()
                     ));
                 }
                 return entries;
@@ -85,6 +93,9 @@ public class TardisManager extends SavedData {
             entry.coordIncrement().ifPresent(index -> manager.coordIncrementById.put(id, index));
             if (entry.coordIncrementNegative().orElse(false)) manager.negativeIncrements.add(id);
             entry.trusted().ifPresent(players -> manager.trustedById.put(id, new HashSet<>(players)));
+            entry.mind().ifPresent(mind -> manager.mindById.put(id, mind));
+            entry.flightStart().ifPresent(start -> manager.flightStartById.put(id, start));
+            if (entry.crashed().orElse(false)) manager.crashed.add(id);
         }
         return manager;
     }));
@@ -108,6 +119,9 @@ public class TardisManager extends SavedData {
     private final Map<UUID, Integer> coordIncrementById = new HashMap<>();
     private final Set<UUID> negativeIncrements = new HashSet<>();
     private final Map<UUID, Set<UUID>> trustedById = new HashMap<>();
+    private final Map<UUID, TardisMind> mindById = new HashMap<>();
+    private final Map<UUID, Long> flightStartById = new HashMap<>();
+    private final Set<UUID> crashed = new HashSet<>();
 
     public Optional<TardisComponent> get(UUID tardisId) {
         if (tardisId == null) {
@@ -135,6 +149,16 @@ public class TardisManager extends SavedData {
         byOwnerId.computeIfAbsent(ownerId, ignored -> new ArrayList<>()).add(tardisId);
         setDirty();
         return component;
+    }
+
+    public void setOwner(UUID tardisId, UUID ownerId, String ownerName) {
+        TardisComponent old = byTardisId.get(tardisId);
+        if (old == null) return;
+        List<UUID> previous = byOwnerId.get(old.ownerId());
+        if (previous != null) previous.remove(tardisId);
+        byTardisId.put(tardisId, new TardisComponent(tardisId, ownerId, ownerName));
+        byOwnerId.computeIfAbsent(ownerId, ignored -> new ArrayList<>()).add(tardisId);
+        setDirty();
     }
 
     public void updateOwnerName(UUID tardisId, String ownerName) {
@@ -177,6 +201,42 @@ public class TardisManager extends SavedData {
         coordIncrementById.remove(tardisId);
         negativeIncrements.remove(tardisId);
         trustedById.remove(tardisId);
+        mindById.remove(tardisId);
+        flightStartById.remove(tardisId);
+        crashed.remove(tardisId);
+        setDirty();
+    }
+
+    public boolean isCrashed(UUID tardisId) {
+        return crashed.contains(tardisId);
+    }
+
+    public void setCrashed(UUID tardisId, boolean isCrashed) {
+        boolean changed = isCrashed ? crashed.add(tardisId) : crashed.remove(tardisId);
+        if (changed) setDirty();
+    }
+
+    public @Nullable Long getFlightStart(UUID tardisId) {
+        return flightStartById.get(tardisId);
+    }
+
+    public void setFlightStart(UUID tardisId, @Nullable Long start) {
+        if (start == null) flightStartById.remove(tardisId);
+        else flightStartById.put(tardisId, start);
+        setDirty();
+    }
+
+    public TardisMind mind(UUID tardisId) {
+        TardisMind mind = mindById.get(tardisId);
+        if (mind != null) return mind;
+        mind = TardisMind.roll(tardisId);
+        mindById.put(tardisId, mind);
+        setDirty();
+        return mind;
+    }
+
+    public void setMind(UUID tardisId, TardisMind mind) {
+        mindById.put(tardisId, mind);
         setDirty();
     }
 

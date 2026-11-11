@@ -1,7 +1,7 @@
 package com.noahtnt2009.gallifreyan_chronicles.init;
 
 import com.noahtnt2009.gallifreyan_chronicles.Constants;
-import com.noahtnt2009.gallifreyan_chronicles.command.GCCommands;
+import com.noahtnt2009.gallifreyan_chronicles.init.GCCommands;
 import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
 
 public class GCFabricCommands {

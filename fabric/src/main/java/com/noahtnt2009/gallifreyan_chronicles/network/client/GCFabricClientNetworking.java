@@ -8,6 +8,9 @@ import com.noahtnt2009.gallifreyan_chronicles.network.TardisConsoleAnimationPayl
 import com.noahtnt2009.gallifreyan_chronicles.network.TardisConsoleRotorStatePayload;
 import com.noahtnt2009.gallifreyan_chronicles.network.TardisConsoleSyncPayload;
 import com.noahtnt2009.gallifreyan_chronicles.network.TardisDrumShakePayload;
+import com.noahtnt2009.gallifreyan_chronicles.network.TardisAlarmPayload;
+import com.noahtnt2009.gallifreyan_chronicles.network.DiscoveryToastPayload;
+import com.noahtnt2009.gallifreyan_chronicles.network.TardisCrashRumblePayload;
 import com.noahtnt2009.gallifreyan_chronicles.network.TardisExteriorSyncPayload;
 import com.noahtnt2009.gallifreyan_chronicles.network.TardisInteriorSyncPayload;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
@@ -36,6 +39,15 @@ public final class GCFabricClientNetworking {
                 (payload, context) -> context.client().execute(payload::apply));
 
         ClientPlayNetworking.registerGlobalReceiver(TardisDrumShakePayload.TYPE,
+                (payload, context) -> context.client().execute(payload::apply));
+
+        ClientPlayNetworking.registerGlobalReceiver(TardisAlarmPayload.TYPE,
+                (payload, context) -> context.client().execute(payload::apply));
+
+        ClientPlayNetworking.registerGlobalReceiver(DiscoveryToastPayload.TYPE,
+                (payload, context) -> context.client().execute(payload::apply));
+
+        ClientPlayNetworking.registerGlobalReceiver(TardisCrashRumblePayload.TYPE,
                 (payload, context) -> context.client().execute(payload::apply));
 
         ClientPlayNetworking.registerGlobalReceiver(RematCatchPayload.TYPE,

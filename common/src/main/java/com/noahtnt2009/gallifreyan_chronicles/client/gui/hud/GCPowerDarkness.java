@@ -1,5 +1,6 @@
 package com.noahtnt2009.gallifreyan_chronicles.client.gui.hud;
 
+import com.noahtnt2009.gallifreyan_chronicles.util.TardisDimensions;
 import com.noahtnt2009.gallifreyan_chronicles.client.tardis.RematCatchClient;
 import com.noahtnt2009.gallifreyan_chronicles.Constants;
 import com.noahtnt2009.gallifreyan_chronicles.block.ConsoleBlock;
@@ -18,6 +19,8 @@ import java.util.WeakHashMap;
 
 public final class GCPowerDarkness {
     private static final float MAX_ALPHA = 0.88F;
+    public static final int ALARM_RED = 0xFF1010;
+    public static final float ALARM_MAX_ALPHA = 0.55F;
     private static final float SHADER_MAX_ALPHA = 0.4F;
     public static final float SHADER_BLINDNESS_SCALE = 0.6F;
     private static final float FADE_SECONDS = 1.0F;
@@ -48,6 +51,7 @@ public final class GCPowerDarkness {
     }
 
     public static void reset() {
+        GCDangerAlarm.reset();
         CONSOLES.clear();
         NO_CONSOLE_LEVELS.clear();
         darkness = 0.0F;
@@ -63,8 +67,7 @@ public final class GCPowerDarkness {
     /* only tardis interiors go dark. a console placed and broken outside
        (or left unpowered outside) must not darken the normal world */
     private static boolean isTardisLevel(Level level) {
-        var id = level.dimension().identifier();
-        return id.getNamespace().equals(Constants.MOD_ID) && id.getPath().startsWith("tardis/");
+        return TardisDimensions.isInterior(level);
     }
 
     private static boolean shouldBeDark(Level level) {
@@ -127,12 +130,23 @@ public final class GCPowerDarkness {
     public static float update() {
         Level level = playerLevel(Minecraft.getInstance());
         darkness = level == null ? 0.0F : step(level, System.nanoTime());
-        return darkness * (float) GCConfig.powerDarknessStrength();
+        return Math.max(darkness, GCDangerAlarm.amountFor(level)) * (float) GCConfig.powerDarknessStrength();
     }
 
     public static float darknessOf(Level level) {
         if (level == null) return 0.0F;
+        return Math.max(step(level, System.nanoTime()), GCDangerAlarm.amountFor(level))
+                * (float) GCConfig.powerDarknessStrength();
+    }
+
+    /* just the power-off darkness, no alarm */
+    public static float powerDarknessOf(Level level) {
+        if (level == null) return 0.0F;
         return step(level, System.nanoTime()) * (float) GCConfig.powerDarknessStrength();
+    }
+
+    public static float alarmOf(Level level) {
+        return GCDangerAlarm.amountFor(level) * (float) GCConfig.powerDarknessStrength();
     }
 
     public static float renderLevelDarkness() {
@@ -158,7 +172,9 @@ public final class GCPowerDarkness {
         if (level <= 0.0F) return;
         if (shaderPackHandlesDarkness()) return;
         float maxAlpha = overlayMaxAlpha();
-        int alpha = (int) (level * maxAlpha * 255.0F);
-        graphics.fill(0, 0, minecraft.getWindow().getGuiScaledWidth(), minecraft.getWindow().getGuiScaledHeight(), alpha << 24);
+        boolean alarm = GCDangerAlarm.amountFor(playerLevel(minecraft)) > darkness;
+        int alpha = (int) (level * (alarm ? ALARM_MAX_ALPHA : maxAlpha) * 255.0F);
+        int colour = alarm ? ALARM_RED : 0;
+        graphics.fill(0, 0, minecraft.getWindow().getGuiScaledWidth(), minecraft.getWindow().getGuiScaledHeight(), (alpha << 24) | colour);
     }
 }

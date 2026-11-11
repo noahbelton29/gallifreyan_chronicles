@@ -1,0 +1,95 @@
+package com.noahtnt2009.gallifreyan_chronicles.tardis.mind.discovery;
+
+import com.noahtnt2009.gallifreyan_chronicles.tardis.mind.TardisMind;
+import com.noahtnt2009.gallifreyan_chronicles.tardis.mind.TardisMindSystem;
+import com.noahtnt2009.gallifreyan_chronicles.tardis.mind.TardisPersonality;
+import com.noahtnt2009.gallifreyan_chronicles.tardis.mind.TardisTrait;
+import com.noahtnt2009.gallifreyan_chronicles.tardis.mind.disability.TardisDisability;
+
+import com.noahtnt2009.gallifreyan_chronicles.network.DiscoveryToastPayload;
+import com.noahtnt2009.gallifreyan_chronicles.tardis.api.Tardis;
+import com.noahtnt2009.gallifreyan_chronicles.tardis.api.TardisEvents;
+import com.noahtnt2009.gallifreyan_chronicles.util.GCUtils;
+import net.minecraft.advancements.AdvancementHolder;
+import net.minecraft.server.MinecraftServer;
+import net.minecraft.server.level.ServerPlayer;
+
+import java.util.ArrayList;
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Set;
+
+/* tardises keep their mind to themselves until they show it */
+public final class TardisDiscovery {
+    private static final String ROOT = "tardis_mind/root";
+    private static final float NOTICEABLE = 5f;
+    private static final float OBEDIENT_REVEAL_STRESS = 50f;
+
+    private TardisDiscovery() {
+    }
+
+    public static void init() {
+        TardisEvents.TAKE_OFF.register(TardisDiscovery::onTakeOff);
+        TardisEvents.LAND.register(TardisDiscovery::onLand);
+    }
+
+    /* obedient ones show it by flying anyway when they're properly stressed */
+    private static void onTakeOff(Tardis tardis) {
+        if (TardisMindSystem.mind(tardis).personality() != TardisPersonality.OBEDIENT) return;
+        if (TardisMindSystem.stress(tardis) >= OBEDIENT_REVEAL_STRESS) personality(tardis);
+    }
+
+    private static void onLand(Tardis tardis) {
+        TardisMind mind = TardisMindSystem.mind(tardis);
+        boolean upset = mind.stress() >= NOTICEABLE || mind.fear() >= NOTICEABLE;
+        if (!upset) return;
+        if (mind.has(TardisTrait.FORGIVING)) trait(tardis, TardisTrait.FORGIVING);
+        if (mind.has(TardisTrait.GRUDGE_HOLDER)) trait(tardis, TardisTrait.GRUDGE_HOLDER);
+    }
+
+    public static void personality(Tardis tardis) {
+        String id = TardisMindSystem.mind(tardis).personality().id();
+        reveal(tardis, "personality", id, "personality", "tardis_mind/personality");
+    }
+
+    public static void trait(Tardis tardis, TardisTrait trait) {
+        if (!TardisMindSystem.mind(tardis).has(trait)) return;
+        reveal(tardis, "trait:" + trait.id(), trait.id(), "trait", "tardis_mind/trait");
+    }
+
+    public static void disability(Tardis tardis, TardisDisability disability) {
+        if (!TardisMindSystem.mind(tardis).has(disability)) return;
+        reveal(tardis, "disability:" + disability.id(), disability.id(), "disability", "tardis_mind/" + disability.id());
+    }
+
+    /* only counts as discovered if someone was there to see it */
+    private static void reveal(Tardis tardis, String key, String id, String kind, String advancement) {
+        TardisMind mind = TardisMindSystem.mind(tardis);
+        if (mind.knows(key)) return;
+        List<ServerPlayer> audience = audience(tardis);
+        if (audience.isEmpty()) return;
+
+        List<String> discovered = new ArrayList<>(mind.discovered());
+        discovered.add(key);
+        TardisMindSystem.setDiscovered(tardis, discovered);
+
+        for (ServerPlayer player : audience) {
+            DiscoveryToastPayload.send(player, kind, id);
+            award(player, ROOT);
+            award(player, advancement);
+        }
+    }
+
+    private static List<ServerPlayer> audience(Tardis tardis) {
+        Set<ServerPlayer> players = new LinkedHashSet<>();
+        tardis.interiorLevel().ifPresent(level -> players.addAll(level.players()));
+        tardis.ownerPlayer().ifPresent(players::add);
+        return List.copyOf(players);
+    }
+
+    private static void award(ServerPlayer player, String path) {
+        MinecraftServer server = player.level().getServer();
+        AdvancementHolder holder = server.getAdvancements().get(GCUtils.modIdentifier(path));
+        if (holder != null) player.getAdvancements().award(holder, "discovered");
+    }
+}

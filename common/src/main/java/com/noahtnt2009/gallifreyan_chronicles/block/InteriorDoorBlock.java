@@ -31,7 +31,9 @@ import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
+import java.util.ArrayList;
 import java.util.EnumMap;
+import java.util.List;
 import java.util.Map;
 import org.jetbrains.annotations.NotNull;
 import org.jspecify.annotations.NonNull;
@@ -186,19 +188,26 @@ public class InteriorDoorBlock extends BaseEntityBlock {
                 .relative(facing.getOpposite());
     }
 
-    public static boolean isBackBlocked(Level level, BlockPos master, BlockState state) {
-        if (isFlush(state)) return false;
+    private static List<BlockPos> barrierPositions(BlockPos master, BlockState state) {
         Direction facing = state.getValue(FACING);
         boolean flipped = isFlipped(state);
+        List<BlockPos> positions = new ArrayList<>();
         for (int x = 0; x < WIDTH; x++) {
             for (int y = 0; y < HEIGHT; y++) {
-                BlockPos p = barrierPos(master, facing, flipped, x, y);
-                if (level.isOutsideBuildHeight(p)) continue;
-                BlockState existing = level.getBlockState(p);
-                if (existing.is(GCBlocks.INTERIOR_DOOR_BARRIER) || existing.canBeReplaced()) continue;
-                if (existing.getCollisionShape(level, p).isEmpty()) continue;
-                return true;
+                positions.add(barrierPos(master, facing, flipped, x, y));
             }
+        }
+        return positions;
+    }
+
+    public static boolean isBackBlocked(Level level, BlockPos master, BlockState state) {
+        if (isFlush(state)) return false;
+        for (BlockPos p : barrierPositions(master, state)) {
+            if (level.isOutsideBuildHeight(p)) continue;
+            BlockState existing = level.getBlockState(p);
+            if (existing.is(GCBlocks.INTERIOR_DOOR_BARRIER) || existing.canBeReplaced()) continue;
+            if (existing.getCollisionShape(level, p).isEmpty()) continue;
+            return true;
         }
         return false;
     }
@@ -210,14 +219,9 @@ public class InteriorDoorBlock extends BaseEntityBlock {
 
     public static void removeBarriers(Level level, BlockPos master, BlockState state) {
         if (level.isClientSide() || isFlush(state)) return;
-        Direction facing = state.getValue(FACING);
-        boolean flipped = isFlipped(state);
-        for (int x = 0; x < WIDTH; x++) {
-            for (int y = 0; y < HEIGHT; y++) {
-                BlockPos p = barrierPos(master, facing, flipped, x, y);
-                if (level.getBlockState(p).is(GCBlocks.INTERIOR_DOOR_BARRIER)) {
-                    level.setBlock(p, Blocks.AIR.defaultBlockState(), Block.UPDATE_ALL | Block.UPDATE_SUPPRESS_DROPS);
-                }
+        for (BlockPos p : barrierPositions(master, state)) {
+            if (level.getBlockState(p).is(GCBlocks.INTERIOR_DOOR_BARRIER)) {
+                level.setBlock(p, Blocks.AIR.defaultBlockState(), Block.UPDATE_ALL | Block.UPDATE_SUPPRESS_DROPS);
             }
         }
     }

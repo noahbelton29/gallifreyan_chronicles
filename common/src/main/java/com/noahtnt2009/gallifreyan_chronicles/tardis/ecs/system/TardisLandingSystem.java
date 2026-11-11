@@ -20,7 +20,7 @@ public final class TardisLandingSystem {
     private TardisLandingSystem() {
     }
 
-    private static BlockPos findLandingSpot(ServerLevel level, BlockPos pos) {
+    public static BlockPos findLandingSpot(ServerLevel level, BlockPos pos) {
         if (isStandable(level, pos)) return pos;
 
         int range = level.getMaxY() - level.getMinY();

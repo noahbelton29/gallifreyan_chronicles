@@ -1,5 +1,8 @@
 package com.noahtnt2009.gallifreyan_chronicles.block.entity;
 
+import com.noahtnt2009.gallifreyan_chronicles.util.BlockEntitySync;
+
+import com.noahtnt2009.gallifreyan_chronicles.util.TardisDimensions;
 import com.noahtnt2009.gallifreyan_chronicles.Constants;
 import com.noahtnt2009.gallifreyan_chronicles.tardis.flight.TardisFlightState;
 import com.noahtnt2009.gallifreyan_chronicles.tardis.api.Tardis;
@@ -158,12 +161,14 @@ public class TardisConsoleBlockEntity extends BlockEntity implements GeoBlockEnt
     /* true when this console is inside a tardis interior. one placed anywhere
        else is just decoration: controls only animate, no lights, no hum */
     public boolean isInTardis() {
-        if (level == null) return false;
-        var id = level.dimension().identifier();
-        return id.getNamespace().equals(Constants.MOD_ID) && id.getPath().startsWith("tardis/");
+        return TardisDimensions.isInterior(level);
     }
 
     /* outside a tardis: move the control and play its animation, nothing else */
+    public void playControlAnimationOnly(String id, boolean activated) {
+        controls.playControlAnimation(id, activated, null);
+    }
+
     public void animateControlOnly(String id, boolean activated, @Nullable Player triggeringPlayer) {
         controls.setControlState(id, activated);
         controls.playControlAnimation(id, activated, triggeringPlayer);
@@ -284,10 +289,7 @@ public class TardisConsoleBlockEntity extends BlockEntity implements GeoBlockEnt
     }
 
     public void sync() {
-        if (level != null) {
-            setChanged();
-            level.sendBlockUpdated(getBlockPos(), getBlockState(), getBlockState(), 3);
-        }
+        BlockEntitySync.sendToClients(this);
     }
 
     public void setConsole(TardisConsole console) {

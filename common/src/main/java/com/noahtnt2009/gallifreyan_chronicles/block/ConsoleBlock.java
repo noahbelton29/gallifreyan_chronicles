@@ -1,5 +1,9 @@
 package com.noahtnt2009.gallifreyan_chronicles.block;
 
+import com.noahtnt2009.gallifreyan_chronicles.util.PlayerMotion;
+
+import com.noahtnt2009.gallifreyan_chronicles.util.ConsoleStacks;
+
 import com.noahtnt2009.gallifreyan_chronicles.Constants;
 import com.noahtnt2009.gallifreyan_chronicles.block.entity.TardisConsoleBlockEntity;
 import com.noahtnt2009.gallifreyan_chronicles.init.GCDataComponents;
@@ -85,10 +89,7 @@ public class ConsoleBlock extends BaseEntityBlock {
         float yaw = livingEntity.getYRot() * ((float) Math.PI / 180F);
         double power = 0.3;
 
-        livingEntity.setDeltaMovement(Math.sin(yaw) * power, 0.3, -Math.cos(yaw) * power);
-        if (livingEntity instanceof ServerPlayer sp) {
-            sp.connection.send(new ClientboundSetEntityMotionPacket(sp));
-        }
+        PlayerMotion.set(livingEntity, new Vec3(Math.sin(yaw) * power, 0.3, -Math.cos(yaw) * power));
         level.playSound(null, pos, GCSounds.TARDIS_CLOISTER_BELL, SoundSource.BLOCKS);
     }
 
@@ -153,15 +154,6 @@ public class ConsoleBlock extends BaseEntityBlock {
                                                    @NonNull BlockState state, boolean includeData) {
         ItemStack stack = super.getCloneItemStack(level, pos, state, includeData);
         if (!(level.getBlockEntity(pos) instanceof TardisConsoleBlockEntity console)) return stack;
-
-        TardisConsole model = console.getConsole();
-        if (model == null) return stack;
-        stack.set(GCDataComponents.CONSOLE_ID, model.id());
-
-        String variantId = console.getVariant();
-        if (variantId != null && !variantId.isEmpty() && model.hasVariant(variantId)) {
-            stack.set(GCDataComponents.CONSOLE_VARIANT, variantId.substring(variantId.indexOf(':') + 1));
-        }
-        return stack;
+        return ConsoleStacks.withConsoleData(stack, console);
     }
 }

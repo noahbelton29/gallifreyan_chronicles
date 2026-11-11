@@ -1,5 +1,7 @@
 package com.noahtnt2009.gallifreyan_chronicles.tardis.console;
 
+import com.noahtnt2009.gallifreyan_chronicles.util.GCUtils;
+
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import com.noahtnt2009.gallifreyan_chronicles.data.IdentifiableData;
@@ -31,8 +33,7 @@ public record TardisConsoleVariant(String id, String parent, String texture, Map
     );
 
     public String localId() {
-        int colon = id.indexOf(':');
-        return colon < 0 ? id : id.substring(colon + 1);
+        return GCUtils.localPath(id);
     }
 
     public @Nullable String glowTexture(String groupName) {

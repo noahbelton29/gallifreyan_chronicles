@@ -1,5 +1,9 @@
 package com.noahtnt2009.gallifreyan_chronicles.client.renderer;
 
+import com.noahtnt2009.gallifreyan_chronicles.client.util.FadeTint;
+
+import com.noahtnt2009.gallifreyan_chronicles.client.util.ModelRenderRange;
+
 import com.noahtnt2009.gallifreyan_chronicles.config.GCConfig;
 import com.geckolib.constant.dataticket.DataTicket;
 import com.geckolib.renderer.GeoBlockRenderer;
@@ -71,11 +75,7 @@ public class TardisExteriorBlockRenderer extends GeoBlockRenderer<@NotNull Tardi
     @Override
     public int getRenderColor(TardisExteriorBlockEntity animatable, @Nullable Void relatedObject, float partialTick) {
         float opacity = Math.clamp(animatable.getOpacity(partialTick), 0.0f, 1.0f);
-        float faded = 1.0f - opacity;
-        int alpha = Math.round(opacity * 255.0f);
-        int red = Math.round((1.0f - 0.25f * faded) * 255.0f);
-        int green = Math.round((1.0f - 0.08f * faded) * 255.0f);
-        return (alpha << 24) | (red << 16) | (green << 8) | 0xFF;
+        return FadeTint.of(opacity);
     }
 
     @Override
@@ -143,9 +143,7 @@ public class TardisExteriorBlockRenderer extends GeoBlockRenderer<@NotNull Tardi
 
     @Override
     public boolean shouldRender(@NonNull TardisExteriorBlockEntity blockEntity, @NonNull Vec3 cameraPos) {
-        if (RenderLevelGuard.isForeign(blockEntity.getLevel())) return false;
-        double range = GCConfig.modelRenderDistance();
-        return Vec3.atCenterOf(blockEntity.getBlockPos()).distanceToSqr(cameraPos) < range * range;
+        return ModelRenderRange.inRangeAndLocal(blockEntity, cameraPos);
     }
 
     @Override

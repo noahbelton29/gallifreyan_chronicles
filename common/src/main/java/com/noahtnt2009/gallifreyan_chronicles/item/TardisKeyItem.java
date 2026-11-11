@@ -1,5 +1,6 @@
 package com.noahtnt2009.gallifreyan_chronicles.item;
 
+import com.noahtnt2009.gallifreyan_chronicles.util.Messages;
 import com.noahtnt2009.gallifreyan_chronicles.tardis.manager.TardisManager;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.Entity;
@@ -71,7 +72,7 @@ public class TardisKeyItem extends Item implements ScrollSelectable {
             }
         }
 
-        player.sendOverlayMessage(Component.translatable("message.gallifreyan_chronicles.key_linked"));
+        Messages.overlay(player, "key_linked");
         return InteractionResult.CONSUME;
     }
 
@@ -132,7 +133,7 @@ public class TardisKeyItem extends Item implements ScrollSelectable {
             }
             if (exterior.isWrongKeyLockedOut(player, stack)) return InteractionResult.FAIL;
             if (!exterior.areDoorsFullyClosed()) {
-                player.sendOverlayMessage(Component.translatable("message.gallifreyan_chronicles.close_doors_to_insert_key"));
+                Messages.overlay(player, "close_doors_to_insert_key");
                 return InteractionResult.FAIL;
             }
             exterior.insertWrongKey(player, context.getHand(), stack);
@@ -147,7 +148,7 @@ public class TardisKeyItem extends Item implements ScrollSelectable {
             if (exterior.rejectKeyIfLockBroken(player)) return InteractionResult.FAIL;
 
             if (!exterior.areDoorsFullyClosed()) {
-                player.sendOverlayMessage(Component.translatable("message.gallifreyan_chronicles.close_doors_to_insert_key"));
+                Messages.overlay(player, "close_doors_to_insert_key");
                 return InteractionResult.FAIL;
             }
 

@@ -1,5 +1,7 @@
 package com.noahtnt2009.gallifreyan_chronicles.mixin.server;
 
+import com.noahtnt2009.gallifreyan_chronicles.tardis.mind.mood.TardisAlarm;
+
 import com.noahtnt2009.gallifreyan_chronicles.compat.voicechat.TardisVoiceLinks;
 import com.noahtnt2009.gallifreyan_chronicles.compat.portal.TardisPortalBridge;
 import com.noahtnt2009.gallifreyan_chronicles.tardis.exterior.TardisKeyLocator;
@@ -27,6 +29,7 @@ public abstract class MinecraftServerMixin {
         GCServerState.onServerStart();
         TardisPortalBridge.reset();
         TardisDimensionManager.restoreAll(server);
+        TardisAlarm.resumeCrashAlarms(server);
         TimedSounds.onServerStart(server);
         TardisPortalBridge.onDimensionsChanged(server);
     }

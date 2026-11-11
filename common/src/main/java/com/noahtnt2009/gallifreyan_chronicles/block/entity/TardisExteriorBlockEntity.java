@@ -1,5 +1,8 @@
 package com.noahtnt2009.gallifreyan_chronicles.block.entity;
 
+import com.noahtnt2009.gallifreyan_chronicles.util.Messages;
+import com.noahtnt2009.gallifreyan_chronicles.util.BlockEntitySync;
+
 import com.noahtnt2009.gallifreyan_chronicles.util.GameClock;
 import com.noahtnt2009.gallifreyan_chronicles.tardis.exterior.RematCatch;
 import com.noahtnt2009.gallifreyan_chronicles.client.GCClientHooks;
@@ -7,6 +10,7 @@ import com.noahtnt2009.gallifreyan_chronicles.block.TardisTopBlock;
 import com.noahtnt2009.gallifreyan_chronicles.tardis.door.TardisDoorRegistry;
 import com.noahtnt2009.gallifreyan_chronicles.tardis.api.Tardis;
 import com.noahtnt2009.gallifreyan_chronicles.tardis.api.TardisApi;
+import com.noahtnt2009.gallifreyan_chronicles.tardis.mind.mood.TardisMoods;
 import com.geckolib.animatable.GeoBlockEntity;
 import com.geckolib.animatable.instance.AnimatableInstanceCache;
 import com.geckolib.animatable.manager.AnimatableManager;
@@ -403,6 +407,16 @@ public class TardisExteriorBlockEntity extends BlockEntity implements GeoBlockEn
         }
     }
 
+    public void vanishInstantly() {
+        if (level == null || level.isClientSide()) return;
+        flight.vanish(GameClock.now(level));
+        BlockState state = getBlockState();
+        if (state.hasProperty(TardisBlock.IN_FLIGHT) && !state.getValue(TardisBlock.IN_FLIGHT)) {
+            level.setBlock(worldPosition, state.setValue(TardisBlock.IN_FLIGHT, true), Block.UPDATE_ALL);
+        }
+        sync();
+    }
+
     public void scheduleLanding(int delayTicks) {
         if (level == null || level.isClientSide()) return;
         if (flight.scheduleLanding(GameClock.now(level), delayTicks)) setChanged();
@@ -616,8 +630,7 @@ public class TardisExteriorBlockEntity extends BlockEntity implements GeoBlockEn
             wrongKeyLockouts.remove(keyIdOf(key));
             return false;
         }
-        player.sendOverlayMessage(Component.translatable("message.gallifreyan_chronicles.key_lockout",
-                (remaining + 19L) / 20L).withStyle(ChatFormatting.RED));
+        Messages.overlay(player, ChatFormatting.RED, "key_lockout", (remaining + 19L) / 20L);
         return true;
     }
 
@@ -628,6 +641,7 @@ public class TardisExteriorBlockEntity extends BlockEntity implements GeoBlockEn
         long now = GameClock.now(serverLevel);
         wrongKeyLockouts.values().removeIf(until -> until <= now);
         wrongKeyLockouts.put(keyId, now + WRONG_KEY_LOCKOUT_TICKS);
+        TardisApi.get(serverLevel.getServer(), getTardisId()).ifPresent(TardisMoods::onWrongKey);
 
         insertKey(player, hand, held);
 
@@ -650,8 +664,7 @@ public class TardisExteriorBlockEntity extends BlockEntity implements GeoBlockEn
             if (!owner.getInventory().add(returned)) {
                 owner.drop(returned, false, Prediction.SERVER_ONLY);
             }
-            owner.sendOverlayMessage(
-                    Component.translatable("message.gallifreyan_chronicles.wrong_key").withStyle(ChatFormatting.RED));
+            Messages.overlay(owner, ChatFormatting.RED, "wrong_key");
         });
     }
 
@@ -666,8 +679,7 @@ public class TardisExteriorBlockEntity extends BlockEntity implements GeoBlockEn
         }
         ExteriorSounds.keyJammed(level, getBlockPos());
         if (player != null) {
-            player.sendOverlayMessage(
-                    Component.translatable("message.gallifreyan_chronicles.lock_too_damaged").withStyle(ChatFormatting.RED));
+            Messages.overlay(player, ChatFormatting.RED, "lock_too_damaged");
         }
         return true;
     }
@@ -716,7 +728,7 @@ public class TardisExteriorBlockEntity extends BlockEntity implements GeoBlockEn
         triggerAnim("key_controller", "key_jammed");
         ExteriorSounds.keyJammed(level, getBlockPos());
         if (player != null) {
-            player.sendOverlayMessage(Component.translatable("message.gallifreyan_chronicles.lock_jammed").withStyle(ChatFormatting.RED));
+            Messages.overlay(player, ChatFormatting.RED, "lock_jammed");
         }
     }
 
@@ -817,10 +829,7 @@ public class TardisExteriorBlockEntity extends BlockEntity implements GeoBlockEn
     }
 
     public void sync() {
-        if (level != null) {
-            setChanged();
-            level.sendBlockUpdated(getBlockPos(), getBlockState(), getBlockState(), 3);
-        }
+        BlockEntitySync.sendToClients(this);
     }
 
     @Override

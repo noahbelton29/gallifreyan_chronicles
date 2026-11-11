@@ -1,5 +1,6 @@
 package com.noahtnt2009.gallifreyan_chronicles.item;
 
+import com.noahtnt2009.gallifreyan_chronicles.util.Messages;
 import com.noahtnt2009.gallifreyan_chronicles.init.GCDataComponents;
 import com.noahtnt2009.gallifreyan_chronicles.tardis.api.TardisApi;
 import com.noahtnt2009.gallifreyan_chronicles.block.entity.TardisExteriorBlockEntity;
@@ -50,7 +51,7 @@ public class MasterTardisKeyItem extends Item implements ScrollSelectable {
         if (exterior.rejectKeyIfLockBroken(player)) return InteractionResult.FAIL;
 
         if (!exterior.areDoorsFullyClosed()) {
-            player.sendOverlayMessage(Component.translatable("message.gallifreyan_chronicles.close_doors_to_insert_key"));
+            Messages.overlay(player, "close_doors_to_insert_key");
             return InteractionResult.FAIL;
         }
 

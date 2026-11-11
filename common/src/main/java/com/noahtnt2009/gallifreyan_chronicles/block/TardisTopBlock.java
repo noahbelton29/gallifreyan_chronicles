@@ -1,5 +1,7 @@
 package com.noahtnt2009.gallifreyan_chronicles.block;
 
+import com.noahtnt2009.gallifreyan_chronicles.util.ExteriorCollision;
+
 import com.noahtnt2009.gallifreyan_chronicles.block.entity.TardisExteriorBlockEntity;
 import com.noahtnt2009.gallifreyan_chronicles.init.GCBlocks;
 import net.minecraft.core.BlockPos;
@@ -80,11 +82,7 @@ public class TardisTopBlock extends Block {
     @Override
     protected @NonNull VoxelShape getCollisionShape(@NonNull BlockState state, @NonNull BlockGetter level,
                                                     @NonNull BlockPos pos, @NonNull CollisionContext context) {
-        if (level.getBlockEntity(pos.below()) instanceof TardisExteriorBlockEntity tardis
-                && (tardis.isFullyInvisible() || !tardis.getDoorState().isClosed())) {
-            return Shapes.empty();
-        }
-        return Shapes.block();
+        return ExteriorCollision.shape(level, pos.below());
     }
 
     @Override

@@ -1,0 +1,23 @@
+{
+  "display": {
+    "icon": {
+      "id": "gallifreyan_chronicles:tardis_key"
+    },
+    "title": {
+      "translate": "advancement.gallifreyan_chronicles.tardis_mind.root.title"
+    },
+    "description": {
+      "translate": "advancement.gallifreyan_chronicles.tardis_mind.root.description"
+    },
+    "frame": "task",
+    "show_toast": false,
+    "announce_to_chat": false,
+    "hidden": false,
+    "background": "minecraft:gui/advancements/backgrounds/stone"
+  },
+  "criteria": {
+    "discovered": {
+      "trigger": "minecraft:impossible"
+    }
+  }
+}

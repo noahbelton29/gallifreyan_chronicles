@@ -1,0 +1,23 @@
+{
+  "parent": "gallifreyan_chronicles:tardis_mind/root",
+  "display": {
+    "icon": {
+      "id": "gallifreyan_chronicles:tardis"
+    },
+    "title": {
+      "translate": "advancement.gallifreyan_chronicles.tardis_mind.personality.title"
+    },
+    "description": {
+      "translate": "advancement.gallifreyan_chronicles.tardis_mind.personality.description"
+    },
+    "frame": "task",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "criteria": {
+    "discovered": {
+      "trigger": "minecraft:impossible"
+    }
+  }
+}

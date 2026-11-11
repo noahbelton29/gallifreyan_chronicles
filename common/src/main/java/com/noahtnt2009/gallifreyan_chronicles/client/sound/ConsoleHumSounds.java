@@ -1,5 +1,6 @@
 package com.noahtnt2009.gallifreyan_chronicles.client.sound;
 
+import com.noahtnt2009.gallifreyan_chronicles.util.TardisDimensions;
 import com.noahtnt2009.gallifreyan_chronicles.Constants;
 import com.noahtnt2009.gallifreyan_chronicles.block.entity.TardisConsoleBlockEntity;
 import net.minecraft.client.Minecraft;
@@ -21,9 +22,7 @@ public final class ConsoleHumSounds {
     }
 
     private static boolean isTardisLevel(TardisConsoleBlockEntity console) {
-        if (console.getLevel() == null) return false;
-        var id = console.getLevel().dimension().identifier();
-        return id.getNamespace().equals(Constants.MOD_ID) && id.getPath().startsWith("tardis/");
+        return TardisDimensions.isInterior(console.getLevel());
     }
 
     public static void track(TardisConsoleBlockEntity console) {

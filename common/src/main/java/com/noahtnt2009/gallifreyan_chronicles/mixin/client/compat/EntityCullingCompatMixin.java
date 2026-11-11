@@ -1,5 +1,6 @@
 package com.noahtnt2009.gallifreyan_chronicles.mixin.client.compat;
 
+import com.noahtnt2009.gallifreyan_chronicles.util.TardisDimensions;
 import com.noahtnt2009.gallifreyan_chronicles.Constants;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.player.LocalPlayer;
@@ -56,8 +57,7 @@ public abstract class EntityCullingCompatMixin {
         if (level == null) {
             return false;
         }
-        Identifier dimension = level.dimension().identifier();
-        if (dimension.getNamespace().equals(Constants.MOD_ID) && dimension.getPath().startsWith("tardis/")) {
+        if (TardisDimensions.isInterior(level)) {
             return true;
         }
         LocalPlayer player = Minecraft.getInstance().player;

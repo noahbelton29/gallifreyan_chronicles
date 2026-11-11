@@ -41,18 +41,7 @@ public class InteriorDoorControl extends BaseControl {
         }
         if (entity.level() instanceof ServerLevel) {
             Optional<Tardis> tardis = tardis(console);
-            if (tardis.isEmpty()) {
-                return InteractionResult.FAIL;
-            }
-            if (tardis.get().isLocked()) {
-                tell(player, "message.gallifreyan_chronicles.doors_locked");
-                return InteractionResult.FAIL;
-            }
-            if (tardis.get().areDoorsSealedForTravel()) {
-                DoorSyncSystem.announceSealed(tardis.get().id());
-                tell(player, "message.gallifreyan_chronicles.doors_sealed");
-                return InteractionResult.FAIL;
-            }
+            if (tardis.isEmpty() || doorsBlocked(tardis.get(), player)) return InteractionResult.FAIL;
         }
         return InteractionResult.SUCCESS;
     }

@@ -1,5 +1,8 @@
 package com.noahtnt2009.gallifreyan_chronicles.block;
 
+import com.noahtnt2009.gallifreyan_chronicles.util.Messages;
+import com.noahtnt2009.gallifreyan_chronicles.util.ExteriorCollision;
+
 import com.noahtnt2009.gallifreyan_chronicles.compat.portal.TardisPortalBridge;
 import com.noahtnt2009.gallifreyan_chronicles.tardis.api.TardisApi;
 import com.noahtnt2009.gallifreyan_chronicles.Constants;
@@ -149,7 +152,7 @@ public class TardisBlock extends BaseEntityBlock {
                     TardisApi.of(tardis).ifPresent(api -> api.returnKeyTo(player));
                     return InteractionResult.CONSUME;
                 } else {
-                    player.sendOverlayMessage(Component.translatable("message.gallifreyan_chronicles.close_doors_to_remove_key"));
+                    Messages.overlay(player, "close_doors_to_remove_key");
                     return InteractionResult.FAIL;
                 }
             }
@@ -159,7 +162,7 @@ public class TardisBlock extends BaseEntityBlock {
             }
 
             if (player.isShiftKeyDown()) {
-                player.sendOverlayMessage(Component.translatable("message.gallifreyan_chronicles.not_your_key"));
+                Messages.overlay(player, "not_your_key");
             }
 
             return InteractionResult.CONSUME;
@@ -197,11 +200,7 @@ public class TardisBlock extends BaseEntityBlock {
     @Override
     protected @NonNull VoxelShape getCollisionShape(@NonNull BlockState state, @NonNull BlockGetter level,
                                                     @NonNull BlockPos pos, @NonNull CollisionContext context) {
-        if (level.getBlockEntity(pos) instanceof TardisExteriorBlockEntity tardis
-                && (tardis.isFullyInvisible() || !tardis.getDoorState().isClosed())) {
-            return Shapes.empty();
-        }
-        return Shapes.block();
+        return ExteriorCollision.shape(level, pos);
     }
 
     @Override

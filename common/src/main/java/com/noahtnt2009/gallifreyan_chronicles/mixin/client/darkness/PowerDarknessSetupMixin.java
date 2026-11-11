@@ -1,6 +1,8 @@
 package com.noahtnt2009.gallifreyan_chronicles.mixin.client.darkness;
 
+import com.noahtnt2009.gallifreyan_chronicles.client.gui.hud.GCDangerAlarm;
 import com.noahtnt2009.gallifreyan_chronicles.client.gui.hud.GCPowerDarkness;
+import com.noahtnt2009.gallifreyan_chronicles.config.GCConfig;
 import net.minecraft.client.Camera;
 import net.minecraft.client.DeltaTracker;
 import net.minecraft.client.Minecraft;
@@ -20,12 +22,16 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 public abstract class PowerDarknessSetupMixin {
     @Unique
     private static final float MIN_FOG_END = 14.0F;
+    @Unique
+    private static final float ALARM_CURVE = 0.3F;
 
     @Inject(method = "setupFog", at = @At("HEAD"), cancellable = true)
     private void gcPowerDarkSetup(FogData fog, Camera camera, ClientLevel level, float renderDistance,
                                   DeltaTracker deltaTracker, CallbackInfo ci) {
         float darkness = GCPowerDarkness.darknessOf(level);
         if (darkness <= 0.0F) return;
+        float alarm = GCDangerAlarm.amountFor(level) * (float) GCConfig.powerDarknessStrength();
+        if (alarm > 0.0F && alarm >= darkness) darkness = (float) Math.pow(alarm, ALARM_CURVE);
         if (camera.entity() instanceof LivingEntity living && living.hasEffect(MobEffects.BLINDNESS)) return;
 
         float far = Minecraft.getInstance().options.getEffectiveRenderDistance() * 16.0F;

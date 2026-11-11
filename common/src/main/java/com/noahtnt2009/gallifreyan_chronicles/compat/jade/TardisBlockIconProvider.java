@@ -1,5 +1,7 @@
 package com.noahtnt2009.gallifreyan_chronicles.compat.jade;
 
+import com.noahtnt2009.gallifreyan_chronicles.util.ConsoleStacks;
+
 import com.noahtnt2009.gallifreyan_chronicles.block.entity.TardisConsoleBlockEntity;
 import com.noahtnt2009.gallifreyan_chronicles.block.entity.TardisExteriorBlockEntity;
 import com.noahtnt2009.gallifreyan_chronicles.init.GCBlocks;
@@ -33,15 +35,7 @@ public class TardisBlockIconProvider implements IBlockComponentProvider {
     }
 
     public static ItemStack consoleStack(TardisConsoleBlockEntity console) {
-        ItemStack stack = new ItemStack(GCBlocks.TARDIS_CONSOLE);
-        TardisConsole model = console.getConsole();
-        if (model == null) return stack;
-        stack.set(GCDataComponents.CONSOLE_ID, model.id());
-        String variantId = console.getVariant();
-        if (variantId != null && !variantId.isEmpty() && model.hasVariant(variantId)) {
-            stack.set(GCDataComponents.CONSOLE_VARIANT, variantId.substring(variantId.indexOf(':') + 1));
-        }
-        return stack;
+        return ConsoleStacks.withConsoleData(new ItemStack(GCBlocks.TARDIS_CONSOLE), console);
     }
 
     private static ItemStack exteriorStack(TardisExteriorBlockEntity exterior) {

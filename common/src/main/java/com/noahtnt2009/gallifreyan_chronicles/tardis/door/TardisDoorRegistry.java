@@ -1,5 +1,7 @@
 package com.noahtnt2009.gallifreyan_chronicles.tardis.door;
 
+import com.noahtnt2009.gallifreyan_chronicles.util.GCUtils;
+
 import com.noahtnt2009.gallifreyan_chronicles.Constants;
 import org.jspecify.annotations.Nullable;
 
@@ -116,8 +118,7 @@ public final class TardisDoorRegistry {
     }
 
     public static String localId(String id) {
-        int colon = id.indexOf(':');
-        return colon < 0 ? id : id.substring(colon + 1);
+        return GCUtils.localPath(id);
     }
 
     public static void validate() {

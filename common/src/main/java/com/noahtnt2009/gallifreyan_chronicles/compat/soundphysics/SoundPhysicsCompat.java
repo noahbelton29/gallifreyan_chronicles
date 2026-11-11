@@ -1,5 +1,6 @@
 package com.noahtnt2009.gallifreyan_chronicles.compat.soundphysics;
 
+import com.noahtnt2009.gallifreyan_chronicles.util.TardisDimensions;
 import com.noahtnt2009.gallifreyan_chronicles.Constants;
 import com.noahtnt2009.gallifreyan_chronicles.client.gui.hud.GCPowerDarkness;
 import com.noahtnt2009.gallifreyan_chronicles.init.GCDimensions;
@@ -23,8 +24,7 @@ public final class SoundPhysicsCompat {
         ClientLevel level = Minecraft.getInstance().level;
         if (level == null) return false;
         if (level.dimension().equals(GCDimensions.TARDIS_INTERIOR_LEVEL_KEY)) return true;
-        Identifier id = level.dimension().identifier();
-        return id.getNamespace().equals(Constants.MOD_ID) && id.getPath().startsWith("tardis/");
+        return TardisDimensions.isInterior(level);
     }
 
     public static float tardisEcho() {

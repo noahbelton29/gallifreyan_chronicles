@@ -1,6 +1,9 @@
 package com.noahtnt2009.gallifreyan_chronicles.init;
 
+import com.noahtnt2009.gallifreyan_chronicles.item.MalletItem;
+
 import com.noahtnt2009.gallifreyan_chronicles.Constants;
+import com.noahtnt2009.gallifreyan_chronicles.item.StattenheimRemoteItem;
 import com.noahtnt2009.gallifreyan_chronicles.item.TardisKeyItem;
 import com.noahtnt2009.gallifreyan_chronicles.item.MasterTardisKeyItem;
 import com.noahtnt2009.gallifreyan_chronicles.util.GCUtils;
@@ -31,6 +34,9 @@ public class GCItems {
     public static final Item MASTER_TARDIS_KEY = registerItem("master_tardis_key",
             properties -> new MasterTardisKeyItem(properties.component(
                     DataComponents.ENCHANTMENT_GLINT_OVERRIDE, true).fireResistant()));
+
+    public static final Item MALLET = registerItem("mallet", properties -> new MalletItem(properties.stacksTo(1)));
+    public static final Item STATTENHEIM_REMOTE = registerItem("stattenheim_remote", properties -> new StattenheimRemoteItem(properties.stacksTo(1)));
 
     // TOOLS
     public static final Item TARANIUM_SWORD = registerItem("taranium_sword",

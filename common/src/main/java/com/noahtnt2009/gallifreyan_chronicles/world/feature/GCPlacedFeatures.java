@@ -67,40 +67,15 @@ public class GCPlacedFeatures {
                 ))
         );
 
-        register(context, GALLIFREYAN_STONE_PATCH, gallifreyanStonePatch,
-                RarityFilter.onAverageOnceEvery(8),
-                InSquarePlacement.spread(),
-                PlacementUtils.HEIGHTMAP_WORLD_SURFACE,
-                BiomeFilter.biome()
-        );
+        register(context, GALLIFREYAN_STONE_PATCH, gallifreyanStonePatch, rareOnSurface(8));
 
-        register(context, GALLIFREYAN_MUDSTONE_PATCH, gallifreyanMudstonePatch,
-                RarityFilter.onAverageOnceEvery(14),
-                InSquarePlacement.spread(),
-                PlacementUtils.HEIGHTMAP_WORLD_SURFACE,
-                BiomeFilter.biome()
-        );
+        register(context, GALLIFREYAN_MUDSTONE_PATCH, gallifreyanMudstonePatch, rareOnSurface(14));
 
-        register(context, GALLIFREYAN_STONE_BOULDER, gallifreyanBoulder,
-                RarityFilter.onAverageOnceEvery(12),
-                InSquarePlacement.spread(),
-                PlacementUtils.HEIGHTMAP_WORLD_SURFACE,
-                BiomeFilter.biome()
-        );
+        register(context, GALLIFREYAN_STONE_BOULDER, gallifreyanBoulder, rareOnSurface(12));
 
-        register(context, MOON_BOULDER, moonBoulder,
-                RarityFilter.onAverageOnceEvery(15),
-                InSquarePlacement.spread(),
-                PlacementUtils.HEIGHTMAP_WORLD_SURFACE,
-                BiomeFilter.biome()
-        );
+        register(context, MOON_BOULDER, moonBoulder, rareOnSurface(15));
 
-        register(context, GALLIFREYAN_ARCADIAN_SHALE_BOULDER, gallifreyanArcadianShaleBoulder,
-                RarityFilter.onAverageOnceEvery(16),
-                InSquarePlacement.spread(),
-                PlacementUtils.HEIGHTMAP_WORLD_SURFACE,
-                BiomeFilter.biome()
-        );
+        register(context, GALLIFREYAN_ARCADIAN_SHALE_BOULDER, gallifreyanArcadianShaleBoulder, rareOnSurface(16));
 
         register(context, PATCH_GALLIFREY_GRASS_PLAIN, grass,
                 NoiseThresholdCountPlacement.of(-0.8, 5, 10),
@@ -173,6 +148,14 @@ public class GCPlacedFeatures {
 
     public static ResourceKey<PlacedFeature> registerKey(String name) {
         return ResourceKey.create(Registries.PLACED_FEATURE, GCUtils.modIdentifier(name));
+    }
+
+    private static List<PlacementModifier> rareOnSurface(int onceEvery) {
+        return List.of(
+                RarityFilter.onAverageOnceEvery(onceEvery),
+                InSquarePlacement.spread(),
+                PlacementUtils.HEIGHTMAP_WORLD_SURFACE,
+                BiomeFilter.biome());
     }
 
     private static PlacementModifier triangleOffset(int xzSpread, int ySpread) {

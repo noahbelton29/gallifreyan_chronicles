@@ -28,7 +28,7 @@ public class TardisConsoleInfoProvider implements IBlockComponentProvider {
 
         String variantId = console.getVariant();
         if (variantId == null || variantId.isEmpty() || model.variants().size() < 2) return;
-        TardisConsoleVariant variant = TardisConsoleRegistry.getVariant(variantId.substring(variantId.indexOf(':') + 1));
+        TardisConsoleVariant variant = TardisConsoleRegistry.getVariant(GCUtils.localPath(variantId));
         String fullId = variant != null ? variant.id() : variantId.contains(":") ? variantId : Constants.MOD_ID + ":" + variantId;
         tooltip.add(SelectionTooltip.line("tooltip.gallifreyan_chronicles.console.variant",
                 SelectionTooltip.highlight(SelectionTooltip.displayName("tardis_console_variant", fullId))));

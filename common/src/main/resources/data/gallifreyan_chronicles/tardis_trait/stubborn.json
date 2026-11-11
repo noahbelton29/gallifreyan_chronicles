@@ -1,11 +1,11 @@
 {
-  "weight": 10,
-  "modifiers": {
-    "refusal_shift": 10
+  "how_common": 10,
+  "refuses_sooner_by": 10,
+  "never_with": {
+    "personalities": [
+      "obedient",
+      "submissive"
+    ]
   },
-  "banned_personalities": [
-    "obedient",
-    "submissive"
-  ],
-  "reveal": "refusal"
+  "revealed_when": "it_refuses"
 }

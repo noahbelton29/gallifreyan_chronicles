@@ -157,7 +157,7 @@ public final class TardisMindSystem {
         }
         long now = now(tardis.server());
         save(tardis, mind.withStress(mind.stressAt(now) + amount, now));
-        if (amount > 0f) TardisDiscovery.reveal(tardis, Reveal.STRESS_GAIN);
+        if (amount > 0f) TardisDiscovery.reveal(tardis, Reveal.IT_GETS_STRESSED);
     }
 
     public static void addTrust(Tardis tardis, float amount) {
@@ -165,7 +165,7 @@ public final class TardisMindSystem {
         TraitModifiers modifiers = mind.modifiers();
         amount *= amount > 0f ? modifiers.trustGain() : modifiers.trustLoss();
         save(tardis, mind.withTrust(mind.trust() + amount));
-        TardisDiscovery.reveal(tardis, Reveal.TRUST_CHANGE);
+        TardisDiscovery.reveal(tardis, Reveal.ITS_TRUST_CHANGES);
     }
 
     /* hurting it on purpose. distrusting ones never forget it */
@@ -225,7 +225,7 @@ public final class TardisMindSystem {
 
     private static void revealStrangerTraits(Tardis tardis, @Nullable UUID pilot) {
         if (pilot == null || pilot.equals(tardis.ownerId())) return;
-        TardisDiscovery.reveal(tardis, Reveal.STRANGER_PILOT);
+        TardisDiscovery.reveal(tardis, Reveal.A_STRANGER_FLIES_IT);
     }
 
     public static Refusal refusesTakeoff(Tardis tardis, @Nullable UUID pilot) {
@@ -235,7 +235,7 @@ public final class TardisMindSystem {
             return Refusal.NONE;
         }
         TardisDiscovery.personality(tardis);
-        TardisDiscovery.reveal(tardis, Reveal.REFUSAL);
+        TardisDiscovery.reveal(tardis, Reveal.IT_REFUSES);
         if (cowed(tardis)) {
             forget(tardis);
             addStress(tardis, COWED_STRESS);

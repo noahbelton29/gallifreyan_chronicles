@@ -53,7 +53,7 @@ public final class TardisWariness {
         level.sendParticles(ParticleTypes.SMOKE, control.getX(), control.getY() + 0.1, control.getZ(), 4, 0.05, 0.05, 0.05, 0.01);
         Messages.overlay(player, ChatFormatting.GRAY, trust < HOSTILE ? "tardis_controls_frozen" : "tardis_control_sticks");
 
-        TardisDiscovery.reveal(tardis, MindEnums.Reveal.CONTROLS_STICK);
+        TardisDiscovery.reveal(tardis, MindEnums.Reveal.ITS_CONTROLS_STICK);
         if (trust < CAUTIOUS) TardisMindSystem.addTrust(tardis, TRUST_PER_JAM);
         return true;
     }

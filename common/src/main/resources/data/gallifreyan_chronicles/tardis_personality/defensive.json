@@ -1,18 +1,22 @@
 {
-  "weight": 25,
-  "stress_limit": 50,
-  "trust_limit": 30,
-  "fear_to_comply": 45,
-  "mallet_fear": {
-    "min": 10,
-    "max": 25
+  "how_common": 25,
+  "refuses_to_fly_when": {
+    "stress_above": 50,
+    "trust_below": 30
   },
-  "trauma_per_hit": 2.5,
-  "terror_hits": {
-    "min": 3,
-    "max": 5
+  "mallet": {
+    "fear_per_hit": {
+      "min": 10,
+      "max": 25
+    },
+    "fear_needed_to_obey": 45,
+    "trauma_per_hit": 2.5,
+    "hits_to_snap_out_of_terror": {
+      "min": 3,
+      "max": 5
+    }
   },
-  "on_unwilling": [
+  "when_unwilling_to_fly": [
     {
       "type": "add_stress",
       "amount": 2
@@ -21,7 +25,7 @@
       "type": "refuse"
     }
   ],
-  "on_mallet_seen": [
+  "when_it_sees_the_mallet": [
     {
       "type": "lock_doors",
       "only_outside": true

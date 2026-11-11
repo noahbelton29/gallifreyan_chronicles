@@ -1,14 +1,16 @@
 {
-  "weight": 10,
-  "modifiers": {
-    "start_trust": 3,
-    "trust_gain": 0.35,
-    "trust_loss": 0.5,
-    "abuse_trust_loss": 4.0
+  "how_common": 10,
+  "trust": {
+    "gained": 0.35,
+    "lost": 0.5,
+    "lost_when_abused": 4.0,
+    "starts_at": 3
   },
-  "clashes_with": [
-    "loyal",
-    "welcoming"
-  ],
-  "reveal": "controls_stick"
+  "never_with": {
+    "traits": [
+      "loyal",
+      "welcoming"
+    ]
+  },
+  "revealed_when": "its_controls_stick"
 }

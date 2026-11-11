@@ -1,24 +1,28 @@
 {
-  "weight": 10,
-  "stress_limit": 40,
-  "trust_limit": 35,
-  "fear_to_comply": 75,
-  "mallet_fear": {
-    "min": 6,
-    "max": 15
+  "how_common": 10,
+  "refuses_to_fly_when": {
+    "stress_above": 40,
+    "trust_below": 35
   },
-  "trauma_per_hit": 2.0,
-  "terror_hits": {
-    "min": 6,
-    "max": 10
+  "mallet": {
+    "fear_per_hit": {
+      "min": 6,
+      "max": 15
+    },
+    "fear_needed_to_obey": 75,
+    "trauma_per_hit": 2.0,
+    "hits_to_snap_out_of_terror": {
+      "min": 6,
+      "max": 10
+    }
   },
-  "on_unwilling": [
+  "when_unwilling_to_fly": [
     {
       "type": "fight",
       "stress": 2
     }
   ],
-  "on_mallet_seen": [
+  "when_it_sees_the_mallet": [
     {
       "type": "particles",
       "particle": "minecraft:electric_spark",
@@ -44,7 +48,7 @@
       "colour": "red"
     }
   ],
-  "on_mallet_hit": [
+  "when_hit": [
     {
       "type": "hit_back",
       "max_damage": 6,
@@ -52,7 +56,7 @@
       "push": 0.9
     }
   ],
-  "on_terror_hit": [
+  "when_hit_while_terrified": [
     {
       "type": "savage",
       "max_damage": 10,

@@ -18,17 +18,26 @@ public record TardisTrait(String id, int weight, TraitModifiers modifiers, List<
                           List<MindAction> onUnwilling, List<MindAction> onTakeOff, List<MindAction> onLand)
         implements IdentifiableData<TardisTrait> {
 
+    private record NeverWith(List<String> traits, List<String> personalities) {
+        static final NeverWith NOTHING = new NeverWith(List.of(), List.of());
+        static final Codec<NeverWith> CODEC = RecordCodecBuilder.create(inst -> inst.group(
+                Codec.STRING.listOf().optionalFieldOf("traits", List.of()).forGetter(NeverWith::traits),
+                Codec.STRING.listOf().optionalFieldOf("personalities", List.of()).forGetter(NeverWith::personalities)
+        ).apply(inst, NeverWith::new));
+    }
+
     public static final Codec<TardisTrait> CODEC = RecordCodecBuilder.create(inst -> inst.group(
             Codec.STRING.optionalFieldOf("id", "").forGetter(TardisTrait::id),
-            Codec.INT.optionalFieldOf("weight", 10).forGetter(TardisTrait::weight),
-            TraitModifiers.CODEC.optionalFieldOf("modifiers", TraitModifiers.NONE).forGetter(TardisTrait::modifiers),
-            Codec.STRING.listOf().optionalFieldOf("clashes_with", List.of()).forGetter(TardisTrait::clashesWith),
-            Codec.STRING.listOf().optionalFieldOf("banned_personalities", List.of()).forGetter(TardisTrait::bannedPersonalities),
-            MindEnums.codec(Reveal.class).optionalFieldOf("reveal", Reveal.NEVER).forGetter(TardisTrait::reveal),
-            MindActions.LIST_CODEC.optionalFieldOf("on_unwilling", List.of()).forGetter(TardisTrait::onUnwilling),
-            MindActions.LIST_CODEC.optionalFieldOf("on_take_off", List.of()).forGetter(TardisTrait::onTakeOff),
-            MindActions.LIST_CODEC.optionalFieldOf("on_land", List.of()).forGetter(TardisTrait::onLand)
-    ).apply(inst, TardisTrait::new));
+            Codec.INT.optionalFieldOf("how_common", 10).forGetter(TardisTrait::weight),
+            TraitModifiers.MAP_CODEC.forGetter(TardisTrait::modifiers),
+            NeverWith.CODEC.optionalFieldOf("never_with", NeverWith.NOTHING)
+                    .forGetter(t -> new NeverWith(t.clashesWith, t.bannedPersonalities)),
+            MindEnums.codec(Reveal.class).optionalFieldOf("revealed_when", Reveal.NEVER).forGetter(TardisTrait::reveal),
+            MindActions.LIST_CODEC.optionalFieldOf("when_unwilling_to_fly", List.of()).forGetter(TardisTrait::onUnwilling),
+            MindActions.LIST_CODEC.optionalFieldOf("when_taking_off", List.of()).forGetter(TardisTrait::onTakeOff),
+            MindActions.LIST_CODEC.optionalFieldOf("when_landing", List.of()).forGetter(TardisTrait::onLand)
+    ).apply(inst, (id, rarity, modifiers, never, reveal, unwilling, takeOff, land) ->
+            new TardisTrait(id, rarity, modifiers, never.traits(), never.personalities(), reveal, unwilling, takeOff, land)));
 
     public String localId() {
         return GCUtils.localPath(id);

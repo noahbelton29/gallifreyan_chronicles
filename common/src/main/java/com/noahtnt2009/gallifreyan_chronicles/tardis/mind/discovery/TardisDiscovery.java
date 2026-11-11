@@ -45,7 +45,7 @@ public final class TardisDiscovery {
         TardisMind mind = TardisMindSystem.mind(tardis);
         boolean upset = mind.stress() >= NOTICEABLE || mind.fear() >= NOTICEABLE;
         if (!upset) return;
-        reveal(tardis, Reveal.UPSET_LANDING);
+        reveal(tardis, Reveal.IT_LANDS_UPSET);
     }
 
     public static void personality(Tardis tardis) {

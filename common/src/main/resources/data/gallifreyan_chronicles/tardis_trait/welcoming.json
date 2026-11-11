@@ -1,11 +1,11 @@
 {
-  "weight": 10,
-  "modifiers": {
-    "stranger_shift": -15
+  "how_common": 10,
+  "refuses_strangers_sooner_by": -15,
+  "never_with": {
+    "personalities": [
+      "defensive",
+      "aggressive"
+    ]
   },
-  "banned_personalities": [
-    "defensive",
-    "aggressive"
-  ],
-  "reveal": "stranger_pilot"
+  "revealed_when": "a_stranger_flies_it"
 }

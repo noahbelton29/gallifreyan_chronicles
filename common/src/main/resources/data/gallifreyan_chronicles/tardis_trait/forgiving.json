@@ -1,14 +1,18 @@
 {
-  "weight": 10,
-  "modifiers": {
-    "stress_fade": 2.0,
-    "fear_fade": 2.0
+  "how_common": 10,
+  "stress": {
+    "calms_down": 2.0
   },
-  "clashes_with": [
-    "grudge_holder"
-  ],
-  "banned_personalities": [
-    "aggressive"
-  ],
-  "reveal": "upset_landing"
+  "fear": {
+    "fades": 2.0
+  },
+  "never_with": {
+    "traits": [
+      "grudge_holder"
+    ],
+    "personalities": [
+      "aggressive"
+    ]
+  },
+  "revealed_when": "it_lands_upset"
 }

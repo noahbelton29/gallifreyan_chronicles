@@ -1,13 +1,13 @@
 {
-  "weight": 10,
-  "modifiers": {
-    "stranger_shift": 20
+  "how_common": 10,
+  "refuses_strangers_sooner_by": 20,
+  "never_with": {
+    "traits": [
+      "welcoming"
+    ],
+    "personalities": [
+      "obedient"
+    ]
   },
-  "clashes_with": [
-    "welcoming"
-  ],
-  "banned_personalities": [
-    "obedient"
-  ],
-  "reveal": "stranger_pilot"
+  "revealed_when": "a_stranger_flies_it"
 }

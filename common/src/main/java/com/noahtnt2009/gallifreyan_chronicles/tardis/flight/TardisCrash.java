@@ -66,7 +66,7 @@ public final class TardisCrash {
     public static void run(Tardis tardis, ServerLevel interior, BlockPos consolePos, int landingTicks) {
         CRASHING.add(tardis.id());
         TardisMindSystem.addStress(tardis, CRASH_STRESS);
-        TardisDiscovery.reveal(tardis, MindEnums.Reveal.CRASH);
+        TardisDiscovery.reveal(tardis, MindEnums.Reveal.IT_CRASHES);
         int flashes = landingTicks / TardisAlarm.FLASH_TICKS + 1;
         TardisAlarm.flashLoud(interior, flashes);
 

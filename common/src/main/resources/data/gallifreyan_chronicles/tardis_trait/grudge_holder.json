@@ -1,8 +1,10 @@
 {
-  "weight": 10,
-  "modifiers": {
-    "stress_fade": 0.5,
-    "fear_fade": 0.5
+  "how_common": 10,
+  "stress": {
+    "calms_down": 0.5
   },
-  "reveal": "upset_landing"
+  "fear": {
+    "fades": 0.5
+  },
+  "revealed_when": "it_lands_upset"
 }

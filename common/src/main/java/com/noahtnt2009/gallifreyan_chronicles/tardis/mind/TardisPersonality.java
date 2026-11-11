@@ -22,22 +22,41 @@ public record TardisPersonality(String id, int weight, float stressLimit, float 
             101f, -1f, 0f, MindRange.of(15f), 3f, new MindRange(1, 2),
             List.of(), List.of(), List.of(), List.of(), List.of(), List.of());
 
+    private record RefusesWhen(float stressAbove, float trustBelow) {
+        static final RefusesWhen NEVER = new RefusesWhen(101f, -1f);
+        static final Codec<RefusesWhen> CODEC = RecordCodecBuilder.create(inst -> inst.group(
+                Codec.FLOAT.optionalFieldOf("stress_above", 101f).forGetter(RefusesWhen::stressAbove),
+                Codec.FLOAT.optionalFieldOf("trust_below", -1f).forGetter(RefusesWhen::trustBelow)
+        ).apply(inst, RefusesWhen::new));
+    }
+
+    private record Mallet(MindRange fearPerHit, float fearNeededToObey, float traumaPerHit, MindRange terrorHits) {
+        static final Mallet DEFAULT = new Mallet(MindRange.of(15f), 0f, 3f, new MindRange(1, 2));
+        static final Codec<Mallet> CODEC = RecordCodecBuilder.create(inst -> inst.group(
+                MindRange.CODEC.optionalFieldOf("fear_per_hit", MindRange.of(15f)).forGetter(Mallet::fearPerHit),
+                Codec.FLOAT.optionalFieldOf("fear_needed_to_obey", 0f).forGetter(Mallet::fearNeededToObey),
+                Codec.FLOAT.optionalFieldOf("trauma_per_hit", 3f).forGetter(Mallet::traumaPerHit),
+                MindRange.CODEC.optionalFieldOf("hits_to_snap_out_of_terror", new MindRange(1, 2)).forGetter(Mallet::terrorHits)
+        ).apply(inst, Mallet::new));
+    }
+
     public static final Codec<TardisPersonality> CODEC = RecordCodecBuilder.create(inst -> inst.group(
             Codec.STRING.optionalFieldOf("id", "").forGetter(TardisPersonality::id),
-            Codec.INT.optionalFieldOf("weight", 10).forGetter(TardisPersonality::weight),
-            Codec.FLOAT.optionalFieldOf("stress_limit", 101f).forGetter(TardisPersonality::stressLimit),
-            Codec.FLOAT.optionalFieldOf("trust_limit", -1f).forGetter(TardisPersonality::trustLimit),
-            Codec.FLOAT.optionalFieldOf("fear_to_comply", 0f).forGetter(TardisPersonality::fearToComply),
-            MindRange.CODEC.optionalFieldOf("mallet_fear", MindRange.of(15f)).forGetter(TardisPersonality::malletFear),
-            Codec.FLOAT.optionalFieldOf("trauma_per_hit", 3f).forGetter(TardisPersonality::traumaPerHit),
-            MindRange.CODEC.optionalFieldOf("terror_hits", new MindRange(1, 2)).forGetter(TardisPersonality::terrorHits),
-            MindActions.LIST_CODEC.optionalFieldOf("on_unwilling", List.of()).forGetter(TardisPersonality::onUnwilling),
-            MindActions.LIST_CODEC.optionalFieldOf("on_mallet_seen", List.of()).forGetter(TardisPersonality::onMalletSeen),
-            MindActions.LIST_CODEC.optionalFieldOf("on_mallet_hit", List.of()).forGetter(TardisPersonality::onMalletHit),
-            MindActions.LIST_CODEC.optionalFieldOf("on_terror_hit", List.of()).forGetter(TardisPersonality::onTerrorHit),
-            MindActions.LIST_CODEC.optionalFieldOf("on_take_off", List.of()).forGetter(TardisPersonality::onTakeOff),
-            MindActions.LIST_CODEC.optionalFieldOf("on_land", List.of()).forGetter(TardisPersonality::onLand)
-    ).apply(inst, TardisPersonality::new));
+            Codec.INT.optionalFieldOf("how_common", 10).forGetter(TardisPersonality::weight),
+            RefusesWhen.CODEC.optionalFieldOf("refuses_to_fly_when", RefusesWhen.NEVER)
+                    .forGetter(p -> new RefusesWhen(p.stressLimit, p.trustLimit)),
+            Mallet.CODEC.optionalFieldOf("mallet", Mallet.DEFAULT)
+                    .forGetter(p -> new Mallet(p.malletFear, p.fearToComply, p.traumaPerHit, p.terrorHits)),
+            MindActions.LIST_CODEC.optionalFieldOf("when_unwilling_to_fly", List.of()).forGetter(TardisPersonality::onUnwilling),
+            MindActions.LIST_CODEC.optionalFieldOf("when_it_sees_the_mallet", List.of()).forGetter(TardisPersonality::onMalletSeen),
+            MindActions.LIST_CODEC.optionalFieldOf("when_hit", List.of()).forGetter(TardisPersonality::onMalletHit),
+            MindActions.LIST_CODEC.optionalFieldOf("when_hit_while_terrified", List.of()).forGetter(TardisPersonality::onTerrorHit),
+            MindActions.LIST_CODEC.optionalFieldOf("when_taking_off", List.of()).forGetter(TardisPersonality::onTakeOff),
+            MindActions.LIST_CODEC.optionalFieldOf("when_landing", List.of()).forGetter(TardisPersonality::onLand)
+    ).apply(inst, (id, rarity, refuses, mallet, unwilling, seen, hit, terror, takeOff, land) ->
+            new TardisPersonality(id, rarity, refuses.stressAbove(), refuses.trustBelow(), mallet.fearNeededToObey(),
+                    mallet.fearPerHit(), mallet.traumaPerHit(), mallet.terrorHits(),
+                    unwilling, seen, hit, terror, takeOff, land)));
 
     public String localId() {
         return GCUtils.localPath(id);

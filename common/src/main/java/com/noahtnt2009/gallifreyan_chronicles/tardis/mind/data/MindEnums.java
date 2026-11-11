@@ -13,7 +13,8 @@ public final class MindEnums {
 
     /* when a trait first shows itself */
     public enum Reveal {
-        STRESS_GAIN, TRUST_CHANGE, REFUSAL, STRANGER_PILOT, CRASH, UPSET_LANDING, CONTROLS_STICK, NEVER
+        IT_GETS_STRESSED, ITS_TRUST_CHANGES, IT_REFUSES, A_STRANGER_FLIES_IT, IT_CRASHES, IT_LANDS_UPSET,
+        ITS_CONTROLS_STICK, NEVER
     }
 
     public static <E extends Enum<E>> Codec<E> codec(Class<E> type) {

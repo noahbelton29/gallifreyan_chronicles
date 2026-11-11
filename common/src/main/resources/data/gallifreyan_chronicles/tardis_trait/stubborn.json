@@ -5,6 +5,9 @@
     "personalities": [
       "obedient",
       "submissive"
+    ],
+    "traits": [
+      "welcoming"
     ]
   },
   "revealed_when": "it_refuses"

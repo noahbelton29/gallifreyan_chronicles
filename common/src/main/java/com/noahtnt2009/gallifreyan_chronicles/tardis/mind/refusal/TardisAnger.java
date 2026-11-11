@@ -1,5 +1,7 @@
 package com.noahtnt2009.gallifreyan_chronicles.tardis.mind.refusal;
 
+import org.jspecify.annotations.Nullable;
+
 import com.noahtnt2009.gallifreyan_chronicles.tardis.mind.TardisMindSystem;
 
 import com.noahtnt2009.gallifreyan_chronicles.tardis.api.Tardis;
@@ -29,11 +31,11 @@ public final class TardisAnger {
         STATES.remove(tardis.id());
     }
 
-    public static void provoke(Tardis tardis, float stressPerLevel) {
+    public static void provoke(Tardis tardis, float stressPerLevel, @Nullable UUID pilot) {
         int level = Math.min(level(tardis) + 1, MAX_LEVEL);
         STATES.put(tardis.id(), new State(level, TardisMindSystem.now(tardis.server())));
         TardisMindSystem.addStress(tardis, stressPerLevel * level);
-        TardisMindSystem.addTrust(tardis, -TRUST_LOSS);
+        TardisMindSystem.addTrust(tardis, pilot, -TRUST_LOSS);
     }
 
     public static int level(Tardis tardis) {

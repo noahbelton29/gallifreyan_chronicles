@@ -18,6 +18,9 @@ import com.noahtnt2009.gallifreyan_chronicles.tardis.mind.TardisMindSystem;
 import com.noahtnt2009.gallifreyan_chronicles.tardis.mind.TardisPersonality;
 import com.noahtnt2009.gallifreyan_chronicles.tardis.mind.TardisTrait;
 import net.minecraft.commands.CommandSourceStack;
+import java.util.UUID;
+import org.jspecify.annotations.Nullable;
+import net.minecraft.commands.arguments.EntityArgument;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -39,7 +42,8 @@ public final class MindCommands {
                 .then(literal("reroll").executes(MindCommands::reroll))
                 .then(literal("undiscover").executes(MindCommands::undiscover))
                 .then(literal("betrayed")
-                        .then(argument("betrayed", BoolArgumentType.bool()).executes(MindCommands::setBetrayed)))
+                        .then(argument("betrayed", BoolArgumentType.bool()).executes(MindCommands::setBetrayed)
+                                .then(argument("player", EntityArgument.player()).executes(MindCommands::setBetrayed))))
                 .then(literal("personality")
                         .then(literal("get").executes(MindCommands::getPersonality))
                         .then(literal("set")
@@ -84,21 +88,26 @@ public final class MindCommands {
             this.name = name;
         }
 
-        private float get(Tardis tardis) {
+        /* trust and fear are per player, null means the owner */
+        private boolean perPlayer() {
+            return this == TRUST || this == FEAR;
+        }
+
+        private float get(Tardis tardis, @Nullable UUID player) {
             return switch (this) {
                 case STRESS -> TardisMindSystem.stress(tardis);
-                case TRUST -> TardisMindSystem.trust(tardis);
-                case FEAR -> TardisMindSystem.fear(tardis);
+                case TRUST -> TardisMindSystem.trust(tardis, player);
+                case FEAR -> TardisMindSystem.fear(tardis, player);
                 case SKILL -> TardisMindSystem.skill(tardis) * 100f;
                 case TRAUMA -> TardisMindSystem.trauma(tardis);
             };
         }
 
-        private void set(Tardis tardis, float value) {
+        private void set(Tardis tardis, @Nullable UUID player, float value) {
             switch (this) {
                 case STRESS -> TardisMindSystem.setStress(tardis, value);
-                case TRUST -> TardisMindSystem.setTrust(tardis, value);
-                case FEAR -> TardisMindSystem.setFear(tardis, value);
+                case TRUST -> TardisMindSystem.setTrust(tardis, player, value);
+                case FEAR -> TardisMindSystem.setFear(tardis, player, value);
                 case SKILL -> TardisMindSystem.setSkill(tardis, value / 100f);
                 case TRAUMA -> TardisMindSystem.setTrauma(tardis, value);
             }
@@ -106,11 +115,13 @@ public final class MindCommands {
     }
 
     private static LiteralArgumentBuilder<CommandSourceStack> value(MindValue which) {
-        return literal(which.name)
-                .then(literal("get").executes(ctx -> getValue(ctx, which)))
-                .then(literal("set")
-                        .then(argument("value", FloatArgumentType.floatArg(0f, 100f))
-                                .executes(ctx -> setValue(ctx, which))));
+        var get = literal("get").executes(ctx -> getValue(ctx, which));
+        var setValue = argument("value", FloatArgumentType.floatArg(0f, 100f)).executes(ctx -> setValue(ctx, which));
+        if (which.perPlayer()) {
+            get.then(argument("player", EntityArgument.player()).executes(ctx -> getValue(ctx, which)));
+            setValue.then(argument("player", EntityArgument.player()).executes(ctx -> setValue(ctx, which)));
+        }
+        return literal(which.name).then(get).then(literal("set").then(setValue));
     }
 
     private static CompletableFuture<Suggestions> suggestPersonalities(CommandContext<CommandSourceStack> ctx,
@@ -139,8 +150,8 @@ public final class MindCommands {
                     disabilityList(mind),
                     oneDecimal(mind.skill() * 100f),
                     oneDecimal(TardisMindSystem.stress(tardis)),
-                    oneDecimal(mind.trust()),
-                    oneDecimal(TardisMindSystem.fear(tardis)),
+                    oneDecimal(TardisMindSystem.trust(tardis, null)),
+                    oneDecimal(TardisMindSystem.fear(tardis, null)),
                     text(willing));
         });
     }
@@ -154,8 +165,9 @@ public final class MindCommands {
 
     private static int setBetrayed(CommandContext<CommandSourceStack> ctx) throws CommandSyntaxException {
         boolean betrayed = BoolArgumentType.getBool(ctx, "betrayed");
+        UUID player = playerArg(ctx);
         return withTardis(ctx, (tardis, idText) -> {
-            TardisMindSystem.setBetrayed(tardis, betrayed);
+            TardisMindSystem.setBetrayed(tardis, player, betrayed);
             return reply(ctx, tardis, "betrayed", String.valueOf(betrayed), true);
         });
     }
@@ -167,14 +179,25 @@ public final class MindCommands {
         });
     }
 
+    /* the optional player argument, or null for the owner */
+    private static @Nullable UUID playerArg(CommandContext<CommandSourceStack> ctx) throws CommandSyntaxException {
+        try {
+            return EntityArgument.getPlayer(ctx, "player").getUUID();
+        } catch (IllegalArgumentException missing) {
+            return null;
+        }
+    }
+
     private static int getValue(CommandContext<CommandSourceStack> ctx, MindValue which) throws CommandSyntaxException {
-        return withTardis(ctx, (tardis, idText) -> reply(ctx, tardis, which.name, oneDecimal(which.get(tardis)), false));
+        UUID player = playerArg(ctx);
+        return withTardis(ctx, (tardis, idText) -> reply(ctx, tardis, which.name, oneDecimal(which.get(tardis, player)), false));
     }
 
     private static int setValue(CommandContext<CommandSourceStack> ctx, MindValue which) throws CommandSyntaxException {
         float value = FloatArgumentType.getFloat(ctx, "value");
+        UUID player = playerArg(ctx);
         return withTardis(ctx, (tardis, idText) -> {
-            which.set(tardis, value);
+            which.set(tardis, player, value);
             return reply(ctx, tardis, which.name, String.valueOf(value), true);
         });
     }

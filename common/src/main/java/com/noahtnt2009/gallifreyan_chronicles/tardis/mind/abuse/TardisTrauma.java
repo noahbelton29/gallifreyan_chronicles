@@ -1,5 +1,7 @@
 package com.noahtnt2009.gallifreyan_chronicles.tardis.mind.abuse;
 
+import com.noahtnt2009.gallifreyan_chronicles.tardis.mind.TardisBond;
+
 import com.noahtnt2009.gallifreyan_chronicles.tardis.mind.TardisMind;
 import com.noahtnt2009.gallifreyan_chronicles.tardis.mind.TardisMindSystem;
 import com.noahtnt2009.gallifreyan_chronicles.tardis.mind.TardisPersonality;
@@ -53,9 +55,10 @@ public final class TardisTrauma {
     }
 
     /* how much one hit scars it. loyal ones feel it the most */
-    public static void hit(Tardis tardis) {
+    public static void hit(Tardis tardis, UUID player) {
         TardisMind mind = TardisMindSystem.mind(tardis);
-        float hurt = mind.personality().traumaPerHit() * sensitivity(tardis) * mind.modifiers().traumaGain();
+        TardisBond bond = TardisMindSystem.bond(tardis, player);
+        float hurt = mind.personality().traumaPerHit() * sensitivity(tardis) * mind.modifiersFor(bond).traumaGain();
         float trauma = mind.trauma() + hurt;
         TardisMindSystem.setTrauma(tardis, trauma);
 
@@ -85,6 +88,7 @@ public final class TardisTrauma {
     public static void sawMallet(Player player, ServerLevel level) {
         for (Tardis tardis : nearby(player, level)) {
             TardisMind mind = TardisMindSystem.mind(tardis);
+            if (!TardisMindSystem.hasHurt(tardis, player.getUUID())) continue;
             if (mind.trauma() < WARY_TRAUMA && !mind.has(TardisDisability.PTSD)) continue;
 
             long now = TardisMindSystem.now(tardis.server());
@@ -92,7 +96,7 @@ public final class TardisTrauma {
             if (last != null && now - last < REACT_COOLDOWN_TICKS) continue;
             LAST_REACTION.put(tardis.id(), now);
 
-            TardisMindSystem.addFear(tardis, SIGHT_FEAR + mind.trauma() * SIGHT_FEAR_PER_TRAUMA);
+            TardisMindSystem.addFear(tardis, player.getUUID(), SIGHT_FEAR + mind.trauma() * SIGHT_FEAR_PER_TRAUMA);
             TardisMindSystem.addStress(tardis, SIGHT_STRESS);
             BlockPos at = reactionPos(tardis, level);
             if (at != null) react(tardis, mind.personality(), player, level, at);

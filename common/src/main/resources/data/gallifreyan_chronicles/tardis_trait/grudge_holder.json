@@ -6,5 +6,10 @@
   "fear": {
     "fades": 0.5
   },
-  "revealed_when": "it_lands_upset"
+  "revealed_when": "it_lands_upset",
+  "never_with": {
+    "personalities": [
+      "obedient"
+    ]
+  }
 }

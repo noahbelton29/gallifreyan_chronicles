@@ -36,10 +36,10 @@ public record HitBackAction(float maxDamage, float minDamage, float push) implem
         ServerLevel level = context.level;
         Player player = context.player;
         if (level == null || player == null || context.pos == null) return;
-        if (TardisMindSystem.cowed(context.tardis)) return;
+        if (TardisMindSystem.cowed(context.tardis, player.getUUID())) return;
 
         float toComply = Math.max(1f, TardisMindSystem.mind(context.tardis).personality().fearToComply());
-        float scared = Mth.clamp(TardisMindSystem.fear(context.tardis) / toComply, 0f, 1f);
+        float scared = Mth.clamp(TardisMindSystem.fear(context.tardis, player.getUUID()) / toComply, 0f, 1f);
         player.hurtServer(level, level.damageSources().lightningBolt(), Mth.lerp(scared, maxDamage, minDamage));
         ShockAction.throwBack(player, context.pos, push, 0.4);
 

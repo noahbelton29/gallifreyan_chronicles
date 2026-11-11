@@ -56,13 +56,14 @@ public final class TardisMallet {
 
     public static void strike(Tardis tardis, ServerLevel level, BlockPos hitPos, Player player) {
         TardisPersonality personality = TardisMindSystem.mind(tardis).personality();
-        TardisMindSystem.addFear(tardis, personality.malletFear().pick(level.getRandom()));
+        UUID hitter = player.getUUID();
+        TardisMindSystem.addFear(tardis, hitter, personality.malletFear().pick(level.getRandom()));
         TardisMindSystem.addStress(tardis, STRESS_PER_HIT);
-        TardisMindSystem.abuse(tardis, TRUST_LOSS_PER_HIT);
-        TardisTrauma.hit(tardis);
+        TardisMindSystem.abuse(tardis, hitter, TRUST_LOSS_PER_HIT);
+        TardisTrauma.hit(tardis, hitter);
 
         Vec3 hit = Vec3.atCenterOf(hitPos);
-        float blast = BASE_BLAST + TardisMindSystem.fear(tardis) * BLAST_PER_FEAR;
+        float blast = BASE_BLAST + TardisMindSystem.fear(tardis, hitter) * BLAST_PER_FEAR;
         level.explode(null, hit.x, hit.y, hit.z, blast, Level.ExplosionInteraction.NONE);
         level.playSound(null, hitPos, SoundEvents.ANVIL_LAND, SoundSource.BLOCKS, 0.6F,
                 0.7F + level.getRandom().nextFloat() * 0.2F);
@@ -71,7 +72,7 @@ public final class TardisMallet {
         shudderInside(tardis);
         int hits = countHit(tardis);
         alarm(tardis, level, hitPos, player, hits);
-        if (hits >= BETRAYAL_HITS && TardisMindSystem.betray(tardis)) {
+        if (hits >= BETRAYAL_HITS && TardisMindSystem.betray(tardis, hitter)) {
             Messages.overlay(player, ChatFormatting.DARK_RED, "tardis_betrayed");
             return;
         }
@@ -81,7 +82,7 @@ public final class TardisMallet {
         MindContext context = new MindContext(tardis, level, player, hit);
         MindActions.run(personality.onMalletHit(), context);
         if (context.handled) return;
-        Messages.overlay(player, ChatFormatting.DARK_GRAY, reaction(TardisMindSystem.fear(tardis)));
+        Messages.overlay(player, ChatFormatting.DARK_GRAY, reaction(TardisMindSystem.fear(tardis, hitter)));
     }
 
 

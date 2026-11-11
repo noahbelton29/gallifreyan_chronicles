@@ -73,36 +73,50 @@ public final class TardisMindSystem {
         return mind(tardis).stressAt(now(tardis.server()));
     }
 
-    public static float fear(Tardis tardis) {
-        return mind(tardis).fearAt(now(tardis.server()));
+    /* null means the owner, e.g. the remote or a command */
+    private static UUID who(Tardis tardis, @Nullable UUID player) {
+        return player != null ? player : tardis.ownerId();
     }
 
-    public static void setFear(Tardis tardis, float value) {
-        save(tardis, mind(tardis).withFear(value, now(tardis.server())));
+    public static TardisBond bond(Tardis tardis, @Nullable UUID player) {
+        return mind(tardis).bond(who(tardis, player), tardis.ownerId());
     }
 
-    public static void addFear(Tardis tardis, float amount) {
+    private static void saveBond(Tardis tardis, @Nullable UUID player, TardisBond bond) {
+        save(tardis, mind(tardis).withBond(who(tardis, player), bond));
+    }
+
+    public static float fear(Tardis tardis, @Nullable UUID player) {
         TardisMind mind = mind(tardis);
-        long now = now(tardis.server());
-        save(tardis, mind.withFear(mind.fearAt(now) + amount, now));
+        return mind.fearAt(mind.bond(who(tardis, player), tardis.ownerId()), now(tardis.server()));
     }
 
-    public static boolean cowed(Tardis tardis) {
+    public static void setFear(Tardis tardis, @Nullable UUID player, float value) {
+        saveBond(tardis, player, bond(tardis, player).withFear(value, now(tardis.server())));
+    }
+
+    public static void addFear(Tardis tardis, @Nullable UUID player, float amount) {
+        float current = fear(tardis, player);
+        saveBond(tardis, player, bond(tardis, player).withFear(current + amount, now(tardis.server())));
+    }
+
+    /* scared enough of this player to do what they want */
+    public static boolean cowed(Tardis tardis, @Nullable UUID player) {
         if (TardisTerror.compliant(tardis)) return true;
         TardisPersonality personality = mind(tardis).personality();
-        return !personality.alwaysFlies() && fear(tardis) >= personality.fearToComply();
+        return !personality.alwaysFlies() && fear(tardis, player) >= personality.fearToComply();
     }
 
-    public static float trust(Tardis tardis) {
-        return mind(tardis).trust();
+    public static float trust(Tardis tardis, @Nullable UUID player) {
+        return bond(tardis, player).trust();
+    }
+
+    public static void setTrust(Tardis tardis, @Nullable UUID player, float value) {
+        saveBond(tardis, player, bond(tardis, player).withTrust(value));
     }
 
     public static void setStress(Tardis tardis, float value) {
         save(tardis, mind(tardis).withStress(value, now(tardis.server())));
-    }
-
-    public static void setTrust(Tardis tardis, float value) {
-        save(tardis, mind(tardis).withTrust(value));
     }
 
     /* traits that don't suit the new personality are dropped */
@@ -152,7 +166,7 @@ public final class TardisMindSystem {
         if (amount > 0f && mind.has(TardisDisability.PTSD)) {
             amount *= PTSD_STRESS_GAIN;
         }
-        if (amount > 0f && mind.trust() >= DEVOTED_TRUST) {
+        if (amount > 0f && trust(tardis, null) >= DEVOTED_TRUST) {
             amount *= DEVOTED_STRESS_GAIN;
         }
         long now = now(tardis.server());
@@ -160,26 +174,26 @@ public final class TardisMindSystem {
         if (amount > 0f) TardisDiscovery.reveal(tardis, Reveal.IT_GETS_STRESSED);
     }
 
-    public static void addTrust(Tardis tardis, float amount) {
-        TardisMind mind = mind(tardis);
-        TraitModifiers modifiers = mind.modifiers();
+    public static void addTrust(Tardis tardis, @Nullable UUID player, float amount) {
+        TardisBond bond = bond(tardis, player);
+        TraitModifiers modifiers = mind(tardis).modifiersFor(bond);
         amount *= amount > 0f ? modifiers.trustGain() : modifiers.trustLoss();
-        save(tardis, mind.withTrust(mind.trust() + amount));
+        saveBond(tardis, player, bond.withTrust(bond.trust() + amount));
         TardisDiscovery.reveal(tardis, Reveal.ITS_TRUST_CHANGES);
     }
 
-    /* hurting it on purpose. distrusting ones never forget it */
-    public static void abuse(Tardis tardis, float trustLoss) {
-        TardisMind mind = mind(tardis);
-        float loss = trustLoss * mind.modifiers().abuseTrustLoss();
-        save(tardis, mind.withTrust(mind.trust() - loss));
+    /* this player hurt it on purpose. distrusting ones never forget it */
+    public static void abuse(Tardis tardis, UUID player, float trustLoss) {
+        TardisBond bond = bond(tardis, player);
+        float loss = trustLoss * mind(tardis).modifiers().abuseTrustLoss();
+        saveBond(tardis, player, bond.hit().withTrust(bond.trust() - loss));
     }
 
-    /* a loyal tardis turned on. trust crashes and is very hard to win back */
-    public static boolean betray(Tardis tardis) {
-        TardisMind mind = mind(tardis);
-        if (!mind.modifiers().betrayable() || mind.betrayed()) return false;
-        save(tardis, mind.withBetrayed(true).withTrust(mind.trust() - BETRAYAL_TRUST_LOSS));
+    /* a loyal tardis turned on by this player. trust crashes and is very hard to win back */
+    public static boolean betray(Tardis tardis, UUID player) {
+        TardisBond bond = bond(tardis, player);
+        if (!mind(tardis).modifiers().betrayable() || bond.betrayed()) return false;
+        saveBond(tardis, player, bond.withBetrayed(true).withTrust(bond.trust() - BETRAYAL_TRUST_LOSS));
         return true;
     }
 
@@ -191,8 +205,12 @@ public final class TardisMindSystem {
         save(tardis, mind(tardis).withTrauma(value));
     }
 
-    public static void setBetrayed(Tardis tardis, boolean betrayed) {
-        save(tardis, mind(tardis).withBetrayed(betrayed));
+    public static void setBetrayed(Tardis tardis, @Nullable UUID player, boolean betrayed) {
+        saveBond(tardis, player, bond(tardis, player).withBetrayed(betrayed));
+    }
+
+    public static boolean hasHurt(Tardis tardis, UUID player) {
+        return bond(tardis, player).hurtIt();
     }
 
     public static boolean unwilling(Tardis tardis) {
@@ -212,7 +230,7 @@ public final class TardisMindSystem {
     public static boolean distrusts(Tardis tardis, @Nullable UUID pilot) {
         TardisMind mind = mind(tardis);
         float limit = mind.personality().trustLimit() + limitShift(tardis, mind, pilot);
-        return mind.trust() < limit;
+        return trust(tardis, pilot) < limit;
     }
 
     /* positive makes it say no sooner */
@@ -236,15 +254,16 @@ public final class TardisMindSystem {
         }
         TardisDiscovery.personality(tardis);
         TardisDiscovery.reveal(tardis, Reveal.IT_REFUSES);
-        if (cowed(tardis)) {
+        if (cowed(tardis, pilot)) {
             forget(tardis);
             addStress(tardis, COWED_STRESS);
-            addTrust(tardis, -COWED_TRUST_LOSS);
+            addTrust(tardis, pilot, -COWED_TRUST_LOSS);
             return Refusal.COWED;
         }
 
         TardisMind mind = mind(tardis);
         MindContext context = MindContext.of(tardis);
+        context.pilot = pilot;
         for (TardisTrait trait : mind.traits()) {
             MindActions.run(trait.onUnwilling(), context);
         }

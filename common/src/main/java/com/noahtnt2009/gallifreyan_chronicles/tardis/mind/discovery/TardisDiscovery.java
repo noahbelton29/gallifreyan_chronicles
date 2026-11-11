@@ -43,7 +43,7 @@ public final class TardisDiscovery {
 
     private static void onLand(Tardis tardis) {
         TardisMind mind = TardisMindSystem.mind(tardis);
-        boolean upset = mind.stress() >= NOTICEABLE || mind.fear() >= NOTICEABLE;
+        boolean upset = mind.stress() >= NOTICEABLE || mind.trauma() >= NOTICEABLE;
         if (!upset) return;
         reveal(tardis, Reveal.IT_LANDS_UPSET);
     }

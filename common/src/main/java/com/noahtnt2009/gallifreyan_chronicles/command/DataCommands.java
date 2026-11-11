@@ -101,7 +101,7 @@ public final class DataCommands {
             lines.put("crashed", String.valueOf(data.isCrashed(id)));
             lines.put("crashing", String.valueOf(TardisCrash.isCrashing(tardis)));
             lines.put("stress / trust / fear", TardisMindSystem.stress(tardis) + " / "
-                    + TardisMindSystem.trust(tardis) + " / " + TardisMindSystem.fear(tardis));
+                    + TardisMindSystem.trust(tardis, null) + " / " + TardisMindSystem.fear(tardis, null));
 
             tardis.exterior().ifPresent(exterior -> {
                 lines.put("flight_state", exterior.getFlightState().name());

@@ -1,5 +1,9 @@
 package com.noahtnt2009.gallifreyan_chronicles.tardis.mind.mood;
 
+import java.util.UUID;
+
+import java.util.List;
+
 import com.noahtnt2009.gallifreyan_chronicles.tardis.mind.TardisMind;
 import com.noahtnt2009.gallifreyan_chronicles.tardis.mind.TardisMindSystem;
 
@@ -40,9 +44,19 @@ public final class TardisMoods {
 
     private static void onLand(Tardis tardis) {
         if (TardisMindSystem.stress(tardis) < CALM_LANDING_STRESS) {
-            TardisMindSystem.addTrust(tardis, CALM_LANDING_TRUST);
+            for (UUID player : crew(tardis)) {
+                TardisMindSystem.addTrust(tardis, player, CALM_LANDING_TRUST);
+            }
         }
         TardisMindSystem.markLanded(tardis);
+    }
+
+    /* everyone on board, or just the owner if nobody is */
+    private static List<UUID> crew(Tardis tardis) {
+        List<UUID> aboard = tardis.interiorLevel()
+                .map(level -> level.players().stream().map(player -> player.getUUID()).toList())
+                .orElse(List.of());
+        return aboard.isEmpty() ? List.of(tardis.ownerId()) : aboard;
     }
 
     private static boolean tookOffTooSoon(Tardis tardis) {

@@ -40,13 +40,13 @@ public final class TardisWariness {
         if (tardis == null) return false;
 
         if (TardisTerror.compliant(tardis)) return false;
-        if (TardisTerror.terrified(tardis)) {
+        if (TardisTerror.terrified(tardis, player.getUUID())) {
             level.playSound(null, control.blockPosition(), GCSounds.LEVER, SoundSource.BLOCKS, 0.5F, 0.4F);
             Messages.overlay(player, ChatFormatting.DARK_GRAY, "tardis_terrified");
             return true;
         }
 
-        float trust = TardisMindSystem.trust(tardis);
+        float trust = TardisMindSystem.trust(tardis, player.getUUID());
         if (level.getRandom().nextFloat() >= jamChance(trust)) return false;
 
         level.playSound(null, control.blockPosition(), GCSounds.LEVER, SoundSource.BLOCKS, 0.7F, 0.5F);
@@ -54,7 +54,7 @@ public final class TardisWariness {
         Messages.overlay(player, ChatFormatting.GRAY, trust < HOSTILE ? "tardis_controls_frozen" : "tardis_control_sticks");
 
         TardisDiscovery.reveal(tardis, MindEnums.Reveal.ITS_CONTROLS_STICK);
-        if (trust < CAUTIOUS) TardisMindSystem.addTrust(tardis, TRUST_PER_JAM);
+        if (trust < CAUTIOUS) TardisMindSystem.addTrust(tardis, player.getUUID(), TRUST_PER_JAM);
         return true;
     }
 

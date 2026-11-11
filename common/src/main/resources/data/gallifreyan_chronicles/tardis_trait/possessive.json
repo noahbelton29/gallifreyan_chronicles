@@ -9,5 +9,8 @@
       "obedient"
     ]
   },
-  "revealed_when": "a_stranger_flies_it"
+  "revealed_when": "a_stranger_flies_it",
+  "trust": {
+    "strangers_start_at": 20
+  }
 }

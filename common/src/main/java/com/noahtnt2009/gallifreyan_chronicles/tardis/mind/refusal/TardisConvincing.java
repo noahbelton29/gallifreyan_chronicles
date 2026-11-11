@@ -1,5 +1,7 @@
 package com.noahtnt2009.gallifreyan_chronicles.tardis.mind.refusal;
 
+import org.jspecify.annotations.Nullable;
+
 import com.noahtnt2009.gallifreyan_chronicles.tardis.mind.TardisMindSystem;
 import com.noahtnt2009.gallifreyan_chronicles.tardis.mind.TardisTrait;
 
@@ -34,7 +36,7 @@ public final class TardisConvincing {
         STATES.remove(tardis.id());
     }
 
-    public static Refusal pull(Tardis tardis) {
+    public static Refusal pull(Tardis tardis, @Nullable UUID pilot) {
         long now = TardisMindSystem.now(tardis.server());
         State state = current(tardis, now);
 
@@ -44,11 +46,11 @@ public final class TardisConvincing {
         }
 
         if (now > state.quickPullUntil()) {
-            return getWorkedUp(tardis, state, now);
+            return getWorkedUp(tardis, pilot, state, now);
         }
 
         if (state.refusals() >= pullsNeeded(tardis, state)) {
-            return giveIn(tardis, state);
+            return giveIn(tardis, pilot, state);
         }
 
         STATES.put(tardis.id(), new State(state.refusals() + 1, now + QUICK_PULL_TICKS, now, state.workedUp()));
@@ -61,17 +63,17 @@ public final class TardisConvincing {
         return state;
     }
 
-    private static Refusal getWorkedUp(Tardis tardis, State state, long now) {
+    private static Refusal getWorkedUp(Tardis tardis, @Nullable UUID pilot, State state, long now) {
         int workedUp = Math.min(state.workedUp() + 1, MAX_WORKED_UP);
         TardisMindSystem.addStress(tardis, WORKED_UP_STRESS * workedUp);
-        TardisMindSystem.addTrust(tardis, -WORKED_UP_TRUST_LOSS);
+        TardisMindSystem.addTrust(tardis, pilot, -WORKED_UP_TRUST_LOSS);
         STATES.put(tardis.id(), new State(1, now + QUICK_PULL_TICKS, now, workedUp));
         return Refusal.WORKED_UP;
     }
 
-    private static Refusal giveIn(Tardis tardis, State state) {
+    private static Refusal giveIn(Tardis tardis, @Nullable UUID pilot, State state) {
         forget(tardis);
-        TardisMindSystem.addTrust(tardis, -FORCED_TRUST_LOSS * (1 + state.workedUp()));
+        TardisMindSystem.addTrust(tardis, pilot, -FORCED_TRUST_LOSS * (1 + state.workedUp()));
         return Refusal.NONE;
     }
 

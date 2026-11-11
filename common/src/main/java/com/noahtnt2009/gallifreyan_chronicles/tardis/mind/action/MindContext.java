@@ -7,6 +7,8 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.phys.Vec3;
 import org.jspecify.annotations.Nullable;
 
+import java.util.UUID;
+
 /* what's going on when a hook runs. level, player and pos are only there when the hook has them */
 public final class MindContext {
     public final Tardis tardis;
@@ -14,6 +16,8 @@ public final class MindContext {
     public final @Nullable Player player;
     public final @Nullable Vec3 pos;
 
+    /* who pulled the lever, when it's "when_unwilling_to_fly". null means the owner */
+    public @Nullable UUID pilot;
     /* how far through something it is, 0 to 1. used by terror */
     public float progress;
     /* set by actions on "on_unwilling" to decide what the lever does */
@@ -26,6 +30,11 @@ public final class MindContext {
         this.level = level;
         this.player = player;
         this.pos = pos;
+    }
+
+    /* the player this is about: the one holding the mallet, or the pilot */
+    public @Nullable UUID who() {
+        return player != null ? player.getUUID() : pilot;
     }
 
     public static MindContext of(Tardis tardis) {

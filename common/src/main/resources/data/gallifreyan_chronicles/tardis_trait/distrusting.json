@@ -9,7 +9,11 @@
   "never_with": {
     "traits": [
       "loyal",
-      "welcoming"
+      "welcoming",
+      "forgiving"
+    ],
+    "personalities": [
+      "obedient"
     ]
   },
   "revealed_when": "its_controls_stick"

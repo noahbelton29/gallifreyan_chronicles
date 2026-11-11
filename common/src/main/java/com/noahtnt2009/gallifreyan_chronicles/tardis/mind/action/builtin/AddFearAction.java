@@ -20,6 +20,6 @@ public record AddFearAction(float amount) implements MindAction {
 
     @Override
     public void run(MindContext context) {
-        TardisMindSystem.addFear(context.tardis, amount);
+        TardisMindSystem.addFear(context.tardis, context.who(), amount);
     }
 }

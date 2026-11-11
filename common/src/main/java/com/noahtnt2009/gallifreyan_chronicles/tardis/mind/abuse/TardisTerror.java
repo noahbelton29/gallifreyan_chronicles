@@ -48,14 +48,16 @@ public final class TardisTerror {
         return episode != null && TardisMindSystem.now(tardis.server()) < episode.compliantUntil;
     }
 
-    public static boolean terrified(Tardis tardis) {
+    /* only freezes up around players who hurt it */
+    public static boolean terrified(Tardis tardis, UUID player) {
         TardisMind mind = TardisMindSystem.mind(tardis);
-        return mind.trauma() >= TERROR_TRAUMA && TardisMindSystem.fear(tardis) >= TERROR_FEAR && !compliant(tardis);
+        return mind.trauma() >= TERROR_TRAUMA && TardisMindSystem.hasHurt(tardis, player)
+                && TardisMindSystem.fear(tardis, player) >= TERROR_FEAR && !compliant(tardis);
     }
 
     /* true if the hit was part of snapping it out of a freeze */
     public static boolean strike(Tardis tardis, ServerLevel level, Vec3 hit, Player player) {
-        if (!terrified(tardis)) return false;
+        if (!terrified(tardis, player.getUUID())) return false;
         TardisPersonality personality = TardisMindSystem.mind(tardis).personality();
         Episode episode = EPISODES.computeIfAbsent(tardis.id(), id -> new Episode());
         if (episode.required == 0) episode.required = Math.max(1, personality.terrorHits().pickInt(level.getRandom()));

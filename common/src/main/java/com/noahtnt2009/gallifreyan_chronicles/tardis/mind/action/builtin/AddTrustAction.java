@@ -20,6 +20,6 @@ public record AddTrustAction(float amount) implements MindAction {
 
     @Override
     public void run(MindContext context) {
-        TardisMindSystem.addTrust(context.tardis, amount);
+        TardisMindSystem.addTrust(context.tardis, context.who(), amount);
     }
 }

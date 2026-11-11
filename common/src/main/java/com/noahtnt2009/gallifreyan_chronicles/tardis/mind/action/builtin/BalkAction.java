@@ -18,6 +18,6 @@ public record BalkAction() implements MindAction {
 
     @Override
     public void run(MindContext context) {
-        context.refusal = TardisConvincing.pull(context.tardis);
+        context.refusal = TardisConvincing.pull(context.tardis, context.pilot);
     }
 }

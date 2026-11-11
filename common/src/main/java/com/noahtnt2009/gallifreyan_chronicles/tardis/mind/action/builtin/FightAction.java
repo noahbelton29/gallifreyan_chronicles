@@ -21,7 +21,7 @@ public record FightAction(float stress) implements MindAction {
 
     @Override
     public void run(MindContext context) {
-        TardisAnger.provoke(context.tardis, stress);
+        TardisAnger.provoke(context.tardis, stress, context.pilot);
         context.refusal = Refusal.REFUSE;
     }
 }

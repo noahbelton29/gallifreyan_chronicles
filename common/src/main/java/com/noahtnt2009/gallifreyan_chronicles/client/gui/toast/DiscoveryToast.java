@@ -1,5 +1,6 @@
 package com.noahtnt2009.gallifreyan_chronicles.client.gui.toast;
 
+import com.noahtnt2009.gallifreyan_chronicles.Constants;
 import com.noahtnt2009.gallifreyan_chronicles.init.GCBlocks;
 import com.noahtnt2009.gallifreyan_chronicles.util.GCUtils;
 import net.minecraft.client.Minecraft;
@@ -27,7 +28,6 @@ public class DiscoveryToast implements Toast {
     private static final long BASE_MS = 6000L;
     private static final long MS_PER_LINE = 1500L;
 
-    /* vanilla advancement toast colours. quirks use the challenge pink */
     private static final int HEADER_COLOUR = 0xFFFFFF00;
     private static final int QUIRK_COLOUR = 0xFFFF88FF;
     private static final int NAME_COLOUR = 0xFFFFFFFF;
@@ -50,9 +50,12 @@ public class DiscoveryToast implements Toast {
     }
 
     public static void show(String kind, String id) {
-        Component name = Component.translatable(LANG + kind + "." + id);
+        String namespace = id.contains(":") ? id.substring(0, id.indexOf(':')) : Constants.MOD_ID;
+        String path = id.contains(":") ? id.substring(id.indexOf(':') + 1) : id;
+        String key = "discovery." + namespace + "." + kind + "." + path;
+        Component name = Component.translatable(key);
         Component header = Component.translatable(LANG + kind + ".found");
-        Component description = Component.translatable(LANG + kind + "." + id + ".desc");
+        Component description = Component.translatable(key + ".desc");
         if (kind.equals("personality")) {
             description = Component.translatable(LANG + "personality.intro").append(" ").append(description);
         }

@@ -1,57 +1,56 @@
 package com.noahtnt2009.gallifreyan_chronicles.tardis.mind;
 
 import com.mojang.serialization.Codec;
-import com.mojang.serialization.DataResult;
+import com.mojang.serialization.codecs.RecordCodecBuilder;
+import com.noahtnt2009.gallifreyan_chronicles.Constants;
+import com.noahtnt2009.gallifreyan_chronicles.data.IdentifiableData;
+import com.noahtnt2009.gallifreyan_chronicles.tardis.mind.action.MindAction;
+import com.noahtnt2009.gallifreyan_chronicles.tardis.mind.action.MindActions;
+import com.noahtnt2009.gallifreyan_chronicles.tardis.mind.data.MindRange;
+import com.noahtnt2009.gallifreyan_chronicles.util.GCUtils;
 
-import java.util.Arrays;
-import java.util.Optional;
+import java.util.List;
 
-public enum TardisPersonality {
-    OBEDIENT("obedient", 35, 101f, -1f, 0f),
-    SUBMISSIVE("submissive", 30, 60f, 20f, 25f),
-    DEFENSIVE("defensive", 25, 50f, 30f, 45f),
-    AGGRESSIVE("aggressive", 10, 40f, 35f, 75f);
+public record TardisPersonality(String id, int weight, float stressLimit, float trustLimit, float fearToComply,
+                                MindRange malletFear, float traumaPerHit, MindRange terrorHits,
+                                List<MindAction> onUnwilling, List<MindAction> onMalletSeen,
+                                List<MindAction> onMalletHit, List<MindAction> onTerrorHit,
+                                List<MindAction> onTakeOff, List<MindAction> onLand)
+        implements IdentifiableData<TardisPersonality> {
 
-    public static final Codec<TardisPersonality> CODEC = Codec.STRING.comapFlatMap(
-            id -> byId(id).map(DataResult::success)
-                    .orElseGet(() -> DataResult.error(() -> "unknown tardis personality " + id)),
-            TardisPersonality::id);
+    public static final TardisPersonality FALLBACK = new TardisPersonality(Constants.MOD_ID + ":obedient", 1,
+            101f, -1f, 0f, MindRange.of(15f), 3f, new MindRange(1, 2),
+            List.of(), List.of(), List.of(), List.of(), List.of(), List.of());
 
-    private final String id;
-    private final int weight;
-    private final float stressLimit;
-    private final float trustLimit;
-    private final float fearToComply;
+    public static final Codec<TardisPersonality> CODEC = RecordCodecBuilder.create(inst -> inst.group(
+            Codec.STRING.optionalFieldOf("id", "").forGetter(TardisPersonality::id),
+            Codec.INT.optionalFieldOf("weight", 10).forGetter(TardisPersonality::weight),
+            Codec.FLOAT.optionalFieldOf("stress_limit", 101f).forGetter(TardisPersonality::stressLimit),
+            Codec.FLOAT.optionalFieldOf("trust_limit", -1f).forGetter(TardisPersonality::trustLimit),
+            Codec.FLOAT.optionalFieldOf("fear_to_comply", 0f).forGetter(TardisPersonality::fearToComply),
+            MindRange.CODEC.optionalFieldOf("mallet_fear", MindRange.of(15f)).forGetter(TardisPersonality::malletFear),
+            Codec.FLOAT.optionalFieldOf("trauma_per_hit", 3f).forGetter(TardisPersonality::traumaPerHit),
+            MindRange.CODEC.optionalFieldOf("terror_hits", new MindRange(1, 2)).forGetter(TardisPersonality::terrorHits),
+            MindActions.LIST_CODEC.optionalFieldOf("on_unwilling", List.of()).forGetter(TardisPersonality::onUnwilling),
+            MindActions.LIST_CODEC.optionalFieldOf("on_mallet_seen", List.of()).forGetter(TardisPersonality::onMalletSeen),
+            MindActions.LIST_CODEC.optionalFieldOf("on_mallet_hit", List.of()).forGetter(TardisPersonality::onMalletHit),
+            MindActions.LIST_CODEC.optionalFieldOf("on_terror_hit", List.of()).forGetter(TardisPersonality::onTerrorHit),
+            MindActions.LIST_CODEC.optionalFieldOf("on_take_off", List.of()).forGetter(TardisPersonality::onTakeOff),
+            MindActions.LIST_CODEC.optionalFieldOf("on_land", List.of()).forGetter(TardisPersonality::onLand)
+    ).apply(inst, TardisPersonality::new));
 
-    TardisPersonality(String id, int weight, float stressLimit, float trustLimit, float fearToComply) {
-        this.id = id;
-        this.weight = weight;
-        this.stressLimit = stressLimit;
-        this.trustLimit = trustLimit;
-        this.fearToComply = fearToComply;
+    public String localId() {
+        return GCUtils.localPath(id);
     }
 
-    public float fearToComply() {
-        return fearToComply;
+    /* nothing to do when unwilling means it always flies, like obedient */
+    public boolean alwaysFlies() {
+        return onUnwilling.isEmpty();
     }
 
-    public String id() {
-        return id;
-    }
-
-    public int weight() {
-        return weight;
-    }
-
-    public float stressLimit() {
-        return stressLimit;
-    }
-
-    public float trustLimit() {
-        return trustLimit;
-    }
-
-    public static Optional<TardisPersonality> byId(String id) {
-        return Arrays.stream(values()).filter(p -> p.id.equals(id)).findFirst();
+    @Override
+    public TardisPersonality withId(String id) {
+        return new TardisPersonality(id, weight, stressLimit, trustLimit, fearToComply, malletFear, traumaPerHit,
+                terrorHits, onUnwilling, onMalletSeen, onMalletHit, onTerrorHit, onTakeOff, onLand);
     }
 }

@@ -1,0 +1,13 @@
+{
+  "weight": 10,
+  "modifiers": {
+    "stranger_shift": 20
+  },
+  "clashes_with": [
+    "welcoming"
+  ],
+  "banned_personalities": [
+    "obedient"
+  ],
+  "reveal": "stranger_pilot"
+}

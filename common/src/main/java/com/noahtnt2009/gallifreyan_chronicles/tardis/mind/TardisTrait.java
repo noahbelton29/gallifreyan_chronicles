@@ -1,61 +1,58 @@
 package com.noahtnt2009.gallifreyan_chronicles.tardis.mind;
 
 import com.mojang.serialization.Codec;
-import com.mojang.serialization.DataResult;
+import com.mojang.serialization.codecs.RecordCodecBuilder;
+import com.noahtnt2009.gallifreyan_chronicles.data.IdentifiableData;
+import com.noahtnt2009.gallifreyan_chronicles.tardis.mind.action.MindAction;
+import com.noahtnt2009.gallifreyan_chronicles.tardis.mind.action.MindActions;
+import com.noahtnt2009.gallifreyan_chronicles.tardis.mind.data.MindEnums;
+import com.noahtnt2009.gallifreyan_chronicles.tardis.mind.data.MindEnums.Reveal;
+import com.noahtnt2009.gallifreyan_chronicles.tardis.mind.data.MindIds;
+import com.noahtnt2009.gallifreyan_chronicles.tardis.mind.data.TraitModifiers;
+import com.noahtnt2009.gallifreyan_chronicles.util.GCUtils;
 
-import java.util.Arrays;
 import java.util.List;
-import java.util.Optional;
 
-public enum TardisTrait {
-    SKITTISH("skittish"),
-    LOYAL("loyal"),
-    STUBBORN("stubborn"),
-    FORGIVING("forgiving"),
-    GRUDGE_HOLDER("grudge_holder"),
-    PROTECTIVE("protective"),
-    POSSESSIVE("possessive"),
-    WELCOMING("welcoming"),
-    DISTRUSTING("distrusting");
+public record TardisTrait(String id, int weight, TraitModifiers modifiers, List<String> clashesWith,
+                          List<String> bannedPersonalities, Reveal reveal,
+                          List<MindAction> onUnwilling, List<MindAction> onTakeOff, List<MindAction> onLand)
+        implements IdentifiableData<TardisTrait> {
 
-    public static final Codec<TardisTrait> CODEC = Codec.STRING.comapFlatMap(
-            id -> byId(id).map(DataResult::success)
-                    .orElseGet(() -> DataResult.error(() -> "unknown tardis trait " + id)),
-            TardisTrait::id);
+    public static final Codec<TardisTrait> CODEC = RecordCodecBuilder.create(inst -> inst.group(
+            Codec.STRING.optionalFieldOf("id", "").forGetter(TardisTrait::id),
+            Codec.INT.optionalFieldOf("weight", 10).forGetter(TardisTrait::weight),
+            TraitModifiers.CODEC.optionalFieldOf("modifiers", TraitModifiers.NONE).forGetter(TardisTrait::modifiers),
+            Codec.STRING.listOf().optionalFieldOf("clashes_with", List.of()).forGetter(TardisTrait::clashesWith),
+            Codec.STRING.listOf().optionalFieldOf("banned_personalities", List.of()).forGetter(TardisTrait::bannedPersonalities),
+            MindEnums.codec(Reveal.class).optionalFieldOf("reveal", Reveal.NEVER).forGetter(TardisTrait::reveal),
+            MindActions.LIST_CODEC.optionalFieldOf("on_unwilling", List.of()).forGetter(TardisTrait::onUnwilling),
+            MindActions.LIST_CODEC.optionalFieldOf("on_take_off", List.of()).forGetter(TardisTrait::onTakeOff),
+            MindActions.LIST_CODEC.optionalFieldOf("on_land", List.of()).forGetter(TardisTrait::onLand)
+    ).apply(inst, TardisTrait::new));
 
-    private final String id;
-
-    TardisTrait(String id) {
-        this.id = id;
-    }
-
-    public String id() {
-        return id;
+    public String localId() {
+        return GCUtils.localPath(id);
     }
 
     public boolean clashesWith(TardisTrait other) {
-        return clash(this, other) || clash(other, this);
-    }
-
-    private static boolean clash(TardisTrait a, TardisTrait b) {
-        return (a == WELCOMING && b == POSSESSIVE) || (a == FORGIVING && b == GRUDGE_HOLDER)
-                || (a == DISTRUSTING && (b == LOYAL || b == WELCOMING));
+        return lists(clashesWith, other.id) || lists(other.clashesWith, id);
     }
 
     public boolean fits(TardisPersonality personality) {
-        return switch (personality) {
-            case OBEDIENT -> this != STUBBORN && this != POSSESSIVE;
-            case SUBMISSIVE -> this != STUBBORN;
-            case DEFENSIVE -> this != WELCOMING;
-            case AGGRESSIVE -> this != WELCOMING && this != FORGIVING && this != PROTECTIVE;
-        };
+        return !lists(bannedPersonalities, personality.id());
     }
 
     public boolean fits(TardisPersonality personality, List<TardisTrait> others) {
         return fits(personality) && others.stream().noneMatch(this::clashesWith);
     }
 
-    public static Optional<TardisTrait> byId(String id) {
-        return Arrays.stream(values()).filter(t -> t.id.equals(id)).findFirst();
+    private static boolean lists(List<String> ids, String id) {
+        String wanted = MindIds.normalize(id);
+        return ids.stream().anyMatch(each -> MindIds.normalize(each).equals(wanted));
+    }
+
+    @Override
+    public TardisTrait withId(String id) {
+        return new TardisTrait(id, weight, modifiers, clashesWith, bannedPersonalities, reveal, onUnwilling, onTakeOff, onLand);
     }
 }

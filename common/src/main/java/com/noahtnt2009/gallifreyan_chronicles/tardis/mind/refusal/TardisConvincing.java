@@ -76,7 +76,7 @@ public final class TardisConvincing {
     }
 
     private static int pullsNeeded(Tardis tardis, State state) {
-        int base = TardisMindSystem.mind(tardis).has(TardisTrait.STUBBORN) ? 2 : 1;
+        int base = TardisMindSystem.mind(tardis).modifiers().refusalShift() > 0f ? 2 : 1;
         return base + state.workedUp();
     }
 }

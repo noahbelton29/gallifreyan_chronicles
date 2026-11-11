@@ -1,0 +1,63 @@
+{
+  "weight": 10,
+  "stress_limit": 40,
+  "trust_limit": 35,
+  "fear_to_comply": 75,
+  "mallet_fear": {
+    "min": 6,
+    "max": 15
+  },
+  "trauma_per_hit": 2.0,
+  "terror_hits": {
+    "min": 6,
+    "max": 10
+  },
+  "on_unwilling": [
+    {
+      "type": "fight",
+      "stress": 2
+    }
+  ],
+  "on_mallet_seen": [
+    {
+      "type": "particles",
+      "particle": "minecraft:electric_spark",
+      "count": 30,
+      "spread": [
+        0.6,
+        0.8,
+        0.6
+      ],
+      "speed": 0.3,
+      "height": 1
+    },
+    {
+      "type": "shock",
+      "range": 4,
+      "damage": 2,
+      "push": 0.6,
+      "lift": 0.3
+    },
+    {
+      "type": "message",
+      "key": "mallet_seen_threatens",
+      "colour": "red"
+    }
+  ],
+  "on_mallet_hit": [
+    {
+      "type": "hit_back",
+      "max_damage": 6,
+      "min_damage": 2,
+      "push": 0.9
+    }
+  ],
+  "on_terror_hit": [
+    {
+      "type": "savage",
+      "max_damage": 10,
+      "min_damage": 4,
+      "burn_seconds": 3
+    }
+  ]
+}

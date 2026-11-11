@@ -1,5 +1,7 @@
 package com.noahtnt2009.gallifreyan_chronicles.tardis.mind.discovery;
 
+import com.noahtnt2009.gallifreyan_chronicles.tardis.mind.data.MindEnums.Reveal;
+
 import com.noahtnt2009.gallifreyan_chronicles.tardis.mind.TardisMind;
 import com.noahtnt2009.gallifreyan_chronicles.tardis.mind.TardisMindSystem;
 import com.noahtnt2009.gallifreyan_chronicles.tardis.mind.TardisPersonality;
@@ -35,7 +37,7 @@ public final class TardisDiscovery {
 
     /* obedient ones show it by flying anyway when they're properly stressed */
     private static void onTakeOff(Tardis tardis) {
-        if (TardisMindSystem.mind(tardis).personality() != TardisPersonality.OBEDIENT) return;
+        if (!TardisMindSystem.mind(tardis).personality().alwaysFlies()) return;
         if (TardisMindSystem.stress(tardis) >= OBEDIENT_REVEAL_STRESS) personality(tardis);
     }
 
@@ -43,8 +45,7 @@ public final class TardisDiscovery {
         TardisMind mind = TardisMindSystem.mind(tardis);
         boolean upset = mind.stress() >= NOTICEABLE || mind.fear() >= NOTICEABLE;
         if (!upset) return;
-        if (mind.has(TardisTrait.FORGIVING)) trait(tardis, TardisTrait.FORGIVING);
-        if (mind.has(TardisTrait.GRUDGE_HOLDER)) trait(tardis, TardisTrait.GRUDGE_HOLDER);
+        reveal(tardis, Reveal.UPSET_LANDING);
     }
 
     public static void personality(Tardis tardis) {
@@ -52,8 +53,16 @@ public final class TardisDiscovery {
         reveal(tardis, "personality", id, "personality", "tardis_mind/personality");
     }
 
+    public static void reveal(Tardis tardis, Reveal trigger) {
+        for (TardisTrait trait : TardisMindSystem.mind(tardis).traits()) {
+            if (trait.reveal() == trigger) trait(tardis, trait);
+        }
+    }
+
     public static void trait(Tardis tardis, TardisTrait trait) {
-        if (!TardisMindSystem.mind(tardis).has(trait)) return;
+        TardisMind mind = TardisMindSystem.mind(tardis);
+        if (!mind.has(trait)) return;
+        if (mind.knows("trait:" + trait.localId())) return;
         reveal(tardis, "trait:" + trait.id(), trait.id(), "trait", "tardis_mind/trait");
     }
 

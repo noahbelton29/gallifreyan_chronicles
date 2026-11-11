@@ -1,0 +1,29 @@
+{
+  "weight": 35,
+  "stress_limit": 101,
+  "trust_limit": -1,
+  "fear_to_comply": 0,
+  "mallet_fear": {
+    "min": 15,
+    "max": 15
+  },
+  "trauma_per_hit": 3.0,
+  "terror_hits": {
+    "min": 1,
+    "max": 2
+  },
+  "on_unwilling": [],
+  "on_mallet_seen": [
+    {
+      "type": "sound",
+      "sound": "gallifreyan_chronicles:stop_demat",
+      "volume": 0.4,
+      "pitch": 1.6
+    },
+    {
+      "type": "message",
+      "key": "mallet_seen_flinch",
+      "colour": "gray"
+    }
+  ]
+}

@@ -1,0 +1,11 @@
+{
+  "weight": 10,
+  "modifiers": {
+    "stranger_shift": -15
+  },
+  "banned_personalities": [
+    "defensive",
+    "aggressive"
+  ],
+  "reveal": "stranger_pilot"
+}

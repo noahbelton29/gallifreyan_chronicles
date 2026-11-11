@@ -1,0 +1,14 @@
+{
+  "weight": 10,
+  "modifiers": {
+    "stress_fade": 2.0,
+    "fear_fade": 2.0
+  },
+  "clashes_with": [
+    "grudge_holder"
+  ],
+  "banned_personalities": [
+    "aggressive"
+  ],
+  "reveal": "upset_landing"
+}

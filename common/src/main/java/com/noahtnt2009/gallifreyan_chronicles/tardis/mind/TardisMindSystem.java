@@ -11,32 +11,27 @@ import com.noahtnt2009.gallifreyan_chronicles.tardis.mind.refusal.TardisAnger;
 import com.noahtnt2009.gallifreyan_chronicles.tardis.mind.refusal.TardisConvincing;
 
 import com.noahtnt2009.gallifreyan_chronicles.tardis.api.Tardis;
+import com.noahtnt2009.gallifreyan_chronicles.tardis.api.TardisEvents;
+import com.noahtnt2009.gallifreyan_chronicles.tardis.mind.action.MindAction;
+import com.noahtnt2009.gallifreyan_chronicles.tardis.mind.action.MindActions;
+import com.noahtnt2009.gallifreyan_chronicles.tardis.mind.action.MindContext;
+import com.noahtnt2009.gallifreyan_chronicles.tardis.mind.data.MindEnums.Reveal;
+import com.noahtnt2009.gallifreyan_chronicles.tardis.mind.data.TraitModifiers;
 import net.minecraft.server.MinecraftServer;
 
 import java.util.List;
 import java.util.UUID;
+import java.util.function.Function;
 
 import org.jspecify.annotations.Nullable;
 
 public final class TardisMindSystem {
-    private static final float PESTER_STRESS = 2f;
-    private static final float STUBBORN_LIMIT_SHIFT = 10f;
-    private static final float SKITTISH_STRESS_GAIN = 1.5f;
-    private static final float LOYAL_TRUST_GAIN = 2f;
-    private static final float LOYAL_TRUST_LOSS = 0.5f;
     private static final float COWED_STRESS = 4f;
     private static final float COWED_TRUST_LOSS = 2f;
-    private static final float POSSESSIVE_STRANGER_SHIFT = 20f;
     private static final float DEVOTED_TRUST = 75f;
     private static final float PTSD_STRESS_GAIN = 1.3f;
     private static final float DEVOTED_STRESS_GAIN = 0.75f;
-    private static final float BETRAYED_TRUST_GAIN = 0.2f;
-    private static final float BETRAYED_TRUST_LOSS = 1.5f;
     private static final float BETRAYAL_TRUST_LOSS = 40f;
-    private static final float DISTRUSTING_TRUST_GAIN = 0.35f;
-    private static final float DISTRUSTING_TRUST_LOSS = 0.5f;
-    private static final float DISTRUSTING_ABUSE = 4f;
-    private static final float WELCOMING_STRANGER_SHIFT = -15f;
 
     public enum Refusal {
         NONE, COWED, BALK, WORKED_UP, REFUSE
@@ -50,6 +45,8 @@ public final class TardisMindSystem {
         TardisDyslexia.init();
         TardisDiscovery.init();
         TardisTrauma.init();
+        TardisEvents.TAKE_OFF.register(tardis -> runHook(tardis, TardisPersonality::onTakeOff, TardisTrait::onTakeOff));
+        TardisEvents.LAND.register(tardis -> runHook(tardis, TardisPersonality::onLand, TardisTrait::onLand));
     }
 
     public static void resetState() {
@@ -93,7 +90,7 @@ public final class TardisMindSystem {
     public static boolean cowed(Tardis tardis) {
         if (TardisTerror.compliant(tardis)) return true;
         TardisPersonality personality = mind(tardis).personality();
-        return personality != TardisPersonality.OBEDIENT && fear(tardis) >= personality.fearToComply();
+        return !personality.alwaysFlies() && fear(tardis) >= personality.fearToComply();
     }
 
     public static float trust(Tardis tardis) {
@@ -149,8 +146,8 @@ public final class TardisMindSystem {
 
     public static void addStress(Tardis tardis, float amount) {
         TardisMind mind = mind(tardis);
-        if (amount > 0f && mind.has(TardisTrait.SKITTISH)) {
-            amount *= SKITTISH_STRESS_GAIN;
+        if (amount > 0f) {
+            amount *= mind.modifiers().stressGain();
         }
         if (amount > 0f && mind.has(TardisDisability.PTSD)) {
             amount *= PTSD_STRESS_GAIN;
@@ -160,34 +157,28 @@ public final class TardisMindSystem {
         }
         long now = now(tardis.server());
         save(tardis, mind.withStress(mind.stressAt(now) + amount, now));
-        if (amount > 0f && mind.has(TardisTrait.SKITTISH)) TardisDiscovery.trait(tardis, TardisTrait.SKITTISH);
+        if (amount > 0f) TardisDiscovery.reveal(tardis, Reveal.STRESS_GAIN);
     }
 
     public static void addTrust(Tardis tardis, float amount) {
         TardisMind mind = mind(tardis);
-        if (mind.has(TardisTrait.LOYAL) && mind.betrayed()) {
-            amount *= amount > 0f ? BETRAYED_TRUST_GAIN : BETRAYED_TRUST_LOSS;
-        } else if (mind.has(TardisTrait.LOYAL)) {
-            amount *= amount > 0f ? LOYAL_TRUST_GAIN : LOYAL_TRUST_LOSS;
-        }
-        if (mind.has(TardisTrait.DISTRUSTING)) {
-            amount *= amount > 0f ? DISTRUSTING_TRUST_GAIN : DISTRUSTING_TRUST_LOSS;
-        }
+        TraitModifiers modifiers = mind.modifiers();
+        amount *= amount > 0f ? modifiers.trustGain() : modifiers.trustLoss();
         save(tardis, mind.withTrust(mind.trust() + amount));
-        if (mind.has(TardisTrait.LOYAL)) TardisDiscovery.trait(tardis, TardisTrait.LOYAL);
+        TardisDiscovery.reveal(tardis, Reveal.TRUST_CHANGE);
     }
 
     /* hurting it on purpose. distrusting ones never forget it */
     public static void abuse(Tardis tardis, float trustLoss) {
         TardisMind mind = mind(tardis);
-        float loss = mind.has(TardisTrait.DISTRUSTING) ? trustLoss * DISTRUSTING_ABUSE : trustLoss;
+        float loss = trustLoss * mind.modifiers().abuseTrustLoss();
         save(tardis, mind.withTrust(mind.trust() - loss));
     }
 
     /* a loyal tardis turned on. trust crashes and is very hard to win back */
     public static boolean betray(Tardis tardis) {
         TardisMind mind = mind(tardis);
-        if (!mind.has(TardisTrait.LOYAL) || mind.betrayed()) return false;
+        if (!mind.modifiers().betrayable() || mind.betrayed()) return false;
         save(tardis, mind.withBetrayed(true).withTrust(mind.trust() - BETRAYAL_TRUST_LOSS));
         return true;
     }
@@ -226,17 +217,15 @@ public final class TardisMindSystem {
 
     /* positive makes it say no sooner */
     private static float limitShift(Tardis tardis, TardisMind mind, @Nullable UUID pilot) {
-        float shift = mind.has(TardisTrait.STUBBORN) ? STUBBORN_LIMIT_SHIFT : 0f;
-        boolean stranger = pilot != null && !pilot.equals(tardis.ownerId());
-        if (stranger && mind.has(TardisTrait.POSSESSIVE)) shift += POSSESSIVE_STRANGER_SHIFT;
-        if (stranger && mind.has(TardisTrait.WELCOMING)) shift += WELCOMING_STRANGER_SHIFT;
+        TraitModifiers modifiers = mind.modifiers();
+        float shift = modifiers.refusalShift();
+        if (pilot != null && !pilot.equals(tardis.ownerId())) shift += modifiers.strangerShift();
         return shift;
     }
 
     private static void revealStrangerTraits(Tardis tardis, @Nullable UUID pilot) {
         if (pilot == null || pilot.equals(tardis.ownerId())) return;
-        TardisDiscovery.trait(tardis, TardisTrait.POSSESSIVE);
-        TardisDiscovery.trait(tardis, TardisTrait.WELCOMING);
+        TardisDiscovery.reveal(tardis, Reveal.STRANGER_PILOT);
     }
 
     public static Refusal refusesTakeoff(Tardis tardis, @Nullable UUID pilot) {
@@ -246,7 +235,7 @@ public final class TardisMindSystem {
             return Refusal.NONE;
         }
         TardisDiscovery.personality(tardis);
-        TardisDiscovery.trait(tardis, TardisTrait.STUBBORN);
+        TardisDiscovery.reveal(tardis, Reveal.REFUSAL);
         if (cowed(tardis)) {
             forget(tardis);
             addStress(tardis, COWED_STRESS);
@@ -254,17 +243,24 @@ public final class TardisMindSystem {
             return Refusal.COWED;
         }
 
-        return switch (mind(tardis).personality()) {
-            case OBEDIENT -> Refusal.NONE;
-            case SUBMISSIVE -> TardisConvincing.pull(tardis);
-            case DEFENSIVE -> {
-                addStress(tardis, PESTER_STRESS);
-                yield Refusal.REFUSE;
-            }
-            case AGGRESSIVE -> {
-                TardisAnger.provoke(tardis, PESTER_STRESS);
-                yield Refusal.REFUSE;
-            }
-        };
+        TardisMind mind = mind(tardis);
+        MindContext context = MindContext.of(tardis);
+        for (TardisTrait trait : mind.traits()) {
+            MindActions.run(trait.onUnwilling(), context);
+        }
+        if (context.refusal == null) {
+            MindActions.run(mind.personality().onUnwilling(), context);
+        }
+        return context.refusal == null ? Refusal.NONE : context.refusal;
+    }
+
+    private static void runHook(Tardis tardis, Function<TardisPersonality, List<MindAction>> personalityHook,
+                                Function<TardisTrait, List<MindAction>> traitHook) {
+        TardisMind mind = mind(tardis);
+        MindContext context = MindContext.of(tardis);
+        MindActions.run(personalityHook.apply(mind.personality()), context);
+        for (TardisTrait trait : mind.traits()) {
+            MindActions.run(traitHook.apply(trait), context);
+        }
     }
 }

@@ -1,0 +1,14 @@
+{
+  "weight": 10,
+  "modifiers": {
+    "start_trust": 3,
+    "trust_gain": 0.35,
+    "trust_loss": 0.5,
+    "abuse_trust_loss": 4.0
+  },
+  "clashes_with": [
+    "loyal",
+    "welcoming"
+  ],
+  "reveal": "controls_stick"
+}

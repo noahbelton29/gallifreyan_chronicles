@@ -1,0 +1,11 @@
+{
+  "weight": 10,
+  "modifiers": {
+    "refusal_shift": 10
+  },
+  "banned_personalities": [
+    "obedient",
+    "submissive"
+  ],
+  "reveal": "refusal"
+}

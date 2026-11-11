@@ -1,0 +1,8 @@
+{
+  "weight": 10,
+  "modifiers": {
+    "stress_gain": 1.5,
+    "stress_fade": 2.0
+  },
+  "reveal": "stress_gain"
+}

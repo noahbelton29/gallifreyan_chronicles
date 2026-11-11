@@ -1,0 +1,16 @@
+{
+  "weight": 10,
+  "modifiers": {
+    "trust_gain": 2.0,
+    "trust_loss": 0.5,
+    "trauma_gain": 1.7,
+    "betrayable": true,
+    "betrayed_trust_gain": 0.2,
+    "betrayed_trust_loss": 1.5,
+    "betrayed_trauma_gain": 2.2
+  },
+  "clashes_with": [
+    "distrusting"
+  ],
+  "reveal": "trust_change"
+}

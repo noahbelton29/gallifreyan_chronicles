@@ -1,5 +1,7 @@
 package com.noahtnt2009.gallifreyan_chronicles.tardis.mind.refusal;
 
+import com.noahtnt2009.gallifreyan_chronicles.tardis.mind.data.MindEnums;
+
 import com.noahtnt2009.gallifreyan_chronicles.tardis.mind.TardisMindSystem;
 import com.noahtnt2009.gallifreyan_chronicles.tardis.mind.TardisPersonality;
 import com.noahtnt2009.gallifreyan_chronicles.tardis.mind.mood.TardisAlarm;
@@ -71,7 +73,7 @@ public final class TardisRefusals {
 
     private static void refuse(ServerLevel level, TardisConsoleBlockEntity console, String leverId,
                                BlockPos soundPos, Vec3 leverPos, Tardis tardis, String reason) {
-        boolean aggressive = TardisMindSystem.mind(tardis).personality() == TardisPersonality.AGGRESSIVE;
+        boolean aggressive = TardisAnger.level(tardis) > 0;
         if (!aggressive) {
             snapLeverBack(level, console, leverId, soundPos, leverPos, Force.ANGRY);
             Messages.overlayNearby(level, leverPos, ChatFormatting.RED, "tardis_refuses." + reason);

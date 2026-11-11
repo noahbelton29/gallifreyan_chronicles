@@ -1,5 +1,7 @@
 package com.noahtnt2009.gallifreyan_chronicles.tardis.mind.refusal;
 
+import com.noahtnt2009.gallifreyan_chronicles.tardis.mind.data.MindEnums;
+
 import com.noahtnt2009.gallifreyan_chronicles.tardis.mind.TardisMindSystem;
 import com.noahtnt2009.gallifreyan_chronicles.tardis.mind.TardisTrait;
 import com.noahtnt2009.gallifreyan_chronicles.tardis.mind.discovery.TardisDiscovery;
@@ -51,7 +53,7 @@ public final class TardisWariness {
         level.sendParticles(ParticleTypes.SMOKE, control.getX(), control.getY() + 0.1, control.getZ(), 4, 0.05, 0.05, 0.05, 0.01);
         Messages.overlay(player, ChatFormatting.GRAY, trust < HOSTILE ? "tardis_controls_frozen" : "tardis_control_sticks");
 
-        TardisDiscovery.trait(tardis, TardisTrait.DISTRUSTING);
+        TardisDiscovery.reveal(tardis, MindEnums.Reveal.CONTROLS_STICK);
         if (trust < CAUTIOUS) TardisMindSystem.addTrust(tardis, TRUST_PER_JAM);
         return true;
     }

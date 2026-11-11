@@ -8,7 +8,10 @@ import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.mojang.brigadier.suggestion.Suggestions;
 import com.mojang.brigadier.suggestion.SuggestionsBuilder;
+import com.noahtnt2009.gallifreyan_chronicles.Constants;
 import com.noahtnt2009.gallifreyan_chronicles.tardis.api.Tardis;
+import com.noahtnt2009.gallifreyan_chronicles.tardis.mind.data.TardisPersonalities;
+import com.noahtnt2009.gallifreyan_chronicles.tardis.mind.data.TardisTraits;
 import com.noahtnt2009.gallifreyan_chronicles.tardis.mind.disability.TardisDisability;
 import com.noahtnt2009.gallifreyan_chronicles.tardis.mind.TardisMind;
 import com.noahtnt2009.gallifreyan_chronicles.tardis.mind.TardisMindSystem;
@@ -40,17 +43,17 @@ public final class MindCommands {
                 .then(literal("personality")
                         .then(literal("get").executes(MindCommands::getPersonality))
                         .then(literal("set")
-                                .then(argument("personality", StringArgumentType.word())
+                                .then(argument("personality", StringArgumentType.greedyString())
                                         .suggests(MindCommands::suggestPersonalities)
                                         .executes(MindCommands::setPersonality))))
                 .then(literal("traits")
                         .then(literal("get").executes(MindCommands::getTraits))
                         .then(literal("add")
-                                .then(argument("trait", StringArgumentType.word())
+                                .then(argument("trait", StringArgumentType.greedyString())
                                         .suggests(MindCommands::suggestTraits)
                                         .executes(MindCommands::addTrait)))
                         .then(literal("remove")
-                                .then(argument("trait", StringArgumentType.word())
+                                .then(argument("trait", StringArgumentType.greedyString())
                                         .suggests(MindCommands::suggestTraits)
                                         .executes(MindCommands::removeTrait)))
                         .then(literal("clear").executes(MindCommands::clearTraits)))
@@ -112,16 +115,16 @@ public final class MindCommands {
 
     private static CompletableFuture<Suggestions> suggestPersonalities(CommandContext<CommandSourceStack> ctx,
                                                                        SuggestionsBuilder builder) {
-        for (TardisPersonality personality : TardisPersonality.values()) {
-            builder.suggest(personality.id());
+        for (TardisPersonality personality : TardisPersonalities.all()) {
+            builder.suggest(shortId(personality.id()));
         }
         return builder.buildFuture();
     }
 
     private static CompletableFuture<Suggestions> suggestTraits(CommandContext<CommandSourceStack> ctx,
                                                                 SuggestionsBuilder builder) {
-        for (TardisTrait trait : TardisTrait.values()) {
-            builder.suggest(trait.id());
+        for (TardisTrait trait : TardisTraits.all()) {
+            builder.suggest(shortId(trait.id()));
         }
         return builder.buildFuture();
     }
@@ -131,7 +134,7 @@ public final class MindCommands {
             TardisMind mind = TardisMindSystem.mind(tardis);
             String willing = TardisMindSystem.unwilling(tardis) ? "mind.unwilling" : "mind.willing";
             return success(ctx, false, "mind",
-                    mind.personality().id(),
+                    shortId(mind.personality().id()),
                     traitList(mind),
                     disabilityList(mind),
                     oneDecimal(mind.skill() * 100f),
@@ -178,13 +181,13 @@ public final class MindCommands {
 
     private static int getPersonality(CommandContext<CommandSourceStack> ctx) throws CommandSyntaxException {
         return withTardis(ctx, (tardis, idText) ->
-                reply(ctx, tardis, "personality", TardisMindSystem.mind(tardis).personality().id(), false));
+                reply(ctx, tardis, "personality", shortId(TardisMindSystem.mind(tardis).personality().id()), false));
     }
 
     private static int setPersonality(CommandContext<CommandSourceStack> ctx) throws CommandSyntaxException {
         String id = StringArgumentType.getString(ctx, "personality");
         return withTardis(ctx, (tardis, idText) -> {
-            Optional<TardisPersonality> personality = TardisPersonality.byId(id);
+            Optional<TardisPersonality> personality = TardisPersonalities.byId(id);
             if (personality.isEmpty()) return fail(ctx, "unknown_personality", id);
 
             TardisMindSystem.setPersonality(tardis, personality.get());
@@ -200,16 +203,16 @@ public final class MindCommands {
     private static int addTrait(CommandContext<CommandSourceStack> ctx) throws CommandSyntaxException {
         String id = StringArgumentType.getString(ctx, "trait");
         return withTardis(ctx, (tardis, idText) -> {
-            Optional<TardisTrait> trait = TardisTrait.byId(id);
+            Optional<TardisTrait> trait = TardisTraits.byId(id);
             if (trait.isEmpty()) return fail(ctx, "unknown_trait", id);
 
             List<TardisTrait> traits = new ArrayList<>(TardisMindSystem.mind(tardis).traits());
             if (traits.contains(trait.get())) return fail(ctx, "trait_already", id);
             if (traits.size() >= TardisMind.MAX_TRAITS) return fail(ctx, "traits_full", TardisMind.MAX_TRAITS);
             TardisPersonality personality = TardisMindSystem.mind(tardis).personality();
-            if (!trait.get().fits(personality)) return fail(ctx, "trait_doesnt_fit", id, personality.id());
+            if (!trait.get().fits(personality)) return fail(ctx, "trait_doesnt_fit", id, shortId(personality.id()));
             Optional<TardisTrait> clash = traits.stream().filter(trait.get()::clashesWith).findFirst();
-            if (clash.isPresent()) return fail(ctx, "trait_clashes", id, clash.get().id());
+            if (clash.isPresent()) return fail(ctx, "trait_clashes", id, shortId(clash.get().id()));
 
             traits.add(trait.get());
             return saveTraits(ctx, tardis, traits);
@@ -219,7 +222,7 @@ public final class MindCommands {
     private static int removeTrait(CommandContext<CommandSourceStack> ctx) throws CommandSyntaxException {
         String id = StringArgumentType.getString(ctx, "trait");
         return withTardis(ctx, (tardis, idText) -> {
-            Optional<TardisTrait> trait = TardisTrait.byId(id);
+            Optional<TardisTrait> trait = TardisTraits.byId(id);
             if (trait.isEmpty()) return fail(ctx, "unknown_trait", id);
 
             List<TardisTrait> traits = new ArrayList<>(TardisMindSystem.mind(tardis).traits());
@@ -289,7 +292,12 @@ public final class MindCommands {
 
     private static String traitList(TardisMind mind) {
         if (mind.traits().isEmpty()) return "none";
-        return String.join(", ", mind.traits().stream().map(TardisTrait::id).toList());
+        return String.join(", ", mind.traits().stream().map(trait -> shortId(trait.id())).toList());
+    }
+
+    private static String shortId(String id) {
+        String prefix = Constants.MOD_ID + ":";
+        return id.startsWith(prefix) ? id.substring(prefix.length()) : id;
     }
 
     private static String oneDecimal(float value) {

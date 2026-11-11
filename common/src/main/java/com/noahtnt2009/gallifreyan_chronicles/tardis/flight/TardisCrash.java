@@ -1,5 +1,7 @@
 package com.noahtnt2009.gallifreyan_chronicles.tardis.flight;
 
+import com.noahtnt2009.gallifreyan_chronicles.tardis.mind.data.MindEnums;
+
 import java.util.UUID;
 
 import java.util.Set;
@@ -56,7 +58,6 @@ public final class TardisCrash {
         return CRASHING.contains(tardis.id());
     }
 
-    private static final float PROTECTIVE_SOFTENING = 0.5F;
 
     public static void reset() {
         CRASHING.clear();
@@ -65,7 +66,7 @@ public final class TardisCrash {
     public static void run(Tardis tardis, ServerLevel interior, BlockPos consolePos, int landingTicks) {
         CRASHING.add(tardis.id());
         TardisMindSystem.addStress(tardis, CRASH_STRESS);
-        TardisDiscovery.trait(tardis, TardisTrait.PROTECTIVE);
+        TardisDiscovery.reveal(tardis, MindEnums.Reveal.CRASH);
         int flashes = landingTicks / TardisAlarm.FLASH_TICKS + 1;
         TardisAlarm.flashLoud(interior, flashes);
 
@@ -161,7 +162,7 @@ public final class TardisCrash {
 
     /* protective tardises soften the crash for the people inside */
     private static float protection(Tardis tardis) {
-        return TardisMindSystem.mind(tardis).has(TardisTrait.PROTECTIVE) ? PROTECTIVE_SOFTENING : 1F;
+        return TardisMindSystem.mind(tardis).modifiers().crashSoftening();
     }
 
     private static void exteriorImpact(TardisExteriorBlockEntity exterior) {

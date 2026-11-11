@@ -1,0 +1,10 @@
+{
+  "weight": 10,
+  "modifiers": {
+    "crash_softening": 0.5
+  },
+  "banned_personalities": [
+    "aggressive"
+  ],
+  "reveal": "crash"
+}

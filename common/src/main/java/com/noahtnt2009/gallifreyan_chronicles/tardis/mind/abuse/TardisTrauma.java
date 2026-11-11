@@ -3,21 +3,15 @@ package com.noahtnt2009.gallifreyan_chronicles.tardis.mind.abuse;
 import com.noahtnt2009.gallifreyan_chronicles.tardis.mind.TardisMind;
 import com.noahtnt2009.gallifreyan_chronicles.tardis.mind.TardisMindSystem;
 import com.noahtnt2009.gallifreyan_chronicles.tardis.mind.TardisPersonality;
-import com.noahtnt2009.gallifreyan_chronicles.tardis.mind.TardisTrait;
 import com.noahtnt2009.gallifreyan_chronicles.tardis.mind.disability.TardisDisability;
 import com.noahtnt2009.gallifreyan_chronicles.tardis.mind.discovery.TardisDiscovery;
-
-import com.noahtnt2009.gallifreyan_chronicles.init.GCSounds;
 import com.noahtnt2009.gallifreyan_chronicles.tardis.api.Tardis;
+import com.noahtnt2009.gallifreyan_chronicles.tardis.mind.action.MindActions;
+import com.noahtnt2009.gallifreyan_chronicles.tardis.mind.action.MindContext;
 import com.noahtnt2009.gallifreyan_chronicles.tardis.api.TardisApi;
 import com.noahtnt2009.gallifreyan_chronicles.tardis.api.TardisEvents;
-import com.noahtnt2009.gallifreyan_chronicles.util.Messages;
-import com.noahtnt2009.gallifreyan_chronicles.util.PlayerMotion;
-import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
-import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.server.level.ServerLevel;
-import net.minecraft.sounds.SoundSource;
 import net.minecraft.util.Mth;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.entity.player.Player;
@@ -32,8 +26,6 @@ import java.util.UUID;
 /* long term scars from abuse. enough of it and the tardis gets ptsd */
 public final class TardisTrauma {
     private static final float PTSD_TRAUMA = 60f;
-    private static final float LOYAL_HURT = 1.7f;
-    private static final float BETRAYED_HURT = 2.2f;
     private static final float MIN_SENSITIVITY = 0.75f;
     private static final float MAX_SENSITIVITY = 1.25f;
     private static final float CALM_STRESS = 30f;
@@ -43,11 +35,9 @@ public final class TardisTrauma {
     private static final long REACT_COOLDOWN_TICKS = 100L;
     private static final double INSIDE_RANGE = 10.0;
     private static final double OUTSIDE_RANGE = 8.0;
-    private static final double SHOCK_RANGE = 4.0;
     private static final float SIGHT_FEAR = 2f;
     private static final float SIGHT_FEAR_PER_TRAUMA = 0.05f;
     private static final float SIGHT_STRESS = 2f;
-    private static final float THREAT_DAMAGE = 2F;
 
     private static final Map<UUID, Long> LAST_REACTION = new HashMap<>();
 
@@ -65,8 +55,7 @@ public final class TardisTrauma {
     /* how much one hit scars it. loyal ones feel it the most */
     public static void hit(Tardis tardis) {
         TardisMind mind = TardisMindSystem.mind(tardis);
-        float hurt = basePerHit(mind.personality()) * sensitivity(tardis);
-        if (mind.has(TardisTrait.LOYAL)) hurt *= mind.betrayed() ? BETRAYED_HURT : LOYAL_HURT;
+        float hurt = mind.personality().traumaPerHit() * sensitivity(tardis) * mind.modifiers().traumaGain();
         float trauma = mind.trauma() + hurt;
         TardisMindSystem.setTrauma(tardis, trauma);
 
@@ -78,14 +67,6 @@ public final class TardisTrauma {
         }
     }
 
-    private static float basePerHit(TardisPersonality personality) {
-        return switch (personality) {
-            case OBEDIENT -> 3.0f;
-            case SUBMISSIVE -> 3.5f;
-            case DEFENSIVE -> 2.5f;
-            case AGGRESSIVE -> 2.0f;
-        };
-    }
 
     /* every tardis takes it differently, but always the same for the same tardis */
     private static float sensitivity(Tardis tardis) {
@@ -119,29 +100,7 @@ public final class TardisTrauma {
     }
 
     private static void react(Tardis tardis, TardisPersonality personality, Player player, ServerLevel level, BlockPos at) {
-        switch (personality) {
-            case OBEDIENT, SUBMISSIVE -> {
-                level.playSound(null, at, GCSounds.TARDIS_STOP_DEMAT, SoundSource.BLOCKS, 0.4F, 1.6F);
-                Messages.overlay(player, ChatFormatting.GRAY, "mallet_seen_flinch");
-            }
-            case DEFENSIVE -> {
-                boolean outside = level != tardis.interiorLevel().orElse(null);
-                if (outside) tardis.lock();
-                level.playSound(null, at, GCSounds.TARDIS_DOOR_LOCK, SoundSource.BLOCKS, 0.8F, 0.8F);
-                Messages.overlay(player, ChatFormatting.GOLD, "mallet_seen_braces");
-            }
-            case AGGRESSIVE -> {
-                Vec3 centre = Vec3.atCenterOf(at);
-                level.sendParticles(ParticleTypes.ELECTRIC_SPARK, centre.x, centre.y + 1, centre.z, 30, 0.6, 0.8, 0.6, 0.3);
-                if (player.distanceToSqr(centre) <= SHOCK_RANGE * SHOCK_RANGE) {
-                    player.hurtServer(level, level.damageSources().lightningBolt(), THREAT_DAMAGE);
-                    Vec3 away = player.position().subtract(centre).multiply(1, 0, 1);
-                    away = away.lengthSqr() < 1.0E-4 ? new Vec3(0, 0, 1) : away.normalize();
-                    PlayerMotion.set(player, new Vec3(away.x * 0.6, 0.3, away.z * 0.6));
-                }
-                Messages.overlay(player, ChatFormatting.RED, "mallet_seen_threatens");
-            }
-        }
+        MindActions.run(personality.onMalletSeen(), new MindContext(tardis, level, player, Vec3.atCenterOf(at)));
     }
 
     private static List<Tardis> nearby(Player player, ServerLevel level) {

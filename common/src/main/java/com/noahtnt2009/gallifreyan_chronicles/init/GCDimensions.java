@@ -168,11 +168,11 @@ public class GCDimensions {
     }
 
     private static final Climate.ParameterPoint DRY_CLIMATE = Climate.parameters(
-            Climate.Parameter.span(-0.9f, 0.1f),
-            Climate.Parameter.span(0.2f, 1.0f),
-            Climate.Parameter.span(-1.0f, -0.2f),
+            Climate.Parameter.span(-1.0f, 0.2f),
+            Climate.Parameter.span(0.0f, 1.0f),
+            Climate.Parameter.span(-1.0f, -0.1f),
+            Climate.Parameter.span(-0.5f, 0.5f),
             Climate.Parameter.span(-0.4f, 0.4f),
-            Climate.Parameter.span(-0.3f, 0.3f),
             Climate.Parameter.span(-1.0f, 1.0f),
             0.0f
     );

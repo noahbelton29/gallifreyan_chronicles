@@ -27,15 +27,44 @@ import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
+/**
+ * Handles TARDIS alarms, including flashing lights and cloister bell sounds.
+ * <p>
+ * Alarms can run for a fixed number of flashes, continue until the TARDIS
+ * calms down, or remain active until a crashed TARDIS is repaired.
+ */
 public final class TardisAlarm {
+    /**
+     * Duration of each alarm flash and interval between repeated sounds, in ticks.
+     */
     public static final int FLASH_TICKS = 30;
+
+    /**
+     * Stress level below which a continuous stress alarm stops.
+     */
     private static final float CALM_STRESS = 30f;
+
+    /**
+     * Number of times the bell is played for a loud alarm.
+     */
     private static final int LOUD_LAYERS = 3;
+
     private static final float INSIDE_VOLUME = 1.0F;
     private static final float OUTSIDE_VOLUME = 0.6F;
+
+    /**
+     * Maximum distance from the TARDIS exterior at which the bell can be heard.
+     */
     private static final double LEAK_RANGE = 32.0;
 
+    /**
+     * TARDISes currently running a stress-based alarm.
+     */
     private static final Set<UUID> RUNNING = new HashSet<>();
+
+    /**
+     * TARDISes whose crash alarms continue until they are repaired.
+     */
     private static final Set<UUID> UNTIL_REPAIRED = new HashSet<>();
 
     private TardisAlarm() {
@@ -46,18 +75,38 @@ public final class TardisAlarm {
         UNTIL_REPAIRED.clear();
     }
 
+    /**
+     * Starts an alarm that continues until the TARDIS is repaired.
+     *
+     * @param tardis the crashed TARDIS
+     */
     public static void untilRepaired(Tardis tardis) {
         if (UNTIL_REPAIRED.add(tardis.id())) {
             repairTick(tardis);
         }
     }
 
+    /**
+     * Restarts crash alarms for TARDISes that are still crashed.
+     * <p>
+     * This allows alarms to resume after the server starts up again.
+     *
+     * @param server the server containing the TARDISes
+     */
     public static void resumeCrashAlarms(MinecraftServer server) {
         for (Tardis tardis : TardisApi.all(server)) {
             if (tardis.data().isCrashed(tardis.id())) untilRepaired(tardis);
         }
     }
 
+    /**
+     * Repeatedly checks whether a crashed TARDIS has been repaired.
+     * <p>
+     * While it remains crashed, the alarm continues to flash and ring.
+     * Once repaired or removed, the alarm is stopped.
+     *
+     * @param tardis the TARDIS being monitored
+     */
     private static void repairTick(Tardis tardis) {
         if (!UNTIL_REPAIRED.contains(tardis.id())) return;
         ServerLevel level = tardis.interiorLevel().orElse(null);
@@ -84,6 +133,15 @@ public final class TardisAlarm {
         flashWithBell(level, times, () -> loudBell(level));
     }
 
+    /**
+     * Broadcasts a fixed-duration alarm and schedules its bell sounds.
+     * <p>
+     * Each sound is scheduled one flash interval apart.
+     *
+     * @param level the level where the alarm is played
+     * @param times the number of flashes and bell sounds
+     * @param ring  the sound action to perform for each interval
+     */
     private static void flashWithBell(ServerLevel level, int times, Runnable ring) {
         TardisAlarmPayload.broadcast(level, times);
         for (int i = 0; i < times; i++) {
@@ -91,12 +149,30 @@ public final class TardisAlarm {
         }
     }
 
+    /**
+     * Starts an alarm that continues until the TARDIS's stress falls below
+     * the calm threshold.
+     *
+     * @param tardis  the TARDIS whose stress is being monitored
+     * @param level   the level where the alarm is played
+     * @param bellPos the bell position
+     */
     public static void untilCalm(Tardis tardis, ServerLevel level, BlockPos bellPos) {
         if (!RUNNING.add(tardis.id())) return;
         TardisAlarmPayload.broadcast(level, TardisAlarmPayload.FOREVER);
         tick(tardis, level, bellPos);
     }
 
+    /**
+     * Checks whether a stress-based alarm should continue.
+     * <p>
+     * Stops the alarm when the TARDIS is removed or its stress drops below
+     * {@link #CALM_STRESS}.
+     *
+     * @param tardis  the TARDIS being monitored
+     * @param level   the level where the alarm is played
+     * @param bellPos the bell position
+     */
     private static void tick(Tardis tardis, ServerLevel level, BlockPos bellPos) {
         if (!RUNNING.contains(tardis.id())) return;
 
@@ -118,7 +194,14 @@ public final class TardisAlarm {
         }
     }
 
-    /* same loudness everywhere inside, and it leaks out through the doors */
+    /**
+     * Plays the cloister bell for players inside the TARDIS and nearby players
+     * outside its exterior.
+     * <p>
+     * The sound is played at full volume inside and reduced volume outside.
+     *
+     * @param level the TARDIS interior level
+     */
     private static void bell(ServerLevel level) {
         for (ServerPlayer player : level.players()) {
             ringAt(player, INSIDE_VOLUME);
@@ -134,7 +217,15 @@ public final class TardisAlarm {
                 player.getX(), player.getEyeY(), player.getZ(), volume, 1.0F, player.getRandom().nextLong()));
     }
 
-    /* players standing near this interior's tardis outside */
+    /**
+     * Finds players outside the TARDIS who are close enough to hear its bell.
+     * <p>
+     * Uses the exterior's block position as the centre of the distance check.
+     *
+     * @param interior the TARDIS interior level
+     * @return nearby players in the exterior level, or an empty list if the
+     * TARDIS or its loaded exterior cannot be found
+     */
     public static List<ServerPlayer> playersOutside(ServerLevel interior) {
         Tardis tardis = TardisApi.ofLevel(interior).orElse(null);
         if (tardis == null) return List.of();

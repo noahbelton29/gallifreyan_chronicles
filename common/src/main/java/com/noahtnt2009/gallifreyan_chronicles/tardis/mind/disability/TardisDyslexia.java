@@ -14,23 +14,40 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.util.RandomSource;
 
-/* mixes up its numbers on takeoff. worse when stressed, better with practice */
+/**
+ * Handles how dyslexia affects a TARDIS when it takes off.
+ * <p>
+ * A dyslexic TARDIS can mix up the coordinates of its landing target.
+ * Stress makes this more likely and can cause more severe mix-ups,
+ * while practising flying helps it get better over time.
+ */
 public final class TardisDyslexia {
     private static final float NEW_CHANCE = 0.8f;
     private static final float FLOOR_CHANCE = 0.05f;
     private static final float STRESS_WEIGHT = 0.6f;
     private static final float STRESSED = 50f;
     private static final float PANICKED = 80f;
-    /* each flight keeps this much of what's left to learn. ~10% chance after 100 flights */
+
+    // Each flight reduces the amount of confusion the TARDIS has left to learn from.
+    // This works out to roughly a 10% chance after 100 flights.
     private static final float PRACTICE_KEEP = (float) Math.exp(-1.0 / 37.0);
 
     private TardisDyslexia() {
     }
 
+    /**
+     * Registers the takeoff event so the TARDIS can handle its dyslexia.
+     */
     public static void init() {
         TardisEvents.TAKE_OFF.register(TardisDyslexia::onTakeOff);
     }
 
+    /**
+     * Checks whether the TARDIS mixes up its landing coordinates when taking off.
+     * <p>
+     * If it does, the owner is shown a message. The TARDIS also gets a little
+     * more practice with each flight, whether or not its coordinates were mixed up.
+     */
     private static void onTakeOff(Tardis tardis) {
         TardisMind mind = TardisMindSystem.mind(tardis);
         if (!mind.has(TardisDisability.DYSLEXIC)) return;
@@ -43,12 +60,29 @@ public final class TardisDyslexia {
         practise(tardis);
     }
 
-    /* calm chance, from 80% when new down towards 5% with practice */
+    /**
+     * Works out how likely the TARDIS is to get its coordinates mixed up.
+     * <p>
+     * The chance starts high and drops towards the minimum as the TARDIS
+     * gains experience.
+     *
+     * @param skill how much practice the TARDIS has gained, from 0 to 1
+     * @return the chance of a mix-up
+     */
     public static float calmChance(float skill) {
         return FLOOR_CHANCE + (NEW_CHANCE - FLOOR_CHANCE) * (1f - skill);
     }
 
-    /* scrambles the landing target. true if it got muddled */
+    /**
+     * Tries to scramble the landing target's X and Z coordinates.
+     * <p>
+     * Higher stress makes a mix-up more likely and can cause several changes
+     * to the coordinates instead of just one.
+     *
+     * @param tardis the TARDIS whose landing target may be changed
+     * @param random the random source used to decide what gets mixed up
+     * @return true if the landing target was changed
+     */
     public static boolean muddle(Tardis tardis, RandomSource random) {
         TardisMind mind = TardisMindSystem.mind(tardis);
         if (!mind.has(TardisDisability.DYSLEXIC)) return false;
@@ -88,12 +122,24 @@ public final class TardisDyslexia {
         return true;
     }
 
+    /**
+     * Gives the TARDIS a little more practice after each flight.
+     */
     private static void practise(Tardis tardis) {
         float skill = TardisMindSystem.skill(tardis);
         TardisMindSystem.setSkill(tardis, 1f - (1f - skill) * PRACTICE_KEEP);
     }
 
-    /* 142 -> 124 */
+    /**
+     * Swaps two neighbouring digits in a coordinate.
+     * <p>
+     * For example, 142 could become 124. Negative values keep their sign,
+     * and values with fewer than two digits are left alone.
+     *
+     * @param value  the coordinate to change
+     * @param random the random source used to choose which digits to swap
+     * @return the coordinate with two neighbouring digits swapped
+     */
     private static int swapDigits(int value, RandomSource random) {
         char[] digits = String.valueOf(Math.abs(value)).toCharArray();
         if (digits.length < 2) return value;

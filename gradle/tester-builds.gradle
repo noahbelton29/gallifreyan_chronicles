@@ -1,0 +1,280 @@
+import groovy.json.JsonOutput
+
+import java.net.URI
+import java.net.http.HttpClient
+import java.net.http.HttpRequest
+import java.net.http.HttpResponse
+import java.nio.charset.StandardCharsets
+import java.nio.file.Files
+import java.nio.file.StandardCopyOption
+import java.time.Duration
+import java.util.zip.ZipFile
+
+def gcTestersFile = rootProject.file('testers.properties')
+def gcWebhookProvider = providers.gradleProperty('gcDiscordWebhook')
+        .orElse(providers.environmentVariable('GC_DISCORD_WEBHOOK'))
+        .orElse('')
+def gcDiscordOff = providers.gradleProperty('discord')
+        .map { it.equalsIgnoreCase('off') || it.equalsIgnoreCase('false') }
+        .orElse(false)
+def gcTesterOnly = providers.gradleProperty('testerOnly').orElse('')
+def gcExpiresIn = providers.gradleProperty('expiresIn').orElse('')
+def gcWatermark = providers.gradleProperty('watermark').orElse('')
+def gcLoaders = ['fabric', 'neoforge']
+
+def gcParseTesters = { File file ->
+    if (!file.exists()) {
+        throw new GradleException("Missing ${file}. Add one 'name=uuid' line per tester.")
+    }
+    def result = new LinkedHashMap<String, List<String>>()
+    file.readLines('UTF-8').eachWithIndex { String rawLine, int index ->
+        def line = rawLine.trim()
+        if (line.isEmpty() || line.startsWith('#')) return
+        int eq = line.indexOf('=')
+        if (eq < 1) {
+            throw new GradleException("testers.properties line ${index + 1}: expected name=uuid")
+        }
+        def label = line.substring(0, eq).trim()
+        if (!(label ==~ /[A-Za-z0-9._-]+/)) {
+            throw new GradleException("testers.properties line ${index + 1}: name '${label}' may only use letters, digits, . _ -")
+        }
+        def uuids = line.substring(eq + 1).split(',').collect { it.trim() }.findAll { !it.isEmpty() }.collect { String raw ->
+            def text = raw.replace('-', '')
+            if (!(text ==~ /[0-9a-fA-F]{32}/)) {
+                throw new GradleException("testers.properties line ${index + 1}: '${raw}' is not a Minecraft UUID")
+            }
+            java.util.UUID.fromString(text.replaceFirst(/(.{8})(.{4})(.{4})(.{4})(.{12})/, '$1-$2-$3-$4-$5')).toString()
+        }
+        if (uuids.isEmpty()) {
+            throw new GradleException("testers.properties line ${index + 1}: no UUID for '${label}'")
+        }
+        if (result.containsKey(label)) {
+            throw new GradleException("testers.properties line ${index + 1}: '${label}' is listed twice")
+        }
+        result.put(label, uuids)
+    }
+    if (result.isEmpty()) {
+        throw new GradleException('testers.properties has no testers')
+    }
+    return result
+}
+
+
+def gcRunWrapper = { File dir, List<String> args ->
+    def windows = System.getProperty('os.name')
+            .toLowerCase()
+            .contains('win')
+
+    def command
+
+    if (windows) {
+        def gradleCommand = (
+                ['gradlew.bat'] + args
+        ).collect { arg ->
+            arg.contains(' ')
+                    ? "\"${arg}\""
+                    : arg
+        }.join(' ')
+
+        command = [
+                'cmd.exe',
+                '/d',
+                '/c',
+                gradleCommand
+        ]
+    } else {
+        command = ['./gradlew'] + args
+    }
+
+    logger.lifecycle("Starting nested Gradle build: ${args.join(' ')}")
+
+    def process = new ProcessBuilder(command)
+            .directory(dir)
+            .inheritIO()
+            .start()
+
+    int exitCode = process.waitFor()
+
+    logger.lifecycle("Nested Gradle build finished with exit code ${exitCode}")
+
+    return exitCode
+}
+
+def gcFindJar = { String module, long startedAt ->
+    def libs = rootProject.file("${module}/build/libs")
+    def jars = (libs.listFiles() ?: new File[0]).findAll { File f ->
+        f.name.startsWith('gc-' + module + '-') && f.name.endsWith('.jar') &&
+                !f.name.endsWith('-sources.jar') && !f.name.endsWith('-javadoc.jar') &&
+                f.lastModified() >= startedAt - 2000L
+    }.sort { File f -> -f.lastModified() }
+    if (jars.isEmpty()) {
+        throw new GradleException("No freshly built jar found in ${libs}")
+    }
+    return jars[0]
+}
+
+def gcReadBuildProps = { File jar ->
+    def zip = new ZipFile(jar)
+    try {
+        def entry = zip.getEntry('gc_build.properties')
+        if (entry == null) {
+            throw new GradleException("${jar.name} has no gc_build.properties")
+        }
+        def props = new Properties()
+        props.load(zip.getInputStream(entry))
+        return props
+    } finally {
+        zip.close()
+    }
+}
+
+def gcUtf8 = { String s -> s.getBytes(StandardCharsets.UTF_8) }
+
+def gcDiscordSend = { String webhook, String content, File file ->
+    def client = HttpClient.newBuilder().connectTimeout(Duration.ofSeconds(20)).build()
+    def url = webhook + (webhook.contains('?') ? '&' : '?') + 'wait=true'
+    def payload = [content: content, username: 'GC Build Bot', allowed_mentions: [parse: []]]
+    String contentType
+    byte[] body
+    if (file == null) {
+        contentType = 'application/json'
+        body = gcUtf8(JsonOutput.toJson(payload))
+    } else {
+        def boundary = '----gcbuild' + java.util.UUID.randomUUID().toString().replace('-', '')
+        payload.attachments = [[id: 0, filename: file.name]]
+        def crlf = '\r\n'
+        def out = new ByteArrayOutputStream()
+        out.write(gcUtf8("--${boundary}${crlf}Content-Disposition: form-data; name=\"payload_json\"${crlf}Content-Type: application/json${crlf}${crlf}".toString()))
+        out.write(gcUtf8(JsonOutput.toJson(payload)))
+        out.write(gcUtf8("${crlf}--${boundary}${crlf}Content-Disposition: form-data; name=\"files[0]\"; filename=\"${file.name}\"${crlf}Content-Type: application/java-archive${crlf}${crlf}".toString()))
+        out.write(Files.readAllBytes(file.toPath()))
+        out.write(gcUtf8("${crlf}--${boundary}--${crlf}".toString()))
+        contentType = 'multipart/form-data; boundary=' + boundary
+        body = out.toByteArray()
+    }
+    for (int attempt = 1; attempt <= 6; attempt++) {
+        def request = HttpRequest.newBuilder(URI.create(url))
+                .timeout(Duration.ofMinutes(5))
+                .header('Content-Type', contentType)
+                .POST(HttpRequest.BodyPublishers.ofByteArray(body))
+                .build()
+        def response = client.send(request, HttpResponse.BodyHandlers.ofString())
+        int status = response.statusCode()
+        if (status >= 200 && status < 300) return
+        if (status == 429) {
+            double waitSeconds = 2.0d
+            def header = response.headers().firstValue('Retry-After')
+            if (header.isPresent()) {
+                try {
+                    waitSeconds = Double.parseDouble(header.get())
+                } catch (NumberFormatException ignored) {
+                }
+            }
+            Thread.sleep((long) (waitSeconds * 1000d) + 250L)
+            continue
+        }
+        if (status == 413) {
+            throw new GradleException("Discord rejected ${file == null ? 'the message' : file.name} as too large (HTTP 413). " +
+                    "Webhook uploads are capped by the server's upload limit.")
+        }
+        def text = response.body() == null ? '' : response.body()
+        throw new GradleException("Discord request failed (HTTP ${status}): ${text.length() > 300 ? text.substring(0, 300) : text}")
+    }
+    throw new GradleException('Discord kept rate limiting the webhook; gave up after 6 tries')
+}
+
+def gcFormatSize = { File f -> String.format(Locale.ROOT, '%.1f MB', f.length() / (1024d * 1024d)) }
+
+tasks.register('buildTesterJars') {
+    group = 'gallifreyan'
+    description = 'Builds a Fabric and a NeoForge jar per tester in testers.properties (locked to their UUIDs) and posts them to Discord'
+    doLast {
+        def testers = gcParseTesters(gcTestersFile)
+
+        def only = gcTesterOnly.get().split(',').collect { it.trim() }.findAll { !it.isEmpty() }
+        if (!only.isEmpty()) {
+            def unknown = only.findAll { name -> !testers.keySet().any { it.equalsIgnoreCase(name) } }
+            if (!unknown.isEmpty()) {
+                throw new GradleException("testerOnly names not in testers.properties: ${unknown.join(', ')}")
+            }
+            testers = testers.findAll { label, ids -> only.any { it.equalsIgnoreCase(label) } }
+        }
+
+        // check the webhook before spending minutes building
+        def webhook = gcWebhookProvider.get().trim()
+        def uploadEnabled = !gcDiscordOff.get() && !webhook.isEmpty()
+        if (uploadEnabled && !webhook.matches('https://(?:(?:ptb|canary)\\.)?discord(?:app)?\\.com/api/webhooks/\\d+/[\\w-]+(?:\\?.*)?')) {
+            throw new GradleException('gcDiscordWebhook / GC_DISCORD_WEBHOOK is not a Discord webhook URL')
+        }
+        if (!uploadEnabled) {
+            logger.lifecycle(gcDiscordOff.get()
+                    ? 'Discord upload disabled (-Pdiscord=off)'
+                    : 'No Discord webhook configured (gcDiscordWebhook / GC_DISCORD_WEBHOOK); jars will only be built locally')
+        }
+
+        def runStamp = java.time.LocalDateTime.now().format(java.time.format.DateTimeFormatter.ofPattern('yyyy-MM-dd_HH-mm-ss'))
+        def outDir = rootProject.layout.buildDirectory.dir("tester-jars/${runStamp}").get().asFile
+        outDir.mkdirs()
+
+        def built = []
+        testers.each { String label, List<String> uuids ->
+            logger.lifecycle("=== Building for ${label} (${uuids.join(', ')}) ===")
+            def args = [':fabric:jar', ':neoforge:jar', "-PtesterLabel=${label}".toString(), "-PlockUuid=${uuids.join(',')}".toString(), '--console=plain']
+            if (!gcExpiresIn.get().trim().isEmpty()) args << "-PexpiresIn=${gcExpiresIn.get().trim()}".toString()
+            if (!gcWatermark.get().trim().isEmpty()) args << "-Pwatermark=${gcWatermark.get().trim()}".toString()
+
+            long startedAt = System.currentTimeMillis()
+            int code = gcRunWrapper(rootProject.projectDir, args)
+            if (code != 0) {
+                throw new GradleException("Build for ${label} failed (exit ${code}); nothing was uploaded")
+            }
+
+            gcLoaders.each { String loader ->
+                def jar = gcFindJar(loader, startedAt)
+                def props = gcReadBuildProps(jar)
+                def baked = props.getProperty('lock_uuids', '').split(',').collect { it.trim() }.findAll { !it.isEmpty() } as Set
+                if (baked != (uuids as Set)) {
+                    throw new GradleException("${jar.name} is locked to ${baked}, expected ${uuids}; refusing to ship it")
+                }
+                def jarName = jar.name.substring(0, jar.name.length() - 4) + '-' + label + '.jar'
+                def target = new File(outDir, jarName)
+                Files.copy(jar.toPath(), target.toPath(), StandardCopyOption.REPLACE_EXISTING)
+                built << [tester: label, loader: loader, file: target, props: props]
+                logger.lifecycle("  ${loader}: ${target.name} (${gcFormatSize(target)}), lock verified")
+            }
+        }
+
+        logger.lifecycle("Built ${built.size()} jars in ${outDir}")
+
+        if (!uploadEnabled) return
+
+        def failures = []
+        try {
+            gcDiscordSend(webhook,
+                    "**GC tester builds** - `${rootProject.version}` - ${testers.size()} testers (Fabric + NeoForge), account-locked".toString(),
+                    null)
+        } catch (Exception e) {
+            failures << "header message: ${e.message}".toString()
+        }
+        built.each { entry ->
+            def props = entry.props
+            def loaderName = entry.loader == 'fabric' ? 'Fabric' : 'NeoForge'
+            def text = "**${entry.tester}** - ${loaderName}".toString()
+            def buildId = props.getProperty('build_id', '-')
+            if (buildId != '-') text += " - build `${buildId}`"
+            def expires = props.getProperty('expires_at', '').trim()
+            if (!expires.isEmpty()) text += " - expires <t:${(long) (Long.parseLong(expires) / 1000L)}:R>"
+            try {
+                gcDiscordSend(webhook, text, entry.file)
+                logger.lifecycle("  posted ${entry.file.name}")
+            } catch (Exception e) {
+                failures << "${entry.file.name}: ${e.message}".toString()
+            }
+            Thread.sleep(700L)
+        }
+        if (!failures.isEmpty()) {
+            throw new GradleException("Some Discord posts failed (the jars are still in ${outDir}):\n  " + failures.join('\n  '))
+        }
+        logger.lifecycle('All jars posted to Discord')
+    }
+}

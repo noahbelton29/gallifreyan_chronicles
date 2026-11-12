@@ -17,24 +17,62 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
-/* a gift to make up with a tardis. it helps, but it can't replace earning trust:
-   it stops working once the tardis is fond of you, it needs a long gap between gifts, repeat gifts
-   count for less, and a frightened or betrayed tardis won't take it at all */
+/**
+ * Handles gifts offered to a TARDIS as a way of repairing a damaged relationship.
+ * <p>
+ * Gifts can improve trust and reduce stress, fear, and trauma, but their
+ * effectiveness decreases when offered repeatedly. They cannot replace
+ * earning trust through normal interactions.
+ */
 public final class TardisPeaceOffering {
     private static final float TRUST_GAIN = 6f;
     private static final float STRESS_RELIEF = 10f;
     private static final float FEAR_RELIEF = 15f;
     private static final float TRAUMA_RELIEF = 1f;
+
+    /**
+     * Maximum trust level at which a peace offering can still be accepted.
+     */
     private static final float TRUST_CEILING = 60f;
+
+    /**
+     * Fear level at which a TARDIS becomes too frightened to accept a gift.
+     */
     private static final float TOO_AFRAID = 40f;
+
+    /**
+     * Multiplier applied to the effectiveness of gifts for TARDISes with PTSD.
+     */
     private static final float PTSD_EFFECT = 0.5f;
+
+    /**
+     * Amount by which each consecutive gift reduces its effectiveness.
+     */
     private static final float STREAK_FALLOFF = 0.25f;
+
+    /**
+     * Minimum effectiveness a gift can have, regardless of the streak.
+     */
     private static final float MIN_EFFECT = 0.25f;
+
+    /**
+     * Minimum time between gifts from the same player to the same TARDIS.
+     */
     private static final long COOLDOWN_TICKS = 6000L;
+
+    /**
+     * Time after which a previous gift no longer counts towards the streak.
+     */
     private static final long STREAK_WINDOW_TICKS = 24000L;
 
+    /**
+     * Tracks the last offering made by each player to each TARDIS.
+     */
     private static final Map<String, Offering> OFFERINGS = new HashMap<>();
 
+    /**
+     * Stores the timing and consecutive gift count for an offering.
+     */
     private static final class Offering {
         final long tick;
         final int streak;
@@ -52,7 +90,23 @@ public final class TardisPeaceOffering {
         OFFERINGS.clear();
     }
 
-    /* true if the tardis took it, so the gift should be used up */
+    /**
+     * Attempts to offer a gift to a TARDIS.
+     * <p>
+     * A gift is rejected if the TARDIS has been betrayed, is too frightened,
+     * already trusts the player sufficiently, or has recently received another
+     * gift from them.
+     * <p>
+     * Accepted gifts improve the TARDIS's relationship with the player and
+     * reduce its negative mental states. Repeated gifts have diminishing
+     * effectiveness, and PTSD reduces their effectiveness further.
+     *
+     * @param tardis the TARDIS receiving the offering
+     * @param level  the server level containing the offering
+     * @param pos    the position where the offering is made
+     * @param player the player making the offering
+     * @return {@code true} if the TARDIS accepts the gift and it should be consumed
+     */
     public static boolean offer(Tardis tardis, ServerLevel level, BlockPos pos, Player player) {
         UUID who = player.getUUID();
         TardisMind mind = TardisMindSystem.mind(tardis);
@@ -79,12 +133,14 @@ public final class TardisPeaceOffering {
             return false;
         }
 
+        // Gifts within the streak window become progressively less effective.
         int streak = last != null && now - last.tick < STREAK_WINDOW_TICKS ? last.streak + 1 : 0;
         float effect = Math.max(MIN_EFFECT, 1f - STREAK_FALLOFF * streak);
+
         boolean ptsd = mind.has(TardisDisability.PTSD);
         if (ptsd) effect *= PTSD_EFFECT;
 
-        /* trust traits scale the gain, so work out how much to give to land exactly on the ceiling */
+        // Account for trust gain modifiers so the offering never pushes trust past the ceiling.
         float scale = Math.max(0.01f, mind.modifiersFor(bond).trustGain());
         float room = (TRUST_CEILING - bond.trust()) / scale;
         float gain = Math.min(TRUST_GAIN * effect, room);

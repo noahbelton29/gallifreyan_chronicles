@@ -19,3 +19,5 @@ subprojects {
         }
     }
 }
+
+apply from: 'gradle/tester-builds.gradle'

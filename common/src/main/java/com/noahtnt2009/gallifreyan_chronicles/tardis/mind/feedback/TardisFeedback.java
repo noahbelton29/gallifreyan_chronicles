@@ -11,21 +11,63 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
-/* shows players how a tardis feels. hearts for trust gained, smoke and sparks for trust lost.
-   small changes are rate limited so a busy console never turns into a particle storm */
+/**
+ * Shows how a TARDIS feels through particles around its console and exterior.
+ * <p>
+ * Gaining trust causes hearts to appear, while losing trust makes the TARDIS
+ * show signs of frustration or distress.
+ * <p>
+ * Small changes are limited by a cooldown so that frequent interactions
+ * don't fill the room with particles.
+ */
 public final class TardisFeedback {
+    /**
+     * What caused the TARDIS's trust to change.
+     */
     public enum Cause {
-        NORMAL, ABUSE, BETRAYAL
+        NORMAL,
+        ABUSE,
+        BETRAYAL
     }
 
+    /**
+     * Ignore small trust changes unless something serious has happened.
+     */
     private static final float MIN_CHANGE = 0.5f;
+
+    /**
+     * A loss this large makes the TARDIS show that it's unhappy.
+     */
     private static final float MODERATE_LOSS = 3f;
+
+    /**
+     * Trust changes this large trigger a stronger reaction.
+     */
     private static final float MAJOR_CHANGE = 8f;
+
+    /**
+     * The most particles a normal reaction can produce.
+     */
     private static final int MAX_PARTICLES = 6;
+
+    /**
+     * How long to wait between smaller particle reactions.
+     */
     private static final long COOLDOWN_TICKS = 20L;
+
+    /**
+     * How far above the console to spawn the particles.
+     */
     private static final double CONSOLE_HEIGHT = 1.1;
+
+    /**
+     * How far above the exterior to spawn the particles.
+     */
     private static final double EXTERIOR_HEIGHT = 2.2;
 
+    /**
+     * Remembers when each TARDIS last showed a reaction.
+     */
     private static final Map<UUID, Long> LAST = new HashMap<>();
 
     private TardisFeedback() {
@@ -35,7 +77,17 @@ public final class TardisFeedback {
         LAST.clear();
     }
 
-    /* change is how much trust really moved, after its traits and the 0 to 100 limits */
+    /**
+     * Called whenever a TARDIS gains or loses trust.
+     * <p>
+     * The size of the change determines how many particles appear.
+     * Serious events like abuse and betrayal can trigger a reaction
+     * straight away, even if the TARDIS has recently shown one.
+     *
+     * @param tardis the TARDIS whose trust has changed
+     * @param change how much trust was gained or lost
+     * @param cause  what caused the change
+     */
     public static void trustChanged(Tardis tardis, float change, Cause cause) {
         float size = Math.abs(change);
         boolean serious = cause != Cause.NORMAL;
@@ -63,6 +115,23 @@ public final class TardisFeedback {
         }
     }
 
+    /**
+     * Spawns the particles that show how the TARDIS feels about the change.
+     * <p>
+     * Gaining trust produces hearts. Losing trust produces different particles
+     * depending on how badly the TARDIS has been affected.
+     * <p>
+     * Betrayal gets its own stronger reaction, while smaller losses produce
+     * a more subtle effect.
+     *
+     * @param level  the dimension where the particles should appear
+     * @param pos    the block position to spawn them around
+     * @param height how far above the block the particles should appear
+     * @param count  how many particles to spawn
+     * @param gained whether the TARDIS gained trust
+     * @param size   how much trust changed
+     * @param cause  what caused the change
+     */
     private static void emit(ServerLevel level, BlockPos pos, double height, int count, boolean gained,
                              float size, Cause cause) {
         double x = pos.getX() + 0.5;

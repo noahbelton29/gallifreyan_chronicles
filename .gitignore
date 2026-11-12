@@ -30,3 +30,4 @@ build-ledger.csv
 
 # essential jars (local copies)
 libs/essential/
+/testers.properties

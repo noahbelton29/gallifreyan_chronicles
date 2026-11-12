@@ -1,6 +1,7 @@
 package com.noahtnt2009.gallifreyan_chronicles.mixin.server;
 
 import com.noahtnt2009.gallifreyan_chronicles.tardis.mind.mood.TardisAlarm;
+import com.noahtnt2009.gallifreyan_chronicles.tardis.mind.fright.TardisFright;
 
 import com.noahtnt2009.gallifreyan_chronicles.compat.voicechat.TardisVoiceLinks;
 import com.noahtnt2009.gallifreyan_chronicles.compat.portal.TardisPortalBridge;
@@ -45,6 +46,7 @@ public abstract class MinecraftServerMixin {
         TardisPortalBridge.tick(server);
         ConsoleSyncSystem.tick(server);
         TardisVoiceLinks.tick(server);
+        TardisFright.tick(server);
     }
 
     @Unique

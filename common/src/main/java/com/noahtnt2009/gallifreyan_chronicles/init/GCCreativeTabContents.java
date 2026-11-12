@@ -18,6 +18,7 @@ public final class GCCreativeTabContents {
         add(output, GCItems.TARDIS_KEY);
         add(output, GCItems.MASTER_TARDIS_KEY);
         add(output, GCItems.MALLET);
+        add(output, GCItems.JELLY_BABIES);
         add(output, GCItems.STATTENHEIM_REMOTE);
         add(output, GCBlocks.TARDIS_INTERIOR_DOOR);
         GCBlocks.pickableDoors().stream().findFirst().ifPresent(door -> add(output, door));

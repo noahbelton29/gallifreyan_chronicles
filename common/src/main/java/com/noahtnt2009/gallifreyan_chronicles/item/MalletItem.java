@@ -51,7 +51,7 @@ public class MalletItem extends Item {
         TardisTrauma.sawMallet(player, level);
     }
 
-    private static Optional<Tardis> tardisAt(Level level, BlockPos pos) {
+    static Optional<Tardis> tardisAt(Level level, BlockPos pos) {
         BlockPos exteriorPos = level.getBlockState(pos).getBlock() instanceof TardisTopBlock ? pos.below() : pos;
         if (level.getBlockEntity(exteriorPos) instanceof TardisExteriorBlockEntity exterior) {
             return TardisApi.of(exterior);

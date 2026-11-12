@@ -85,7 +85,7 @@ public class TardisExteriorBlockEntity extends BlockEntity implements GeoBlockEn
     private long lastLockedFeedbackAt = 0L;
     private long keyCooldownUntil = 0L;
     private AnimationController<TardisExteriorBlockEntity> controller;
-    private boolean locked = true;
+    private boolean locked = false;
     private static final int POWER_CHECK_INTERVAL_TICKS = 10;
     private static final int ENTRY_ZONE_INTERVAL_TICKS = 2;
     private boolean powered = true;
@@ -93,6 +93,11 @@ public class TardisExteriorBlockEntity extends BlockEntity implements GeoBlockEn
     private int doorAnimSeq = 0;
     private String doorAnim = "";
     private boolean doorAnimSeqKnown = false;
+    private boolean doorAnimInstant = false;
+    private int snapFramesLeft = 0;
+    /* a snap runs the animation at this speed for a few frames, then goes back to normal */
+    private static final int SNAP_SPEED = 999999;
+    private static final int SNAP_FRAMES = 3;
     private final int tickOffset;
     private final ExteriorFlight flight = new ExteriorFlight();
     private boolean lastShadowActive = true;
@@ -340,16 +345,24 @@ public class TardisExteriorBlockEntity extends BlockEntity implements GeoBlockEn
 
     private void snapAnimation(AnimationController<TardisExteriorBlockEntity> target, String animName) {
         target.setAnimation(RawAnimation.begin().thenPlay(animName));
-        target.setAnimationSpeed(999999);
-        new Thread(() -> {
-            try {
-                Thread.sleep(50);
-                if (controller != null) {
-                    controller.setAnimationSpeed(1.0);
-                }
-            } catch (InterruptedException ignored) {
-            }
-        }).start();
+        target.setAnimationSpeed(SNAP_SPEED);
+        snapFramesLeft = SNAP_FRAMES;
+    }
+
+    private void startSnapClient() {
+        if (controller == null) return;
+        controller.setAnimationSpeed(SNAP_SPEED);
+        snapFramesLeft = SNAP_FRAMES;
+    }
+
+    /* the doors go to closed right away on every client, no closing animation (used when the TARDIS is spawned) */
+    public void snapDoorsShut() {
+        if (level == null || level.isClientSide()) return;
+        DoorSystem.snapToState(asEntity(), DoorState.CLOSED);
+        doorAnimSeq++;
+        doorAnim = getAnimationForDoorState(DoorState.CLOSED);
+        doorAnimInstant = true;
+        sync();
     }
 
     public void resetAnimationState() {
@@ -365,8 +378,10 @@ public class TardisExteriorBlockEntity extends BlockEntity implements GeoBlockEn
     private void reapplyDoorVisualState() {
         if (level != null && level.isClientSide()) return;
         DoorState state = getDoorState();
-        String animName = getAnimationForDoorState(state);
-        playAnimation(animName);
+        doorAnimSeq++;
+        doorAnim = getAnimationForDoorState(state);
+        doorAnimInstant = true;
+        sync();
     }
 
     public float getYaw() {
@@ -782,6 +797,7 @@ public class TardisExteriorBlockEntity extends BlockEntity implements GeoBlockEn
         }
         doorAnimSeq++;
         doorAnim = animationName;
+        doorAnimInstant = false;
         sync();
     }
 
@@ -794,6 +810,7 @@ public class TardisExteriorBlockEntity extends BlockEntity implements GeoBlockEn
         output.putBoolean("Locked", locked);
         output.putInt("DoorAnimSeq", doorAnimSeq);
         output.putString("DoorAnim", doorAnim);
+        output.putBoolean("DoorAnimInstant", doorAnimInstant);
         flight.save(output);
         cloak.save(output);
     }
@@ -810,15 +827,19 @@ public class TardisExteriorBlockEntity extends BlockEntity implements GeoBlockEn
         portalActive = input.getBooleanOr("PortalActive", false);
         int animSeq = input.getIntOr("DoorAnimSeq", 0);
         String anim = input.getStringOr("DoorAnim", "");
+        boolean instant = input.getBooleanOr("DoorAnimInstant", false);
         if (doorAnimSeqKnown && animSeq != doorAnimSeq && !anim.isEmpty()
                 && level != null && level.isClientSide()) {
-            if (controller != null) {
+            if (instant) {
+                startSnapClient();
+            } else if (controller != null) {
                 controller.setAnimationSpeed(1.0);
             }
             triggerAnim("anim_controller", anim);
         }
         doorAnimSeq = animSeq;
         doorAnim = anim;
+        doorAnimInstant = instant;
         doorAnimSeqKnown = true;
     }
 
@@ -855,6 +876,8 @@ public class TardisExteriorBlockEntity extends BlockEntity implements GeoBlockEn
                         String animName = getAnimationForDoorState(doorState);
                         snapAnimation(state.controller(), animName);
                         needsStateSync = false;
+                    } else if (snapFramesLeft > 0 && --snapFramesLeft == 0) {
+                        state.controller().setAnimationSpeed(1.0);
                     }
                     return PlayState.CONTINUE;
                 }

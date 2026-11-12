@@ -1,6 +1,10 @@
 {
   "how_common": 10,
-  "refuses_strangers_sooner_by": 20,
+  "refuses_strangers_sooner_by": 15,
+  "trust": {
+    "gained": 1.2,
+    "strangers_start_at": 25
+  },
   "never_with": {
     "traits": [
       "welcoming"
@@ -9,8 +13,5 @@
       "obedient"
     ]
   },
-  "revealed_when": "a_stranger_flies_it",
-  "trust": {
-    "strangers_start_at": 20
-  }
+  "revealed_when": "a_stranger_upsets_it"
 }

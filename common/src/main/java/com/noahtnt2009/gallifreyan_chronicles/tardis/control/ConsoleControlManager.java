@@ -25,6 +25,8 @@ public class ConsoleControlManager {
     private static final double STRAY_SEARCH_RADIUS = 4.0;
 
     private final ConsoleControlHost host;
+    public static final String REVERSE_SUFFIX = "_reverse";
+
     private final ConsoleAnimatable animatable;
 
     private final transient List<TardisControlEntity> controlEntities = new ArrayList<>();
@@ -186,6 +188,14 @@ public class ConsoleControlManager {
             animatable.triggerAnimation(controlId, animationName, triggeringPlayer);
             controlAnimations.put(controlId, animationName);
         }
+    }
+
+    public void playControlAnimationReversed(String controlId, @Nullable Player triggeringPlayer) {
+        String animationName = host.resolveControlAnimation(controlId, true);
+        if (animationName == null) return;
+        animationName += REVERSE_SUFFIX;
+        animatable.triggerAnimation(controlId, animationName, triggeringPlayer);
+        controlAnimations.put(controlId, animationName);
     }
 
     public String getCurrentAnimation(String controlId) {

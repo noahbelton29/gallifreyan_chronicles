@@ -13,6 +13,7 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.LevelReader;
 import net.minecraft.world.level.block.BaseEntityBlock;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
@@ -231,6 +232,10 @@ public class InteriorDoorBlock extends BaseEntityBlock {
                             @Nullable LivingEntity placer, @NonNull ItemStack stack) {
         super.setPlacedBy(level, pos, state, placer, stack);
         if (level.isClientSide()) return;
+        if (stack.getOrDefault(GCDataComponents.PRIMARY_DOOR, false)
+                && level.getBlockEntity(pos) instanceof InteriorDoorBlockEntity primaryDoor) {
+            primaryDoor.setPrimary(true);
+        }
         if (linked && stack.get(GCDataComponents.DOOR_TYPE) != null
                 && level.getBlockEntity(pos) instanceof InteriorDoorBlockEntity door) {
             door.setDoorVariant(InteriorDoorBlockItem.selectedVariant(stack));
@@ -253,6 +258,9 @@ public class InteriorDoorBlock extends BaseEntityBlock {
                                                  @NotNull BlockState state, @NotNull Player player) {
         if (!level.isClientSide()) {
             BlockPos master = masterBlockPos(state, pos);
+            // read this first: breaking a non-master part removes the master (and its block entity) below
+            boolean primary = level.getBlockEntity(master) instanceof InteriorDoorBlockEntity masterDoor
+                    && masterDoor.isPrimary();
             Direction right = rightDirectionOf(state);
             Direction up = upDirectionOf(state);
             for (int x = 0; x < WIDTH; x++) {
@@ -267,10 +275,23 @@ public class InteriorDoorBlock extends BaseEntityBlock {
             }
             removeBarriers(level, master, state);
             if (!player.isCreative()) {
-                Block.popResource(level, master, new ItemStack(this));
+                ItemStack drop = new ItemStack(this);
+                if (primary) drop.set(GCDataComponents.PRIMARY_DOOR, true);
+                Block.popResource(level, master, drop);
             }
         }
         return super.playerWillDestroy(level, pos, state, player);
+    }
+
+    @Override
+    protected @NonNull ItemStack getCloneItemStack(@NonNull LevelReader level, @NonNull BlockPos pos,
+                                                   @NonNull BlockState state, boolean includeData) {
+        ItemStack stack = super.getCloneItemStack(level, pos, state, includeData);
+        if (level.getBlockEntity(masterBlockPos(state, pos)) instanceof InteriorDoorBlockEntity door
+                && door.isPrimary()) {
+            stack.set(GCDataComponents.PRIMARY_DOOR, true);
+        }
+        return stack;
     }
 
     @Override

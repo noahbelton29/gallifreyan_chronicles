@@ -1,5 +1,6 @@
 package com.noahtnt2009.gallifreyan_chronicles.client.sound;
 
+import com.noahtnt2009.gallifreyan_chronicles.client.tardis.TardisFrightClient;
 import com.noahtnt2009.gallifreyan_chronicles.config.GCConfig;
 import com.noahtnt2009.gallifreyan_chronicles.init.GCSounds;
 import net.minecraft.client.Minecraft;
@@ -77,6 +78,14 @@ public class TardisConsoleHumSoundInstance extends AbstractTickableSoundInstance
             this.volume = IN_RANGE_VOLUME * attenuation;
         }
         this.volume *= fade * (float) GCConfig.tardisHumVolume();
+
+        float warp = TardisFrightClient.humWarp(Minecraft.getInstance().level);
+        if (warp > 0f) {
+            this.pitch = TardisFrightClient.warpedPitch(warp);
+            this.volume *= TardisFrightClient.warpedVolume(warp);
+        } else {
+            this.pitch = 1.0F;
+        }
     }
 
     @Override

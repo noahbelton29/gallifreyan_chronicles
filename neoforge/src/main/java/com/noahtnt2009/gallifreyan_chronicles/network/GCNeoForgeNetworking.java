@@ -66,6 +66,11 @@ public final class GCNeoForgeNetworking {
                 (payload, context) -> context.enqueueWork(payload::apply)
         );
         registrar.playToClient(
+                TardisFrightPayload.TYPE,
+                TardisFrightPayload.STREAM_CODEC,
+                (payload, context) -> context.enqueueWork(payload::apply)
+        );
+        registrar.playToClient(
                 DiscoveryToastPayload.TYPE,
                 DiscoveryToastPayload.STREAM_CODEC,
                 (payload, context) -> context.enqueueWork(payload::apply)

@@ -77,6 +77,15 @@ public final class TardisDestinations {
         return increment(server, tardisId);
     }
 
+    /* left click: the same cycle, run backwards, so you can undo an overshoot without going all the way round */
+    public static int cycleIncrementBack(MinecraftServer server, UUID tardisId) {
+        TardisManager manager = TardisManager.get(server);
+        int count = INCREMENTS.length;
+        int previous = (manager.getCoordIncrementIndex(tardisId) - 1 + count) % count;
+        manager.setCoordIncrementIndex(tardisId, previous);
+        return increment(server, tardisId);
+    }
+
     public static @Nullable LandingTarget step(MinecraftServer server, UUID tardisId, Axis axis) {
         LandingTarget target = current(server, tardisId);
         if (target == null) return null;

@@ -65,6 +65,11 @@ public final class DoorSyncSystem {
         applyControl(server, tardisId, GCTardisControls.INTERIOR_DOOR_CONTROL, !state.isClosed(), false);
     }
 
+    /* silently keeps the console's interior door switch matching the primary door's real state */
+    public static void reconcileInteriorDoorControl(MinecraftServer server, UUID tardisId, DoorState state) {
+        applyControl(server, tardisId, GCTardisControls.INTERIOR_DOOR_CONTROL, !state.isClosed(), true);
+    }
+
     public static void onExteriorDoorChanged(MinecraftServer server, UUID tardisId, DoorState state,
                                        String animation, boolean opening) {
         for (InteriorDoorBlockEntity door : doorsOf(tardisId)) {

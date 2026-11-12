@@ -1,10 +1,11 @@
 {
   "how_common": 10,
   "stress": {
-    "calms_down": 2.0
+    "builds_up": 1.15,
+    "calms_down": 1.6
   },
   "fear": {
-    "fades": 2.0
+    "fades": 1.6
   },
   "never_with": {
     "traits": [

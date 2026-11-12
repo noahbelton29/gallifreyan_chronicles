@@ -13,7 +13,7 @@ public final class MindEnums {
 
     /* when a trait first shows itself */
     public enum Reveal {
-        IT_GETS_STRESSED, ITS_TRUST_CHANGES, IT_REFUSES, A_STRANGER_FLIES_IT, IT_CRASHES, IT_LANDS_UPSET,
+        IT_GETS_STRESSED, IT_LOSES_TRUST, IT_REFUSES, A_STRANGER_UPSETS_IT, IT_CRASHES, IT_LANDS_UPSET,
         ITS_CONTROLS_STICK, NEVER
     }
 

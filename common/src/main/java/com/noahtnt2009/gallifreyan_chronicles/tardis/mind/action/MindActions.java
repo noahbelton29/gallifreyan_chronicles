@@ -9,6 +9,7 @@ import com.noahtnt2009.gallifreyan_chronicles.tardis.mind.action.builtin.AddTrus
 import com.noahtnt2009.gallifreyan_chronicles.tardis.mind.action.builtin.BalkAction;
 import com.noahtnt2009.gallifreyan_chronicles.tardis.mind.action.builtin.FightAction;
 import com.noahtnt2009.gallifreyan_chronicles.tardis.mind.action.builtin.HitBackAction;
+import com.noahtnt2009.gallifreyan_chronicles.tardis.mind.action.builtin.LashOutAction;
 import com.noahtnt2009.gallifreyan_chronicles.tardis.mind.action.builtin.LockDoorsAction;
 import com.noahtnt2009.gallifreyan_chronicles.tardis.mind.action.builtin.MessageAction;
 import com.noahtnt2009.gallifreyan_chronicles.tardis.mind.action.builtin.ParticlesAction;
@@ -51,6 +52,7 @@ public final class MindActions {
         register(ShockAction.TYPE, ShockAction.CODEC);
         register(HitBackAction.TYPE, HitBackAction.CODEC);
         register(SavageAction.TYPE, SavageAction.CODEC);
+        register(LashOutAction.TYPE, LashOutAction.CODEC);
     }
 
     private MindActions() {

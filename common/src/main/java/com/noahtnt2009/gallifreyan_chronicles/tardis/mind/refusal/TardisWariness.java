@@ -20,26 +20,72 @@ import net.minecraft.sounds.SoundSource;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.player.Player;
 
-/* low trust makes the controls stick. keep trying and it slowly gives in */
+/**
+ * Handles control refusal based on the TARDIS's trust in the player.
+ *
+ * <p>Low trust makes controls more likely to stick or refuse to move.
+ * Repeated attempts can gradually improve trust and reduce the chance of refusal.
+ */
 public final class TardisWariness {
+
+    /**
+     * Trust below this value causes controls to always refuse.
+     */
     public static final float HOSTILE = 5f;
+
+    /**
+     * Trust below this value causes controls to have a higher chance of refusing.
+     */
     public static final float WARY = 20f;
+
+    /**
+     * Trust below this value causes a small chance of refusal.
+     */
     public static final float CAUTIOUS = 35f;
+
+    /**
+     * Maximum chance of a control sticking while the TARDIS is wary.
+     */
     private static final float WARY_MAX_JAM = 0.6f;
+
+    /**
+     * Minimum chance of a control sticking while the TARDIS is wary.
+     */
     private static final float WARY_MIN_JAM = 0.25f;
+
+    /**
+     * Chance of a control sticking while the TARDIS is cautious.
+     */
     private static final float CAUTIOUS_JAM = 0.1f;
-    private static final float TRUST_PER_JAM = 1f;
+
+    /**
+     * Trust gained when a control sticks, if the TARDIS is not afraid.
+     */
+    private static final float TRUST_PER_JAM = 2f;
 
     private TardisWariness() {
     }
 
-    /* true if the control refuses to move */
+    /**
+     * Checks whether a TARDIS control refuses to move.
+     *
+     * <p>Refusal depends on the TARDIS's trust in the player and whether
+     * the TARDIS is currently terrified of them.
+     *
+     * @param control control entity being used
+     * @param console console containing the control
+     * @param player  player attempting to use the control
+     * @return {@code true} if the control refuses to move
+     */
     public static boolean jams(TardisControlEntity control, TardisConsoleBlockEntity console, Player player) {
         if (!(control.level() instanceof ServerLevel level)) return false;
+
         Tardis tardis = TardisApi.of(console).orElse(null);
+
         if (tardis == null) return false;
 
         if (TardisTerror.compliant(tardis)) return false;
+
         if (TardisTerror.terrified(tardis, player.getUUID())) {
             level.playSound(null, control.blockPosition(), GCSounds.LEVER, SoundSource.BLOCKS, 0.5F, 0.4F);
             Messages.overlay(player, ChatFormatting.DARK_GRAY, "tardis_terrified");
@@ -47,6 +93,7 @@ public final class TardisWariness {
         }
 
         float trust = TardisMindSystem.trust(tardis, player.getUUID());
+
         if (level.getRandom().nextFloat() >= jamChance(trust)) return false;
 
         level.playSound(null, control.blockPosition(), GCSounds.LEVER, SoundSource.BLOCKS, 0.7F, 0.5F);
@@ -54,14 +101,35 @@ public final class TardisWariness {
         Messages.overlay(player, ChatFormatting.GRAY, trust < HOSTILE ? "tardis_controls_frozen" : "tardis_control_sticks");
 
         TardisDiscovery.reveal(tardis, MindEnums.Reveal.ITS_CONTROLS_STICK);
-        if (trust < CAUTIOUS) TardisMindSystem.addTrust(tardis, player.getUUID(), TRUST_PER_JAM);
+
+        // A successful refusal can improve trust, unless the TARDIS is afraid of the player.
+        if (trust < CAUTIOUS && !TardisMindSystem.afraidOf(tardis, player.getUUID())) {
+            TardisMindSystem.addTrust(tardis, player.getUUID(), TRUST_PER_JAM);
+        }
+
         return true;
     }
 
+    /**
+     * Calculates the chance of a control sticking based on the player's trust.
+     *
+     * <p>Hostile trust always causes refusal, wary trust gradually reduces
+     * the chance, cautious trust has a small fixed chance, and higher trust
+     * prevents controls from sticking.
+     *
+     * @param trust current trust value
+     * @return chance of the control sticking, between {@code 0.0} and {@code 1.0}
+     */
     public static float jamChance(float trust) {
         if (trust < HOSTILE) return 1f;
-        if (trust < WARY) return Mth.lerp((trust - HOSTILE) / (WARY - HOSTILE), WARY_MAX_JAM, WARY_MIN_JAM);
+
+        // Interpolate between the two chances as trust improves.
+        if (trust < WARY) {
+            return Mth.lerp((trust - HOSTILE) / (WARY - HOSTILE), WARY_MAX_JAM, WARY_MIN_JAM);
+        }
+
         if (trust < CAUTIOUS) return CAUTIOUS_JAM;
+
         return 0f;
     }
 }

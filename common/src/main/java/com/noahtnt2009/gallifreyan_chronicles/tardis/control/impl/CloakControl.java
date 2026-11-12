@@ -48,7 +48,7 @@ public class CloakControl extends BaseControl {
 
     @Override
     public void onStateChanged(TardisConsoleBlockEntity console, boolean activated) {
-        tardis(console).flatMap(Tardis::exterior).ifPresent(exterior -> exterior.setCloaked(activated));
+        linkedTardis(console).flatMap(Tardis::exterior).ifPresent(exterior -> exterior.setCloaked(activated));
     }
 
     @Override

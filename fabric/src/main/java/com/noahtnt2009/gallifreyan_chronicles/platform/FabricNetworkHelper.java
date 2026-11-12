@@ -8,6 +8,7 @@ import com.noahtnt2009.gallifreyan_chronicles.network.TardisConsoleRotorStatePay
 import com.noahtnt2009.gallifreyan_chronicles.network.TardisConsoleSyncPayload;
 import com.noahtnt2009.gallifreyan_chronicles.network.TardisDrumShakePayload;
 import com.noahtnt2009.gallifreyan_chronicles.network.TardisAlarmPayload;
+import com.noahtnt2009.gallifreyan_chronicles.network.TardisFrightPayload;
 import com.noahtnt2009.gallifreyan_chronicles.network.DiscoveryToastPayload;
 import com.noahtnt2009.gallifreyan_chronicles.network.TardisCrashRumblePayload;
 import com.noahtnt2009.gallifreyan_chronicles.network.TardisExteriorSyncPayload;
@@ -106,6 +107,11 @@ public class FabricNetworkHelper implements INetworkHelper {
 
     @Override
     public void sendTardisAlarm(ServerPlayer player, TardisAlarmPayload payload) {
+        ServerPlayNetworking.send(player, payload);
+    }
+
+    @Override
+    public void sendTardisFright(ServerPlayer player, TardisFrightPayload payload) {
         ServerPlayNetworking.send(player, payload);
     }
 

@@ -74,14 +74,22 @@ public class InteriorDoorBlockEntity extends BlockEntity implements GeoBlockEnti
     private int doorAnimSeq = 0;
     private String doorAnim = "";
     private boolean doorAnimSeqKnown = false;
+    private boolean doorAnimInstant = false;
+    private int snapFramesLeft = 0;
+
+    /* a snap runs the animation at this speed for a few frames, then goes back to normal */
+    private static final int SNAP_SPEED = 999999;
+    private static final int SNAP_FRAMES = 3;
 
     private static final int EXIT_CHECK_INTERVAL_TICKS = 4;
+    private static final int CONTROL_SYNC_INTERVAL_TICKS = 10;
     private static final double EXIT_NEAR = -0.5;
     private static final double EXIT_FAR = 0.5;
     private static final double EXIT_HALF_WIDTH = 1.0;
     private static final double EXIT_BOTTOM = -0.5;
 
     private boolean primary;
+    private long cooldownUntilTick = 0L;
 
     public InteriorDoorBlockEntity(BlockPos pos, BlockState state) {
         super(TYPE.get(), pos, state);
@@ -132,6 +140,32 @@ public class InteriorDoorBlockEntity extends BlockEntity implements GeoBlockEnti
                 ? variantId
                 : TardisDoorRegistry.defaultVariantId(model);
         asEntity().set(TardisComponentTypes.DOOR_VARIANT, new DoorVariantComponent(resolved));
+    }
+
+    /**
+     * The three kinds of door this block entity can be, so "interior door" stops meaning all of them:
+     * <ul>
+     *   <li>{@link #TARDIS_DOOR}: the linked door (tardis_interior_door) that leads out of the TARDIS.
+     *       It follows the exterior's lock and the flight seal.</li>
+     *   <li>{@link #PRIMARY}: the door flagged primary in the interior structure, driven by the console's
+     *       interior door control. It is just a door: the TARDIS lock and the flight seal never touch it.</li>
+     *   <li>{@link #DECORATIVE}: any other fixed-variant door, not tied to the TARDIS at all.</li>
+     * </ul>
+     */
+    public enum Role {
+        TARDIS_DOOR,
+        PRIMARY,
+        DECORATIVE
+    }
+
+    public Role role() {
+        if (primary) return Role.PRIMARY;
+        return isLinked() ? Role.TARDIS_DOOR : Role.DECORATIVE;
+    }
+
+    /* only the TARDIS's own door obeys the exterior lock and the flight seal */
+    public boolean followsTardisLock() {
+        return role() == Role.TARDIS_DOOR;
     }
 
     public boolean isPrimary() {
@@ -203,6 +237,9 @@ public class InteriorDoorBlockEntity extends BlockEntity implements GeoBlockEnti
             DoorSyncSystem.register(tardisId, this);
             applyInteriorDoorVariant(serverLevel);
             if (!primary) DoorSyncSystem.pullFromExterior(serverLevel.getServer(), tardisId, this);
+        }
+        if (primary && tardisId != null && serverLevel.getGameTime() % CONTROL_SYNC_INTERVAL_TICKS == 0) {
+            DoorSyncSystem.reconcileInteriorDoorControl(serverLevel.getServer(), tardisId, getDoorState());
         }
         tickExit(serverLevel);
     }
@@ -284,14 +321,28 @@ public class InteriorDoorBlockEntity extends BlockEntity implements GeoBlockEnti
                 .ifPresent(this::setDoorVariant);
     }
 
+    /* only the primary door has a cooldown between toggles */
+    public boolean isOnCooldown() {
+        return primary && level != null && level.getGameTime() < cooldownUntilTick;
+    }
+
+    private void startCooldown() {
+        if (!primary || level == null) return;
+        TardisDoorVariant variant = TardisDoorRegistry.resolve(getVariant(), getDoorVariantId());
+        float seconds = variant != null ? variant.cooldownSeconds() : TardisDoorVariant.DEFAULT_COOLDOWN_SECONDS;
+        cooldownUntilTick = level.getGameTime() + Math.max(0, Math.round(seconds * 20f));
+    }
+
     public void interact(boolean sneaking) {
-        if (isTardisLocked() || isTardisSealedForTravel()) {
+        if (isOnCooldown()) return;
+        if (followsTardisLock() && (isTardisLocked() || isTardisSealedForTravel())) {
             announceLocked();
             return;
         }
         DoorSystem.InteractionResult result =
                 DoorSystem.interact(asEntity(), sneaking, System.currentTimeMillis(), openAllOnly());
         if (result.hasNoAnimation()) return;
+        startCooldown();
         if (controller != null) {
             controller.setAnimationSpeed(1.0);
         }
@@ -342,6 +393,7 @@ public class InteriorDoorBlockEntity extends BlockEntity implements GeoBlockEnti
     }
 
     public void announceLocked() {
+        if (!followsTardisLock()) return;
         long now = System.currentTimeMillis();
         if (now - lastLockedFeedbackAt < 1000L) return;
         lastLockedFeedbackAt = now;
@@ -354,6 +406,7 @@ public class InteriorDoorBlockEntity extends BlockEntity implements GeoBlockEnti
     }
 
     public void applySyncedLock(boolean locked) {
+        if (!followsTardisLock()) return;
         playLockSound(locked);
     }
 
@@ -362,6 +415,7 @@ public class InteriorDoorBlockEntity extends BlockEntity implements GeoBlockEnti
         if (getDoorState() == state) return;
         DoorSystem.snapToState(asEntity(), state);
         playDoorAnimation(animationFor(state));
+        doorAnimInstant = true;
         sync();
     }
 
@@ -372,6 +426,7 @@ public class InteriorDoorBlockEntity extends BlockEntity implements GeoBlockEnti
         }
         doorAnimSeq++;
         doorAnim = animationName;
+        doorAnimInstant = false;
     }
 
     private static String animationFor(DoorState state) {
@@ -443,16 +498,14 @@ public class InteriorDoorBlockEntity extends BlockEntity implements GeoBlockEnti
 
     private void snapAnimationClient(AnimationController<InteriorDoorBlockEntity> c) {
         c.setAnimation(RawAnimation.begin().thenPlay(animationFor(getDoorState())));
-        c.setAnimationSpeed(999999);
-        new Thread(() -> {
-            try {
-                Thread.sleep(50);
-                if (controller != null) {
-                    controller.setAnimationSpeed(1.0);
-                }
-            } catch (InterruptedException ignored) {
-            }
-        }).start();
+        c.setAnimationSpeed(SNAP_SPEED);
+        snapFramesLeft = SNAP_FRAMES;
+    }
+
+    private void startSnapClient() {
+        if (controller == null) return;
+        controller.setAnimationSpeed(SNAP_SPEED);
+        snapFramesLeft = SNAP_FRAMES;
     }
 
     public void sync() {
@@ -465,6 +518,7 @@ public class InteriorDoorBlockEntity extends BlockEntity implements GeoBlockEnti
         components.save(output, SAVED);
         output.putInt("DoorAnimSeq", doorAnimSeq);
         output.putString("DoorAnim", doorAnim);
+        output.putBoolean("DoorAnimInstant", doorAnimInstant);
         output.putBoolean("Primary", primary);
     }
 
@@ -475,15 +529,19 @@ public class InteriorDoorBlockEntity extends BlockEntity implements GeoBlockEnti
         primary = input.getBooleanOr("Primary", false);
         int animSeq = input.getIntOr("DoorAnimSeq", 0);
         String anim = input.getStringOr("DoorAnim", "");
+        boolean instant = input.getBooleanOr("DoorAnimInstant", false);
         if (doorAnimSeqKnown && animSeq != doorAnimSeq && !anim.isEmpty()
                 && level != null && level.isClientSide()) {
-            if (controller != null) {
+            if (instant) {
+                startSnapClient();
+            } else if (controller != null) {
                 controller.setAnimationSpeed(1.0);
             }
             triggerAnim("anim_controller", anim);
         }
         doorAnimSeq = animSeq;
         doorAnim = anim;
+        doorAnimInstant = instant;
         doorAnimSeqKnown = true;
     }
 
@@ -503,6 +561,8 @@ public class InteriorDoorBlockEntity extends BlockEntity implements GeoBlockEnti
             if (needsStateSync && level != null && level.isClientSide()) {
                 snapAnimationClient(state.controller());
                 needsStateSync = false;
+            } else if (snapFramesLeft > 0 && --snapFramesLeft == 0) {
+                state.controller().setAnimationSpeed(1.0);
             }
             return PlayState.CONTINUE;
         });

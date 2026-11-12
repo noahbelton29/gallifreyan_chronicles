@@ -19,7 +19,7 @@ public final class TardisMoods {
     private static final float DAMAGED_FLIGHT_STRESS = 8f;
     private static final float WRONG_KEY_STRESS = 4f;
     private static final float CALM_LANDING_STRESS = 30f;
-    private static final float CALM_LANDING_TRUST = 1f;
+    private static final float CALM_LANDING_TRUST = 2f;
 
     private TardisMoods() {
     }
@@ -45,7 +45,9 @@ public final class TardisMoods {
     private static void onLand(Tardis tardis) {
         if (TardisMindSystem.stress(tardis) < CALM_LANDING_STRESS) {
             for (UUID player : crew(tardis)) {
-                TardisMindSystem.addTrust(tardis, player, CALM_LANDING_TRUST);
+                if (!TardisMindSystem.afraidOf(tardis, player)) {
+                    TardisMindSystem.addTrust(tardis, player, CALM_LANDING_TRUST);
+                }
             }
         }
         TardisMindSystem.markLanded(tardis);

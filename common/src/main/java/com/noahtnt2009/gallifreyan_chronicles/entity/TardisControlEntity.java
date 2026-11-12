@@ -110,6 +110,10 @@ public class TardisControlEntity extends Entity {
             if (isOnCooldown(console)) {
                 return false;
             }
+            /* a left click is still you working the controls, so a frightened or wary tardis can jam it too */
+            if (console != null && TardisWariness.jams(this, console, player)) {
+                return false;
+            }
             TardisControl control = TardisControlRegistry.get(this.getControlId());
             return control.onLeftClick(this, player);
         }
@@ -332,6 +336,12 @@ public class TardisControlEntity extends Entity {
 
     @Override
     public boolean skipAttackInteraction(@NonNull Entity attacker) {
+        /* returning true makes vanilla drop the attack before it ever calls hurt, so a left click never
+           reached onLeftClick. handle it here on the server and swallow it, so it can't fall through
+           and chip or break the console behind the control */
+        if (attacker instanceof Player player && this.level() instanceof ServerLevel serverLevel) {
+            this.hurtServer(serverLevel, serverLevel.damageSources().playerAttack(player), 0f);
+        }
         return true;
     }
 }

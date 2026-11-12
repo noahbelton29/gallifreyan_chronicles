@@ -30,7 +30,7 @@ import java.util.UUID;
 
 public final class TardisMallet {
     private static final float STRESS_PER_HIT = 8f;
-    private static final float TRUST_LOSS_PER_HIT = 4f;
+    private static final float TRUST_LOSS_PER_HIT = 6f;
     private static final float SHUDDER_SHAKE = 0.4F;
     private static final float FLINCH_FEAR = 30f;
     private static final float COWER_FEAR = 60f;

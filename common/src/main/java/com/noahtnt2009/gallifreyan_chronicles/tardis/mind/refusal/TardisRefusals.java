@@ -1,3 +1,4 @@
+
 package com.noahtnt2009.gallifreyan_chronicles.tardis.mind.refusal;
 
 import com.noahtnt2009.gallifreyan_chronicles.tardis.mind.data.MindEnums;
@@ -27,7 +28,16 @@ import org.jspecify.annotations.Nullable;
 
 import java.util.UUID;
 
+/**
+ * Handles TARDIS refusals when a pilot attempts to take off.
+ *
+ * <p>The response depends on the TARDIS's mental state and anger, ranging
+ * from a simple warning to physically attacking nearby players.
+ */
 public final class TardisRefusals {
+    /**
+     * Delay before a rejected lever returns to its original position.
+     */
     private static final int SNAP_BACK_TICKS = 8;
 
     private static final int WARNING_ANGER = 2;
@@ -37,6 +47,7 @@ public final class TardisRefusals {
     private static final double LASH_RANGE = 4.0;
     private static final float MAX_LASH_DAMAGE = 12.0F;
 
+    // Determines how forcefully the TARDIS rejects the pilot's input.
     private enum Force {
         GENTLE, AGITATED, ANGRY, VIOLENT
     }
@@ -44,6 +55,22 @@ public final class TardisRefusals {
     private TardisRefusals() {
     }
 
+    /**
+     * Handles a TARDIS refusing a takeoff attempt based on its relationship
+     * with the pilot and its current mental state.
+     *
+     * <p>Some refusals only produce a warning, while others physically
+     * reject the lever and may cause the TARDIS to attack nearby players.
+     *
+     * @param level    server level containing the TARDIS
+     * @param console  console receiving the input
+     * @param leverId  ID of the takeoff lever
+     * @param soundPos position used for sounds and alarms
+     * @param leverPos world position of the lever
+     * @param tardis   TARDIS handling the takeoff attempt
+     * @param pilot    UUID of the player attempting takeoff, or {@code null}
+     * @return {@code true} if takeoff was refused, otherwise {@code false}
+     */
     public static boolean refuseTakeoff(ServerLevel level, TardisConsoleBlockEntity console, String leverId,
                                         BlockPos soundPos, Vec3 leverPos, Tardis tardis, @Nullable UUID pilot) {
         TardisMindSystem.Refusal refusal = TardisMindSystem.refusesTakeoff(tardis, pilot);
@@ -55,40 +82,50 @@ public final class TardisRefusals {
             }
             case COWED -> {
                 play(level, soundPos, GCSounds.LEVER, 0.6F);
-                Messages.overlayNearby(level, leverPos, ChatFormatting.DARK_GRAY, "tardis_cowed");
+                tell(level, tardis, pilot, ChatFormatting.DARK_GRAY, "tardis_cowed");
                 return false;
             }
             case BALK -> {
                 snapLeverBack(level, console, leverId, soundPos, leverPos, Force.GENTLE);
-                Messages.overlayNearby(level, leverPos, ChatFormatting.GOLD, "tardis_balks." + reason);
+                tell(level, tardis, pilot, ChatFormatting.GOLD, "tardis_balks." + reason);
             }
             case WORKED_UP -> {
                 snapLeverBack(level, console, leverId, soundPos, leverPos, Force.AGITATED);
-                Messages.overlayNearby(level, leverPos, ChatFormatting.RED, "tardis_worked_up");
+                tell(level, tardis, pilot, ChatFormatting.RED, "tardis_worked_up");
             }
-            case REFUSE -> refuse(level, console, leverId, soundPos, leverPos, tardis, reason);
+            case REFUSE -> refuse(level, console, leverId, soundPos, leverPos, tardis, pilot, reason);
         }
+
         return true;
     }
 
     private static void refuse(ServerLevel level, TardisConsoleBlockEntity console, String leverId,
-                               BlockPos soundPos, Vec3 leverPos, Tardis tardis, String reason) {
+                               BlockPos soundPos, Vec3 leverPos, Tardis tardis, @Nullable UUID pilot, String reason) {
         boolean aggressive = TardisAnger.level(tardis) > 0;
         if (!aggressive) {
             snapLeverBack(level, console, leverId, soundPos, leverPos, Force.ANGRY);
-            Messages.overlayNearby(level, leverPos, ChatFormatting.RED, "tardis_refuses." + reason);
+            tell(level, tardis, pilot, ChatFormatting.RED, "tardis_refuses." + reason);
             return;
         }
 
         int anger = TardisAnger.level(tardis);
         snapLeverBack(level, console, leverId, soundPos, leverPos, Force.VIOLENT);
-        Messages.overlayNearby(level, leverPos, anger >= LASH_ANGER ? ChatFormatting.DARK_RED : ChatFormatting.RED,
+        tell(level, tardis, pilot, anger >= LASH_ANGER ? ChatFormatting.DARK_RED : ChatFormatting.RED,
                 angerMessage(anger, reason));
         soundAlarm(level, soundPos, tardis, anger);
 
         if (anger >= LASH_ANGER) {
+            // Delay the attack until the lever has snapped back.
             GCScheduler.runLater(level.getServer(), SNAP_BACK_TICKS, () -> lashOut(level, leverPos, anger));
         }
+    }
+
+    private static void tell(ServerLevel level, Tardis tardis, @Nullable UUID pilot, ChatFormatting colour, String key) {
+        ServerPlayer who = pilot != null
+                ? level.getServer().getPlayerList().getPlayer(pilot)
+                : tardis.ownerPlayer().orElse(null);
+
+        if (who != null) Messages.overlay(who, colour, key);
     }
 
     private static String angerMessage(int anger, String reason) {
@@ -115,6 +152,7 @@ public final class TardisRefusals {
 
         GCScheduler.runLater(level.getServer(), SNAP_BACK_TICKS, () -> {
             if (console.isRemoved()) return;
+
             console.setControlActivated(leverId, false);
             play(level, soundPos, GCSounds.LEVER, 0.8F - force.ordinal() * 0.1F);
             snapBackEffects(level, soundPos, leverPos, force);
@@ -144,6 +182,8 @@ public final class TardisRefusals {
 
     private static void lashOut(ServerLevel level, Vec3 leverPos, int anger) {
         int strength = anger - LASH_ANGER + 1;
+
+        // Damage and knockback increase with anger, but damage has a fixed cap.
         float damage = Math.min(2.0F * strength, MAX_LASH_DAMAGE);
         double push = 0.5 + 0.2 * strength;
 
@@ -152,9 +192,11 @@ public final class TardisRefusals {
 
             player.hurtServer(level, level.damageSources().lightningBolt(), damage);
             throwBack(player, leverPos, push, 0.35 + 0.05 * strength);
+
             if (anger >= BURN_ANGER) {
                 player.igniteForSeconds(2 + (anger - BURN_ANGER));
             }
+
             level.sendParticles(ParticleTypes.ELECTRIC_SPARK, player.getX(), player.getY() + 1, player.getZ(),
                     20, 0.3, 0.5, 0.3, 0.4);
         }
@@ -162,7 +204,10 @@ public final class TardisRefusals {
 
     private static void throwBack(ServerPlayer player, Vec3 from, double push, double lift) {
         Vec3 away = player.position().subtract(from).multiply(1, 0, 1);
+
+        // Use a fixed direction if the player is directly on top of the source.
         away = away.lengthSqr() < 1.0E-4 ? new Vec3(0, 0, 1) : away.normalize();
+
         PlayerMotion.set(player, new Vec3(away.x * push, lift, away.z * push));
     }
 

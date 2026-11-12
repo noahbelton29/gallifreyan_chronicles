@@ -9,6 +9,7 @@ import com.noahtnt2009.gallifreyan_chronicles.network.TardisConsoleRotorStatePay
 import com.noahtnt2009.gallifreyan_chronicles.network.TardisConsoleSyncPayload;
 import com.noahtnt2009.gallifreyan_chronicles.network.TardisDrumShakePayload;
 import com.noahtnt2009.gallifreyan_chronicles.network.TardisAlarmPayload;
+import com.noahtnt2009.gallifreyan_chronicles.network.TardisFrightPayload;
 import com.noahtnt2009.gallifreyan_chronicles.network.DiscoveryToastPayload;
 import com.noahtnt2009.gallifreyan_chronicles.network.TardisCrashRumblePayload;
 import com.noahtnt2009.gallifreyan_chronicles.network.TardisExteriorSyncPayload;
@@ -42,6 +43,9 @@ public final class GCFabricClientNetworking {
                 (payload, context) -> context.client().execute(payload::apply));
 
         ClientPlayNetworking.registerGlobalReceiver(TardisAlarmPayload.TYPE,
+                (payload, context) -> context.client().execute(payload::apply));
+
+        ClientPlayNetworking.registerGlobalReceiver(TardisFrightPayload.TYPE,
                 (payload, context) -> context.client().execute(payload::apply));
 
         ClientPlayNetworking.registerGlobalReceiver(DiscoveryToastPayload.TYPE,

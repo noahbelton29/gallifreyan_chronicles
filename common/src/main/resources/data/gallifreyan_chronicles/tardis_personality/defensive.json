@@ -1,5 +1,5 @@
 {
-  "how_common": 25,
+  "how_common": 32,
   "refuses_to_fly_when": {
     "stress_above": 50,
     "trust_below": 30
@@ -10,7 +10,7 @@
       "max": 25
     },
     "fear_needed_to_obey": 45,
-    "trauma_per_hit": 2.5,
+    "trauma_per_hit": 4.0,
     "hits_to_snap_out_of_terror": {
       "min": 3,
       "max": 5
@@ -40,6 +40,16 @@
       "type": "message",
       "key": "mallet_seen_braces",
       "colour": "gold"
+    }
+  ],
+  "when_you_enter": [
+    {
+      "type": "lash_out",
+      "from_severity": 0.65,
+      "min_damage": 1,
+      "max_damage": 3,
+      "push": 0.5,
+      "lift": 0.25
     }
   ]
 }

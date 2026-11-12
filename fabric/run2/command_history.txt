@@ -1,6 +1,50 @@
-/gamemode survival
-/gc tardis f4b823f0-e1cf-4aa0-826a-412b38ee8b00 exterior set gallifreyan_chronicles:second_doctors_exterior
-/gc tardis 1f97ad2d-0374-4181-b287-98053a6d2c45 destination here
-/gc tardis ac63981b-b1f0-4ba2-9415-6233a49c2136 destination here
-/gc tardis ac63981b-b1f0-4ba2-9415-6233a49c2136 exterior set gallifreyan_chronicles:hellbent_exterior
-/gc tardis ac63981b-b1f0-4ba2-9415-6233a49c2136 destination here
+/gamemode spectator
+/gamemode creative
+/give @s gallifreyan_chronicles:first_doctors_door[minecraft:block_entity_data={id:"gallifreyan_chronicles:interior_door_block_entity",Primary:1b}]
+/gamemode spectator
+/gamemode creative
+/give Tester2 minecraft:red_cushion
+/gamemode spectator
+/gamemode creative
+/give Tester2 minecraft:structure_block
+/setblock ~ ~ ~ minecraft:structure_block
+/give @s gallifreyan_chronicles:second_doctors_door[minecraft:block_entity_data={id:"gallifreyan_chronicles:interior_door_block_entity",Primary:1b}]
+/gamemode spectator
+/gamemode creative
+/setblock ~ ~ ~ minecraft:structure_block
+/gamemode spectatorp
+/gamemode spectator
+/gamemode creative
+/give Tester2 minecraft:red_cushion
+/gamemode spectator
+/gamemode creative
+/give @s gallifreyan_chronicles:second_doctors_door_alt[minecraft:block_entity_data={id:"gallifreyan_chronicles:interior_door_block_entity",Primary:1b}]
+/gamemode spectator
+/gamemode creative
+/setblock ~ ~ ~ minecraft:structure_block
+/gamemode spectator
+/gamemode creative
+/gamemode spectator
+/gamemode creative
+/gamemode spectator
+/gamemode creative
+/give @s gallifreyan_chronicles:tuat_door[minecraft:block_entity_data={id:"gallifreyan_chronicles:interior_door_block_entity",Primary:1b}]
+/gamemode spectator
+/gamemode creative
+/setblock ~ ~ ~ minecraft:structure_block
+/gamemode spectator
+/gamemode creative
+/gamemode spectator
+/gamemode creative
+/gc tardis deletion on
+/give @s gallifreyan_chronicles:hellbent_door[minecraft:block_entity_data={id:"gallifreyan_chronicles:interior_door_block_entity",Primary:1b}]
+/gamemode spectator
+/gamemode creative
+/setblock ~ ~ ~ minecraft:structure_block
+/gc tardis 9a4764b3-1d3a-41a7-86d6-593e5baeb6e7 interior set gallifreyan_chronicles:hellbent_interior
+/gc tardis 9a4764b3-1d3a-41a7-86d6-593e5baeb6e7 interior set gallifreyan_chronicles:second_doctors_interior_alt
+/gc tardis 745f22d7-d0f3-4a13-908a-e33a7a3d9bc5 interior set gallifreyan_chronicles:tuat_interior
+/gamemode spectator
+/gamemode creative
+/gc tardis deletion on
+/time set day

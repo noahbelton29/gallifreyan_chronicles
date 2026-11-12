@@ -36,7 +36,7 @@ public abstract class DestinationControl extends BaseControl {
         if (console == null) return InteractionResult.FAIL;
         if (!(entity.level() instanceof ServerLevel level)) return InteractionResult.SUCCESS;
 
-        UUID tardisId = tardis(console).map(Tardis::id).orElse(null);
+        UUID tardisId = linkedTardis(console).map(Tardis::id).orElse(null);
         if (tardisId == null || !apply(level.getServer(), tardisId, player)) {
             tell(player, "message.gallifreyan_chronicles.no_destination_to_set");
             return InteractionResult.FAIL;

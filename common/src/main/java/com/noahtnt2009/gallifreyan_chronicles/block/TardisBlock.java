@@ -85,7 +85,7 @@ public class TardisBlock extends BaseEntityBlock {
             TardisComponent record = TardisLinkSystem.registerNewTardis(entity, serverLevel, player.getUUID(),
                     player.getGameProfile().name(), pos);
             applyChosenInterior(serverLevel, entity, record, chosenInterior);
-            blockEntity.sync();
+            blockEntity.snapDoorsShut();
 
             blockEntity.spawnKeyEntity();
 

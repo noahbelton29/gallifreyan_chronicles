@@ -1,8 +1,11 @@
 {
   "how_common": 10,
   "stress": {
-    "builds_up": 1.5,
-    "calms_down": 2.0
+    "builds_up": 1.4,
+    "calms_down": 1.8
+  },
+  "trust": {
+    "gained": 1.15
   },
   "revealed_when": "it_gets_stressed"
 }

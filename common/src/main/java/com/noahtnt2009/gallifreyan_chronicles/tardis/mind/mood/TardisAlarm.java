@@ -107,6 +107,7 @@ public final class TardisAlarm {
             return;
         }
 
+        TardisAlarmPayload.broadcast(level, TardisAlarmPayload.FOREVER);
         bell(level);
         GCScheduler.runLater(level.getServer(), FLASH_TICKS, () -> tick(tardis, level, bellPos));
     }

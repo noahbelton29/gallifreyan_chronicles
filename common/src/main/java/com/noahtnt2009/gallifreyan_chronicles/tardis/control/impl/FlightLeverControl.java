@@ -88,7 +88,7 @@ public class FlightLeverControl extends BaseControl {
         boolean takingOff = !console.getControlState(controlId);
 
         if (entity.level() instanceof ServerLevel level) {
-            UUID tardisId = tardis(console).map(Tardis::id).orElse(null);
+            UUID tardisId = linkedTardis(console).map(Tardis::id).orElse(null);
 
             if (refuseToggle(level, entity.blockPosition(), entity.position(), console, tardisId, takingOff, player)) {
                 return InteractionResult.FAIL;
@@ -145,7 +145,7 @@ public class FlightLeverControl extends BaseControl {
         }
         if (tardis != null && takingOff
                 && TardisRefusals.refuseTakeoff(level, console, controlId, soundPos, leverPos, tardis,
-                        pilot == null ? null : pilot.getUUID())) {
+                pilot == null ? null : pilot.getUUID())) {
             return true;
         }
 
@@ -174,7 +174,7 @@ public class FlightLeverControl extends BaseControl {
 
     public static boolean pull(TardisConsoleBlockEntity console) {
         if (!(console.getLevel() instanceof ServerLevel level)) return false;
-        UUID tardisId = tardis(console).map(Tardis::id).orElse(null);
+        UUID tardisId = linkedTardis(console).map(Tardis::id).orElse(null);
         BlockPos soundPos = console.getBlockPos();
         boolean takingOff = !console.getControlState(ID);
 
@@ -192,7 +192,7 @@ public class FlightLeverControl extends BaseControl {
 
     public static boolean crashLand(TardisConsoleBlockEntity console) {
         if (!(console.getLevel() instanceof ServerLevel level)) return false;
-        Tardis tardis = tardis(console).orElse(null);
+        Tardis tardis = linkedTardis(console).orElse(null);
         TardisExteriorBlockEntity exterior = tardis == null ? null : tardis.exterior().orElse(null);
         if (exterior == null || exterior.getFlightState() != TardisFlightState.IN_VORTEX) return false;
 
@@ -232,7 +232,7 @@ public class FlightLeverControl extends BaseControl {
                     SoundSource.BLOCKS, 1.0F, 1.0F, VWORP_VOLUME);
         }
         playAtExterior(console, level, GCSounds.TARDIS_TAKEOFF);
-        tardis(console).ifPresent(TardisEvents.TAKE_OFF::fire);
+        linkedTardis(console).ifPresent(TardisEvents.TAKE_OFF::fire);
 
         for (TardisConsoleBlockEntity each : ConsoleSyncSystem.liveConsolesWith(console)) {
             if (!(each.getLevel() instanceof ServerLevel eachLevel)) continue;
@@ -287,7 +287,7 @@ public class FlightLeverControl extends BaseControl {
 
     public static boolean abortTakeoff(TardisConsoleBlockEntity console) {
         if (!(console.getLevel() instanceof ServerLevel level)) return false;
-        Optional<Tardis> tardis = tardis(console);
+        Optional<Tardis> tardis = linkedTardis(console);
         TardisExteriorBlockEntity exterior = tardis.flatMap(Tardis::exterior).orElse(null);
         if (exterior == null || exterior.getFlightState() != TardisFlightState.TAKING_OFF) return false;
 
@@ -331,7 +331,7 @@ public class FlightLeverControl extends BaseControl {
         Constants.LOG.debug("Flight lever state changed to: {}", activated);
 
         if (console.getLevel() instanceof ServerLevel serverLevel) {
-            TardisExteriorBlockEntity exterior = tardis(console).flatMap(Tardis::exterior).orElse(null);
+            TardisExteriorBlockEntity exterior = linkedTardis(console).flatMap(Tardis::exterior).orElse(null);
             if (exterior != null) {
                 if (activated) {
                     exterior.cancelLanding();

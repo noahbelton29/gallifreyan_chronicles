@@ -26,6 +26,7 @@ public final class GCFabricNetworking {
         PayloadTypeRegistry.clientboundPlay().register(TardisConsoleRotorStatePayload.TYPE, TardisConsoleRotorStatePayload.STREAM_CODEC);
         PayloadTypeRegistry.clientboundPlay().register(TardisDrumShakePayload.TYPE, TardisDrumShakePayload.STREAM_CODEC);
         PayloadTypeRegistry.clientboundPlay().register(TardisAlarmPayload.TYPE, TardisAlarmPayload.STREAM_CODEC);
+        PayloadTypeRegistry.clientboundPlay().register(TardisFrightPayload.TYPE, TardisFrightPayload.STREAM_CODEC);
         PayloadTypeRegistry.clientboundPlay().register(DiscoveryToastPayload.TYPE, DiscoveryToastPayload.STREAM_CODEC);
         PayloadTypeRegistry.clientboundPlay().register(TardisCrashRumblePayload.TYPE, TardisCrashRumblePayload.STREAM_CODEC);
         PayloadTypeRegistry.clientboundPlay().register(RematCatchPayload.TYPE, RematCatchPayload.STREAM_CODEC);

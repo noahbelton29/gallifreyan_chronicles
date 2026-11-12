@@ -13,7 +13,6 @@ import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.util.RandomSource;
-import net.minecraft.world.phys.Vec3;
 
 /* mixes up its numbers on takeoff. worse when stressed, better with practice */
 public final class TardisDyslexia {
@@ -38,7 +37,8 @@ public final class TardisDyslexia {
         TardisConsoleBlockEntity console = tardis.console().orElse(null);
         if (console != null && console.getLevel() instanceof ServerLevel level && muddle(tardis, level.getRandom())) {
             TardisDiscovery.disability(tardis, TardisDisability.DYSLEXIC);
-            Messages.overlayNearby(level, Vec3.atCenterOf(console.getBlockPos()), ChatFormatting.GOLD, "tardis_muddled");
+            tardis.ownerPlayer().filter(owner -> owner.level() == level)
+                    .ifPresent(owner -> Messages.overlay(owner, ChatFormatting.GOLD, "tardis_muddled"));
         }
         practise(tardis);
     }

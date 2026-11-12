@@ -40,6 +40,12 @@ public class GCDataComponents {
             () -> DataComponentType.<String>builder().persistent(Codec.STRING).build()
     );
 
+    /* set on a door item that was picked or dropped from a primary door, so placing it makes a primary door again */
+    public static final DataComponentType<Boolean> PRIMARY_DOOR = register(
+            "primary_door",
+            () -> DataComponentType.<Boolean>builder().persistent(Codec.BOOL).build()
+    );
+
     public static final DataComponentType<ItemInfoTooltip> ITEM_INFO = register(
             "item_info",
             () -> DataComponentType.<ItemInfoTooltip>builder()

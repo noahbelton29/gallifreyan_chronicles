@@ -1,11 +1,12 @@
 {
   "how_common": 10,
   "trust": {
-    "gained": 0.35,
-    "lost": 0.5,
-    "lost_when_abused": 4.0,
-    "starts_at": 3
+    "gained": 0.6,
+    "lost": 0.6,
+    "lost_when_abused": 2.5,
+    "starts_at": 12
   },
+  "trauma_taken": 0.7,
   "never_with": {
     "traits": [
       "loyal",

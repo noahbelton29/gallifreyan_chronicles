@@ -55,6 +55,7 @@
     "client.compat.VoxyTardisLodMixin",
     "client.compat.VoxyReplayIngestMixin",
     "client.compat.VoxyPortalPassMixin",
+    "client.compat.VoxyPortalBlitMixin",
     "client.compat.PortalNoSyncRebuildMixin",
     "client.compat.PortalDoorSoundMixin",
     "client.compat.EntityCullingCompatMixin",

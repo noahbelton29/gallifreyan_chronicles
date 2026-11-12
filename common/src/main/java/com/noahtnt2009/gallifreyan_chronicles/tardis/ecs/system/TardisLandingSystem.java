@@ -7,6 +7,7 @@ import com.noahtnt2009.gallifreyan_chronicles.block.TardisBlock;
 import com.noahtnt2009.gallifreyan_chronicles.block.entity.TardisExteriorBlockEntity;
 import com.noahtnt2009.gallifreyan_chronicles.init.GCBlocks;
 import com.noahtnt2009.gallifreyan_chronicles.tardis.flight.LandingTarget;
+import com.noahtnt2009.gallifreyan_chronicles.tardis.flight.TardisLandingSite;
 import com.noahtnt2009.gallifreyan_chronicles.tardis.manager.TardisManager;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -44,7 +45,7 @@ public final class TardisLandingSystem {
 
     private static boolean isOpen(ServerLevel level, BlockPos pos) {
         var state = level.getBlockState(pos);
-        return state.canBeReplaced() && state.getFluidState().isEmpty();
+        return (state.canBeReplaced() || TardisLandingSite.isSoft(state)) && state.getFluidState().isEmpty();
     }
 
     public static void relocate(MinecraftServer server, UUID tardisId) {
@@ -61,7 +62,9 @@ public final class TardisLandingSystem {
         BlockPos pos = target.pos();
         if (newLevel.isOutsideBuildHeight(pos) || newLevel.isOutsideBuildHeight(pos.above())) return;
         newLevel.getChunkAt(pos);
-        pos = findLandingSpot(newLevel, pos);
+        BlockPos own = newLevel == old.getLevel() ? oldPos : null;
+        BlockPos found = TardisLandingSite.find(newLevel, pos, own);
+        pos = found != null ? found : findLandingSpot(newLevel, pos);
 
         if (newLevel == old.getLevel() && pos.equals(oldPos)) {
             old.setYaw(target.yaw());
@@ -69,6 +72,8 @@ public final class TardisLandingSystem {
             return;
         }
 
+        TardisLandingSite.clearSoft(newLevel, pos);
+        TardisLandingSite.clearSoft(newLevel, pos.above());
         if (!newLevel.getBlockState(pos).canBeReplaced() || !newLevel.getBlockState(pos.above()).canBeReplaced()) {
             return;
         }

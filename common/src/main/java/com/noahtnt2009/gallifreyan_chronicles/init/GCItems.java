@@ -1,6 +1,7 @@
 package com.noahtnt2009.gallifreyan_chronicles.init;
 
 import com.noahtnt2009.gallifreyan_chronicles.item.MalletItem;
+import com.noahtnt2009.gallifreyan_chronicles.item.PeaceOfferingItem;
 
 import com.noahtnt2009.gallifreyan_chronicles.Constants;
 import com.noahtnt2009.gallifreyan_chronicles.item.StattenheimRemoteItem;
@@ -36,6 +37,7 @@ public class GCItems {
                     DataComponents.ENCHANTMENT_GLINT_OVERRIDE, true).fireResistant()));
 
     public static final Item MALLET = registerItem("mallet", properties -> new MalletItem(properties.stacksTo(1)));
+    public static final Item JELLY_BABIES = registerItem("jelly_babies", properties -> new PeaceOfferingItem(properties.stacksTo(16)));
     public static final Item STATTENHEIM_REMOTE = registerItem("stattenheim_remote", properties -> new StattenheimRemoteItem(properties.stacksTo(1)));
 
     // TOOLS

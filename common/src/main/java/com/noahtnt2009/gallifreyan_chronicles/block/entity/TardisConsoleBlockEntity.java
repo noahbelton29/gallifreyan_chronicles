@@ -169,6 +169,10 @@ public class TardisConsoleBlockEntity extends BlockEntity implements GeoBlockEnt
         controls.playControlAnimation(id, activated, null);
     }
 
+    public void playControlAnimationReversed(String id, @Nullable Player triggeringPlayer) {
+        controls.playControlAnimationReversed(id, triggeringPlayer);
+    }
+
     public void animateControlOnly(String id, boolean activated, @Nullable Player triggeringPlayer) {
         controls.setControlState(id, activated);
         controls.playControlAnimation(id, activated, triggeringPlayer);

@@ -2,6 +2,7 @@ package com.noahtnt2009.gallifreyan_chronicles.client.gui.hud;
 
 import com.noahtnt2009.gallifreyan_chronicles.util.TardisDimensions;
 import com.noahtnt2009.gallifreyan_chronicles.client.tardis.RematCatchClient;
+import com.noahtnt2009.gallifreyan_chronicles.client.tardis.TardisFrightClient;
 import com.noahtnt2009.gallifreyan_chronicles.Constants;
 import com.noahtnt2009.gallifreyan_chronicles.block.ConsoleBlock;
 import com.noahtnt2009.gallifreyan_chronicles.block.entity.TardisConsoleBlockEntity;
@@ -52,6 +53,7 @@ public final class GCPowerDarkness {
 
     public static void reset() {
         GCDangerAlarm.reset();
+        TardisFrightClient.reset();
         CONSOLES.clear();
         NO_CONSOLE_LEVELS.clear();
         darkness = 0.0F;
@@ -130,13 +132,14 @@ public final class GCPowerDarkness {
     public static float update() {
         Level level = playerLevel(Minecraft.getInstance());
         darkness = level == null ? 0.0F : step(level, System.nanoTime());
-        return Math.max(darkness, GCDangerAlarm.amountFor(level)) * (float) GCConfig.powerDarknessStrength();
+        float lights = Math.max(darkness, GCDangerAlarm.amountFor(level));
+        return Math.max(lights, TardisFrightClient.flickerOf(level)) * (float) GCConfig.powerDarknessStrength();
     }
 
     public static float darknessOf(Level level) {
         if (level == null) return 0.0F;
-        return Math.max(step(level, System.nanoTime()), GCDangerAlarm.amountFor(level))
-                * (float) GCConfig.powerDarknessStrength();
+        float lights = Math.max(step(level, System.nanoTime()), GCDangerAlarm.amountFor(level));
+        return Math.max(lights, TardisFrightClient.flickerOf(level)) * (float) GCConfig.powerDarknessStrength();
     }
 
     /* just the power-off darkness, no alarm */

@@ -20,6 +20,8 @@ public final class MindContext {
     public @Nullable UUID pilot;
     /* how far through something it is, 0 to 1. used by terror */
     public float progress;
+    /* how afraid of the player it is, 0 to 1. used by "when_you_enter" */
+    public float severity;
     /* set by actions on "on_unwilling" to decide what the lever does */
     public @Nullable Refusal refusal;
     /* set when an action replaces the normal reaction */

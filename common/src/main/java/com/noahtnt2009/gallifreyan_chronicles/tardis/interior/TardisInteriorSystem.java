@@ -12,6 +12,7 @@ import com.noahtnt2009.gallifreyan_chronicles.init.GCBlocks;
 import com.noahtnt2009.gallifreyan_chronicles.tardis.console.TardisConsole;
 import com.noahtnt2009.gallifreyan_chronicles.tardis.console.TardisConsoleRegistry;
 import com.noahtnt2009.gallifreyan_chronicles.tardis.ecs.system.ConsoleLinkSystem;
+import com.noahtnt2009.gallifreyan_chronicles.tardis.ecs.component.DoorState;
 import com.noahtnt2009.gallifreyan_chronicles.tardis.ecs.system.DoorSyncSystem;
 import com.noahtnt2009.gallifreyan_chronicles.tardis.manager.TardisManager;
 import net.minecraft.core.BlockPos;
@@ -300,11 +301,17 @@ public final class TardisInteriorSystem {
                 Math.max(oldSize.getY(), newSize.getY()),
                 Math.max(oldSize.getZ(), newSize.getZ()));
 
+        // read before clearArea removes the old doors
+        DoorState carriedPrimary = primaryDoorState(level, tardisId);
+
         clearArea(level, size);
 
         manager.clearInteriorOrigin(tardisId);
         manager.setInteriorId(tardisId, newDef.id());
         buildInteriorIfMissing(level, tardisId, carry);
+        if (carriedPrimary != null && !carriedPrimary.isClosed()) {
+            snapPrimaryDoors(level, tardisId, size, carriedPrimary);
+        }
         BlockPos doorPos = findInteriorDoor(level, tardisId);
         if (doorPos != null && level.getBlockEntity(doorPos) instanceof InteriorDoorBlockEntity door) {
             door.matchTardis(server, tardisId);
@@ -318,6 +325,23 @@ public final class TardisInteriorSystem {
             player.teleportTo(level, arrival.pos().x, arrival.pos().y, arrival.pos().z, Set.of(), arrival.yaw(), 0.0f, true);
         }
         return ChangeResult.CHANGED;
+    }
+
+    private static @Nullable DoorState primaryDoorState(ServerLevel interior, UUID tardisId) {
+        InteriorDoorBlockEntity door = DoorSyncSystem.primaryDoor(tardisId);
+        return door != null && door.getLevel() == interior ? door.getDoorState() : null;
+    }
+
+    /* puts the new interior's primary doors in the state the old one's was in, snapped rather than animated */
+    private static void snapPrimaryDoors(ServerLevel interior, UUID tardisId, Vec3i size, DoorState state) {
+        BlockPos stored = TardisManager.get(interior.getServer()).getInteriorOrigin(tardisId);
+        BlockPos origin = stored != null ? stored : ORIGIN;
+        BlockPos max = origin.offset(size.getX() - 1, size.getY() - 1, size.getZ() - 1);
+        for (BlockPos p : BlockPos.betweenClosed(origin, max)) {
+            if (interior.getBlockEntity(p) instanceof InteriorDoorBlockEntity door && door.isPrimary()) {
+                door.snapTo(state);
+            }
+        }
     }
 
     private static void clearArea(ServerLevel level, Vec3i size) {

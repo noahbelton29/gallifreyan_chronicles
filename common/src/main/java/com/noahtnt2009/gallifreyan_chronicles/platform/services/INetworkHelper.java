@@ -8,6 +8,7 @@ import com.noahtnt2009.gallifreyan_chronicles.network.TardisConsoleRotorStatePay
 import com.noahtnt2009.gallifreyan_chronicles.network.TardisConsoleSyncPayload;
 import com.noahtnt2009.gallifreyan_chronicles.network.TardisDrumShakePayload;
 import com.noahtnt2009.gallifreyan_chronicles.network.TardisAlarmPayload;
+import com.noahtnt2009.gallifreyan_chronicles.network.TardisFrightPayload;
 import com.noahtnt2009.gallifreyan_chronicles.network.DiscoveryToastPayload;
 import com.noahtnt2009.gallifreyan_chronicles.network.TardisCrashRumblePayload;
 import com.noahtnt2009.gallifreyan_chronicles.network.TardisExteriorSyncPayload;
@@ -32,6 +33,7 @@ public interface INetworkHelper {
     void broadcastTardisConsoleRotorState(MinecraftServer server, TardisConsoleRotorStatePayload payload);
     void sendTardisDrumShake(ServerPlayer player, TardisDrumShakePayload payload);
     void sendTardisAlarm(ServerPlayer player, TardisAlarmPayload payload);
+    void sendTardisFright(ServerPlayer player, TardisFrightPayload payload);
     void sendDiscoveryToast(ServerPlayer player, DiscoveryToastPayload payload);
     void sendTardisCrashRumble(ServerPlayer player, TardisCrashRumblePayload payload);
     void sendRematCatch(ServerPlayer player, RematCatchPayload payload);

@@ -12,10 +12,12 @@ import net.minecraft.network.codec.StreamCodec;
 public record TardisDoorVariant(String id, String parent, String texture, boolean isDefault, boolean interior,
                                 String exterior,
                                 String openSound, String closeSound, boolean openAllOnly, int priority,
-                                String block, String particle)
+                                String block, String particle, float cooldownSeconds)
         implements IdentifiableData<TardisDoorVariant> {
 
     public static final int NO_PRIORITY = Integer.MAX_VALUE;
+    /* how long the primary door waits between toggles; set "cooldown_seconds" in the variant json to change it */
+    public static final float DEFAULT_COOLDOWN_SECONDS = 3.0f;
 
     public static final Codec<TardisDoorVariant> CODEC = RecordCodecBuilder.create(inst -> inst.group(
             Codec.STRING.optionalFieldOf("id", "").forGetter(TardisDoorVariant::id),
@@ -29,7 +31,8 @@ public record TardisDoorVariant(String id, String parent, String texture, boolea
             Codec.BOOL.optionalFieldOf("open_all_only", false).forGetter(TardisDoorVariant::openAllOnly),
             Codec.INT.optionalFieldOf("priority", NO_PRIORITY).forGetter(TardisDoorVariant::priority),
             Codec.STRING.optionalFieldOf("block", "").forGetter(TardisDoorVariant::block),
-            Codec.STRING.optionalFieldOf("particle", "").forGetter(TardisDoorVariant::particle)
+            Codec.STRING.optionalFieldOf("particle", "").forGetter(TardisDoorVariant::particle),
+            Codec.FLOAT.optionalFieldOf("cooldown_seconds", DEFAULT_COOLDOWN_SECONDS).forGetter(TardisDoorVariant::cooldownSeconds)
     ).apply(inst, TardisDoorVariant::new));
 
     public static final StreamCodec<FriendlyByteBuf, TardisDoorVariant> STREAM_CODEC = StreamCodec.of(
@@ -46,6 +49,7 @@ public record TardisDoorVariant(String id, String parent, String texture, boolea
                 ByteBufCodecs.INT.encode(buf, v.priority());
                 ByteBufCodecs.STRING_UTF8.encode(buf, v.block());
                 ByteBufCodecs.STRING_UTF8.encode(buf, v.particle());
+                ByteBufCodecs.FLOAT.encode(buf, v.cooldownSeconds());
             },
             buf -> new TardisDoorVariant(
                     ByteBufCodecs.STRING_UTF8.decode(buf),
@@ -59,7 +63,8 @@ public record TardisDoorVariant(String id, String parent, String texture, boolea
                     ByteBufCodecs.BOOL.decode(buf),
                     ByteBufCodecs.INT.decode(buf),
                     ByteBufCodecs.STRING_UTF8.decode(buf),
-                    ByteBufCodecs.STRING_UTF8.decode(buf)
+                    ByteBufCodecs.STRING_UTF8.decode(buf),
+                    ByteBufCodecs.FLOAT.decode(buf)
             )
     );
 
@@ -69,6 +74,6 @@ public record TardisDoorVariant(String id, String parent, String texture, boolea
 
     @Override
     public TardisDoorVariant withId(String id) {
-        return new TardisDoorVariant(id, parent, texture, isDefault, interior, exterior, openSound, closeSound, openAllOnly, priority, block, particle);
+        return new TardisDoorVariant(id, parent, texture, isDefault, interior, exterior, openSound, closeSound, openAllOnly, priority, block, particle, cooldownSeconds);
     }
 }

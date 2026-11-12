@@ -102,6 +102,11 @@ public enum ItemInfoTooltip implements TooltipProvider {
         tooltip.accept(SelectionTooltip.line("tooltip.gallifreyan_chronicles.door.type",
                 SelectionTooltip.highlight(SelectionTooltip.displayName("door_type", Constants.MOD_ID + ":" + type))));
 
+        if (components.getOrDefault(GCDataComponents.PRIMARY_DOOR, false)) {
+            tooltip.accept(Component.translatable("tooltip.gallifreyan_chronicles.door.primary")
+                    .withStyle(ChatFormatting.GOLD));
+        }
+
         if (flag.isCreative()) {
             tooltip.accept(SelectionTooltip.scrollHint());
         }

@@ -1,15 +1,17 @@
 package uk.nbforge.gallifreyan_chronicles.compat.jade;
 
-import uk.nbforge.gallifreyan_chronicles.core.block_entities.TardisExteriorBlockEntity;
-import uk.nbforge.gallifreyan_chronicles.core.item.tooltip.SelectionTooltip;
-import uk.nbforge.gallifreyan_chronicles.tardis.TardisExterior;
-import uk.nbforge.gallifreyan_chronicles.util.GCUtil;
+import net.minecraft.ChatFormatting;
+import net.minecraft.network.chat.Component;
 import net.minecraft.resources.Identifier;
 import org.jspecify.annotations.NonNull;
 import snownee.jade.api.BlockAccessor;
 import snownee.jade.api.IBlockComponentProvider;
 import snownee.jade.api.ITooltip;
 import snownee.jade.api.config.IPluginConfig;
+import uk.nbforge.gallifreyan_chronicles.core.block_entities.TardisExteriorBlockEntity;
+import uk.nbforge.gallifreyan_chronicles.core.item.tooltip.SelectionTooltip;
+import uk.nbforge.gallifreyan_chronicles.tardis.TardisExterior;
+import uk.nbforge.gallifreyan_chronicles.util.GCUtil;
 
 public class TardisExteriorInfoProvider implements IBlockComponentProvider {
     public static final TardisExteriorInfoProvider INSTANCE = new TardisExteriorInfoProvider();
@@ -22,6 +24,14 @@ public class TardisExteriorInfoProvider implements IBlockComponentProvider {
 
         tooltip.add(SelectionTooltip.line("tooltip.gallifreyan_chronicles.tardis.exterior",
                 SelectionTooltip.highlight(SelectionTooltip.displayName("tardis_exterior", exterior.id()))));
+
+        Component state = tardis.isLocked()
+                ? Component.translatable("tooltip.gallifreyan_chronicles.tardis.locked").withStyle(ChatFormatting.RED)
+                : Component.translatable("tooltip.gallifreyan_chronicles.tardis.unlocked").withStyle(ChatFormatting.GREEN);
+
+        tooltip.add(Component.translatable("tooltip.gallifreyan_chronicles.tardis.door")
+                .append(Component.translatable("tooltip.gallifreyan_chronicles.label_separator"))
+                .append(state));
     }
 
     @Override

@@ -582,8 +582,11 @@
   "tooltip.gallifreyan_chronicles.key.unlinked": "No vinculada a ninguna TARDIS",
   "tooltip.gallifreyan_chronicles.label_separator": ": ",
   "tooltip.gallifreyan_chronicles.scroll": "Desplaza la rueda para cambiar",
+  "tooltip.gallifreyan_chronicles.tardis.door": "Puertas",
   "tooltip.gallifreyan_chronicles.tardis.exterior": "Exterior",
+  "tooltip.gallifreyan_chronicles.tardis.locked": "Cerradas",
   "tooltip.gallifreyan_chronicles.tardis.owner": "Propietario",
   "tooltip.gallifreyan_chronicles.tardis.owner_unknown": "Desconocido",
-  "tooltip.gallifreyan_chronicles.tardis.schema": "Esquema"
+  "tooltip.gallifreyan_chronicles.tardis.schema": "Esquema",
+  "tooltip.gallifreyan_chronicles.tardis.unlocked": "Abiertas"
 }

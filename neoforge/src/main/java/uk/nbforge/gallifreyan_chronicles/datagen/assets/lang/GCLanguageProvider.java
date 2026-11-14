@@ -85,7 +85,6 @@ public class GCLanguageProvider extends LanguageProvider {
                 "Crashing TARDISes Make Craters");
 
 
-        // Added to match en_us.json
         add("overlay.gallifreyan_chronicles.stattenheim_linked", "Remote linked to your TARDIS");
         add("overlay.gallifreyan_chronicles.stattenheim_linked_other", "Remote linked to %s's TARDIS");
         add("overlay.gallifreyan_chronicles.stattenheim_already_linked", "Remote is already linked to this TARDIS");
@@ -592,5 +591,8 @@ public class GCLanguageProvider extends LanguageProvider {
         add("config.jade.plugin_gallifreyan_chronicles", "Gallifreyan Chronicles");
         add("config.jade.plugin_gallifreyan_chronicles.tardis_control", "TARDIS Control Icon");
         add("config.jade.plugin_gallifreyan_chronicles.tardis_block_icon", "TARDIS Exterior and Console Icon");
+        add("tooltip.gallifreyan_chronicles.tardis.door", "Doors");
+        add("tooltip.gallifreyan_chronicles.tardis.locked", "Locked");
+        add("tooltip.gallifreyan_chronicles.tardis.unlocked", "Unlocked");
     }
 }

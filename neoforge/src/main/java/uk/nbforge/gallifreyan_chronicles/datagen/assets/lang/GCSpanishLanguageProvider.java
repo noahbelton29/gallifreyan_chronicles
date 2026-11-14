@@ -4,7 +4,9 @@ import uk.nbforge.gallifreyan_chronicles.Constants;
 import net.minecraft.data.PackOutput;
 import net.neoforged.neoforge.common.data.LanguageProvider;
 
-/** Spanish (Spain) translations. Keys must match {@link GCLanguageProvider} / en_us. */
+/**
+ * Spanish (Spain) translations. Keys must match {@link GCLanguageProvider} / en_us.
+ */
 public class GCSpanishLanguageProvider extends LanguageProvider {
     public GCSpanishLanguageProvider(PackOutput output) {
         super(output, Constants.MOD_ID, "es_es");
@@ -599,5 +601,8 @@ public class GCSpanishLanguageProvider extends LanguageProvider {
         add("death.attack.gallifreyan_chronicles.smoke", "%1$s se asfixió con el humo de una TARDIS estrellada");
         add("death.attack.gallifreyan_chronicles.smoke.player", "%1$s se asfixió con el humo de una TARDIS estrellada mientras luchaba contra %2$s");
         add("effect.gallifreyan_chronicles.choking", "Asfixia");
+        add("tooltip.gallifreyan_chronicles.tardis.door", "Puertas");
+        add("tooltip.gallifreyan_chronicles.tardis.locked", "Cerradas");
+        add("tooltip.gallifreyan_chronicles.tardis.unlocked", "Abiertas");
     }
 }

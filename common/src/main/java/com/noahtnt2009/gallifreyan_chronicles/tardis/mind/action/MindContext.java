@@ -1,5 +1,7 @@
 package com.noahtnt2009.gallifreyan_chronicles.tardis.mind.action;
 
+import net.minecraft.core.BlockPos;
+import java.util.function.BiConsumer;
 import com.noahtnt2009.gallifreyan_chronicles.tardis.api.Tardis;
 import com.noahtnt2009.gallifreyan_chronicles.tardis.mind.TardisMindSystem.Refusal;
 import net.minecraft.server.level.ServerLevel;
@@ -37,6 +39,23 @@ public final class MindContext {
     /* the player this is about: the one holding the mallet, or the pilot */
     public @Nullable UUID who() {
         return player != null ? player.getUUID() : pilot;
+    }
+
+    /* runs at the console inside and the box outside */
+    public void everywhere(BiConsumer<ServerLevel, Vec3> run) {
+        ServerLevel inside = tardis.interiorLevel().orElse(null);
+        BlockPos console = tardis.consolePos().orElse(null);
+        if (inside != null && console != null) run.accept(inside, Vec3.atCenterOf(console));
+
+        ServerLevel outside = tardis.exteriorLevel().orElse(null);
+        BlockPos box = tardis.exteriorPos().orElse(null);
+        if (outside != null && box != null) run.accept(outside, Vec3.atCenterOf(box));
+    }
+
+    /* runs where this happened, or everywhere if it didn't happen anywhere (like a refusal) */
+    public void here(BiConsumer<ServerLevel, Vec3> run) {
+        if (level != null && pos != null) run.accept(level, pos);
+        else everywhere(run);
     }
 
     public static MindContext of(Tardis tardis) {

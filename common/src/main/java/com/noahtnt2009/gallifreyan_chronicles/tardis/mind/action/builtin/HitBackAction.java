@@ -1,5 +1,7 @@
 package com.noahtnt2009.gallifreyan_chronicles.tardis.mind.action.builtin;
 
+import com.noahtnt2009.gallifreyan_chronicles.util.GCSparks;
+import com.noahtnt2009.gallifreyan_chronicles.tardis.mind.MindMessages;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
@@ -7,7 +9,6 @@ import com.noahtnt2009.gallifreyan_chronicles.Constants;
 import com.noahtnt2009.gallifreyan_chronicles.tardis.mind.TardisMindSystem;
 import com.noahtnt2009.gallifreyan_chronicles.tardis.mind.action.MindAction;
 import com.noahtnt2009.gallifreyan_chronicles.tardis.mind.action.MindContext;
-import com.noahtnt2009.gallifreyan_chronicles.util.Messages;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.server.level.ServerLevel;
@@ -43,10 +44,8 @@ public record HitBackAction(float maxDamage, float minDamage, float push) implem
         player.hurtServer(level, level.damageSources().lightningBolt(), Mth.lerp(scared, maxDamage, minDamage));
         ShockAction.throwBack(player, context.pos, push, 0.4);
 
-        level.sendParticles(ParticleTypes.ELECTRIC_SPARK, player.getX(), player.getY() + 1, player.getZ(),
-                25, 0.3, 0.5, 0.3, 0.4);
-        level.playSound(null, player.blockPosition(), SoundEvents.LIGHTNING_BOLT_IMPACT, SoundSource.BLOCKS, 0.8F, 1.4F);
-        Messages.overlay(player, ChatFormatting.RED, "mallet_fights_back");
+        GCSparks.big(level, player.position().add(0, 1, 0));
+        MindMessages.say(player, ChatFormatting.RED, "mallet_fights_back");
         context.handled = true;
     }
 }

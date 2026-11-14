@@ -27,7 +27,6 @@ public record SoundAction(SoundEvent sound, float volume, float pitch) implement
 
     @Override
     public void run(MindContext context) {
-        if (context.level == null || context.pos == null) return;
-        context.level.playSound(null, BlockPos.containing(context.pos), sound, SoundSource.BLOCKS, volume, pitch);
+        context.here((level, pos) -> level.playSound(null, BlockPos.containing(pos), sound, SoundSource.BLOCKS, volume, pitch));
     }
 }

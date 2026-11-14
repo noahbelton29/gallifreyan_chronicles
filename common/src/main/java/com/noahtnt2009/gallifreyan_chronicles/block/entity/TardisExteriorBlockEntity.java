@@ -1,5 +1,6 @@
 package com.noahtnt2009.gallifreyan_chronicles.block.entity;
 
+import com.noahtnt2009.gallifreyan_chronicles.tardis.exterior.fade.PulseFadeType;
 import com.noahtnt2009.gallifreyan_chronicles.util.Messages;
 import com.noahtnt2009.gallifreyan_chronicles.util.BlockEntitySync;
 
@@ -38,7 +39,6 @@ import com.noahtnt2009.gallifreyan_chronicles.tardis.ecs.system.DoorSystem;
 import com.noahtnt2009.gallifreyan_chronicles.tardis.ecs.system.ExteriorSystem;
 import com.noahtnt2009.gallifreyan_chronicles.tardis.ecs.system.GlowSystem;
 import com.noahtnt2009.gallifreyan_chronicles.tardis.ecs.system.SubsystemSystem;
-import com.noahtnt2009.gallifreyan_chronicles.init.GCGameRules;
 import com.noahtnt2009.gallifreyan_chronicles.tardis.interior.TardisInteriorSystem;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
@@ -531,12 +531,90 @@ public class TardisExteriorBlockEntity extends BlockEntity implements GeoBlockEn
         sync();
     }
 
+    /* how bright the lamp is right now, 0 to 1. it flickers while taking off and landing:
+       classic who snaps on and off, new who fades in and out */
+    private static final float LAMP_FLICKER_TICKS = 25f;
+
+    public float lampBrightness(float partialTick) {
+        if (!isGlowing()) return 0f;
+        if (!isFlickering(partialTick) || level == null) return 1f;
+        float cycles = (level.getGameTime() + partialTick) / LAMP_FLICKER_TICKS;
+        if (getFadeType() instanceof PulseFadeType) {
+            return 0.5f + 0.5f * (float) Math.cos(cycles * Math.PI);
+        }
+        return ((int) cycles) % 2 == 0 ? 1f : 0f;
+    }
+
+    /* taking off or landing and still fading, not fully gone or fully landed yet */
+    private boolean isFlickering(float partialTick) {
+        if (!getFlightState().isTransitioning()) return false;
+        float opacity = getOpacity(partialTick);
+        boolean gone = getFlightState() == TardisFlightState.TAKING_OFF && opacity <= 0.001f;
+        boolean landed = getFlightState() == TardisFlightState.LANDING && opacity >= 0.999f;
+        return !gone && !landed;
+    }
+
+    /* the glowing orb on the lamp, only for new who takeoffs and landings. returns how big and bright it is, 0 to 1.
+       takeoff: starts pulsing 2 seconds in, and does one more pulse once the box has fully gone.
+       landing: starts once the box actually begins to fade in, and stops at the end of the pulse it's on */
+    private static final long ORB_TAKEOFF_DELAY_TICKS = 40L;
+    private @Nullable TardisFlightState orbState;
+    private long orbTransitionStart;
+    private long orbStart = -1L;
+    private float orbEndCycle = -1f;
+    private boolean orbDone;
+
+    public float lampOrb(float partialTick) {
+        if (level == null || !isGlowing() || !(getFadeType() instanceof PulseFadeType)) return 0f;
+        long now = GameClock.now(level);
+        TardisFlightState state = getFlightState();
+
+        /* a new takeoff or landing starts the orb over */
+        if (state.isTransitioning() && state != orbState) {
+            orbState = state;
+            orbTransitionStart = now;
+            orbStart = -1L;
+            orbEndCycle = -1f;
+            orbDone = false;
+        }
+        if (orbDone) return 0f;
+
+        if (orbStart < 0L) {
+            if (!state.isTransitioning()) return 0f;
+            boolean ready = state == TardisFlightState.TAKING_OFF
+                    ? now - orbTransitionStart >= ORB_TAKEOFF_DELAY_TICKS
+                    : getOpacity(partialTick) > 0.001f;
+            if (!ready) return 0f;
+            orbStart = now;
+        }
+
+        float cycles = (now - orbStart + partialTick) / LAMP_FLICKER_TICKS;
+        /* the fade is over. takeoff does one more full pulse, landing just finishes the one it's on */
+        if (orbEndCycle < 0f && fadeFinished(now)) {
+            float extra = orbState == TardisFlightState.TAKING_OFF ? 2f : 0f;
+            float end = (float) Math.ceil(cycles + extra);
+            if (((int) end) % 2 != 0) end += 1f;
+            orbEndCycle = end;
+        }
+        if (orbEndCycle >= 0f && cycles >= orbEndCycle) {
+            orbDone = true;
+            return 0f;
+        }
+        /* starts at size 0 and swells up into its first pulse */
+        return 0.5f - 0.5f * (float) Math.cos(cycles * Math.PI);
+    }
+
+    /* the box has finished fading out (takeoff) or in (landing) */
+    private boolean fadeFinished(long now) {
+        return now - flight.fadeStartTick() >= flight.duration();
+    }
+
     public boolean isGlowing() {
         return asEntity().get(TardisComponentTypes.GLOW).glowing();
     }
 
     public void setGlowing(boolean glowing) {
-        GlowSystem.setManualGlow(asEntity(), glowing);
+        GlowSystem.setLamp(asEntity(), glowing);
         applyGlowToBlockState(glowing);
         sync();
     }
@@ -613,10 +691,7 @@ public class TardisExteriorBlockEntity extends BlockEntity implements GeoBlockEn
     private void refreshPowerAndGlow(Level level) {
         boolean wasPowered = powered;
         powered = TardisApi.of(this).flatMap(Tardis::livePower).orElse(powered);
-        MinecraftServer server = level.getServer();
-        boolean daylightAffectsGlow = server == null
-                || server.getGameRules().get(GCGameRules.DAYLIGHT_CYCLE_AFFECTS_GLOW);
-        if (GlowSystem.tick(asEntity(), level.getDefaultClockTime(), daylightAffectsGlow, powered)) {
+        if (GlowSystem.tick(asEntity(), powered)) {
             applyGlowToBlockState(isGlowing());
             sync();
         } else if (powered != wasPowered) {
@@ -661,7 +736,7 @@ public class TardisExteriorBlockEntity extends BlockEntity implements GeoBlockEn
         insertKey(player, hand, held);
 
         UUID playerId = player.getUUID();
-        net.minecraft.server.MinecraftServer server = serverLevel.getServer();
+        MinecraftServer server = serverLevel.getServer();
         GCScheduler.runLater(server, WRONG_KEY_JAM_DELAY_TICKS, () -> {
             if (isRemoved() || !isWrongKeyStillInside(playerId, keyId)) return;
             triggerAnim("key_controller", "key_jammed");
@@ -821,7 +896,7 @@ public class TardisExteriorBlockEntity extends BlockEntity implements GeoBlockEn
         components.load(input, TardisComponentTypes.ALL);
         heldKey.load(input);
         powered = input.getBooleanOr("Powered", true);
-        locked = input.getBooleanOr("Locked", true);
+        locked = input.getBooleanOr("Locked", false);
         flight.load(input);
         cloak.load(input);
         portalActive = input.getBooleanOr("PortalActive", false);

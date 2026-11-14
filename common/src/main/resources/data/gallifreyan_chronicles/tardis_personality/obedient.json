@@ -22,5 +22,10 @@
       "key": "mallet_seen_flinch",
       "colour": "gray"
     }
+  ],
+  "when_hit": [
+    {
+      "type": "reveal"
+    }
   ]
 }

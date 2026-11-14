@@ -760,10 +760,18 @@
         "interior_door_control": {
           "rotation": {
             "0.0": {
-              "vector": [0, 0, 0]
+              "vector": [
+                0,
+                0,
+                0
+              ]
             },
             "0.25": {
-              "vector": [-90, 0, 0]
+              "vector": [
+                -90,
+                0,
+                0
+              ]
             }
           }
         }
@@ -776,15 +784,22 @@
         "interior_door_control": {
           "rotation": {
             "0.0": {
-              "vector": [-90, 0, 0]
+              "vector": [
+                -90,
+                0,
+                0
+              ]
             },
             "0.25": {
-              "vector": [0, 0, 0]
+              "vector": [
+                0,
+                0,
+                0
+              ]
             }
           }
         }
       }
     }
   }
-}
 }

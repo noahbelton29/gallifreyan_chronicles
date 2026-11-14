@@ -33,6 +33,8 @@ import static net.minecraft.commands.Commands.argument;
 public final class CommandUtil {
     private static final String KEY = "command.gallifreyan_chronicles.";
     private static final double LOOK_DISTANCE = 8.0;
+    /* not called "id" so it doesn't clash with /gc tardis id */
+    private static final String ID_ARG = "tardis_id";
 
     interface TardisAction {
         int run(Tardis tardis, String idText) throws CommandSyntaxException;
@@ -46,7 +48,7 @@ public final class CommandUtil {
     }
 
     static int withTardisId(CommandContext<CommandSourceStack> ctx, IdAction action) throws CommandSyntaxException {
-        String idText = StringArgumentType.getString(ctx, "id");
+        String idText = StringArgumentType.getString(ctx, ID_ARG);
         UUID id;
         try {
             id = UUID.fromString(idText);
@@ -66,14 +68,14 @@ public final class CommandUtil {
 
     static Optional<UUID> idArgument(CommandContext<CommandSourceStack> ctx) {
         try {
-            return Optional.of(UUID.fromString(StringArgumentType.getString(ctx, "id")));
+            return Optional.of(UUID.fromString(StringArgumentType.getString(ctx, ID_ARG)));
         } catch (IllegalArgumentException e) {
             return Optional.empty();
         }
     }
 
     public static RequiredArgumentBuilder<CommandSourceStack, String> tardisIdArgument() {
-        return argument("id", StringArgumentType.string()).suggests(CommandUtil::suggestTardisIds);
+        return argument(ID_ARG, StringArgumentType.string()).suggests(CommandUtil::suggestTardisIds);
     }
 
     static CompletableFuture<Suggestions> suggestTardisIds(CommandContext<CommandSourceStack> ctx,

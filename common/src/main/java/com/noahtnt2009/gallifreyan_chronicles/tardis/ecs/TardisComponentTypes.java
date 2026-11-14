@@ -25,7 +25,7 @@ public final class TardisComponentTypes {
             ComponentType.persistent("tardis_link", TardisLinkComponent.CODEC);
 
     public static final ComponentType<GlowComponent> GLOW =
-            ComponentType.persistentDefaulted("glow", GlowComponent.CODEC, GlowComponent::off);
+            ComponentType.persistentDefaulted("glow", GlowComponent.CODEC, GlowComponent::fresh);
 
     public static final ComponentType<SubsystemsComponent> SUBSYSTEMS =
             ComponentType.persistentDefaulted("subsystems", SubsystemsComponent.CODEC, SubsystemsComponent::fresh);

@@ -16,6 +16,7 @@ public class GCSoundsProvider extends SoundDefinitionsProvider {
     private static final String CONTROL = TARDIS + "control/";
     private static final String ROTOR = TARDIS + "rotor/";
     private static final String TITLE = "title/";
+    private static final String FX = TARDIS + "fx/";
 
     public GCSoundsProvider(PackOutput output) {
         super(output, Constants.MOD_ID);
@@ -45,6 +46,10 @@ public class GCSoundsProvider extends SoundDefinitionsProvider {
         registerSimple(GCSounds.TARDIS_UNCLOAK, TARDIS);
         registerSimple(GCSounds.TARDIS_STOP_DEMAT, TARDIS);
 
+        // Spark and explosion sounds
+        registerVariants(GCSounds.SPARK, FX, 16, "spark_01", "spark_02");
+        registerSimple(GCSounds.SPARK_EXPLOSION, FX, 24);
+        registerSimple(GCSounds.EXPLOSION, FX, 32);
         // Control Sounds
         registerSimple(GCSounds.SLIDER, CONTROL);
         registerSimple(GCSounds.SWITCH, CONTROL);
@@ -63,6 +68,18 @@ public class GCSoundsProvider extends SoundDefinitionsProvider {
 
     private void registerSimple(SoundEvent soundEvent, String folder, int attenuationDistance) {
         registerSound(soundEvent, folder, false, attenuationDistance);
+    }
+
+    /* one sound event that picks one of these files at random each time */
+    private void registerVariants(SoundEvent soundEvent, String folder, int attenuationDistance, String... files) {
+        SoundDefinition definition = SoundDefinition.definition()
+                .subtitle("sound." + Constants.MOD_ID + "." + soundEvent.location().getPath())
+                .replace(true);
+        for (String file : files) {
+            definition.with(sound(GCUtils.modIdentifier(folder + file), SoundDefinition.SoundType.SOUND)
+                    .attenuationDistance(attenuationDistance));
+        }
+        add(soundEvent, definition);
     }
 
     private void registerStreamed(SoundEvent soundEvent, String folder) {

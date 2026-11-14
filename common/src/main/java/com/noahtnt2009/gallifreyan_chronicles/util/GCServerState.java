@@ -1,5 +1,6 @@
 package com.noahtnt2009.gallifreyan_chronicles.util;
 
+import com.noahtnt2009.gallifreyan_chronicles.tardis.flight.CrashSmoke;
 import com.noahtnt2009.gallifreyan_chronicles.tardis.flight.TardisCrash;
 
 import com.noahtnt2009.gallifreyan_chronicles.data.GCJsonReloadListener;
@@ -27,6 +28,7 @@ public final class GCServerState {
         TardisMindSystem.resetState();
         TardisAlarm.reset();
         TardisCrash.reset();
+        CrashSmoke.reset();
         DoorSyncSystem.clear();
         IsomorphicPunishment.reset();
         ConsoleSyncSystem.clear();

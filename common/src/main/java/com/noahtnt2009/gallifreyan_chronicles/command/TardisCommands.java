@@ -1,5 +1,12 @@
 package com.noahtnt2009.gallifreyan_chronicles.command;
 
+import net.minecraft.network.chat.HoverEvent;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.ClickEvent;
+import com.noahtnt2009.gallifreyan_chronicles.tardis.interior.TardisInteriorSystem;
+import com.noahtnt2009.gallifreyan_chronicles.tardis.interior.TardisDimensionManager;
+import com.noahtnt2009.gallifreyan_chronicles.tardis.api.TardisApi;
+import com.noahtnt2009.gallifreyan_chronicles.block.TardisTopBlock;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
@@ -56,6 +63,67 @@ public final class TardisCommands {
 
     public static LiteralArgumentBuilder<CommandSourceStack> repair() {
         return literal("repair").executes(TardisCommands::repair);
+    }
+
+    public static LiteralArgumentBuilder<CommandSourceStack> tp() {
+        return literal("tp")
+                .then(literal("exterior").executes(TardisCommands::tpExterior))
+                .then(literal("interior").executes(TardisCommands::tpInterior));
+    }
+
+    public static LiteralArgumentBuilder<CommandSourceStack> id() {
+        return literal("id").executes(TardisCommands::id);
+    }
+
+    private static int tpExterior(CommandContext<CommandSourceStack> ctx) throws CommandSyntaxException {
+        return withTardis(ctx, (tardis, idText) -> {
+            ServerPlayer player = playerOrFail(ctx);
+            if (player == null) return 0;
+            if (tardis.exteriorPos().isEmpty()) return fail(ctx, "no_exterior", idText);
+
+            TardisInteriorSystem.exitInterior(ctx.getSource().getServer(), player, tardis.id());
+            return success(ctx, false, "tp_exterior", idText);
+        });
+    }
+
+    private static int tpInterior(CommandContext<CommandSourceStack> ctx) throws CommandSyntaxException {
+        return withTardis(ctx, (tardis, idText) -> {
+            ServerPlayer player = playerOrFail(ctx);
+            if (player == null) return 0;
+
+            /* loads the interior first so you go straight in */
+            TardisDimensionManager.getOrCreate(ctx.getSource().getServer(), tardis.id());
+            TardisDimensionManager.requestEntry(ctx.getSource().getServer(), player, tardis.id());
+            return success(ctx, false, "tp_interior", idText);
+        });
+    }
+
+    /* the id of the tardis you're looking at, or the one you're inside. click it to copy */
+    private static int id(CommandContext<CommandSourceStack> ctx) {
+        ServerPlayer player = playerOrFail(ctx);
+        if (player == null) return 0;
+
+        ServerLevel level = ctx.getSource().getLevel();
+        Optional<Tardis> tardis = lookedAtBlock(ctx)
+                .flatMap(pos -> tardisAt(level, pos))
+                .or(() -> TardisApi.ofLevel(level));
+        if (tardis.isEmpty()) return fail(ctx, "no_tardis_here");
+
+        String id = tardis.get().id().toString();
+        Component copy = Component.literal(id).withStyle(style -> style
+                .withColor(ChatFormatting.GREEN)
+                .withUnderlined(true)
+                .withClickEvent(new ClickEvent.CopyToClipboard(id))
+                .withHoverEvent(new HoverEvent.ShowText(text("click_to_copy"))));
+        send(ctx, text("tardis_id", copy), false);
+        return 1;
+    }
+
+    private static Optional<Tardis> tardisAt(ServerLevel level, BlockPos pos) {
+        BlockPos exteriorPos = level.getBlockState(pos).getBlock() instanceof TardisTopBlock ? pos.below() : pos;
+        if (level.getBlockEntity(exteriorPos) instanceof TardisExteriorBlockEntity exterior) return TardisApi.of(exterior);
+        if (level.getBlockEntity(pos) instanceof TardisConsoleBlockEntity console) return TardisApi.of(console);
+        return Optional.empty();
     }
 
     private static int repair(CommandContext<CommandSourceStack> ctx) throws CommandSyntaxException {

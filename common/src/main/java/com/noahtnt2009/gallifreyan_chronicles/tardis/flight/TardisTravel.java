@@ -61,10 +61,15 @@ public final class TardisTravel {
     }
 
     public static LandingTarget crashTarget(Tardis tardis) {
+        return partWayTarget(tardis, 0F);
+    }
+
+    /* where it ends up if it drops out early. atLeast: never less than this far along */
+    public static LandingTarget partWayTarget(Tardis tardis, float atLeast) {
         LandingTarget target = tardis.landingTarget().orElse(null);
         BlockPos from = tardis.exteriorPos().orElse(BlockPos.ZERO);
         if (target == null) return new LandingTarget(tardis.exteriorDimension(), from, 0F);
-        float progress = progress(tardis);
+        float progress = Math.max(progress(tardis), atLeast);
         BlockPos partWay = between(from, target.pos(), progress);
         boolean pastHalfway = progress >= 0.5F;
         ResourceKey<Level> dimension = pastHalfway ? target.dimension() : tardis.exteriorDimension();

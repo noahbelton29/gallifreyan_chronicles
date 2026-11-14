@@ -1,5 +1,9 @@
 package com.noahtnt2009.gallifreyan_chronicles.tardis.mind.action;
 
+import com.noahtnt2009.gallifreyan_chronicles.tardis.mind.action.builtin.SparksAction;
+import com.noahtnt2009.gallifreyan_chronicles.tardis.mind.action.builtin.ShieldAction;
+import com.noahtnt2009.gallifreyan_chronicles.tardis.mind.action.builtin.SlamDoorsAction;
+import com.noahtnt2009.gallifreyan_chronicles.tardis.mind.action.builtin.RevealAction;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.DataResult;
 import com.mojang.serialization.MapCodec;
@@ -53,6 +57,10 @@ public final class MindActions {
         register(HitBackAction.TYPE, HitBackAction.CODEC);
         register(SavageAction.TYPE, SavageAction.CODEC);
         register(LashOutAction.TYPE, LashOutAction.CODEC);
+        register(RevealAction.TYPE, RevealAction.CODEC);
+        register(SlamDoorsAction.TYPE, SlamDoorsAction.CODEC);
+        register(ShieldAction.TYPE, ShieldAction.CODEC);
+        register(SparksAction.TYPE, SparksAction.CODEC);
     }
 
     private MindActions() {

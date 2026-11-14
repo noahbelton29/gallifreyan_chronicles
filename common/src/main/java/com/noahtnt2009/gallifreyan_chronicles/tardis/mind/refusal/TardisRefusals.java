@@ -1,13 +1,14 @@
 
 package com.noahtnt2009.gallifreyan_chronicles.tardis.mind.refusal;
 
+import com.noahtnt2009.gallifreyan_chronicles.util.GCSparks;
+import com.noahtnt2009.gallifreyan_chronicles.tardis.mind.MindMessages;
 import com.noahtnt2009.gallifreyan_chronicles.tardis.mind.data.MindEnums;
 
 import com.noahtnt2009.gallifreyan_chronicles.tardis.mind.TardisMindSystem;
 import com.noahtnt2009.gallifreyan_chronicles.tardis.mind.TardisPersonality;
 import com.noahtnt2009.gallifreyan_chronicles.tardis.mind.mood.TardisAlarm;
 
-import com.noahtnt2009.gallifreyan_chronicles.util.Messages;
 import com.noahtnt2009.gallifreyan_chronicles.util.PlayerMotion;
 
 import com.noahtnt2009.gallifreyan_chronicles.block.entity.TardisConsoleBlockEntity;
@@ -125,7 +126,7 @@ public final class TardisRefusals {
                 ? level.getServer().getPlayerList().getPlayer(pilot)
                 : tardis.ownerPlayer().orElse(null);
 
-        if (who != null) Messages.overlay(who, colour, key);
+        if (who != null) MindMessages.say(who, colour, key);
     }
 
     private static String angerMessage(int anger, String reason) {
@@ -170,13 +171,12 @@ public final class TardisRefusals {
         if (force.compareTo(Force.AGITATED) >= 0) {
             play(level, soundPos, GCSounds.TARDIS_STOP_DEMAT, 1.2F - strength * 0.13F);
             level.sendParticles(ParticleTypes.LARGE_SMOKE, x, y, z, strength * 3, 0.08, 0.05, 0.08, 0.01);
-            level.sendParticles(ParticleTypes.ELECTRIC_SPARK, x, y, z, strength * 6, 0.15, 0.1, 0.15, 0.3);
+            GCSparks.small(level, leverPos.add(0, 0.1, 0), strength * 4);
             TardisDrumShakePayload.broadcast(level, leverPos, strength * 0.3F);
         }
 
         if (force == Force.VIOLENT) {
-            level.sendParticles(ParticleTypes.FLAME, x, y, z, 6, 0.1, 0.05, 0.1, 0.03);
-            level.sendParticles(ParticleTypes.LAVA, x, y, z, 3, 0.1, 0.05, 0.1, 0.0);
+            GCSparks.big(level, leverPos.add(0, 0.1, 0));
         }
     }
 
@@ -197,8 +197,7 @@ public final class TardisRefusals {
                 player.igniteForSeconds(2 + (anger - BURN_ANGER));
             }
 
-            level.sendParticles(ParticleTypes.ELECTRIC_SPARK, player.getX(), player.getY() + 1, player.getZ(),
-                    20, 0.3, 0.5, 0.3, 0.4);
+            GCSparks.big(level, player.position().add(0, 1, 0));
         }
     }
 

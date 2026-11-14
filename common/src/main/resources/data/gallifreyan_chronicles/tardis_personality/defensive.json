@@ -23,12 +23,22 @@
     },
     {
       "type": "refuse"
+    },
+    {
+      "type": "shield",
+      "radius": 2.5,
+      "push": 0.6
+    },
+    {
+      "type": "lock_doors"
+    },
+    {
+      "type": "reveal"
     }
   ],
   "when_it_sees_the_mallet": [
     {
-      "type": "lock_doors",
-      "only_outside": true
+      "type": "lock_doors"
     },
     {
       "type": "sound",
@@ -40,6 +50,9 @@
       "type": "message",
       "key": "mallet_seen_braces",
       "colour": "gold"
+    },
+    {
+      "type": "reveal"
     }
   ],
   "when_you_enter": [
@@ -50,6 +63,10 @@
       "max_damage": 3,
       "push": 0.5,
       "lift": 0.25
+    },
+    {
+      "type": "reveal",
+      "if_it_reacted": true
     }
   ]
 }

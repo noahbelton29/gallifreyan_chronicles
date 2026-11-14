@@ -12,8 +12,10 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.phys.Vec3;
 import org.jspecify.annotations.NonNull;
 
-/* a harsh rumble for the whole crash */
-public record TardisCrashRumblePayload(double x, double y, double z, int ticks) implements CustomPacketPayload {
+/* a harsh rumble for the whole crash. with stress set, it's the ongoing stressed flight rumble instead,
+   strength 0 to 1 where 1 is as hard as a crash */
+public record TardisCrashRumblePayload(double x, double y, double z, int ticks, boolean stress, float strength)
+        implements CustomPacketPayload {
     public static final Type<TardisCrashRumblePayload> TYPE =
             new Type<>(GCUtils.modIdentifier("tardis_crash_rumble"));
 
@@ -26,18 +28,31 @@ public record TardisCrashRumblePayload(double x, double y, double z, int ticks) 
             TardisCrashRumblePayload::z,
             ByteBufCodecs.VAR_INT,
             TardisCrashRumblePayload::ticks,
+            ByteBufCodecs.BOOL,
+            TardisCrashRumblePayload::stress,
+            ByteBufCodecs.FLOAT,
+            TardisCrashRumblePayload::strength,
             TardisCrashRumblePayload::new
     );
 
     public static void broadcast(ServerLevel level, Vec3 origin, int ticks) {
-        TardisCrashRumblePayload payload = new TardisCrashRumblePayload(origin.x, origin.y, origin.z, ticks);
+        send(level, new TardisCrashRumblePayload(origin.x, origin.y, origin.z, ticks, false, 1f));
+    }
+
+    /* keeps the stress rumble going. send it about once a second while flying */
+    public static void broadcastStress(ServerLevel level, Vec3 origin, float strength) {
+        send(level, new TardisCrashRumblePayload(origin.x, origin.y, origin.z, 0, true, strength));
+    }
+
+    private static void send(ServerLevel level, TardisCrashRumblePayload payload) {
         for (ServerPlayer player : level.players()) {
             Services.NETWORK.sendTardisCrashRumble(player, payload);
         }
     }
 
     public void apply() {
-        GCCameraShake.crashRumble(new Vec3(x, y, z), ticks);
+        if (stress) GCCameraShake.stressRumble(new Vec3(x, y, z), strength);
+        else GCCameraShake.crashRumble(new Vec3(x, y, z), ticks);
     }
 
     @Override

@@ -157,7 +157,7 @@ public final class GCConfig {
 
     private static int clampRenderDistance(int distance) {
         if (distance <= 0) return 64;
-        return Math.max(MIN_MODEL_RENDER_DISTANCE, Math.min(MAX_MODEL_RENDER_DISTANCE, distance));
+        return Math.clamp(distance, MIN_MODEL_RENDER_DISTANCE, MAX_MODEL_RENDER_DISTANCE);
     }
 
     public static final int MIN_PORTAL_RENDER_DISTANCE = 4;
@@ -165,7 +165,8 @@ public final class GCConfig {
 
     private static int clampPortalDistance(int distance) {
         if (distance <= 0) return 20;
-        return Math.max(MIN_PORTAL_RENDER_DISTANCE, Math.min(MAX_PORTAL_RENDER_DISTANCE, distance));
+
+        return Math.clamp(distance, MIN_PORTAL_RENDER_DISTANCE, MAX_PORTAL_RENDER_DISTANCE);
     }
 
     public static final int MIN_RENDERED_PORTALS = 1;
@@ -173,7 +174,7 @@ public final class GCConfig {
 
     private static int clampMaxPortals(int count) {
         if (count <= 0) return 8;
-        return Math.max(MIN_RENDERED_PORTALS, Math.min(MAX_RENDERED_PORTALS, count));
+        return Math.clamp(count, MIN_RENDERED_PORTALS, MAX_RENDERED_PORTALS);
     }
 
     public static boolean debugReplay() {

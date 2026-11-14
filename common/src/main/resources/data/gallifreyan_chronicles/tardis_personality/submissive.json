@@ -16,6 +16,15 @@
   "when_unwilling_to_fly": [
     {
       "type": "balk"
+    },
+    {
+      "type": "sound",
+      "sound": "gallifreyan_chronicles:tardis_drum",
+      "volume": 0.6,
+      "pitch": 0.5
+    },
+    {
+      "type": "reveal"
     }
   ],
   "when_it_sees_the_mallet": [

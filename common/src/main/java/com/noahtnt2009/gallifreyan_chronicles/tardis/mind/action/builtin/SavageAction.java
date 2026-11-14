@@ -1,12 +1,13 @@
 package com.noahtnt2009.gallifreyan_chronicles.tardis.mind.action.builtin;
 
+import com.noahtnt2009.gallifreyan_chronicles.util.GCSparks;
+import com.noahtnt2009.gallifreyan_chronicles.tardis.mind.MindMessages;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import com.noahtnt2009.gallifreyan_chronicles.Constants;
 import com.noahtnt2009.gallifreyan_chronicles.tardis.mind.action.MindAction;
 import com.noahtnt2009.gallifreyan_chronicles.tardis.mind.action.MindContext;
-import com.noahtnt2009.gallifreyan_chronicles.util.Messages;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.server.level.ServerLevel;
@@ -42,10 +43,9 @@ public record SavageAction(float maxDamage, float minDamage, int burnSeconds) im
         player.igniteForSeconds(burnSeconds);
         ShockAction.throwBack(player, hit, 1.4, 0.6);
 
-        level.sendParticles(ParticleTypes.ELECTRIC_SPARK, player.getX(), player.getY() + 1, player.getZ(), 40, 0.4, 0.6, 0.4, 0.5);
-        level.sendParticles(ParticleTypes.FLAME, hit.x, hit.y, hit.z, 30, 0.5, 0.5, 0.5, 0.1);
-        level.playSound(null, player.blockPosition(), SoundEvents.LIGHTNING_BOLT_THUNDER, SoundSource.BLOCKS, 0.7F, 1.6F);
-        Messages.overlay(player, ChatFormatting.DARK_RED, "tardis_terror_savage");
+        GCSparks.blast(level, hit);
+        GCSparks.big(level, player.position().add(0, 1, 0));
+        MindMessages.say(player, ChatFormatting.DARK_RED, "tardis_terror_savage");
         context.handled = true;
     }
 }

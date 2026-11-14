@@ -63,8 +63,6 @@ public class GCLanguageProvider extends LanguageProvider {
         // Miscellaneous
         add("gamerule.category.gallifreyan_chronicles.gallifreyan_chronicles",
                 "Gallifreyan Chronicles");
-        add("gamerule.gallifreyan_chronicles.gc_daylight_cycle_affects_glow",
-                "Daylight Cycle Affects Exterior Glow");
         add("gamerule.gallifreyan_chronicles.gc_tardis_griefing",
                 "Crashing TARDISes Make Craters");
 
@@ -127,6 +125,14 @@ public class GCLanguageProvider extends LanguageProvider {
 
         // Commands: General
         add("command.gallifreyan_chronicles.invalid_id",
+        add("command.gallifreyan_chronicles.mind_header", "TARDIS %s mind:");
+        add("command.gallifreyan_chronicles.mind_bond", "  %s: trust %s | fear %s (%s) | trauma %s | hits %s | betrayed %s");
+        add("command.gallifreyan_chronicles.mind_no_bonds", "  It doesn't know anyone yet");
+        add("command.gallifreyan_chronicles.tp_exterior", "Teleported to the exterior of TARDIS %s");
+        add("command.gallifreyan_chronicles.tp_interior", "Teleported inside TARDIS %s");
+        add("command.gallifreyan_chronicles.no_tardis_here", "Look at a TARDIS exterior or console, or stand inside one");
+        add("command.gallifreyan_chronicles.tardis_id", "TARDIS id: %s");
+        add("command.gallifreyan_chronicles.click_to_copy", "Click to copy");
                 "Invalid TARDIS ID: %s");
         add("command.gallifreyan_chronicles.no_tardis_id",
                 "No TARDIS found with ID: %s");
@@ -218,8 +224,6 @@ public class GCLanguageProvider extends LanguageProvider {
                 "Health of subsystem %s in TARDIS %s: %s");
 
         // Commands: Mind
-        add("command.gallifreyan_chronicles.mind.willing", "Willing to fly");
-        add("command.gallifreyan_chronicles.mind.unwilling", "Doesn't want to fly");
         add("command.gallifreyan_chronicles.get_mind", "%s of TARDIS %s: %s");
         add("command.gallifreyan_chronicles.unknown_personality", "Unknown personality: %s");
         add("command.gallifreyan_chronicles.unknown_trait", "Unknown trait: %s");
@@ -316,12 +320,22 @@ public class GCLanguageProvider extends LanguageProvider {
         add("message.gallifreyan_chronicles.tardis_furious", "The TARDIS is furious, it's trying to hurt you!");
         add("message.gallifreyan_chronicles.still_travelling", "Still in the vortex, %s seconds until you can land");
         add("message.gallifreyan_chronicles.crash_landing", "Handbrake on in the vortex, the TARDIS is crashing!");
+        add("message.gallifreyan_chronicles.crash_landing_stress", "The TARDIS was barely hanging on... emergency landing!");
+        add("message.gallifreyan_chronicles.smoke_choking", "The smoke is getting thick... you need to get out!");
+        add("effect.gallifreyan_chronicles.choking", "Choking");
+        add("death.attack.gallifreyan_chronicles.smoke", "%1$s choked on the smoke of a crashed TARDIS");
+        add("death.attack.gallifreyan_chronicles.smoke.player", "%1$s choked on the smoke of a crashed TARDIS while fighting %2$s");
         add("message.gallifreyan_chronicles.power_locked_crashing", "The TARDIS is crashing, the power won't budge!");
         add("message.gallifreyan_chronicles.mallet_shudders", "The TARDIS shudders...");
         add("message.gallifreyan_chronicles.mallet_flinches", "The TARDIS flinches away from you...");
         add("message.gallifreyan_chronicles.mallet_cowers", "The TARDIS cowers...");
         add("message.gallifreyan_chronicles.tardis_cowed", "The TARDIS doesn't want to go, but it's too scared of you to refuse...");
         add("message.gallifreyan_chronicles.mallet_fights_back", "The TARDIS lashes back at you!");
+        add("message.gallifreyan_chronicles.tardis_offering_afraid", "The TARDIS takes it, trembling");
+        add("message.gallifreyan_chronicles.tardis_offering_betrayed", "The TARDIS takes it, but it hasn't forgotten");
+        add("message.gallifreyan_chronicles.tardis_forgives_you", "The TARDIS has forgiven you");
+        add("message.gallifreyan_chronicles.tardis_ptsd_easing", "The TARDIS seems more at peace lately");
+        add("message.gallifreyan_chronicles.mallet_not_yours", "This isn't your TARDIS to hit");
         add("message.gallifreyan_chronicles.tardis_controls_frozen", "The controls won't budge. The TARDIS doesn't trust you");
         add("message.gallifreyan_chronicles.tardis_control_sticks", "The control sticks... the TARDIS is wary of you");
         add("message.gallifreyan_chronicles.tardis_betrayed", "The TARDIS will never forget this betrayal");
@@ -377,9 +391,11 @@ public class GCLanguageProvider extends LanguageProvider {
         add("discovery.gallifreyan_chronicles.disability.found", "Quirk Discovered!");
         add("discovery.gallifreyan_chronicles.disability.dyslexic", "Dyslexic");
         add("discovery.gallifreyan_chronicles.disability.dyslexic.desc", "It sometimes mixes up its coordinates, especially when stressed. It gets better with practice, but it never fully goes away.");
-        add("command.gallifreyan_chronicles.mind", "Personality: %s | Traits: %s | Disabilities: %s | Skill: %s | Stress: %s | Trust: %s | Fear: %s | %s");
         // Sound subtitles
         add("sound.gallifreyan_chronicles.first_doctors_hum", "TARDIS hums");
+        add("sound.gallifreyan_chronicles.spark", "Sparks crackle");
+        add("sound.gallifreyan_chronicles.spark_explosion", "Sparks burst");
+        add("sound.gallifreyan_chronicles.explosion", "TARDIS explodes");
         add("sound.gallifreyan_chronicles.hartnell_door", "TARDIS doors move");
         add("sound.gallifreyan_chronicles.tardis_door_open", "TARDIS doors open");
         add("sound.gallifreyan_chronicles.tardis_door_close", "TARDIS doors close");

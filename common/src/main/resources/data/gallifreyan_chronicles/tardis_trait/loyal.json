@@ -6,7 +6,7 @@
   },
   "trauma_taken": 1.5,
   "if_betrayed": {
-    "trust_gained": 0.3,
+    "trust_gained": 0.5,
     "trust_lost": 1.5,
     "trauma_taken": 2.0
   },

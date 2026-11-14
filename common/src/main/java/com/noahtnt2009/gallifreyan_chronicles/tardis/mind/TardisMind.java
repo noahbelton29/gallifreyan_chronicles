@@ -27,7 +27,7 @@ import java.util.UUID;
 public record TardisMind(String personalityId, List<String> traitIds, float stress, float ownerStartTrust,
                          long stressTick, long lastLand, Map<UUID, TardisBond> bonds,
                          List<TardisDisability> disabilities, float skill, List<String> discovered,
-                         float trauma) {
+                         float trauma, long traumaTick, float recovery) {
 
     /**
      * Maximum value for stress, trust and trauma.
@@ -49,9 +49,12 @@ public record TardisMind(String personalityId, List<String> traitIds, float stre
      */
     public static final int MAX_TRAITS = 3;
 
-    private static final long TICKS_PER_STRESS_POINT = 200L;
-    private static final long TICKS_PER_FEAR_POINT = 600L;
-    private static final float TRAUMA_FEAR_SHARE = 0.6f;
+    private static final long TICKS_PER_STRESS_POINT = 100L;
+    /* fear fades a point every 15 seconds, so a scare wears off in a few minutes */
+    private static final long TICKS_PER_FEAR_POINT = 300L;
+    /* trauma fades a point every 10 minutes */
+    private static final long TICKS_PER_TRAUMA_POINT = 12000L;
+    public static final float TRAUMA_FEAR_SHARE = 0.6f;
     private static final float PTSD_FEAR_FLOOR = 50f;
 
     /**
@@ -68,7 +71,9 @@ public record TardisMind(String personalityId, List<String> traitIds, float stre
             TardisDisability.CODEC.listOf().optionalFieldOf("disabilities", List.of()).forGetter(TardisMind::disabilities),
             Codec.FLOAT.optionalFieldOf("skill", 0f).forGetter(TardisMind::skill),
             Codec.STRING.listOf().optionalFieldOf("discovered", List.of()).forGetter(TardisMind::discovered),
-            Codec.FLOAT.optionalFieldOf("trauma", 0f).forGetter(TardisMind::trauma)
+            Codec.FLOAT.optionalFieldOf("trauma", 0f).forGetter(TardisMind::trauma),
+            Codec.LONG.optionalFieldOf("trauma_tick", 0L).forGetter(TardisMind::traumaTick),
+            Codec.FLOAT.optionalFieldOf("recovery", 0f).forGetter(TardisMind::recovery)
     ).apply(inst, TardisMind::new));
 
     public TardisMind {
@@ -80,6 +85,7 @@ public record TardisMind(String personalityId, List<String> traitIds, float stre
         stress = Math.clamp(stress, 0f, MAX);
         ownerStartTrust = Math.clamp(ownerStartTrust, 0f, MAX);
         trauma = Math.clamp(trauma, 0f, MAX);
+        recovery = Math.clamp(recovery, 0f, 1f);
     }
 
     /**
@@ -153,47 +159,43 @@ public record TardisMind(String personalityId, List<String> traitIds, float stre
      */
     public float fearAt(TardisBond bond, long now) {
         float pointsFaded = Math.max(0L, now - bond.fearTick()) / (float) TICKS_PER_FEAR_POINT * modifiers().fearFade();
-        float floor = bond.hurtIt() ? traumaFloor() : 0f;
+        float floor = bond.hurtIt() ? traumaFloor(bond, now) : 0f;
         return Math.max(floor, Math.max(0f, bond.fear() - pointsFaded));
     }
 
-    /**
-     * Gets the minimum fear retained towards players who have hurt the TARDIS.
-     *
-     * <p>PTSD raises this minimum to at least {@link #PTSD_FEAR_FLOOR}.
-     */
-    public float traumaFloor() {
-        float floor = has(TardisDisability.PTSD) ? Math.max(trauma, PTSD_FEAR_FLOOR) : trauma;
-        return floor * TRAUMA_FEAR_SHARE;
+    /* the fear a player's scars leave behind. ptsd keeps a higher minimum until it recovers */
+    public float traumaFloor(TardisBond bond, long now) {
+        float scars = Math.max(bond.traumaAt(now), PTSD_FEAR_FLOOR * ptsdStrength());
+        return scars * TRAUMA_FEAR_SHARE;
     }
 
     public TardisMind withBond(UUID player, TardisBond bond) {
         Map<UUID, TardisBond> updated = new HashMap<>(bonds);
         updated.put(player, bond);
-        return new TardisMind(personalityId, traitIds, stress, ownerStartTrust, stressTick, lastLand, updated, disabilities, skill, discovered, trauma);
+        return new TardisMind(personalityId, traitIds, stress, ownerStartTrust, stressTick, lastLand, updated, disabilities, skill, discovered, trauma, traumaTick, recovery);
     }
 
     public TardisMind withStress(float value, long now) {
-        return new TardisMind(personalityId, traitIds, value, ownerStartTrust, now, lastLand, bonds, disabilities, skill, discovered, trauma);
+        return new TardisMind(personalityId, traitIds, value, ownerStartTrust, now, lastLand, bonds, disabilities, skill, discovered, trauma, traumaTick, recovery);
     }
 
     // Traits that don't suit the new personality are dropped.
     public TardisMind withPersonality(TardisPersonality value) {
         List<String> kept = traits().stream().filter(trait -> trait.fits(value)).map(TardisTrait::id).toList();
-        return new TardisMind(value.id(), kept, stress, ownerStartTrust, stressTick, lastLand, bonds, disabilities, skill, discovered, trauma);
+        return new TardisMind(value.id(), kept, stress, ownerStartTrust, stressTick, lastLand, bonds, disabilities, skill, discovered, trauma, traumaTick, recovery);
     }
 
     public TardisMind withTraits(List<TardisTrait> value) {
         List<String> ids = value.stream().map(TardisTrait::id).toList();
-        return new TardisMind(personalityId, ids, stress, ownerStartTrust, stressTick, lastLand, bonds, disabilities, skill, discovered, trauma);
+        return new TardisMind(personalityId, ids, stress, ownerStartTrust, stressTick, lastLand, bonds, disabilities, skill, discovered, trauma, traumaTick, recovery);
     }
 
     public TardisMind withDisabilities(List<TardisDisability> value) {
-        return new TardisMind(personalityId, traitIds, stress, ownerStartTrust, stressTick, lastLand, bonds, value, skill, discovered, trauma);
+        return new TardisMind(personalityId, traitIds, stress, ownerStartTrust, stressTick, lastLand, bonds, value, skill, discovered, trauma, traumaTick, recovery);
     }
 
     public TardisMind withSkill(float value) {
-        return new TardisMind(personalityId, traitIds, stress, ownerStartTrust, stressTick, lastLand, bonds, disabilities, value, discovered, trauma);
+        return new TardisMind(personalityId, traitIds, stress, ownerStartTrust, stressTick, lastLand, bonds, disabilities, value, discovered, trauma, traumaTick, recovery);
     }
 
     public boolean knows(String key) {
@@ -201,15 +203,34 @@ public record TardisMind(String personalityId, List<String> traitIds, float stre
     }
 
     public TardisMind withDiscovered(List<String> value) {
-        return new TardisMind(personalityId, traitIds, stress, ownerStartTrust, stressTick, lastLand, bonds, disabilities, skill, value, trauma);
+        return new TardisMind(personalityId, traitIds, stress, ownerStartTrust, stressTick, lastLand, bonds, disabilities, skill, value, trauma, traumaTick, recovery);
     }
 
-    public TardisMind withTrauma(float value) {
-        return new TardisMind(personalityId, traitIds, stress, ownerStartTrust, stressTick, lastLand, bonds, disabilities, skill, discovered, value);
+    public TardisMind withTrauma(float value, long now) {
+        return new TardisMind(personalityId, traitIds, stress, ownerStartTrust, stressTick, lastLand, bonds, disabilities, skill, discovered, value, now, recovery);
+    }
+
+    public TardisMind withRecovery(float value) {
+        return new TardisMind(personalityId, traitIds, stress, ownerStartTrust, stressTick, lastLand, bonds, disabilities, skill, discovered, trauma, traumaTick, value);
+    }
+
+    /* the tardis's total trauma from everyone. this is what gives it ptsd */
+    public float traumaAt(long now) {
+        return faded(trauma, traumaTick, now);
+    }
+
+    /* trauma fades by itself, one point every TICKS_PER_TRAUMA_POINT */
+    public static float faded(float value, long since, long now) {
+        return Math.max(0f, value - Math.max(0L, now - since) / (float) TICKS_PER_TRAUMA_POINT);
+    }
+
+    /* how much ptsd still affects it. 1 when it first gets it, close to 0 once it has recovered */
+    public float ptsdStrength() {
+        return has(TardisDisability.PTSD) ? 1f - recovery : 0f;
     }
 
     public TardisMind landed(long now) {
-        return new TardisMind(personalityId, traitIds, stress, ownerStartTrust, stressTick, now, bonds, disabilities, skill, discovered, trauma);
+        return new TardisMind(personalityId, traitIds, stress, ownerStartTrust, stressTick, now, bonds, disabilities, skill, discovered, trauma, traumaTick, recovery);
     }
 
     /**
@@ -226,7 +247,7 @@ public record TardisMind(String personalityId, List<String> traitIds, float stre
         List<TardisTrait> traits = rollTraits(random, personality);
         float trust = TraitModifiers.combine(traits, false).startTrust().orElse(START_TRUST);
         return new TardisMind(personality.id(), traits.stream().map(TardisTrait::id).toList(), 0f, trust, 0L, NEVER,
-                Map.of(), rollDisabilities(random), 0f, List.of(), 0f);
+                Map.of(), rollDisabilities(random), 0f, List.of(), 0f, 0L, 0f);
     }
 
     private static TardisPersonality rollPersonality(RandomSource random) {

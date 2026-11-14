@@ -1,12 +1,13 @@
 package com.noahtnt2009.gallifreyan_chronicles.tardis.mind.action.builtin;
 
+import com.noahtnt2009.gallifreyan_chronicles.util.GCSparks;
+import com.noahtnt2009.gallifreyan_chronicles.tardis.mind.MindMessages;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import com.noahtnt2009.gallifreyan_chronicles.Constants;
 import com.noahtnt2009.gallifreyan_chronicles.tardis.mind.action.MindAction;
 import com.noahtnt2009.gallifreyan_chronicles.tardis.mind.action.MindContext;
-import com.noahtnt2009.gallifreyan_chronicles.util.Messages;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.server.level.ServerLevel;
@@ -55,10 +56,8 @@ public record LashOutAction(float fromSeverity, float minDamage, float maxDamage
         }
         ShockAction.throwBack(player, context.pos, push, lift);
 
-        level.sendParticles(ParticleTypes.ELECTRIC_SPARK, player.getX(), player.getY() + 1, player.getZ(),
-                20, 0.3, 0.5, 0.3, 0.3);
-        level.playSound(null, player.blockPosition(), SoundEvents.LIGHTNING_BOLT_IMPACT, SoundSource.BLOCKS, 0.7F, 1.4F);
-        Messages.overlay(player, ChatFormatting.RED, "tardis_lashes_out");
+        GCSparks.big(level, player.position().add(0, 1, 0));
+        MindMessages.say(player, ChatFormatting.RED, "tardis_lashes_out");
         context.handled = true;
     }
 }

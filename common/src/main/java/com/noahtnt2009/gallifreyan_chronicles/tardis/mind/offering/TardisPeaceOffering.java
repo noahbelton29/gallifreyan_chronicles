@@ -1,11 +1,12 @@
 package com.noahtnt2009.gallifreyan_chronicles.tardis.mind.offering;
 
+import com.noahtnt2009.gallifreyan_chronicles.tardis.mind.MindMessages;
+import com.noahtnt2009.gallifreyan_chronicles.tardis.mind.FearLevel;
 import com.noahtnt2009.gallifreyan_chronicles.tardis.api.Tardis;
 import com.noahtnt2009.gallifreyan_chronicles.tardis.mind.TardisBond;
 import com.noahtnt2009.gallifreyan_chronicles.tardis.mind.TardisMind;
 import com.noahtnt2009.gallifreyan_chronicles.tardis.mind.TardisMindSystem;
 import com.noahtnt2009.gallifreyan_chronicles.tardis.mind.disability.TardisDisability;
-import com.noahtnt2009.gallifreyan_chronicles.util.Messages;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
@@ -33,12 +34,10 @@ public final class TardisPeaceOffering {
     /**
      * Maximum trust level at which a peace offering can still be accepted.
      */
-    private static final float TRUST_CEILING = 60f;
+    private static final float TRUST_CEILING = 70f;
 
-    /**
-     * Fear level at which a TARDIS becomes too frightened to accept a gift.
-     */
-    private static final float TOO_AFRAID = 40f;
+    /* scared or betrayed tardises still take gifts, just at half effect */
+    private static final float WARY_EFFECT = 0.5f;
 
     /**
      * Multiplier applied to the effectiveness of gifts for TARDISes with PTSD.
@@ -112,16 +111,8 @@ public final class TardisPeaceOffering {
         TardisMind mind = TardisMindSystem.mind(tardis);
         TardisBond bond = TardisMindSystem.bond(tardis, who);
 
-        if (bond.betrayed()) {
-            Messages.overlay(player, ChatFormatting.DARK_RED, "tardis_offering_betrayed");
-            return false;
-        }
-        if (TardisMindSystem.fear(tardis, who) >= TOO_AFRAID) {
-            Messages.overlay(player, ChatFormatting.DARK_GRAY, "tardis_offering_afraid");
-            return false;
-        }
         if (bond.trust() >= TRUST_CEILING - 1f) {
-            Messages.overlay(player, ChatFormatting.GRAY, "tardis_offering_content");
+            MindMessages.say(player, ChatFormatting.GRAY, "tardis_offering_content");
             return false;
         }
 
@@ -129,7 +120,7 @@ public final class TardisPeaceOffering {
         String key = tardis.id() + "/" + who;
         Offering last = OFFERINGS.get(key);
         if (last != null && now - last.tick < COOLDOWN_TICKS) {
-            Messages.overlay(player, ChatFormatting.GRAY, "tardis_offering_wait");
+            MindMessages.say(player, ChatFormatting.GRAY, "tardis_offering_wait");
             return false;
         }
 
@@ -138,7 +129,10 @@ public final class TardisPeaceOffering {
         float effect = Math.max(MIN_EFFECT, 1f - STREAK_FALLOFF * streak);
 
         boolean ptsd = mind.has(TardisDisability.PTSD);
-        if (ptsd) effect *= PTSD_EFFECT;
+        if (ptsd) effect *= 1f - (1f - PTSD_EFFECT) * mind.ptsdStrength();
+        boolean betrayed = bond.betrayed();
+        boolean afraid = TardisMindSystem.fearLevel(tardis, who).atLeast(FearLevel.AFRAID);
+        if (betrayed || afraid) effect *= WARY_EFFECT;
 
         // Account for trust gain modifiers so the offering never pushes trust past the ceiling.
         float scale = Math.max(0.01f, mind.modifiersFor(bond).trustGain());
@@ -149,11 +143,13 @@ public final class TardisPeaceOffering {
         TardisMindSystem.addStress(tardis, -STRESS_RELIEF * effect);
         TardisMindSystem.addFear(tardis, who, -FEAR_RELIEF * effect);
         TardisMindSystem.setTrauma(tardis, Math.max(0f, TardisMindSystem.trauma(tardis) - TRAUMA_RELIEF * effect));
+        TardisMindSystem.forgiveOneHit(tardis, who, TRAUMA_RELIEF);
         OFFERINGS.put(key, new Offering(now, streak));
 
         level.playSound(null, pos, SoundEvents.ALLAY_ITEM_GIVEN, SoundSource.BLOCKS, 0.8F, 1.2F);
-        String message = ptsd ? "tardis_offering_nervous" : streak > 0 ? "tardis_offering_again" : "tardis_offering_accepted";
-        Messages.overlay(player, ChatFormatting.LIGHT_PURPLE, message);
+        String message = betrayed ? "tardis_offering_betrayed" : afraid ? "tardis_offering_afraid"
+                : ptsd ? "tardis_offering_nervous" : streak > 0 ? "tardis_offering_again" : "tardis_offering_accepted";
+        MindMessages.say(player, ChatFormatting.LIGHT_PURPLE, message);
         return true;
     }
 }

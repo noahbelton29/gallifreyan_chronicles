@@ -10,6 +10,7 @@ public final class TardisDamage {
     public static void markCrashed(Tardis tardis) {
         tardis.data().setCrashed(tardis.id(), true);
         TardisAlarm.untilRepaired(tardis);
+        CrashSmoke.start(tardis);
     }
 
     public static void repair(Tardis tardis) {

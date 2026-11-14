@@ -1,5 +1,6 @@
 package com.noahtnt2009.gallifreyan_chronicles.tardis.mind.mood;
 
+import com.noahtnt2009.gallifreyan_chronicles.tardis.flight.CrashSmoke;
 import com.noahtnt2009.gallifreyan_chronicles.tardis.mind.TardisMindSystem;
 
 import net.minecraft.server.MinecraftServer;
@@ -95,7 +96,10 @@ public final class TardisAlarm {
      */
     public static void resumeCrashAlarms(MinecraftServer server) {
         for (Tardis tardis : TardisApi.all(server)) {
-            if (tardis.data().isCrashed(tardis.id())) untilRepaired(tardis);
+            if (tardis.data().isCrashed(tardis.id())) {
+                untilRepaired(tardis);
+                CrashSmoke.start(tardis);
+            }
         }
     }
 

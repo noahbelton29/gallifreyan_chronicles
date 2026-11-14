@@ -37,8 +37,7 @@ public record ParticlesAction(SimpleParticleType particle, int count, Vec3 sprea
 
     @Override
     public void run(MindContext context) {
-        if (context.level == null || context.pos == null) return;
-        Vec3 at = context.pos;
-        context.level.sendParticles(particle, at.x, at.y + height, at.z, count, spread.x, spread.y, spread.z, speed);
+        context.here((level, at) ->
+                level.sendParticles(particle, at.x, at.y + height, at.z, count, spread.x, spread.y, spread.z, speed));
     }
 }

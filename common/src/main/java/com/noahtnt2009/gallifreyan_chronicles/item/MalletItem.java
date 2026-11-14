@@ -7,6 +7,8 @@ import com.noahtnt2009.gallifreyan_chronicles.tardis.api.Tardis;
 import com.noahtnt2009.gallifreyan_chronicles.tardis.api.TardisApi;
 import com.noahtnt2009.gallifreyan_chronicles.tardis.mind.abuse.TardisMallet;
 import com.noahtnt2009.gallifreyan_chronicles.tardis.mind.abuse.TardisTrauma;
+import com.noahtnt2009.gallifreyan_chronicles.tardis.mind.MindMessages;
+import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.InteractionResult;
@@ -34,9 +36,16 @@ public class MalletItem extends Item {
     public @NonNull InteractionResult useOn(@NonNull UseOnContext context) {
         Level level = context.getLevel();
         Player player = context.getPlayer();
-        Optional<Tardis> tardis = tardisAt(level, context.getClickedPos());
+        /* console only. hitting the box would set off the alarm fog out in the world */
+        Optional<Tardis> tardis = consoleAt(level, context.getClickedPos());
         if (player == null || tardis.isEmpty()) return InteractionResult.PASS;
         if (!(level instanceof ServerLevel serverLevel)) return InteractionResult.SUCCESS;
+
+        /* only the owner or trusted crew can use it, so strangers can't wreck your tardis */
+        if (!tardis.get().isOwner(player) && !tardis.get().isTrusted(player.getUUID())) {
+            MindMessages.say(player, ChatFormatting.RED, "mallet_not_yours");
+            return InteractionResult.FAIL;
+        }
 
         TardisMallet.strike(tardis.get(), serverLevel, context.getClickedPos(), player);
         player.getCooldowns().addCooldown(context.getItemInHand(), STRIKE_COOLDOWN_TICKS);
@@ -49,6 +58,11 @@ public class MalletItem extends Item {
         if (slot != EquipmentSlot.MAINHAND || !(owner instanceof Player player)) return;
         if (level.getGameTime() % LOOK_TICKS != 0) return;
         TardisTrauma.sawMallet(player, level);
+    }
+
+    private static Optional<Tardis> consoleAt(Level level, BlockPos pos) {
+        if (level.getBlockEntity(pos) instanceof TardisConsoleBlockEntity console) return TardisApi.of(console);
+        return Optional.empty();
     }
 
     static Optional<Tardis> tardisAt(Level level, BlockPos pos) {

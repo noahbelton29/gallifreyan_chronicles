@@ -20,19 +20,21 @@
     {
       "type": "fight",
       "stress": 2
+    },
+    {
+      "type": "slam_doors",
+      "volume": 1.6,
+      "shake": 0.8,
+      "lock": true
+    },
+    {
+      "type": "reveal"
     }
   ],
   "when_it_sees_the_mallet": [
     {
-      "type": "particles",
-      "particle": "minecraft:electric_spark",
-      "count": 30,
-      "spread": [
-        0.6,
-        0.8,
-        0.6
-      ],
-      "speed": 0.3,
+      "type": "sparks",
+      "size": "big",
       "height": 1
     },
     {
@@ -46,6 +48,14 @@
       "type": "message",
       "key": "mallet_seen_threatens",
       "colour": "red"
+    },
+    {
+      "type": "slam_doors",
+      "volume": 1.4,
+      "shake": 0.6
+    },
+    {
+      "type": "reveal"
     }
   ],
   "when_hit": [
@@ -54,6 +64,10 @@
       "max_damage": 6,
       "min_damage": 2,
       "push": 0.9
+    },
+    {
+      "type": "reveal",
+      "if_it_reacted": true
     }
   ],
   "when_hit_while_terrified": [
@@ -62,6 +76,10 @@
       "max_damage": 10,
       "min_damage": 4,
       "burn_seconds": 3
+    },
+    {
+      "type": "reveal",
+      "if_it_reacted": true
     }
   ],
   "when_you_enter": [
@@ -72,6 +90,10 @@
       "max_damage": 6,
       "push": 0.9,
       "lift": 0.35
+    },
+    {
+      "type": "reveal",
+      "if_it_reacted": true
     }
   ]
 }

@@ -17,7 +17,9 @@ public final class HaywireControls {
     public static void flick(Tardis tardis, RandomSource random) {
         for (TardisConsoleBlockEntity console : tardis.consoles()) {
             List<TardisControlEntity> controls = console.getControlEntities().stream()
+                    /* power and handbrake stay put */
                     .filter(control -> !control.getControlId().equals(GCTardisControls.POWER_LEVER))
+                    .filter(control -> !control.getControlId().equals(GCTardisControls.HANDBRAKE))
                     .toList();
             if (controls.isEmpty()) continue;
 

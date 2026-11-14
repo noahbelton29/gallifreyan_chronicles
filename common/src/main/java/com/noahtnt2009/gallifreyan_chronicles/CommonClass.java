@@ -1,5 +1,6 @@
 package com.noahtnt2009.gallifreyan_chronicles;
 
+import com.noahtnt2009.gallifreyan_chronicles.init.GCEffects;
 import com.noahtnt2009.gallifreyan_chronicles.addon.AddonManager;
 import com.noahtnt2009.gallifreyan_chronicles.config.GCConfig;
 import com.noahtnt2009.gallifreyan_chronicles.init.*;
@@ -26,6 +27,7 @@ public class CommonClass {
         GCFeatures.registerFeatures();
         GCTreeDecoratorTypes.registerTreeDecoratorTypes();
         GCSounds.registerSounds();
+        GCEffects.registerEffects();
         TardisMindSystem.init();
         TardisTravel.init();
         AddonManager.init();

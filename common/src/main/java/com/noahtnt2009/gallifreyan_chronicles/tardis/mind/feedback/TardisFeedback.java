@@ -5,6 +5,8 @@ import com.noahtnt2009.gallifreyan_chronicles.tardis.mind.TardisMindSystem;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.sounds.SoundEvents;
+import net.minecraft.sounds.SoundSource;
 import net.minecraft.util.Mth;
 
 import java.util.HashMap;
@@ -140,6 +142,9 @@ public final class TardisFeedback {
 
         if (gained) {
             level.sendParticles(ParticleTypes.HEART, x, y, z, count, 0.35, 0.15, 0.35, 0.0);
+            /* a soft warm chime so being kind feels nice */
+            level.playSound(null, pos, SoundEvents.AMETHYST_BLOCK_CHIME, SoundSource.BLOCKS, 0.6F, 1.3F);
+            level.sendParticles(ParticleTypes.WAX_OFF, x, y, z, count, 0.4, 0.2, 0.4, 0.02);
         } else if (cause == Cause.BETRAYAL) {
             level.sendParticles(ParticleTypes.DAMAGE_INDICATOR, x, y, z, 8, 0.4, 0.2, 0.4, 0.1);
             level.sendParticles(ParticleTypes.SMOKE, x, y, z, 12, 0.4, 0.3, 0.4, 0.03);

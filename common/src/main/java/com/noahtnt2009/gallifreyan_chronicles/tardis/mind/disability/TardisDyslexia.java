@@ -1,5 +1,6 @@
 package com.noahtnt2009.gallifreyan_chronicles.tardis.mind.disability;
 
+import com.noahtnt2009.gallifreyan_chronicles.tardis.mind.MindMessages;
 import com.noahtnt2009.gallifreyan_chronicles.tardis.mind.TardisMind;
 import com.noahtnt2009.gallifreyan_chronicles.tardis.mind.TardisMindSystem;
 import com.noahtnt2009.gallifreyan_chronicles.tardis.mind.discovery.TardisDiscovery;
@@ -8,7 +9,6 @@ import com.noahtnt2009.gallifreyan_chronicles.tardis.api.Tardis;
 import com.noahtnt2009.gallifreyan_chronicles.tardis.api.TardisEvents;
 import com.noahtnt2009.gallifreyan_chronicles.tardis.flight.LandingTarget;
 import com.noahtnt2009.gallifreyan_chronicles.block.entity.TardisConsoleBlockEntity;
-import com.noahtnt2009.gallifreyan_chronicles.util.Messages;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
@@ -55,7 +55,7 @@ public final class TardisDyslexia {
         if (console != null && console.getLevel() instanceof ServerLevel level && muddle(tardis, level.getRandom())) {
             TardisDiscovery.disability(tardis, TardisDisability.DYSLEXIC);
             tardis.ownerPlayer().filter(owner -> owner.level() == level)
-                    .ifPresent(owner -> Messages.overlay(owner, ChatFormatting.GOLD, "tardis_muddled"));
+                    .ifPresent(owner -> MindMessages.say(owner, ChatFormatting.GOLD, "tardis_muddled"));
         }
         practise(tardis);
     }

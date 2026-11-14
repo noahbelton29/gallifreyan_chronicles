@@ -1,5 +1,7 @@
 package com.noahtnt2009.gallifreyan_chronicles.tardis.flight;
 
+import com.noahtnt2009.gallifreyan_chronicles.init.GCSounds;
+import com.noahtnt2009.gallifreyan_chronicles.util.GCSparks;
 import com.noahtnt2009.gallifreyan_chronicles.tardis.mind.data.MindEnums;
 
 import java.util.UUID;
@@ -63,12 +65,63 @@ public final class TardisCrash {
         CRASHING.clear();
     }
 
+    private static final float EMERGENCY_IMPACT_SHAKE = 2.5F;
+    private static final float EMERGENCY_TRAUMA = 1f;
+
+    /* a stressed tardis losing its grip. very shaky, smoke and the odd spark, then one bump when it lands.
+       no fire, no damage, no repair needed */
+    public static void emergency(Tardis tardis, ServerLevel interior, BlockPos consolePos, int landingTicks) {
+        CRASHING.add(tardis.id());
+        TardisMindSystem.setTrauma(tardis, TardisMindSystem.trauma(tardis) + EMERGENCY_TRAUMA);
+        TardisDiscovery.reveal(tardis, MindEnums.Reveal.IT_CRASHES);
+        int flashes = landingTicks / TardisAlarm.FLASH_TICKS + 1;
+        TardisAlarm.flashLoud(tardis.interiorLevel().orElse(interior), flashes);
+
+        Vec3 console = Vec3.atCenterOf(consolePos);
+        TardisCrashRumblePayload.broadcast(interior, console, landingTicks);
+        for (int tick = 0; tick < landingTicks; tick += BUMP_TICKS) {
+            GCScheduler.runLater(interior.getServer(), tick, () -> struggle(tardis, interior, console));
+        }
+        GCScheduler.runLater(interior.getServer(), landingTicks, () -> emergencyImpact(tardis, interior, console));
+        GCScheduler.runLater(interior.getServer(), landingTicks + SETTLE_DELAY_TICKS, () -> HaywireControls.settle(tardis));
+    }
+
+    private static void struggle(Tardis tardis, ServerLevel level, Vec3 console) {
+        RandomSource random = level.getRandom();
+        HaywireControls.flick(tardis, random);
+        level.sendParticles(ParticleTypes.LARGE_SMOKE, console.x, console.y + 1, console.z, 6, 2.5, 1.0, 2.5, 0.02);
+        if (random.nextInt(3) == 0) {
+            Vec3 spot = console.add((random.nextDouble() - 0.5) * 2, 1, (random.nextDouble() - 0.5) * 2);
+            GCSparks.small(level, spot, 6);
+        }
+    }
+
+    /* one explosion as it hits the ground, softer than a crash */
+    private static void emergencyImpact(Tardis tardis, ServerLevel interior, Vec3 console) {
+        CRASHING.remove(tardis.id());
+        float protection = protection(tardis);
+        interior.sendParticles(ParticleTypes.EXPLOSION, console.x, console.y + 1, console.z, 2, 0.6, 0.4, 0.6, 0.0);
+        interior.sendParticles(ParticleTypes.LARGE_SMOKE, console.x, console.y + 1, console.z, 30, 2.0, 1.0, 2.0, 0.04);
+        interior.playSound(null, BlockPos.containing(console), GCSounds.EXPLOSION, SoundSource.BLOCKS, 1.0F, 0.95F);
+        TardisDrumShakePayload.broadcast(interior, console, EMERGENCY_IMPACT_SHAKE * protection);
+
+        tardis.exteriorIfLoaded().ifPresent(exterior -> {
+            if (!(exterior.getLevel() instanceof ServerLevel outside)) return;
+            Vec3 at = Vec3.atBottomCenterOf(exterior.getBlockPos());
+            outside.sendParticles(ParticleTypes.EXPLOSION, at.x, at.y + 1, at.z, 1, 0, 0, 0, 0);
+            outside.sendParticles(ParticleTypes.LARGE_SMOKE, at.x, at.y + 1, at.z, 20, 1.0, 1.0, 1.0, 0.04);
+            outside.playSound(null, exterior.getBlockPos(), GCSounds.EXPLOSION, SoundSource.BLOCKS, 1.5F, 0.9F);
+            TardisDrumShakePayload.broadcast(outside, at, 1.0F);
+        });
+    }
+
     public static void run(Tardis tardis, ServerLevel interior, BlockPos consolePos, int landingTicks) {
         CRASHING.add(tardis.id());
         TardisMindSystem.addStress(tardis, CRASH_STRESS);
         TardisDiscovery.reveal(tardis, MindEnums.Reveal.IT_CRASHES);
         int flashes = landingTicks / TardisAlarm.FLASH_TICKS + 1;
-        TardisAlarm.flashLoud(interior, flashes);
+        /* the alarm always goes off inside, even if the crash started from a console somewhere else */
+        TardisAlarm.flashLoud(tardis.interiorLevel().orElse(interior), flashes);
 
         Vec3 console = Vec3.atCenterOf(consolePos);
         burst(interior, console);
@@ -93,6 +146,11 @@ public final class TardisCrash {
         level.sendParticles(ParticleTypes.CAMPFIRE_COSY_SMOKE, console.x, console.y + 0.5, console.z, 4, 4.0, 0.5, 4.0, 0.01);
         level.sendParticles(ParticleTypes.FLAME, console.x, console.y + 0.5, console.z, 30, 6.0, 1.0, 6.0, 0.02);
         level.sendParticles(ParticleTypes.LAVA, console.x, console.y + 0.5, console.z, 6, 5.0, 0.5, 5.0, 0.0);
+
+        /* the console keeps sparking as it goes down */
+        Vec3 spot = console.add((random.nextDouble() - 0.5) * 6, 1 + random.nextDouble(), (random.nextDouble() - 0.5) * 6);
+        if (random.nextInt(10) == 0) GCSparks.big(level, spot);
+        else if (random.nextInt(3) == 0) GCSparks.small(level, spot, 10);
     }
 
     /* smoke and fire blasting out of the console */
@@ -105,7 +163,7 @@ public final class TardisCrash {
         level.sendParticles(ParticleTypes.CAMPFIRE_SIGNAL_SMOKE, x, y, z, 20, 0.8, 0.5, 0.8, 0.05);
         level.sendParticles(ParticleTypes.FLAME, x, y, z, 120, 1.2, 0.8, 1.2, 0.3);
         level.sendParticles(ParticleTypes.LAVA, x, y, z, 30, 1.0, 0.5, 1.0, 0.0);
-        level.playSound(null, BlockPos.containing(console), SoundEvents.GENERIC_EXPLODE.value(), SoundSource.BLOCKS, 2.0F, 0.6F);
+        GCSparks.blast(level, console.add(0, 1, 0));
     }
 
     private static void damageInterior(ServerLevel level, Vec3 console, RandomSource random) {
@@ -171,7 +229,7 @@ public final class TardisCrash {
         outside.sendParticles(ParticleTypes.EXPLOSION_EMITTER, at.x, at.y + 1, at.z, 1, 0, 0, 0, 0);
         outside.sendParticles(ParticleTypes.LARGE_SMOKE, at.x, at.y + 1, at.z, 50, 1.5, 1.5, 1.5, 0.05);
         outside.sendParticles(ParticleTypes.CAMPFIRE_SIGNAL_SMOKE, at.x, at.y + 2, at.z, 10, 0.6, 0.5, 0.6, 0.02);
-        outside.playSound(null, exterior.getBlockPos(), SoundEvents.GENERIC_EXPLODE.value(), SoundSource.BLOCKS, 4.0F, 0.7F);
+        GCSparks.blast(outside, at.add(0, 1, 0));
         TardisDrumShakePayload.broadcast(outside, at, 2.0F);
     }
 

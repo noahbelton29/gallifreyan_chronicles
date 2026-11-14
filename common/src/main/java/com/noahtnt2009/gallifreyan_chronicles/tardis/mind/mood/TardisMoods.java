@@ -75,7 +75,7 @@ public final class TardisMoods {
      * @param tardis the TARDIS whose crew is being checked
      * @return UUIDs of the players considered to be aboard
      */
-    private static List<UUID> crew(Tardis tardis) {
+    public static List<UUID> crew(Tardis tardis) {
         List<UUID> aboard = tardis.interiorLevel()
                 .map(level -> level.players().stream().map(player -> player.getUUID()).toList())
                 .orElse(List.of());

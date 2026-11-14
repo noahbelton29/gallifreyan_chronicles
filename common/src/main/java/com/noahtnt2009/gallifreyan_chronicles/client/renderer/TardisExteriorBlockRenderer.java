@@ -1,5 +1,8 @@
 package com.noahtnt2009.gallifreyan_chronicles.client.renderer;
 
+import org.joml.Vector3f;
+import org.joml.Quaternionf;
+import com.noahtnt2009.gallifreyan_chronicles.client.renderer.geo_layer.TardisLampOrbLayer;
 import com.noahtnt2009.gallifreyan_chronicles.client.util.FadeTint;
 
 import com.noahtnt2009.gallifreyan_chronicles.client.util.ModelRenderRange;
@@ -36,6 +39,13 @@ public class TardisExteriorBlockRenderer extends GeoBlockRenderer<@NotNull Tardi
     public static final DataTicket<String> EXTERIOR_ID = DataTicket.create("exterior_id", String.class);
     public static final DataTicket<Float> YAW = DataTicket.create("tardis_yaw", Float.class);
     public static final DataTicket<Boolean> GLOWING = DataTicket.create("tardis_glowing", Boolean.class);
+    /* how bright the lamp is, 0 to 1, for the takeoff and landing flicker */
+    public static final DataTicket<Float> LAMP = DataTicket.create("tardis_lamp", Float.class);
+    public static final DataTicket<Float> LAMP_ORB = DataTicket.create("tardis_lamp_orb", Float.class);
+    /* which way the camera is looking, saved each frame for the lamp orb */
+    public static final Quaternionf cameraOrientation = new Quaternionf();
+    /* where this block's corner is relative to the camera, saved each frame for the lamp orb */
+    public static final Vector3f blockOrigin = new Vector3f();
     public static final DataTicket<Float> OPACITY = DataTicket.create("tardis_opacity", Float.class);
 
     private static final float GLASS_STRENGTH = .1f;
@@ -48,6 +58,7 @@ public class TardisExteriorBlockRenderer extends GeoBlockRenderer<@NotNull Tardi
 
         withRenderLayer(TardisExteriorGlowLayer::new);
         withRenderLayer(renderer -> new TardisExteriorKeyLayer<>(renderer, context));
+        withRenderLayer(TardisLampOrbLayer::new);
     }
 
     @SuppressWarnings("UnstableApiUsage")
@@ -64,6 +75,8 @@ public class TardisExteriorBlockRenderer extends GeoBlockRenderer<@NotNull Tardi
         renderState.addGeckolibData(YAW, animatable.getYaw());
         boolean hiddenFromInterior = isSeenFromItsInterior(animatable);
         renderState.addGeckolibData(GLOWING, animatable.isGlowing() && !hiddenFromInterior);
+        renderState.addGeckolibData(LAMP, animatable.lampBrightness(partialTick));
+        renderState.addGeckolibData(LAMP_ORB, hiddenFromInterior ? 0f : animatable.lampOrb(partialTick));
         renderState.addGeckolibData(OPACITY, hiddenFromInterior ? 0.0f : animatable.getOpacity(partialTick));
     }
 
@@ -138,7 +151,14 @@ public class TardisExteriorBlockRenderer extends GeoBlockRenderer<@NotNull Tardi
     public void submit(@NonNull TardisExteriorBlockRenderState renderState, @NonNull PoseStack poseStack,
                        @NonNull SubmitNodeCollector submitNodeCollector, @NonNull CameraRenderState cameraState) {
         if (RenderLevelGuard.belongsToOtherLevel(renderState)) return;
+        /* the lamp orb needs this to face the camera */
+        cameraOrientation.set(cameraState.orientation);
+        poseStack.last().pose().transformPosition(blockOrigin.set(0f, 0f, 0f));
         super.submit(renderState, poseStack, submitNodeCollector, cameraState);
+        /* geckolib skips a fully see-through box, so the orb draws itself then */
+        if (renderState.getOrDefaultGeckolibData(OPACITY, 1.0f) <= 0.0f) {
+            TardisLampOrbLayer.drawWithoutBox(renderState, poseStack, submitNodeCollector);
+        }
     }
 
     @Override

@@ -14,12 +14,6 @@ import net.minecraft.world.level.gamerules.GameRuleType;
 import net.minecraft.world.level.gamerules.GameRuleTypeVisitor;
 
 public class GCGameRules {
-    public static final GameRule<Boolean> DAYLIGHT_CYCLE_AFFECTS_GLOW = register(
-            "gc_daylight_cycle_affects_glow",
-            GCGameRuleCategories.GALLIFREYAN_CHRONICLES,
-            true
-    );
-
     public static final GameRule<Boolean> TARDIS_GRIEFING = register(
             "gc_tardis_griefing",
             GCGameRuleCategories.GALLIFREYAN_CHRONICLES,

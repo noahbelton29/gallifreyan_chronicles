@@ -1,5 +1,9 @@
 package com.noahtnt2009.gallifreyan_chronicles.command;
 
+import net.minecraft.server.level.ServerPlayer;
+import java.util.Map;
+import java.util.Locale;
+import java.util.LinkedHashMap;
 import com.mojang.brigadier.arguments.BoolArgumentType;
 import com.mojang.brigadier.arguments.FloatArgumentType;
 import com.mojang.brigadier.arguments.StringArgumentType;
@@ -37,8 +41,7 @@ public final class MindCommands {
 
     public static LiteralArgumentBuilder<CommandSourceStack> mind() {
         return literal("mind")
-                .executes(MindCommands::show)
-                .then(literal("get").executes(MindCommands::show))
+                .then(literal("inspect").executes(MindCommands::inspect))
                 .then(literal("reroll").executes(MindCommands::reroll))
                 .then(literal("undiscover").executes(MindCommands::undiscover))
                 .then(literal("betrayed")
@@ -74,13 +77,18 @@ public final class MindCommands {
                         .then(literal("clear").executes(MindCommands::clearDisabilities)))
                 .then(value(MindValue.SKILL))
                 .then(value(MindValue.TRAUMA))
+                .then(value(MindValue.TOTAL_TRAUMA))
+                .then(value(MindValue.HITS))
+                .then(literal("forgive").executes(MindCommands::forgive)
+                        .then(argument("player", EntityArgument.player()).executes(MindCommands::forgive)))
                 .then(value(MindValue.STRESS))
                 .then(value(MindValue.TRUST))
                 .then(value(MindValue.FEAR));
     }
 
     private enum MindValue {
-        STRESS("stress"), TRUST("trust"), FEAR("fear"), SKILL("skill"), TRAUMA("trauma");
+        STRESS("stress"), TRUST("trust"), FEAR("fear"), SKILL("skill"), TRAUMA("trauma"),
+        TOTAL_TRAUMA("total_trauma"), HITS("hits");
 
         private final String name;
 
@@ -90,7 +98,7 @@ public final class MindCommands {
 
         /* trust and fear are per player, null means the owner */
         private boolean perPlayer() {
-            return this == TRUST || this == FEAR;
+            return this == TRUST || this == FEAR || this == TRAUMA || this == HITS;
         }
 
         private float get(Tardis tardis, @Nullable UUID player) {
@@ -99,7 +107,9 @@ public final class MindCommands {
                 case TRUST -> TardisMindSystem.trust(tardis, player);
                 case FEAR -> TardisMindSystem.fear(tardis, player);
                 case SKILL -> TardisMindSystem.skill(tardis) * 100f;
-                case TRAUMA -> TardisMindSystem.trauma(tardis);
+                case TRAUMA -> TardisMindSystem.traumaFrom(tardis, player);
+                case TOTAL_TRAUMA -> TardisMindSystem.trauma(tardis);
+                case HITS -> TardisMindSystem.bond(tardis, player).hits();
             };
         }
 
@@ -107,9 +117,18 @@ public final class MindCommands {
             switch (this) {
                 case STRESS -> TardisMindSystem.setStress(tardis, value);
                 case TRUST -> TardisMindSystem.setTrust(tardis, player, value);
-                case FEAR -> TardisMindSystem.setFear(tardis, player, value);
+                case FEAR -> {
+                    /* trauma keeps fear from going below a floor, so lower it enough for the new fear to stick */
+                    float maxTrauma = value / TardisMind.TRAUMA_FEAR_SHARE;
+                    if (TardisMindSystem.traumaFrom(tardis, player) > maxTrauma) {
+                        TardisMindSystem.setTraumaFrom(tardis, player, maxTrauma);
+                    }
+                    TardisMindSystem.setFear(tardis, player, value);
+                }
                 case SKILL -> TardisMindSystem.setSkill(tardis, value / 100f);
-                case TRAUMA -> TardisMindSystem.setTrauma(tardis, value);
+                case TRAUMA -> TardisMindSystem.setTraumaFrom(tardis, player, value);
+                case TOTAL_TRAUMA -> TardisMindSystem.setTrauma(tardis, value);
+                case HITS -> TardisMindSystem.setHits(tardis, player, Math.round(value));
             }
         }
     }
@@ -140,26 +159,48 @@ public final class MindCommands {
         return builder.buildFuture();
     }
 
-    private static int show(CommandContext<CommandSourceStack> ctx) throws CommandSyntaxException {
+    /* everything about its mind, and how it feels about every player it knows */
+    private static int inspect(CommandContext<CommandSourceStack> ctx) throws CommandSyntaxException {
         return withTardis(ctx, (tardis, idText) -> {
             TardisMind mind = TardisMindSystem.mind(tardis);
-            String willing = TardisMindSystem.unwilling(tardis) ? "mind.unwilling" : "mind.willing";
-            return success(ctx, false, "mind",
-                    shortId(mind.personality().id()),
-                    traitList(mind),
-                    disabilityList(mind),
-                    oneDecimal(mind.skill() * 100f),
-                    oneDecimal(TardisMindSystem.stress(tardis)),
-                    oneDecimal(TardisMindSystem.trust(tardis, null)),
-                    oneDecimal(TardisMindSystem.fear(tardis, null)),
-                    text(willing));
+            long now = TardisMindSystem.now(tardis.server());
+            Map<String, String> lines = new LinkedHashMap<>();
+
+            lines.put("personality", shortId(mind.personality().id()));
+            lines.put("traits", traitList(mind));
+            lines.put("disabilities", disabilityList(mind));
+            lines.put("skill", oneDecimal(mind.skill() * 100f));
+            lines.put("stress", oneDecimal(TardisMindSystem.stress(tardis)));
+            lines.put("trauma (total)", oneDecimal(TardisMindSystem.trauma(tardis)));
+            lines.put("ptsd recovery", mind.has(TardisDisability.PTSD) ? oneDecimal(mind.recovery() * 100f) + "%" : "no ptsd");
+            lines.put("willing to fly", String.valueOf(!TardisMindSystem.unwilling(tardis)));
+            lines.put("discovered", mind.discovered().isEmpty() ? "nothing" : String.join(", ", mind.discovered()));
+
+            success(ctx, false, "mind_header", idText);
+            lines.forEach((key, value) -> success(ctx, false, "data_line", key, value));
+
+            if (mind.bonds().isEmpty()) return success(ctx, false, "mind_no_bonds");
+            mind.bonds().forEach((player, bond) -> success(ctx, false, "mind_bond",
+                    playerName(tardis, player) + (tardis.isOwner(player) ? " (owner)" : ""),
+                    oneDecimal(bond.trust()),
+                    oneDecimal(TardisMindSystem.fear(tardis, player)),
+                    TardisMindSystem.fearLevel(tardis, player).name().toLowerCase(Locale.ROOT),
+                    oneDecimal(bond.traumaAt(now)),
+                    bond.hits(),
+                    bond.betrayed()));
+            return 1;
         });
+    }
+
+    private static String playerName(Tardis tardis, UUID player) {
+        ServerPlayer online = tardis.server().getPlayerList().getPlayer(player);
+        return online != null ? online.getName().getString() : player.toString();
     }
 
     private static int reroll(CommandContext<CommandSourceStack> ctx) throws CommandSyntaxException {
         return withTardis(ctx, (tardis, idText) -> {
             TardisMindSystem.reroll(tardis);
-            return show(ctx);
+            return inspect(ctx);
         });
     }
 
@@ -169,6 +210,14 @@ public final class MindCommands {
         return withTardis(ctx, (tardis, idText) -> {
             TardisMindSystem.setBetrayed(tardis, player, betrayed);
             return reply(ctx, tardis, "betrayed", String.valueOf(betrayed), true);
+        });
+    }
+
+    private static int forgive(CommandContext<CommandSourceStack> ctx) throws CommandSyntaxException {
+        UUID player = playerArg(ctx);
+        return withTardis(ctx, (tardis, idText) -> {
+            TardisMindSystem.forgive(tardis, player);
+            return reply(ctx, tardis, "fear, trauma, hits and betrayal", "cleared", true);
         });
     }
 

@@ -1,5 +1,7 @@
 package com.noahtnt2009.gallifreyan_chronicles.tardis.control.impl;
 
+import com.noahtnt2009.gallifreyan_chronicles.tardis.mind.TardisMindSystem;
+import com.noahtnt2009.gallifreyan_chronicles.tardis.mind.flight.TardisTurbulence;
 import com.noahtnt2009.gallifreyan_chronicles.util.Messages;
 import com.noahtnt2009.gallifreyan_chronicles.sound.TimedSounds;
 
@@ -191,13 +193,18 @@ public class FlightLeverControl extends BaseControl {
     }
 
     public static boolean crashLand(TardisConsoleBlockEntity console) {
+        return crashLand(console, "crash_landing");
+    }
+
+    /* message: the lang key shown as it falls out the vortex */
+    public static boolean crashLand(TardisConsoleBlockEntity console, String message) {
         if (!(console.getLevel() instanceof ServerLevel level)) return false;
         Tardis tardis = linkedTardis(console).orElse(null);
         TardisExteriorBlockEntity exterior = tardis == null ? null : tardis.exterior().orElse(null);
         if (exterior == null || exterior.getFlightState() != TardisFlightState.IN_VORTEX) return false;
 
         int ticks = LAND_FADE_DELAY_TICKS + exterior.getFadeType().timing().fadeInTicks();
-        Messages.overlayNearby(level, Vec3.atCenterOf(console.getBlockPos()), ChatFormatting.DARK_RED, "crash_landing");
+        Messages.overlayNearby(level, Vec3.atCenterOf(console.getBlockPos()), ChatFormatting.DARK_RED, message);
         TardisCrash.run(tardis, level, console.getBlockPos(), ticks);
 
         tardis.data().setLandingTarget(tardis.id(), TardisTravel.crashTarget(tardis));
@@ -206,6 +213,27 @@ public class FlightLeverControl extends BaseControl {
         console.triggerControl(ID, false, null);
         return true;
     }
+
+    /* a stressed tardis dropping out of the vortex on its own. rough but not a crash, no damage,
+       and it gets most of the way there */
+    public static boolean emergencyLand(TardisConsoleBlockEntity console, String message) {
+        if (!(console.getLevel() instanceof ServerLevel level)) return false;
+        Tardis tardis = linkedTardis(console).orElse(null);
+        TardisExteriorBlockEntity exterior = tardis == null ? null : tardis.exterior().orElse(null);
+        if (exterior == null || exterior.getFlightState() != TardisFlightState.IN_VORTEX) return false;
+
+        int ticks = LAND_FADE_DELAY_TICKS + exterior.getFadeType().timing().fadeInTicks();
+        Messages.overlayNearby(level, Vec3.atCenterOf(console.getBlockPos()), ChatFormatting.GOLD, message);
+        TardisCrash.emergency(tardis, level, console.getBlockPos(), ticks);
+
+        tardis.data().setLandingTarget(tardis.id(), TardisTravel.partWayTarget(tardis, EMERGENCY_DISTANCE));
+        playAt(level, console.getBlockPos(), GCSounds.SLIDER, 1.0f);
+        land(level, console, tardis.id());
+        console.triggerControl(ID, false, null);
+        return true;
+    }
+
+    private static final float EMERGENCY_DISTANCE = 0.75F;
 
     private static void land(ServerLevel level, TardisConsoleBlockEntity console, @Nullable UUID tardisId) {
         stopVworp(level);
@@ -226,10 +254,12 @@ public class FlightLeverControl extends BaseControl {
             Vec3 shakePos
     ) {
         playEverywhere(console, level, GCSounds.TARDIS_DRUM);
+        /* a stressed tardis sounds strained */
+        float pitch = linkedTardis(console).map(tardis -> TardisTurbulence.vworpPitch(TardisMindSystem.stress(tardis))).orElse(1.0F);
         for (TardisConsoleBlockEntity each : ConsoleSyncSystem.liveConsolesWith(console)) {
             if (!(each.getLevel() instanceof ServerLevel eachLevel)) continue;
             TimedSounds.playThenLoop(eachLevel, each.getBlockPos(), GCSounds.TARDIS_TAKEOFF, GCSounds.TARDIS_VWORP,
-                    SoundSource.BLOCKS, 1.0F, 1.0F, VWORP_VOLUME);
+                    SoundSource.BLOCKS, 1.0F, pitch, VWORP_VOLUME);
         }
         playAtExterior(console, level, GCSounds.TARDIS_TAKEOFF);
         linkedTardis(console).ifPresent(TardisEvents.TAKE_OFF::fire);

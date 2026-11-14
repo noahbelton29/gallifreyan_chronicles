@@ -30,6 +30,8 @@ public record ShockAction(float range, float damage, float push, float lift) imp
     public void run(MindContext context) {
         Player player = context.player;
         if (context.level == null || context.pos == null || player == null) return;
+        /* it can only zap you from inside, not through the box outside */
+        if (context.level != context.tardis.interiorLevel().orElse(null)) return;
         if (player.distanceToSqr(context.pos) > range * range) return;
         player.hurtServer(context.level, context.level.damageSources().lightningBolt(), damage);
         throwBack(player, context.pos, push, lift);

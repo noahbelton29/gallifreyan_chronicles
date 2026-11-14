@@ -1,5 +1,8 @@
 package com.noahtnt2009.gallifreyan_chronicles.tardis.mind.abuse;
 
+import com.noahtnt2009.gallifreyan_chronicles.util.GCSparks;
+import com.noahtnt2009.gallifreyan_chronicles.tardis.mind.data.MindEnums.Reveal;
+import com.noahtnt2009.gallifreyan_chronicles.tardis.mind.discovery.TardisDiscovery;
 import com.noahtnt2009.gallifreyan_chronicles.tardis.mind.TardisMindSystem;
 import com.noahtnt2009.gallifreyan_chronicles.tardis.mind.TardisPersonality;
 import com.noahtnt2009.gallifreyan_chronicles.tardis.mind.mood.TardisAlarm;
@@ -7,9 +10,9 @@ import com.noahtnt2009.gallifreyan_chronicles.tardis.mind.mood.TardisAlarm;
 import com.noahtnt2009.gallifreyan_chronicles.network.TardisAlarmPayload;
 import com.noahtnt2009.gallifreyan_chronicles.network.TardisDrumShakePayload;
 import com.noahtnt2009.gallifreyan_chronicles.tardis.api.Tardis;
+import com.noahtnt2009.gallifreyan_chronicles.tardis.mind.MindMessages;
 import com.noahtnt2009.gallifreyan_chronicles.tardis.mind.action.MindActions;
 import com.noahtnt2009.gallifreyan_chronicles.tardis.mind.action.MindContext;
-import com.noahtnt2009.gallifreyan_chronicles.util.Messages;
 import com.noahtnt2009.gallifreyan_chronicles.util.PlayerMotion;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
@@ -38,29 +41,35 @@ public final class TardisMallet {
     private static final float BLAST_PER_FEAR = 0.02F;
 
     private static final int ALARM_HITS = 2;
-    private static final int BETRAYAL_HITS = 4;
+    /* a betrayal is a real beating of a tardis that trusted you, not a couple of taps */
+    private static final int BETRAYAL_HITS = 8;
+    private static final float BETRAYAL_NEEDS_TRUST = 50f;
     private static final int LONG_ALARM_HITS = 5;
     private static final int LONG_ALARM_FLASHES = 3;
-    private static final long HITS_FORGOTTEN_TICKS = 600L;
-    private static final Map<UUID, Hits> HITS = new HashMap<>();
+    /* hits within this long of each other count as one beating */
+    private static final long BEATING_GAP_TICKS = 6000L;
+    private static final Map<String, Beating> BEATINGS = new HashMap<>();
 
-    private record Hits(int count, long lastTick) {
+    /* trustBefore: how much it trusted them when the beating started */
+    private record Beating(int count, long lastTick, float trustBefore) {
     }
 
     private TardisMallet() {
     }
 
     public static void reset() {
-        HITS.clear();
+        BEATINGS.clear();
     }
 
     public static void strike(Tardis tardis, ServerLevel level, BlockPos hitPos, Player player) {
         TardisPersonality personality = TardisMindSystem.mind(tardis).personality();
         UUID hitter = player.getUUID();
+        Beating beating = countHit(tardis, hitter);
         TardisMindSystem.addFear(tardis, hitter, personality.malletFear().pick(level.getRandom()));
         TardisMindSystem.addStress(tardis, STRESS_PER_HIT);
         TardisMindSystem.abuse(tardis, hitter, TRUST_LOSS_PER_HIT);
-        TardisTrauma.hit(tardis, hitter);
+        TardisTrauma.hit(tardis, hitter, beating.count());
+        TardisDiscovery.reveal(tardis, Reveal.IT_IS_HIT);
 
         Vec3 hit = Vec3.atCenterOf(hitPos);
         float blast = BASE_BLAST + TardisMindSystem.fear(tardis, hitter) * BLAST_PER_FEAR;
@@ -68,12 +77,13 @@ public final class TardisMallet {
         level.playSound(null, hitPos, SoundEvents.ANVIL_LAND, SoundSource.BLOCKS, 0.6F,
                 0.7F + level.getRandom().nextFloat() * 0.2F);
         level.sendParticles(ParticleTypes.CRIT, hit.x, hit.y, hit.z, 12, 0.3, 0.3, 0.3, 0.2);
+        GCSparks.small(level, hit, 8);
         TardisDrumShakePayload.broadcast(level, hit, SHUDDER_SHAKE);
         shudderInside(tardis);
-        int hits = countHit(tardis);
-        alarm(tardis, level, hitPos, player, hits);
-        if (hits >= BETRAYAL_HITS && TardisMindSystem.betray(tardis, hitter)) {
-            Messages.overlay(player, ChatFormatting.DARK_RED, "tardis_betrayed");
+        alarm(tardis, level, hitPos, player, beating.count());
+        boolean betrayal = beating.count() >= BETRAYAL_HITS && beating.trustBefore() >= BETRAYAL_NEEDS_TRUST;
+        if (betrayal && TardisMindSystem.betray(tardis, hitter)) {
+            MindMessages.say(player, ChatFormatting.DARK_RED, "tardis_betrayed");
             return;
         }
 
@@ -82,17 +92,22 @@ public final class TardisMallet {
         MindContext context = new MindContext(tardis, level, player, hit);
         MindActions.run(personality.onMalletHit(), context);
         if (context.handled) return;
-        Messages.overlay(player, ChatFormatting.DARK_GRAY, reaction(TardisMindSystem.fear(tardis, hitter)));
+        MindMessages.say(player, ChatFormatting.DARK_GRAY, reaction(TardisMindSystem.fear(tardis, hitter)));
     }
 
 
 
-    private static int countHit(Tardis tardis) {
+    /* each player's hits on each tardis, grouped into beatings */
+    private static Beating countHit(Tardis tardis, UUID hitter) {
         long now = TardisMindSystem.now(tardis.server());
-        Hits last = HITS.get(tardis.id());
-        int count = last == null || now - last.lastTick() > HITS_FORGOTTEN_TICKS ? 1 : last.count() + 1;
-        HITS.put(tardis.id(), new Hits(count, now));
-        return count;
+        String key = tardis.id() + "/" + hitter;
+        Beating last = BEATINGS.get(key);
+        boolean fresh = last == null || now - last.lastTick() > BEATING_GAP_TICKS;
+        Beating beating = fresh
+                ? new Beating(1, now, TardisMindSystem.trust(tardis, hitter))
+                : new Beating(last.count() + 1, now, last.trustBefore());
+        BEATINGS.put(key, beating);
+        return beating;
     }
 
     /* after a couple of hits the cloister bell rings and the lights go red */

@@ -55,6 +55,17 @@ public final class GCCameraShake {
     private static final double CRASH_FADE_IN = 0.3;
     private static final double CRASH_FADE_OUT = 0.8;
     private static @Nullable Vec3 crashOrigin;
+
+    /* stressed flight rumble. eases towards what the server last said, fades out if it stops hearing */
+    private static final double STRESS_TIMEOUT = 1.5;
+    /* goes from no shake to full in about a quarter of a second, fades out slower when it lands */
+    private static final double STRESS_EASE_PER_SECOND = 4.0;
+    private static final double STRESS_FADE_OUT_PER_SECOND = 1.0;
+    private static @Nullable Vec3 stressOrigin;
+    private static float stressTarget;
+    private static double stressLevel;
+    private static long stressHeardNanos;
+    private static long stressFrameNanos;
     private static long crashStartNanos;
     private static double crashSeconds;
 
@@ -128,7 +139,7 @@ public final class GCCameraShake {
     }
 
     private static @Nullable Sample combined() {
-        return add(add(drumSample(), rumbleSample()), crashSample());
+        return add(add(add(drumSample(), rumbleSample()), crashSample()), stressSample());
     }
 
     private static @Nullable Sample add(@Nullable Sample a, @Nullable Sample b) {
@@ -141,6 +152,39 @@ public final class GCCameraShake {
         crashOrigin = origin;
         crashStartNanos = System.nanoTime();
         crashSeconds = ticks / 20.0;
+    }
+
+    public static void stressRumble(Vec3 origin, float strength) {
+        stressOrigin = origin;
+        stressTarget = Math.clamp(strength, 0f, 1f);
+        stressHeardNanos = System.nanoTime();
+    }
+
+    private static @Nullable Sample stressSample() {
+        if (stressOrigin == null) return null;
+        long now = System.nanoTime();
+        double dt = stressFrameNanos == 0L ? 0.0 : Math.min((now - stressFrameNanos) / 1.0E9, 0.1);
+        stressFrameNanos = now;
+
+        boolean stale = (now - stressHeardNanos) / 1.0E9 > STRESS_TIMEOUT;
+        double target = stale ? 0.0 : stressTarget;
+        double step = (stale ? STRESS_FADE_OUT_PER_SECOND : STRESS_EASE_PER_SECOND) * dt;
+        stressLevel = stressLevel < target ? Math.min(target, stressLevel + step) : Math.max(target, stressLevel - step);
+        if (stressLevel <= 0.0) {
+            if (stale) stressOrigin = null;
+            return null;
+        }
+
+        LocalPlayer player = Minecraft.getInstance().player;
+        if (player == null) return null;
+        double attenuation = Math.clamp(1.0 - player.getEyePosition().distanceTo(stressOrigin) / RUMBLE_RANGE, 0.0, 1.0);
+        double amount = stressLevel * attenuation;
+        double clock = now / 1.0E9;
+        return new Sample(
+                (float) (rumbleWave(CRASH_PITCH_HZ, clock + 1.3) * amount * CRASH_PITCH_DEGREES),
+                (float) (rumbleWave(CRASH_YAW_HZ, clock + 4.1) * amount * CRASH_YAW_DEGREES),
+                (float) (rumbleWave(CRASH_ROLL_HZ, clock + 7.7) * amount * CRASH_ROLL_DEGREES)
+        );
     }
 
     private static @Nullable Sample crashSample() {

@@ -1,5 +1,6 @@
 package com.noahtnt2009.gallifreyan_chronicles.tardis.mind.fright;
 
+import com.noahtnt2009.gallifreyan_chronicles.tardis.mind.MindMessages;
 import com.noahtnt2009.gallifreyan_chronicles.network.TardisFrightPayload;
 import com.noahtnt2009.gallifreyan_chronicles.platform.Services;
 import com.noahtnt2009.gallifreyan_chronicles.tardis.api.Tardis;
@@ -11,7 +12,6 @@ import com.noahtnt2009.gallifreyan_chronicles.tardis.mind.action.MindActions;
 import com.noahtnt2009.gallifreyan_chronicles.tardis.mind.action.MindContext;
 import com.noahtnt2009.gallifreyan_chronicles.tardis.mind.disability.TardisDisability;
 import com.noahtnt2009.gallifreyan_chronicles.util.GCScheduler;
-import com.noahtnt2009.gallifreyan_chronicles.util.Messages;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.MinecraftServer;
@@ -62,7 +62,7 @@ public final class TardisFright {
     /**
      * The TARDIS needs at least this much fear to react.
      */
-    private static final float MIN_SEVERITY = 0.12f;
+    private static final float MIN_SEVERITY = 0.17f;
 
     /**
      * Below this point, the TARDIS is uneasy rather than frightened.
@@ -140,17 +140,16 @@ public final class TardisFright {
     public static float severity(Tardis tardis, UUID player) {
         TardisMind mind = TardisMindSystem.mind(tardis);
         TardisBond bond = TardisMindSystem.bond(tardis, player);
-        boolean hurt = bond.hurtIt() || bond.betrayed();
+        /* fear already includes the lasting fear trauma leaves towards whoever hurt it */
         float fear = Mth.clamp(TardisMindSystem.fear(tardis, player) / FEAR_FOR_FULL, 0f, 1f);
-        if (!hurt && fear <= 0f) return 0f;
+        if (fear <= 0f) return 0f;
 
-        float trauma = hurt ? Mth.clamp(mind.trauma() / TRAUMA_FOR_FULL, 0f, 1f) : 0f;
+        /* the past only makes current fear worse. once fear is gone, so is the reaction */
         float scar = Mth.clamp(bond.hits() / (float) HITS_FOR_FULL_SCAR, 0f, 1f) * MAX_SCAR;
-
-        float severity = Math.max(Math.max(trauma, fear), scar);
-        if (bond.betrayed()) severity += BETRAYED_BONUS;
-        if (mind.has(TardisDisability.PTSD)) severity += PTSD_BONUS;
-        return Mth.clamp(severity, 0f, 1f);
+        float worse = 1f + scar;
+        if (bond.betrayed()) worse += BETRAYED_BONUS;
+        worse += PTSD_BONUS * mind.ptsdStrength();
+        return Mth.clamp(fear * worse, 0f, 1f);
     }
 
     /**
@@ -246,11 +245,11 @@ public final class TardisFright {
      */
     private static void announce(ServerPlayer player, float severity) {
         if (severity < UNEASY_BELOW) {
-            Messages.overlay(player, ChatFormatting.GRAY, "tardis_uneasy");
+            MindMessages.say(player, ChatFormatting.GRAY, "tardis_uneasy");
         } else if (severity < AFRAID_BELOW) {
-            Messages.overlay(player, ChatFormatting.GOLD, "tardis_afraid");
+            MindMessages.say(player, ChatFormatting.GOLD, "tardis_afraid");
         } else {
-            Messages.overlay(player, ChatFormatting.RED, "tardis_dreads_you");
+            MindMessages.say(player, ChatFormatting.RED, "tardis_dreads_you");
         }
     }
 }

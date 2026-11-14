@@ -216,7 +216,7 @@ public final class Tardis {
 
     public boolean openDoors() {
         if (isLocked() || areDoorsSealedForTravel()) return false;
-        return doorState().isClosed() ? setControl(GCTardisControls.DOOR_CONTROL, true) : true;
+        return !doorState().isClosed() || setControl(GCTardisControls.DOOR_CONTROL, true);
     }
 
     public boolean closeDoors() {

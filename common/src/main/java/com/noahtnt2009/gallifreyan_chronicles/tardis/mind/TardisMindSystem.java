@@ -1,5 +1,6 @@
 package com.noahtnt2009.gallifreyan_chronicles.tardis.mind;
 
+import com.noahtnt2009.gallifreyan_chronicles.tardis.mind.flight.TardisTurbulence;
 import com.noahtnt2009.gallifreyan_chronicles.tardis.mind.abuse.TardisMallet;
 import com.noahtnt2009.gallifreyan_chronicles.tardis.mind.abuse.TardisTerror;
 import com.noahtnt2009.gallifreyan_chronicles.tardis.mind.abuse.TardisTrauma;
@@ -23,9 +24,13 @@ import com.noahtnt2009.gallifreyan_chronicles.tardis.mind.data.TraitModifiers;
 import net.minecraft.server.MinecraftServer;
 
 import java.util.List;
+import java.util.Map;
+import java.util.HashMap;
 import java.util.UUID;
 import java.util.function.Function;
 
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.ChatFormatting;
 import org.jspecify.annotations.Nullable;
 
 /**
@@ -40,11 +45,16 @@ public final class TardisMindSystem {
      * Stress added when a frightened TARDIS is forced to cooperate.
      */
     private static final float COWED_STRESS = 4f;
+    private static final float GENTLE_USE_TRUST = 1f;
+    private static final long GENTLE_USE_COOLDOWN_TICKS = 1200L;
+    private static final Map<String, Long> LAST_GENTLE_USE = new HashMap<>();
 
     /**
      * Trust lost when a frightened TARDIS is forced to cooperate.
      */
-    private static final float COWED_TRUST_LOSS = 2f;
+    /* forcing it with fear works, but it costs. kindness should always be the better way */
+    private static final float COWED_TRUST_LOSS = 4f;
+    private static final float COWED_TRAUMA = 1f;
 
     /**
      * Trust required for the TARDIS to be considered devoted to its owner.
@@ -70,11 +80,12 @@ public final class TardisMindSystem {
      * Trust lost when a TARDIS is betrayed by a player.
      */
     private static final float BETRAYAL_TRUST_LOSS = 40f;
+    private static final float FORGIVE_BETRAYAL_TRUST = 40f;
 
     /**
      * Fear required for the TARDIS to be considered afraid of a player.
      */
-    private static final float AFRAID_OF = 10f;
+    private static final float AFRAID_OF = FearLevel.AFRAID_AT;
 
     /**
      * Describes the result of a TARDIS refusing to take off.
@@ -122,6 +133,7 @@ public final class TardisMindSystem {
      */
     public static void init() {
         TardisMoods.init();
+        TardisTurbulence.init();
         TardisDyslexia.init();
         TardisDiscovery.init();
         TardisTrauma.init();
@@ -139,12 +151,15 @@ public final class TardisMindSystem {
      * <p>Does not reset the TARDIS's saved personality, traits or relationships.</p>
      */
     public static void resetState() {
+        MindMessages.reset();
+        LAST_GENTLE_USE.clear();
         TardisConvincing.reset();
         TardisAnger.reset();
         TardisMallet.reset();
         TardisTrauma.reset();
         TardisTerror.reset();
         TardisFeedback.reset();
+        TardisTurbulence.reset();
         TardisPeaceOffering.reset();
         TardisFright.reset();
     }
@@ -281,7 +296,7 @@ public final class TardisMindSystem {
      * @return whether the TARDIS is frightened into cooperating
      */
     public static boolean cowed(Tardis tardis, @Nullable UUID player) {
-        if (TardisTerror.compliant(tardis)) return true;
+        if (TardisTerror.compliant(tardis, player)) return true;
 
         TardisPersonality personality = mind(tardis).personality();
         return personality.refusesToFly() && fear(tardis, player) >= personality.fearToComply();
@@ -450,8 +465,9 @@ public final class TardisMindSystem {
             amount *= mind.modifiers().stressGain();
         }
 
-        if (amount > 0f && mind.has(TardisDisability.PTSD)) {
-            amount *= PTSD_STRESS_GAIN;
+        if (amount > 0f) {
+            /* ptsd makes it jumpier, less so as it recovers */
+            amount *= 1f + (PTSD_STRESS_GAIN - 1f) * mind.ptsdStrength();
         }
 
         if (amount > 0f && trust(tardis, null) >= DEVOTED_TRUST) {
@@ -482,6 +498,9 @@ public final class TardisMindSystem {
         amount *= amount > 0f ? modifiers.trustGain() : modifiers.trustLoss();
 
         TardisBond updated = bond.withTrust(bond.trust() + amount);
+        /* earning enough trust back makes it forgive a betrayal */
+        boolean forgiven = updated.betrayed() && updated.trust() >= FORGIVE_BETRAYAL_TRUST;
+        if (forgiven) updated = updated.withBetrayed(false);
         saveBond(tardis, player, updated);
 
         TardisFeedback.trustChanged(
@@ -489,6 +508,10 @@ public final class TardisMindSystem {
                 updated.trust() - bond.trust(),
                 TardisFeedback.Cause.NORMAL
         );
+        if (forgiven) {
+            ServerPlayer forgivenPlayer = tardis.server().getPlayerList().getPlayer(who(tardis, player));
+            if (forgivenPlayer != null) MindMessages.say(forgivenPlayer, ChatFormatting.LIGHT_PURPLE, "tardis_forgives_you");
+        }
 
         if (amount < 0f) TardisDiscovery.reveal(tardis, Reveal.IT_LOSES_TRUST);
     }
@@ -508,7 +531,7 @@ public final class TardisMindSystem {
         TardisBond bond = bond(tardis, player);
         float loss = trustLoss * mind(tardis).modifiers().abuseTrustLoss();
 
-        TardisBond updated = bond.hit().withTrust(bond.trust() - loss);
+        TardisBond updated = bond.withHits(bond.hits() + 1).withTrust(bond.trust() - loss);
         saveBond(tardis, player, updated);
 
         TardisFeedback.trustChanged(
@@ -554,7 +577,7 @@ public final class TardisMindSystem {
      * @return its trauma level
      */
     public static float trauma(Tardis tardis) {
-        return mind(tardis).trauma();
+        return mind(tardis).traumaAt(now(tardis.server()));
     }
 
     /**
@@ -564,7 +587,48 @@ public final class TardisMindSystem {
      * @param value  the new trauma level
      */
     public static void setTrauma(Tardis tardis, float value) {
-        save(tardis, mind(tardis).withTrauma(value));
+        save(tardis, mind(tardis).withTrauma(value, now(tardis.server())));
+    }
+
+    /* scars from one player */
+    public static float traumaFrom(Tardis tardis, @Nullable UUID player) {
+        return bond(tardis, player).traumaAt(now(tardis.server()));
+    }
+
+    public static void setTraumaFrom(Tardis tardis, @Nullable UUID player, float value) {
+        saveBond(tardis, player, bond(tardis, player).withTrauma(value, now(tardis.server())));
+    }
+
+    public static void setHits(Tardis tardis, @Nullable UUID player, int value) {
+        saveBond(tardis, player, bond(tardis, player).withHits(Math.max(0, value)));
+    }
+
+    /* wipes everything bad between it and this player. fear, trauma, hits, betrayal */
+    public static void forgive(Tardis tardis, @Nullable UUID player) {
+        long now = now(tardis.server());
+        TardisBond bond = bond(tardis, player);
+        saveBond(tardis, player, bond.withFear(0f, now).withTrauma(0f, now).withHits(0).withBetrayed(false));
+    }
+
+    /* kindness from this player forgives one hit and eases their scars */
+    public static void forgiveOneHit(Tardis tardis, @Nullable UUID player, float traumaEased) {
+        TardisBond bond = bond(tardis, player);
+        long now = now(tardis.server());
+        float trauma = Math.max(0f, bond.traumaAt(now) - traumaEased);
+        saveBond(tardis, player, bond.withHits(bond.hits() - 1).withTrauma(trauma, now));
+    }
+
+    public static float recovery(Tardis tardis) {
+        return mind(tardis).recovery();
+    }
+
+    public static void setRecovery(Tardis tardis, float value) {
+        save(tardis, mind(tardis).withRecovery(value));
+    }
+
+    /* how scared it is of this player, as one simple step */
+    public static FearLevel fearLevel(Tardis tardis, @Nullable UUID player) {
+        return FearLevel.of(fear(tardis, player));
     }
 
     /**
@@ -713,6 +777,7 @@ public final class TardisMindSystem {
 
         if (!unwilling(tardis, pilot)) {
             forget(tardis);
+            rewardGentleUse(tardis, pilot);
             return Refusal.NONE;
         }
 
@@ -723,6 +788,7 @@ public final class TardisMindSystem {
             forget(tardis);
             addStress(tardis, COWED_STRESS);
             addTrust(tardis, pilot, -COWED_TRUST_LOSS);
+            setTraumaFrom(tardis, pilot, traumaFrom(tardis, pilot) + COWED_TRAUMA);
             return Refusal.COWED;
         }
 
@@ -741,6 +807,17 @@ public final class TardisMindSystem {
         }
 
         return context.refusal == null ? Refusal.NONE : context.refusal;
+    }
+
+    /* flying it when it's happy to go builds trust a little. once a minute per player so the lever can't be farmed */
+    private static void rewardGentleUse(Tardis tardis, @Nullable UUID pilot) {
+        UUID player = who(tardis, pilot);
+        long now = now(tardis.server());
+        String key = tardis.id() + "/" + player;
+        Long last = LAST_GENTLE_USE.get(key);
+        if (last != null && now - last < GENTLE_USE_COOLDOWN_TICKS) return;
+        LAST_GENTLE_USE.put(key, now);
+        addTrust(tardis, player, GENTLE_USE_TRUST);
     }
 
     /**

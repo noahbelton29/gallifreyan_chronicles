@@ -9,7 +9,7 @@ import uk.nbforge.gallifreyan_chronicles.core.GCBlocks;
 import uk.nbforge.gallifreyan_chronicles.core.GCTardisControls;
 import uk.nbforge.gallifreyan_chronicles.tardis.console.TardisConsole;
 import uk.nbforge.gallifreyan_chronicles.core.dynamic_registries.TardisConsoleRegistry;
-import uk.nbforge.gallifreyan_chronicles.tardis.control.impl.FlightLeverControl;
+import uk.nbforge.gallifreyan_chronicles.tardis.control.impl.SpaceTimeThrottleControl;
 import uk.nbforge.gallifreyan_chronicles.tardis.TardisManager;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
@@ -101,9 +101,9 @@ public final class ConsoleLinkSystem {
         if (sibling != null) {
             console.applyCarriedControlStates(sibling.copyControlStates());
         } else {
-            console.reconcileControl(GCTardisControls.POWER_LEVER, false);
+            console.reconcileControl(GCTardisControls.POWER_CONTROL, false);
             if (tardis.isTravelling()) {
-                console.reconcileControl(FlightLeverControl.ID, true);
+                console.reconcileControl(GCTardisControls.SPACE_TIME_THROTTLE, true);
                 console.triggerRotorAnimation("rotor_flight");
             }
         }

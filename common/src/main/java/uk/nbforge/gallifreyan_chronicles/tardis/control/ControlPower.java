@@ -14,7 +14,7 @@ import uk.nbforge.gallifreyan_chronicles.core.dynamic_registries.TardisControlRe
 
 public final class ControlPower {
     private static final Set<String> USABLE_WITHOUT_POWER = Set.of(
-            GCTardisControls.POWER_LEVER,
+            GCTardisControls.POWER_CONTROL,
             GCTardisControls.DOOR_CONTROL,
             GCTardisControls.DOOR_LOCK_CONTROL
     );
@@ -23,11 +23,11 @@ public final class ControlPower {
             console -> TardisApi.of(console).map(Tardis::isTravelling).orElse(false);
 
     private static final Predicate<TardisConsoleBlockEntity> CLOAKED =
-            console -> console.getControlState(GCTardisControls.CLOAK_CONTROL);
+            console -> console.getControlState(GCTardisControls.CLOAKING_DEVICE_CONTROL);
 
     private static final Map<String, List<Predicate<TardisConsoleBlockEntity>>> BLOCKED_WHEN = Map.of(
-            GCTardisControls.POWER_LEVER, List.of(TRAVELLING, CLOAKED),
-            GCTardisControls.FLIGHT_LEVER, List.of(CLOAKED)
+            GCTardisControls.POWER_CONTROL, List.of(TRAVELLING, CLOAKED),
+            GCTardisControls.SPACE_TIME_THROTTLE, List.of(CLOAKED)
     );
 
     private ControlPower() {

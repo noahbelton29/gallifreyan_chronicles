@@ -8,6 +8,7 @@ import uk.nbforge.gallifreyan_chronicles.core.GCTardisControls;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Consumer;
+
 import uk.nbforge.gallifreyan_chronicles.datagen.util.GCJson;
 
 /**
@@ -97,31 +98,31 @@ public final class GCConsoleBuilder {
      * Every control a console normally has, with its usual cooldown, in the usual order.
      */
     public GCConsoleBuilder standardControls() {
-        return control(GCTardisControls.CHANGE_INCREMENT, 0.75)
-                .control(GCTardisControls.CLOAK_CONTROL, 1.5)
-                .control(GCTardisControls.DIMENSION_SELECTOR, 0.5, Control::noAnimation)
+        return control(GCTardisControls.COORDINATE_STEP_CONTROL, 0.75)
+                .control(GCTardisControls.CLOAKING_DEVICE_CONTROL, 1.5)
+                .control(GCTardisControls.DIMENSIONAL_CONTROL, 0.5, Control::noAnimation)
                 .control(GCTardisControls.DOOR_CONTROL, 0.5)
                 .control(GCTardisControls.DOOR_LOCK_CONTROL, 0.5)
-                .control(GCTardisControls.FLIGHT_LEVER, 1.5)
-                .control(GCTardisControls.HANDBRAKE, 1.5)
-                .control(GCTardisControls.POWER_LEVER, 1.5)
+                .control(GCTardisControls.SPACE_TIME_THROTTLE, 1.5)
+                .control(GCTardisControls.TIME_ROTOR_HANDBRAKE, 1.5)
+                .control(GCTardisControls.POWER_CONTROL, 1.5)
                 .control(GCTardisControls.X_INCREMENT_CONTROL, 1)
                 .control(GCTardisControls.Y_INCREMENT_CONTROL, 1)
                 .control(GCTardisControls.Z_INCREMENT_CONTROL, 1)
                 .control(GCTardisControls.ISOMORPHIC_CONTROL, 0.5)
-                .control(GCTardisControls.DIRECTION_CONTROL, 0.5, Control::noAnimation);
+                .control(GCTardisControls.DIRECTIONAL_CONTROL, 0.5, Control::noAnimation);
     }
 
     /**
      * The interior door control, right after the door control. Needs {@link #standardControls()} first.
      */
-    public GCConsoleBuilder interiorDoorControl() {
-        return interiorDoorControl(details -> {
+    public void interiorDoorControl() {
+        interiorDoorControl(details -> {
         });
     }
 
-    public GCConsoleBuilder interiorDoorControl(Consumer<Control> details) {
-        return controlAfter(GCTardisControls.DOOR_CONTROL, GCTardisControls.INTERIOR_DOOR_CONTROL,
+    public void interiorDoorControl(Consumer<Control> details) {
+        controlAfter(GCTardisControls.DOOR_CONTROL, GCTardisControls.INTERIOR_DOOR_CONTROL,
                 INTERIOR_DOOR_COOLDOWN, details);
     }
 
@@ -188,9 +189,8 @@ public final class GCConsoleBuilder {
         /**
          * The control moves, but plays no animation.
          */
-        public Control noAnimation() {
+        public void noAnimation() {
             this.animated = false;
-            return this;
         }
 
         private JsonObject toJson() {

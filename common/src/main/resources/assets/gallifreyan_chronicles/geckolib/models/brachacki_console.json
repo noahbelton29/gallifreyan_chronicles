@@ -248,7 +248,7 @@
 					]
 				},
 				{
-					"name": "handbrake",
+					"name": "time_rotor_handbrake",
 					"parent": "controls5",
 					"pivot": [-1, 17.83138, -15.52496],
 					"cubes": [
@@ -256,7 +256,7 @@
 					]
 				},
 				{
-					"name": "flight_lever",
+					"name": "space_time_throttle",
 					"parent": "controls5",
 					"pivot": [-5, 17.83138, -15.52496],
 					"cubes": [
@@ -322,7 +322,7 @@
 					]
 				},
 				{
-					"name": "cloak_control",
+					"name": "cloaking_device_control",
 					"parent": "controls",
 					"pivot": [8.65995, 19.96261, -7.91748],
 					"rotation": [-20, -60, 0],
@@ -331,7 +331,7 @@
 					]
 				},
 				{
-					"name": "power_lever",
+					"name": "power_control",
 					"parent": "controls",
 					"pivot": [13.01018, 18.28532, -7.56375],
 					"rotation": [0, -60, 0],
@@ -478,14 +478,14 @@
 					]
 				},
 				{
-					"name": "door_lock",
+					"name": "door_lock_control",
 					"parent": "controls4",
 					"pivot": [-2.5, 17.19223, 16.27652],
 					"rotation": [-25, 0, 0]
 				},
 				{
 					"name": "bone2",
-					"parent": "door_lock",
+					"parent": "door_lock_control",
 					"pivot": [-2.5, 17.17773, 16.27331],
 					"cubes": [
 						{"origin": [-3.5, 16.97773, 15.27331], "size": [1, 1, 2], "uv": [41, 207]}
@@ -565,7 +565,7 @@
 					]
 				},
 				{
-					"name": "direction_control",
+					"name": "directional_control",
 					"parent": "controls6",
 					"pivot": [-11.90655, 19.5919, 2.01031],
 					"cubes": [
@@ -663,7 +663,7 @@
 					]
 				},
 				{
-					"name": "change_increment",
+					"name": "coordinate_step_control",
 					"parent": "controls2",
 					"pivot": [-14.75228, 18.75034, -7.26125],
 					"rotation": [-27.62113, -12.19908, 68.00946],
@@ -673,7 +673,7 @@
 				},
 				{
 					"name": "controls8",
-					"parent": "change_increment",
+					"parent": "coordinate_step_control",
 					"pivot": [-14.17682, 18.70849, -7.25519],
 					"rotation": [-90, 0, -90],
 					"cubes": [
@@ -682,7 +682,7 @@
 				},
 				{
 					"name": "controls9",
-					"parent": "change_increment",
+					"parent": "coordinate_step_control",
 					"pivot": [-14.17682, 18.75, -7.25519],
 					"rotation": [0, -90, -180],
 					"cubes": [

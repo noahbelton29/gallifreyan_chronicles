@@ -11,14 +11,14 @@ import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
 
-public class PowerLeverControl extends BaseControl {
-    public static final ControlAnimations DEFAULT_ANIMATIONS = new ControlAnimations("power_lever_down", "power_lever_up", false);
+public class PowerControl extends BaseControl {
+    public static final ControlAnimations DEFAULT_ANIMATIONS = new ControlAnimations("power_control_on", "power_control_off", false);
 
-    public PowerLeverControl() {
+    public PowerControl() {
         this(DEFAULT_ANIMATIONS);
     }
 
-    public PowerLeverControl(ControlAnimations animations) {
+    public PowerControl(ControlAnimations animations) {
         super(animations);
     }
 
@@ -27,7 +27,7 @@ public class PowerLeverControl extends BaseControl {
         super.playClickSound(entity);
         var console = entity.getConsole();
         if (console == null) return;
-        playSound(entity, console.getControlState(GCTardisControls.POWER_LEVER)
+        playSound(entity, console.getControlState(GCTardisControls.POWER_CONTROL)
                 ? GCSounds.TARDIS_POWER_OFF : GCSounds.TARDIS_POWER_ON, 1.0f);
     }
 

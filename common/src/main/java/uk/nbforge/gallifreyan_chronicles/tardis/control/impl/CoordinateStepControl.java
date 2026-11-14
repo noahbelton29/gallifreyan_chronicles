@@ -11,14 +11,14 @@ import net.minecraft.world.entity.player.Player;
 
 import java.util.UUID;
 
-public class ChangeIncrementControl extends DestinationControl {
-    public static final ControlAnimations DEFAULT_ANIMATIONS = new ControlAnimations("change_increment", "change_increment", false);
+public class CoordinateStepControl extends DestinationControl {
+    public static final ControlAnimations DEFAULT_ANIMATIONS = new ControlAnimations("coordinate_step_control", "coordinate_step_control", false);
 
-    public ChangeIncrementControl() {
+    public CoordinateStepControl() {
         this(DEFAULT_ANIMATIONS);
     }
 
-    public ChangeIncrementControl(ControlAnimations animations) {
+    public CoordinateStepControl(ControlAnimations animations) {
         super(animations);
     }
 

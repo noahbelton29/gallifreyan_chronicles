@@ -49,15 +49,14 @@ import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 
-public class FlightLeverControl extends BaseControl {
-    public static final String ID = "flight_lever";
-    public static final ControlAnimations DEFAULT_ANIMATIONS = new ControlAnimations("flight_lever_down", "flight_lever_up", false);
+public class SpaceTimeThrottleControl extends BaseControl {
+    public static final ControlAnimations DEFAULT_ANIMATIONS = new ControlAnimations("space_time_throttle_on", "space_time_throttle_off", false);
 
-    public FlightLeverControl() {
+    public SpaceTimeThrottleControl() {
         this(DEFAULT_ANIMATIONS);
     }
 
-    public FlightLeverControl(ControlAnimations animations) {
+    public SpaceTimeThrottleControl(ControlAnimations animations) {
         super(animations);
     }
 
@@ -113,12 +112,10 @@ public class FlightLeverControl extends BaseControl {
             boolean takingOff,
             @Nullable Player pilot
     ) {
-        String controlId = ID;
-
         if (!takingOff && tardisId != null && QUEUED_TAKEOFFS.containsKey(tardisId)) {
             QUEUED_TAKEOFFS.remove(tardisId);
             playAt(level, soundPos, GCSounds.SLIDER, 1.0f);
-            console.setControlActivated(controlId, false);
+            console.setControlActivated(GCTardisControls.SPACE_TIME_THROTTLE, false);
             return true;
         }
 
@@ -134,7 +131,7 @@ public class FlightLeverControl extends BaseControl {
 
         if (!takingOff && !exterior.isTravelling()) {
             playAt(level, soundPos, GCSounds.SLIDER, 1.0f);
-            console.setControlActivated(controlId, false);
+            console.setControlActivated(GCTardisControls.SPACE_TIME_THROTTLE, false);
             return true;
         }
 
@@ -143,16 +140,16 @@ public class FlightLeverControl extends BaseControl {
             return true;
         }
         if (tardis != null && takingOff
-                && TardisRefusals.refuseTakeoff(level, console, controlId, soundPos, leverPos, tardis,
+                && TardisRefusals.refuseTakeoff(level, console, GCTardisControls.SPACE_TIME_THROTTLE, soundPos, leverPos, tardis,
                 pilot == null ? null : pilot.getUUID())) {
             return true;
         }
 
-        boolean handbrakeOn = console.getControlState(GCTardisControls.HANDBRAKE);
+        boolean handbrakeOn = console.getControlState(GCTardisControls.TIME_ROTOR_HANDBRAKE);
         if (takingOff && (handbrakeOn || !exterior.areDoorsFullyClosed())) {
             playAt(level, soundPos, GCSounds.SLIDER, 0.9f);
-            console.setControlActivated(controlId, true);
-            queueTakeoff(level.getServer(), tardisId, controlId);
+            console.setControlActivated(GCTardisControls.SPACE_TIME_THROTTLE, true);
+            queueTakeoff(level.getServer(), tardisId, GCTardisControls.SPACE_TIME_THROTTLE);
             return true;
         }
 
@@ -165,7 +162,7 @@ public class FlightLeverControl extends BaseControl {
         if (ticksLeft <= 0L) return false;
 
         playAt(level, soundPos, GCSounds.SLIDER, 0.6f);
-        console.setControlActivated(ID, true);
+        console.setControlActivated(GCTardisControls.SPACE_TIME_THROTTLE, true);
         long secondsLeft = (ticksLeft + 19L) / 20L;
         MessageUtil.overlayNearby(level, leverPos, ChatFormatting.GOLD, "still_travelling", secondsLeft);
         return true;
@@ -175,30 +172,30 @@ public class FlightLeverControl extends BaseControl {
         if (!(console.getLevel() instanceof ServerLevel level)) return false;
         UUID tardisId = linkedTardis(console).map(Tardis::id).orElse(null);
         BlockPos soundPos = console.getBlockPos();
-        boolean takingOff = !console.getControlState(ID);
+        boolean takingOff = !console.getControlState(GCTardisControls.SPACE_TIME_THROTTLE);
 
         if (refuseToggle(level, soundPos, Vec3.atCenterOf(soundPos), console, tardisId, takingOff, null)) return false;
 
         playAt(level, soundPos, GCSounds.SLIDER, takingOff ? 0.9f : 1.0f);
         if (takingOff) {
-            beginTakeoffEffects(level, console, ID, Vec3.atCenterOf(soundPos));
+            beginTakeoffEffects(level, console, GCTardisControls.SPACE_TIME_THROTTLE, Vec3.atCenterOf(soundPos));
         } else {
             land(level, console, tardisId);
         }
-        console.triggerControl(ID, takingOff, null);
+        console.triggerControl(GCTardisControls.SPACE_TIME_THROTTLE, false, null);
         return true;
     }
 
-    public static boolean crashLand(TardisConsoleBlockEntity console) {
-        return crashLand(console, "crash_landing");
+    public static void crashLand(TardisConsoleBlockEntity console) {
+        crashLand(console, "crash_landing");
     }
 
     /* message: the lang key shown as it falls out the vortex */
-    public static boolean crashLand(TardisConsoleBlockEntity console, String message) {
-        if (!(console.getLevel() instanceof ServerLevel level)) return false;
+    public static void crashLand(TardisConsoleBlockEntity console, String message) {
+        if (!(console.getLevel() instanceof ServerLevel level)) return;
         Tardis tardis = linkedTardis(console).orElse(null);
         TardisExteriorBlockEntity exterior = tardis == null ? null : tardis.exterior().orElse(null);
-        if (exterior == null || exterior.getFlightState() != TardisFlightState.IN_VORTEX) return false;
+        if (exterior == null || exterior.getFlightState() != TardisFlightState.IN_VORTEX) return;
 
         int ticks = LAND_FADE_DELAY_TICKS + exterior.getFadeType().timing().fadeInTicks();
         MessageUtil.overlayNearby(level, Vec3.atCenterOf(console.getBlockPos()), ChatFormatting.DARK_RED, message);
@@ -207,8 +204,7 @@ public class FlightLeverControl extends BaseControl {
         tardis.data().setLandingTarget(tardis.id(), TardisTravel.crashTarget(tardis));
         playAt(level, console.getBlockPos(), GCSounds.SLIDER, 1.0f);
         land(level, console, tardis.id());
-        console.triggerControl(ID, false, null);
-        return true;
+        console.triggerControl(GCTardisControls.SPACE_TIME_THROTTLE, false, null);
     }
 
     /* a stressed tardis dropping out of the vortex on its own. rough but not a crash, no damage,
@@ -226,7 +222,7 @@ public class FlightLeverControl extends BaseControl {
         tardis.data().setLandingTarget(tardis.id(), TardisTravel.partWayTarget(tardis, EMERGENCY_DISTANCE));
         playAt(level, console.getBlockPos(), GCSounds.SLIDER, 1.0f);
         land(level, console, tardis.id());
-        console.triggerControl(ID, false, null);
+        console.triggerControl(GCTardisControls.SPACE_TIME_THROTTLE, false, null);
         return true;
     }
 
@@ -288,7 +284,7 @@ public class FlightLeverControl extends BaseControl {
             return;
         }
 
-        if (exterior.areDoorsFullyClosed() && !console.getControlState(GCTardisControls.HANDBRAKE)) {
+        if (exterior.areDoorsFullyClosed() && !console.getControlState(GCTardisControls.TIME_ROTOR_HANDBRAKE)) {
             QUEUED_TAKEOFFS.remove(tardisId);
 
             applyLeverState(console, true);
@@ -336,7 +332,7 @@ public class FlightLeverControl extends BaseControl {
         exterior.abortTakeoff(ABORT_FADE_IN_TICKS);
 
         for (TardisConsoleBlockEntity each : consoles) {
-            each.setControlActivated(ID, false);
+            each.setControlActivated(GCTardisControls.SPACE_TIME_THROTTLE, false);
             each.triggerRotorAnimation("rotor_idle");
         }
 
@@ -402,7 +398,8 @@ public class FlightLeverControl extends BaseControl {
 
     private static List<TardisConsoleBlockEntity> landedConsoles(TardisConsoleBlockEntity console) {
         List<TardisConsoleBlockEntity> live = ConsoleSyncSystem.liveConsolesWith(console);
-        if (live.stream().anyMatch(each -> each.getControlState(ID))) return List.of();
+        if (live.stream().anyMatch(each -> each.getControlState(GCTardisControls.SPACE_TIME_THROTTLE)))
+            return List.of();
         return live;
     }
 

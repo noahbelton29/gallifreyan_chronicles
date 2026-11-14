@@ -2,16 +2,16 @@
   "controls": [
     {
       "cooldown": 0.75,
-      "id": "change_increment"
+      "id": "coordinate_step_control"
     },
     {
       "cooldown": 1.5,
-      "id": "cloak_control"
+      "id": "cloaking_device_control"
     },
     {
       "animation": false,
       "cooldown": 0.5,
-      "id": "dimension_selector"
+      "id": "dimensional_control"
     },
     {
       "cooldown": 0.5,
@@ -33,19 +33,19 @@
     },
     {
       "cooldown": 0.5,
-      "id": "door_lock"
+      "id": "door_lock_control"
     },
     {
       "cooldown": 1.5,
-      "id": "flight_lever"
+      "id": "space_time_throttle"
     },
     {
       "cooldown": 1.5,
-      "id": "handbrake"
+      "id": "time_rotor_handbrake"
     },
     {
       "cooldown": 1.5,
-      "id": "power_lever"
+      "id": "power_control"
     },
     {
       "cooldown": 1,
@@ -66,7 +66,7 @@
     {
       "animation": false,
       "cooldown": 0.5,
-      "id": "direction_control"
+      "id": "directional_control"
     }
   ],
   "default_variant": "second_doctors_console_alt",

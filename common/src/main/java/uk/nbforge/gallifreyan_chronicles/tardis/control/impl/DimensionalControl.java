@@ -8,11 +8,16 @@ import net.minecraft.world.entity.player.Player;
 
 import java.util.UUID;
 
-public class DimensionSelectorControl extends DestinationControl {
-    public static final ControlAnimations DEFAULT_ANIMATIONS = new ControlAnimations("dimension_selector", "dimension_selector", false);
+public class DimensionalControl extends DestinationControl {
+    public static final ControlAnimations DEFAULT_ANIMATIONS = new ControlAnimations("dimensional_control", "dimensional_control", false);
 
-    public DimensionSelectorControl() { this(DEFAULT_ANIMATIONS); }
-    public DimensionSelectorControl(ControlAnimations animations) { super(animations); }
+    public DimensionalControl() {
+        this(DEFAULT_ANIMATIONS);
+    }
+
+    public DimensionalControl(ControlAnimations animations) {
+        super(animations);
+    }
 
     @Override
     protected boolean apply(MinecraftServer server, UUID tardisId, Player player) {
@@ -25,8 +30,12 @@ public class DimensionSelectorControl extends DestinationControl {
     }
 
     @Override
-    public String getAnimation(boolean activated) { return null; }
+    public String getAnimation(boolean activated) {
+        return null;
+    }
 
     @Override
-    protected boolean playsSound() { return false; }
+    protected boolean playsSound() {
+        return false;
+    }
 }

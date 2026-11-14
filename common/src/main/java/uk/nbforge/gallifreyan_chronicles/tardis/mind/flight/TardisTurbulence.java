@@ -6,7 +6,7 @@ import uk.nbforge.gallifreyan_chronicles.network.tardis.TardisCrashRumblePayload
 import uk.nbforge.gallifreyan_chronicles.tardis.Tardis;
 import uk.nbforge.gallifreyan_chronicles.tardis.TardisApi;
 import uk.nbforge.gallifreyan_chronicles.tardis.TardisEvents;
-import uk.nbforge.gallifreyan_chronicles.tardis.control.impl.FlightLeverControl;
+import uk.nbforge.gallifreyan_chronicles.tardis.control.impl.SpaceTimeThrottleControl;
 import uk.nbforge.gallifreyan_chronicles.tardis.flight.crash.TardisCrash;
 import uk.nbforge.gallifreyan_chronicles.tardis.flight.TardisFlightState;
 import uk.nbforge.gallifreyan_chronicles.tardis.mind.TardisMindSystem;
@@ -131,7 +131,7 @@ public final class TardisTurbulence {
                 .filter(each -> each.getLevel() == interior)
                 .findFirst()
                 .orElseGet(() -> tardis.console().orElse(null));
-        if (console == null || !FlightLeverControl.emergencyLand(console, "crash_landing_stress")) return false;
+        if (console == null || !SpaceTimeThrottleControl.emergencyLand(console, "crash_landing_stress")) return false;
         TardisMindSystem.setStress(tardis, AFTER_CRASH);
         return true;
     }

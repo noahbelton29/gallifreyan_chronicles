@@ -14,7 +14,7 @@ import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
 
 public class DoorLockControl extends BaseControl {
-    public static final ControlAnimations DEFAULT_ANIMATIONS = new ControlAnimations("door_lock_on", "door_lock_off", false);
+    public static final ControlAnimations DEFAULT_ANIMATIONS = new ControlAnimations("door_lock_control_on", "door_lock_control_off", false);
 
     public DoorLockControl() {
         this(DEFAULT_ANIMATIONS);

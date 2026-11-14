@@ -73,12 +73,12 @@ public class StattenheimRemoteItem extends Item {
         LandingTarget landingTarget = new LandingTarget(serverLevel.dimension(), target, yaw);
         tardis.data().setLandingTarget(tardisID, landingTarget);
 
-        boolean handbrakeWasOn = tardis.getControl(GCTardisControls.HANDBRAKE);
+        boolean handbrakeWasOn = tardis.getControl(GCTardisControls.TIME_ROTOR_HANDBRAKE);
         if (handbrakeWasOn) {
-            tardis.setControl(GCTardisControls.HANDBRAKE, false);
+            tardis.setControl(GCTardisControls.TIME_ROTOR_HANDBRAKE, false);
         }
         if (!tardis.takeOff()) {
-            if (handbrakeWasOn) tardis.setControl(GCTardisControls.HANDBRAKE, true);
+            if (handbrakeWasOn) tardis.setControl(GCTardisControls.TIME_ROTOR_HANDBRAKE, true);
             say(player, "stattenheim_cannot_summon", ChatFormatting.RED);
             return InteractionResult.FAIL;
         }

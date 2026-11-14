@@ -3,7 +3,7 @@ package uk.nbforge.gallifreyan_chronicles.tardis;
 import uk.nbforge.gallifreyan_chronicles.tardis.ecs.system.TardisInteriorSystem;
 import uk.nbforge.gallifreyan_chronicles.util.MessageUtil;
 import uk.nbforge.gallifreyan_chronicles.core.GCItems;
-import uk.nbforge.gallifreyan_chronicles.tardis.control.impl.FlightLeverControl;
+import uk.nbforge.gallifreyan_chronicles.tardis.control.impl.SpaceTimeThrottleControl;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.util.Prediction;
 import uk.nbforge.gallifreyan_chronicles.core.GCDataComponents;
@@ -229,13 +229,13 @@ public final class Tardis {
     }
 
     public boolean takeOff() {
-        if (!hasPower() || getControl(GCTardisControls.FLIGHT_LEVER)) return false;
-        return console().map(FlightLeverControl::pull).orElse(false);
+        if (!hasPower() || getControl(GCTardisControls.SPACE_TIME_THROTTLE)) return false;
+        return console().map(SpaceTimeThrottleControl::pull).orElse(false);
     }
 
     public boolean land() {
-        if (!hasPower() || !getControl(GCTardisControls.FLIGHT_LEVER)) return false;
-        return console().map(FlightLeverControl::pull).orElse(false);
+        if (!hasPower() || !getControl(GCTardisControls.SPACE_TIME_THROTTLE)) return false;
+        return console().map(SpaceTimeThrottleControl::pull).orElse(false);
     }
 
     public boolean setDestination(ServerLevel level, BlockPos pos, float yaw) {

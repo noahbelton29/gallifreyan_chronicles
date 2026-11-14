@@ -12,40 +12,41 @@ import uk.nbforge.gallifreyan_chronicles.core.dynamic_registries.TardisControlRe
 import uk.nbforge.gallifreyan_chronicles.tardis.control.TardisControlTypes;
 import uk.nbforge.gallifreyan_chronicles.tardis.control.BaseControl;
 import uk.nbforge.gallifreyan_chronicles.tardis.control.ControlAnimations;
+
 import java.util.function.Function;
 
 public class GCTardisControls {
     public static final String NOOP_CONTROL = "noop";
-    public static final String FLIGHT_LEVER = "flight_lever";
-    public static final String HANDBRAKE = "handbrake";
-    public static final String POWER_LEVER = "power_lever";
+    public static final String SPACE_TIME_THROTTLE = "space_time_throttle";
+    public static final String TIME_ROTOR_HANDBRAKE = "time_rotor_handbrake";
+    public static final String POWER_CONTROL = "power_control";
     public static final String DOOR_CONTROL = "door_control";
-    public static final String DOOR_LOCK_CONTROL = "door_lock";
+    public static final String DOOR_LOCK_CONTROL = "door_lock_control";
     public static final String X_INCREMENT_CONTROL = "x_increment";
     public static final String Y_INCREMENT_CONTROL = "y_increment";
     public static final String Z_INCREMENT_CONTROL = "z_increment";
-    public static final String CHANGE_INCREMENT = "change_increment";
-    public static final String DIMENSION_SELECTOR = "dimension_selector";
+    public static final String COORDINATE_STEP_CONTROL = "coordinate_step_control";
+    public static final String DIMENSIONAL_CONTROL = "dimensional_control";
     public static final String ISOMORPHIC_CONTROL = "isomorphic_control";
-    public static final String DIRECTION_CONTROL = "direction_control";
-    public static final String CLOAK_CONTROL = "cloak_control";
+    public static final String DIRECTIONAL_CONTROL = "directional_control";
+    public static final String CLOAKING_DEVICE_CONTROL = "cloaking_device_control";
     public static final String INTERIOR_DOOR_CONTROL = "interior_door_control";
 
     public static void registerTardisControls() {
         TardisControlTypes.register(NOOP_CONTROL, NoopControl.class, MapCodec.unit(NoopControl.INSTANCE));
-        control(FLIGHT_LEVER, FlightLeverControl.DEFAULT_ANIMATIONS, FlightLeverControl::new);
-        control(HANDBRAKE, HandbrakeControl.DEFAULT_ANIMATIONS, HandbrakeControl::new);
-        control(POWER_LEVER, PowerLeverControl.DEFAULT_ANIMATIONS, PowerLeverControl::new);
+        control(SPACE_TIME_THROTTLE, SpaceTimeThrottleControl.DEFAULT_ANIMATIONS, SpaceTimeThrottleControl::new);
+        control(TIME_ROTOR_HANDBRAKE, TimeRotorHandbrakeControl.DEFAULT_ANIMATIONS, TimeRotorHandbrakeControl::new);
+        control(POWER_CONTROL, PowerControl.DEFAULT_ANIMATIONS, PowerControl::new);
         control(DOOR_CONTROL, DoorControl.DEFAULT_ANIMATIONS, DoorControl::new);
         control(DOOR_LOCK_CONTROL, DoorLockControl.DEFAULT_ANIMATIONS, DoorLockControl::new);
         control(X_INCREMENT_CONTROL, XIncrementControl.DEFAULT_ANIMATIONS, XIncrementControl::new);
         control(Y_INCREMENT_CONTROL, YIncrementControl.DEFAULT_ANIMATIONS, YIncrementControl::new);
         control(Z_INCREMENT_CONTROL, ZIncrementControl.DEFAULT_ANIMATIONS, ZIncrementControl::new);
-        control(CHANGE_INCREMENT, ChangeIncrementControl.DEFAULT_ANIMATIONS, ChangeIncrementControl::new);
-        control(DIMENSION_SELECTOR, DimensionSelectorControl.DEFAULT_ANIMATIONS, DimensionSelectorControl::new);
+        control(COORDINATE_STEP_CONTROL, CoordinateStepControl.DEFAULT_ANIMATIONS, CoordinateStepControl::new);
+        control(DIMENSIONAL_CONTROL, DimensionalControl.DEFAULT_ANIMATIONS, DimensionalControl::new);
         control(ISOMORPHIC_CONTROL, IsomorphicControl.DEFAULT_ANIMATIONS, IsomorphicControl::new);
-        control(DIRECTION_CONTROL, DirectionControl.DEFAULT_ANIMATIONS, DirectionControl::new);
-        control(CLOAK_CONTROL, CloakControl.DEFAULT_ANIMATIONS, CloakControl::new);
+        control(DIRECTIONAL_CONTROL, DirectionalControl.DEFAULT_ANIMATIONS, DirectionalControl::new);
+        control(CLOAKING_DEVICE_CONTROL, CloakingDeviceControl.DEFAULT_ANIMATIONS, CloakingDeviceControl::new);
         control(INTERIOR_DOOR_CONTROL, InteriorDoorControl.DEFAULT_ANIMATIONS, InteriorDoorControl::new);
 
         verifyCodecs();

@@ -3,6 +3,7 @@ package uk.nbforge.gallifreyan_chronicles.datagen.assets.lang;
 import uk.nbforge.gallifreyan_chronicles.Constants;
 import uk.nbforge.gallifreyan_chronicles.core.GCBlocks;
 import uk.nbforge.gallifreyan_chronicles.core.GCItems;
+import uk.nbforge.gallifreyan_chronicles.core.GCTardisControls;
 import uk.nbforge.gallifreyan_chronicles.core.dynamic_registries.TardisControlRegistry;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.data.PackOutput;
@@ -11,6 +12,7 @@ import net.minecraft.world.level.block.Block;
 import net.neoforged.neoforge.common.data.LanguageProvider;
 
 import java.util.Arrays;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 public class GCLanguageProvider extends LanguageProvider {
@@ -62,6 +64,14 @@ public class GCLanguageProvider extends LanguageProvider {
 
         // TARDIS controls
         for (String id : TardisControlRegistry.allIds()) {
+            if (Objects.equals(id, GCTardisControls.SPACE_TIME_THROTTLE)) {
+                add(TardisControlRegistry.translationKey(id), "Space-Time Throttle");
+                continue;
+            }
+            if (Objects.equals(id, GCTardisControls.TIME_ROTOR_HANDBRAKE)) {
+                add(TardisControlRegistry.translationKey(id), "Time-Rotor Handbrake");
+                continue;
+            }
             add(TardisControlRegistry.translationKey(id), titleCase(id));
         }
 

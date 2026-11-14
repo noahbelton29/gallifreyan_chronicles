@@ -1,5 +1,9 @@
 package uk.nbforge.gallifreyan_chronicles.compat.jade;
 
+import net.minecraft.client.Minecraft;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.phys.EntityHitResult;
+import net.minecraft.world.phys.Vec3;
 import uk.nbforge.gallifreyan_chronicles.core.block.ConsoleBlock;
 import uk.nbforge.gallifreyan_chronicles.core.block.InteriorDoorBlock;
 import uk.nbforge.gallifreyan_chronicles.core.block.TardisBlock;
@@ -32,10 +36,25 @@ public class GCJadePlugin implements IWailaPlugin {
 
     @Override
     public void registerClient(IWailaClientRegistration registration) {
-        registration.addRayTraceCallback((hitResult, accessor, originalAccessor) ->
-                accessor instanceof EntityAccessor entityAccessor && isTardisPortal(entityAccessor.getEntity())
-                        ? null
-                        : accessor);
+        registration.addRayTraceCallback((hitResult, accessor, originalAccessor) -> {
+            // hide immersive portals jade tooltips
+            if (accessor instanceof EntityAccessor entityAccessor && isTardisPortal(entityAccessor.getEntity())) {
+                return null;
+            }
+
+            // only show tardis control jade tooltips if directly looking at a control entity
+            if (accessor instanceof EntityAccessor entityAccessor && entityAccessor.getEntity() instanceof TardisControlEntity control) {
+                Player player = Minecraft.getInstance().player;
+                if (player == null) return null;
+
+                Vec3 eye = player.getEyePosition();
+                Vec3 end = eye.add(player.getViewVector(1.0F).scale(player.entityInteractionRange()));
+
+                boolean lookingAtIt = control.getBoundingBox().clip(eye, end).isPresent();
+                if (!lookingAtIt) return null;
+            }
+            return accessor;
+        });
         registration.registerEntityIcon(ControlIconProvider.INSTANCE, TardisControlEntity.class);
         registration.registerBlockIcon(TardisBlockIconProvider.INSTANCE, TardisBlock.class);
         registration.registerBlockIcon(TardisBlockIconProvider.INSTANCE, ConsoleBlock.class);

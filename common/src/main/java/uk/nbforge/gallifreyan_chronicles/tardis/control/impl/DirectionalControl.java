@@ -8,11 +8,16 @@ import net.minecraft.world.entity.player.Player;
 
 import java.util.UUID;
 
-public class DirectionControl extends DestinationControl {
-    public static final ControlAnimations DEFAULT_ANIMATIONS = new ControlAnimations("direction_control_on", "direction_control_off", false);
+public class DirectionalControl extends DestinationControl {
+    public static final ControlAnimations DEFAULT_ANIMATIONS = new ControlAnimations("directional_control_on", "directional_control_off", false);
 
-    public DirectionControl() { this(DEFAULT_ANIMATIONS); }
-    public DirectionControl(ControlAnimations animations) { super(animations); }
+    public DirectionalControl() {
+        this(DEFAULT_ANIMATIONS);
+    }
+
+    public DirectionalControl(ControlAnimations animations) {
+        super(animations);
+    }
 
     @Override
     protected boolean apply(MinecraftServer server, UUID tardisId, Player player) {

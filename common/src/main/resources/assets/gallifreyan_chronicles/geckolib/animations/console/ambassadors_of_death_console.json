@@ -1,10 +1,10 @@
 {
   "format_version": "1.8.0",
   "animations": {
-    "change_increment": {
+    "coordinate_step_control": {
       "animation_length": 0.5,
       "bones": {
-        "change_increment": {
+        "coordinate_step_control": {
           "rotation": {
             "0.0": {
               "vector": [
@@ -18,17 +18,16 @@
                 -360,
                 0,
                 0
-              ],
-              "easing": "easeInOutQuad"
+              ]
             }
           }
         }
       }
     },
-    "change_increment_reverse": {
+    "coordinate_step_control_reverse": {
       "animation_length": 0.5,
       "bones": {
-        "change_increment": {
+        "coordinate_step_control": {
           "rotation": {
             "0.0": {
               "vector": [
@@ -42,18 +41,17 @@
                 0,
                 0,
                 0
-              ],
-              "easing": "easeInOutQuad"
+              ]
             }
           }
         }
       }
     },
-    "flight_lever_down": {
+    "space_time_throttle_on": {
       "loop": "hold_on_last_frame",
       "animation_length": 0.5,
       "bones": {
-        "flight_lever": {
+        "space_time_throttle": {
           "rotation": {
             "0.0": {
               "vector": [
@@ -80,11 +78,11 @@
         }
       }
     },
-    "flight_lever_up": {
+    "space_time_throttle_off": {
       "loop": "hold_on_last_frame",
       "animation_length": 0.5,
       "bones": {
-        "flight_lever": {
+        "space_time_throttle": {
           "rotation": {
             "0.0": {
               "vector": [
@@ -111,11 +109,11 @@
         }
       }
     },
-    "handbrake_down": {
+    "time_rotor_handbrake_on": {
       "loop": "hold_on_last_frame",
       "animation_length": 0.5,
       "bones": {
-        "handbrake": {
+        "time_rotor_handbrake": {
           "rotation": {
             "0.0": {
               "vector": [
@@ -142,11 +140,11 @@
         }
       }
     },
-    "handbrake_up": {
+    "time_rotor_handbrake_off": {
       "loop": "hold_on_last_frame",
       "animation_length": 0.5,
       "bones": {
-        "handbrake": {
+        "time_rotor_handbrake": {
           "rotation": {
             "0.0": {
               "vector": [
@@ -172,10 +170,6 @@
           }
         }
       }
-    },
-    "isomorphic_on": {
-      "loop": "hold_on_last_frame",
-      "animation_length": 0.25
     },
     "rotor_flight": {
       "loop": true,
@@ -256,54 +250,6 @@
         }
       }
     },
-    "lever_down": {
-      "loop": "hold_on_last_frame",
-      "animation_length": 0.5,
-      "bones": {
-        "lever": {
-          "rotation": {
-            "0.0": {
-              "vector": [
-                0,
-                0,
-                0
-              ]
-            },
-            "0.25": {
-              "vector": [
-                80,
-                0,
-                0
-              ]
-            }
-          }
-        }
-      }
-    },
-    "lever_up": {
-      "loop": "hold_on_last_frame",
-      "animation_length": 0.5,
-      "bones": {
-        "lever": {
-          "rotation": {
-            "0.0": {
-              "vector": [
-                80,
-                0,
-                0
-              ]
-            },
-            "0.25": {
-              "vector": [
-                0,
-                0,
-                0
-              ]
-            }
-          }
-        }
-      }
-    },
     "rotor_idle": {
       "loop": true,
       "animation_length": 4.24,
@@ -328,11 +274,11 @@
         }
       }
     },
-    "power_lever_down": {
+    "power_control_on": {
       "loop": "hold_on_last_frame",
       "animation_length": 0.5,
       "bones": {
-        "power_lever": {
+        "power_control": {
           "rotation": {
             "0.0": {
               "vector": [
@@ -368,11 +314,11 @@
         }
       }
     },
-    "power_lever_up": {
+    "power_control_off": {
       "loop": "hold_on_last_frame",
       "animation_length": 0.5,
       "bones": {
-        "power_lever": {
+        "power_control": {
           "rotation": {
             "0.0": {
               "vector": [
@@ -447,7 +393,7 @@
         }
       }
     },
-    "door_lock_on": {
+    "door_lock_control_on": {
       "loop": "hold_on_last_frame",
       "animation_length": 0.25,
       "bones": {
@@ -471,7 +417,7 @@
         }
       }
     },
-    "door_lock_off": {
+    "door_lock_control_off": {
       "loop": "hold_on_last_frame",
       "animation_length": 0.25,
       "bones": {
@@ -512,24 +458,21 @@
                 -105,
                 0,
                 0
-              ],
-              "easing": "easeInSine"
+              ]
             },
             "0.5": {
               "vector": [
                 -105,
                 0,
                 0
-              ],
-              "easing": "easeInSine"
+              ]
             },
             "0.75": {
               "vector": [
                 0,
                 0,
                 0
-              ],
-              "easing": "easeInSine"
+              ]
             }
           }
         }
@@ -552,24 +495,21 @@
                 105,
                 0,
                 0
-              ],
-              "easing": "easeInSine"
+              ]
             },
             "0.5": {
               "vector": [
                 105,
                 0,
                 0
-              ],
-              "easing": "easeInSine"
+              ]
             },
             "0.75": {
               "vector": [
                 0,
                 0,
                 0
-              ],
-              "easing": "easeInSine"
+              ]
             }
           }
         }
@@ -592,24 +532,21 @@
                 -105,
                 0,
                 0
-              ],
-              "easing": "easeInSine"
+              ]
             },
             "0.5": {
               "vector": [
                 -105,
                 0,
                 0
-              ],
-              "easing": "easeInSine"
+              ]
             },
             "0.75": {
               "vector": [
                 0,
                 0,
                 0
-              ],
-              "easing": "easeInSine"
+              ]
             }
           }
         }
@@ -713,57 +650,97 @@
         }
       }
     },
-    "cloak_control_on": {
+    "cloaking_device_control_on": {
       "loop": "hold_on_last_frame",
       "animation_length": 0.25,
       "bones": {
-        "cloak_control": {
+        "cloaking_device_control": {
           "rotation": {
-            "0.0": [
-              0,
-              0,
-              0
-            ],
-            "0.25": [
-              100,
-              0,
-              0
-            ]
+            "0.0": {
+              "vector": [
+                0,
+                0,
+                0
+              ]
+            },
+            "0.25": {
+              "vector": [
+                100,
+                0,
+                0
+              ]
+            }
           }
         }
       }
     },
-    "cloak_control_off": {
+    "cloaking_device_control_off": {
       "loop": "hold_on_last_frame",
       "animation_length": 0.5,
       "bones": {
-        "cloak_control": {
+        "cloaking_device_control": {
           "rotation": {
-            "0.0": [
-              100,
-              0,
-              0
-            ],
-            "0.25": [
-              0,
-              0,
-              0
-            ]
+            "0.0": {
+              "vector": [
+                100,
+                0,
+                0
+              ]
+            },
+            "0.25": {
+              "vector": [
+                0,
+                0,
+                0
+              ]
+            }
           }
         }
       }
     },
     "interior_door_control_on": {
       "loop": "hold_on_last_frame",
-      "animation_length": 0.25,
+      "animation_length": 0.5,
       "bones": {
         "interior_door_control": {
           "rotation": {
             "0.0": {
-              "vector": [0, 0, 0]
+              "vector": [
+                0,
+                0,
+                0
+              ]
             },
             "0.25": {
-              "vector": [-90, 0, 0]
+              "vector": [
+                -90,
+                0,
+                0
+              ]
+            }
+          }
+        }
+      }
+    },
+    "exterior_lights_control_on": {
+      "loop": "hold_on_last_frame",
+      "animation_length": 0.25,
+      "bones": {
+        "cloister_bell_control": {
+          "rotation": {
+            "0.0": {
+              "vector": [
+                0,
+                0,
+                0
+              ]
+            },
+            "0.25": {
+              "vector": [
+                -90,
+                0,
+                0
+              ]
             }
           }
         }
@@ -776,15 +753,94 @@
         "interior_door_control": {
           "rotation": {
             "0.0": {
-              "vector": [-90, 0, 0]
+              "vector": [
+                -90,
+                0,
+                0
+              ]
             },
             "0.25": {
-              "vector": [0, 0, 0]
+              "vector": [
+                0,
+                0,
+                0
+              ]
+            }
+          }
+        }
+      }
+    },
+    "exterior_lights_control_off": {
+      "loop": "hold_on_last_frame",
+      "animation_length": 0.25,
+      "bones": {
+        "cloister_bell_control": {
+          "rotation": {
+            "0.0": {
+              "vector": [
+                -90,
+                0,
+                0
+              ]
+            },
+            "0.25": {
+              "vector": [
+                0,
+                0,
+                0
+              ]
+            }
+          }
+        }
+      }
+    },
+    "locking_down_mechanism_on": {
+      "loop": "hold_on_last_frame",
+      "animation_length": 0.5,
+      "bones": {
+        "locking_down_mechanism": {
+          "rotation": {
+            "0.0": {
+              "vector": [
+                0,
+                0,
+                0
+              ]
+            },
+            "0.5": {
+              "vector": [
+                -25,
+                0,
+                0
+              ]
+            }
+          }
+        }
+      }
+    },
+    "locking_down_mechanism_off": {
+      "loop": "hold_on_last_frame",
+      "animation_length": 0.5,
+      "bones": {
+        "locking_down_mechanism": {
+          "rotation": {
+            "0.0": {
+              "vector": [
+                -25,
+                0,
+                0
+              ]
+            },
+            "0.5": {
+              "vector": [
+                0,
+                0,
+                0
+              ]
             }
           }
         }
       }
     }
   }
-}
 }

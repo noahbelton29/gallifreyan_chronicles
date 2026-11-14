@@ -13,14 +13,14 @@ import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
 
-public class CloakControl extends BaseControl {
-    public static final ControlAnimations DEFAULT_ANIMATIONS = new ControlAnimations("cloak_control_on", "cloak_control_off", true);
+public class CloakingDeviceControl extends BaseControl {
+    public static final ControlAnimations DEFAULT_ANIMATIONS = new ControlAnimations("cloaking_device_control_on", "cloaking_device_control_off", true);
 
-    public CloakControl(ControlAnimations animations) {
+    public CloakingDeviceControl(ControlAnimations animations) {
         super(animations);
     }
 
-    public CloakControl() {
+    public CloakingDeviceControl() {
         this(DEFAULT_ANIMATIONS);
     }
 
@@ -38,7 +38,7 @@ public class CloakControl extends BaseControl {
         if (console == null) {
             return InteractionResult.FAIL;
         }
-        SoundEvent cloakSound = console.getControlState(GCTardisControls.CLOAK_CONTROL) ? GCSounds.TARDIS_UNCLOAK : GCSounds.TARDIS_CLOAK;
+        SoundEvent cloakSound = console.getControlState(GCTardisControls.CLOAKING_DEVICE_CONTROL) ? GCSounds.TARDIS_UNCLOAK : GCSounds.TARDIS_CLOAK;
         playEverywhere(console, serverLevel, cloakSound);
         return InteractionResult.SUCCESS;
     }

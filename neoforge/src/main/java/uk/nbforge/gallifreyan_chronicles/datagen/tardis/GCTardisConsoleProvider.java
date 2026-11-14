@@ -22,9 +22,9 @@ public class GCTardisConsoleProvider extends GCJsonDataProvider {
         console("ambassadors_of_death_console")
                 .standardGlowGroups()
                 .standardControls()
-                .adjust(GCTardisControls.CLOAK_CONTROL, c -> c.at(-0.525, 0.6875, -0.5).size(0.0625, 0.1875, 0.0625))
+                .adjust(GCTardisControls.CLOAKING_DEVICE_CONTROL, c -> c.at(-0.525, 0.6875, -0.5).size(0.0625, 0.1875, 0.0625))
                 .adjust(GCTardisControls.ISOMORPHIC_CONTROL, c -> c.at(-0.0312, 0.5592, 1.0224).size(0.25, 0.125, 0.125))
-                .adjust(GCTardisControls.DIRECTION_CONTROL, c -> c.at(0.7715, 0.6968, 0.168).size(0.125, 0.1875, 0.1875));
+                .adjust(GCTardisControls.DIRECTIONAL_CONTROL, c -> c.at(0.7715, 0.6968, 0.168).size(0.125, 0.1875, 0.1875));
 
         console("brachacki_console")
                 .defaultVariant("first_doctors_console")
@@ -35,9 +35,9 @@ public class GCTardisConsoleProvider extends GCJsonDataProvider {
         console("inferno_console")
                 .standardGlowGroups()
                 .standardControls()
-                .adjust(GCTardisControls.CLOAK_CONTROL, c -> c.at(-0.525, 0.6875, -0.5).size(0.0625, 0.1875, 0.0625))
+                .adjust(GCTardisControls.CLOAKING_DEVICE_CONTROL, c -> c.at(-0.525, 0.6875, -0.5).size(0.0625, 0.1875, 0.0625))
                 .adjust(GCTardisControls.ISOMORPHIC_CONTROL, c -> c.at(-0.0312, 0.5592, 1.0224).size(0.25, 0.125, 0.125))
-                .adjust(GCTardisControls.DIRECTION_CONTROL, c -> c.at(0.7715, 0.6968, 0.168).size(0.125, 0.1875, 0.1875));
+                .adjust(GCTardisControls.DIRECTIONAL_CONTROL, c -> c.at(0.7715, 0.6968, 0.168).size(0.125, 0.1875, 0.1875));
 
         console("second_doctors_console_alt")
                 .defaultVariant("second_doctors_console_alt")

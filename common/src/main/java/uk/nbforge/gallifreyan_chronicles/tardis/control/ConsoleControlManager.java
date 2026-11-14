@@ -148,7 +148,7 @@ public class ConsoleControlManager {
     }
 
     public static boolean defaultState(String controlId) {
-        return GCTardisControls.POWER_LEVER.equals(controlId);
+        return GCTardisControls.POWER_CONTROL.equals(controlId);
     }
 
     public boolean getControlState(String controlId) {

@@ -18,8 +18,8 @@ public final class HaywireControls {
         for (TardisConsoleBlockEntity console : tardis.consoles()) {
             List<TardisControlEntity> controls = console.getControlEntities().stream()
                     /* power and handbrake stay put */
-                    .filter(control -> !control.getControlId().equals(GCTardisControls.POWER_LEVER))
-                    .filter(control -> !control.getControlId().equals(GCTardisControls.HANDBRAKE))
+                    .filter(control -> !control.getControlId().equals(GCTardisControls.POWER_CONTROL))
+                    .filter(control -> !control.getControlId().equals(GCTardisControls.TIME_ROTOR_HANDBRAKE))
                     .toList();
             if (controls.isEmpty()) continue;
 

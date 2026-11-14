@@ -27,7 +27,6 @@ import uk.nbforge.gallifreyan_chronicles.util.FadingValue;
 import uk.nbforge.gallifreyan_chronicles.tardis.control.ConsoleControlHost;
 import uk.nbforge.gallifreyan_chronicles.tardis.control.ConsoleControlManager;
 import uk.nbforge.gallifreyan_chronicles.tardis.console.TardisConsole;
-import uk.nbforge.gallifreyan_chronicles.tardis.control.ControlSpec;
 import uk.nbforge.gallifreyan_chronicles.tardis.control.TardisControl;
 import uk.nbforge.gallifreyan_chronicles.core.dynamic_registries.TardisControlRegistry;
 import uk.nbforge.gallifreyan_chronicles.tardis.ecs.TardisComponentTypes;
@@ -55,6 +54,7 @@ import org.jspecify.annotations.Nullable;
 
 import java.util.*;
 import java.util.function.Supplier;
+
 import uk.nbforge.gallifreyan_chronicles.tardis.codec.control.ControlSpecCodec;
 
 public class TardisConsoleBlockEntity extends BlockEntity implements GeoBlockEntity, ComponentHolder, TardisLinkable, ConsoleControlHost {
@@ -208,9 +208,9 @@ public class TardisConsoleBlockEntity extends BlockEntity implements GeoBlockEnt
 
     public boolean hasPower() {
         if (level != null && level.isClientSide()) {
-            return !Boolean.FALSE.equals(clientAppliedStates.get(GCTardisControls.POWER_LEVER));
+            return !Boolean.FALSE.equals(clientAppliedStates.get(GCTardisControls.POWER_CONTROL));
         }
-        return controls.getControlState(GCTardisControls.POWER_LEVER);
+        return controls.getControlState(GCTardisControls.POWER_CONTROL);
     }
 
     public void triggerControl(String id, boolean activated, @Nullable Player triggeringPlayer) {
@@ -403,8 +403,8 @@ public class TardisConsoleBlockEntity extends BlockEntity implements GeoBlockEnt
         if (isRemoved() || !(level instanceof ServerLevel)) return;
         TardisFlightState state = TardisApi.of(this).map(Tardis::flightState).orElse(TardisFlightState.IDLE);
         boolean inVortex = state == TardisFlightState.TAKING_OFF || state == TardisFlightState.IN_VORTEX;
-        if (!inVortex || controls.getControlState(GCTardisControls.FLIGHT_LEVER)) return;
-        reconcileControl(GCTardisControls.FLIGHT_LEVER, true);
+        if (!inVortex || controls.getControlState(GCTardisControls.SPACE_TIME_THROTTLE)) return;
+        reconcileControl(GCTardisControls.SPACE_TIME_THROTTLE, true);
         triggerRotorAnimation(FLIGHT_STATE);
     }
 

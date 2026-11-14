@@ -1,0 +1,60 @@
+package uk.nbforge.gallifreyan_chronicles.compat.jade;
+
+import uk.nbforge.gallifreyan_chronicles.util.ConsoleStackUtil;
+
+import uk.nbforge.gallifreyan_chronicles.core.block_entities.TardisConsoleBlockEntity;
+import uk.nbforge.gallifreyan_chronicles.core.block_entities.TardisExteriorBlockEntity;
+import uk.nbforge.gallifreyan_chronicles.core.GCBlocks;
+import uk.nbforge.gallifreyan_chronicles.core.GCDataComponents;
+import uk.nbforge.gallifreyan_chronicles.tardis.TardisInteriorOptions;
+import uk.nbforge.gallifreyan_chronicles.util.GCUtil;
+import net.minecraft.resources.Identifier;
+import net.minecraft.world.item.ItemStack;
+import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.NonNull;
+import snownee.jade.api.BlockAccessor;
+import snownee.jade.api.IBlockComponentProvider;
+import snownee.jade.api.ITooltip;
+import snownee.jade.api.config.IPluginConfig;
+import snownee.jade.api.ui.Element;
+import snownee.jade.api.ui.JadeUI;
+
+public class TardisBlockIconProvider implements IBlockComponentProvider {
+    public static final TardisBlockIconProvider INSTANCE = new TardisBlockIconProvider();
+
+    @Override
+    public @Nullable Element getIcon(@NonNull BlockAccessor accessor, @NonNull IPluginConfig config, @Nullable Element currentIcon) {
+        if (accessor.getBlockEntity() instanceof TardisConsoleBlockEntity console) {
+            return JadeUI.item(consoleStack(console));
+        }
+        if (accessor.getBlockEntity() instanceof TardisExteriorBlockEntity exterior) {
+            return JadeUI.item(exteriorStack(exterior));
+        }
+        return currentIcon;
+    }
+
+    public static ItemStack consoleStack(TardisConsoleBlockEntity console) {
+        return ConsoleStackUtil.withConsoleData(new ItemStack(GCBlocks.TARDIS_CONSOLE), console);
+    }
+
+    private static ItemStack exteriorStack(TardisExteriorBlockEntity exterior) {
+        ItemStack stack = new ItemStack(GCBlocks.TARDIS);
+        String exteriorId = exterior.getExterior().id();
+        for (TardisInteriorOptions.Option option : TardisInteriorOptions.client()) {
+            if (exteriorId.equals(option.exteriorId())) {
+                stack.set(GCDataComponents.TARDIS_INTERIOR, option.interiorId());
+                break;
+            }
+        }
+        return stack;
+    }
+
+    @Override
+    public void appendTooltip(@NonNull ITooltip tooltip, @NonNull BlockAccessor accessor, @NonNull IPluginConfig config) {
+    }
+
+    @Override
+    public @NonNull Identifier getUid() {
+        return GCUtil.modIdentifier("tardis_block_icon");
+    }
+}

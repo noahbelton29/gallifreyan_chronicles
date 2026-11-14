@@ -1,0 +1,55 @@
+package uk.nbforge.gallifreyan_chronicles.core.dynamic_registries;
+
+import uk.nbforge.gallifreyan_chronicles.config.GCConfig;
+
+import java.util.Collection;
+
+import uk.nbforge.gallifreyan_chronicles.tardis.TardisExterior;
+
+public class TardisExteriorRegistry {
+    public static String defaultId() {
+        return GCConfig.defaultExterior();
+    }
+
+    private static final GCJsonDataRegistry<TardisExterior> REGISTRY = new GCJsonDataRegistry<>();
+    private static TardisExterior defaultExterior;
+
+    private TardisExteriorRegistry() {
+    }
+
+    public static void clear() {
+        REGISTRY.clear();
+        defaultExterior = null;
+    }
+
+    public static TardisExterior register(TardisExterior exterior) {
+        return REGISTRY.register(exterior);
+    }
+
+    public static void setDefault(TardisExterior exterior) {
+        defaultExterior = exterior;
+    }
+
+    public static TardisExterior get(String id) {
+        TardisExterior result = REGISTRY.getById(id);
+        if (result != null) return result;
+        if (defaultExterior != null) return defaultExterior;
+        return REGISTRY.getAll().stream().findFirst().orElse(null);
+    }
+
+    public static boolean contains(String id) {
+        return REGISTRY.contains(id);
+    }
+
+    public static Collection<TardisExterior> getAll() {
+        return REGISTRY.getAll();
+    }
+
+    public static TardisExterior getDefault() {
+        return defaultExterior;
+    }
+
+    public static int size() {
+        return REGISTRY.size();
+    }
+}

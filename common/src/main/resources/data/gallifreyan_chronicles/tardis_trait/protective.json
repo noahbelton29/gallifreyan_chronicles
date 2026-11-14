@@ -1,8 +1,8 @@
 {
-  "how_common": 10,
   "crash_damage": 0.6,
+  "how_common": 10,
+  "revealed_when": "it_crashes",
   "stress": {
     "builds_up": 1.2
-  },
-  "revealed_when": "it_crashes"
+  }
 }

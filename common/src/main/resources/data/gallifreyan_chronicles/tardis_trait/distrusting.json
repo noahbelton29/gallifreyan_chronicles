@@ -1,21 +1,21 @@
 {
   "how_common": 10,
-  "trust": {
-    "gained": 0.6,
-    "lost": 0.6,
-    "lost_when_abused": 2.5,
-    "starts_at": 12
-  },
-  "trauma_taken": 0.7,
   "never_with": {
+    "personalities": [
+      "obedient"
+    ],
     "traits": [
       "loyal",
       "welcoming",
       "forgiving"
-    ],
-    "personalities": [
-      "obedient"
     ]
   },
-  "revealed_when": "its_controls_stick"
+  "revealed_when": "its_controls_stick",
+  "trauma_taken": 0.7,
+  "trust": {
+    "gained": 0.6,
+    "lost": 0.6,
+    "lost_when_abused": 2.5,
+    "starts_at": 12.0
+  }
 }

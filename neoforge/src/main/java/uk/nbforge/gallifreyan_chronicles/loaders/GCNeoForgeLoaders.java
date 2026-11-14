@@ -1,0 +1,35 @@
+package uk.nbforge.gallifreyan_chronicles.loaders;
+
+import uk.nbforge.gallifreyan_chronicles.Constants;
+import uk.nbforge.gallifreyan_chronicles.loader.GCJsonReloadListener;
+import uk.nbforge.gallifreyan_chronicles.util.GCUtil;
+import net.minecraft.resources.Identifier;
+import net.neoforged.bus.api.SubscribeEvent;
+import net.neoforged.fml.common.EventBusSubscriber;
+import net.neoforged.neoforge.event.AddServerReloadListenersEvent;
+
+import java.util.LinkedHashMap;
+import java.util.Map;
+import java.util.function.Supplier;
+
+
+@EventBusSubscriber(modid = Constants.MOD_ID)
+public final class GCNeoForgeLoaders {
+    private static final Map<Identifier, Supplier<GCJsonReloadListener<?>>> LOADERS =
+            new LinkedHashMap<>();
+
+    private GCNeoForgeLoaders() {
+    }
+
+    public static void register(String path, Supplier<GCJsonReloadListener<?>> factory) {
+        LOADERS.put(GCUtil.modIdentifier(path), factory);
+    }
+
+    @SubscribeEvent
+    public static void onAddReloadListeners(AddServerReloadListenersEvent event) {
+        for (Map.Entry<Identifier, Supplier<GCJsonReloadListener<?>>> entry : LOADERS.entrySet()) {
+            event.addListener(entry.getKey(), entry.getValue().get());
+            Constants.LOG.info("Registered GC NeoForge Reload Listener: {}", entry.getKey());
+        }
+    }
+}

@@ -1,19 +1,19 @@
 {
-  "how_common": 10,
-  "stress": {
-    "calms_down": 0.7
-  },
   "fear": {
     "fades": 0.6
   },
-  "trust": {
-    "gained": 1.3,
-    "lost_when_abused": 1.5
-  },
+  "how_common": 10,
   "never_with": {
     "personalities": [
       "obedient"
     ]
   },
-  "revealed_when": "it_lands_upset"
+  "revealed_when": "it_lands_upset",
+  "stress": {
+    "calms_down": 0.7
+  },
+  "trust": {
+    "gained": 1.3,
+    "lost_when_abused": 1.5
+  }
 }

@@ -1,0 +1,148 @@
+package uk.nbforge.gallifreyan_chronicles.tardis;
+
+import uk.nbforge.gallifreyan_chronicles.compat.portal.TardisPortalBridge;
+import uk.nbforge.gallifreyan_chronicles.Constants;
+import uk.nbforge.gallifreyan_chronicles.core.block_entities.TardisConsoleBlockEntity;
+import uk.nbforge.gallifreyan_chronicles.core.GCDimensions;
+import uk.nbforge.gallifreyan_chronicles.mixin.server.MinecraftServerAccessor;
+import uk.nbforge.gallifreyan_chronicles.tardis.ecs.system.TardisInteriorSystem;
+import uk.nbforge.gallifreyan_chronicles.util.GCUtil;
+import net.minecraft.core.registries.Registries;
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.server.MinecraftServer;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.util.Util;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.biome.BiomeManager;
+import net.minecraft.world.level.dimension.LevelStem;
+import net.minecraft.world.level.storage.DerivedLevelData;
+import org.jspecify.annotations.Nullable;
+
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.UUID;
+
+public final class TardisDimensionManager {
+    private static final Map<UUID, UUID> PENDING = new LinkedHashMap<>();
+    private static final Map<UUID, Integer> PLACE_CONTROLS = new LinkedHashMap<>();
+    private static final int CONTROL_PLACE_DELAY_TICKS = 5;
+
+    private TardisDimensionManager() {
+    }
+
+    public static ResourceKey<Level> levelKey(UUID tardisId) {
+        return ResourceKey.create(Registries.DIMENSION, GCUtil.modIdentifier("tardis/" + tardisId));
+    }
+
+    public static @Nullable ServerLevel get(MinecraftServer server, UUID tardisId) {
+        return server.getLevel(levelKey(tardisId));
+    }
+
+    public static ServerLevel getOrCreate(MinecraftServer server, UUID tardisId) {
+        ResourceKey<Level> key = levelKey(tardisId);
+        ServerLevel existing = server.getLevel(key);
+        if (existing != null) return existing;
+
+        LevelStem template = server.registryAccess().lookupOrThrow(Registries.LEVEL_STEM)
+                .getValue(GCDimensions.TARDIS_INTERIOR_KEY);
+        if (template == null) {
+            throw new IllegalStateException("missing level stem " + GCDimensions.TARDIS_INTERIOR_KEY);
+        }
+
+        MinecraftServerAccessor accessor = (MinecraftServerAccessor) server;
+        var worldData = server.getWorldData();
+        DerivedLevelData levelData = new DerivedLevelData(worldData, worldData.overworldData());
+        long biomeZoomSeed = BiomeManager.obfuscateSeed(server.getWorldGenSettings().options().seed());
+
+        ServerLevel level = new ServerLevel(server, Util.backgroundExecutor(),
+                accessor.gallifreyan_chronicles$getStorageSource(), levelData, key, template,
+                worldData.isDebugWorld(), biomeZoomSeed, List.of(), false);
+
+        accessor.gallifreyan_chronicles$getLevels().put(key, level);
+        level.getWorldBorder().setAbsoluteMaxSize(server.getAbsoluteMaxWorldSize());
+        server.getPlayerList().addWorldborderListener(level);
+
+        Constants.LOG.info("created tardis dimension {}", key.identifier());
+        TardisPortalBridge.onDimensionsChanged(server);
+        return level;
+    }
+
+    public static void restoreAll(MinecraftServer server) {
+        PENDING.clear();
+        PLACE_CONTROLS.clear();
+        for (UUID tardisId : TardisManager.get(server).getInteriorIds()) {
+            try {
+                getOrCreate(server, tardisId);
+            } catch (Exception e) {
+                Constants.LOG.error("failed to restore tardis dimension for {}", tardisId, e);
+            }
+        }
+    }
+
+    // if the interior is not loaded yet, the player waits in the queue
+    public static void requestEntry(MinecraftServer server, ServerPlayer player, UUID tardisId) {
+        ServerLevel level = get(server, tardisId);
+        if (level != null) {
+            teleportPlayerIntoInterior(player, level, tardisId);
+            return;
+        }
+        PENDING.putIfAbsent(player.getUUID(), tardisId);
+    }
+
+    public static void processPendingEntries(MinecraftServer server) {
+        processControlPlacement(server);
+        if (PENDING.isEmpty()) return;
+
+        Map<UUID, UUID> work = new LinkedHashMap<>(PENDING);
+        PENDING.clear();
+
+        for (Map.Entry<UUID, UUID> entry : work.entrySet()) {
+            ServerPlayer player = server.getPlayerList().getPlayer(entry.getKey());
+            if (player == null) continue;
+            try {
+                ServerLevel level = getOrCreate(server, entry.getValue());
+                teleportPlayerIntoInterior(player, level, entry.getValue());
+            } catch (Exception e) {
+                Constants.LOG.error("failed to enter tardis {}", entry.getValue(), e);
+            }
+        }
+    }
+
+    public static void scheduleControlPlacement(UUID tardisId) {
+        PLACE_CONTROLS.put(tardisId, CONTROL_PLACE_DELAY_TICKS);
+    }
+
+    private static void teleportPlayerIntoInterior(ServerPlayer player, ServerLevel interior, UUID tardisId) {
+        boolean firstEntry = TardisInteriorSystem.buildInteriorIfMissing(interior, tardisId);
+        TardisInteriorSystem.Arrival arrival = TardisInteriorSystem.arrival(interior, tardisId);
+        TardisInteriorSystem.markArriving(player);
+        player.teleportTo(interior, arrival.pos().x, arrival.pos().y, arrival.pos().z, Set.of(),
+                arrival.yaw(), 0.0f, true);
+
+        if (firstEntry) {
+            PLACE_CONTROLS.put(tardisId, CONTROL_PLACE_DELAY_TICKS);
+        }
+    }
+
+    private static void processControlPlacement(MinecraftServer server) {
+        if (PLACE_CONTROLS.isEmpty()) return;
+
+        var iterator = PLACE_CONTROLS.entrySet().iterator();
+        while (iterator.hasNext()) {
+            var entry = iterator.next();
+            if (entry.getValue() > 1) {
+                entry.setValue(entry.getValue() - 1);
+                continue;
+            }
+            iterator.remove();
+
+            UUID tardisId = entry.getKey();
+            TardisApi.get(server, tardisId).flatMap(Tardis::console).ifPresentOrElse(
+                    TardisConsoleBlockEntity::respawnControls,
+                    () -> Constants.LOG.warn("no console to place controls on for tardis {}", tardisId));
+        }
+    }
+}

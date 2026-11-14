@@ -1,55 +1,55 @@
 {
   "how_common": 32,
-  "refuses_to_fly_when": {
-    "stress_above": 50,
-    "trust_below": 30
-  },
   "mallet": {
+    "fear_needed_to_obey": 45.0,
     "fear_per_hit": {
-      "min": 10,
-      "max": 25
+      "max": 25.0,
+      "min": 10.0
     },
-    "fear_needed_to_obey": 45,
-    "trauma_per_hit": 4.0,
     "hits_to_snap_out_of_terror": {
-      "min": 3,
-      "max": 5
-    }
+      "max": 5,
+      "min": 3
+    },
+    "trauma_per_hit": 4.0
   },
-  "when_unwilling_to_fly": [
-    {
-      "type": "add_stress",
-      "amount": 2
-    },
-    {
-      "type": "refuse"
-    },
-    {
-      "type": "shield",
-      "radius": 2.5,
-      "push": 0.6
-    },
-    {
-      "type": "lock_doors"
-    },
-    {
-      "type": "reveal"
-    }
-  ],
+  "refuses_to_fly_when": {
+    "stress_above": 50.0,
+    "trust_below": 30.0
+  },
   "when_it_sees_the_mallet": [
     {
       "type": "lock_doors"
     },
     {
       "type": "sound",
+      "pitch": 0.8,
       "sound": "gallifreyan_chronicles:tardis_door_lock",
-      "volume": 0.8,
-      "pitch": 0.8
+      "volume": 0.8
     },
     {
       "type": "message",
-      "key": "mallet_seen_braces",
-      "colour": "gold"
+      "colour": "gold",
+      "key": "mallet_seen_braces"
+    },
+    {
+      "type": "reveal"
+    }
+  ],
+  "when_unwilling_to_fly": [
+    {
+      "type": "add_stress",
+      "amount": 2.0
+    },
+    {
+      "type": "refuse"
+    },
+    {
+      "type": "shield",
+      "push": 0.6,
+      "radius": 2.5
+    },
+    {
+      "type": "lock_doors"
     },
     {
       "type": "reveal"
@@ -59,10 +59,10 @@
     {
       "type": "lash_out",
       "from_severity": 0.65,
-      "min_damage": 1,
-      "max_damage": 3,
-      "push": 0.5,
-      "lift": 0.25
+      "lift": 0.25,
+      "max_damage": 3.0,
+      "min_damage": 1.0,
+      "push": 0.5
     },
     {
       "type": "reveal",

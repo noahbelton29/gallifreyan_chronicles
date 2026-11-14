@@ -1,0 +1,92 @@
+package uk.nbforge.gallifreyan_chronicles.core;
+
+import java.util.List;
+import java.util.UUID;
+
+import uk.nbforge.gallifreyan_chronicles.core.item.tooltip.ItemInfoTooltip;
+import net.minecraft.core.UUIDUtil;
+import com.mojang.serialization.Codec;
+import uk.nbforge.gallifreyan_chronicles.util.GCUtil;
+import net.minecraft.core.Registry;
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.core.component.DataComponentType;
+import uk.nbforge.gallifreyan_chronicles.Constants;
+
+import java.util.function.Supplier;
+import uk.nbforge.gallifreyan_chronicles.codec.item.ItemInfoTooltipCodec;
+
+public class GCDataComponents {
+    public static final DataComponentType<String> COBBLESTONE_VARIANT = register(
+            "cobblestone_variant",
+            () -> DataComponentType.<String>builder().persistent(Codec.STRING).build()
+    );
+
+    public static final DataComponentType<String> CONSOLE_ID = register(
+            "console_id",
+            () -> DataComponentType.<String>builder().persistent(Codec.STRING).build()
+    );
+
+    public static final DataComponentType<String> CONSOLE_VARIANT = register(
+            "console_variant",
+            () -> DataComponentType.<String>builder().persistent(Codec.STRING).build()
+    );
+
+    public static final DataComponentType<String> TARDIS_INTERIOR = register(
+            "tardis_interior",
+            () -> DataComponentType.<String>builder().persistent(Codec.STRING).build()
+    );
+
+    public static final DataComponentType<String> DOOR_TYPE = register(
+            "door_type",
+            () -> DataComponentType.<String>builder().persistent(Codec.STRING).build()
+    );
+
+    /* set on a door item that was picked or dropped from a primary door, so placing it makes a primary door again */
+    public static final DataComponentType<Boolean> PRIMARY_DOOR = register(
+            "primary_door",
+            () -> DataComponentType.<Boolean>builder().persistent(Codec.BOOL).build()
+    );
+
+    public static final DataComponentType<ItemInfoTooltip> ITEM_INFO = register(
+            "item_info",
+            () -> DataComponentType.<ItemInfoTooltip>builder()
+                    .persistent(ItemInfoTooltipCodec.CODEC).build()
+    );
+
+    public static final DataComponentType<UUID> TARDIS_ID = register(
+            "tardis_id",
+            () -> DataComponentType.<UUID>builder().persistent(UUIDUtil.CODEC).build()
+    );
+
+    public static final DataComponentType<Boolean> KEY_INSERTED = register(
+            "key_inserted",
+            () -> DataComponentType.<Boolean>builder().persistent(Codec.BOOL).build()
+    );
+
+    public static final DataComponentType<String> KEY_STYLE = register(
+            "key_style",
+            () -> DataComponentType.<String>builder().persistent(Codec.STRING).build()
+    );
+
+    public static final DataComponentType<Boolean> MASTER_KEY = register(
+            "master_key",
+            () -> DataComponentType.<Boolean>builder().persistent(Codec.BOOL).build()
+    );
+
+    public static final DataComponentType<List<String>> KEY_TRUSTED = register(
+            "key_trusted",
+            () -> DataComponentType.<List<String>>builder().persistent(Codec.STRING.listOf()).build()
+    );
+
+    private static <T> DataComponentType<T> register(String name, Supplier<DataComponentType<T>> supplier) {
+        return Registry.register(
+                BuiltInRegistries.DATA_COMPONENT_TYPE,
+                GCUtil.modIdentifier(name),
+                supplier.get()
+        );
+    }
+
+    public static void registerDataComponents() {
+        Constants.LOG.info("Registered GC Data Components");
+    }
+}

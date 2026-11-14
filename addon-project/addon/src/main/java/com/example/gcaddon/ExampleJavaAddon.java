@@ -1,7 +1,7 @@
 package com.example.gcaddon;
 
-import com.noahtnt2009.gallifreyan_chronicles.addon.api.AddonContext;
-import com.noahtnt2009.gallifreyan_chronicles.addon.api.GCAddon;
+import uk.nbforge.gallifreyan_chronicles.addon.api.AddonContext;
+import uk.nbforge.gallifreyan_chronicles.addon.api.GCAddon;
 import net.minecraft.world.item.Item;
 
 public class ExampleJavaAddon implements GCAddon {

@@ -1,0 +1,115 @@
+package uk.nbforge.gallifreyan_chronicles;
+
+import uk.nbforge.gallifreyan_chronicles.client.gui.hud.GCHudRenderer;
+import uk.nbforge.gallifreyan_chronicles.client.protection.watermark.WatermarkIdentity;
+import uk.nbforge.gallifreyan_chronicles.client.protection.watermark.WatermarkOverlay;
+import uk.nbforge.gallifreyan_chronicles.client.renderer.util.OutlineHider;
+import uk.nbforge.gallifreyan_chronicles.client.renderer.block.TardisConsoleBlockRenderer;
+import uk.nbforge.gallifreyan_chronicles.client.renderer.entity.TardisControlEntityRenderer;
+import uk.nbforge.gallifreyan_chronicles.client.renderer.entity.TardisKeyEntityRenderer;
+import uk.nbforge.gallifreyan_chronicles.client.renderer.block.InteriorDoorBlockRenderer;
+import uk.nbforge.gallifreyan_chronicles.client.renderer.block.TardisExteriorBlockRenderer;
+import uk.nbforge.gallifreyan_chronicles.core.GCBlockEntities;
+import uk.nbforge.gallifreyan_chronicles.core.GCBlocks;
+import uk.nbforge.gallifreyan_chronicles.core.GCEntityTypes;
+import uk.nbforge.gallifreyan_chronicles.network.client.GCFabricClientNetworking;
+import uk.nbforge.gallifreyan_chronicles.util.GCUtil;
+import uk.nbforge.gallifreyan_chronicles.compat.flashback.FlashbackOptionsButton;
+import uk.nbforge.gallifreyan_chronicles.compat.replaymod.ReplayModOptionsButton;
+import net.fabricmc.api.ClientModInitializer;
+import net.fabricmc.loader.api.FabricLoader;
+import net.fabricmc.fabric.api.client.rendering.v1.hud.HudElementRegistry;
+import net.fabricmc.fabric.api.client.rendering.v1.hud.VanillaHudElements;
+import net.fabricmc.fabric.api.client.rendering.v1.level.LevelRenderEvents;
+import net.fabricmc.fabric.api.item.v1.BlockTransformerHelper;
+import net.minecraft.client.renderer.blockentity.BlockEntityRenderers;
+import net.minecraft.client.renderer.entity.EntityRenderers;
+
+public class GallifreyanChroniclesFabricClient implements ClientModInitializer {
+    @Override
+    public void onInitializeClient() {
+        WatermarkIdentity.enabled();
+//        BlockColorRegistry.register(
+//                List.of(BlockTintSources.constant(0xFF590a0a, 0xFF590a0a)),
+//                GCBlocks.SHORT_GALLIFREYAN_GRASS,
+//                GCBlocks.TALL_GALLIFREYAN_GRASS
+//        );
+
+
+        BlockTransformerHelper.registerStripping(GCBlocks.CADONWOOD_LOG, GCBlocks.STRIPPED_CADONWOOD_LOG);
+        BlockEntityRenderers.register(GCBlockEntities.TARDIS_EXTERIOR_BLOCK_ENTITY_TYPE, TardisExteriorBlockRenderer::new);
+        BlockEntityRenderers.register(GCBlockEntities.TARDIS_CONSOLE_BLOCK_ENTITY_TYPE, TardisConsoleBlockRenderer::new);
+        BlockEntityRenderers.register(GCBlockEntities.INTERIOR_DOOR_BLOCK_ENTITY_TYPE, InteriorDoorBlockRenderer::new);
+        EntityRenderers.register(GCEntityTypes.TARDIS_CONTROL_ENTITY_TYPE, TardisControlEntityRenderer::new);
+        EntityRenderers.register(GCEntityTypes.TARDIS_KEY_ENTITY_TYPE, TardisKeyEntityRenderer::new);
+        GCFabricClientNetworking.registerClientNetworking();
+
+        if (FabricLoader.getInstance().isModLoaded("replaymod")) {
+            ReplayModOptionsButton.register();
+        }
+        if (FabricLoader.getInstance().isModLoaded("flashback")) {
+            FlashbackOptionsButton.register();
+        }
+
+        // Hide the selection outline on interior doors (returning false cancels the outline)
+        LevelRenderEvents.BEFORE_BLOCK_OUTLINE.register((_, hit) ->
+                !OutlineHider.shouldHide(hit.pos()));
+
+        HudElementRegistry.attachElementAfter(
+                VanillaHudElements.MISC_OVERLAYS,
+                GCUtil.modIdentifier("power_darkness"),
+                (graphics, _) -> GCHudRenderer.renderBelowHud(graphics)
+        );
+
+        HudElementRegistry.addLast(
+                GCUtil.modIdentifier("hud_overlay"),
+                (graphics, _) -> GCHudRenderer.render(graphics)
+        );
+
+        HudElementRegistry.addLast(
+                GCUtil.modIdentifier("watermark_overlay"),
+                (graphics, _) -> WatermarkOverlay.render(graphics)
+        );
+
+//        ImGuiMCEvents.INSTANCE.imGuiLoadPre(() -> {
+//            ImGui.getIO().addConfigFlags(
+//                    ImGuiConfigFlags.NavEnableKeyboard |
+//                            ImGuiConfigFlags.NavEnableGamepad |
+//                            ImGuiConfigFlags.NavEnableSetMousePos |
+//                            ImGuiConfigFlags.DockingEnable |
+//                            ImGuiConfigFlags.ViewportsEnable);
+//        });
+//        ImGuiMCEvents.INSTANCE.preRenderImGuiEvent(() -> {
+//            TardisExteriorDebugInfo.Info info = TardisExteriorDebugInfo.getLookedAt();
+//            Minecraft mc = Minecraft.getInstance();
+//            if (mc.player == null || mc.level == null) return;
+//
+//            HitResult hit = mc.player.pick(20.0, 0.0f, false);
+//            if (hit.getType() != HitResult.Type.BLOCK) return;
+//
+//            BlockHitResult blockHit = (BlockHitResult) hit;
+//            if (!(mc.level.getBlockEntity(blockHit.getBlockPos()) instanceof TardisExteriorBlockEntity tardisBE)) return;
+//            if (info != null) {
+//                ImGui.setNextWindowBgAlpha(0.6f);
+//                if (ImGui.begin("TARDIS Info",
+//                                ImGuiWindowFlags.NoFocusOnAppearing)) {
+//                    ImGui.text("TARDIS ID: " + (tardisBE.getTardisId() != null ? tardisBE.getTardisId() : "unlinked"));
+//                    ImGui.text("Current Exterior: " + tardisBE.getExterior().id());
+//
+//                    ImGui.text("Change Exterior:");
+//                    ArrayList<TardisExterior> exteriors = new ArrayList<>(TardisExteriorRegistry.getAll());
+//                    String[] exteriorNames = exteriors.stream().map(TardisExterior::id).toArray(String[]::new);
+//                    ImInt currentExteriorIndex = new ImInt(Math.max(0, exteriors.indexOf(tardisBE.getExterior())));
+//
+//                    if (ImGui.combo("##exterior", currentExteriorIndex, exteriorNames)) {
+//                        TardisExterior selected = exteriors.get(currentExteriorIndex.get());
+//                        tardisBE.setExterior(selected);
+//                    }
+//
+//                    ImGui.separator();
+//                }
+//                ImGui.end();
+//            }
+//        });
+    }
+}

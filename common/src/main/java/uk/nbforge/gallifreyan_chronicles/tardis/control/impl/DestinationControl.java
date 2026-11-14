@@ -1,0 +1,47 @@
+package uk.nbforge.gallifreyan_chronicles.tardis.control.impl;
+
+import uk.nbforge.gallifreyan_chronicles.tardis.Tardis;
+import uk.nbforge.gallifreyan_chronicles.core.block_entities.TardisConsoleBlockEntity;
+import uk.nbforge.gallifreyan_chronicles.core.entity.TardisControlEntity;
+import uk.nbforge.gallifreyan_chronicles.core.GCSounds;
+import uk.nbforge.gallifreyan_chronicles.tardis.control.BaseControl;
+import uk.nbforge.gallifreyan_chronicles.tardis.control.ControlAnimations;
+import net.minecraft.server.MinecraftServer;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.world.entity.player.Player;
+
+import java.util.UUID;
+
+public abstract class DestinationControl extends BaseControl {
+    protected DestinationControl(ControlAnimations animations) {
+        super(animations);
+    }
+
+    protected abstract boolean apply(MinecraftServer server, UUID tardisId, Player player);
+
+    protected boolean playsSound() {
+        return true;
+    }
+
+    @Override
+    public void playClickSound(TardisControlEntity entity) {
+        if (playsSound()) playSound(entity, GCSounds.SWITCH, 0.8f);
+    }
+
+    @Override
+    public InteractionResult onRightClick(TardisControlEntity entity, Player player, InteractionHand hand) {
+        TardisConsoleBlockEntity console = entity.getConsole();
+        if (console == null) return InteractionResult.FAIL;
+        if (!(entity.level() instanceof ServerLevel level)) return InteractionResult.SUCCESS;
+
+        UUID tardisId = linkedTardis(console).map(Tardis::id).orElse(null);
+        if (tardisId == null || !apply(level.getServer(), tardisId, player)) {
+            tell(player, "message.gallifreyan_chronicles.no_destination_to_set");
+            return InteractionResult.FAIL;
+        }
+
+        return InteractionResult.SUCCESS;
+    }
+}

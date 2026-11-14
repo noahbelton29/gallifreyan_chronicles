@@ -1,19 +1,19 @@
 {
   "how_common": 10,
-  "trust": {
-    "gained": 1.6,
-    "lost": 0.6
-  },
-  "trauma_taken": 1.5,
   "if_betrayed": {
+    "trauma_taken": 2.0,
     "trust_gained": 0.5,
-    "trust_lost": 1.5,
-    "trauma_taken": 2.0
+    "trust_lost": 1.5
   },
   "never_with": {
     "traits": [
       "distrusting"
     ]
   },
-  "revealed_when": "it_loses_trust"
+  "revealed_when": "it_loses_trust",
+  "trauma_taken": 1.5,
+  "trust": {
+    "gained": 1.6,
+    "lost": 0.6
+  }
 }

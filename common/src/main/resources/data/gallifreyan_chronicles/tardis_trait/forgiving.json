@@ -1,19 +1,19 @@
 {
-  "how_common": 10,
-  "stress": {
-    "builds_up": 1.15,
-    "calms_down": 1.6
-  },
   "fear": {
     "fades": 1.6
   },
+  "how_common": 10,
   "never_with": {
-    "traits": [
-      "grudge_holder"
-    ],
     "personalities": [
       "aggressive"
+    ],
+    "traits": [
+      "grudge_holder"
     ]
   },
-  "revealed_when": "it_lands_upset"
+  "revealed_when": "it_lands_upset",
+  "stress": {
+    "builds_up": 1.15,
+    "calms_down": 1.6
+  }
 }

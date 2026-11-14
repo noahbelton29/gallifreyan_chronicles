@@ -10,24 +10,24 @@
           "parameters": {
             "continentalness": [
               -1.0,
-              -0.2
+              -0.1
             ],
             "depth": [
-              -0.3,
-              0.3
-            ],
-            "erosion": [
               -0.4,
               0.4
             ],
+            "erosion": [
+              -0.5,
+              0.5
+            ],
             "humidity": [
-              0.2,
+              0.0,
               1.0
             ],
             "offset": 0.0,
             "temperature": [
-              -0.9,
-              0.1
+              -1.0,
+              0.2
             ],
             "weirdness": [
               -1.0,

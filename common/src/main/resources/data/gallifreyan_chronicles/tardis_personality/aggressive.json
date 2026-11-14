@@ -1,68 +1,26 @@
 {
   "how_common": 10,
-  "refuses_to_fly_when": {
-    "stress_above": 45,
-    "trust_below": 30
-  },
   "mallet": {
+    "fear_needed_to_obey": 65.0,
     "fear_per_hit": {
-      "min": 6,
-      "max": 15
+      "max": 15.0,
+      "min": 6.0
     },
-    "fear_needed_to_obey": 65,
-    "trauma_per_hit": 3.0,
     "hits_to_snap_out_of_terror": {
-      "min": 5,
-      "max": 8
-    }
+      "max": 8,
+      "min": 5
+    },
+    "trauma_per_hit": 3.0
   },
-  "when_unwilling_to_fly": [
-    {
-      "type": "fight",
-      "stress": 2
-    },
-    {
-      "type": "slam_doors",
-      "volume": 1.6,
-      "shake": 0.8,
-      "lock": true
-    },
-    {
-      "type": "reveal"
-    }
-  ],
-  "when_it_sees_the_mallet": [
-    {
-      "type": "sparks",
-      "size": "big",
-      "height": 1
-    },
-    {
-      "type": "shock",
-      "range": 4,
-      "damage": 2,
-      "push": 0.6,
-      "lift": 0.3
-    },
-    {
-      "type": "message",
-      "key": "mallet_seen_threatens",
-      "colour": "red"
-    },
-    {
-      "type": "slam_doors",
-      "volume": 1.4,
-      "shake": 0.6
-    },
-    {
-      "type": "reveal"
-    }
-  ],
+  "refuses_to_fly_when": {
+    "stress_above": 45.0,
+    "trust_below": 30.0
+  },
   "when_hit": [
     {
       "type": "hit_back",
-      "max_damage": 6,
-      "min_damage": 2,
+      "max_damage": 6.0,
+      "min_damage": 2.0,
       "push": 0.9
     },
     {
@@ -73,23 +31,65 @@
   "when_hit_while_terrified": [
     {
       "type": "savage",
-      "max_damage": 10,
-      "min_damage": 4,
-      "burn_seconds": 3
+      "burn_seconds": 3.0,
+      "max_damage": 10.0,
+      "min_damage": 4.0
     },
     {
       "type": "reveal",
       "if_it_reacted": true
     }
   ],
+  "when_it_sees_the_mallet": [
+    {
+      "type": "sparks",
+      "height": 1.0,
+      "size": "big"
+    },
+    {
+      "type": "shock",
+      "damage": 2.0,
+      "lift": 0.3,
+      "push": 0.6,
+      "range": 4.0
+    },
+    {
+      "type": "message",
+      "colour": "red",
+      "key": "mallet_seen_threatens"
+    },
+    {
+      "type": "slam_doors",
+      "shake": 0.6,
+      "volume": 1.4
+    },
+    {
+      "type": "reveal"
+    }
+  ],
+  "when_unwilling_to_fly": [
+    {
+      "type": "fight",
+      "stress": 2.0
+    },
+    {
+      "type": "slam_doors",
+      "lock": true,
+      "shake": 0.8,
+      "volume": 1.6
+    },
+    {
+      "type": "reveal"
+    }
+  ],
   "when_you_enter": [
     {
       "type": "lash_out",
       "from_severity": 0.35,
-      "min_damage": 2,
-      "max_damage": 6,
-      "push": 0.9,
-      "lift": 0.35
+      "lift": 0.35,
+      "max_damage": 6.0,
+      "min_damage": 2.0,
+      "push": 0.9
     },
     {
       "type": "reveal",

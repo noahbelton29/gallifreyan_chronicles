@@ -1,0 +1,40 @@
+package uk.nbforge.gallifreyan_chronicles.tardis.ecs.system;
+
+import uk.nbforge.gallifreyan_chronicles.ecs.Entity;
+import uk.nbforge.gallifreyan_chronicles.tardis.ecs.TardisComponentTypes;
+import uk.nbforge.gallifreyan_chronicles.tardis.ecs.component.TardisLinkComponent;
+import uk.nbforge.gallifreyan_chronicles.tardis.ecs.component.TardisComponent;
+import uk.nbforge.gallifreyan_chronicles.tardis.TardisManager;
+import net.minecraft.core.BlockPos;
+import net.minecraft.server.level.ServerLevel;
+
+import java.util.Optional;
+import java.util.UUID;
+
+public final class TardisLinkSystem {
+    private TardisLinkSystem() {
+    }
+
+    public static Optional<UUID> linkedTardisId(Entity entity) {
+        TardisLinkComponent link = entity.getOrNull(TardisComponentTypes.TARDIS_LINK);
+        return Optional.ofNullable(link).map(TardisLinkComponent::tardisId);
+    }
+
+    public static void link(Entity entity, UUID tardisId) {
+        entity.set(TardisComponentTypes.TARDIS_LINK, new TardisLinkComponent(tardisId));
+    }
+
+    public static void unlink(Entity entity) {
+        entity.remove(TardisComponentTypes.TARDIS_LINK);
+    }
+
+    public static TardisComponent registerNewTardis(Entity entity, ServerLevel level, UUID ownerId, String ownerName, BlockPos pos) {
+        TardisManager manager = TardisManager.get(level.getServer());
+        TardisComponent record = manager.create(ownerId, ownerName);
+        manager.setRegisteredBlockPos(record.tardisId(), pos);
+        manager.setExteriorDimension(record.tardisId(), level.dimension());
+
+        link(entity, record.tardisId());
+        return record;
+    }
+}

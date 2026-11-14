@@ -1,31 +1,31 @@
 {
   "how_common": 28,
   "mallet": {
-    "fear_per_hit": 15,
-    "fear_needed_to_obey": 0,
-    "trauma_per_hit": 5.0,
+    "fear_needed_to_obey": 0.0,
+    "fear_per_hit": 15.0,
     "hits_to_snap_out_of_terror": {
-      "min": 1,
-      "max": 2
-    }
-  },
-  "when_unwilling_to_fly": [],
-  "when_it_sees_the_mallet": [
-    {
-      "type": "sound",
-      "sound": "gallifreyan_chronicles:stop_demat",
-      "volume": 0.4,
-      "pitch": 1.6
+      "max": 2,
+      "min": 1
     },
-    {
-      "type": "message",
-      "key": "mallet_seen_flinch",
-      "colour": "gray"
-    }
-  ],
+    "trauma_per_hit": 5.0
+  },
   "when_hit": [
     {
       "type": "reveal"
     }
-  ]
+  ],
+  "when_it_sees_the_mallet": [
+    {
+      "type": "sound",
+      "pitch": 1.6,
+      "sound": "gallifreyan_chronicles:stop_demat",
+      "volume": 0.4
+    },
+    {
+      "type": "message",
+      "colour": "gray",
+      "key": "mallet_seen_flinch"
+    }
+  ],
+  "when_unwilling_to_fly": []
 }

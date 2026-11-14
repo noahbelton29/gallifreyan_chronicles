@@ -1,17 +1,17 @@
 {
   "how_common": 10,
-  "refuses_strangers_sooner_by": 15,
-  "trust": {
-    "gained": 1.2,
-    "strangers_start_at": 25
-  },
   "never_with": {
-    "traits": [
-      "welcoming"
-    ],
     "personalities": [
       "obedient"
+    ],
+    "traits": [
+      "welcoming"
     ]
   },
-  "revealed_when": "a_stranger_upsets_it"
+  "refuses_strangers_sooner_by": 15.0,
+  "revealed_when": "a_stranger_upsets_it",
+  "trust": {
+    "gained": 1.2,
+    "strangers_start_at": 25.0
+  }
 }

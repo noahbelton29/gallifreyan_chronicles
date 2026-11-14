@@ -1,18 +1,18 @@
 {
   "how_common": 10,
-  "refuses_sooner_by": 8,
-  "trauma_taken": 0.75,
-  "trust": {
-    "lost": 0.85
-  },
   "never_with": {
-    "traits": [
-      "welcoming"
-    ],
     "personalities": [
       "obedient",
       "submissive"
+    ],
+    "traits": [
+      "welcoming"
     ]
   },
-  "revealed_when": "it_refuses"
+  "refuses_sooner_by": 8.0,
+  "revealed_when": "it_refuses",
+  "trauma_taken": 0.75,
+  "trust": {
+    "lost": 0.85
+  }
 }

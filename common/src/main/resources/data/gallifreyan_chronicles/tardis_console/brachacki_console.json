@@ -1,223 +1,83 @@
 {
+  "controls": [
+    {
+      "cooldown": 0.75,
+      "id": "change_increment"
+    },
+    {
+      "cooldown": 1.5,
+      "id": "cloak_control"
+    },
+    {
+      "animation": false,
+      "cooldown": 0.5,
+      "id": "dimension_selector"
+    },
+    {
+      "cooldown": 0.5,
+      "id": "door_control"
+    },
+    {
+      "cooldown": 3.35,
+      "id": "interior_door_control"
+    },
+    {
+      "cooldown": 0.5,
+      "id": "door_lock"
+    },
+    {
+      "cooldown": 1.5,
+      "id": "flight_lever"
+    },
+    {
+      "cooldown": 1.5,
+      "id": "handbrake"
+    },
+    {
+      "cooldown": 1.5,
+      "id": "power_lever"
+    },
+    {
+      "cooldown": 1,
+      "id": "x_increment"
+    },
+    {
+      "cooldown": 1,
+      "id": "y_increment"
+    },
+    {
+      "cooldown": 1,
+      "id": "z_increment"
+    },
+    {
+      "cooldown": 0.5,
+      "id": "isomorphic_control"
+    },
+    {
+      "animation": false,
+      "cooldown": 0.5,
+      "id": "direction_control"
+    }
+  ],
   "default_variant": "first_doctors_console",
   "glow_groups": [
     {
-      "name": "lights",
+      "fade_ticks": 8,
       "frames": 4,
       "hold_ticks": 30,
-      "fade_ticks": 8
+      "name": "lights"
     },
     {
-      "name": "buttons",
+      "fade_ticks": 8,
       "frames": 4,
       "hold_ticks": 60,
-      "fade_ticks": 8
+      "name": "buttons"
     },
     {
-      "name": "rotor",
+      "fade_ticks": 8,
       "frames": 4,
       "hold_ticks": 50,
-      "fade_ticks": 8
-    }
-  ],
-  "controls": [
-    {
-      "id": "change_increment",
-      "position": [
-        0.9236,
-        0.6094,
-        -0.4538
-      ],
-      "size": [
-        0.175,
-        0.125,
-        0.125
-      ],
-      "cooldown": 0.75
-    },
-    {
-      "id": "cloak_control",
-      "position": [
-        -0.525,
-        0.6875,
-        -0.5
-      ],
-      "size": [
-        0.0625,
-        0.1875,
-        0.0625
-      ],
-      "cooldown": 1.5
-    },
-    {
-      "id": "dimension_selector",
-      "position": [
-        0.7173,
-        0.5344,
-        -0.7538
-      ],
-      "size": [
-        0.1375,
-        0.1625,
-        0.125
-      ],
-      "cooldown": 0.5,
-      "animation": false
-    },
-    {
-      "id": "door_control",
-      "position": [
-        -0.3437,
-        0.5592,
-        1.0224
-      ],
-      "size": [
-        0.125,
-        0.125,
-        0.125
-      ],
-      "cooldown": 0.5
-    },
-    {
-      "id": "interior_door_control",
-      "position": [
-        1.0237,
-        0.5653,
-        0.388
-      ],
-      "size": [
-        0.125,
-        0.125,
-        0.1875
-      ],
-      "cooldown": 3.35
-    },
-    {
-      "id": "door_lock",
-      "position": [
-        0.2188,
-        0.5592,
-        1.0224
-      ],
-      "size": [
-        0.125,
-        0.125,
-        0.125
-      ],
-      "cooldown": 0.5
-    },
-    {
-      "id": "flight_lever",
-      "position": [
-        0.3125,
-        0.5597,
-        -0.9512
-      ],
-      "size": [
-        0.125,
-        0.1875,
-        0.1875
-      ],
-      "cooldown": 1.5
-    },
-    {
-      "id": "handbrake",
-      "position": [
-        0.0625,
-        0.5597,
-        -0.9512
-      ],
-      "size": [
-        0.125,
-        0.1875,
-        0.1875
-      ],
-      "cooldown": 1.5
-    },
-    {
-      "id": "power_lever",
-      "position": [
-        -0.7994,
-        0.5847,
-        -0.4624
-      ],
-      "size": [
-        0.125,
-        0.1875,
-        0.1875
-      ],
-      "cooldown": 1.5
-    },
-    {
-      "id": "x_increment",
-      "position": [
-        1.0923,
-        0.5406,
-        -0.1382
-      ],
-      "size": [
-        0.15,
-        0.1563,
-        0.1063
-      ],
-      "cooldown": 1
-    },
-    {
-      "id": "y_increment",
-      "position": [
-        0.9486,
-        0.5719,
-        -0.2445
-      ],
-      "size": [
-        0.15,
-        0.1563,
-        0.1063
-      ],
-      "cooldown": 1
-    },
-    {
-      "id": "z_increment",
-      "position": [
-        0.6236,
-        0.6719,
-        -0.3663
-      ],
-      "size": [
-        0.15,
-        0.1563,
-        0.15
-      ],
-      "cooldown": 1
-    },
-    {
-      "id": "isomorphic_control",
-      "position": [
-        -0.0312,
-        0.5592,
-        1.0224
-      ],
-      "size": [
-        0.25,
-        0.125,
-        0.125
-      ],
-      "cooldown": 0.5
-    },
-    {
-      "id": "direction_control",
-      "position": [
-        0.7715,
-        0.6968,
-        0.168
-      ],
-      "size": [
-        0.125,
-        0.1875,
-        0.1875
-      ],
-      "cooldown": 0.5,
-      "animation": false
+      "name": "rotor"
     }
   ]
 }

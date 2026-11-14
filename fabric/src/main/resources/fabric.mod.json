@@ -19,20 +19,20 @@
     "environment": "*",
     "entrypoints": {
         "voicechat": [
-            "com.noahtnt2009.gallifreyan_chronicles.compat.voicechat.TardisVoicePlugin"
+            "uk.nbforge.gallifreyan_chronicles.compat.voicechat.TardisVoicePlugin"
         ],
         "main": [
-            "com.noahtnt2009.gallifreyan_chronicles.GallifreyanChroniclesFabric"
+            "uk.nbforge.gallifreyan_chronicles.GallifreyanChroniclesFabric"
         ],
         "client": [
-            "com.noahtnt2009.gallifreyan_chronicles.GallifreyanChroniclesFabricClient"
+            "uk.nbforge.gallifreyan_chronicles.GallifreyanChroniclesFabricClient"
         ],
         "modmenu": [
-            "com.noahtnt2009.gallifreyan_chronicles.compat.modmenu.GCModMenuIntegration"
+            "uk.nbforge.gallifreyan_chronicles.compat.modmenu.GCModMenuIntegration"
         ],
-        "jade": ["com.noahtnt2009.gallifreyan_chronicles.compat.jade.GCJadePlugin"],
+        "jade": ["uk.nbforge.gallifreyan_chronicles.compat.jade.GCJadePlugin"],
         "sodium:config_api_user": [
-            "com.noahtnt2009.gallifreyan_chronicles.compat.sodium.GCSodiumConfig"
+            "uk.nbforge.gallifreyan_chronicles.compat.sodium.GCSodiumConfig"
         ]
     },
     "mixins": [

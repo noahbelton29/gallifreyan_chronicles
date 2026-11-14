@@ -1,9 +1,9 @@
 {
   "parent": "gallifreyan_chronicles:brachacki_doors",
-  "texture": "gallifreyan_chronicles:brachacki_doors/second_doctors_doors",
-  "open_sound": "gallifreyan_chronicles:hartnell_door",
+  "block": "gallifreyan_chronicles:second_doctors_door",
   "close_sound": "gallifreyan_chronicles:hartnell_door",
   "open_all_only": true,
-  "block": "gallifreyan_chronicles:second_doctors_door",
-  "priority": 2
+  "open_sound": "gallifreyan_chronicles:hartnell_door",
+  "priority": 2,
+  "texture": "gallifreyan_chronicles:brachacki_doors/second_doctors_doors"
 }

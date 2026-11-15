@@ -15,10 +15,11 @@ import qouteall.imm_ptl.core.chunk_loading.ImmPtlClientChunkMap;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicReferenceArray;
 
-/* when you start recording, flashback saves the chunks that are already loaded.
-   it reads them from the vanilla chunk array, but immersive portals keeps
-   its chunks somewhere else, so that array is empty and the replay had no world.
-   here we give flashback immersive portals' chunks instead. */
+/**
+   When you start recording Flashback saves the chunks that are already loaded.
+   It reads them from the vanilla chunk array but Immersive Portals keeps its chunks somewhere else, so that array is empty and the replay had no world.
+   Here we give Flashback the chunks of Immersive Portals instead.
+*/
 @Pseudo
 @Mixin(targets = "com.moulberry.flashback.record.Recorder", remap = false)
 public abstract class RecordImmPtlChunksMixin {

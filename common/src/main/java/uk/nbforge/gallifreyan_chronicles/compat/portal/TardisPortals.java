@@ -313,6 +313,7 @@ public final class TardisPortals {
         tickTardis(server, tardisId);
     }
 
+    /** Runs every tick for one TARDIS, keeps the location of its door up to date and makes sure a portal links the exterior to the door. */
     private static void tickTardis(MinecraftServer server, UUID tardisId) {
         Tardis tardis = TardisApi.get(server, tardisId).orElse(null);
         InteriorDoorBlockEntity door = findDoor(tardisId);
@@ -333,6 +334,7 @@ public final class TardisPortals {
         Placement placement = placementOf(server, exterior, DOORS.get(tardisId));
         Link link = LINKS.get(tardisId);
 
+        // No place for the portal right now, wait a short while before dropping the link in case the door is only missing for a moment
         if (placement == null) {
             boolean definitelyGone = doorDestroyed && !DOORS.containsKey(tardisId)
                     || exterior != null && (exterior.isTravelling() || exterior.isFullyInvisible());
@@ -436,7 +438,7 @@ public final class TardisPortals {
         Direction right = InteriorDoorBlock.rightDirectionOf(placement.doorFacing(), flipped);
         Direction facing = placement.doorFacing();
 
-        /* portal bones from the models, old numbers if a model has none */
+        // Portal bones from the models, old numbers if a model has none
         PortalBone exteriorBone = PortalBone.of(placement.exteriorModel());
         PortalBone doorBone = PortalBone.of(placement.doorModel());
         double width = exteriorBone != null ? exteriorBone.width() : PORTAL_WIDTH;
@@ -444,7 +446,7 @@ public final class TardisPortals {
         Vec3 exteriorOffset = exteriorBone != null
                 ? new Vec3(exteriorBone.x(), exteriorBone.centerY(), exteriorBone.front() - PORTAL_GAP)
                 : EXTERIOR_PORTAL_OFFSET;
-        /* same size both ends, interior lines up on its bottom */
+        // Same size at both ends and the interior lines up on its bottom
         Vec3 doorLocal = doorBone != null
                 ? new Vec3(doorBone.x(), doorBone.bottom() + height / 2.0, doorBone.back() + PORTAL_GAP)
                 : INTERIOR_PORTAL_OFFSET;
@@ -606,6 +608,11 @@ public final class TardisPortals {
         return new Vec3[]{up.cross(normal), up, normal};
     }
 
+    /**
+       Works out the rotation that turns the source directions into the destination ones.
+       The destination x and z are flipped because the portal faces the other way.
+       It is built from a matrix and turned into an axis and an angle, with special cases for no turn and a half turn.
+    */
     private static DQuaternion transformation(Vec3[] source, Vec3[] destination) {
         Vec3[] target = {destination[0].scale(-1.0), destination[1], destination[2].scale(-1.0)};
         double[][] m = new double[3][3];

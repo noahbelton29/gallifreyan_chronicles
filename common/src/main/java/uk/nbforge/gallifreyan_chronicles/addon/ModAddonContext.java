@@ -38,7 +38,7 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.regex.Pattern;
 
-/* what one addon gets. all its stuff is tagged with its id */
+/** What one addon gets, everything it adds is tagged with its id. */
 final class ModAddonContext implements AddonContext {
     private static final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
     private static final Pattern NAME = Pattern.compile("[a-z0-9_./-]+");
@@ -75,6 +75,7 @@ final class ModAddonContext implements AddonContext {
         return Services.PLATFORM.isModLoaded(modId);
     }
 
+    /** The folder of this addon inside the config folder, made if it is missing. */
     @Override
     public Path dataFolder() {
         Path path = Services.PLATFORM.getConfigDir().resolve(Constants.MOD_ID).resolve("addons").resolve(addonId);
@@ -86,6 +87,7 @@ final class ModAddonContext implements AddonContext {
         return path;
     }
 
+    /** Reads config.json of the addon, an empty config if the file is missing or broken. */
     @Override
     public JsonObject loadConfig() {
         Path file = dataFolder().resolve("config.json");
@@ -98,6 +100,7 @@ final class ModAddonContext implements AddonContext {
         }
     }
 
+    /** Writes config.json of the addon. */
     @Override
     public void saveConfig(JsonObject config) {
         Path file = dataFolder().resolve("config.json");
@@ -116,6 +119,7 @@ final class ModAddonContext implements AddonContext {
         return Identifier.fromNamespaceAndPath(addonId, path);
     }
 
+    /** Registers an item under the id of the addon and adds it to the addons tab. */
     @Override
     public <T extends Item> T registerItem(String name, Function<Item.Properties, T> factory) {
         Identifier id = id(name);
@@ -142,6 +146,7 @@ final class ModAddonContext implements AddonContext {
         return block;
     }
 
+    /** Registers a block under the id of the addon, no item is made for it. */
     @Override
     public Block registerBlockWithoutItem(String name, Function<BlockBehaviour.Properties, Block> factory) {
         Identifier id = id(name);
@@ -149,18 +154,21 @@ final class ModAddonContext implements AddonContext {
                 factory.apply(BlockBehaviour.Properties.of().setId(ResourceKey.create(Registries.BLOCK, id))));
     }
 
+    /** Registers a sound that gets quieter with distance the normal way. */
     @Override
     public SoundEvent registerSound(String name) {
         Identifier id = id(name);
         return Registry.register(BuiltInRegistries.SOUND_EVENT, id, SoundEvent.createVariableRangeEvent(id));
     }
 
+    /** Registers a sound that can be heard up to range blocks. */
     @Override
     public SoundEvent registerSound(String name, float range) {
         Identifier id = id(name);
         return Registry.register(BuiltInRegistries.SOUND_EVENT, id, SoundEvent.createFixedRangeEvent(id, range));
     }
 
+    /** Registers a control, the id must be lower case letters, digits and underscores, start with the prefix of the addon and not be taken already. */
     @Override
     public <T extends TardisControl> void registerControl(String id, MapCodec<T> codec, T control) {
         if (!CONTROL_ID.matcher(id).matches() || !id.startsWith(controlPrefix) || id.length() == controlPrefix.length()) {
@@ -184,6 +192,7 @@ final class ModAddonContext implements AddonContext {
         TardisEvents.LAND.register(guard("land", listener, TardisEvents.LAND));
     }
 
+    /** Runs the action on the server after delayTicks, if it throws the error is logged and nothing crashes. */
     @Override
     public void runLater(MinecraftServer server, int delayTicks, Runnable action) {
         GCSchedulerUtil.runLater(server, delayTicks, () -> {
@@ -196,11 +205,12 @@ final class ModAddonContext implements AddonContext {
         });
     }
 
-    /* catches errors from the addon, drops the listener after too many */
+    /** Catches errors from the addon and drops the listener after too many. */
     private Consumer<Tardis> guard(String eventName, Consumer<Tardis> listener, TardisEvents.Event event) {
         return new Consumer<>() {
             private int failures;
 
+            /** Runs the listener and logs it if it throws, after too many failures the listener is removed. */
             @Override
             public void accept(Tardis tardis) {
                 try {

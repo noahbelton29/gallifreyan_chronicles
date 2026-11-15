@@ -13,7 +13,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 
-/** Base for providers that write one data pack JSON per entry into a mod data folder. */
+/** Base for providers that write one data pack json per entry into a mod data folder. */
 public abstract class GCJsonDataProvider implements DataProvider {
     private final PackOutput.PathProvider pathProvider;
     private final String label;
@@ -26,7 +26,7 @@ public abstract class GCJsonDataProvider implements DataProvider {
 
     protected abstract void addEntries();
 
-    /** "tuat_doors" becomes "gallifreyan_chronicles:tuat_doors"; ids that already have a namespace are kept. */
+    /** Adds the mod namespace to an id that has none, ids that already have one are kept. */
     protected static String mod(String id) {
         return id.contains(":") ? id : uk.nbforge.gallifreyan_chronicles.Constants.MOD_ID + ":" + id;
     }

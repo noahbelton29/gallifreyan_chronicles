@@ -4,8 +4,10 @@ import uk.nbforge.gallifreyan_chronicles.platform.Services;
 import net.minecraft.client.Minecraft;
 import net.minecraft.server.MinecraftServer;
 
-/* tells you if we're watching a flashback replay with immersive portals installed.
-   the replay runs on a flashback server inside the game, so we check its class name */
+/**
+   Tells you if we are watching a Flashback replay with Immersive Portals installed.
+   The replay runs on a Flashback server inside the game so we check its class name.
+*/
 public final class PortalReplay {
     private static final boolean PORTALS = Services.PLATFORM.isModLoaded("seamlessportals");
 

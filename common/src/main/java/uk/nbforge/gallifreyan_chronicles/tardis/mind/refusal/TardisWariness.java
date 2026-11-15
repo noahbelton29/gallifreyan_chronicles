@@ -4,7 +4,7 @@ import uk.nbforge.gallifreyan_chronicles.tardis.mind.MindMessages;
 import uk.nbforge.gallifreyan_chronicles.tardis.mind.FearLevel;
 import uk.nbforge.gallifreyan_chronicles.tardis.mind.data.MindEnums;
 
-import uk.nbforge.gallifreyan_chronicles.tardis.mind.TardisMindSystem;
+import uk.nbforge.gallifreyan_chronicles.tardis.ecs.system.TardisMindSystem;
 import uk.nbforge.gallifreyan_chronicles.tardis.mind.discovery.TardisDiscovery;
 
 import uk.nbforge.gallifreyan_chronicles.core.block_entities.TardisConsoleBlockEntity;
@@ -21,62 +21,36 @@ import net.minecraft.util.Mth;
 import net.minecraft.world.entity.player.Player;
 
 /**
- * Handles control refusal based on the TARDIS's trust in the player.
- *
- * <p>Low trust makes controls more likely to stick or refuse to move.
- * Repeated attempts can gradually improve trust and reduce the chance of refusal.
- */
+   Controls refuse or stick depending on how much the TARDIS trusts the player.
+   Low trust makes controls stick more, and repeated tries slowly build trust and lower the chance.
+*/
 public final class TardisWariness {
 
-    /**
-     * Trust below this value causes controls to always refuse.
-     */
+    // Below this trust controls always refuse
     public static final float HOSTILE = 5f;
 
-    /**
-     * Trust below this value causes controls to have a higher chance of refusing.
-     */
+    // Below this trust controls are much more likely to refuse
     public static final float WARY = 20f;
 
-    /**
-     * Trust below this value causes a small chance of refusal.
-     */
+    // Below this trust there is a small chance of refusal
     public static final float CAUTIOUS = 35f;
 
-    /**
-     * Maximum chance of a control sticking while the TARDIS is wary.
-     */
+    // Highest chance of a control sticking while wary
     private static final float WARY_MAX_JAM = 0.6f;
 
-    /**
-     * Minimum chance of a control sticking while the TARDIS is wary.
-     */
+    // Lowest chance of a control sticking while wary
     private static final float WARY_MIN_JAM = 0.25f;
 
-    /**
-     * Chance of a control sticking while the TARDIS is cautious.
-     */
+    // Chance of a control sticking while cautious
     private static final float CAUTIOUS_JAM = 0.1f;
 
-    /**
-     * Trust gained when a control sticks, if the TARDIS is not afraid.
-     */
+    // Trust gained when a control sticks, if it is not afraid
     private static final float TRUST_PER_JAM = 2f;
 
     private TardisWariness() {
     }
 
-    /**
-     * Checks whether a TARDIS control refuses to move.
-     *
-     * <p>Refusal depends on the TARDIS's trust in the player and whether
-     * the TARDIS is currently terrified of them.
-     *
-     * @param control control entity being used
-     * @param console console containing the control
-     * @param player  player attempting to use the control
-     * @return {@code true} if the control refuses to move
-     */
+    /** Refusal depends on the trust and on whether the TARDIS is terrified of the player. */
     public static boolean jams(TardisControlEntity control, TardisConsoleBlockEntity console, Player player) {
         if (!(control.level() instanceof ServerLevel level)) return false;
 
@@ -94,7 +68,7 @@ public final class TardisWariness {
 
         float trust = TardisMindSystem.trust(tardis, player.getUUID());
 
-        /* afraid of you: controls stick more even if it trusts you */
+        // Afraid of you, controls stick more even if it trusts you
         float chance = jamChance(trust);
         if (TardisMindSystem.fearLevel(tardis, player.getUUID()).atLeast(FearLevel.AFRAID))
             chance = Math.min(1f, chance + AFRAID_JAM);
@@ -107,7 +81,7 @@ public final class TardisWariness {
 
         TardisDiscovery.reveal(tardis, MindEnums.Reveal.ITS_CONTROLS_STICK);
 
-        // A successful refusal can improve trust, unless the TARDIS is afraid of the player.
+        // A refusal can build trust unless the TARDIS is afraid of the player
         if (trust < CAUTIOUS && !TardisMindSystem.afraidOf(tardis, player.getUUID())) {
             TardisMindSystem.addTrust(tardis, player.getUUID(), TRUST_PER_JAM);
         }
@@ -115,22 +89,13 @@ public final class TardisWariness {
         return true;
     }
 
-    /**
-     * Calculates the chance of a control sticking based on the player's trust.
-     *
-     * <p>Hostile trust always causes refusal, wary trust gradually reduces
-     * the chance, cautious trust has a small fixed chance, and higher trust
-     * prevents controls from sticking.
-     *
-     * @param trust current trust value
-     * @return chance of the control sticking, between {@code 0.0} and {@code 1.0}
-     */
+    // Chance of a control sticking while the TARDIS is afraid of the player
     private static final float AFRAID_JAM = 0.2f;
 
     public static float jamChance(float trust) {
         if (trust < HOSTILE) return 1f;
 
-        // Interpolate between the two chances as trust improves.
+        // Moves between the two chances as trust improves
         if (trust < WARY) {
             return Mth.lerp((trust - HOSTILE) / (WARY - HOSTILE), WARY_MAX_JAM, WARY_MIN_JAM);
         }

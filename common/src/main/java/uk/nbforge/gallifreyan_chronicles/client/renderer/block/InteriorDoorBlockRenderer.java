@@ -35,10 +35,13 @@ import uk.nbforge.gallifreyan_chronicles.client.renderer.util.RenderLevelGuard;
 public class InteriorDoorBlockRenderer extends GeoBlockRenderer<@NotNull InteriorDoorBlockEntity, @NotNull TardisExteriorBlockRenderState> {
     public static final DataTicket<String> VARIANT = DataTicket.create("interior_door_variant", String.class);
     public static final DataTicket<String> TEXTURE_ID = DataTicket.create("interior_door_texture_id", String.class);
+    public static final DataTicket<String> ROUNDEL = DataTicket.create("interior_door_roundel", String.class);
     public static final DataTicket<Boolean> FLIPPED = DataTicket.create("interior_door_flipped", Boolean.class);
     public static final DataTicket<Boolean> FLUSH = DataTicket.create("interior_door_flush", Boolean.class);
     public static final DataTicket<Float> YAW = DataTicket.create("interior_door_yaw", Float.class);
     public static final DataTicket<Float> REMAT = DataTicket.create("interior_door_remat_opacity", Float.class);
+
+    private static final java.util.Set<Identifier> LOGGED_SKINS = new java.util.HashSet<>();
 
     public InteriorDoorBlockRenderer(BlockEntityRendererProvider.Context context) {
         super(context, new InteriorDoorBlockModel());
@@ -56,6 +59,7 @@ public class InteriorDoorBlockRenderer extends GeoBlockRenderer<@NotNull Interio
         RenderLevelGuard.tag(renderState, animatable.getLevel());
         renderState.addGeckolibData(VARIANT, animatable.getVariant());
         renderState.addGeckolibData(TEXTURE_ID, animatable.getTextureId());
+        renderState.addGeckolibData(ROUNDEL, animatable.getRoundelBlock());
         renderState.addGeckolibData(YAW, animatable.getFacing().toYRot());
         renderState.addGeckolibData(FLIPPED, animatable.isFlipped());
         renderState.addGeckolibData(FLUSH, animatable.isFlush());
@@ -110,11 +114,11 @@ public class InteriorDoorBlockRenderer extends GeoBlockRenderer<@NotNull Interio
     @Override
     public void adjustModelBonesForRender(@NonNull RenderPassInfo<TardisExteriorBlockRenderState> renderPassInfo, @NonNull BoneSnapshots snapshots) {
         super.adjustModelBonesForRender(renderPassInfo, snapshots);
-        /* portal bone is only a marker */
+        // The portal bone is only a marker
         snapshots.ifPresent(PortalBone.BONE_NAME, snapshot -> snapshot.skipRender(true));
     }
 
-    /* fades with the interior while it materialises around you, like the exterior does */
+    /** Fades with the interior while it materialises around you, like the exterior does. */
     @Override
     public int getRenderColor(InteriorDoorBlockEntity animatable, @Nullable Void relatedObject, float partialTick) {
         int color = super.getRenderColor(animatable, relatedObject, partialTick);
@@ -126,8 +130,15 @@ public class InteriorDoorBlockRenderer extends GeoBlockRenderer<@NotNull Interio
     public @Nullable RenderType getRenderType(TardisExteriorBlockRenderState renderState, Identifier texture) {
         float opacity = renderState.getOrDefaultGeckolibData(REMAT, 1.0f);
         if (opacity <= 0.0f) return null;
-        if (opacity < 1.0f) return RenderTypes.entityTranslucentCull(texture);
-        return super.getRenderType(renderState, texture);
+        // Ask for the texture here and do not trust the one passed in so a roundel style always shows
+        Identifier skin = InteriorDoorBlockModel.textureFor(renderState);
+        if (!skin.equals(texture) || skin.getPath().startsWith("dynamic/")) {
+            if (LOGGED_SKINS.add(skin)) {
+                uk.nbforge.gallifreyan_chronicles.Constants.LOG.info("Interior door is drawn with {} (GeckoLib offered {})", skin, texture);
+            }
+        }
+        if (opacity < 1.0f) return RenderTypes.entityTranslucentCull(skin);
+        return super.getRenderType(renderState, skin);
     }
 
     @Override

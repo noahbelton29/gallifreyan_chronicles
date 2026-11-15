@@ -36,7 +36,6 @@ public final class DoorBlockJson {
     private DoorBlockJson() {
     }
 
-    /* every door block to register, in priority order */
     public static List<Entry> entries() {
         if (entries != null) return entries;
         List<Entry> found = new ArrayList<>();
@@ -53,7 +52,6 @@ public final class DoorBlockJson {
         return entries = List.copyOf(found);
     }
 
-    /* every door variant json the mod ships, decoded with the codec, by priority then id */
     public static List<TardisDoorVariant> bundledVariants() {
         if (variants != null) return variants;
         List<TardisDoorVariant> found = new ArrayList<>();
@@ -88,7 +86,7 @@ public final class DoorBlockJson {
         return variants = List.copyOf(found);
     }
 
-    /* datagen can't look up folders, only files, so find a shipped file and use its folder */
+    /** Datagen cannot look up folders, only files, so find a shipped file and use its folder. */
     private static @Nullable URL folderUrl() throws Exception {
         URL url = DoorBlockJson.class.getResource(FOLDER);
         if (url != null) return url;
@@ -100,7 +98,7 @@ public final class DoorBlockJson {
         return sourceFolderUrl();
     }
 
-    /* last resort in dev: walk up from the run folder to common's resources */
+    /** Last resort in dev, walk up from the run folder to the resources of common. */
     private static @Nullable URL sourceFolderUrl() throws Exception {
         for (Path dir = Path.of("").toAbsolutePath(); dir != null; dir = dir.getParent()) {
             Path folder = dir.resolve("common/src/main/resources" + FOLDER);

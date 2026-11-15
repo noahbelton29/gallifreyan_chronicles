@@ -10,7 +10,7 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
-/* voxy should leave tardis dimensions alone */
+/** Voxy should leave TARDIS dimensions alone. */
 @Pseudo
 @Mixin(targets = "me.cortex.voxy.commonImpl.WorldIdentifier", remap = false)
 public abstract class VoxyTardisLodMixin {

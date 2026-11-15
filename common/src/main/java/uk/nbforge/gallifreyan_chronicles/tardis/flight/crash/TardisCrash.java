@@ -20,7 +20,6 @@ import net.minecraft.core.Direction;
 
 import uk.nbforge.gallifreyan_chronicles.util.CrackedBlockUtil;
 
-
 import uk.nbforge.gallifreyan_chronicles.core.block_entities.TardisExteriorBlockEntity;
 import uk.nbforge.gallifreyan_chronicles.core.GCGameRules;
 import uk.nbforge.gallifreyan_chronicles.network.tardis.TardisCrashRumblePayload;
@@ -28,7 +27,7 @@ import uk.nbforge.gallifreyan_chronicles.network.tardis.TardisDrumShakePayload;
 import uk.nbforge.gallifreyan_chronicles.tardis.Tardis;
 import uk.nbforge.gallifreyan_chronicles.tardis.mind.mood.TardisAlarm;
 import uk.nbforge.gallifreyan_chronicles.tardis.mind.discovery.TardisDiscovery;
-import uk.nbforge.gallifreyan_chronicles.tardis.mind.TardisMindSystem;
+import uk.nbforge.gallifreyan_chronicles.tardis.ecs.system.TardisMindSystem;
 import uk.nbforge.gallifreyan_chronicles.util.GCSchedulerUtil;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.ParticleTypes;
@@ -57,7 +56,6 @@ public final class TardisCrash {
         return CRASHING.contains(tardis.id());
     }
 
-
     public static void reset() {
         CRASHING.clear();
     }
@@ -65,8 +63,10 @@ public final class TardisCrash {
     private static final float EMERGENCY_IMPACT_SHAKE = 2.5F;
     private static final float EMERGENCY_TRAUMA = 1f;
 
-    /* a stressed tardis losing its grip. very shaky, smoke and the odd spark, then one bump when it lands.
-       no fire, no damage, no repair needed */
+    /**
+       A stressed TARDIS losing its grip, very shaky with smoke and the odd spark and then one bump when it lands.
+       No fire, no damage and no repair needed.
+    */
     public static void emergency(Tardis tardis, ServerLevel interior, BlockPos consolePos, int landingTicks) {
         CRASHING.add(tardis.id());
         TardisMindSystem.setTrauma(tardis, TardisMindSystem.trauma(tardis) + EMERGENCY_TRAUMA);
@@ -93,7 +93,7 @@ public final class TardisCrash {
         }
     }
 
-    /* one explosion as it hits the ground, softer than a crash */
+    /** One explosion as it hits the ground, softer than a crash. */
     private static void emergencyImpact(Tardis tardis, ServerLevel interior, Vec3 console) {
         CRASHING.remove(tardis.id());
         float protection = protection(tardis);
@@ -117,7 +117,7 @@ public final class TardisCrash {
         TardisMindSystem.addStress(tardis, CRASH_STRESS);
         TardisDiscovery.reveal(tardis, MindEnums.Reveal.IT_CRASHES);
         int flashes = landingTicks / TardisAlarm.FLASH_TICKS + 1;
-        /* the alarm always goes off inside, even if the crash started from a console somewhere else */
+        // The alarm always goes off inside, even if the crash started from a console somewhere else
         TardisAlarm.flashLoud(tardis.interiorLevel().orElse(interior), flashes);
 
         Vec3 console = Vec3.atCenterOf(consolePos);
@@ -132,6 +132,7 @@ public final class TardisCrash {
         GCSchedulerUtil.runLater(interior.getServer(), landingTicks + SETTLE_DELAY_TICKS, () -> HaywireControls.settle(tardis));
     }
 
+    /** One bump of the crash, scrambles the controls, damages the interior if griefing is on and throws out smoke and fire. */
     private static void bump(Tardis tardis, ServerLevel level, Vec3 console, float progress) {
         RandomSource random = level.getRandom();
         HaywireControls.flick(tardis, random);
@@ -144,13 +145,13 @@ public final class TardisCrash {
         level.sendParticles(ParticleTypes.FLAME, console.x, console.y + 0.5, console.z, 30, 6.0, 1.0, 6.0, 0.02);
         level.sendParticles(ParticleTypes.LAVA, console.x, console.y + 0.5, console.z, 6, 5.0, 0.5, 5.0, 0.0);
 
-        /* the console keeps sparking as it goes down */
+        // The console keeps sparking as it goes down
         Vec3 spot = console.add((random.nextDouble() - 0.5) * 6, 1 + random.nextDouble(), (random.nextDouble() - 0.5) * 6);
         if (random.nextInt(10) == 0) GCSparkUtil.big(level, spot);
         else if (random.nextInt(3) == 0) GCSparkUtil.small(level, spot, 10);
     }
 
-    /* smoke and fire blasting out of the console */
+    /** Smoke and fire blasting out of the console. */
     private static void burst(ServerLevel level, Vec3 console) {
         double x = console.x;
         double y = console.y + 1.0;
@@ -196,7 +197,6 @@ public final class TardisCrash {
         }
     }
 
-
     private static void impact(Tardis tardis, ServerLevel interior, Vec3 console) {
         CRASHING.remove(tardis.id());
         if (interior.getServer().getGameRules().get(GCGameRules.TARDIS_GRIEFING)) {
@@ -215,7 +215,7 @@ public final class TardisCrash {
         TardisDrumShakePayload.broadcast(interior, console, IMPACT_SHAKE * protection);
     }
 
-    /* protective tardises soften the crash for the people inside */
+    /** Protective TARDISes soften the crash for the people inside. */
     private static float protection(Tardis tardis) {
         return TardisMindSystem.mind(tardis).modifiers().crashSoftening();
     }
@@ -229,6 +229,5 @@ public final class TardisCrash {
         GCSparkUtil.blast(outside, at.add(0, 1, 0));
         TardisDrumShakePayload.broadcast(outside, at, 2.0F);
     }
-
 
 }

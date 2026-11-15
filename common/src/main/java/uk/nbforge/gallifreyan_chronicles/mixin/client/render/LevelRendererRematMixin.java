@@ -11,7 +11,7 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-/* draws the fading interior for a player a tardis materialised around */
+/** Draws the fading interior for a player a TARDIS materialised around. */
 @Mixin(LevelRenderer.class)
 public abstract class LevelRendererRematMixin {
     @Inject(method = "submitTransientBlocks", at = @At("HEAD"), require = 0)

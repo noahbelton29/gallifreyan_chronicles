@@ -82,7 +82,7 @@ public final class TardisDimensionManager {
         }
     }
 
-    // if the interior is not loaded yet, the player waits in the queue
+    /** If the interior is not loaded yet the player waits in the queue. */
     public static void requestEntry(MinecraftServer server, ServerPlayer player, UUID tardisId) {
         ServerLevel level = get(server, tardisId);
         if (level != null) {

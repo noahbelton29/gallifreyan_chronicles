@@ -10,12 +10,9 @@ import uk.nbforge.gallifreyan_chronicles.util.GCUtil;
 import java.util.List;
 
 /**
- * Defines a trait that affects a TARDIS's personality and behaviour.
- *
- * <p>Traits can modify how a TARDIS thinks and behaves, determine which
- * personalities they are compatible with, and provide actions for different
- * situations such as refusing to fly, taking off or landing.</p>
- */
+   A trait is a quirk that changes how a TARDIS acts.
+   It can also block some personalities and some other traits.
+*/
 public record TardisTrait(
         String id,
         int weight,
@@ -28,84 +25,32 @@ public record TardisTrait(
         List<MindAction> onLand
 ) implements IdentifiableData<TardisTrait> {
 
-    /**
-     * Gets the part of this trait's ID after its namespace.
-     *
-     * <p>For example, {@code gallifreyan_chronicles:brave} becomes
-     * {@code brave}.</p>
-     *
-     * @return the local part of this trait's ID
-     */
+    /** The id without the mod name at the front. */
     public String localId() {
         return GCUtil.localPath(id);
     }
 
-    /**
-     * Checks whether this trait conflicts with another trait.
-     *
-     * <p>A conflict exists if either trait lists the other as incompatible.
-     * This means compatibility restrictions only need to be declared on
-     * one of the two traits.</p>
-     *
-     * @param other the trait to check against
-     * @return whether either trait conflicts with the other
-     */
+    /** Either trait can list the clash, so it only needs to be written once. */
     public boolean clashesWith(TardisTrait other) {
         return lists(clashesWith, other.id) || lists(other.clashesWith, id);
     }
 
-    /**
-     * Checks whether this trait is compatible with a personality.
-     *
-     * <p>A personality is incompatible when its ID appears in this trait's
-     * {@code bannedPersonalities} list.</p>
-     *
-     * @param personality the personality to check
-     * @return whether this trait can be used with that personality
-     */
+    /** Not allowed if the personality is on the banned list. */
     public boolean fits(TardisPersonality personality) {
         return !lists(bannedPersonalities, personality.id());
     }
 
-    /**
-     * Checks whether this trait is compatible with a personality and a list
-     * of other traits.
-     *
-     * <p>The trait must be compatible with the personality and must not
-     * conflict with any of the other traits.</p>
-     *
-     * @param personality the personality to check
-     * @param others      the other traits being used
-     * @return whether this trait can be used alongside the given personality and traits
-     */
+    /** Same as above but it also cannot clash with traits already picked. */
     public boolean fits(TardisPersonality personality, List<TardisTrait> others) {
         return fits(personality) && others.stream().noneMatch(this::clashesWith);
     }
 
-    /**
-     * Checks whether a list of IDs contains a matching ID.
-     *
-     * <p>Both the requested ID and the IDs in the list are normalised before
-     * comparison, allowing equivalent IDs to match even if their formatting
-     * differs.</p>
-     *
-     * @param ids the list of IDs to search
-     * @param id  the ID to look for
-     * @return whether the list contains the requested ID
-     */
+    /** An id with no mod name counts as one from this mod. */
     private static boolean lists(List<String> ids, String id) {
         String wanted = MindIds.normalize(id);
         return ids.stream().anyMatch(each -> MindIds.normalize(each).equals(wanted));
     }
 
-    /**
-     * Creates a copy of this trait with a different ID.
-     *
-     * <p>All other trait properties remain unchanged.</p>
-     *
-     * @param id the new ID
-     * @return a copy of this trait with the supplied ID
-     */
     @Override
     public TardisTrait withId(String id) {
         return new TardisTrait(id, weight, modifiers, clashesWith, bannedPersonalities, reveal, onUnwilling, onTakeOff, onLand);

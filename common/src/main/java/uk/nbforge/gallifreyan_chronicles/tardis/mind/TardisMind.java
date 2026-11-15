@@ -14,41 +14,29 @@ import java.util.Map;
 import java.util.UUID;
 
 /**
- * Stores a TARDIS's mental state, including its personality, traits, stress,
- * trauma and relationships with individual players.
- *
- * <p>Stress and trauma belong to the TARDIS itself, while trust and fear are
- * tracked separately for each player through {@link TardisBond}.
- */
+   The mental state of a TARDIS.
+   Stress and trauma belong to the TARDIS itself, trust and fear are tracked per player in TardisBond.
+*/
 public record TardisMind(String personalityId, List<String> traitIds, float stress, float ownerStartTrust,
                          long stressTick, long lastLand, Map<UUID, TardisBond> bonds,
                          List<TardisDisability> disabilities, float skill, List<String> discovered,
                          float trauma, long traumaTick, float recovery) {
 
-    /**
-     * Maximum value for stress, trust and trauma.
-     */
+    // Highest value for stress, trust and trauma
     public static final float MAX = 100f;
 
-    /**
-     * Default starting trust when no other value is provided.
-     */
+    // Trust it starts with when nothing else is given
     public static final float START_TRUST = 50f;
 
-    /**
-     * Value used when an event has never occurred.
-     */
+    // Used when something has never happened
     public static final long NEVER = Long.MIN_VALUE;
 
-    /**
-     * Maximum number of traits a TARDIS can have.
-     */
     public static final int MAX_TRAITS = 3;
 
     private static final long TICKS_PER_STRESS_POINT = 100L;
-    /* fear fades a point every 15 seconds, so a scare wears off in a few minutes */
+    // Fear fades a point every 15 seconds so a scare wears off in a few minutes
     private static final long TICKS_PER_FEAR_POINT = 300L;
-    /* trauma fades a point every 10 minutes */
+    // Trauma fades a point every 10 minutes
     private static final long TICKS_PER_TRAUMA_POINT = 12000L;
     public static final float TRAUMA_FEAR_SHARE = 0.6f;
     private static final float PTSD_FEAR_FLOOR = 50f;
@@ -65,30 +53,18 @@ public record TardisMind(String personalityId, List<String> traitIds, float stre
         recovery = Math.clamp(recovery, 0f, 1f);
     }
 
-    /**
-     * Gets the personality assigned to this TARDIS.
-     */
     public TardisPersonality personality() {
         return TardisPersonalities.get(personalityId);
     }
 
-    /**
-     * Gets the traits assigned to this TARDIS.
-     */
     public List<TardisTrait> traits() {
         return TardisTraits.of(traitIds);
     }
 
-    /**
-     * Combines the modifiers from all of this TARDIS's traits.
-     */
     public TraitModifiers modifiers() {
         return TraitModifiers.combine(traits(), false);
     }
 
-    /**
-     * Gets the trait modifiers that apply to a specific player's bond.
-     */
     public TraitModifiers modifiersFor(TardisBond bond) {
         return TraitModifiers.combine(traits(), bond.betrayed());
     }
@@ -102,11 +78,9 @@ public record TardisMind(String personalityId, List<String> traitIds, float stre
     }
 
     /**
-     * Gets the bond with a player, creating a fresh one if they have no existing bond.
-     *
-     * <p>The owner uses the TARDIS's configured starting trust. Other players
-     * use the starting trust provided by its traits, if any.
-     */
+       Makes a fresh bond if the player has none.
+       The owner starts with the configured trust, others use the starting trust from the traits if any.
+    */
     public TardisBond bond(UUID player, UUID owner) {
         TardisBond bond = bonds.get(player);
         if (bond != null) return bond;
@@ -115,32 +89,19 @@ public record TardisMind(String personalityId, List<String> traitIds, float stre
         return TardisBond.fresh(modifiers.strangerStartTrust().orElse(modifiers.startTrust().orElse(START_TRUST)));
     }
 
-    /**
-     * Gets the current stress after accounting for how much has faded over time.
-     *
-     * @param now the current game tick
-     */
     public float stressAt(long now) {
         float pointsCalmed = Math.max(0L, now - stressTick) / (float) TICKS_PER_STRESS_POINT * modifiers().stressFade();
         return Math.max(0f, stress - pointsCalmed);
     }
 
-    /**
-     * Gets the current fear of a player after accounting for how much has faded.
-     *
-     * <p>Trauma can prevent fear from fading below a certain level for players
-     * who have hurt the TARDIS.
-     *
-     * @param bond the player's bond with the TARDIS
-     * @param now  the current game tick
-     */
+    /** Trauma stops fear from fading below a certain level for players who hurt the TARDIS. */
     public float fearAt(TardisBond bond, long now) {
         float pointsFaded = Math.max(0L, now - bond.fearTick()) / (float) TICKS_PER_FEAR_POINT * modifiers().fearFade();
         float floor = bond.hurtIt() ? traumaFloor(bond, now) : 0f;
         return Math.max(floor, Math.max(0f, bond.fear() - pointsFaded));
     }
 
-    /* the fear a player's scars leave behind. ptsd keeps a higher minimum until it recovers */
+    /** The fear that scars leave behind, PTSD keeps a higher minimum until it recovers. */
     public float traumaFloor(TardisBond bond, long now) {
         float scars = Math.max(bond.traumaAt(now), PTSD_FEAR_FLOOR * ptsdStrength());
         return scars * TRAUMA_FEAR_SHARE;
@@ -156,7 +117,7 @@ public record TardisMind(String personalityId, List<String> traitIds, float stre
         return new TardisMind(personalityId, traitIds, value, ownerStartTrust, now, lastLand, bonds, disabilities, skill, discovered, trauma, traumaTick, recovery);
     }
 
-    // Traits that don't suit the new personality are dropped.
+    /** Traits that do not suit the new personality are dropped. */
     public TardisMind withPersonality(TardisPersonality value) {
         List<String> kept = traits().stream().filter(trait -> trait.fits(value)).map(TardisTrait::id).toList();
         return new TardisMind(value.id(), kept, stress, ownerStartTrust, stressTick, lastLand, bonds, disabilities, skill, discovered, trauma, traumaTick, recovery);
@@ -191,17 +152,17 @@ public record TardisMind(String personalityId, List<String> traitIds, float stre
         return new TardisMind(personalityId, traitIds, stress, ownerStartTrust, stressTick, lastLand, bonds, disabilities, skill, discovered, trauma, traumaTick, value);
     }
 
-    /* the tardis's total trauma from everyone. this is what gives it ptsd */
+    /** The total trauma from everyone, this is what gives it PTSD. */
     public float traumaAt(long now) {
         return faded(trauma, traumaTick, now);
     }
 
-    /* trauma fades by itself, one point every TICKS_PER_TRAUMA_POINT */
+    /** Trauma fades by itself, one point every TICKS_PER_TRAUMA_POINT. */
     public static float faded(float value, long since, long now) {
         return Math.max(0f, value - Math.max(0L, now - since) / (float) TICKS_PER_TRAUMA_POINT);
     }
 
-    /* how much ptsd still affects it. 1 when it first gets it, close to 0 once it has recovered */
+    /** How much PTSD still affects it, 1 when it first gets it and close to 0 once it recovers. */
     public float ptsdStrength() {
         return has(TardisDisability.PTSD) ? 1f - recovery : 0f;
     }
@@ -210,13 +171,7 @@ public record TardisMind(String personalityId, List<String> traitIds, float stre
         return new TardisMind(personalityId, traitIds, stress, ownerStartTrust, stressTick, now, bonds, disabilities, skill, discovered, trauma, traumaTick, recovery);
     }
 
-    /**
-     * Creates a new TARDIS mind with a randomly generated personality, traits
-     * and disabilities.
-     *
-     * <p>The TARDIS UUID is used as the random seed, so the same UUID always
-     * produces the same initial mind.
-     */
+    /** The TARDIS id is the random seed so the same id always gives the same mind. */
     public static TardisMind roll(UUID tardisId) {
         long seed = tardisId.getMostSignificantBits() ^ tardisId.getLeastSignificantBits();
         RandomSource random = RandomSource.create(seed);
@@ -243,7 +198,7 @@ public record TardisMind(String personalityId, List<String> traitIds, float stre
         return all.getLast();
     }
 
-    // Traits are weighted, but traits that don't fit the personality or clash with an already picked trait are excluded.
+    /** Traits are weighted, traits that do not fit the personality or clash with one already picked are left out. */
     private static List<TardisTrait> rollTraits(RandomSource random, TardisPersonality personality) {
         int count = Math.min(rollTraitCount(random), MAX_TRAITS);
         List<TardisTrait> pool = new ArrayList<>(TardisTraits.all());

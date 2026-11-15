@@ -4,7 +4,7 @@ import net.minecraft.data.PackOutput;
 import uk.nbforge.gallifreyan_chronicles.datagen.util.GCJson;
 import uk.nbforge.gallifreyan_chronicles.datagen.util.GCJsonDataProvider;
 
-/** Generates data/gallifreyan_chronicles/tardis_exterior/*.json. To add one, copy a line below and change the names. */
+/** Generates the tardis_exterior json files, to add one copy a line below and change the names. */
 public class GCTardisExteriorProvider extends GCJsonDataProvider {
     public GCTardisExteriorProvider(PackOutput output) {
         super(output, "tardis_exterior", "TARDIS Exterior");
@@ -18,7 +18,7 @@ public class GCTardisExteriorProvider extends GCJsonDataProvider {
         exterior("tuat_exterior");
     }
 
-    /** An exterior is just its model; the file only has to exist. */
+    /** An exterior is just its model, the file only has to exist. */
     private void exterior(String name) {
         add(name, GCJson.obj());
     }

@@ -22,9 +22,10 @@ import qouteall.imm_ptl.core.ClientWorldLoader;
 import qouteall.imm_ptl.core.chunk_loading.ImmPtlClientChunkMap;
 import qouteall.imm_ptl.core.network.PacketRedirection;
 
-/* a flashback snapshot saves portals as plain entities with no shape, and it
-   doesn't save immersive portals' list of dimensions. so a recording started
-   after a tardis was placed had no working portal. we add both to the snapshot */
+/**
+   A Flashback snapshot saves portals as plain entities with no shape and it does not save the dimension list of Immersive Portals.
+   So a recording started after a TARDIS was placed had no working portal, we add both to the snapshot.
+*/
 final class FlashbackPortalSnapshot {
     private static Method saveMethod;
     private static int errors;
@@ -38,9 +39,9 @@ final class FlashbackPortalSnapshot {
             ClientLevel level = mc.level;
             if (level == null) return;
 
-            /* the dimension list first, so the client knows the tardis worlds.
-               only possible in singleplayer, where the server is right here */
-            /* the recording's item component numbers, see ReplayComponentIds */
+            // The dimension list first so the client knows the TARDIS worlds
+            // Only possible in singleplayer where the server is right here
+            // The item component numbers of the recording, see ReplayComponentIds
             out.accept(new ClientboundCustomPayloadPacket(ReplayComponentIds.current()));
 
             MinecraftServer server = mc.getSingleplayerServer();
@@ -49,10 +50,9 @@ final class FlashbackPortalSnapshot {
             DimIntIdMap map = DimensionIntId.getClientMap();
             if (map == null || !map.containsDimId(level.dimension())) return;
 
-            /* every other loaded world (the tardis inside, or the overworld when you
-               stand inside the tardis). flashback only saves the world you stand in.
-               it also takes a new snapshot when you walk through the door, and an
-               export plays those, so the outside portal has to be in it too */
+            // Every other loaded world, the TARDIS inside or the overworld when you stand inside the TARDIS
+            // Flashback only saves the world you stand in
+            // It also takes a new snapshot when you walk through the door and an export plays those, so the outside portal has to be in it too
             for (ClientLevel other : ClientWorldLoader.getClientWorlds()) {
                 if (other == level || !map.containsDimId(other.dimension())) continue;
                 if (!(other.getChunkSource() instanceof ImmPtlClientChunkMap chunkMap)) continue;
@@ -65,7 +65,7 @@ final class FlashbackPortalSnapshot {
                 }
             }
 
-            /* the portals in every loaded world, with the world they're in */
+            // The portals in every loaded world with the world they are in
             for (ClientLevel world : ClientWorldLoader.getClientWorlds()) {
                 if (!map.containsDimId(world.dimension())) continue;
                 int worldId = map.toIntegerId(world.dimension());
@@ -83,7 +83,7 @@ final class FlashbackPortalSnapshot {
         }
     }
 
-    /* Portal.addAdditionalSaveData(CompoundTag) is protected */
+    /** Portal addAdditionalSaveData is protected. */
     private static void save(Portal portal, CompoundTag tag) throws Exception {
         if (saveMethod == null) {
             saveMethod = Portal.class.getDeclaredMethod("addAdditionalSaveData", CompoundTag.class);

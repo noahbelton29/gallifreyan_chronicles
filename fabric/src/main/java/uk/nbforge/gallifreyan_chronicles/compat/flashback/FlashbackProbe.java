@@ -12,9 +12,10 @@ import qouteall.imm_ptl.core.ClientWorldLoader;
 import qouteall.imm_ptl.core.portal.Portal;
 import qouteall.imm_ptl.core.render.context_management.RenderStates;
 
-/* debug_replay in the config: while a replay plays, logs once a second what each
-   loaded world has (chunks, entities, portals) and how many portals were drawn.
-   a line is only written when something changed. off by default */
+/**
+   Turn on debug_replay in the config and while a replay plays it logs once a second what each loaded world has, chunks, entities and portals, and how many portals were drawn.
+   A line is only written when something changed, it is off by default.
+*/
 final class FlashbackProbe {
     private static String last = "";
     private static int ticks;
@@ -60,7 +61,7 @@ final class FlashbackProbe {
         });
     }
 
-    /* where the replay server has the camera, it sends chunks around this */
+    /** Where the replay server has the camera, it sends chunks around this. */
     private static String viewerPos() {
         ReplayServer server = Flashback.getReplayServer();
         if (server == null) return "none";
@@ -73,8 +74,7 @@ final class FlashbackProbe {
         return n.startsWith("tardis/") ? "tardis" : n;
     }
 
-    /* how many chunk sections actually hold blocks, to tell "chunk is there but
-       empty" apart from "chunk is there but not drawn" */
+    /** How many chunk sections really hold blocks, to tell a chunk that is there but empty from one that is there but not drawn. */
     private static String sections(net.minecraft.client.multiplayer.ClientLevel world) {
         try {
             if (!(world.getChunkSource() instanceof qouteall.imm_ptl.core.chunk_loading.ImmPtlClientChunkMap map)) return "";

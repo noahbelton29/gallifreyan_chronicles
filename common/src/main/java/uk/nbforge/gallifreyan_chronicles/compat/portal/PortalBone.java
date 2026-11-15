@@ -17,7 +17,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 
-/* where the portal goes, read from the "portal" bone of a geo model. blocks, blockbench space */
+/** Where the portal goes, read from the portal bone of a geo model, in blocks and Blockbench space. */
 public record PortalBone(double x, double bottom, double width, double height, double front, double back) {
     public static final String BONE_NAME = "portal";
 
@@ -79,7 +79,7 @@ public record PortalBone(double x, double bottom, double width, double height, d
             for (int i = 0; i < 8; i++) {
                 double[] p = {o[0] + ((i & 1) != 0 ? s[0] : 0), o[1] + ((i & 2) != 0 ? s[1] : 0),
                         o[2] + ((i & 4) != 0 ? s[2] : 0)};
-                /* cube spin, then every bone up the chain */
+                // The spin of the cube, then every bone up the chain
                 p = turn(p, cube);
                 JsonObject at = bone;
                 while (at != null) {
@@ -92,13 +92,14 @@ public record PortalBone(double x, double bottom, double width, double height, d
                 }
             }
         }
-        /* geo json has x flipped vs blockbench */
+        // Geo json has x flipped compared to Blockbench
+        // blockbench and geo json disagree on x and this bit me twice
         double x = -(min[0] + max[0]) / 2.0;
         return new PortalBone(x / 16.0, min[1] / 16.0, (max[0] - min[0]) / 16.0, (max[1] - min[1]) / 16.0,
                 min[2] / 16.0, max[2] / 16.0);
     }
 
-    /* y spin only, x/z spins on the portal are ignored */
+    /** Only the y spin counts, x and z spins on the portal are ignored. */
     private static double[] turn(double[] p, JsonObject part) {
         JsonArray rotation = part.getAsJsonArray("rotation");
         if (rotation == null || rotation.size() < 3) return p;

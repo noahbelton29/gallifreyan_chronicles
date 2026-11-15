@@ -8,10 +8,11 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Pseudo;
 import qouteall.imm_ptl.core.portal.Portal;
 
-/* replays can give the client broken portals:
-   - the other side is a tardis dimension that doesn't exist
-   - the portal has no shape (axisW is null)
-   both crashed the game. we remove those portals. */
+/**
+   Replays can give the client broken portals, ones where the other side is a TARDIS dimension that does not exist and ones with no shape, axisW is null.
+   Both crashed the game so we remove those portals.
+   no idea why flashback hands us these but whatever.
+*/
 @Pseudo
 @Mixin(targets = "qouteall.imm_ptl.core.portal.Portal", remap = false)
 public abstract class PortalReplayTickMixin {
@@ -29,7 +30,8 @@ public abstract class PortalReplayTickMixin {
         }
     }
 
-    /* the renderer asks this before the portal gets to tick. no shape means "very far away" */
+    // The renderer asks this before the portal ticks, no shape means very far away
+    // hacky but it works
     @WrapMethod(method = "getDistanceToNearestPointInPortal", remap = false, require = 0)
     private double gc$noShapeFar(Vec3 pos, Operation<Double> original) {
         if (((Portal) (Object) this).getAxisW() == null) return Double.MAX_VALUE;

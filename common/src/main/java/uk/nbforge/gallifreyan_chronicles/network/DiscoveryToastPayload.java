@@ -7,7 +7,7 @@ import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.server.level.ServerPlayer;
 import org.jspecify.annotations.NonNull;
 
-/* kind is personality, trait or disability */
+/** kind is personality, trait or disability. */
 public record DiscoveryToastPayload(String kind, String id) implements CustomPacketPayload {
     public static final Type<DiscoveryToastPayload> TYPE =
             new Type<>(GCUtil.modIdentifier("discovery_toast"));

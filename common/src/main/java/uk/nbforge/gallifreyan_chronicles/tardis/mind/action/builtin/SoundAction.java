@@ -7,7 +7,10 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundSource;
 
-/* {"type": "sound", "sound": "minecraft:block.anvil.land", "volume": 1, "pitch": 1} at the tardis */
+/**
+   Plays a sound at the TARDIS.
+   The json fields are sound, volume and pitch.
+*/
 public record SoundAction(SoundEvent sound, float volume, float pitch) implements MindAction {
     public static final String TYPE = Constants.MOD_ID + ":sound";
 

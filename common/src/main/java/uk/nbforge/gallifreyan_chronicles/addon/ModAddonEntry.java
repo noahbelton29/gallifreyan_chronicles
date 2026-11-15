@@ -1,7 +1,7 @@
 package uk.nbforge.gallifreyan_chronicles.addon;
 
-/* a mod that says it's an addon */
+/** A mod that says it is an addon. */
 public record ModAddonEntry(String modId, String className) {
-    /* the key addons use in their mod info */
+    // The key addons use in their mod info
     public static final String KEY = "gallifreyan_chronicles:addon";
 }

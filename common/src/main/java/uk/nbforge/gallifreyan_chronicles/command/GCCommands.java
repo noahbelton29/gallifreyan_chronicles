@@ -18,14 +18,14 @@ public final class GCCommands {
                 .then(TardisCommands.debug().requires(GCCommands::isOp));
     }
 
-    /* only server operators can use tardis commands */
+    /** Only server operators can use TARDIS commands. */
     private static boolean isOp(CommandSourceStack source) {
         return source.permissions().hasPermission(Permissions.COMMANDS_GAMEMASTER);
     }
 
     private static LiteralArgumentBuilder<CommandSourceStack> tardis() {
         return literal("tardis")
-                /* anyone can get a tardis id */
+                // Anyone can get a TARDIS id
                 .then(TardisCommands.id())
                 .then(TardisCommands.list().requires(GCCommands::isOp))
                 .then(TardisCommands.deletion())

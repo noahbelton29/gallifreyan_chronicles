@@ -16,10 +16,11 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
-/* immersive portals also carries sounds through portals. the interior door sounds
-   reach 10 blocks, so outside you heard them up to 10 blocks away. the main door's
-   sound is already played outside by us within the hum's range
-   (InteriorDoorBlockEntity.playThroughExterior), so don't carry door sounds across */
+/**
+   Immersive Portals also carries sounds through portals.
+   The interior door sounds reach 10 blocks so outside you heard them up to 10 blocks away.
+   The main door sound is already played outside by us within the range of the hum, see InteriorDoorBlockEntity playThroughExterior, so do not carry door sounds across.
+*/
 @Pseudo
 @Mixin(targets = "qouteall.imm_ptl.core.teleportation.CrossPortalSound", remap = false)
 public abstract class PortalDoorSoundMixin {

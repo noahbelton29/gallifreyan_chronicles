@@ -45,6 +45,7 @@ public final class SkyGlowTextures {
         return textures.getTexture(converted);
     }
 
+    /** Turns the image into a glow mask, the brightest colour channel becomes the alpha and the colour is scaled back up to full strength. */
     private static void convert(NativeImage image) {
         for (int y = 0; y < image.getHeight(); y++) {
             for (int x = 0; x < image.getWidth(); x++) {

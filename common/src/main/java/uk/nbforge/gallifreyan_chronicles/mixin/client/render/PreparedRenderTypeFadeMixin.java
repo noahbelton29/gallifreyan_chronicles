@@ -9,7 +9,7 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-/* a fading tardis isn't drawn with everything else, it's kept for its own canvas later */
+/** A fading TARDIS is not drawn with everything else, it is kept for its own canvas later. */
 @Mixin(PreparedRenderType.class)
 public abstract class PreparedRenderTypeFadeMixin {
     @Inject(method = "drawFromBuffer", at = @At("HEAD"), cancellable = true)

@@ -66,22 +66,24 @@ public final class GCPowerDarkness {
         return minecraft.player != null ? minecraft.player.level() : minecraft.level;
     }
 
-    /* only tardis interiors go dark. a console placed and broken outside
-       (or left unpowered outside) must not darken the normal world */
+    /**
+       Only TARDIS interiors go dark.
+       A console placed and broken outside or left unpowered outside must not darken the normal world.
+    */
     private static boolean isTardisLevel(Level level) {
         return TardisDimensionUtil.isInterior(level);
     }
 
     private static boolean shouldBeDark(Level level) {
         if (!isTardisLevel(level)) return false;
-        /* materialising around you hides the console for a moment */
+        // Materialising around you hides the console for a moment
         if (RematCatchClient.hidesBlocksIn(level)) return false;
         boolean dark = false;
         boolean hasConsole = false;
         for (TardisConsoleBlockEntity console : new ArrayList<>(CONSOLES)) {
             if (!console.isRemoved()) continue;
             CONSOLES.remove(console);
-            // only a destroyed console counts, one that was just unloaded with its chunk is still there
+            // Only a destroyed console counts, one that was just unloaded with its chunk is still there
             Level consoleLevel = console.getLevel();
             if (consoleLevel != null && consoleLevel.hasChunkAt(console.getBlockPos())
                     && isTardisLevel(consoleLevel)
@@ -102,13 +104,13 @@ public final class GCPowerDarkness {
         return darkness;
     }
 
-    /* moves the fade for one world along by the real time that passed */
+    /** Moves the fade for one world along by the real time that passed. */
     private static float step(Level level, long now) {
         Minecraft minecraft = Minecraft.getInstance();
         float target = minecraft.player != null && shouldBeDark(level) ? 1.0F : 0.0F;
         LevelDarkness state = STATES.get(level);
         if (state == null) {
-            /* first look at this world: start where it should be, no fade */
+            // First look at this world so start where it should be with no fade
             state = new LevelDarkness();
             state.darkness = target;
             state.lastNanos = now;
@@ -116,7 +118,7 @@ public final class GCPowerDarkness {
             return state.darkness;
         }
         if (now < snapUntilNanos && target > state.darkness) {
-            /* a console just loaded in (joining the world): go dark straight away */
+            // A console just loaded in, like joining the world, so go dark straight away
             state.darkness = target;
         } else {
             float seconds = Math.min((now - state.lastNanos) / 1.0E9F, FADE_SECONDS);
@@ -142,7 +144,7 @@ public final class GCPowerDarkness {
         return Math.max(lights, TardisFrightClient.flickerOf(level)) * (float) GCConfig.powerDarknessStrength();
     }
 
-    /* just the power-off darkness, no alarm */
+    /** Just the power off darkness with no alarm. */
     public static float powerDarknessOf(Level level) {
         if (level == null) return 0.0F;
         return step(level, System.nanoTime()) * (float) GCConfig.powerDarknessStrength();

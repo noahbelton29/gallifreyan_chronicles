@@ -5,9 +5,10 @@ import uk.nbforge.gallifreyan_chronicles.config.GCConfig;
 import uk.nbforge.gallifreyan_chronicles.core.GCSounds;
 import net.minecraft.client.Minecraft;
 
-/* the interior hum, heard from outside the tardis.
-   doors shut: only within 3 blocks, quieter and muffled.
-   doors open: within 6 blocks and clear */
+/**
+   The interior hum heard from outside the TARDIS.
+   With the doors shut only within 3 blocks and quieter and muffled, with them open within 6 blocks and clear.
+*/
 public class ExteriorHumSoundInstance extends ExteriorSoundInstance {
     private static final float OPEN_VOLUME = 0.6F;
     private static final float POWER_FADE_PER_TICK = 0.035F;
@@ -19,7 +20,7 @@ public class ExteriorHumSoundInstance extends ExteriorSoundInstance {
 
     public ExteriorHumSoundInstance(TardisExteriorBlockEntity exterior) {
         super(exterior, GCSounds.FIRST_DOCTORS_HUM, true);
-        /* start silent and fade in with the power */
+        // Start silent and fade in with the power
         this.power = 0.0F;
         this.volume = 0.0F;
     }
@@ -31,7 +32,7 @@ public class ExteriorHumSoundInstance extends ExteriorSoundInstance {
             return;
         }
         if (fadingOut || exteriorGone()) {
-            /* went through the door (or the tardis left): fade out instead of cutting off */
+            // Went through the door or the TARDIS left, fade out instead of cutting off
             if (!fadingOut) fadeOut();
             this.volume = Math.max(0.0F, this.volume - fadeOutStep);
             if (this.volume <= 0.0F) this.stop();
@@ -42,7 +43,7 @@ public class ExteriorHumSoundInstance extends ExteriorSoundInstance {
         power = approach(power, exterior.isPowered() ? 1.0F : 0.0F, POWER_FADE_PER_TICK);
         this.volume = doorLoudness(OPEN_VOLUME) * falloff() * power * (float) GCConfig.tardisHumVolume();
 
-        /* power off and fully faded: stop it. it starts again when the power comes back */
+        // Power off and fully faded so stop it, it starts again when the power comes back
         if (power <= 0.0F && !exterior.isPowered()) {
             this.stop();
             return;
@@ -51,7 +52,7 @@ public class ExteriorHumSoundInstance extends ExteriorSoundInstance {
         applyMuffle();
     }
 
-    /* stop it smoothly, see tick */
+    /** Stops it smoothly, see tick. */
     public void fadeOut() {
         fadingOut = true;
         fadeOutStep = Math.max(0.01F, this.volume / FADE_OUT_TICKS);

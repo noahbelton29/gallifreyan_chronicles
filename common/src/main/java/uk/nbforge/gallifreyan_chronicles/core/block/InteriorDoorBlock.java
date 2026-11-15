@@ -260,7 +260,7 @@ public class InteriorDoorBlock extends BaseEntityBlock {
                                                  @NotNull BlockState state, @NotNull Player player) {
         if (!level.isClientSide()) {
             BlockPos master = masterBlockPos(state, pos);
-            // read this first: breaking a non-master part removes the master (and its block entity) below
+            // Read this first, breaking a part that is not the master removes the master and its block entity below
             boolean primary = level.getBlockEntity(master) instanceof InteriorDoorBlockEntity masterDoor
                     && masterDoor.isPrimary();
             Direction right = rightDirectionOf(state);
@@ -309,8 +309,7 @@ public class InteriorDoorBlock extends BaseEntityBlock {
     @Override
     protected @NonNull VoxelShape getShape(@NonNull BlockState state, @NonNull BlockGetter level,
                                            @NonNull BlockPos pos, @NonNull CollisionContext context) {
-        // Seen from outside through the exterior's portal: no selection shape, so no outline (and the
-        // targeting ray passes through the door instead of selecting it).
+        // Seen from outside through the portal of the exterior there is no selection shape so no outline, and the targeting ray passes through the door instead of selecting it
         if (level instanceof Level l && l.isClientSide()
                 && uk.nbforge.gallifreyan_chronicles.client.renderer.util.RemoteDoorView.isSeenThroughPortal(l)) {
             return Shapes.empty();

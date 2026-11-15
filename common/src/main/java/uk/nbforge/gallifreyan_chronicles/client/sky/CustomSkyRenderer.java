@@ -1,5 +1,7 @@
 package uk.nbforge.gallifreyan_chronicles.client.sky;
 
+import uk.nbforge.gallifreyan_chronicles.client.util.DetailLevelUtil;
+
 import com.mojang.blaze3d.pipeline.RenderTarget;
 import com.mojang.blaze3d.pipeline.TextureTarget;
 import com.mojang.blaze3d.systems.RenderSystem;
@@ -75,11 +77,11 @@ public final class CustomSkyRenderer {
         if (level == null) return false;
 
         DimensionSky sky = DimensionSkyRegistry.getForDimension(level.dimension().identifier());
-        if (sky == null) return false;
+        if (sky == null || !DetailLevelUtil.highDetail()) return false;
 
         SkyShaderCompat.assignPipelines();
-        /* pack skies: the pack paints over the sky, so stars and bodies go on a canvas laid on after it.
-           overlay skies are drawn here as normal, and a pack that supports them keeps them (the patched solas) */
+        // Pack skies, the pack paints over the sky so stars and bodies go on a canvas laid on after it
+        // Overlay skies are drawn here as normal and a pack that supports them keeps them, the patched Solas
         boolean onCanvas = sky.shaderSky() == ShaderSky.PACK && SkyShaderCompat.isShaderPackInUse()
                 && !TardisPortalBridge.isRenderingAnyPortal();
         if (onCanvas) {
@@ -119,13 +121,13 @@ public final class CustomSkyRenderer {
         return true;
     }
 
-    /* start of a frame, remembers how far the camera can see */
+    /** Start of a frame, remembers how far the camera can see. */
     public static void beginFrame(float depthFar) {
         if (TardisPortalBridge.isRenderingAnyPortal()) return;
         canvasDepthFar = depthFar;
     }
 
-    /* mid-frame, while the camera is still the world's: draw the sky on its own canvas behind the world */
+    /** Mid frame while the camera is still the world one, draw the sky on its own canvas behind the world. */
     public static void drawCanvas(RenderTarget main) {
         if (TardisPortalBridge.isRenderingAnyPortal() || SkyShaderCompat.isRenderingShadowPass()) return;
         SkyRenderState state = canvasState;
@@ -167,7 +169,7 @@ public final class CustomSkyRenderer {
         canvasWaiting = true;
     }
 
-    /* after the shader pack's last pass: lay the sky canvas on */
+    /** After the last pass of the shader pack, lay the sky canvas on. */
     public static void afterShaders(RenderTarget main) {
         if (!canvasWaiting) return;
         canvasWaiting = false;
@@ -183,7 +185,7 @@ public final class CustomSkyRenderer {
         }
     }
 
-    /* the world's depth, so the sky only shows where nothing is in front */
+    /** The depth of the world so the sky only shows where nothing is in front. */
     private static void copyWorldDepth(RenderTarget main, TextureTarget target) {
         var nearest = RenderSystem.getSamplerCache().getClampToEdge(FilterMode.NEAREST);
         RenderPassDescriptor depthCopy = RenderPassDescriptor.builder(() -> "GC sky canvas depth")

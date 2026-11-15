@@ -4,7 +4,7 @@ import java.util.UUID;
 import java.util.List;
 
 import uk.nbforge.gallifreyan_chronicles.tardis.mind.TardisMind;
-import uk.nbforge.gallifreyan_chronicles.tardis.mind.TardisMindSystem;
+import uk.nbforge.gallifreyan_chronicles.tardis.ecs.system.TardisMindSystem;
 
 import uk.nbforge.gallifreyan_chronicles.core.block_entities.TardisExteriorBlockEntity;
 import uk.nbforge.gallifreyan_chronicles.tardis.Tardis;
@@ -13,15 +13,11 @@ import uk.nbforge.gallifreyan_chronicles.tardis.ecs.component.TardisSubsystem;
 import uk.nbforge.gallifreyan_chronicles.tardis.ecs.system.SubsystemSystem;
 
 /**
- * Handles changes to a TARDIS's mood in response to flight events.
- * <p>
- * Taking off too soon, flying with damaged systems, and using the wrong key
- * can increase stress. A calm landing can improve trust with the crew.
- */
+   Changes the mood of a TARDIS from flight events.
+   Taking off too soon, flying with damaged systems and using the wrong key can raise stress, a calm landing can improve trust with the crew.
+*/
 public final class TardisMoods {
-    /**
-     * Minimum time between landings and take-offs before overuse causes stress.
-     */
+    // Minimum time between landing and takeoff before overuse causes stress
     private static final long OVERUSE_TICKS = 600L;
 
     private static final float OVERUSE_STRESS = 10f;
@@ -29,9 +25,7 @@ public final class TardisMoods {
     private static final float WRONG_KEY_STRESS = 4f;
     private static final float ABORTED_TAKEOFF_STRESS = 6f;
 
-    /**
-     * Maximum stress level at which a landing is considered calm.
-     */
+    // Highest stress that still counts as a calm landing
     private static final float CALM_LANDING_STRESS = 30f;
 
     private static final float CALM_LANDING_TRUST = 2f;
@@ -72,14 +66,7 @@ public final class TardisMoods {
         TardisMindSystem.markLanded(tardis);
     }
 
-    /**
-     * Gets everyone currently aboard the TARDIS.
-     * <p>
-     * If nobody is in the interior, the TARDIS owner is used instead.
-     *
-     * @param tardis the TARDIS whose crew is being checked
-     * @return UUIDs of the players considered to be aboard
-     */
+    /** Everyone aboard, or the owner if nobody is in the interior. */
     public static List<UUID> crew(Tardis tardis) {
         List<UUID> aboard = tardis.interiorLevel()
                 .map(level -> level.players().stream().map(player -> player.getUUID()).toList())
@@ -87,27 +74,13 @@ public final class TardisMoods {
         return aboard.isEmpty() ? List.of(tardis.ownerId()) : aboard;
     }
 
-    /**
-     * Checks whether the TARDIS is taking off too soon after its previous landing.
-     *
-     * @param tardis the TARDIS being checked
-     * @return {@code true} if it has been less than {@link #OVERUSE_TICKS}
-     * since its last landing
-     */
     private static boolean tookOffTooSoon(Tardis tardis) {
         long lastLand = TardisMindSystem.mind(tardis).lastLand();
         long now = TardisMindSystem.now(tardis.server());
         return lastLand != TardisMind.NEVER && now - lastLand < OVERUSE_TICKS;
     }
 
-    /**
-     * Checks whether any of the TARDIS's subsystems are faulty.
-     * <p>
-     * An unloaded exterior is treated as having no detected faults.
-     *
-     * @param tardis the TARDIS being checked
-     * @return {@code true} if at least one subsystem is faulty
-     */
+    /** An unloaded exterior counts as having no faults. */
     private static boolean hasDamagedSystems(Tardis tardis) {
         TardisExteriorBlockEntity exterior = tardis.exteriorIfLoaded().orElse(null);
         if (exterior == null) return false;

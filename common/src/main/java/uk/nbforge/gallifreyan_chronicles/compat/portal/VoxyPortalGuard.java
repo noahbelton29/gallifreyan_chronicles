@@ -5,43 +5,28 @@ import org.lwjgl.opengl.GL30C;
 import org.lwjgl.opengl.GL45C;
 
 /**
- * Keeps Voxy inside Immersive Portals' stencil clipping.
- *
- * <p>Immersive Portals draws a portal view with the stencil test on. The opening is stamped with the
- * portal's layer number, and everything drawn in that view is only kept where the stencil matches.
- * Voxy breaks this in two places:
- * <ul>
- *     <li>It switches the stencil test off at the end of {@code renderOpaque} and never switches it back on.
- *     Everything drawn after it in that portal view (entities, block entities such as another TARDIS exterior)
- *     is then no longer clipped to the opening and is painted over whatever surrounds the portal.</li>
- *     <li>Its final composite goes into a scratch framebuffer that only has the depth and colour textures
- *     attached (no stencil), and it turns the stencil test off first. The far terrain is then written over
- *     the whole screen instead of just the opening.</li>
- * </ul>
- *
- * <p>To fix this, the stencil state is remembered when Voxy starts and put back when it is done. For the
- * composite, the stencil buffer is attached to Voxy's scratch framebuffer and the portal's stencil test
- * is kept on.
- *
- * <p>This only happens while a portal view is being drawn, a normal view is untouched. If the stencil
- * cannot be used safely, Voxy is skipped for that portal view instead.
- *
- * <p>Start the game with {@code -Dgc.voxy.skipInPortals=true} to skip Voxy in every portal view. This is
- * useful for checking whether a problem comes from Voxy at all.
- */
+   Keeps Voxy inside the stencil clipping of Immersive Portals.
+   A portal view is drawn with the stencil test on and only kept where the stencil matches.
+   Voxy breaks this in two places.
+   It switches the stencil test off at the end of renderOpaque and never back on, so everything drawn after it, like entities and other TARDIS exteriors, is painted over what surrounds the portal.
+   Its final composite goes into a scratch framebuffer with no stencil and the test off, so the far terrain covers the whole screen and not just the opening.
+   The fix remembers the stencil state when Voxy starts and puts it back when done.
+   For the composite it attaches the stencil buffer to the scratch framebuffer and keeps the portal test on.
+   This only happens while a portal view is drawn, if the stencil cannot be used safely Voxy is skipped for that view.
+   The debug switch gc.voxy.skipInPortals set to true skips Voxy in every portal view, it helps check if a problem comes from Voxy at all.
+*/
 public final class VoxyPortalGuard {
-    /** Debug switch that skips Voxy in every portal view. */
     private static final boolean SKIP_IN_PORTALS = Boolean.getBoolean("gc.voxy.skipInPortals");
 
-    // Everything below is only touched from the render thread.
+    // Everything below is only touched from the render thread
 
-    /** True once {@link #begin()} has saved the stencil state, so {@link #end()} knows to put it back. */
+    // True once begin has saved the stencil state so end knows to put it back
     private static boolean active;
 
-    /** True when Voxy's composite has to be clipped to the portal's stencil. */
+    // True when the composite of Voxy has to be clipped to the stencil of the portal
     private static boolean clip;
 
-    // The portal's stencil state as it was when Voxy started drawing.
+    // The stencil state of the portal from when Voxy started drawing
     private static boolean stencilWasOn;
     private static int func;
     private static int ref;
@@ -51,23 +36,19 @@ public final class VoxyPortalGuard {
     private static int opDepthFail;
     private static int opDepthPass;
 
-    /** What kind of object (texture or renderbuffer) holds the stencil buffer being drawn into. */
+    // The kind of object, texture or renderbuffer, that holds the stencil buffer
     private static int stencilType;
 
-    /** GL name of the stencil buffer being drawn into. */
+    // The GL name of the stencil buffer being drawn into
     private static int stencilName;
 
-    /** The scratch framebuffer the stencil is currently attached to, or 0 when none is. */
+    // The scratch framebuffer the stencil is attached to, 0 when none
     private static int attachedTo;
 
     private VoxyPortalGuard() {
     }
 
-    /**
-     * Called when Voxy starts drawing. Saves the portal's stencil state if a portal view is being drawn.
-     *
-     * @return false when Voxy should not draw in this view at all
-     */
+    /** Returns false when Voxy should not draw in this view at all. */
     public static boolean begin() {
         active = false;
         clip = false;
@@ -86,8 +67,8 @@ public final class VoxyPortalGuard {
         opDepthPass = GL11C.glGetInteger(GL11C.GL_STENCIL_PASS_DEPTH_PASS);
 
         if (stencilWasOn) {
-            // The portal clips with the stencil, so Voxy's composite has to as well. Find the stencil
-            // buffer of the framebuffer being drawn into so it can be attached for the composite.
+            // The portal clips with the stencil so the composite of Voxy has to as well
+            // Find the stencil buffer of the framebuffer being drawn into so it can be attached for the composite
             int framebuffer = GL11C.glGetInteger(GL30C.GL_DRAW_FRAMEBUFFER_BINDING);
             if (framebuffer == 0) return false;
             stencilType = GL30C.glGetFramebufferAttachmentParameteri(GL30C.GL_DRAW_FRAMEBUFFER,
@@ -102,7 +83,6 @@ public final class VoxyPortalGuard {
         return true;
     }
 
-    /** Called when Voxy is done drawing. Puts the portal's stencil state back. */
     public static void end() {
         if (!active) return;
         active = false;
@@ -119,17 +99,14 @@ public final class VoxyPortalGuard {
         GL11C.glStencilMask(writeMask);
     }
 
-    /** Whether Voxy's composite should be clipped to the portal instead of having the stencil test turned off. */
     public static boolean clippingComposite() {
         return active && clip;
     }
 
     /**
-     * Called right after Voxy binds its scratch framebuffer for the composite.
-     *
-     * <p>Attaches the portal's stencil buffer to it and turns the portal's stencil test back on. Falls back
-     * to Voxy's own unclipped composite if the framebuffer is not complete with the stencil attached.
-     */
+       Attaches the stencil buffer of the portal and turns its stencil test back on.
+       If the framebuffer is not complete with the stencil attached it falls back to the unclipped composite of Voxy.
+    */
     public static void prepareClippedBlit() {
         if (!active || !clip) return;
 
@@ -141,7 +118,7 @@ public final class VoxyPortalGuard {
 
         attachStencil(framebuffer, stencilName);
         if (GL45C.glCheckNamedFramebufferStatus(framebuffer, GL30C.GL_DRAW_FRAMEBUFFER) != GL30C.GL_FRAMEBUFFER_COMPLETE) {
-            // Can't clip with this framebuffer, fall back to Voxy's own unclipped composite.
+            /** Cannot clip with this framebuffer so fall back to the unclipped composite of Voxy. */
             attachStencil(framebuffer, 0);
             GL11C.glDisable(GL11C.GL_STENCIL_TEST);
             return;
@@ -154,14 +131,14 @@ public final class VoxyPortalGuard {
         GL11C.glStencilMask(0);
     }
 
-    /** Called when Voxy's composite is done. Takes the stencil off Voxy's scratch framebuffer again. */
+    /** Takes the stencil off the scratch framebuffer again. */
     public static void finishClippedBlit() {
         if (attachedTo == 0) return;
         attachStencil(attachedTo, 0);
         attachedTo = 0;
     }
 
-    /** Attaches the given stencil buffer to the framebuffer, or detaches it when {@code name} is 0. */
+    /** A name of 0 detaches it. */
     private static void attachStencil(int framebuffer, int name) {
         if (stencilType == GL30C.GL_RENDERBUFFER) {
             GL45C.glNamedFramebufferRenderbuffer(framebuffer, GL30C.GL_STENCIL_ATTACHMENT, GL30C.GL_RENDERBUFFER, name);

@@ -7,7 +7,7 @@ import org.jspecify.annotations.Nullable;
 import uk.nbforge.gallifreyan_chronicles.tardis.mind.action.MindActions;
 import uk.nbforge.gallifreyan_chronicles.tardis.mind.action.MindContext;
 import uk.nbforge.gallifreyan_chronicles.tardis.mind.TardisMind;
-import uk.nbforge.gallifreyan_chronicles.tardis.mind.TardisMindSystem;
+import uk.nbforge.gallifreyan_chronicles.tardis.ecs.system.TardisMindSystem;
 import uk.nbforge.gallifreyan_chronicles.tardis.mind.TardisPersonality;
 import uk.nbforge.gallifreyan_chronicles.util.PlayerMotionUtil;
 import net.minecraft.ChatFormatting;
@@ -24,8 +24,10 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
-/* so scared of a player it freezes up for them. it wears off by itself as its fear fades
-   (leave it alone a few minutes), or the mallet snaps it out of it for a while */
+/**
+   So scared of a player it freezes up for them.
+   It wears off by itself as its fear fades, leave it alone a few minutes, or the mallet snaps it out of it for a while.
+*/
 public final class TardisTerror {
     private static final long COMPLY_TICKS = 600L;
 
@@ -48,21 +50,21 @@ public final class TardisTerror {
         return tardis.id() + "/" + player;
     }
 
-    /* this player snapped it out of a freeze recently, so it does what they say */
+    /** This player snapped it out of a freeze recently so it does what they say. */
     public static boolean compliant(Tardis tardis, @Nullable UUID player) {
         if (player == null) return false;
         Episode episode = EPISODES.get(key(tardis, player));
         return episode != null && TardisMindSystem.now(tardis.server()) < episode.compliantUntil;
     }
 
-    /* only freezes up around players who hurt it */
+    /** Only freezes up around players who hurt it. */
     public static boolean terrified(Tardis tardis, UUID player) {
         return TardisMindSystem.hasHurt(tardis, player)
                 && TardisMindSystem.fearLevel(tardis, player) == FearLevel.TERRIFIED
                 && !compliant(tardis, player);
     }
 
-    /* true if the hit was part of snapping it out of a freeze */
+    /** True if the hit was part of snapping it out of a freeze. */
     public static boolean strike(Tardis tardis, ServerLevel level, Vec3 hit, Player player) {
         if (!terrified(tardis, player.getUUID())) return false;
         TardisPersonality personality = TardisMindSystem.mind(tardis).personality();
@@ -84,6 +86,5 @@ public final class TardisTerror {
         }
         return true;
     }
-
 
 }

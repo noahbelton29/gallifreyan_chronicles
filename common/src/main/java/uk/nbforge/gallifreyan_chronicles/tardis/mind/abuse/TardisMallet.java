@@ -3,7 +3,7 @@ package uk.nbforge.gallifreyan_chronicles.tardis.mind.abuse;
 import uk.nbforge.gallifreyan_chronicles.util.GCSparkUtil;
 import uk.nbforge.gallifreyan_chronicles.tardis.mind.data.MindEnums.Reveal;
 import uk.nbforge.gallifreyan_chronicles.tardis.mind.discovery.TardisDiscovery;
-import uk.nbforge.gallifreyan_chronicles.tardis.mind.TardisMindSystem;
+import uk.nbforge.gallifreyan_chronicles.tardis.ecs.system.TardisMindSystem;
 import uk.nbforge.gallifreyan_chronicles.tardis.mind.TardisPersonality;
 import uk.nbforge.gallifreyan_chronicles.tardis.mind.mood.TardisAlarm;
 
@@ -41,16 +41,16 @@ public final class TardisMallet {
     private static final float BLAST_PER_FEAR = 0.02F;
 
     private static final int ALARM_HITS = 2;
-    /* a betrayal is a real beating of a tardis that trusted you, not a couple of taps */
+    // A betrayal is a real beating of a TARDIS that trusted you and not a couple of taps
     private static final int BETRAYAL_HITS = 8;
     private static final float BETRAYAL_NEEDS_TRUST = 50f;
     private static final int LONG_ALARM_HITS = 5;
     private static final int LONG_ALARM_FLASHES = 3;
-    /* hits within this long of each other count as one beating */
+    // Hits within this long of each other count as one beating
     private static final long BEATING_GAP_TICKS = 6000L;
     private static final Map<String, Beating> BEATINGS = new HashMap<>();
 
-    /* trustBefore: how much it trusted them when the beating started */
+    /** trustBefore is how much it trusted them when the beating started. */
     private record Beating(int count, long lastTick, float trustBefore) {
     }
 
@@ -95,9 +95,7 @@ public final class TardisMallet {
         MindMessages.say(player, ChatFormatting.DARK_GRAY, reaction(TardisMindSystem.fear(tardis, hitter)));
     }
 
-
-
-    /* each player's hits on each tardis, grouped into beatings */
+    /** Each player hits on each TARDIS grouped into beatings. */
     private static Beating countHit(Tardis tardis, UUID hitter) {
         long now = TardisMindSystem.now(tardis.server());
         String key = tardis.id() + "/" + hitter;
@@ -110,7 +108,7 @@ public final class TardisMallet {
         return beating;
     }
 
-    /* after a couple of hits the cloister bell rings and the lights go red */
+    /** After a couple of hits the cloister bell rings and the lights go red. */
     private static void alarm(Tardis tardis, ServerLevel level, BlockPos hitPos, Player player, int hits) {
         if (hits < ALARM_HITS) return;
         int flashes = hits >= LONG_ALARM_HITS ? LONG_ALARM_FLASHES : 1;

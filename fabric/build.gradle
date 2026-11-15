@@ -156,12 +156,20 @@ def gcWatermarkOff = providers.gradleProperty('watermark')
         .orElse(false)
 def gcLedgerFile = rootProject.layout.projectDirectory.file('build-ledger.csv')
 def gcLockUuids = providers.gradleProperty('lockUuid').orElse(providers.environmentVariable('GC_LOCK_UUID')).orElse('')
+def gcDevBypass = providers.gradleProperty('devBypass').orElse(providers.environmentVariable('GC_DEV_BYPASS')).map { it.equalsIgnoreCase('true') }.orElse(false)
 def gcLockOff = providers.gradleProperty('lock')
         .map { it.equalsIgnoreCase('off') || it.equalsIgnoreCase('false') }
         .orElse(false)
 def gcUnassignedLock = '00000000-0000-0000-0000-000000000000'
 def gcExpiresIn = providers.gradleProperty('expiresIn').orElse('')
 def gcLedgerHeader = 'timestamp,build_id,tester,jar,locked_to,expires_at'
+
+def gcLockChecksum(String lockUuids, String devBypassText) {
+    def salt = 'gc-9f21-locksalt-7733'
+    def digest = java.security.MessageDigest.getInstance('SHA-256')
+    digest.update("${lockUuids}|${devBypassText}|${salt}".getBytes('UTF-8'))
+    return digest.digest().collect { String.format('%02x', it & 0xFF) }.join('')
+}
 
 def generateBuildId = tasks.register('generateBuildId') {
     outputs.dir(gcBuildIdDir)
@@ -207,7 +215,10 @@ def generateBuildId = tasks.register('generateBuildId') {
 
         def dir = gcBuildIdDir.get().asFile
         dir.mkdirs()
-        new File(dir, 'gc_build.properties').text = "build_id=${buildId}\nwatermark=${watermarkOn}\nlock_uuids=${lockIds.join(',')}\nexpires_at=${expiresAt}\n"
+        def gcLockUuidsText = lockIds.join(',')
+        def gcDevBypassText = gcDevBypass.get().toString()
+        def gcChecksum = gcLockChecksum(gcLockUuidsText, gcDevBypassText)
+        new File(dir, 'gc_build.properties').text = "build_id=${buildId}\nwatermark=${watermarkOn}\nlock_uuids=${gcLockUuidsText}\nexpires_at=${expiresAt}\ndev_bypass=${gcDevBypassText}\nchecksum=${gcChecksum}\n"
         if (!lockIds.isEmpty()) {
             logger.lifecycle("Build locked to Minecraft account(s): ${lockIds.join(', ')}")
         }

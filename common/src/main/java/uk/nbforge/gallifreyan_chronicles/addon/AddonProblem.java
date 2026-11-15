@@ -1,19 +1,19 @@
 package uk.nbforge.gallifreyan_chronicles.addon;
 
-/* why an addon isn't running */
+/** Why an addon is not running. */
 public record AddonProblem(Kind kind, String detail) {
     public enum Kind {
-        /* can't read it. detail: the reason */
+        /** Cannot read it, the detail is the reason. */
         INVALID(true),
-        /* needs a newer addon api. detail: addon api|our api */
+        /** Needs a newer addon api, the detail is the addon api and then ours. */
         INCOMPATIBLE_API(true),
-        /* wrong mod version. detail: needed range|your version */
+        /** Wrong mod version, the detail is the needed range and then your version. */
         INCOMPATIBLE_MOD(true),
-        /* needed mod or addon is missing. detail: name|needed range */
+        /** A needed mod or addon is missing, the detail is the name and then the needed range. */
         MISSING_REQUIREMENT(true),
-        /* needed mod or addon is the wrong version. detail: name|needed range|found */
+        /** A needed mod or addon is the wrong version, the detail is the name, the needed range and what was found. */
         WRONG_REQUIREMENT_VERSION(true),
-        /* crashed while starting. detail: the error */
+        /** Crashed while starting, the detail is the error. */
         FAILED_TO_START(true);
 
         private final boolean cannotBeSwitchedOn;
@@ -22,7 +22,7 @@ public record AddonProblem(Kind kind, String detail) {
             this.cannotBeSwitchedOn = cannotBeSwitchedOn;
         }
 
-        /* switching it can't fix it */
+        /** Switching it on cannot fix it. */
         public boolean cannotBeSwitchedOn() {
             return cannotBeSwitchedOn;
         }

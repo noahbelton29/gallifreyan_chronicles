@@ -53,9 +53,10 @@ final class FlashbackChunksImpl {
         return FlashbackPuppet.isHiddenReal(entity);
     }
 
-    /* only packets for other worlds. ones for the replay's own world (the overworld
-       chunks while the player was in the tardis) must go into the replay server,
-       or it never has them and the world is void */
+    /**
+       Only packets for other worlds.
+       The ones for the own world of the replay, the overworld chunks while the player was in the TARDIS, must go into the replay server or it never has them and the world is void.
+    */
     static boolean passOn(int dimId, Packet<?> packet) {
         ReplayServer server = Flashback.getReplayServer();
         if (server == null) return false;
@@ -65,7 +66,6 @@ final class FlashbackChunksImpl {
         return true;
     }
 
-    /* the world the replay server is playing in */
     private static @Nullable ResourceKey<Level> replayDim(ReplayServer server) {
         for (ReplayPlayer viewer : server.getReplayViewers()) return viewer.level().dimension();
         for (ServerLevel level : server.getAllLevels()) return level.dimension();
@@ -132,13 +132,13 @@ final class FlashbackChunksImpl {
         });
     }
 
-    /* jumping on the timeline */
+    /** Jumping on the timeline. */
     static void clearPuppet() {
         FlashbackPuppet.remove();
         FlashbackPuppet.scheduleRebuild();
     }
 
-    /* the client's number for this world, or MIN_VALUE if the client doesn't know it */
+    /** The number the client uses for this world, MIN_VALUE if the client does not know it. */
     private static int clientDimId(ServerLevel level) {
         DimIntIdMap map = DimensionIntId.getClientMap();
         if (!map.containsDimId(level.dimension())) return Integer.MIN_VALUE;
@@ -155,11 +155,9 @@ final class FlashbackChunksImpl {
         if (server == null) return;
         for (ReplayPlayer viewer : server.getReplayViewers()) {
             if (viewer.level() == level) {
-                /* tag the chunk with its world, using the client's numbers, so a
-                   tardis chunk can't end up in the overworld */
+                // Tag the chunk with its world using the numbers of the client so a TARDIS chunk cannot end up in the overworld
                 int dimId = clientDimId(level);
-                /* if the client doesn't know this world yet, skip it. sending it
-                   plain put tardis chunks into the overworld (holes in the ground) */
+                // If the client does not know this world yet skip it, sending it plain put TARDIS chunks into the overworld and left holes in the ground
                 if (dimId == Integer.MIN_VALUE) continue;
                 viewer.connection.send(new ClientboundCustomPayloadPacket(
                         new PacketRedirection.Payload(dimId, packet)));

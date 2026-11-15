@@ -26,16 +26,18 @@ public abstract class ChannelMixin implements OffsetChannel {
     @Unique
     private float gc$offsetSeconds;
 
-    /* openal low-pass filter for muffling, made the first time it's needed */
+    // The OpenAL low pass filter for muffling, made the first time it is needed
     @Unique
     private int gc$filter;
 
     @Override
+    @Unique
     public void gc$setOffsetSeconds(float seconds) {
         this.gc$offsetSeconds = seconds;
     }
 
     @Override
+    @Unique
     public void gc$setMuffle(float highGain) {
         try {
             if (highGain >= 0.999F) {
@@ -50,7 +52,8 @@ public abstract class ChannelMixin implements OffsetChannel {
             EXTEfx.alFilterf(gc$filter, EXTEfx.AL_LOWPASS_GAINHF, Math.max(0.0F, highGain));
             AL10.alSourcei(source, EXTEfx.AL_DIRECT_FILTER, gc$filter);
         } catch (Throwable ignored) {
-            /* no efx on this sound card, it just won't be muffled */
+            // No EFX on this sound card so it just will not be muffled
+            // some cards just do not have it, nothing we can do
         }
     }
 

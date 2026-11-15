@@ -76,7 +76,7 @@ public class InteriorDoorBlockEntity extends BlockEntity implements GeoBlockEnti
     private boolean doorAnimInstant = false;
     private int snapFramesLeft = 0;
 
-    /* a snap runs the animation at this speed for a few frames, then goes back to normal */
+    // A snap runs the animation at this speed for a few frames, then goes back to normal
     private static final int SNAP_SPEED = 999999;
     private static final int SNAP_FRAMES = 3;
 
@@ -88,6 +88,9 @@ public class InteriorDoorBlockEntity extends BlockEntity implements GeoBlockEnti
     private static final double EXIT_BOTTOM = -0.5;
 
     private boolean primary;
+    // A roundel block the player clicked on this door, the door shows its texture
+    // Empty means the normal skin
+    private String roundelBlock = "";
     private long cooldownUntilTick = 0L;
 
     public InteriorDoorBlockEntity(BlockPos pos, BlockState state) {
@@ -103,6 +106,7 @@ public class InteriorDoorBlockEntity extends BlockEntity implements GeoBlockEnti
         return Entity.of(this, this::sync);
     }
 
+    /** The door model to draw, a linked door takes the model of its TARDIS and others use the model of the block. */
     public String getVariant() {
         InteriorDoorBlock block = (InteriorDoorBlock) getBlockState().getBlock();
         if (block.isLinked()) {
@@ -116,6 +120,7 @@ public class InteriorDoorBlockEntity extends BlockEntity implements GeoBlockEnti
         return asEntity().get(TardisComponentTypes.DOOR_VARIANT).variantId();
     }
 
+    /** The id of the door style, a style the block forces wins, then the one saved for a linked door. */
     public String getDoorVariantId() {
         String fixed = ((InteriorDoorBlock) getBlockState().getBlock()).fixedVariantId();
         if (!fixed.isEmpty()) return fixed;
@@ -126,6 +131,7 @@ public class InteriorDoorBlockEntity extends BlockEntity implements GeoBlockEnti
         return storedVariantId();
     }
 
+    /** Sets the door style, an unknown style on a linked door falls back to the default one. */
     public void setDoorVariant(String variantId) {
         if (isLinked()) {
             String resolved = TardisDoorRegistry.isInteriorVariant(variantId)
@@ -142,29 +148,41 @@ public class InteriorDoorBlockEntity extends BlockEntity implements GeoBlockEnti
     }
 
     /**
-     * The three kinds of door this block entity can be, so "interior door" stops meaning all of them:
-     * <ul>
-     *   <li>{@link #TARDIS_DOOR}: the linked door (tardis_interior_door) that leads out of the TARDIS.
-     *       It follows the exterior's lock and the flight seal.</li>
-     *   <li>{@link #PRIMARY}: the door flagged primary in the interior structure, driven by the console's
-     *       interior door control. It is just a door: the TARDIS lock and the flight seal never touch it.</li>
-     *   <li>{@link #DECORATIVE}: any other fixed-variant door, not tied to the TARDIS at all.</li>
-     * </ul>
-     */
+       The three kinds of door this can be.
+       TARDIS_DOOR is the linked door that leads out of the TARDIS, it follows the lock of the exterior and the flight seal.
+       PRIMARY is the door flagged primary in the interior structure and driven by the interior door control of the console, it is just a door and the lock and flight seal never touch it.
+       DECORATIVE is any other fixed variant door and is not tied to the TARDIS at all.
+    */
     public enum Role {
         TARDIS_DOOR,
         PRIMARY,
         DECORATIVE
     }
 
+    /** What this door is, the primary door, a door linked to a TARDIS, or just decoration. */
     public Role role() {
         if (primary) return Role.PRIMARY;
         return isLinked() ? Role.TARDIS_DOOR : Role.DECORATIVE;
     }
 
-    /* only the TARDIS's own door obeys the exterior lock and the flight seal */
+    /** Only the door of the TARDIS follows the lock of the exterior and the flight seal. */
     public boolean followsTardisLock() {
         return role() == Role.TARDIS_DOOR;
+    }
+
+    public String getRoundelBlock() {
+        return roundelBlock;
+    }
+
+    /** Every door can be restyled including the primary one, the roundel only changes how it looks. */
+    public boolean canTakeRoundel() {
+        return true;
+    }
+
+    public void setRoundelBlock(String blockId) {
+        if (this.roundelBlock.equals(blockId)) return;
+        this.roundelBlock = blockId;
+        sync();
     }
 
     public boolean isPrimary() {
@@ -267,6 +285,7 @@ public class InteriorDoorBlockEntity extends BlockEntity implements GeoBlockEnti
         }
     }
 
+    /** How far in front of the door the player is, negative means behind it. */
     private double frontDepth(ServerPlayer player) {
         BlockState state = getBlockState();
         Direction facing = state.getValue(InteriorDoorBlock.FACING);
@@ -277,6 +296,10 @@ public class InteriorDoorBlockEntity extends BlockEntity implements GeoBlockEnti
         return (player.getX() - centre.x) * facing.getStepX() + (player.getZ() - centre.z) * facing.getStepZ();
     }
 
+    /**
+       True when the player stands in the spot in front of the door where walking forward leaves the TARDIS.
+       lateral is how far left or right of the door centre they are and along or depth is how far in front.
+    */
     private boolean isInExitZone(ServerPlayer player) {
         BlockPos pos = getBlockPos();
         BlockState state = getBlockState();
@@ -308,11 +331,13 @@ public class InteriorDoorBlockEntity extends BlockEntity implements GeoBlockEnti
                 && dy >= EXIT_BOTTOM && dy <= InteriorDoorBlock.HEIGHT;
     }
 
+    /** Picks the door style from the exterior the first time, if none is saved yet. */
     private void applyInteriorDoorVariant(ServerLevel serverLevel) {
         if (tardisId == null || !storedVariantId().isEmpty()) return;
         matchTardis(serverLevel.getServer(), tardisId);
     }
 
+    /** Sets the door style to match the exterior of the TARDIS. */
     public void matchTardis(MinecraftServer server, UUID id) {
         if (!isLinked()) return;
         TardisApi.get(server, id).flatMap(Tardis::exterior)
@@ -320,11 +345,12 @@ public class InteriorDoorBlockEntity extends BlockEntity implements GeoBlockEnti
                 .ifPresent(this::setDoorVariant);
     }
 
-    /* only the primary door has a cooldown between toggles */
+    /** Only the primary door has a cooldown between toggles. */
     public boolean isOnCooldown() {
         return primary && level != null && level.getGameTime() < cooldownUntilTick;
     }
 
+    /** Stops the primary door being used again until its cooldown is over, the style sets how long in seconds. */
     private void startCooldown() {
         if (!primary || level == null) return;
         TardisDoorVariant variant = TardisDoorRegistry.resolve(getVariant(), getDoorVariantId());
@@ -334,8 +360,8 @@ public class InteriorDoorBlockEntity extends BlockEntity implements GeoBlockEnti
 
     public void interact(boolean sneaking) {
         if (isOnCooldown()) return;
-        /* the lock still holds, but the flight seal only guards the exterior door. inside, the door and its console
-           control work in flight. the portal is already gone while travelling, so nothing can walk out through it */
+        // The lock still holds but the flight seal only guards the exterior door
+        // Inside, the door and its console control work in flight, the portal is already gone while travelling so nothing can walk out through it
         if (followsTardisLock() && isTardisLocked()) {
             announceLocked();
             return;
@@ -379,6 +405,7 @@ public class InteriorDoorBlockEntity extends BlockEntity implements GeoBlockEnti
         sync();
     }
 
+    /** The TARDIS of this door, empty on the client. */
     private Optional<Tardis> tardisApi() {
         return level instanceof ServerLevel serverLevel
                 ? TardisApi.get(serverLevel.getServer(), tardisId)
@@ -407,6 +434,7 @@ public class InteriorDoorBlockEntity extends BlockEntity implements GeoBlockEnti
         playLockSound(locked);
     }
 
+    /** Puts the door straight into a state with its animation already finished, a door that only opens all the way goes to both open. */
     public void snapTo(DoorState state) {
         if (openAllOnly() && !state.isClosed()) state = DoorState.BOTH_OPEN;
         if (getDoorState() == state) return;
@@ -416,6 +444,7 @@ public class InteriorDoorBlockEntity extends BlockEntity implements GeoBlockEnti
         sync();
     }
 
+    /** Plays a door animation, the client plays it now and the server saves it so everyone else plays it too. */
     private void playDoorAnimation(String animationName) {
         if (level != null && level.isClientSide()) {
             triggerAnim("anim_controller", animationName);
@@ -435,6 +464,7 @@ public class InteriorDoorBlockEntity extends BlockEntity implements GeoBlockEnti
         };
     }
 
+    /** Where the door sounds also play, the console of the TARDIS or the door itself if there is none. */
     private BlockPos soundPos() {
         if (level instanceof ServerLevel serverLevel) {
             UUID id = tardisId != null ? tardisId : TardisApi.idOfLevel(serverLevel).orElse(null);
@@ -451,13 +481,14 @@ public class InteriorDoorBlockEntity extends BlockEntity implements GeoBlockEnti
         playThroughExterior(sound);
     }
 
-    /* same as the outside hum's open range (ExteriorHumSoundInstance.OPEN_RANGE) */
+    // Same as the open range of the outside hum, ExteriorHumSoundInstance.OPEN_RANGE
     private static final float HEARD_OUTSIDE_RANGE = 6.0f;
 
-    /* the main interior door opening or shutting is also heard outside, at the
-       exterior's doorway, within the same range as the hum. it only ever plays while
-       the doors are open or just shutting, so with them shut you hear nothing.
-       it's a normal sound in the overworld, so flashback records and plays it too */
+    /**
+       The main interior door opening or shutting is also heard outside at the doorway of the exterior, in the same range as the hum.
+       It only plays while the doors are open or just shutting, so with them shut you hear nothing.
+       It is a normal sound in the overworld so Flashback records and plays it too.
+    */
     private void playThroughExterior(SoundEvent sound) {
         if (!primary || !(level instanceof ServerLevel)) return;
         TardisExteriorBlockEntity exterior = tardisApi().flatMap(Tardis::exterior).orElse(null);
@@ -468,11 +499,13 @@ public class InteriorDoorBlockEntity extends BlockEntity implements GeoBlockEnti
                 outside.getRandom().nextLong());
     }
 
+    /** True for a door style with no left and right panels, so it only opens and closes as one. */
     private boolean openAllOnly() {
         TardisDoorVariant variant = TardisDoorRegistry.resolve(getVariant(), getDoorVariantId());
         return variant != null && variant.openAllOnly();
     }
 
+    /** The sound for opening or closing, the one the door style sets or the normal one if it sets none. */
     private SoundEvent doorSound(boolean opening) {
         SoundEvent fallback = opening ? GCSounds.TARDIS_DOOR_OPEN : GCSounds.TARDIS_DOOR_CLOSE;
         TardisDoorVariant variant = TardisDoorRegistry.resolve(getVariant(), getDoorVariantId());
@@ -486,6 +519,7 @@ public class InteriorDoorBlockEntity extends BlockEntity implements GeoBlockEnti
         return BuiltInRegistries.SOUND_EVENT.getOptional(id).orElseGet(() -> SoundEvent.createVariableRangeEvent(id));
     }
 
+    /** Plays the lock or unlock sound at the door and also at the console. */
     private void playLockSound(boolean locked) {
         if (level == null) return;
         SoundEvent sound = locked ? GCSounds.TARDIS_DOOR_LOCK : GCSounds.TARDIS_DOOR_UNLOCK;
@@ -517,6 +551,7 @@ public class InteriorDoorBlockEntity extends BlockEntity implements GeoBlockEnti
         output.putString("DoorAnim", doorAnim);
         output.putBoolean("DoorAnimInstant", doorAnimInstant);
         output.putBoolean("Primary", primary);
+        output.putString("RoundelBlock", roundelBlock);
     }
 
     @Override
@@ -524,6 +559,7 @@ public class InteriorDoorBlockEntity extends BlockEntity implements GeoBlockEnti
         super.loadAdditional(input);
         components.load(input, SAVED);
         primary = input.getBooleanOr("Primary", false);
+        roundelBlock = input.getStringOr("RoundelBlock", "");
         int animSeq = input.getIntOr("DoorAnimSeq", 0);
         String anim = input.getStringOr("DoorAnim", "");
         boolean instant = input.getBooleanOr("DoorAnimInstant", false);

@@ -8,8 +8,10 @@ import uk.nbforge.gallifreyan_chronicles.tardis.mind.action.MindContext;
 import net.minecraft.core.BlockPos;
 import net.minecraft.sounds.SoundSource;
 
-/* {"type": "slam_doors", "volume": 1.5, "shake": 0.6, "lock": true}
-   it slams its doors shut with a bang and the room shakes. lock: locks them too */
+/**
+   Slams its doors shut with a bang and the room shakes, lock locks them too.
+   The json fields are volume, shake and lock.
+*/
 public record SlamDoorsAction(float volume, float shake, boolean lock) implements MindAction {
     public static final String TYPE = Constants.MOD_ID + ":slam_doors";
 

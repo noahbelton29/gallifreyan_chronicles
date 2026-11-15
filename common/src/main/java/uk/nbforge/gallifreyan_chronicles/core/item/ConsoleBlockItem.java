@@ -98,6 +98,10 @@ public class ConsoleBlockItem extends BlockItem implements ScrollSelectable {
         return entries().size();
     }
 
+    /**
+       Moves the selected console and variant forward or back by step, wrapping round at the ends.
+       Returns false when there is nothing to switch between.
+    */
     @Override
     public boolean cycleSelection(ItemStack stack, int step) {
         List<Entry> entries = entries();

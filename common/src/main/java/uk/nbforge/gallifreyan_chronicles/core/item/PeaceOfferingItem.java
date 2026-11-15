@@ -12,7 +12,7 @@ import org.jspecify.annotations.NonNull;
 
 import java.util.Optional;
 
-/* a treat to make peace with a tardis. use it on the console or the box */
+/** A treat to make peace with a TARDIS, use it on the console or the box. */
 public class PeaceOfferingItem extends Item {
     private static final int USE_COOLDOWN_TICKS = 20;
 

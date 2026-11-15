@@ -4,6 +4,7 @@ import uk.nbforge.gallifreyan_chronicles.util.TardisDimensionUtil;
 import uk.nbforge.gallifreyan_chronicles.Constants;
 import uk.nbforge.gallifreyan_chronicles.core.block_entities.TardisConsoleBlockEntity;
 import net.minecraft.client.Minecraft;
+import uk.nbforge.gallifreyan_chronicles.client.util.DetailLevelUtil;
 import net.minecraft.client.sounds.SoundManager;
 import net.minecraft.world.phys.Vec3;
 
@@ -29,6 +30,7 @@ public final class ConsoleHumSounds {
         HUMS.putIfAbsent(console, null);
     }
 
+    /** Every few ticks, start a hum for consoles near you and stop it for consoles that are removed, in another world or outside a TARDIS. */
     public static void tick() {
         if (++ticks % CHECK_INTERVAL_TICKS != 0) return;
 
@@ -56,7 +58,7 @@ public final class ConsoleHumSounds {
                 continue;
             }
 
-            /* a console placed outside a tardis doesn't hum */
+            // A console placed outside a TARDIS does not hum
             if (!isTardisLevel(console)) {
                 if (hum != null) {
                     sounds.stop(hum);
@@ -66,6 +68,7 @@ public final class ConsoleHumSounds {
             }
 
             if (hum != null && sounds.isActive(hum)) continue;
+            if (!DetailLevelUtil.highDetail()) continue;
             if (SoundListener.pos().distanceToSqr(Vec3.atCenterOf(console.getBlockPos())) > START_RANGE_SQR) continue;
 
             TardisConsoleHumSoundInstance fresh = new TardisConsoleHumSoundInstance(console.getBlockPos(),

@@ -8,31 +8,18 @@ import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
 import org.jspecify.annotations.Nullable;
 
-/**
- * Finds safe landing positions for a TARDIS.
- *
- * <p>Searches nearby columns for a suitable position, preferring locations
- * close to the requested position with enough room to land.
- */
+/** Finds a safe landing spot, it searches nearby columns and prefers spots close to the requested one with enough room. */
 public final class TardisLandingSite {
-    /**
-     * Maximum horizontal distance from the requested position to search.
-     */
+    // The furthest sideways distance searched
     public static final int MAX_RADIUS = 12;
 
-    /**
-     * Maximum vertical distance to check in each column.
-     */
+    // How far up and down to check in each column
     private static final int VERTICAL_WINDOW = 24;
 
-    /**
-     * Weight applied to vertical distance when calculating the landing score.
-     */
+    // How much vertical distance counts against the score
     private static final double VERTICAL_WEIGHT = 0.35;
 
-    /**
-     * Penalty applied to positions surrounded by solid blocks.
-     */
+    // Penalty for spots surrounded by solid blocks
     private static final double ENCLOSED_PENALTY = 100.0;
 
     private record Candidate(BlockPos feet, double score) {
@@ -42,27 +29,19 @@ public final class TardisLandingSite {
     }
 
     /**
-     * Finds the best available landing position near the requested position.
-     *
-     * <p>If no suitable position is found within the search radius, the
-     * original column is checked for the nearest available position.
-     *
-     * @param level  server level to search in
-     * @param target requested landing position
-     * @param own    current TARDIS position, if it is in the same level
-     * @return the best landing position, or {@code null} if none is available
-     */
+       If nothing is found in the radius it checks the original column for the nearest spot.
+       Returns null if nothing is available.
+    */
     public static @Nullable BlockPos find(ServerLevel level, BlockPos target, @Nullable BlockPos own) {
         Candidate best = null;
 
         for (int radius = 0; radius <= MAX_RADIUS; radius++) {
-            // Every column outside this radius is at least this far away horizontally.
-            // If it cannot beat the current score, there is no reason to keep searching.
+            // Everything outside this radius is at least this far away sideways, if it cannot beat the best score there is no reason to keep searching
             if (best != null && (double) radius * radius >= best.score()) break;
 
             for (int dx = -radius; dx <= radius; dx++) {
                 for (int dz = -radius; dz <= radius; dz++) {
-                    // Only check the outer edge of the current radius.
+                    // Only the outer edge of the current radius is new
                     if (Math.max(Math.abs(dx), Math.abs(dz)) != radius) continue;
 
                     double horizontal = (double) dx * dx + (double) dz * dz;
@@ -73,7 +52,7 @@ public final class TardisLandingSite {
 
                     if (!level.getWorldBorder().isWithinBounds(column)) continue;
 
-                    // Ensure the chunk is loaded before checking its blocks.
+                    // Loads the chunk before checking its blocks
                     level.getChunkAt(column);
 
                     Candidate found = bestInColumn(level, column, horizontal, own);
@@ -98,7 +77,7 @@ public final class TardisLandingSite {
 
         for (int dy = 0; dy <= VERTICAL_WINDOW; dy++) {
             for (int side = 0; side < 2; side++) {
-                // The target height is only checked once.
+                // The target height is only checked once
                 if (dy == 0 && side == 1) continue;
 
                 int y = side == 0 ? column.getY() - dy : column.getY() + dy;
@@ -116,8 +95,7 @@ public final class TardisLandingSite {
                 }
             }
 
-            // Once the next vertical distance cannot beat the current score,
-            // checking higher positions in this column is unnecessary.
+            // Once the next vertical step cannot beat the best score, higher spots in this column are pointless
             double next = horizontal + VERTICAL_WEIGHT * (dy + 1.0) * (dy + 1.0);
 
             if (best != null && next >= best.score()) break;
@@ -144,15 +122,7 @@ public final class TardisLandingSite {
         return null;
     }
 
-    /**
-     * Gets the highest valid Y position for a TARDIS landing.
-     *
-     * <p>Dimensions with a ceiling use their logical height to avoid
-     * searching above the Nether roof.
-     *
-     * @param level server level being checked
-     * @return highest valid Y position for the TARDIS
-     */
+    /** Dimensions with a ceiling use their logical height so the search stays below the Nether roof. */
     private static int highestFeet(ServerLevel level) {
         if (level.dimensionType().hasCeiling()) {
             return level.getMinY() + level.dimensionType().logicalHeight() - 3;
@@ -161,23 +131,14 @@ public final class TardisLandingSite {
         return level.getMaxY() - 2;
     }
 
-    /**
-     * Checks whether a position has enough room for a TARDIS to land.
-     *
-     * <p>Requires two clear blocks of space above a solid, non-harmful floor.
-     *
-     * @param level server level being checked
-     * @param feet  position where the TARDIS would stand
-     * @param own   current TARDIS position, if available
-     * @return {@code true} if the position is suitable for landing
-     */
+    /** Needs two clear blocks above a solid floor that does not hurt. */
     public static boolean standable(ServerLevel level, BlockPos feet, @Nullable BlockPos own) {
         BlockPos below = feet.below();
         BlockPos head = feet.above();
 
         if (level.isOutsideBuildHeight(below) || level.isOutsideBuildHeight(head)) return false;
 
-        // Allow the TARDIS to overlap its own blocks, but not land inside them.
+        // The TARDIS may overlap its own blocks but not land inside them
         if (own != null && !feet.equals(own) && (feet.equals(own.above()) || head.equals(own))) return false;
 
         if (isBlocked(level, feet, own) || isBlocked(level, head, own)) return false;
@@ -191,7 +152,7 @@ public final class TardisLandingSite {
     }
 
     private static boolean isBlocked(ServerLevel level, BlockPos pos, @Nullable BlockPos own) {
-        // Treat the TARDIS's existing blocks as clear so it can land at its current position.
+        // Its own blocks count as clear so it can land where it already is
         if (own != null && (pos.equals(own) || pos.equals(own.above()))) return false;
 
         BlockState state = level.getBlockState(pos);
@@ -212,15 +173,7 @@ public final class TardisLandingSite {
         return ENCLOSED_PENALTY;
     }
 
-    /**
-     * Checks whether a block can be safely removed when the TARDIS lands.
-     *
-     * <p>Blocks containing block entities are never considered soft, as they
-     * may contain stored data that should not be destroyed.
-     *
-     * @param state block state to check
-     * @return {@code true} if the block can be replaced during landing
-     */
+    /** Blocks with block entities are never soft because they may hold data that should not be destroyed. */
     public static boolean isSoft(BlockState state) {
         if (state.isAir() || state.hasBlockEntity()) return false;
 
@@ -236,15 +189,7 @@ public final class TardisLandingSite {
                 || state.is(Blocks.TWISTING_VINES) || state.is(Blocks.TWISTING_VINES_PLANT);
     }
 
-    /**
-     * Removes a soft block so the TARDIS can occupy its position.
-     *
-     * <p>Blocks are destroyed without dropping items. Blocks containing
-     * fluids are left untouched.
-     *
-     * @param level server level containing the block
-     * @param pos   position of the block to remove
-     */
+    /** Destroyed without drops, blocks with fluids are left alone. */
     public static void clearSoft(ServerLevel level, BlockPos pos) {
         BlockState state = level.getBlockState(pos);
 

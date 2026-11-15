@@ -1,14 +1,11 @@
 package uk.nbforge.gallifreyan_chronicles.datagen.assets;
 
-
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.ArrayList;
 
-
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.client.renderer.item.SelectItemModel;
-
 
 import uk.nbforge.gallifreyan_chronicles.Constants;
 import uk.nbforge.gallifreyan_chronicles.core.block.TardisBlock;
@@ -150,7 +147,7 @@ public class GCModelProvider extends ModelProvider {
         );
         blockModels.createParticleOnlyBlock(GCBlocks.TARDIS_CONSOLE);
         blockModels.createParticleOnlyBlock(GCBlocks.TARDIS_TOP);
-        /* every door block just needs a particle, the wall it's set in */
+        // Every door block just needs a particle, the wall it is set in
         Map<String, String> doorParticles = new HashMap<>();
         for (DoorBlockJson.Entry door : DoorBlockJson.entries()) doorParticles.put(door.block(), door.particle());
         for (Block door : GCBlocks.interiorDoorBlocks()) {
@@ -214,7 +211,7 @@ public class GCModelProvider extends ModelProvider {
                 ItemModelUtils.when("inferno_console", flatItem(itemModels, "tardis_console/inferno_console")),
                 ItemModelUtils.when("ambassadors_of_death_console", flatItem(itemModels, "tardis_console/ambassadors_of_death_console"))));
 
-        /* tardis interior doors: one item, a model per interior door variant in the data */
+        // TARDIS interior doors have one item and a model per interior door variant in the data
         List<String> interiorVariants = interiorDoorVariants();
         if (!interiorVariants.isEmpty()) {
             List<SelectItemModel.SwitchCase<String>> interiorCases = new ArrayList<>();
@@ -228,7 +225,7 @@ public class GCModelProvider extends ModelProvider {
                     ItemModelUtils.select(new ComponentContents<>(GCDataComponents.DOOR_TYPE), interiorFallback, interiorCases));
         }
 
-        /* plain doors: every door item can show every door type */
+        // Plain doors, every door item can show every door type
         Map<Block, ItemModel.Unbaked> doorModels = new LinkedHashMap<>();
         for (Block door : GCBlocks.pickableDoors()) {
             doorModels.put(door, ItemModelUtils.plainModel(itemModels.createFlatItemModel(door.asItem(), ModelTemplates.FLAT_ITEM)));
@@ -240,7 +237,7 @@ public class GCModelProvider extends ModelProvider {
                 ItemModelUtils.select(new ComponentContents<>(GCDataComponents.DOOR_TYPE), fallback, doorCases)));
     }
 
-    /* interior door variant ids, from the same codec-read files the game uses, in priority order */
+    /** Interior door variant ids from the same files the game reads with its codec, in priority order. */
     private static List<String> interiorDoorVariants() {
         return DoorBlockJson.bundledVariants().stream()
                 .filter(TardisDoorVariant::interior)
@@ -324,7 +321,6 @@ public class GCModelProvider extends ModelProvider {
                 .fence(GCBlocks.BRACHACKI_FENCE)
                 .fenceGate(GCBlocks.BRACHACKI_FENCE_GATE);
     }
-
 
     private void registerThorivine(BlockModelGenerators generators) {
         TextureMapping mapping = new TextureMapping()

@@ -3,8 +3,10 @@ package uk.nbforge.gallifreyan_chronicles.tardis.codec.console;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.DataResult;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
+
 import java.util.List;
 import java.util.Optional;
+
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
@@ -37,20 +39,17 @@ public final class ControlEntryCodec {
 
         private DataResult<TardisConsole.ControlEntry> toEntry() {
             Vec3 pos;
+            // No position means it comes from the hitbox bone of the model, named after the control id, once the console id is known
             if (position.isPresent()) {
                 List<Double> p = position.get();
                 if (p.size() != 3) return DataResult.error(() -> "Control '" + id + "' position needs 3 numbers");
                 pos = new Vec3(p.get(0), p.get(1), p.get(2));
-            } else if (offset.isPresent()) {
-                pos = offset.get();
-            } else {
-                /* no position: it comes from the model's <id>_hitbox bone once the console id is known */
-                pos = TardisConsole.ControlEntry.FROM_HITBOX;
-            }
+            } else pos = offset.orElse(TardisConsole.ControlEntry.FROM_HITBOX);
 
             float w;
             float h;
             float d;
+            // With no position and no size at all both come from the hitbox bone of the model, NaN means not set yet
             boolean noSize = size.isEmpty() && width.isEmpty() && height.isEmpty() && depth.isEmpty();
             if (pos == TardisConsole.ControlEntry.FROM_HITBOX && noSize) {
                 w = Float.NaN;

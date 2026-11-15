@@ -8,8 +8,10 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-/* in a replay, portals that show up with no shape are never added. removing them
-   after adding made seamless portals crash in its cleanup (unitAxis is null) */
+/**
+   In a replay, portals that show up with no shape are never added.
+   Removing them after adding made Seamless Portals crash in its cleanup because unitAxis is null.
+*/
 @Mixin(ClientLevel.class)
 public abstract class ShapelessPortalSkipMixin {
     @Inject(method = "addEntity", at = @At("HEAD"), cancellable = true, require = 0)

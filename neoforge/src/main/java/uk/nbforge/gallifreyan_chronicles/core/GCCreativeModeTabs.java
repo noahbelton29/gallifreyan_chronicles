@@ -45,9 +45,7 @@ public class GCCreativeModeTabs {
                     .displayItems((params, output) -> GCCreativeTabContents.toolsAndArmor(output::accept))
                     .build());
 
-    /**
-     * Everything addons registered through the addon API. Read when the tab is built, after addons have started.
-     */
+    // Everything addons registered through the addon api, read when the tab is built after addons have started
     public static final Supplier<CreativeModeTab> ADDONS_TAB = CREATIVE_MODE_TABS.register("addons",
             () -> CreativeModeTab.builder().icon(() -> new ItemStack(GCItems.TARANIUM_INGOT))
                     .title(Component.translatable("creativetab.gallifreyan_chronicles.addons"))

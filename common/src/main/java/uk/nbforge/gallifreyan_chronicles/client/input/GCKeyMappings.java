@@ -6,8 +6,10 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.network.chat.Component;
 import org.jspecify.annotations.Nullable;
 
-/* the mod's keybinds. the key mappings are built here but registered by each loader, because fabric and neoforge
-   register them (and their category) differently */
+/**
+   The keybinds of the mod.
+   The key mappings are built here but registered by each loader because Fabric and NeoForge register them and their category differently.
+*/
 public final class GCKeyMappings {
     private static @Nullable KeyMapping showControlNames;
     private static boolean controlNamesOn;

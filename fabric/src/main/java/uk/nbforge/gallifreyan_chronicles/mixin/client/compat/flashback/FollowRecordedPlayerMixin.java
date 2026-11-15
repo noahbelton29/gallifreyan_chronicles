@@ -7,8 +7,7 @@ import net.minecraft.network.RegistryFriendlyByteBuf;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Pseudo;
 
-/* before flashback moves the recorded entities, we take a look at the data
-   (to follow the recorded player into a tardis). see FlashbackPuppet */
+/** Before Flashback moves the recorded entities we look at the data to follow the recorded player into a TARDIS, see FlashbackPuppet. */
 @Pseudo
 @Mixin(targets = "com.moulberry.flashback.playback.ReplayServer", remap = false)
 public abstract class FollowRecordedPlayerMixin {

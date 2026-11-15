@@ -10,8 +10,10 @@ import net.minecraft.sounds.SoundSource;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.phys.Vec3;
 
-/* sparks made of fire with a bit of smoke, and their sounds. small crackles, big bursts and full blasts.
-   every spark gives the screen a jolt, bigger sparks jolt harder */
+/**
+   Sparks made of fire with a bit of smoke and their sounds, small crackles, big bursts and full blasts.
+   Every spark jolts the screen and bigger sparks jolt harder.
+*/
 public final class GCSparkUtil {
     private static final float SMALL_SHAKE = 2.0f;
     private static final float BIG_SHAKE = 3.0f;
@@ -20,7 +22,7 @@ public final class GCSparkUtil {
     private GCSparkUtil() {
     }
 
-    /* a little crackle of sparks */
+    /** A little crackle. */
     public static void small(ServerLevel level, Vec3 at, int amount) {
         RandomSource random = level.getRandom();
         level.sendParticles(ParticleTypes.FLAME, at.x, at.y, at.z, amount, 0.15, 0.1, 0.15, 0.08);
@@ -31,7 +33,7 @@ public final class GCSparkUtil {
         TardisDrumShakePayload.broadcast(level, at, SMALL_SHAKE);
     }
 
-    /* a burst of sparks that crackles for a moment after */
+    /** A burst that crackles for a moment after. */
     public static void big(ServerLevel level, Vec3 at) {
         RandomSource random = level.getRandom();
         level.sendParticles(ParticleTypes.FLAME, at.x, at.y, at.z, 35, 0.3, 0.3, 0.3, 0.2);
@@ -42,7 +44,7 @@ public final class GCSparkUtil {
         crackleAfter(level, at, 2);
     }
 
-    /* an explosion with sparks flying everywhere */
+    /** An explosion with sparks flying everywhere. */
     public static void blast(ServerLevel level, Vec3 at) {
         RandomSource random = level.getRandom();
         level.sendParticles(ParticleTypes.FLAME, at.x, at.y, at.z, 80, 0.8, 0.6, 0.8, 0.3);
@@ -54,7 +56,7 @@ public final class GCSparkUtil {
         crackleAfter(level, at, 4);
     }
 
-    /* quieter crackles trailing off after a burst */
+    /** Quieter crackles trailing off after a burst. */
     private static void crackleAfter(ServerLevel level, Vec3 at, int times) {
         RandomSource random = level.getRandom();
         int delay = 0;

@@ -27,7 +27,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import org.jspecify.annotations.Nullable;
 import uk.nbforge.gallifreyan_chronicles.tardis.codec.mind.action.MindActionBuiltinCodec;
 
-/* every action type json can use. addons call register to add their own */
+/** Every action type json can use, addons call register to add their own. */
 public final class MindActions {
     private static final Map<String, MapCodec<? extends MindAction>> TYPES = new ConcurrentHashMap<>();
 

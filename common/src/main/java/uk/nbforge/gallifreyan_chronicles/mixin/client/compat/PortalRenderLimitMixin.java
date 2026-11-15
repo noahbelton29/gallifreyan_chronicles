@@ -11,9 +11,9 @@ import qouteall.imm_ptl.core.portal.Portal;
 import java.util.function.Supplier;
 
 /**
- * Applies the Portal Render Distance and Max Rendered Portals video settings to TARDIS door portals.
- * Immersive Portals decides per frame, per portal, whether to skip rendering it; we add our own limits there.
- */
+   Applies the Portal Render Distance and Max Rendered Portals video settings to TARDIS door portals.
+   Immersive Portals decides per frame and per portal whether to skip rendering it and we add our own limits there.
+*/
 @Pseudo
 @Mixin(targets = "qouteall.imm_ptl.core.render.renderer.PortalRenderer", remap = false)
 public abstract class PortalRenderLimitMixin {

@@ -47,7 +47,7 @@ public class ControlIconProvider implements IEntityComponentProvider {
         }
     }
 
-    /* the destination controls: what they would set or show, read from the server data */
+    /** The destination controls, what they would set or show, read from the server data. */
     private static void appendDestination(ITooltip tooltip, String id, CompoundTag data) {
         switch (id) {
             case GCTardisControls.X_INCREMENT_CONTROL -> coord(tooltip, "target_x", data);

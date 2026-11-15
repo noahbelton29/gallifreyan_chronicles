@@ -1,4 +1,4 @@
-package uk.nbforge.gallifreyan_chronicles.mixin.client.security;
+package uk.nbforge.gallifreyan_chronicles.mixin.client.capture;
 
 import com.mojang.blaze3d.platform.NativeImage;
 import uk.nbforge.gallifreyan_chronicles.Constants;

@@ -7,8 +7,10 @@ import uk.nbforge.gallifreyan_chronicles.util.PlayerMotionUtil;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.phys.Vec3;
 
-/* {"type": "shock", "range": 4, "damage": 2, "push": 0.6, "lift": 0.3}
-   zaps the player if they're close enough and throws them back */
+/**
+   Zaps the player if they are close enough and throws them back.
+   The json fields are range, damage, push and lift.
+*/
 public record ShockAction(float range, float damage, float push, float lift) implements MindAction {
     public static final String TYPE = Constants.MOD_ID + ":shock";
 
@@ -21,7 +23,7 @@ public record ShockAction(float range, float damage, float push, float lift) imp
     public void run(MindContext context) {
         Player player = context.player;
         if (context.level == null || context.pos == null || player == null) return;
-        /* it can only zap you from inside, not through the box outside */
+        // It can only zap you from inside, not through the box outside
         if (context.level != context.tardis.interiorLevel().orElse(null)) return;
         if (player.distanceToSqr(context.pos) > range * range) return;
         player.hurtServer(context.level, context.level.damageSources().lightningBolt(), damage);

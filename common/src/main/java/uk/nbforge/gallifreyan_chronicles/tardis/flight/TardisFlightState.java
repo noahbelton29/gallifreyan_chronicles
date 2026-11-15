@@ -1,7 +1,6 @@
 package uk.nbforge.gallifreyan_chronicles.tardis.flight;
 
-// where a tardis is in its trip, TAKING_OFF and LANDING are timed and move on by themselves, IN_VORTEX lasts until the
-// flight lever goes back up
+/** Where a TARDIS is in its trip, TAKING_OFF and LANDING are timed and move on by themselves and IN_VORTEX lasts until the flight lever goes back up. */
 public enum TardisFlightState {
     IDLE,
     TAKING_OFF,
@@ -12,7 +11,7 @@ public enum TardisFlightState {
         return this == IDLE;
     }
 
-    // the lever can't be used and the doors stay shut during these, the engines are still spinning up or winding down
+    /** The lever cannot be used and the doors stay shut during these because the engines are still spinning up or winding down. */
     public boolean isTransitioning() {
         return this == TAKING_OFF || this == LANDING;
     }
@@ -21,7 +20,7 @@ public enum TardisFlightState {
         return this == TAKING_OFF || this == LANDING;
     }
 
-    // the state a timed state moves on to once its time is up
+    /** The state a timed state moves on to once its time is up. */
     public TardisFlightState afterTimer() {
         return switch (this) {
             case TAKING_OFF -> IN_VORTEX;

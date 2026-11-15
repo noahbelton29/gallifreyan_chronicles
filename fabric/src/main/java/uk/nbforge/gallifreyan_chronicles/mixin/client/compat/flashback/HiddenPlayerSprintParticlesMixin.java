@@ -7,8 +7,7 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
-/* in a replay, the recorded player we hid at the tardis door kept making sprint
-   particles there. the copy inside makes them instead. see FlashbackPuppet */
+/** In a replay the recorded player we hid at the TARDIS door kept making sprint particles there, the copy inside makes them instead, see FlashbackPuppet. */
 @Mixin(Entity.class)
 public abstract class HiddenPlayerSprintParticlesMixin {
     @Inject(method = "canSpawnSprintParticle", at = @At("HEAD"), cancellable = true, require = 0)

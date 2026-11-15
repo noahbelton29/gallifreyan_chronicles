@@ -7,11 +7,9 @@ import uk.nbforge.gallifreyan_chronicles.datagen.util.GCJsonDataProvider;
 import uk.nbforge.gallifreyan_chronicles.datagen.tardis.builder.GCConsoleBuilder;
 
 /**
- * Generates data/gallifreyan_chronicles/tardis_console/*.json.
- * To add a console, copy a block below. {@code standardControls()} adds every normal control with its usual
- * cooldown; use {@code adjust(...)} to place or resize one for this console's model, and the ids in
- * {@link GCTardisControls} for anything else.
- */
+   Generates the tardis_console json files.
+   To add a console copy a block below, standardControls adds every normal control with its usual cooldown, use adjust to place or resize one for the model of this console, and use the ids in GCTardisControls for anything else.
+*/
 public class GCTardisConsoleProvider extends GCJsonDataProvider {
     public GCTardisConsoleProvider(PackOutput output) {
         super(output, "tardis_console", "TARDIS Console");

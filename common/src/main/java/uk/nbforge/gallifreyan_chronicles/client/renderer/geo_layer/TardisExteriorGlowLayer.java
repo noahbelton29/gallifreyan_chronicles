@@ -1,6 +1,7 @@
 package uk.nbforge.gallifreyan_chronicles.client.renderer.geo_layer;
 
 import uk.nbforge.gallifreyan_chronicles.client.renderer.fade.FadeBoxRenderer;
+import uk.nbforge.gallifreyan_chronicles.client.util.DetailLevelUtil;
 import net.minecraft.client.renderer.SubmitNodeCollector;
 import com.geckolib.renderer.base.RenderPassInfo;
 import com.geckolib.constant.DataTickets;
@@ -26,16 +27,17 @@ public class TardisExteriorGlowLayer<T extends GeoAnimatable, O, R extends GeoRe
     protected RenderType getRenderType(@NonNull R renderState) {
         boolean glowing = renderState.getOrDefaultGeckolibData(TardisExteriorBlockRenderer.GLOWING, false);
 
-        if (!glowing) return null;
+        if (!glowing || !DetailLevelUtil.highDetail()) return null;
         if (renderState.getOrDefaultGeckolibData(TardisExteriorBlockRenderer.LAMP, 1.0f) <= 0.01f) return null;
         if (renderState.getOrDefaultGeckolibData(TardisExteriorBlockRenderer.OPACITY, 1.0f) <= 0.0f) return null;
-        /* while fading on the canvas, the glow goes on the canvas too so it fades with the box */
+        // While fading on the canvas the glow goes on the canvas too so it fades with the box
+        // the glow staying behind while the box fades was so ugly
         boolean fading = renderState.getOrDefaultGeckolibData(TardisExteriorBlockRenderer.OPACITY, 1.0f) < 1.0f;
         if (fading && FadeBoxRenderer.active()) return FadeBoxRenderer.glowRenderType(getTextureResource(renderState));
         return GCRenderTypes.layeredEyes(getTextureResource(renderState));
     }
 
-    /* dims the glow by the lamp brightness, so it can flicker and fade */
+    /** Dims the glow by the lamp brightness so it can flicker and fade. */
     @Override
     public void submitRenderTask(@NonNull RenderPassInfo<R> info, @NonNull SubmitNodeCollector tasks) {
         R state = info.renderState();

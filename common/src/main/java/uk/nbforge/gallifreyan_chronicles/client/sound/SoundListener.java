@@ -7,12 +7,13 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
 import org.jspecify.annotations.Nullable;
 
-/* where our sounds are heard from. normally the player. in a flashback replay the
-   camera is the listener, and once it flies through a door it hears the tardis world
-   instead of the overworld. the replay side sets the override */
+/**
+   Where our sounds are heard from, normally the player.
+   In a Flashback replay the camera is the listener and once it flies through a door it hears the TARDIS world instead of the overworld, the replay side sets the override.
+*/
 public final class SoundListener {
     public interface Override {
-        /* null when not in a replay */
+        // Null when not in a replay
         @Nullable Level level();
 
         Vec3 pos();
@@ -27,7 +28,7 @@ public final class SoundListener {
         override = value;
     }
 
-    /* true while a replay decides what is heard */
+    /** True while a replay decides what is heard. */
     public static boolean inReplay() {
         return override != null && override.level() != null;
     }

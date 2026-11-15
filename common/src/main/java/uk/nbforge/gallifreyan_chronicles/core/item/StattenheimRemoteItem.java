@@ -38,12 +38,12 @@ public class StattenheimRemoteItem extends Item {
         if (player == null) return InteractionResult.PASS;
         ItemStack stack = context.getItemInHand();
 
-        // link the stattenheim remote
+        // Link the remote
         if (player.isShiftKeyDown()) {
             return link(serverLevel, context.getClickedPos(), player, stack);
         }
 
-        // summon the TARDIS
+        // Summon the TARDIS
         UUID tardisID = stack.get(GCDataComponents.TARDIS_ID);
         if (tardisID == null) {
             say(player, "stattenheim_not_linked", ChatFormatting.RED);
@@ -118,12 +118,12 @@ public class StattenheimRemoteItem extends Item {
         return InteractionResult.SUCCESS;
     }
 
-    /* the owner and anyone they've trusted. a remote linked to a stranger's TARDIS does nothing */
+    /** The owner and anyone they trust, a remote linked to the TARDIS of a stranger does nothing. */
     private static boolean mayUse(Tardis tardis, Player player) {
         return tardis.isOwner(player) || tardis.isTrusted(player.getUUID());
     }
 
-    /* a TARDIS can't land inside another TARDIS's interior */
+    /** A TARDIS cannot land inside the interior of another TARDIS. */
     private static boolean isInsideATardis(ServerLevel level) {
         return TardisApi.idOfLevel(level).isPresent() || TardisDimensionUtil.isInterior(level);
     }

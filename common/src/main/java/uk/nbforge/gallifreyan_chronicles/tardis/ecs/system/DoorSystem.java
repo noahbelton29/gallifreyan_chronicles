@@ -31,7 +31,7 @@ public final class DoorSystem {
         entity.set(TardisComponentTypes.DOOR, entity.get(TardisComponentTypes.DOOR).animatingUntil(next, now + duration));
     }
 
-    // sets the state right away, no animation
+    /** Sets the state right away with no animation. */
     public static void snapToState(Entity entity, DoorState state) {
         entity.set(TardisComponentTypes.DOOR, entity.get(TardisComponentTypes.DOOR).animatingUntil(state, 0L));
     }
@@ -40,9 +40,7 @@ public final class DoorSystem {
         return interact(entity, sneaking, now, false);
     }
 
-    /**
-     * @param openAllOnly a door with no left/right panels: every click just toggles closed and fully open
-     */
+    /** openAllOnly is for a door with no left and right panels where every click just toggles between closed and fully open. */
     public static InteractionResult interact(Entity entity, boolean sneaking, long now, boolean openAllOnly) {
         DoorComponent door = entity.get(TardisComponentTypes.DOOR);
         if (door.isAnimating(now)) {

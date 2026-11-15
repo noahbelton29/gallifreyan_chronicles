@@ -33,7 +33,7 @@ import static net.minecraft.commands.Commands.argument;
 public final class CommandUtil {
     private static final String KEY = "command.gallifreyan_chronicles.";
     private static final double LOOK_DISTANCE = 8.0;
-    /* not called "id" so it doesn't clash with /gc tardis id */
+    // Not called id so it does not clash with the gc tardis id command
     private static final String ID_ARG = "tardis_id";
 
     public interface TardisAction {

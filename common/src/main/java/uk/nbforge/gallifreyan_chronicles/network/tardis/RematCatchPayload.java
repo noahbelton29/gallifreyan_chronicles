@@ -8,9 +8,11 @@ import org.jspecify.annotations.NonNull;
 
 import java.util.UUID;
 
-/* a tardis materialised around a player and pulled them in.
-   self: that player, who sees the interior fade in around them (box, floorY).
-   everyone else in the interior: that player fades in like the tardis does */
+/**
+   A TARDIS materialised around a player and pulled them in.
+   self is that player, who sees the interior fade in around them with box and floorY.
+   Everyone else in the interior sees that player fade in like the TARDIS does.
+*/
 public record RematCatchPayload(UUID player, String fadeType, int elapsedTicks, int durationTicks,
                                 boolean self, BlockPos boxMin, BlockPos boxMax, int floorY)
         implements CustomPacketPayload {

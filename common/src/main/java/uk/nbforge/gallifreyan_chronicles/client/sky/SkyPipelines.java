@@ -42,7 +42,7 @@ public final class SkyPipelines {
             .withDepthStencilState(BEHIND_SCENE)
             .build();
 
-    /* stars add light but leave the canvas see-through */
+    // Stars add light but leave the canvas see through
     private static final BlendFunction ADD_KEEP_ALPHA = new BlendFunction(BlendFactor.SRC_ALPHA, BlendFactor.ONE, BlendFactor.ZERO, BlendFactor.ONE);
 
     public static final RenderPipeline CANVAS_STARS = stars("sky_canvas_stars")
@@ -50,7 +50,7 @@ public final class SkyPipelines {
             .withDepthStencilState(BEHIND_SCENE)
             .build();
 
-    /* lays the sky canvas over the screen after a shader pack is done */
+    // Lays the sky canvas over the screen after a shader pack is done
     public static final RenderPipeline CANVAS_COMPOSITE = RenderPipeline.builder(RenderPipelines.GLOBALS_SNIPPET)
             .withLocation(GCUtil.modIdentifier("pipeline/sky_canvas_composite"))
             .withVertexShader("core/screenquad")

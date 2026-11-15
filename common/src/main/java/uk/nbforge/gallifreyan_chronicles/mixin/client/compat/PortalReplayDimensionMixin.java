@@ -10,16 +10,14 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.core.registries.BuiltInRegistries;
 import qouteall.imm_ptl.core.portal.Portal;
 
-/* in a replay the tardis dimensions don't exist, and the portal packet
-   for one throws and disconnects ("Network Protocol Error").
-   skip just that packet.
-   also: in a replay the entity type inside the portal packet can come out
-   wrong (it said TardisControlEntity), and immersive portals then refused the
-   portal. all our portals are the normal portal type, so fix the type */
+/**
+   In a replay the TARDIS dimensions do not exist and the portal packet for one throws and disconnects with a network protocol error, so skip just that packet.
+   Also in a replay the entity type inside the portal packet can come out wrong, it said TardisControlEntity, and Immersive Portals then refused the portal.
+   All our portals are the normal portal type so fix the type.
+*/
 @Pseudo
 @Mixin(targets = "qouteall.imm_ptl.core.network.ImmPtlNetworkingClient", remap = false)
 public abstract class PortalReplayDimensionMixin {
-    // why the fuck does immersive portals make my life so hard with this compat
 
     @Unique
     private static ImmPtlNetworking.PortalSyncPacket gc$fixType(ImmPtlNetworking.PortalSyncPacket packet) {
@@ -31,7 +29,7 @@ public abstract class PortalReplayDimensionMixin {
         var registry = BuiltInRegistries.ENTITY_TYPE;
         var key = type == null ? null : registry.getKey(type);
         var portalKey = registry.getKey(portalType);
-        /* keep other portal types from the same mod */
+        // Keep other portal types from the same mod
         if (key != null && key.getNamespace().equals(portalKey.getNamespace())) return packet;
         return new ImmPtlNetworking.PortalSyncPacket(packet.id(), packet.uuid(), portalType, packet.dimensionId(),
                 packet.x(), packet.y(), packet.z(), packet.extraData());

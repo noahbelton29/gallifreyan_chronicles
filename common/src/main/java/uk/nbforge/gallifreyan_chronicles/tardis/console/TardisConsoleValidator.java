@@ -22,6 +22,10 @@ public final class TardisConsoleValidator {
         return problems;
     }
 
+    /**
+       Checks a console file and logs what is wrong, returns how many problems it found.
+       Problems are unknown controls, repeated controls and sizes of zero or less.
+    */
     private static int validate(TardisConsole console) {
         int problems = 0;
         Set<String> seen = new HashSet<>();

@@ -26,6 +26,10 @@ public record TardisExterior(String id) implements IdentifiableData<TardisExteri
         return KEY_OFFSETS.computeIfAbsent(id, TardisExterior::readKeyBoneOffset);
     }
 
+    /**
+       Reads where the key bone sits in the model json of an exterior, the pivot is in sixteenths of a block and x is flipped.
+       It falls back to the default offset if the model or the bone is missing.
+    */
     private static Vec3 readKeyBoneOffset(String exteriorId) {
         Identifier parsed = Identifier.tryParse(exteriorId);
         if (parsed == null) return DEFAULT_KEY_OFFSET;

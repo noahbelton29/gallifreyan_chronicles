@@ -6,7 +6,7 @@ import net.minecraft.data.PackOutput;
 import uk.nbforge.gallifreyan_chronicles.datagen.util.GCJson;
 import uk.nbforge.gallifreyan_chronicles.datagen.util.GCJsonDataProvider;
 
-/** Generates data/gallifreyan_chronicles/tardis_console_variant/*.json. To add one, copy a line below and change the names. */
+/** Generates the tardis_console_variant json files, to add one copy a line below and change the names. */
 public class GCTardisConsoleVariantProvider extends GCJsonDataProvider {
     public GCTardisConsoleVariantProvider(PackOutput output) {
         super(output, "tardis_console_variant", "TARDIS Console Variant");
@@ -14,7 +14,7 @@ public class GCTardisConsoleVariantProvider extends GCJsonDataProvider {
 
     @Override
     protected void addEntries() {
-        // consoleVariant(name, console model, texture, glowing parts...)
+        /** consoleVariant takes name, console model, texture and glowing parts. */
         consoleVariant("ambassadors_of_death_console", "ambassadors_of_death_console", "ambassadors_of_death_console", "buttons");
         consoleVariant("first_doctors_console", "brachacki_console", "brachacki_console/first_doctors_console", "lights", "rotor");
         consoleVariant("inferno_console", "inferno_console", "inferno_console", "buttons", "rotor");

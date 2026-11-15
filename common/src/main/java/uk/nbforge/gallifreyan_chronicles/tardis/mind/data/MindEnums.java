@@ -6,12 +6,12 @@ import com.mojang.serialization.DataResult;
 import java.util.Arrays;
 import java.util.Locale;
 
-/* enums json can name, plus a codec helper for them */
+/** Enums json can name, plus a codec helper for them. */
 public final class MindEnums {
     private MindEnums() {
     }
 
-    /* when a trait first shows itself */
+    /** When a trait first shows itself. */
     public enum Reveal {
         IT_GETS_STRESSED, IT_LOSES_TRUST, IT_REFUSES, A_STRANGER_UPSETS_IT, IT_CRASHES, IT_LANDS_UPSET,
         ITS_CONTROLS_STICK, IT_IS_HIT, IT_SEES_THE_MALLET, NEVER

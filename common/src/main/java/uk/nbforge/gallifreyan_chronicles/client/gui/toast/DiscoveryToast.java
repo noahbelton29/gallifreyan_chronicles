@@ -16,7 +16,7 @@ import net.minecraft.world.item.ItemStack;
 
 import java.util.List;
 
-/* "trait discovered" popup. grows to fit the explanation */
+/** The trait discovered popup, it grows to fit the explanation. */
 public class DiscoveryToast implements Toast {
     private static final Identifier BACKGROUND = GCUtil.modIdentifier("toast/discovery");
     private static final String LANG = "discovery.gallifreyan_chronicles.";

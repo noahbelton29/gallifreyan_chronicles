@@ -9,9 +9,10 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-/* starts the addons that are real mods.
-   The loader already loaded their jars.
-   We call each one while we register our own stuff. */
+/**
+   Starts the addons that are real mods.
+   The loader already loaded their jars and we call each one while we register our own things.
+*/
 final class ModAddonLoader {
     private static final Map<String, GCAddon> LOADED = new LinkedHashMap<>();
     private static final Map<String, String> FAILURES = new HashMap<>();
@@ -24,7 +25,7 @@ final class ModAddonLoader {
             AddonInfo info = AddonManager.infoFor(entry.modId());
             AddonProblem blocking = info == null ? null : AddonManager.blockingProblem(info);
             if (blocking != null) {
-                /* its mixins are in, but its code can't register anything */
+                // Its mixins are in but its code cannot register anything
                 Constants.LOG.warn("Not starting addon '{}': {}", entry.modId(), blocking.kind());
                 FAILURES.put(entry.modId(), blocking.kind() + " " + blocking.detail());
                 continue;
@@ -52,7 +53,6 @@ final class ModAddonLoader {
         return LOADED.containsKey(id);
     }
 
-    /* did the loader load it as an addon? */
     static synchronized boolean wasFound(String id) {
         return LOADED.containsKey(id) || FAILURES.containsKey(id);
     }

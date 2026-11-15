@@ -36,12 +36,12 @@ public class MalletItem extends Item {
     public @NonNull InteractionResult useOn(@NonNull UseOnContext context) {
         Level level = context.getLevel();
         Player player = context.getPlayer();
-        /* console only. hitting the box would set off the alarm fog out in the world */
+        // Console only, hitting the box would set off the alarm fog out in the world
         Optional<Tardis> tardis = consoleAt(level, context.getClickedPos());
         if (player == null || tardis.isEmpty()) return InteractionResult.PASS;
         if (!(level instanceof ServerLevel serverLevel)) return InteractionResult.SUCCESS;
 
-        /* only the owner or trusted crew can use it, so strangers can't wreck your tardis */
+        // Only the owner or trusted crew can use it so strangers cannot wreck your TARDIS
         if (!tardis.get().isOwner(player) && !tardis.get().isTrusted(player.getUUID())) {
             MindMessages.say(player, ChatFormatting.RED, "mallet_not_yours");
             return InteractionResult.FAIL;
@@ -52,7 +52,7 @@ public class MalletItem extends Item {
         return InteractionResult.SUCCESS;
     }
 
-    /* a scarred tardis notices you holding it */
+    /** A scarred TARDIS notices you holding it. */
     @Override
     public void inventoryTick(ItemStack stack, ServerLevel level, Entity owner, @Nullable EquipmentSlot slot) {
         if (slot != EquipmentSlot.MAINHAND || !(owner instanceof Player player)) return;

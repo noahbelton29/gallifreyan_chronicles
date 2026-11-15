@@ -12,8 +12,10 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 
-/* {"type": "shield", "radius": 2.5, "push": 0.6}
-   it throws up a glowing shield and gently pushes away anyone too close. no damage */
+/**
+   Throws up a glowing shield and gently pushes away anyone too close, no damage.
+   The json fields are radius, push and lift.
+*/
 public record ShieldAction(float radius, float push, float lift) implements MindAction {
     public static final String TYPE = Constants.MOD_ID + ":shield";
     private static final int DOTS = 80;
@@ -31,7 +33,7 @@ public record ShieldAction(float radius, float push, float lift) implements Mind
     private void raise(ServerLevel level, Vec3 centre) {
         level.playSound(null, BlockPos.containing(centre), SoundEvents.BEACON_POWER_SELECT, SoundSource.BLOCKS, 0.8F, 1.4F);
 
-        /* dots spread evenly over a dome */
+        // Dots spread evenly over a dome
         for (int i = 0; i < DOTS; i++) {
             double up = (i + 0.5) / DOTS;
             double around = i * 2.39996;

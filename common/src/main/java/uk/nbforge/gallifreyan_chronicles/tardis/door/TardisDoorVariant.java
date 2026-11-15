@@ -11,7 +11,7 @@ public record TardisDoorVariant(String id, String parent, String texture, boolea
         implements IdentifiableData<TardisDoorVariant> {
 
     public static final int NO_PRIORITY = Integer.MAX_VALUE;
-    /* how long the primary door waits between toggles; set "cooldown_seconds" in the variant json to change it */
+    // How long the primary door waits between toggles, set cooldown_seconds in the variant json to change it
     public static final float DEFAULT_COOLDOWN_SECONDS = 3.0f;
 
     public String localId() {

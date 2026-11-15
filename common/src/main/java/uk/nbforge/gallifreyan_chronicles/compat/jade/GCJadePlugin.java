@@ -38,7 +38,7 @@ public class GCJadePlugin implements IWailaPlugin {
     @Override
     public void registerClient(IWailaClientRegistration registration) {
         registration.addRayTraceCallback((hitResult, accessor, originalAccessor) -> {
-            // looking at a portal: show the info of the tardis exterior or interior door it belongs to
+            // Looking at a portal, show the info of the TARDIS exterior or interior door it belongs to
             if (accessor instanceof EntityAccessor entityAccessor && isPortal(entityAccessor.getEntity())) {
                 Entity portal = entityAccessor.getEntity();
 
@@ -51,7 +51,7 @@ public class GCJadePlugin implements IWailaPlugin {
                 return accessor;
             }
 
-            // only show a control's tooltip while the crosshair is really on its hitbox
+            // Only show the tooltip of a control while the crosshair is really on its hitbox
             if (accessor instanceof EntityAccessor entityAccessor
                     && entityAccessor.getEntity() instanceof TardisControlEntity control) {
                 Player player = Minecraft.getInstance().player;
@@ -62,7 +62,7 @@ public class GCJadePlugin implements IWailaPlugin {
                 if (control.getBoundingBox().clip(eye, end).isEmpty()) return null;
             }
 
-            // looking at the top half of the tardis: show the exterior's info instead
+            // Looking at the top half of the TARDIS, show the info of the exterior instead
             if (accessor instanceof BlockAccessor blockAccessor
                     && blockAccessor.getBlockState().is(GCBlocks.TARDIS_TOP)) {
                 BlockPos base = blockAccessor.getPosition().below();

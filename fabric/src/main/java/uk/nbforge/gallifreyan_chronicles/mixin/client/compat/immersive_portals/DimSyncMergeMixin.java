@@ -7,8 +7,7 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-/* before the client takes a dimension list, in a replay merge it with the ones
-   from before. see FlashbackDimMerge */
+/** Before the client takes a dimension list, in a replay merge it with the ones from before, see FlashbackDimMerge. */
 @Pseudo
 @Mixin(targets = "qouteall.q_misc_util.MiscNetworking$DimIdSyncPacket", remap = false)
 public abstract class DimSyncMergeMixin {

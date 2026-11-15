@@ -18,15 +18,11 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
- * Reads control positions from a console model's "&lt;control_id&gt;_hitbox" bones, so the model is the single
- * source of truth for where each control sits.
- *
- * <p>A bone's first cube is the hitbox. Its eight corners are carried through the cube's own rotation and then
- * through the rotation of its bone and every parent bone, exactly the way GeckoLib draws the model (x mirrored,
- * x and y angles negated, Z then Y then X order). The centre of the moved cube is the control position
- * (/16, y minus 0.5625 like the rest of the console space) and the cube's own size is the hitbox size, since a
- * control hitbox can't be tilted.
- */
+   Reads control positions from the hitbox bones of a console model, named after the control id, so the model is the one place that says where each control sits.
+   The first cube of a bone is the hitbox.
+   Its eight corners are moved through the own rotation of the cube and then through the rotation of its bone and every parent bone, exactly how GeckoLib draws the model with x mirrored, x and y angles negated and Z then Y then X order.
+   The centre of the moved cube is the control position, divided by 16 with y minus 0.5625 like the rest of the console space, and the size of the cube is the hitbox size since a control hitbox cannot be tilted.
+*/
 final class ConsoleHitboxBones {
     static final String SUFFIX = "_hitbox";
     private static final double Y_OFFSET = 0.5625;
@@ -42,6 +38,7 @@ final class ConsoleHitboxBones {
         return CACHE.computeIfAbsent(consoleId, ConsoleHitboxBones::load);
     }
 
+    /** Reads the model json of a console and finds every bone ending in the hitbox suffix, the result is keyed by control id. */
     private static Map<String, Box> load(String consoleId) {
         Map<String, Box> boxes = new HashMap<>();
         Identifier parsed = Identifier.tryParse(consoleId.contains(":") ? consoleId : Constants.MOD_ID + ":" + consoleId);
@@ -89,7 +86,8 @@ final class ConsoleHitboxBones {
         double[] low = {Double.MAX_VALUE, Double.MAX_VALUE, Double.MAX_VALUE};
         double[] high = {-Double.MAX_VALUE, -Double.MAX_VALUE, -Double.MAX_VALUE};
         for (int corner = 0; corner < 8; corner++) {
-            /* x is mirrored, as the model is drawn */
+            // X is mirrored, as the model is drawn
+            // forgetting this puts every control on the wrong side, ask me how I know
             double[] point = {
                     -(origin[0] + ((corner & 1) != 0 ? size[0] : 0.0)),
                     origin[1] + ((corner & 2) != 0 ? size[1] : 0.0),
@@ -111,7 +109,7 @@ final class ConsoleHitboxBones {
         return new Box(centre, (float) (size[0] / 16.0), (float) (size[1] / 16.0), (float) (size[2] / 16.0));
     }
 
-    /* turns a point about a pivot the way GeckoLib does: x mirrored, x and y angles negated, x then y then z */
+    /** Turns a point about a pivot the way GeckoLib does, x mirrored, x and y angles negated, then x, y and z. */
     private static void spin(double[] point, double @Nullable [] pivot, double @Nullable [] rotation) {
         if (rotation == null || (rotation[0] == 0.0 && rotation[1] == 0.0 && rotation[2] == 0.0)) return;
         double px = pivot == null ? 0.0 : -pivot[0];

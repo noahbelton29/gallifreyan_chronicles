@@ -24,10 +24,10 @@ public class GCSoundsProvider extends SoundDefinitionsProvider {
 
     @Override
     public void registerSounds() {
-        // Hum Sounds
+        /** Hum Sounds. */
         registerSimple(GCSounds.FIRST_DOCTORS_HUM, ROTOR, 45);
 
-        // TARDIS Sounds
+        /** TARDIS Sounds. */
         registerSimple(GCSounds.TARDIS_DOOR_OPEN, DOOR, 30);
         registerSimple(GCSounds.TARDIS_DOOR_CLOSE, DOOR, 30);
         registerSimple(GCSounds.TARDIS_DOOR_LOCK, DOOR);
@@ -46,19 +46,19 @@ public class GCSoundsProvider extends SoundDefinitionsProvider {
         registerSimple(GCSounds.TARDIS_UNCLOAK, TARDIS);
         registerSimple(GCSounds.TARDIS_STOP_DEMAT, TARDIS);
 
-        // Spark and explosion sounds
+        /** Spark and explosion sounds. */
         registerVariants(GCSounds.SPARK, FX, 16, "spark_01", "spark_02");
         registerSimple(GCSounds.SPARK_EXPLOSION, FX, 24);
         registerSimple(GCSounds.EXPLOSION, FX, 32);
-        // Control Sounds
+        /** Control Sounds. */
         registerSimple(GCSounds.SLIDER, CONTROL);
         registerSimple(GCSounds.SWITCH, CONTROL);
         registerSimple(GCSounds.LEVER, CONTROL);
 
-        // Door Sounds
+        /** Door Sounds. */
         registerSimple(GCSounds.HARTNELL_DOOR, DOOR, 24);
 
-        // Streamed Sounds
+        /** Streamed Sounds. */
         registerStreamed(GCSounds.TITLE_THEME, TITLE);
     }
 
@@ -70,7 +70,7 @@ public class GCSoundsProvider extends SoundDefinitionsProvider {
         registerSound(soundEvent, folder, false, attenuationDistance);
     }
 
-    /* one sound event that picks one of these files at random each time */
+    /** One sound event that picks one of these files at random each time. */
     private void registerVariants(SoundEvent soundEvent, String folder, int attenuationDistance, String... files) {
         SoundDefinition definition = SoundDefinition.definition()
                 .subtitle("sound." + Constants.MOD_ID + "." + soundEvent.location().getPath())

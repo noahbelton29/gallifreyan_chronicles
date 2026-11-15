@@ -11,39 +11,22 @@ import uk.nbforge.gallifreyan_chronicles.tardis.codec.mind.action.MindActionCode
 
 public final class TardisTraitCodec {
     /**
-     * Stores the traits and personalities that cannot be used together
-     * with another trait.
-     *
-     * @param traits        IDs of traits that conflict with this trait
-     * @param personalities IDs of personalities that cannot use this trait
-     */
+       The traits and personalities that cannot be used with a trait.
+       traits are the ones that clash with this trait and personalities are the ones that cannot use it.
+    */
     private record NeverWith(List<String> traits, List<String> personalities) {
 
-        /**
-         * Empty compatibility restrictions.
-         */
         static final NeverWith NOTHING = new NeverWith(List.of(), List.of());
 
-        /**
-         * Codec for loading and saving compatibility restrictions.
-         *
-         * <p>Both lists are optional and default to empty when not provided.</p>
-         */
+        // Both lists are optional and empty by default
         static final Codec<NeverWith> CODEC = RecordCodecBuilder.create(inst -> inst.group(
                 Codec.STRING.listOf().optionalFieldOf("traits", List.of()).forGetter(NeverWith::traits),
                 Codec.STRING.listOf().optionalFieldOf("personalities", List.of()).forGetter(NeverWith::personalities)
         ).apply(inst, NeverWith::new));
     }
 
-    /**
-     * Codec for loading and saving TARDIS traits.
-     *
-     * <p>Optional fields use defaults so older or incomplete trait definitions
-     * can still be loaded.</p>
-     *
-     * <p>The {@code never_with} field groups together traits and personalities
-     * that are incompatible with this trait.</p>
-     */
+    // Optional fields have defaults so older or incomplete trait files still load
+    // never_with holds the traits and personalities that are not allowed with this trait
     public static final Codec<TardisTrait> CODEC = RecordCodecBuilder.create(inst -> inst.group(
             Codec.STRING.optionalFieldOf("id", "").forGetter(TardisTrait::id),
             Codec.INT.optionalFieldOf("how_common", 10).forGetter(TardisTrait::weight),

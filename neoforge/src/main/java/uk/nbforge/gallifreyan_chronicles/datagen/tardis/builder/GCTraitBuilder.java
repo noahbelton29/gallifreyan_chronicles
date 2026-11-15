@@ -8,9 +8,9 @@ import java.util.Locale;
 import uk.nbforge.gallifreyan_chronicles.datagen.util.GCJson;
 
 /**
- * Fluent way to describe a TARDIS trait; every method is optional. Multipliers ("times") default to 1,
- * shifts ("by") to 0, so only set what the trait changes.
- */
+   Describes a TARDIS trait, every method is optional.
+   Multipliers called times default to 1 and shifts called by default to 0 so only set what the trait changes.
+*/
 public final class GCTraitBuilder {
     private final JsonObject json;
 
@@ -18,13 +18,13 @@ public final class GCTraitBuilder {
         this.json = json;
     }
 
-    /** How likely a trait is to be picked (default 10). */
+    /** How likely the trait is to be picked, default 10. */
     public GCTraitBuilder howCommon(int weight) {
         json.addProperty("how_common", weight);
         return this;
     }
 
-    // stress
+    /** stress. */
     public GCTraitBuilder stressBuildsUp(double times) {
         return set("stress", "builds_up", times);
     }
@@ -33,12 +33,12 @@ public final class GCTraitBuilder {
         return set("stress", "calms_down", times);
     }
 
-    // fear
+    /** fear. */
     public GCTraitBuilder fearFades(double times) {
         return set("fear", "fades", times);
     }
 
-    // trust
+    /** trust. */
     public GCTraitBuilder trustGained(double times) {
         return set("trust", "gained", times);
     }
@@ -59,7 +59,7 @@ public final class GCTraitBuilder {
         return set("trust", "strangers_start_at", trust);
     }
 
-    // everything else
+    /** everything else. */
     public GCTraitBuilder traumaTaken(double times) {
         json.addProperty("trauma_taken", times);
         return this;
@@ -80,14 +80,14 @@ public final class GCTraitBuilder {
         return this;
     }
 
-    /** Different multipliers once the player has betrayed it. */
+    /** Different multipliers once the player betrayed it. */
     public GCTraitBuilder ifBetrayed(double trustGainedTimes, double trustLostTimes, double traumaTakenTimes) {
         json.add("if_betrayed", GCJson.obj("trust_gained", trustGainedTimes, "trust_lost", trustLostTimes,
                 "trauma_taken", traumaTakenTimes));
         return this;
     }
 
-    // who it can't be rolled with
+    /** Who it cannot be rolled with. */
     public GCTraitBuilder neverWithTraits(String... traits) {
         return never("traits", traits);
     }

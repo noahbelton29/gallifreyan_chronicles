@@ -8,7 +8,7 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-/* the replay found the recording's component numbers: use them, don't pass them on */
+/** The replay found the component numbers of the recording, use them and do not pass them on. */
 @Pseudo
 @Mixin(targets = "com.moulberry.flashback.playback.ReplayGamePacketHandler", remap = false)
 public abstract class ComponentIdsPayloadMixin {

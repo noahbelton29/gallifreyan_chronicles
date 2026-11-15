@@ -23,20 +23,20 @@ import java.util.Set;
 import java.util.TreeSet;
 import java.util.UUID;
 
-/* every build: log who is playing (uuid, name, build id, jar hash) and, while
-   they play, which screen recording programs are running, to gc_tester_log.jsonl
-   in the game folder. it can't see if they're actually recording, only that the
-   program is open. if REPORT_URL (or report_url in gc_build.properties) is set,
-   each line is also sent there */
+/**
+   Logs who is playing, their account id, their name, the build id and the jar hash, every time someone launches this build.
+   While they play, it also notices if a screen recording or screenshot program is running, without being able to tell if it is actually recording.
+   Everything goes to gc_tester_log.jsonl in the game folder, and if report_url in gc_build.properties is set, each line is sent there too.
+*/
 public final class TesterReport {
-    /* optional server, gets each report as a json POST. empty = file only */
+    // optional server, gets each report as a json post, empty means file only
     private static final String REPORT_URL = "";
     private static final String RESOURCE = "/gc_build.properties";
-    /* one json line per report, in the game folder */
+    // one json line per report, in the game folder
     private static final String LOG_FILE = "gc_tester_log.jsonl";
     private static final long CHECK_EVERY_SECONDS = 5;
 
-    /* process names of common recording / screenshot programs */
+    // process names of common recording or screenshot programs
     private static final Set<String> RECORDERS = Set.of(
             "obs64.exe", "obs32.exe", "obs.exe", "streamlabs obs.exe",
             "bandicam.exe", "bdcam.exe", "sharex.exe", "medal.exe", "fraps.exe",
@@ -86,8 +86,7 @@ public final class TesterReport {
             String file = Path.of(command).getFileName().toString().toLowerCase(Locale.ROOT);
             if (RECORDERS.contains(file)) found.add(file);
         }));
-        /* java can't read the path of windows store apps like the new snipping tool,
-           so on windows also ask tasklist, which lists every process by name */
+        // java cant read the path of windows store apps like the new snipping tool, so on windows also ask tasklist, which lists every process by name
         if (System.getProperty("os.name", "").toLowerCase(Locale.ROOT).startsWith("windows")) {
             try {
                 Process tasklist = new ProcessBuilder("tasklist", "/fo", "csv", "/nh").redirectErrorStream(true).start();
@@ -121,7 +120,7 @@ public final class TesterReport {
         }
     }
 
-    /* sha-256 of the mod jar, so you know exactly which file they have */
+    /** Works out the sha-256 of the mod jar, so you know exactly which file someone has. */
     private static void readJar() {
         try {
             Path jar = Path.of(TesterReport.class.getProtectionDomain().getCodeSource().getLocation().toURI());

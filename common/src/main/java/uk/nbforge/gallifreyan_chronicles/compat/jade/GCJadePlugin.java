@@ -20,6 +20,7 @@ import uk.nbforge.gallifreyan_chronicles.core.GCBlocks;
 import uk.nbforge.gallifreyan_chronicles.core.block.ConsoleBlock;
 import uk.nbforge.gallifreyan_chronicles.core.block.InteriorDoorBlock;
 import uk.nbforge.gallifreyan_chronicles.core.block.TardisBlock;
+import uk.nbforge.gallifreyan_chronicles.core.block_entities.InteriorDoorBlockEntity;
 import uk.nbforge.gallifreyan_chronicles.core.block_entities.TardisExteriorBlockEntity;
 import uk.nbforge.gallifreyan_chronicles.core.entity.TardisControlEntity;
 
@@ -30,19 +31,22 @@ public class GCJadePlugin implements IWailaPlugin {
     @Override
     public void register(IWailaCommonRegistration registration) {
         registration.registerBlockDataProvider(TardisOwnerDataProvider.INSTANCE, TardisExteriorBlockEntity.class);
+        registration.registerBlockDataProvider(TardisInteriorDoorDataProvider.INSTANCE, InteriorDoorBlockEntity.class);
     }
 
     @Override
     public void registerClient(IWailaClientRegistration registration) {
         registration.addRayTraceCallback((hitResult, accessor, originalAccessor) -> {
-            // looking at a portal: near a tardis exterior show the exterior's info, near a linked door show nothing
+            // looking at a portal: show the info of the tardis exterior or interior door it belongs to
             if (accessor instanceof EntityAccessor entityAccessor && isPortal(entityAccessor.getEntity())) {
                 Entity portal = entityAccessor.getEntity();
-                BlockPos exterior = findExterior(portal);
-                if (exterior != null) {
-                    return blockAccessor(registration, accessor, exterior);
-                }
-                if (isNearLinkedDoor(portal)) return null;
+
+                BlockPos exterior = findNearby(portal, true);
+                if (exterior != null) return blockAccessor(registration, exterior);
+
+                BlockPos door = findNearby(portal, false);
+                if (door != null) return blockAccessor(registration, door);
+
                 return accessor;
             }
 
@@ -62,7 +66,14 @@ public class GCJadePlugin implements IWailaPlugin {
                     && blockAccessor.getBlockState().is(GCBlocks.TARDIS_TOP)) {
                 BlockPos base = blockAccessor.getPosition().below();
                 if (!blockAccessor.getLevel().getBlockState(base).is(GCBlocks.TARDIS)) return null;
-                return blockAccessor(registration, accessor, base);
+                return blockAccessor(registration, base);
+            }
+            
+            if (accessor instanceof BlockAccessor doorAccessor
+                    && doorAccessor.getBlockState().getBlock() instanceof InteriorDoorBlock
+                    && !InteriorDoorBlock.isMaster(doorAccessor.getBlockState())) {
+                BlockPos master = InteriorDoorBlock.masterBlockPos(doorAccessor.getBlockState(), doorAccessor.getPosition());
+                return blockAccessor(registration, master);
             }
 
             return accessor;
@@ -73,18 +84,21 @@ public class GCJadePlugin implements IWailaPlugin {
         registration.registerBlockComponent(TardisOwnerProvider.INSTANCE, TardisBlock.class);
         registration.registerBlockComponent(TardisExteriorInfoProvider.INSTANCE, TardisBlock.class);
         registration.registerBlockComponent(TardisConsoleInfoProvider.INSTANCE, ConsoleBlock.class);
+        registration.registerBlockComponent(TardisInteriorDoorInfoProvider.INSTANCE, InteriorDoorBlock.class);
     }
 
-    // builds a jade block accessor for the tardis block at base, so all the normal block providers run on it
-    private static Accessor<?> blockAccessor(IWailaClientRegistration registration, Accessor<?> from, BlockPos base) {
-        Level level = from.getLevel();
-        BlockState state = level.getBlockState(base);
+    private static Accessor<?> blockAccessor(IWailaClientRegistration registration, BlockPos pos) {
+        Level level = Minecraft.getInstance().level;
+        Player player = Minecraft.getInstance().player;
+        if (level == null || player == null) return null;
+
+        BlockState state = level.getBlockState(pos);
         return registration.blockAccessor()
                 .level(level)
-                .player(from.getPlayer())
+                .player(player)
                 .blockState(state)
-                .blockEntity(() -> level.getBlockEntity(base))
-                .hit(new BlockHitResult(Vec3.atCenterOf(base), Direction.UP, base, false))
+                .blockEntity(() -> level.getBlockEntity(pos))
+                .hit(new BlockHitResult(Vec3.atCenterOf(pos), Direction.UP, pos, false))
                 .build();
     }
 
@@ -92,21 +106,21 @@ public class GCJadePlugin implements IWailaPlugin {
         return entity.getClass().getName().startsWith(PORTAL_PACKAGE);
     }
 
-    private static BlockPos findExterior(Entity portal) {
-        Level level = portal.level();
-        BlockPos centre = portal.blockPosition();
-        for (BlockPos pos : BlockPos.betweenClosed(centre.offset(-2, -2, -2), centre.offset(2, 2, 2))) {
-            if (level.getBlockState(pos).getBlock() instanceof TardisBlock) return pos.immutable();
-        }
-        return null;
-    }
+    private static BlockPos findNearby(Entity portal, boolean exterior) {
+        Level level = Minecraft.getInstance().level;
+        if (level == null) return null;
 
-    private static boolean isNearLinkedDoor(Entity portal) {
-        Level level = portal.level();
         BlockPos centre = portal.blockPosition();
+        BlockPos fallbackDoor = null;
         for (BlockPos pos : BlockPos.betweenClosed(centre.offset(-2, -2, -2), centre.offset(2, 2, 2))) {
-            if (level.getBlockState(pos).getBlock() instanceof InteriorDoorBlock door && door.isLinked()) return true;
+            BlockState state = level.getBlockState(pos);
+            if (exterior) {
+                if (state.getBlock() instanceof TardisBlock) return pos.immutable();
+            } else if (state.getBlock() instanceof InteriorDoorBlock door && door.isLinked()) {
+                if (InteriorDoorBlock.isMaster(state)) return pos.immutable();
+                if (fallbackDoor == null) fallbackDoor = pos.immutable();
+            }
         }
-        return false;
+        return fallbackDoor;
     }
 }

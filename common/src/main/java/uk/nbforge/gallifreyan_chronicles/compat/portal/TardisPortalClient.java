@@ -1,5 +1,7 @@
 package uk.nbforge.gallifreyan_chronicles.compat.portal;
 
+import uk.nbforge.gallifreyan_chronicles.core.block.TardisBlock;
+import uk.nbforge.gallifreyan_chronicles.core.block.TardisTopBlock;
 import uk.nbforge.gallifreyan_chronicles.util.TardisDimensionUtil;
 import uk.nbforge.gallifreyan_chronicles.Constants;
 import uk.nbforge.gallifreyan_chronicles.core.block.InteriorDoorBarrierBlock;
@@ -32,6 +34,9 @@ import qouteall.imm_ptl.core.render.context_management.PortalRendering;
 import qouteall.imm_ptl.core.render.renderer.RendererUsingStencil;
 
 final class TardisPortalClient {
+    private static final double DOOR_FOOTPRINT_HORIZONTAL = 2.6;
+    private static final double DOOR_FOOTPRINT_VERTICAL = 3.0;
+
     private TardisPortalClient() {
     }
 
@@ -141,11 +146,6 @@ final class TardisPortalClient {
         return false;
     }
 
-    // Horizontal / vertical reach (in blocks) from a portal's destination centre that still counts as the
-    // interior door zone: the 2x3 door, its barrier row and the blocks right around them (a re-placed door can sit
-    // a block or two off the old one). Measured to block centres.
-    private static final double DOOR_FOOTPRINT_HORIZONTAL = 2.6;
-    private static final double DOOR_FOOTPRINT_VERTICAL = 3.0;
 
     /**
      * Doorway centres seen so far, per TARDIS interior dimension. Immersive Portals draws the outline of the
@@ -214,17 +214,33 @@ final class TardisPortalClient {
         return false;
     }
 
-    /** Base block of the exterior TARDIS this portal sits in, or null when it cannot be found. */
+    /**
+     * Base block of the exterior TARDIS this portal sits in, or null when it cannot be found.
+     */
     static @Nullable BlockPos exteriorBaseOf(Object object) {
         if (!(object instanceof Portal portal)) return null;
         Level level = portal.level();
-        BlockPos at = BlockPos.containing(portal.getOriginPos());
-        for (BlockPos p : new BlockPos[]{at, at.below(), at.above()}) {
+        Vec3 origin = portal.getOriginPos();
+        BlockPos at = BlockPos.containing(origin);
+        BlockPos best = null;
+        double bestDistance = Double.MAX_VALUE;
+        for (BlockPos p : BlockPos.betweenClosed(at.offset(-1, -1, -1), at.offset(1, 1, 1))) {
             Block block = level.getBlockState(p).getBlock();
-            if (block instanceof uk.nbforge.gallifreyan_chronicles.core.block.TardisBlock) return p;
-            if (block instanceof uk.nbforge.gallifreyan_chronicles.core.block.TardisTopBlock) return p.below();
+            BlockPos base;
+            if (block instanceof TardisBlock) {
+                base = p.immutable();
+            } else if (block instanceof TardisTopBlock) {
+                base = p.below();
+            } else {
+                continue;
+            }
+            double distance = Vec3.atCenterOf(p).distanceToSqr(origin);
+            if (distance < bestDistance) {
+                bestDistance = distance;
+                best = base;
+            }
         }
-        return null;
+        return best;
     }
 
     static void tintPortalForPowerDarkness(Object object) {

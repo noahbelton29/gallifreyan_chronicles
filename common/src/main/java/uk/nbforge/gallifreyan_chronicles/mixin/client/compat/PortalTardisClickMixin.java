@@ -23,12 +23,12 @@ public abstract class PortalTardisClickMixin {
     private static HitResult gc$localHit;
 
     @Inject(method = "updatePointedBlock", at = @At("HEAD"), remap = false, require = 0)
-    private static void gc$rememberLocalHit(float tickDelta, CallbackInfo ci) {
+    private static void gc$rememberLocalHit(float partialTick, CallbackInfo ci) {
         gc$localHit = Minecraft.getInstance().hitResult;
     }
 
     @Inject(method = "updatePointedBlock", at = @At("RETURN"), remap = false, require = 0)
-    private static void gc$fallBackToTardis(float tickDelta, CallbackInfo ci) {
+    private static void gc$fallBackToTardis(float partialTick, CallbackInfo ci) {
         Portal portal = BlockManipulationClient.remotePointedPortal;
         HitResult local = gc$localHit;
         gc$localHit = null;
@@ -51,7 +51,11 @@ public abstract class PortalTardisClickMixin {
             mc.hitResult = local;
             return;
         }
-        Vec3 at = portal.getOriginPos();
+        Vec3 origin = portal.getOriginPos();
+        Vec3 at = new Vec3(
+                Math.clamp(origin.x, base.getX(), base.getX() + 1.0),
+                Math.clamp(origin.y, base.getY(), base.getY() + 1.0),
+                Math.clamp(origin.z, base.getZ(), base.getZ() + 1.0));
         mc.hitResult = new BlockHitResult(at, mc.player != null ? mc.player.getDirection().getOpposite() : Direction.NORTH,
                 base, false);
     }

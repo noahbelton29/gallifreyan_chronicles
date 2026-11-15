@@ -385,7 +385,7 @@ public class InteriorDoorBlockEntity extends BlockEntity implements GeoBlockEnti
                 : Optional.empty();
     }
 
-    private boolean isTardisLocked() {
+    public boolean isTardisLocked() {
         return tardisApi().map(Tardis::isLocked).orElse(false);
     }
 

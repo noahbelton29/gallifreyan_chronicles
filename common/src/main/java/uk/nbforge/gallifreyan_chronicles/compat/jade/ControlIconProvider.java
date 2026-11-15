@@ -4,7 +4,13 @@ import uk.nbforge.gallifreyan_chronicles.core.block_entities.TardisConsoleBlockE
 import uk.nbforge.gallifreyan_chronicles.core.entity.TardisControlEntity;
 import uk.nbforge.gallifreyan_chronicles.core.GCBlocks;
 import uk.nbforge.gallifreyan_chronicles.util.GCUtil;
+import net.minecraft.ChatFormatting;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.chat.Component;
+import uk.nbforge.gallifreyan_chronicles.core.GCTardisControls;
+import uk.nbforge.gallifreyan_chronicles.tardis.flight.TardisDestinations;
 import net.minecraft.resources.Identifier;
+import uk.nbforge.gallifreyan_chronicles.core.dynamic_registries.TardisControlRegistry;
 import net.minecraft.world.item.ItemStack;
 import org.jetbrains.annotations.Nullable;
 import org.jspecify.annotations.NonNull;
@@ -31,7 +37,55 @@ public class ControlIconProvider implements IEntityComponentProvider {
 
     @Override
     public void appendTooltip(@NonNull ITooltip tooltip, @NonNull EntityAccessor accessor, @NonNull IPluginConfig config) {
-        // name comes from the entity, icon from getIcon
+        if (accessor.getEntity() instanceof TardisControlEntity control
+                && accessor.getLevel().getBlockEntity(control.getConsolePos()) instanceof TardisConsoleBlockEntity console
+                && console.isPowerKnown()) {
+            Component text = TardisControlRegistry.get(control.getControlId())
+                    .describeState(console.displayedControlState(control.getControlId()));
+            if (text != null) tooltip.add(text);
+            appendDestination(tooltip, control.getControlId(), accessor.getServerData());
+        }
+    }
+
+    /* the destination controls: what they would set or show, read from the server data */
+    private static void appendDestination(ITooltip tooltip, String id, CompoundTag data) {
+        switch (id) {
+            case GCTardisControls.X_INCREMENT_CONTROL -> coord(tooltip, "target_x", data);
+            case GCTardisControls.Y_INCREMENT_CONTROL -> coord(tooltip, "target_y", data);
+            case GCTardisControls.Z_INCREMENT_CONTROL -> coord(tooltip, "target_z", data);
+            case GCTardisControls.COORDINATE_STEP_CONTROL -> {
+                if (!data.contains(ControlDataProvider.STEP)) return;
+                int step = data.getIntOr(ControlDataProvider.STEP, 0);
+                tooltip.add(line("step", Component.literal((step > 0 ? "+" : "") + step).withStyle(ChatFormatting.GOLD)));
+            }
+            case GCTardisControls.DIRECTIONAL_CONTROL -> {
+                if (!data.contains(ControlDataProvider.YAW)) return;
+                tooltip.add(line("facing", TardisDestinations.facingName(data.getFloatOr(ControlDataProvider.YAW, 0F))
+                        .copy().withStyle(ChatFormatting.WHITE)));
+            }
+            case GCTardisControls.DIMENSIONAL_CONTROL -> {
+                if (!data.contains(ControlDataProvider.DIMENSION)) return;
+                tooltip.add(line("dimension", Component.literal(data.getStringOr(ControlDataProvider.DIMENSION, ""))
+                        .withStyle(ChatFormatting.AQUA)
+                        .append(Component.literal(" (" + data.getStringOr(ControlDataProvider.DIMENSION_INDEX, "") + ")")
+                                .withStyle(ChatFormatting.GRAY))));
+            }
+            default -> {
+            }
+        }
+    }
+
+    private static void coord(ITooltip tooltip, String label, CompoundTag data) {
+        if (!data.contains(ControlDataProvider.COORD)) return;
+        tooltip.add(line(label, Component.literal(String.valueOf(data.getIntOr(ControlDataProvider.COORD, 0)))
+                .withStyle(ChatFormatting.WHITE)));
+    }
+
+    private static Component line(String label, Component value) {
+        return Component.translatable("tooltip.gallifreyan_chronicles.control_state.label." + label)
+                .withStyle(ChatFormatting.GRAY)
+                .append(Component.literal(": ").withStyle(ChatFormatting.GRAY))
+                .append(value);
     }
 
     @Override

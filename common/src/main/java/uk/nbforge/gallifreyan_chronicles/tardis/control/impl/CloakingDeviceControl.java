@@ -9,6 +9,8 @@ import uk.nbforge.gallifreyan_chronicles.tardis.control.BaseControl;
 import uk.nbforge.gallifreyan_chronicles.tardis.control.ControlAnimations;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvent;
+import net.minecraft.ChatFormatting;
+import net.minecraft.network.chat.Component;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
@@ -46,5 +48,10 @@ public class CloakingDeviceControl extends BaseControl {
     @Override
     public void onStateChanged(TardisConsoleBlockEntity console, boolean activated) {
         linkedTardis(console).flatMap(Tardis::exterior).ifPresent(exterior -> exterior.setCloaked(activated));
+    }
+
+    @Override
+    public Component describeState(boolean activated) {
+        return activated ? state("cloak", "active", ChatFormatting.GREEN) : state("cloak", "inactive", ChatFormatting.RED);
     }
 }

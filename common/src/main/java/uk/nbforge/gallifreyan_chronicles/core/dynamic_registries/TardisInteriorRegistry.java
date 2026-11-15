@@ -1,6 +1,6 @@
 package uk.nbforge.gallifreyan_chronicles.core.dynamic_registries;
 
-import uk.nbforge.gallifreyan_chronicles.config.GCConfig;
+import uk.nbforge.gallifreyan_chronicles.Constants;
 
 import java.util.Collection;
 
@@ -8,7 +8,7 @@ import uk.nbforge.gallifreyan_chronicles.tardis.TardisInterior;
 
 public final class TardisInteriorRegistry {
     public static String defaultId() {
-        return GCConfig.defaultInterior();
+        return Constants.MOD_ID + ":first_doctors_interior";
     }
 
     private static final GCJsonDataRegistry<TardisInterior> REGISTRY = new GCJsonDataRegistry<>();

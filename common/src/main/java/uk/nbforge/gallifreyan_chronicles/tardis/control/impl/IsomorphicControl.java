@@ -7,6 +7,8 @@ import uk.nbforge.gallifreyan_chronicles.core.entity.TardisControlEntity;
 import uk.nbforge.gallifreyan_chronicles.core.GCSounds;
 import uk.nbforge.gallifreyan_chronicles.tardis.control.BaseControl;
 import uk.nbforge.gallifreyan_chronicles.tardis.control.ControlAnimations;
+import net.minecraft.ChatFormatting;
+import net.minecraft.network.chat.Component;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
@@ -37,5 +39,10 @@ public class IsomorphicControl extends BaseControl {
     @Override
     public InteractionResult onRightClick(TardisControlEntity entity, Player player, InteractionHand hand) {
         return entity.getConsole() == null ? InteractionResult.FAIL : InteractionResult.SUCCESS;
+    }
+
+    @Override
+    public Component describeState(boolean activated) {
+        return activated ? state("isomorphic", "engaged", ChatFormatting.GREEN) : state("isomorphic", "disengaged", ChatFormatting.RED);
     }
 }

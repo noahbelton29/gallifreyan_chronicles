@@ -36,6 +36,7 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundSource;
+import net.minecraft.network.chat.Component;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
@@ -349,6 +350,7 @@ public class SpaceTimeThrottleControl extends BaseControl {
         Constants.LOG.debug("Flight lever state changed to: {}", activated);
 
         if (console.getLevel() instanceof ServerLevel serverLevel) {
+            if (activated) announceDeparture(serverLevel);
             TardisExteriorBlockEntity exterior = linkedTardis(console).flatMap(Tardis::exterior).orElse(null);
             if (exterior != null) {
                 if (activated) {
@@ -389,7 +391,28 @@ public class SpaceTimeThrottleControl extends BaseControl {
             for (TardisConsoleBlockEntity each : live) {
                 each.triggerRotorAnimation("rotor_idle");
             }
+            announceArrival(level, console);
         });
+    }
+
+    private static void announceDeparture(ServerLevel interior) {
+        for (var player : interior.players()) {
+            player.sendOverlayMessage(Component.translatable("overlay.gallifreyan_chronicles.flight_departing")
+                    .withStyle(ChatFormatting.GOLD));
+        }
+    }
+
+    private static void announceArrival(ServerLevel interior, TardisConsoleBlockEntity console) {
+        Tardis tardis = TardisApi.of(console).orElse(null);
+        if (tardis == null) return;
+        BlockPos pos = tardis.exteriorPos().orElse(null);
+        if (pos == null) return;
+        Component where = uk.nbforge.gallifreyan_chronicles.tardis.flight.TardisDestinations.dimensionName(tardis.exteriorDimension());
+        for (var player : interior.players()) {
+            player.sendOverlayMessage(Component.translatable("overlay.gallifreyan_chronicles.flight_arrived", where,
+                            Component.literal(pos.getX() + ", " + pos.getY() + ", " + pos.getZ()).withStyle(ChatFormatting.WHITE))
+                    .withStyle(ChatFormatting.GOLD));
+        }
     }
 
     private static void scheduleLandDrum(ServerLevel level, TardisConsoleBlockEntity console) {
@@ -413,5 +436,10 @@ public class SpaceTimeThrottleControl extends BaseControl {
             TardisDrumShakePayload.broadcast(eachLevel, Vec3.atCenterOf(each.getBlockPos()), 1.0F);
         }
         playAtExterior(console, level, GCSounds.TARDIS_DRUM);
+    }
+
+    @Override
+    public Component describeState(boolean activated) {
+        return activated ? state("throttle", "engaged", ChatFormatting.GREEN) : state("throttle", "disengaged", ChatFormatting.RED);
     }
 }

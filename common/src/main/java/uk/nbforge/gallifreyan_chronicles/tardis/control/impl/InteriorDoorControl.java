@@ -11,6 +11,8 @@ import uk.nbforge.gallifreyan_chronicles.tardis.control.ControlAnimations;
 import uk.nbforge.gallifreyan_chronicles.tardis.TardisApi;
 import uk.nbforge.gallifreyan_chronicles.tardis.ecs.system.DoorSyncSystem;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.ChatFormatting;
+import net.minecraft.network.chat.Component;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
@@ -44,6 +46,8 @@ public class InteriorDoorControl extends BaseControl {
             InteriorDoorBlockEntity door = TardisApi.of(entity.getConsole())
                     .map(tardis -> DoorSyncSystem.primaryDoor(tardis.id())).orElse(null);
             if (door != null && door.isOnCooldown()) return InteractionResult.FAIL;
+            announce(player, entity.getConsole().getControlState(entity.getControlId())
+                    ? "message.gallifreyan_chronicles.interior_door_closing" : "message.gallifreyan_chronicles.interior_door_opening");
         }
         return InteractionResult.SUCCESS;
     }
@@ -71,5 +75,10 @@ public class InteriorDoorControl extends BaseControl {
                 }
             }
         });
+    }
+
+    @Override
+    public Component describeState(boolean activated) {
+        return activated ? state("interior_door", "open", ChatFormatting.GREEN) : state("interior_door", "closed", ChatFormatting.RED);
     }
 }

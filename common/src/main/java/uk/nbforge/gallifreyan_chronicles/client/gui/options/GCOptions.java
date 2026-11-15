@@ -34,6 +34,39 @@ public final class GCOptions {
                 GCConfig.powerDarknessStrength(), GCConfig::setPowerDarknessStrength);
     }
 
+    public static OptionInstance<Boolean> versionHud() {
+        return OptionInstance.createBoolean(
+                "options.gallifreyan_chronicles.version_hud",
+                OptionInstance.cachedConstantTooltip(Component.translatable("options.gallifreyan_chronicles.version_hud.tooltip")),
+                GCConfig.showVersionHud(),
+                value -> {
+                    GCConfig.setShowVersionHud(value);
+                    GCConfig.saveSoon();
+                });
+    }
+
+    public static OptionInstance<Boolean> overlayMessages() {
+        return OptionInstance.createBoolean(
+                "options.gallifreyan_chronicles.overlay_messages",
+                OptionInstance.cachedConstantTooltip(Component.translatable("options.gallifreyan_chronicles.overlay_messages.tooltip")),
+                GCConfig.showOverlayMessages(),
+                value -> {
+                    GCConfig.setShowOverlayMessages(value);
+                    GCConfig.saveSoon();
+                });
+    }
+
+    public static OptionInstance<Boolean> flightMessages() {
+        return OptionInstance.createBoolean(
+                "options.gallifreyan_chronicles.flight_messages",
+                OptionInstance.cachedConstantTooltip(Component.translatable("options.gallifreyan_chronicles.flight_messages.tooltip")),
+                GCConfig.showFlightMessages(),
+                value -> {
+                    GCConfig.setShowFlightMessages(value);
+                    GCConfig.saveSoon();
+                });
+    }
+
     public static OptionInstance<Boolean> immersivePortals() {
         return OptionInstance.createBoolean(
                 "options.gallifreyan_chronicles.immersive_portals",

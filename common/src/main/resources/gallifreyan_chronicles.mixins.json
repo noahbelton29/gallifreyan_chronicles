@@ -15,6 +15,7 @@
     "worldgen.StructurePaletteCacheMixin"
   ],
   "client": [
+    "client.gameplay.OverlayMessageMixin",
     "client.screen.LogoRendererMixin",
     "client.render.WindowMixin",
     "client.render.LevelRendererRematMixin",

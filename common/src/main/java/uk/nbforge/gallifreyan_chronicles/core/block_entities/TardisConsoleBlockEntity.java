@@ -151,6 +151,14 @@ public class TardisConsoleBlockEntity extends BlockEntity implements GeoBlockEnt
         return controls.getControlState(controlId);
     }
 
+    public boolean displayedControlState(String controlId) {
+        if (level != null && level.isClientSide()) {
+            Boolean applied = clientAppliedStates.get(controlId);
+            if (applied != null) return applied;
+        }
+        return controls.getControlState(controlId);
+    }
+
     public float glowLevel() {
         /* no lights on a console that isn't inside a tardis */
         return glowFade.update(hasPower() && isInTardis() ? 1.0F : 0.0F);

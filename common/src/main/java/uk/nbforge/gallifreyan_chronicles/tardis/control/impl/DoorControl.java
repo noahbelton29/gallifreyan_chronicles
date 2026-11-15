@@ -10,6 +10,8 @@ import uk.nbforge.gallifreyan_chronicles.tardis.control.BaseControl;
 import uk.nbforge.gallifreyan_chronicles.tardis.control.ControlAnimations;
 import uk.nbforge.gallifreyan_chronicles.tardis.ecs.system.DoorSyncSystem;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.ChatFormatting;
+import net.minecraft.network.chat.Component;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
@@ -38,6 +40,8 @@ public class DoorControl extends BaseControl {
         if (entity.level() instanceof ServerLevel level) {
             Optional<Tardis> tardis = linkedTardis(console);
             if (tardis.isPresent() && doorsBlocked(tardis.get(), player)) return InteractionResult.FAIL;
+            announce(player, console.getControlState(entity.getControlId())
+                    ? "message.gallifreyan_chronicles.doors_closing" : "message.gallifreyan_chronicles.doors_opening");
         }
         return InteractionResult.SUCCESS;
     }
@@ -47,5 +51,10 @@ public class DoorControl extends BaseControl {
         if (!(console.getLevel() instanceof ServerLevel level)) return;
 
         linkedTardis(console).ifPresent(tardis -> DoorSyncSystem.toggleAllDoors(level.getServer(), tardis.id()));
+    }
+
+    @Override
+    public Component describeState(boolean activated) {
+        return activated ? state("doors", "open", ChatFormatting.GREEN) : state("doors", "closed", ChatFormatting.RED);
     }
 }

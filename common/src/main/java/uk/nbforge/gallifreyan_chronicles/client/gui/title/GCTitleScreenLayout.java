@@ -103,7 +103,7 @@ public final class GCTitleScreenLayout {
         }
 
         add.accept(new GCButton(PADDING, y, halfWidth, BUTTON_HEIGHT, Component.translatable("menu.gallifreyan_chronicles.settings"),
-                button -> minecraft.gui.setScreen(new GCConfigScreen(screen))));
+                button -> minecraft.gui.setScreen(new GCConfigScreen(screen, minecraft.options))));
         add.accept(new GCButton(PADDING + buttonWidth - halfWidth, y, halfWidth, BUTTON_HEIGHT,
                 Component.translatable("menu.gallifreyan_chronicles.addons"),
                 button -> minecraft.gui.setScreen(new GCAddonsScreen(screen))));

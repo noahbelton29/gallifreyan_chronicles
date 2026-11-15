@@ -182,6 +182,19 @@ public abstract class BaseControl implements TardisControl {
      * @param player         the player to send the message to
      * @param translationKey the translation key of the message
      */
+    protected static void announce(@Nullable Player player, String translationKey) {
+        if (player != null) {
+            player.sendOverlayMessage(Component.translatable(translationKey).withStyle(ChatFormatting.GREEN));
+        }
+    }
+
+    protected static Component state(String label, String value, ChatFormatting colour) {
+        return Component.translatable("tooltip.gallifreyan_chronicles.control_state.label." + label)
+                .withStyle(ChatFormatting.GRAY)
+                .append(Component.literal(": ").withStyle(ChatFormatting.GRAY))
+                .append(Component.translatable("tooltip.gallifreyan_chronicles.control_state.value." + value).withStyle(colour));
+    }
+
     protected static void tell(@Nullable Player player, String translationKey) {
         if (player != null) {
             player.sendOverlayMessage(Component.translatable(translationKey).withStyle(ChatFormatting.RED));

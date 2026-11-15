@@ -10,9 +10,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 
 public final class GCConfig {
-    public static final String BUILT_IN_EXTERIOR = Constants.MOD_ID + ":first_doctors_exterior";
-    public static final String BUILT_IN_CONSOLE = Constants.MOD_ID + ":brachacki_console";
-    public static final String BUILT_IN_INTERIOR = Constants.MOD_ID + ":first_doctors_interior";
     private static final long SAVE_DELAY_NANOS = 1_000_000_000L;
     private static boolean dirty;
     private static boolean shutdownHookAdded;
@@ -21,10 +18,9 @@ public final class GCConfig {
     private static final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
 
     private static final class Data {
-        String default_exterior = BUILT_IN_EXTERIOR;
-        String default_console = BUILT_IN_CONSOLE;
-        String default_interior = BUILT_IN_INTERIOR;
         boolean show_version_hud = true;
+        boolean show_overlay_messages = true;
+        boolean show_flight_messages = true;
         double tardis_hum_volume = 1.0;
         double camera_shake_intensity = 1.0;
         double power_darkness_strength = 1.0;
@@ -33,7 +29,6 @@ public final class GCConfig {
         int portal_render_distance = 20;
         int max_rendered_portals = 8;
         boolean immersive_portals = true;
-        /* logs replay state every second while a flashback replay plays. for finding replay bugs */
         boolean debug_replay = false;
     }
 
@@ -57,9 +52,6 @@ public final class GCConfig {
             }
         }
         data = loaded != null ? loaded : new Data();
-        if (isBlank(data.default_exterior)) data.default_exterior = BUILT_IN_EXTERIOR;
-        if (isBlank(data.default_console)) data.default_console = BUILT_IN_CONSOLE;
-        if (isBlank(data.default_interior)) data.default_interior = BUILT_IN_INTERIOR;
         data.tardis_hum_volume = clampVolume(data.tardis_hum_volume);
         data.camera_shake_intensity = clampVolume(data.camera_shake_intensity);
         data.power_darkness_strength = clampVolume(data.power_darkness_strength);
@@ -100,32 +92,8 @@ public final class GCConfig {
         return s == null || s.isBlank();
     }
 
-    public static String defaultExterior() {
-        return data.default_exterior;
-    }
-
-    public static String defaultConsole() {
-        return data.default_console;
-    }
-
-    public static String defaultInterior() {
-        return data.default_interior;
-    }
-
     public static boolean showVersionHud() {
         return data.show_version_hud;
-    }
-
-    public static void setDefaultExterior(String id) {
-        data.default_exterior = id;
-    }
-
-    public static void setDefaultConsole(String id) {
-        data.default_console = id;
-    }
-
-    public static void setDefaultInterior(String id) {
-        data.default_interior = id;
     }
 
     public static double tardisHumVolume() {
@@ -223,6 +191,22 @@ public final class GCConfig {
 
     private static double clampVolume(double volume) {
         return Double.isNaN(volume) ? 1.0 : Math.clamp(volume, 0.0, 1.0);
+    }
+
+    public static boolean showFlightMessages() {
+        return data.show_flight_messages;
+    }
+
+    public static void setShowFlightMessages(boolean show) {
+        data.show_flight_messages = show;
+    }
+
+    public static boolean showOverlayMessages() {
+        return data.show_overlay_messages;
+    }
+
+    public static void setShowOverlayMessages(boolean show) {
+        data.show_overlay_messages = show;
     }
 
     public static void setShowVersionHud(boolean show) {

@@ -1,6 +1,6 @@
 package uk.nbforge.gallifreyan_chronicles.core.dynamic_registries;
 
-import uk.nbforge.gallifreyan_chronicles.config.GCConfig;
+import uk.nbforge.gallifreyan_chronicles.Constants;
 
 import java.util.Collection;
 
@@ -8,7 +8,7 @@ import uk.nbforge.gallifreyan_chronicles.tardis.TardisExterior;
 
 public class TardisExteriorRegistry {
     public static String defaultId() {
-        return GCConfig.defaultExterior();
+        return Constants.MOD_ID + ":first_doctors_exterior";
     }
 
     private static final GCJsonDataRegistry<TardisExterior> REGISTRY = new GCJsonDataRegistry<>();

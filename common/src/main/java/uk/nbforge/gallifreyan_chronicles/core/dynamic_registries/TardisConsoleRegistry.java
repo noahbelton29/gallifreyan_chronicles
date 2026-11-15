@@ -1,7 +1,6 @@
 package uk.nbforge.gallifreyan_chronicles.core.dynamic_registries;
 
 import uk.nbforge.gallifreyan_chronicles.Constants;
-import uk.nbforge.gallifreyan_chronicles.config.GCConfig;
 import org.jspecify.annotations.Nullable;
 
 import java.util.Collection;
@@ -14,7 +13,7 @@ import uk.nbforge.gallifreyan_chronicles.tardis.console.TardisConsoleVariant;
 
 public class TardisConsoleRegistry {
     public static String defaultId() {
-        return GCConfig.defaultConsole();
+        return Constants.MOD_ID + ":brachacki_console";
     }
 
     private static final GCJsonDataRegistry<TardisConsole> REGISTRY = new GCJsonDataRegistry<>();

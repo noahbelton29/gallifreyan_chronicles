@@ -32,6 +32,7 @@ public class GCJadePlugin implements IWailaPlugin {
     public void register(IWailaCommonRegistration registration) {
         registration.registerBlockDataProvider(TardisOwnerDataProvider.INSTANCE, TardisExteriorBlockEntity.class);
         registration.registerBlockDataProvider(TardisInteriorDoorDataProvider.INSTANCE, InteriorDoorBlockEntity.class);
+        registration.registerEntityDataProvider(ControlDataProvider.INSTANCE, TardisControlEntity.class);
     }
 
     @Override
@@ -79,6 +80,7 @@ public class GCJadePlugin implements IWailaPlugin {
             return accessor;
         });
         registration.registerEntityIcon(ControlIconProvider.INSTANCE, TardisControlEntity.class);
+        registration.registerEntityComponent(ControlIconProvider.INSTANCE, TardisControlEntity.class);
         registration.registerBlockIcon(TardisBlockIconProvider.INSTANCE, TardisBlock.class);
         registration.registerBlockIcon(TardisBlockIconProvider.INSTANCE, ConsoleBlock.class);
         registration.registerBlockComponent(TardisOwnerProvider.INSTANCE, TardisBlock.class);

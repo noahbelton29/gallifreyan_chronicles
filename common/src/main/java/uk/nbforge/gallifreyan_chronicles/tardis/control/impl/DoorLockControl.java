@@ -9,6 +9,8 @@ import uk.nbforge.gallifreyan_chronicles.core.GCTardisControls;
 import uk.nbforge.gallifreyan_chronicles.tardis.control.BaseControl;
 import uk.nbforge.gallifreyan_chronicles.tardis.control.ControlAnimations;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.ChatFormatting;
+import net.minecraft.network.chat.Component;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
@@ -46,6 +48,8 @@ public class DoorLockControl extends BaseControl {
             tell(player, "message.gallifreyan_chronicles.close_doors_to_lock");
             return InteractionResult.FAIL;
         }
+        announce(player, exterior.isLocked()
+                ? "message.gallifreyan_chronicles.doors_unlocking" : "message.gallifreyan_chronicles.doors_locking");
         return InteractionResult.SUCCESS;
     }
 
@@ -54,5 +58,10 @@ public class DoorLockControl extends BaseControl {
         if (!(console.getLevel() instanceof ServerLevel level)) return;
 
         linkedTardis(console).flatMap(Tardis::exterior).ifPresent(exterior -> exterior.setLockedFromConsole(activated));
+    }
+
+    @Override
+    public Component describeState(boolean activated) {
+        return activated ? state("door_lock", "locked", ChatFormatting.RED) : state("door_lock", "unlocked", ChatFormatting.GREEN);
     }
 }

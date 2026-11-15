@@ -246,7 +246,7 @@ public final class TardisDestinations {
                 .withStyle(ChatFormatting.GOLD));
     }
 
-    private static Component dimensionName(ResourceKey<Level> dimension) {
+    public static Component dimensionName(ResourceKey<Level> dimension) {
         StringBuilder name = new StringBuilder();
         for (String word : dimension.identifier().getPath().split("[_/]")) {
             if (word.isEmpty()) continue;

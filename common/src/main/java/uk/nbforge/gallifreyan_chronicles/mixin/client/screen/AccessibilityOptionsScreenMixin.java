@@ -21,6 +21,8 @@ public abstract class AccessibilityOptionsScreenMixin extends OptionsSubScreen {
     private void gc$addTardisAccessibility(CallbackInfo ci) {
         if (this.list != null) {
             this.list.addSmall(GCOptions.cameraShake(), GCOptions.powerDarkness());
+            this.list.addBig(GCOptions.overlayMessages());
+            this.list.addBig(GCOptions.flightMessages());
         }
     }
 }

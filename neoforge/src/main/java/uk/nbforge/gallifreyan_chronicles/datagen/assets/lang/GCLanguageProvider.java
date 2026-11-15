@@ -480,6 +480,12 @@ public class GCLanguageProvider extends LanguageProvider {
         add("gc.build.expired.message", "This test build of Gallifreyan Chronicles has expired. Ask for a new build to keep testing.");
         add("options.gallifreyan_chronicles.tardis_hum", "TARDIS Hum");
         add("options.gallifreyan_chronicles.camera_shake", "TARDIS Camera Shake");
+        add("options.gallifreyan_chronicles.flight_messages", "TARDIS Flight Messages");
+        add("options.gallifreyan_chronicles.flight_messages.tooltip", "Show a message above your hotbar when the TARDIS you are inside departs and when it arrives.");
+        add("overlay.gallifreyan_chronicles.flight_departing", "Dematerialising...");
+        add("overlay.gallifreyan_chronicles.flight_arrived", "Arrived in %s at %s");
+        add("options.gallifreyan_chronicles.overlay_messages", "TARDIS Action Bar Messages");
+        add("options.gallifreyan_chronicles.overlay_messages.tooltip", "Show the messages above your hotbar when you use TARDIS controls, such as locking the doors or setting a destination.");
         add("options.gallifreyan_chronicles.camera_shake.tooltip", "How strongly the camera shakes during TARDIS takeoff, flight and landing.");
         add("addons.gallifreyan_chronicles.title", "Addons");
         add("addons.gallifreyan_chronicles.drop_hint", "Drag addon .zip or .jar files into this window to install them.");
@@ -516,6 +522,11 @@ public class GCLanguageProvider extends LanguageProvider {
         add("addons.gallifreyan_chronicles.details.requires", "Needs %s %s");
         add("addons.gallifreyan_chronicles.details.file", "File: %s");
         add("options.gallifreyan_chronicles.header", "Gallifreyan Chronicles");
+        add("options.gallifreyan_chronicles.header.audio_visual", "Audio & Visual");
+        add("options.gallifreyan_chronicles.header.messages", "Messages & HUD");
+        add("options.gallifreyan_chronicles.header.rendering", "Rendering");
+        add("options.gallifreyan_chronicles.version_hud", "Version Overlay");
+        add("options.gallifreyan_chronicles.version_hud.tooltip", "Show the mod version in the corner of the screen.");
         add("options.gallifreyan_chronicles.immersive_portals", "Immersive Portals");
         add("options.gallifreyan_chronicles.immersive_portals.tooltip", "Use Immersive Portals for TARDIS doors. When off, doors use the plain teleport instead. Applies to worlds you host.");
         add("options.gallifreyan_chronicles.model_render_distance", "Model Render Distance");
@@ -544,6 +555,37 @@ public class GCLanguageProvider extends LanguageProvider {
         add("message.gallifreyan_chronicles.control_names_off", "Control names: off");
         add("key.gallifreyan_chronicles.show_control_names", "Show Control Names");
         add("key.category.gallifreyan_chronicles.controls", "Gallifreyan Chronicles");
+        add("tooltip.gallifreyan_chronicles.control_state.label.target_x", "Target X");
+        add("tooltip.gallifreyan_chronicles.control_state.label.target_y", "Target Y");
+        add("tooltip.gallifreyan_chronicles.control_state.label.target_z", "Target Z");
+        add("tooltip.gallifreyan_chronicles.control_state.label.step", "Step");
+        add("tooltip.gallifreyan_chronicles.control_state.label.facing", "Facing");
+        add("tooltip.gallifreyan_chronicles.control_state.label.dimension", "Dimension");
+        add("tooltip.gallifreyan_chronicles.control_state.label.doors", "Doors");
+        add("tooltip.gallifreyan_chronicles.control_state.label.door_lock", "Door Lock");
+        add("tooltip.gallifreyan_chronicles.control_state.label.interior_door", "Interior Door");
+        add("tooltip.gallifreyan_chronicles.control_state.label.power", "Power");
+        add("tooltip.gallifreyan_chronicles.control_state.label.cloak", "Cloak");
+        add("tooltip.gallifreyan_chronicles.control_state.label.isomorphic", "Isomorphic Security");
+        add("tooltip.gallifreyan_chronicles.control_state.label.handbrake", "Handbrake");
+        add("tooltip.gallifreyan_chronicles.control_state.label.throttle", "Throttle");
+        add("tooltip.gallifreyan_chronicles.control_state.value.open", "Open");
+        add("tooltip.gallifreyan_chronicles.control_state.value.closed", "Closed");
+        add("tooltip.gallifreyan_chronicles.control_state.value.locked", "Locked");
+        add("tooltip.gallifreyan_chronicles.control_state.value.unlocked", "Unlocked");
+        add("tooltip.gallifreyan_chronicles.control_state.value.on", "On");
+        add("tooltip.gallifreyan_chronicles.control_state.value.off", "Off");
+        add("tooltip.gallifreyan_chronicles.control_state.value.active", "Active");
+        add("tooltip.gallifreyan_chronicles.control_state.value.inactive", "Inactive");
+        add("tooltip.gallifreyan_chronicles.control_state.value.engaged", "Engaged");
+        add("tooltip.gallifreyan_chronicles.control_state.value.disengaged", "Disengaged");
+        add("tooltip.gallifreyan_chronicles.control_state.value.released", "Released");
+        add("message.gallifreyan_chronicles.doors_opening", "Opening the doors");
+        add("message.gallifreyan_chronicles.doors_closing", "Closing the doors");
+        add("message.gallifreyan_chronicles.doors_locking", "Doors locked");
+        add("message.gallifreyan_chronicles.doors_unlocking", "Doors unlocked");
+        add("message.gallifreyan_chronicles.interior_door_opening", "Opening the interior door");
+        add("message.gallifreyan_chronicles.interior_door_closing", "Closing the interior door");
         add("message.gallifreyan_chronicles.doors_sealed", "The doors are sealed while the TARDIS is travelling!");
         add("message.gallifreyan_chronicles.lock_no_exterior", "The door lock has no linked TARDIS exterior!");
         add("message.gallifreyan_chronicles.isomorphic_denied", "Isomorphic security: only the owner can use these controls.");
@@ -565,11 +607,6 @@ public class GCLanguageProvider extends LanguageProvider {
         add("tooltip.gallifreyan_chronicles.label_separator", ": ");
 
         // Config screen
-        add("menu.gallifreyan_chronicles.config", "Gallifreyan Chronicles Config");
-        add("menu.gallifreyan_chronicles.config.exterior", "Default Exterior");
-        add("menu.gallifreyan_chronicles.config.console", "Default Console");
-        add("menu.gallifreyan_chronicles.config.interior", "Default Interior");
-        add("menu.gallifreyan_chronicles.config.hint", "Changes apply to newly created TARDISes");
 
         // Sound subtitles
         add("sounds.gallifreyan_chronicles.block_entity.tardis_door_open", "TARDIS door opens");

@@ -27,7 +27,7 @@ public final class TardisMoods {
     private static final float OVERUSE_STRESS = 10f;
     private static final float DAMAGED_FLIGHT_STRESS = 8f;
     private static final float WRONG_KEY_STRESS = 4f;
-    private static final float ABORTED_TAKEOFF_STRESS = 10f;
+    private static final float ABORTED_TAKEOFF_STRESS = 6f;
 
     /**
      * Maximum stress level at which a landing is considered calm.

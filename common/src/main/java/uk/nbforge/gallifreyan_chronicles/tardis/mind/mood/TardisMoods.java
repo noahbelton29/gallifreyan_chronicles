@@ -27,6 +27,7 @@ public final class TardisMoods {
     private static final float OVERUSE_STRESS = 10f;
     private static final float DAMAGED_FLIGHT_STRESS = 8f;
     private static final float WRONG_KEY_STRESS = 4f;
+    private static final float ABORTED_TAKEOFF_STRESS = 10f;
 
     /**
      * Maximum stress level at which a landing is considered calm.
@@ -41,6 +42,10 @@ public final class TardisMoods {
     public static void init() {
         TardisEvents.TAKE_OFF.register(TardisMoods::onTakeOff);
         TardisEvents.LAND.register(TardisMoods::onLand);
+    }
+
+    public static void onTakeoffForcedStop(Tardis tardis) {
+        TardisMindSystem.addStress(tardis, ABORTED_TAKEOFF_STRESS);
     }
 
     public static void onWrongKey(Tardis tardis) {

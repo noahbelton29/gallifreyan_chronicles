@@ -2,6 +2,7 @@ package uk.nbforge.gallifreyan_chronicles.tardis.control.impl;
 
 import uk.nbforge.gallifreyan_chronicles.tardis.mind.TardisMindSystem;
 import uk.nbforge.gallifreyan_chronicles.tardis.mind.flight.TardisTurbulence;
+import uk.nbforge.gallifreyan_chronicles.tardis.mind.mood.TardisMoods;
 import uk.nbforge.gallifreyan_chronicles.util.MessageUtil;
 import uk.nbforge.gallifreyan_chronicles.core.sound.timed.TimedSounds;
 
@@ -316,6 +317,7 @@ public class SpaceTimeThrottleControl extends BaseControl {
         if (exterior == null || exterior.getFlightState() != TardisFlightState.TAKING_OFF) return false;
 
         QUEUED_TAKEOFFS.remove(tardis.get().id());
+        TardisMoods.onTakeoffForcedStop(tardis.get());
         List<TardisConsoleBlockEntity> consoles = ConsoleSyncSystem.liveConsolesWith(console);
 
         Set<ServerLevel> levels = new LinkedHashSet<>();

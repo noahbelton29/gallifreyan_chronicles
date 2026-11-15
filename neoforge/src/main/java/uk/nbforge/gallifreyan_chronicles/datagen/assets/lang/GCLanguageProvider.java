@@ -540,6 +540,10 @@ public class GCLanguageProvider extends LanguageProvider {
         add("message.gallifreyan_chronicles.close_doors_to_lock", "Close both doors before locking!");
         add("message.gallifreyan_chronicles.no_destination_to_set", "This console has no TARDIS destination to set!");
         add("message.gallifreyan_chronicles.doors_locked", "The doors are locked!");
+        add("message.gallifreyan_chronicles.control_names_on", "Control names: on");
+        add("message.gallifreyan_chronicles.control_names_off", "Control names: off");
+        add("key.gallifreyan_chronicles.show_control_names", "Show Control Names");
+        add("key.category.gallifreyan_chronicles.controls", "Gallifreyan Chronicles");
         add("message.gallifreyan_chronicles.doors_sealed", "The doors are sealed while the TARDIS is travelling!");
         add("message.gallifreyan_chronicles.lock_no_exterior", "The door lock has no linked TARDIS exterior!");
         add("message.gallifreyan_chronicles.isomorphic_denied", "Isomorphic security: only the owner can use these controls.");

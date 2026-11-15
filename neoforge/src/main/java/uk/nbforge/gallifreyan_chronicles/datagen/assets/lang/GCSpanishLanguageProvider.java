@@ -399,6 +399,10 @@ public class GCSpanishLanguageProvider extends LanguageProvider {
         add("message.gallifreyan_chronicles.crash_landing", "¡Freno de mano puesto en el vórtice, la TARDIS se estrella!");
         add("message.gallifreyan_chronicles.deletion_mode_required", "%s: activa el modo de eliminación con %s para romper esta TARDIS.");
         add("message.gallifreyan_chronicles.doors_locked", "¡Las puertas están cerradas con llave!");
+        add("message.gallifreyan_chronicles.control_names_on", "Nombres de controles: activados");
+        add("message.gallifreyan_chronicles.control_names_off", "Nombres de controles: desactivados");
+        add("key.gallifreyan_chronicles.show_control_names", "Mostrar nombres de controles");
+        add("key.category.gallifreyan_chronicles.controls", "Gallifreyan Chronicles");
         add("message.gallifreyan_chronicles.doors_sealed", "¡Las puertas están selladas mientras la TARDIS viaja!");
         add("message.gallifreyan_chronicles.isomorphic_denied", "Seguridad isomórfica: solo el propietario puede usar estos controles.");
         add("message.gallifreyan_chronicles.key_linked", "La llave ahora está vinculada a esta TARDIS.");

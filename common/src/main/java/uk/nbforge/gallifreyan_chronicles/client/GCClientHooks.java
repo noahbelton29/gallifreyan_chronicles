@@ -16,6 +16,7 @@ import uk.nbforge.gallifreyan_chronicles.network.ResumeSoundPayload;
 import uk.nbforge.gallifreyan_chronicles.client.sound.SoundListener;
 import uk.nbforge.gallifreyan_chronicles.core.block_entities.TardisConsoleBlockEntity;
 import uk.nbforge.gallifreyan_chronicles.client.camera.GCCameraShake;
+import uk.nbforge.gallifreyan_chronicles.client.input.GCKeyMappings;
 import uk.nbforge.gallifreyan_chronicles.client.gui.hud.GCPowerDarkness;
 import uk.nbforge.gallifreyan_chronicles.client.protection.build.BuildExpiry;
 import uk.nbforge.gallifreyan_chronicles.core.block_entities.TardisExteriorBlockEntity;
@@ -92,6 +93,7 @@ public final class GCClientHooks {
         RematCatchClient.tick();
         ExteriorHumSounds.tick();
         GCMusic.tick(minecraft);
+        GCKeyMappings.tick();
     }
 
     public static void trackExteriorHum(TardisExteriorBlockEntity be) {

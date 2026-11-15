@@ -16,7 +16,10 @@ import uk.nbforge.gallifreyan_chronicles.network.client.GCFabricClientNetworking
 import uk.nbforge.gallifreyan_chronicles.util.GCUtil;
 import uk.nbforge.gallifreyan_chronicles.compat.flashback.FlashbackOptionsButton;
 import uk.nbforge.gallifreyan_chronicles.compat.replaymod.ReplayModOptionsButton;
+import uk.nbforge.gallifreyan_chronicles.client.input.GCKeyMappings;
 import net.fabricmc.api.ClientModInitializer;
+import net.fabricmc.fabric.api.client.keymapping.v1.KeyMappingHelper;
+import net.minecraft.client.KeyMapping;
 import net.fabricmc.loader.api.FabricLoader;
 import net.fabricmc.fabric.api.client.rendering.v1.hud.HudElementRegistry;
 import net.fabricmc.fabric.api.client.rendering.v1.hud.VanillaHudElements;
@@ -43,6 +46,9 @@ public class GallifreyanChroniclesFabricClient implements ClientModInitializer {
         EntityRenderers.register(GCEntityTypes.TARDIS_CONTROL_ENTITY_TYPE, TardisControlEntityRenderer::new);
         EntityRenderers.register(GCEntityTypes.TARDIS_KEY_ENTITY_TYPE, TardisKeyEntityRenderer::new);
         GCFabricClientNetworking.registerClientNetworking();
+
+        KeyMapping.Category keyCategory = KeyMapping.Category.register(GCUtil.modIdentifier("controls"));
+        KeyMappingHelper.registerKeyMapping(GCKeyMappings.createShowControlNames(keyCategory));
 
         if (FabricLoader.getInstance().isModLoaded("replaymod")) {
             ReplayModOptionsButton.register();

@@ -14,10 +14,10 @@ public final class FadeTypes {
     public static final String NEW_WHO_ID = Constants.MOD_ID + ":newwho";
     public static final String CLASSIC_WHO_ID = Constants.MOD_ID + ":classicwho";
 
-    /** Modern series fade with the pulse. Used for new TARDISes and when a saved id is missing or unknown. */
+    // The modern series fade with the pulse, used for new TARDISes and when a saved id is missing or unknown
     public static final FadeType NEW_WHO =
             new PulseFadeType(NEW_WHO_ID, FadeTiming.DEFAULT, 30.0f, 2.5f, 1.0f);
-    /** Classic series fade, no pulse. */
+    // The classic series fade with no pulse
     public static final FadeType CLASSIC_WHO =
             new LinearFadeType(CLASSIC_WHO_ID, FadeTiming.DEFAULT, 1.0f);
     public static final FadeType DEFAULT = NEW_WHO;

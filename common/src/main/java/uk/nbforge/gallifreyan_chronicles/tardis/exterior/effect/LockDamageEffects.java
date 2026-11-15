@@ -9,6 +9,10 @@ public final class LockDamageEffects {
     private LockDamageEffects() {
     }
 
+    /**
+       Smoke and fire from a damaged lock, the lower the health the more often it smokes.
+       Under the fire limit it also sparks flames and at zero health it burns constantly.
+    */
     public static void tick(ServerLevel level, Vec3 pos, float health) {
         if (health >= SubsystemSystem.SMOKE_THRESHOLD) {
             return;

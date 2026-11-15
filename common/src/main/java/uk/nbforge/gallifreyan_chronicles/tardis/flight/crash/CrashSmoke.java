@@ -26,39 +26,41 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
 
-/* a crashed tardis keeps billowing smoke out of its console until it's repaired.
-   open the doors and the smoke gets pulled through the room, out the doorway and out of the box */
+/**
+   A crashed TARDIS keeps pouring smoke out of its console until it is repaired.
+   Open the doors and the smoke is pulled through the room and out of the box.
+*/
 public final class CrashSmoke {
     private static final int PUFF_TICKS = 5;
 
-    /* pouring out of the console */
+    // Pouring out of the console
     private static final int CONSOLE_PUFFS = 12;
     private static final int CONSOLE_COLUMN = 4;
 
-    /* hanging in the room */
+    // Hanging in the room
     private static final double ROOM_SPREAD = 8.0;
     private static final double ROOM_HEIGHT = 3.0;
     private static final int ROOM_PUFFS = 40;
 
-    /* drawn towards the doors when they're open */
+    // Pulled towards the doors when they are open
     private static final int DRAFT_PUFFS = 30;
     private static final double DRAFT_SPEED = 0.15;
     private static final int DOORWAY_PUFFS = 15;
     private static final int OUTSIDE_PUFFS = 25;
     private static final double OUTSIDE_SPEED = 0.2;
 
-    /* breathing it in. about 10 seconds before you start choking, and it gets worse the longer you stay.
-       open doors let some out so it builds slower */
+    // Breathing it in, about 10 seconds before you start choking and it gets worse the longer you stay
+    // Open doors let some out so it builds slower
     private static final int SAFE_TICKS = 200;
     private static final int WARN_TICKS = 100;
-    /* choking goes up a level this often */
+    // Choking goes up a level this often
     private static final int WORSE_EVERY_TICKS = 80;
     private static final int MAX_LEVEL = 4;
-    /* how long choking lasts after you get out */
+    // How long choking lasts after you get out
     private static final int LINGER_TICKS = 100;
 
     private static final Set<UUID> RUNNING = new HashSet<>();
-    /* how long each player has been breathing it, per tardis */
+    // How long each player has been breathing it, per TARDIS
     private static final Map<UUID, Map<UUID, Integer>> BREATHED = new HashMap<>();
 
     private CrashSmoke() {
@@ -97,7 +99,6 @@ public final class CrashSmoke {
         GCSchedulerUtil.runLater(tardis.server(), PUFF_TICKS, () -> puff(tardis));
     }
 
-    /* thick smoke rising out of the console */
     private static void pourFromConsole(ServerLevel level, Vec3 console) {
         level.sendParticles(ParticleTypes.LARGE_SMOKE, console.x, console.y + 1.0, console.z, CONSOLE_PUFFS,
                 0.6, 0.3, 0.6, 0.06);
@@ -105,7 +106,7 @@ public final class CrashSmoke {
                 0.4, 0.2, 0.4, 0.01);
     }
 
-    /* doors shut: it just fills the room */
+    /** Doors shut so it just fills the room. */
     private static void hangInRoom(ServerLevel level, Vec3 console) {
         level.sendParticles(ParticleTypes.CAMPFIRE_COSY_SMOKE, console.x, console.y + 1.5, console.z, ROOM_PUFFS,
                 ROOM_SPREAD, ROOM_HEIGHT, ROOM_SPREAD, 0.005);
@@ -113,7 +114,7 @@ public final class CrashSmoke {
                 ROOM_SPREAD, ROOM_HEIGHT, ROOM_SPREAD, 0.01);
     }
 
-    /* doors open: smoke all over the room drifts towards the doorway and out through it */
+    /** Doors open so smoke all over the room drifts towards the doorway and out. */
     private static void draftToDoor(ServerLevel level, Vec3 console, InteriorDoorBlockEntity door) {
         RandomSource random = level.getRandom();
         Vec3 doorway = Vec3.atCenterOf(door.getBlockPos()).add(0, 0.5, 0);
@@ -126,7 +127,7 @@ public final class CrashSmoke {
             send(level, random, from, towards, DRAFT_SPEED);
         }
 
-        /* thick stream right at the doorway going through it */
+        // A thick stream right at the doorway going through it
         Direction facing = door.getFacing();
         Vec3 through = new Vec3(-facing.getStepX(), 0.05, -facing.getStepZ());
         Vec3 inFront = doorway.add(facing.getStepX() * 1.2, 0, facing.getStepZ() * 1.2);
@@ -137,7 +138,7 @@ public final class CrashSmoke {
         }
     }
 
-    /* smoke billowing out of the box */
+    /** Smoke pours out of the doors of the exterior, outwards is the way the doors face worked out from the yaw. */
     private static void pourOutOfBox(Tardis tardis) {
         TardisExteriorBlockEntity exterior = tardis.exteriorIfLoaded().orElse(null);
         if (exterior == null || !(exterior.getLevel() instanceof ServerLevel outside)) return;
@@ -169,13 +170,13 @@ public final class CrashSmoke {
             if (now < SAFE_TICKS) continue;
             int level = Math.min((now - SAFE_TICKS) / WORSE_EVERY_TICKS, MAX_LEVEL);
             MobEffectInstance current = player.getEffect(GCEffects.CHOKING);
-            /* only top it up when it gets worse or is about to run out, so its timer keeps ticking */
+            // Only top it up when it gets worse or is about to run out so its timer keeps ticking
             boolean worse = current == null || current.getAmplifier() < level;
             if (worse || current.getDuration() < LINGER_TICKS / 2) {
                 player.addEffect(new MobEffectInstance(GCEffects.CHOKING, LINGER_TICKS, level));
             }
         }
-        /* leaving lets you catch your breath */
+        // Leaving lets you catch your breath
         breathed.keySet().removeIf(id -> interior.getPlayerByUUID(id) == null);
     }
 
@@ -186,7 +187,7 @@ public final class CrashSmoke {
         return null;
     }
 
-    /* count 0 makes the particle move in the given direction */
+    /** A count of 0 makes the particle move in the given direction. */
     private static void send(ServerLevel level, RandomSource random, Vec3 from, Vec3 direction, double speed) {
         SimpleParticleType type = random.nextInt(3) == 0 ? ParticleTypes.LARGE_SMOKE : ParticleTypes.CAMPFIRE_COSY_SMOKE;
         level.sendParticles(type, from.x, from.y, from.z, 0, direction.x, direction.y, direction.z, speed);

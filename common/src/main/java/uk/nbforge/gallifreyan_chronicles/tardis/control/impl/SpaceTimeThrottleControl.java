@@ -1,6 +1,6 @@
 package uk.nbforge.gallifreyan_chronicles.tardis.control.impl;
 
-import uk.nbforge.gallifreyan_chronicles.tardis.mind.TardisMindSystem;
+import uk.nbforge.gallifreyan_chronicles.tardis.ecs.system.TardisMindSystem;
 import uk.nbforge.gallifreyan_chronicles.tardis.mind.flight.TardisTurbulence;
 import uk.nbforge.gallifreyan_chronicles.tardis.mind.mood.TardisMoods;
 import uk.nbforge.gallifreyan_chronicles.util.MessageUtil;
@@ -192,7 +192,7 @@ public class SpaceTimeThrottleControl extends BaseControl {
         crashLand(console, "crash_landing");
     }
 
-    /* message: the lang key shown as it falls out the vortex */
+    /** The message is the lang key shown as it falls out of the vortex. */
     public static void crashLand(TardisConsoleBlockEntity console, String message) {
         if (!(console.getLevel() instanceof ServerLevel level)) return;
         Tardis tardis = linkedTardis(console).orElse(null);
@@ -209,8 +209,10 @@ public class SpaceTimeThrottleControl extends BaseControl {
         console.triggerControl(GCTardisControls.SPACE_TIME_THROTTLE, false, null);
     }
 
-    /* a stressed tardis dropping out of the vortex on its own. rough but not a crash, no damage,
-       and it gets most of the way there */
+    /**
+       A stressed TARDIS dropping out of the vortex on its own.
+       Rough but not a crash, no damage and it gets most of the way there.
+    */
     public static boolean emergencyLand(TardisConsoleBlockEntity console, String message) {
         if (!(console.getLevel() instanceof ServerLevel level)) return false;
         Tardis tardis = linkedTardis(console).orElse(null);
@@ -249,7 +251,7 @@ public class SpaceTimeThrottleControl extends BaseControl {
             Vec3 shakePos
     ) {
         playEverywhere(console, level, GCSounds.TARDIS_DRUM);
-        /* a stressed tardis sounds strained */
+        // A stressed TARDIS sounds strained
         float pitch = linkedTardis(console).map(tardis -> TardisTurbulence.vworpPitch(TardisMindSystem.stress(tardis))).orElse(1.0F);
         for (TardisConsoleBlockEntity each : ConsoleSyncSystem.liveConsolesWith(console)) {
             if (!(each.getLevel() instanceof ServerLevel eachLevel)) continue;

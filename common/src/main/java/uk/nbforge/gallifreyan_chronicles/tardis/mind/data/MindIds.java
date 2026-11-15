@@ -2,7 +2,7 @@ package uk.nbforge.gallifreyan_chronicles.tardis.mind.data;
 
 import uk.nbforge.gallifreyan_chronicles.Constants;
 
-/* "skittish" and "gallifreyan_chronicles:skittish" mean the same thing */
+/** An id with or without the mod namespace means the same thing. */
 public final class MindIds {
     private MindIds() {
     }

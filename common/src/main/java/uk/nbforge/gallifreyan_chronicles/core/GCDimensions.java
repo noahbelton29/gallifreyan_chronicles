@@ -177,6 +177,7 @@ public class GCDimensions {
             0.0f
     );
 
+    /** Sets up the Gallifrey world, which biome goes where in the climate ranges, and the terrain generator. */
     public static void bootstrapStem(BootstrapContext<LevelStem> context) {
         var biomes = context.lookup(Registries.BIOME);
         var dimensionTypes = context.lookup(Registries.DIMENSION_TYPE);

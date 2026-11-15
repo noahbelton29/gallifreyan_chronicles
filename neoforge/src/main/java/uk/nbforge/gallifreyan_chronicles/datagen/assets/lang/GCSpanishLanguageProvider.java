@@ -4,9 +4,7 @@ import uk.nbforge.gallifreyan_chronicles.Constants;
 import net.minecraft.data.PackOutput;
 import net.neoforged.neoforge.common.data.LanguageProvider;
 
-/**
- * Spanish (Spain) translations. Keys must match {@link GCLanguageProvider} / en_us.
- */
+/** Spanish translations for Spain, the keys must match GCLanguageProvider. */
 public class GCSpanishLanguageProvider extends LanguageProvider {
     public GCSpanishLanguageProvider(PackOutput output) {
         super(output, Constants.MOD_ID, "es_es");
@@ -291,6 +289,7 @@ public class GCSpanishLanguageProvider extends LanguageProvider {
         add("config.jade.plugin_gallifreyan_chronicles.tardis_console_info", "Modelo y variante de la consola de la TARDIS");
         add("config.jade.plugin_gallifreyan_chronicles.tardis_control", "Icono de los controles de la TARDIS");
         add("config.jade.plugin_gallifreyan_chronicles.tardis_exterior_info", "Exterior de la TARDIS");
+        add("config.jade.plugin_gallifreyan_chronicles.interior_door_lock", "Nombre y bloqueo de la puerta interior de la TARDIS");
         add("config.jade.plugin_gallifreyan_chronicles.tardis_owner", "Propietario de la TARDIS");
         add("control.gallifreyan_chronicles.change_increment", "Cambiar incremento");
         add("control.gallifreyan_chronicles.cloak_control", "Control de camuflaje");
@@ -468,6 +467,10 @@ public class GCSpanishLanguageProvider extends LanguageProvider {
         add("options.gallifreyan_chronicles.flight_messages", "Mensajes de vuelo de la TARDIS");
         add("options.gallifreyan_chronicles.flight_messages.tooltip", "Muestra un mensaje sobre la barra de objetos cuando la TARDIS en la que estás sale y cuando llega.");
         add("overlay.gallifreyan_chronicles.flight_departing", "Desmaterializando...");
+        add("overlay.gallifreyan_chronicles.door_style_set", "Puerta con el estilo de %s");
+        add("overlay.gallifreyan_chronicles.door_style_cleared", "Estilo de la puerta eliminado");
+        add("overlay.gallifreyan_chronicles.door_style_no_match", "Esta puerta no se puede combinar con el estilo de %s");
+        add("overlay.gallifreyan_chronicles.door_style_primary", "Esta puerta la controla la consola y no se puede cambiar de estilo");
         add("overlay.gallifreyan_chronicles.flight_arrived", "Llegada a %s en %s");
         add("options.gallifreyan_chronicles.overlay_messages", "Mensajes de la TARDIS en la barra de acción");
         add("options.gallifreyan_chronicles.overlay_messages.tooltip", "Muestra los mensajes sobre la barra de objetos al usar los controles de la TARDIS, como bloquear las puertas o fijar un destino.");
@@ -643,6 +646,10 @@ public class GCSpanishLanguageProvider extends LanguageProvider {
         add("death.attack.gallifreyan_chronicles.smoke.player", "%1$s se asfixió con el humo de una TARDIS estrellada mientras luchaba contra %2$s");
         add("effect.gallifreyan_chronicles.choking", "Asfixia");
         add("tooltip.gallifreyan_chronicles.tardis.door", "Puertas");
+        add("tooltip.gallifreyan_chronicles.interior_door.tardis_door", "Puerta de la TARDIS");
+        add("tooltip.gallifreyan_chronicles.interior_door.primary", "Puerta interior principal");
+        add("tooltip.gallifreyan_chronicles.interior_door.decorative", "Puerta interior");
+        add("tooltip.gallifreyan_chronicles.interior_door.styled", "%s (%s)");
         add("tooltip.gallifreyan_chronicles.tardis.locked", "Cerradas");
         add("tooltip.gallifreyan_chronicles.tardis.unlocked", "Abiertas");
     }

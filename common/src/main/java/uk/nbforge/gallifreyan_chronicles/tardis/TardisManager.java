@@ -77,6 +77,7 @@ public class TardisManager extends SavedData {
         return entries;
     }
 
+    /** Builds the manager from the saved list with one lookup map per piece of data, so a TARDIS can be found by its id or by its owner. */
     public static TardisManager fromEntries(List<Entry> entries) {
         TardisManager manager = new TardisManager();
         for (Entry entry : entries) {
@@ -112,6 +113,7 @@ public class TardisManager extends SavedData {
         return Optional.ofNullable(byTardisId.get(tardisId));
     }
 
+    /** Every TARDIS owned by this player, ids that have no record are skipped. */
     public List<TardisComponent> getByOwner(UUID ownerId) {
         return byOwnerId.getOrDefault(ownerId, List.of())
                 .stream()
@@ -143,6 +145,7 @@ public class TardisManager extends SavedData {
         setDirty();
     }
 
+    /** Saves a new owner name, nothing happens if it is the same. */
     public void updateOwnerName(UUID tardisId, String ownerName) {
         TardisComponent old = byTardisId.get(tardisId);
         if (old == null || old.ownerName().equals(ownerName)) return;
@@ -158,6 +161,7 @@ public class TardisManager extends SavedData {
         return Set.copyOf(trustedById.getOrDefault(tardisId, Set.of()));
     }
 
+    /** Adds or removes a trusted player, true only if that changed something, an empty trusted list is dropped. */
     public boolean setTrusted(UUID tardisId, UUID playerId, boolean trusted) {
         if (!byTardisId.containsKey(tardisId)) return false;
         Set<UUID> players = trustedById.computeIfAbsent(tardisId, ignored -> new HashSet<>());
@@ -193,6 +197,7 @@ public class TardisManager extends SavedData {
         return crashed.contains(tardisId);
     }
 
+    /** Marks the TARDIS as crashed or not crashed. */
     public void setCrashed(UUID tardisId, boolean isCrashed) {
         boolean changed = isCrashed ? crashed.add(tardisId) : crashed.remove(tardisId);
         if (changed) setDirty();
@@ -222,7 +227,7 @@ public class TardisManager extends SavedData {
         setDirty();
     }
 
-    // where the tardis was first placed. used when no exterior is linked
+    /** Where the TARDIS was first placed, used when no exterior is linked. */
     public void setRegisteredBlockPos(UUID tardisId, BlockPos pos) {
         if (pos == null) {
             blockPosById.remove(tardisId);
@@ -284,12 +289,12 @@ public class TardisManager extends SavedData {
         setDirty();
     }
 
-    // index into TardisDestinations.INCREMENTS, the step the console's x/y/z controls move the destination by
+    /** Index into TardisDestinations INCREMENTS, the step the x, y and z controls of the console move the destination by. */
     public int getCoordIncrementIndex(UUID tardisId) {
         return coordIncrementById.getOrDefault(tardisId, 0);
     }
 
-    // when set, the x/y/z controls subtract the increment instead of adding it
+    /** When set the x, y and z controls subtract the step instead of adding it. */
     public boolean isCoordIncrementNegative(UUID tardisId) {
         return negativeIncrements.contains(tardisId);
     }
@@ -337,6 +342,7 @@ public class TardisManager extends SavedData {
         setDirty();
     }
 
+    /** The world the exterior is in, the overworld if none is saved. */
     public ResourceKey<Level> getExteriorDimension(UUID tardisId) {
         Identifier id = exteriorDimensionById.get(tardisId);
         return id == null ? Level.OVERWORLD : ResourceKey.create(Registries.DIMENSION, id);

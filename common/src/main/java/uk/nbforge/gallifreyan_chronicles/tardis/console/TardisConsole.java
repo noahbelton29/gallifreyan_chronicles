@@ -2,7 +2,6 @@ package uk.nbforge.gallifreyan_chronicles.tardis.console;
 
 import uk.nbforge.gallifreyan_chronicles.Constants;
 
-
 import uk.nbforge.gallifreyan_chronicles.core.data.IdentifiableData;
 import net.minecraft.world.phys.Vec3;
 import org.jspecify.annotations.Nullable;
@@ -19,9 +18,7 @@ public record TardisConsole(String id, List<ControlEntry> controls, String defau
     public record ControlEntry(String id, Vec3 offset, float width, float height, float depth, float cooldown,
                                ControlAnimationSetting animation) {
         public static final float DEFAULT_COOLDOWN_SECONDS = 1.5F;
-        /**
-         * Position placeholder for controls placed by their model's hitbox bone; resolved in withId.
-         */
+        // Position placeholder for controls placed by the hitbox bone of their model, resolved in withId
         public static final Vec3 FROM_HITBOX = new Vec3(Double.NaN, Double.NaN, Double.NaN);
 
     }

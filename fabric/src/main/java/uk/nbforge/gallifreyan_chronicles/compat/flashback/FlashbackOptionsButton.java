@@ -11,19 +11,19 @@ import net.minecraft.client.gui.screens.TitleScreen;
 import java.lang.reflect.Constructor;
 import java.nio.file.Path;
 
-/* moves flashback's replay button from the title screen into our options menu */
+/** Moves the replay button of Flashback from the title screen into our options menu. */
 public final class FlashbackOptionsButton {
     private static final String PACKAGE = "com.moulberry.flashback";
     private static final String SELECT_SCREEN = PACKAGE + ".screen.select_replay.SelectReplayScreen";
 
-    /* the screen that is open, so flashback's screen can return to it */
+    // The open screen so the screen of Flashback can return to it
     private static volatile Screen lastScreen;
 
     private FlashbackOptionsButton() {
     }
 
     public static void register() {
-        /* replaymod's hook wins if both are installed */
+        // The hook of ReplayMod wins if both are installed
         if (ReplayViewerHook.opener == null) {
             ReplayViewerHook.opener = FlashbackOptionsButton::open;
         }
@@ -34,7 +34,7 @@ public final class FlashbackOptionsButton {
         });
     }
 
-    /* hide any widget that is a flashback class */
+    /** Hide any widget that is a Flashback class. */
     private static void hideTitleButton(Screen screen) {
         for (Object child : screen.children()) {
             if (child instanceof AbstractWidget widget && child.getClass().getName().startsWith(PACKAGE)) {
@@ -44,7 +44,7 @@ public final class FlashbackOptionsButton {
         }
     }
 
-    /* opens flashback's replay list. reflection, so a renamed class only logs a warning */
+    /** Opens the replay list of Flashback, it uses reflection so a renamed class only logs a warning. */
     private static void open() {
         Minecraft minecraft = Minecraft.getInstance();
         Screen current = lastScreen;

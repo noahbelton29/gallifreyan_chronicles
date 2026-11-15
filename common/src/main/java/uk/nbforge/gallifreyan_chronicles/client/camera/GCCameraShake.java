@@ -56,9 +56,9 @@ public final class GCCameraShake {
     private static final double CRASH_FADE_OUT = 0.8;
     private static @Nullable Vec3 crashOrigin;
 
-    /* stressed flight rumble. eases towards what the server last said, fades out if it stops hearing */
+    // Stressed flight rumble, it eases towards what the server last said and fades out if it stops hearing
     private static final double STRESS_TIMEOUT = 1.5;
-    /* goes from no shake to full in about a quarter of a second, fades out slower when it lands */
+    // Goes from no shake to full in about a quarter of a second and fades out slower when it lands
     private static final double STRESS_EASE_PER_SECOND = 4.0;
     private static final double STRESS_FADE_OUT_PER_SECOND = 1.0;
     private static @Nullable Vec3 stressOrigin;

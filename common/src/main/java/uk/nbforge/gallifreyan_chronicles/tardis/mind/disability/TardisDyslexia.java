@@ -2,7 +2,7 @@ package uk.nbforge.gallifreyan_chronicles.tardis.mind.disability;
 
 import uk.nbforge.gallifreyan_chronicles.tardis.mind.MindMessages;
 import uk.nbforge.gallifreyan_chronicles.tardis.mind.TardisMind;
-import uk.nbforge.gallifreyan_chronicles.tardis.mind.TardisMindSystem;
+import uk.nbforge.gallifreyan_chronicles.tardis.ecs.system.TardisMindSystem;
 import uk.nbforge.gallifreyan_chronicles.tardis.mind.discovery.TardisDiscovery;
 
 import uk.nbforge.gallifreyan_chronicles.tardis.Tardis;
@@ -15,12 +15,9 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.util.RandomSource;
 
 /**
- * Handles how dyslexia affects a TARDIS when it takes off.
- * <p>
- * A dyslexic TARDIS can mix up the coordinates of its landing target.
- * Stress makes this more likely and can cause more severe mix-ups,
- * while practising flying helps it get better over time.
- */
+   How dyslexia affects a TARDIS when it takes off.
+   It can mix up the coordinates of its landing target, stress makes that more likely and worse, and practising flying helps it get better.
+*/
 public final class TardisDyslexia {
     private static final float NEW_CHANCE = 0.8f;
     private static final float FLOOR_CHANCE = 0.05f;
@@ -28,26 +25,21 @@ public final class TardisDyslexia {
     private static final float STRESSED = 50f;
     private static final float PANICKED = 80f;
 
-    // Each flight reduces the amount of confusion the TARDIS has left to learn from.
-    // This works out to roughly a 10% chance after 100 flights.
+    // Each flight reduces the confusion it has left to learn from
+    // It works out to roughly a 10 percent chance after 100 flights
     private static final float PRACTICE_KEEP = (float) Math.exp(-1.0 / 37.0);
 
     private TardisDyslexia() {
     }
 
-    /**
-     * Registers the takeoff event so the TARDIS can handle its dyslexia.
-     */
     public static void init() {
         TardisEvents.TAKE_OFF.register(TardisDyslexia::onTakeOff);
     }
 
     /**
-     * Checks whether the TARDIS mixes up its landing coordinates when taking off.
-     * <p>
-     * If it does, the owner is shown a message. The TARDIS also gets a little
-     * more practice with each flight, whether or not its coordinates were mixed up.
-     */
+       If it mixes up the coordinates the owner sees a message.
+       It gets a little practice with each flight whether or not it was mixed up.
+    */
     private static void onTakeOff(Tardis tardis) {
         TardisMind mind = TardisMindSystem.mind(tardis);
         if (!mind.has(TardisDisability.DYSLEXIC)) return;
@@ -61,28 +53,14 @@ public final class TardisDyslexia {
     }
 
     /**
-     * Works out how likely the TARDIS is to get its coordinates mixed up.
-     * <p>
-     * The chance starts high and drops towards the minimum as the TARDIS
-     * gains experience.
-     *
-     * @param skill how much practice the TARDIS has gained, from 0 to 1
-     * @return the chance of a mix-up
-     */
+       The chance starts high and drops towards the minimum as it gains experience.
+       skill goes from 0 to 1.
+    */
     public static float calmChance(float skill) {
         return FLOOR_CHANCE + (NEW_CHANCE - FLOOR_CHANCE) * (1f - skill);
     }
 
-    /**
-     * Tries to scramble the landing target's X and Z coordinates.
-     * <p>
-     * Higher stress makes a mix-up more likely and can cause several changes
-     * to the coordinates instead of just one.
-     *
-     * @param tardis the TARDIS whose landing target may be changed
-     * @param random the random source used to decide what gets mixed up
-     * @return true if the landing target was changed
-     */
+    /** Higher stress makes a mix up more likely and can change the coordinates several times and not just once. */
     public static boolean muddle(Tardis tardis, RandomSource random) {
         TardisMind mind = TardisMindSystem.mind(tardis);
         if (!mind.has(TardisDisability.DYSLEXIC)) return false;
@@ -122,24 +100,15 @@ public final class TardisDyslexia {
         return true;
     }
 
-    /**
-     * Gives the TARDIS a little more practice after each flight.
-     */
     private static void practise(Tardis tardis) {
         float skill = TardisMindSystem.skill(tardis);
         TardisMindSystem.setSkill(tardis, 1f - (1f - skill) * PRACTICE_KEEP);
     }
 
     /**
-     * Swaps two neighbouring digits in a coordinate.
-     * <p>
-     * For example, 142 could become 124. Negative values keep their sign,
-     * and values with fewer than two digits are left alone.
-     *
-     * @param value  the coordinate to change
-     * @param random the random source used to choose which digits to swap
-     * @return the coordinate with two neighbouring digits swapped
-     */
+       Swaps two neighbouring digits so 142 can become 124.
+       Negative values keep their sign and values with fewer than two digits are left alone.
+    */
     private static int swapDigits(int value, RandomSource random) {
         char[] digits = String.valueOf(Math.abs(value)).toCharArray();
         if (digits.length < 2) return value;

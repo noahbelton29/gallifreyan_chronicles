@@ -20,17 +20,18 @@ import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
-/* a tardis materialising on top of a player pulls them inside. they see the interior
-   fade in around them (floor first), everyone inside sees them fade in */
+/**
+   A TARDIS materialising on top of a player pulls them inside.
+   They see the interior fade in around them, floor first, and everyone inside sees them fade in.
+*/
 public final class RematCatch {
     private static final Vec3i FALLBACK_SIZE = new Vec3i(48, 32, 48);
-    /* after the fade, send the real interior again so block entities come back right */
+    // After the fade send the real interior again so block entities come back right
     private static final int RESEND_EXTRA_TICKS = 5;
 
     private RematCatch() {
     }
 
-    /* the exterior just started materialising */
     public static void onRemat(TardisExteriorBlockEntity exterior, long startTick) {
         if (!(exterior.getLevel() instanceof ServerLevel level)) return;
         UUID tardisId = exterior.getTardisId();

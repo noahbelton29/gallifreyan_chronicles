@@ -1,6 +1,6 @@
 package uk.nbforge.gallifreyan_chronicles.client.gui.hud;
 
-import uk.nbforge.gallifreyan_chronicles.client.protection.build.BuildExpiryOverlay;
+import uk.nbforge.gallifreyan_chronicles.client.render.detail.TrialTimerOverlay;
 import uk.nbforge.gallifreyan_chronicles.config.GCConfig;
 import uk.nbforge.gallifreyan_chronicles.platform.Services;
 import net.minecraft.client.Minecraft;
@@ -52,7 +52,7 @@ public final class GCHudRenderer {
     }
 
     public static void render(GuiGraphicsExtractor graphics) {
-        BuildExpiryOverlay.render(graphics);
+        TrialTimerOverlay.render(graphics);
         if (!GCConfig.showVersionHud()) return;
 
         Minecraft minecraft = Minecraft.getInstance();

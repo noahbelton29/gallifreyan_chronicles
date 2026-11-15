@@ -8,8 +8,7 @@ import net.minecraft.network.protocol.Packet;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 
-/* while the replay camera is in the tardis world, packets from the replay server
-   still belong to its world (the overworld). see ReplayVirtualDimension */
+/** While the replay camera is in the TARDIS world, packets from the replay server still belong to its world, the overworld, see ReplayVirtualDimension. */
 @Mixin(targets = "net.minecraft.network.PacketProcessor$ListenerAndPacket")
 public abstract class VirtualDimensionIncomingMixin {
     @WrapOperation(method = "handle",

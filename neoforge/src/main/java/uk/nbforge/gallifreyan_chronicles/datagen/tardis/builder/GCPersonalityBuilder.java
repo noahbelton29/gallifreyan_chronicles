@@ -6,7 +6,7 @@ import com.google.gson.JsonObject;
 import java.util.function.Consumer;
 import uk.nbforge.gallifreyan_chronicles.datagen.util.GCJson;
 
-/** Fluent way to describe a TARDIS personality; every method is optional. */
+/** Describes a TARDIS personality, every method is optional. */
 public final class GCPersonalityBuilder {
     private final JsonObject json;
 
@@ -14,7 +14,7 @@ public final class GCPersonalityBuilder {
         this.json = json;
     }
 
-    /** How likely a new TARDIS is to roll this personality (default 10). */
+    /** How likely a new TARDIS is to roll this personality, default 10. */
     public GCPersonalityBuilder howCommon(int weight) {
         json.addProperty("how_common", weight);
         return this;
@@ -75,7 +75,6 @@ public final class GCPersonalityBuilder {
             this.json = json;
         }
 
-        /** Fear added by one hit. */
         public Mallet fearPerHit(double fear) {
             json.addProperty("fear_per_hit", fear);
             return this;

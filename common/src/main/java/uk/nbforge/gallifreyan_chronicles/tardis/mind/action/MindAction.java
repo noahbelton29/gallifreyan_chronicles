@@ -1,9 +1,11 @@
 package uk.nbforge.gallifreyan_chronicles.tardis.mind.action;
 
-/* one small thing a tardis does, written in json as {"type": "...", ...}.
-   personalities and traits list these under hooks like "on_unwilling" */
+/**
+   One small thing a TARDIS does, written in json with a type field.
+   Personalities and traits list these under hooks like on_unwilling.
+*/
 public interface MindAction {
-    /* the "type" this was loaded from */
+    /** The type this was loaded from. */
     String type();
 
     void run(MindContext context);

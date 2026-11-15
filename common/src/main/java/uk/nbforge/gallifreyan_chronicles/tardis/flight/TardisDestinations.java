@@ -77,7 +77,7 @@ public final class TardisDestinations {
         return increment(server, tardisId);
     }
 
-    /* left click: the same cycle, run backwards, so you can undo an overshoot without going all the way round */
+    /** Left click runs the same cycle backwards so you can undo an overshoot without going all the way round. */
     public static int cycleIncrementBack(MinecraftServer server, UUID tardisId) {
         TardisManager manager = TardisManager.get(server);
         int count = INCREMENTS.length;

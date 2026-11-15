@@ -4,7 +4,7 @@ import net.minecraft.data.PackOutput;
 import uk.nbforge.gallifreyan_chronicles.datagen.util.GCJson;
 import uk.nbforge.gallifreyan_chronicles.datagen.util.GCJsonDataProvider;
 
-/** Generates data/gallifreyan_chronicles/tardis_interior/*.json. To add one, copy a line below and change the names. */
+/** Generates the tardis_interior json files, to add one copy a line below and change the names. */
 public class GCTardisInteriorProvider extends GCJsonDataProvider {
     public GCTardisInteriorProvider(PackOutput output) {
         super(output, "tardis_interior", "TARDIS Interior");

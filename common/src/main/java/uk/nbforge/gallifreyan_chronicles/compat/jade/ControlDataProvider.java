@@ -18,7 +18,7 @@ import uk.nbforge.gallifreyan_chronicles.util.GCUtil;
 
 import java.util.UUID;
 
-/* the destination data lives on the server, so the destination controls send what their tooltip needs from here */
+/** The destination data lives on the server so the destination controls send what their tooltip needs from here. */
 public class ControlDataProvider implements IServerDataProvider<EntityAccessor> {
     public static final ControlDataProvider INSTANCE = new ControlDataProvider();
 

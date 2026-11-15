@@ -13,10 +13,12 @@ import net.minecraft.sounds.SoundSource;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.player.Player;
 
-/* {"type": "lash_out", "from_severity": 0.35, "min_damage": 2, "max_damage": 6, "push": 0.9, "lift": 0.35}
-   for "when_you_enter". a tardis that fears you zaps you and throws you back. nothing happens below
-   from_severity, and the damage grows with how scared it is. it can hurt but never kill: it always
-   leaves the player at least a little health */
+/**
+   Used for when_you_enter, a TARDIS that fears you zaps you and throws you back.
+   Nothing happens below from_severity and the damage grows with how scared it is.
+   It can hurt but never kill, it always leaves the player at least a little health.
+   The json fields are from_severity, min_damage, max_damage, push and lift.
+*/
 public record LashOutAction(float fromSeverity, float minDamage, float maxDamage, float push, float lift)
         implements MindAction {
     public static final String TYPE = Constants.MOD_ID + ":lash_out";
@@ -38,7 +40,7 @@ public record LashOutAction(float fromSeverity, float minDamage, float maxDamage
         float scale = Mth.clamp((context.severity - fromSeverity) / span, 0f, 1f);
         float damage = Mth.lerp(scale, minDamage, maxDamage);
 
-        /* never lethal, whatever the numbers in the json say */
+        // Never lethal, whatever the numbers in the json say
         damage = Math.min(damage, player.getHealth() - LEAVES_HEALTH);
         if (damage > 0f) {
             player.hurtServer(level, level.damageSources().lightningBolt(), damage);

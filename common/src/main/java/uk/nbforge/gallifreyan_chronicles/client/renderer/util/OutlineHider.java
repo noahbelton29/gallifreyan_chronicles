@@ -14,7 +14,7 @@ public final class OutlineHider {
     private OutlineHider() {
     }
 
-    /* interior doors and the whole tardis exterior never show a block outline */
+    /** Interior doors and the whole TARDIS exterior never show a block outline. */
     private static boolean isDoorBlock(Block block) {
         return block instanceof InteriorDoorBlock || block instanceof InteriorDoorBarrierBlock
                 || block instanceof TardisBlock || block instanceof TardisTopBlock;

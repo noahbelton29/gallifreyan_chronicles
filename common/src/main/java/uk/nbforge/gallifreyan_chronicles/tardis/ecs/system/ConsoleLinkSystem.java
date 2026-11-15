@@ -75,8 +75,7 @@ public final class ConsoleLinkSystem {
 
         Tardis tardis = TardisApi.ofLevel(level).orElse(null);
         if (tardis == null) {
-            /* placed outside a tardis: still give it its control hitboxes, they
-               only animate (see TardisControlEntity) */
+            /** Placed outside a TARDIS, still give it its control hitboxes, they only animate, see TardisControlEntity. */
             spawnDefaultControls(console);
             console.sync();
             return;
@@ -137,7 +136,6 @@ public final class ConsoleLinkSystem {
             console.addControl(entry.id(), entry.offset(), entry.width(), entry.height(), entry.depth());
         }
     }
-
 
     private static BlockPos findConsolePlacementPos(ServerLevel level, BlockPos exteriorPos) {
         return exteriorPos.offset(CONSOLE_OFFSET_DISTANCE, 0, 0);

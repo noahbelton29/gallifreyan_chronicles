@@ -102,7 +102,7 @@ public class TardisExteriorBlockEntity extends BlockEntity implements GeoBlockEn
     private boolean doorAnimSeqKnown = false;
     private boolean doorAnimInstant = false;
     private int snapFramesLeft = 0;
-    /* a snap runs the animation at this speed for a few frames, then goes back to normal */
+    // A snap runs the animation at this speed for a few frames, then goes back to normal
     private static final int SNAP_SPEED = 999999;
     private static final int SNAP_FRAMES = 3;
     private final int tickOffset;
@@ -134,6 +134,7 @@ public class TardisExteriorBlockEntity extends BlockEntity implements GeoBlockEn
         return cachedKeyBoneWorldPos;
     }
 
+    /** Makes the key entity that shows the key in the lock, removing the old one first. */
     public void spawnKeyEntity() {
         if (level == null || level.isClientSide() || !(level instanceof ServerLevel serverLevel)) {
             return;
@@ -163,6 +164,7 @@ public class TardisExteriorBlockEntity extends BlockEntity implements GeoBlockEn
         this.tickOffset = Math.floorMod(pos.hashCode(), POWER_CHECK_INTERVAL_TICKS);
     }
 
+    /** Puts one key from the hand into the lock and keeps the rest in the hand. */
     public void insertKey(Player player, InteractionHand hand, ItemStack held) {
         ItemStack toStore = held.copyWithCount(1);
         toStore.set(GCDataComponents.KEY_INSERTED, true);
@@ -172,6 +174,7 @@ public class TardisExteriorBlockEntity extends BlockEntity implements GeoBlockEn
         player.setItemInHand(hand, remaining.isEmpty() ? ItemStack.EMPTY : remaining);
     }
 
+    /** True for the player whose key it is and for the owner of the TARDIS. */
     public boolean canRemoveKey(Player player) {
         return player.getUUID().equals(heldKey.owner())
                 || TardisApi.of(this).map(tardis -> tardis.isOwner(player)).orElse(false);
@@ -185,11 +188,13 @@ public class TardisExteriorBlockEntity extends BlockEntity implements GeoBlockEn
         return powered;
     }
 
+    /** True when the doors are shut and not in the middle of an animation. */
     public boolean areDoorsFullyClosed() {
         return getDoorState().isClosed()
                 && !DoorSystem.isAnimating(asEntity(), System.currentTimeMillis());
     }
 
+    /** The flight state, it also moves a timed state on if its time is up. */
     public TardisFlightState getFlightState() {
         if (level != null && !level.isClientSide() && flight.expireState(GameClockUtil.now(level))) {
             setChanged();
@@ -197,6 +202,7 @@ public class TardisExteriorBlockEntity extends BlockEntity implements GeoBlockEn
         return flight.state();
     }
 
+    /** Sets the flight state for a number of ticks, server only. */
     public void setFlightState(TardisFlightState state, long durationTicks) {
         if (level == null || level.isClientSide()) return;
         flight.setState(state, GameClockUtil.now(level), durationTicks);
@@ -246,6 +252,7 @@ public class TardisExteriorBlockEntity extends BlockEntity implements GeoBlockEn
         }
     }
 
+    /** Locks or unlocks from the console, plays the key turning sound and updates everyone. */
     public void setLockedFromConsole(boolean nowLocked) {
         if (locked == nowLocked) return;
         locked = nowLocked;
@@ -313,6 +320,7 @@ public class TardisExteriorBlockEntity extends BlockEntity implements GeoBlockEn
         return ExteriorSystem.exteriorOf(asEntity());
     }
 
+    /** Changes the exterior, resets the animations and updates the key location and the interior door style to match. */
     public void setExterior(TardisExterior exterior) {
         ExteriorSystem.setExterior(asEntity(), exterior);
         resetAnimationState();
@@ -328,6 +336,7 @@ public class TardisExteriorBlockEntity extends BlockEntity implements GeoBlockEn
         }
     }
 
+    /** Copies everything from another exterior, used when the TARDIS moves to a new block. */
     @SuppressWarnings({"unchecked", "rawtypes"})
     public void copyStateFrom(TardisExteriorBlockEntity other) {
         for (ComponentType<?> type : TardisComponentTypes.ALL) {
@@ -343,6 +352,7 @@ public class TardisExteriorBlockEntity extends BlockEntity implements GeoBlockEn
         resetAnimationState();
     }
 
+    /** Client only, jumps the door animation to the current door state. */
     private void snapToState() {
         if (level == null || !level.isClientSide() || controller == null) return;
         DoorState state = getDoorState();
@@ -362,7 +372,7 @@ public class TardisExteriorBlockEntity extends BlockEntity implements GeoBlockEn
         snapFramesLeft = SNAP_FRAMES;
     }
 
-    /* the doors go to closed right away on every client, no closing animation (used when the TARDIS is spawned) */
+    /** Doors close right away on every client with no closing animation, used when the TARDIS is spawned. */
     public void snapDoorsShut() {
         if (level == null || level.isClientSide()) return;
         DoorSystem.snapToState(asEntity(), DoorState.CLOSED);
@@ -372,6 +382,7 @@ public class TardisExteriorBlockEntity extends BlockEntity implements GeoBlockEn
         sync();
     }
 
+    /** Makes the door animation match the real door state again. */
     public void resetAnimationState() {
         needsStateSync = true;
         if (level != null && level.isClientSide()) {
@@ -382,6 +393,7 @@ public class TardisExteriorBlockEntity extends BlockEntity implements GeoBlockEn
         sync();
     }
 
+    /** Server only, tells the clients to jump the door animation to the current state. */
     private void reapplyDoorVisualState() {
         if (level != null && level.isClientSide()) return;
         DoorState state = getDoorState();
@@ -420,15 +432,17 @@ public class TardisExteriorBlockEntity extends BlockEntity implements GeoBlockEn
         setChanged();
     }
 
+    /** Starts or ends flight, landing on top of someone pulls them inside. */
     private void setInFlight(boolean inFlight, long atTick) {
         if (level == null || level.isClientSide()) return;
         if (flight.setInFlight(inFlight, atTick)) {
             sync();
-            /* landing on top of someone pulls them inside */
+            // Landing on top of someone pulls them inside
             if (!inFlight) RematCatch.onRemat(this, atTick);
         }
     }
 
+    /** Makes the exterior vanish at once and marks the block as in flight. */
     public void vanishInstantly() {
         if (level == null || level.isClientSide()) return;
         flight.vanish(GameClockUtil.now(level));
@@ -439,11 +453,13 @@ public class TardisExteriorBlockEntity extends BlockEntity implements GeoBlockEn
         sync();
     }
 
+    /** Lands after a delay in ticks. */
     public void scheduleLanding(int delayTicks) {
         if (level == null || level.isClientSide()) return;
         if (flight.scheduleLanding(GameClockUtil.now(level), delayTicks)) setChanged();
     }
 
+    /** Cancels a takeoff that is happening and fades the TARDIS back in over fadeInTicks. */
     public void abortTakeoff(int fadeInTicks) {
         if (level == null || level.isClientSide()) return;
         flight.cancelLanding();
@@ -468,6 +484,7 @@ public class TardisExteriorBlockEntity extends BlockEntity implements GeoBlockEn
         return flight.fadeType();
     }
 
+    /** Changes the fade style, the server also tells the clients. */
     public void setFadeType(FadeType fadeType) {
         boolean serverSide = level != null && !level.isClientSide();
         long now = serverSide ? GameClockUtil.now(level) : 0L;
@@ -482,6 +499,7 @@ public class TardisExteriorBlockEntity extends BlockEntity implements GeoBlockEn
         return cloak.isCloaked();
     }
 
+    /** Turns the cloak on or off, server only. */
     public void setCloaked(boolean cloaked) {
         if (level == null || level.isClientSide()) return;
         if (cloak.set(cloaked, GameClockUtil.now(level))) sync();
@@ -492,6 +510,7 @@ public class TardisExteriorBlockEntity extends BlockEntity implements GeoBlockEn
         return cloak.opacity(GameClockUtil.now(level), partialTick);
     }
 
+    /** True when the TARDIS is fully solid and landed, so it casts a shadow. */
     public boolean isShadowActive() {
         if (level == null) return true;
         return !flight.inFlight() && flight.opacity(GameClockUtil.now(level), 0.0f) >= 1.0f;
@@ -502,6 +521,7 @@ public class TardisExteriorBlockEntity extends BlockEntity implements GeoBlockEn
         return flight.isFullyInvisible(GameClockUtil.now(level));
     }
 
+    /** How see through the exterior is, the lowest of the flight fade and the cloak, on the client a held key reveals it a bit while cloaked. */
     public float getOpacity(float partialTick) {
         float flight = flightOpacity(partialTick);
         float base = Math.min(flight, cloakOpacity(partialTick));
@@ -510,6 +530,7 @@ public class TardisExteriorBlockEntity extends BlockEntity implements GeoBlockEn
         return Math.max(base, revealed);
     }
 
+    /** Eases the reveal up while the player holds the key of this cloaked TARDIS and down when they do not. */
     private float updateKeyReveal() {
         boolean target = cloak.isCloaked() && CloakKeyReveal.isHoldingKeyFor(getTardisId());
         return keyReveal.update(target ? 1.0f : 0.0f);
@@ -538,10 +559,11 @@ public class TardisExteriorBlockEntity extends BlockEntity implements GeoBlockEn
         sync();
     }
 
-    /* how bright the lamp is right now, 0 to 1. it flickers while taking off and landing:
-       classic who snaps on and off, new who fades in and out */
+    // How bright the lamp is right now from 0 to 1
+    // It flickers while taking off and landing, classic who snaps on and off and new who fades in and out
     private static final float LAMP_FLICKER_TICKS = 25f;
 
+    /** How bright the lamp is, 0 when off and full when steady, while flickering it pulses or blinks depending on the fade type. */
     public float lampBrightness(float partialTick) {
         if (!isGlowing()) return 0f;
         if (!isFlickering(partialTick) || level == null) return 1f;
@@ -552,7 +574,7 @@ public class TardisExteriorBlockEntity extends BlockEntity implements GeoBlockEn
         return ((int) cycles) % 2 == 0 ? 1f : 0f;
     }
 
-    /* taking off or landing and still fading, not fully gone or fully landed yet */
+    /** Still fading while taking off or landing. */
     private boolean isFlickering(float partialTick) {
         if (!getFlightState().isTransitioning()) return false;
         float opacity = getOpacity(partialTick);
@@ -561,9 +583,9 @@ public class TardisExteriorBlockEntity extends BlockEntity implements GeoBlockEn
         return !gone && !landed;
     }
 
-    /* the glowing orb on the lamp, only for new who takeoffs and landings. returns how big and bright it is, 0 to 1.
-       takeoff: starts pulsing 2 seconds in, and does one more pulse once the box has fully gone.
-       landing: starts once the box actually begins to fade in, and stops at the end of the pulse it's on */
+    // The glowing orb on the lamp, only for new who takeoffs and landings, returns how big and bright it is from 0 to 1
+    // Takeoff starts pulsing 2 seconds in and does one more pulse once the box has fully gone
+    // Landing starts once the box begins to fade in and stops at the end of the pulse it is on
     private static final long ORB_TAKEOFF_DELAY_TICKS = 40L;
     private @Nullable TardisFlightState orbState;
     private long orbTransitionStart;
@@ -576,7 +598,7 @@ public class TardisExteriorBlockEntity extends BlockEntity implements GeoBlockEn
         long now = GameClockUtil.now(level);
         TardisFlightState state = getFlightState();
 
-        /* a new takeoff or landing starts the orb over */
+        // A new takeoff or landing starts the orb over
         if (state.isTransitioning() && state != orbState) {
             orbState = state;
             orbTransitionStart = now;
@@ -596,7 +618,7 @@ public class TardisExteriorBlockEntity extends BlockEntity implements GeoBlockEn
         }
 
         float cycles = (now - orbStart + partialTick) / LAMP_FLICKER_TICKS;
-        /* the fade is over. takeoff does one more full pulse, landing just finishes the one it's on */
+        // The fade is over, takeoff does one more full pulse and landing just finishes the one it is on
         if (orbEndCycle < 0f && fadeFinished(now)) {
             float extra = orbState == TardisFlightState.TAKING_OFF ? 2f : 0f;
             float end = (float) Math.ceil(cycles + extra);
@@ -607,11 +629,10 @@ public class TardisExteriorBlockEntity extends BlockEntity implements GeoBlockEn
             orbDone = true;
             return 0f;
         }
-        /* starts at size 0 and swells up into its first pulse */
+        // Starts at size 0 and swells up into its first pulse
         return 0.5f - 0.5f * (float) Math.cos(cycles * Math.PI);
     }
 
-    /* the box has finished fading out (takeoff) or in (landing) */
     private boolean fadeFinished(long now) {
         return now - flight.fadeStartTick() >= flight.duration();
     }
@@ -626,6 +647,7 @@ public class TardisExteriorBlockEntity extends BlockEntity implements GeoBlockEn
         sync();
     }
 
+    /** Keeps the glowing property of the block the same as the lamp. */
     private void applyGlowToBlockState(boolean glowing) {
         if (level == null || level.isClientSide()) return;
         BlockState current = getBlockState();
@@ -634,8 +656,7 @@ public class TardisExteriorBlockEntity extends BlockEntity implements GeoBlockEn
         }
     }
 
-    // client side, re-meshes the surrounding chunk sections whenever the shadow toggles, so the baked ambient
-    // occlusion on neighbouring blocks is refreshed
+    /** Client side, re-meshes the chunk sections around it when the shadow toggles so the baked ambient occlusion on nearby blocks is refreshed. */
     public static void clientTick(Level level, TardisExteriorBlockEntity blockEntity) {
         GCClientHooks.trackExteriorHum(blockEntity);
         boolean active = blockEntity.isShadowActive();
@@ -654,8 +675,7 @@ public class TardisExteriorBlockEntity extends BlockEntity implements GeoBlockEn
         if (level.isClientSide()) return;
         blockEntity.refreshFadeType();
         blockEntity.tickLanding(level);
-        /* players whose view of this chunk changed (left the interior, came back through
-           a portal) may have missed an update, so resend while it travels */
+        // Players whose view of this chunk changed, like leaving the interior or coming back through a portal, may have missed an update so resend while it travels
         if (blockEntity.isTravelling() && (GameClockUtil.now(level) + blockEntity.tickOffset) % TRAVEL_RESYNC_TICKS == 0) {
             blockEntity.sync();
         }
@@ -675,8 +695,10 @@ public class TardisExteriorBlockEntity extends BlockEntity implements GeoBlockEn
         }
     }
 
-    // scales the block light with the exterior's opacity, so it fades out as the tardis dematerialises and comes
-    // back as it materialises, it only touches the block state when the level actually changes
+    /**
+       Scales the block light with the opacity of the exterior so it fades out as the TARDIS dematerialises and back in as it materialises.
+       It only touches the block state when the level really changes.
+    */
     private void updateLight(Level level) {
         BlockState current = getBlockState();
         if (!current.hasProperty(TardisBlock.LIGHT)) return;
@@ -687,7 +709,7 @@ public class TardisExteriorBlockEntity extends BlockEntity implements GeoBlockEn
         }
     }
 
-    // called when the interior loses its last console, cuts the exterior's power and glow straight away
+    /** Called when the interior loses its last console, cuts the power and glow of the exterior straight away. */
     public void cutPower() {
         if (level == null || level.isClientSide()) return;
         powered = false;
@@ -695,6 +717,7 @@ public class TardisExteriorBlockEntity extends BlockEntity implements GeoBlockEn
         setChanged();
     }
 
+    /** Updates power and the lamp from the console, and tells the client if either changed. */
     private void refreshPowerAndGlow(Level level) {
         boolean wasPowered = powered;
         powered = TardisApi.of(this).flatMap(Tardis::livePower).orElse(powered);
@@ -702,7 +725,7 @@ public class TardisExteriorBlockEntity extends BlockEntity implements GeoBlockEn
             applyGlowToBlockState(isGlowing());
             sync();
         } else if (powered != wasPowered) {
-            /* tell the client right away, the outside hum fades with the power */
+            /** Tell the client right away, the outside hum fades with the power. */
             sync();
         }
     }
@@ -717,6 +740,7 @@ public class TardisExteriorBlockEntity extends BlockEntity implements GeoBlockEn
         return linked != null ? linked : UNLINKED_KEY;
     }
 
+    /** True while this key is locked out from trying again after a wrong try, server only. */
     public boolean isWrongKeyLockedOut(Player player, ItemStack key) {
         if (level == null || level.isClientSide()) return false;
         Long until = wrongKeyLockouts.get(keyIdOf(key));
@@ -765,6 +789,7 @@ public class TardisExteriorBlockEntity extends BlockEntity implements GeoBlockEn
         });
     }
 
+    /** True if this key is the one already inside the lock and belongs to this player. */
     private boolean isWrongKeyStillInside(UUID playerId, UUID keyId) {
         ItemStack inside = heldKey.stack();
         return hasKeyRendered() && playerId.equals(heldKey.owner()) && inside != null && keyIdOf(inside).equals(keyId);
@@ -855,6 +880,7 @@ public class TardisExteriorBlockEntity extends BlockEntity implements GeoBlockEn
         ExteriorSounds.locked(level, getBlockPos());
     }
 
+    /** Shows the player that it is locked with the animation, sound and message, not too often. */
     public void announceLocked(Player player) {
         if (lockedFeedbackThrottled()) {
             return;
@@ -872,6 +898,7 @@ public class TardisExteriorBlockEntity extends BlockEntity implements GeoBlockEn
         player.sendOverlayMessage(overlay.copy().withStyle(ChatFormatting.RED));
     }
 
+    /** Plays a door animation, the client plays it now and the server saves it so everyone else plays it too. */
     public void playAnimation(String animationName) {
         if (level != null && level.isClientSide()) {
             triggerAnim("anim_controller", animationName);

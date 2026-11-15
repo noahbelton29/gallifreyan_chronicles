@@ -11,11 +11,15 @@ import uk.nbforge.gallifreyan_chronicles.util.GCUtil;
 public class TardisInteriorDoorDataProvider implements IServerDataProvider<BlockAccessor> {
     public static final TardisInteriorDoorDataProvider INSTANCE = new TardisInteriorDoorDataProvider();
     public static final String KEY = "DoorLocked";
+    public static final String ROLE_KEY = "DoorRole";
+    public static final String STYLE_KEY = "DoorStyle";
 
     @Override
     public void appendServerData(@NonNull CompoundTag data, BlockAccessor accessor) {
-        if (accessor.getBlockEntity() instanceof InteriorDoorBlockEntity door && door.followsTardisLock()) {
-            data.putBoolean(KEY, door.isTardisLocked());
+        if (accessor.getBlockEntity() instanceof InteriorDoorBlockEntity door) {
+            data.putString(ROLE_KEY, door.role().name());
+            data.putString(STYLE_KEY, door.getRoundelBlock());
+            if (door.followsTardisLock()) data.putBoolean(KEY, door.isTardisLocked());
         }
     }
 

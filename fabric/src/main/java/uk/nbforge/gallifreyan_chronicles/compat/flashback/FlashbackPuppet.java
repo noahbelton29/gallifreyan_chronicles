@@ -21,11 +21,12 @@ import net.minecraft.core.SectionPos;
 import qouteall.imm_ptl.core.chunk_loading.ImmPtlClientChunkMap;
 import qouteall.imm_ptl.core.portal.Portal;
 
-/* when the recorded player goes into a tardis, the replay server doesn't have
-   that world, so flashback can't move them. instead we read their recorded
-   movement ourselves and move a copy of them ("puppet") in the client's tardis
-   world. immersive portals then draws it through the door like in the real game.
-   the real one in the overworld is hidden while the puppet is out. */
+/**
+   When the recorded player goes into a TARDIS the replay server does not have that world, so Flashback cannot move them.
+   Instead we read their recorded movement and move a copy, the puppet, in the TARDIS world of the client.
+   Immersive Portals then draws it through the door like in the real game.
+   The real player in the overworld is hidden while the puppet is out.
+*/
 public final class FlashbackPuppet {
     private static final int PUPPET_ID = Integer.MAX_VALUE - 7;
     private static RemotePlayer puppet;
@@ -34,30 +35,28 @@ public final class FlashbackPuppet {
     private static int errors;
     private static int lastTickCount = -1;
 
-    /* the tardis world may not tick our copy, and then its legs never move.
-       if nothing ticked it since last time, so tick it */
-    /* ticks until we rebuild the world's render (like pressing F3+A) */
+    // The TARDIS world may not tick our copy and then its legs never move, so tick it if nothing ticked it since last time
+    // Ticks until we rebuild the render of the world, like pressing F3 plus A
     private static int rebuildIn = -1;
     private static Object lastLevel;
 
-    /* in a replay the renderer sometimes only built part of the world at the
-       start or after jumping on the timeline (holes everywhere). rebuilding it a
-       moment later, once the chunks are in, fixes that */
+    /**
+       In a replay the renderer sometimes only built part of the world at the start or after jumping on the timeline, leaving holes.
+       Rebuilding a moment later once the chunks are in fixes it.
+    */
     static void scheduleRebuild() {
         rebuildIn = 40;
     }
 
-    /* on first play, flashback loads the start of the replay before the camera
-       has joined, so immersive portals' tardis world wasn't ready and the door
-       drew black. jumping on the timeline loads it again with everything ready,
-       which is why going back fixed it. so do that one jump ourselves */
+    // On first play Flashback loads the start of the replay before the camera joined, so the TARDIS world of Immersive Portals was not ready and the door drew black
+    // Jumping on the timeline loads it again with everything ready, which is why going back fixed it, so we do that one jump ourselves
     private static Object lastReplayServer;
     private static int waitTicks = -1;
     private static int step;
     private static int backTo;
 
     private static void tickFirstPlayReload() {
-        /* never jump the timeline in the middle of an export */
+        // Never jump the timeline in the middle of an export
         if (Flashback.isExporting()) {
             waitTicks = -1;
             return;
@@ -74,14 +73,12 @@ public final class FlashbackPuppet {
         }
         if (waitTicks < 0 || --waitTicks > 0) return;
         if (step == 0) {
-            /* only needed when a door leads to an empty world. each reload also
-               restarts voxy, so don't do it for nothing */
+            // Only needed when a door leads to an empty world, each reload also restarts Voxy so do not do it for nothing
             if (!portalLeadsNowhere(Minecraft.getInstance())) {
                 waitTicks = -1;
                 return;
             }
-            /* flashback only reloads when going backwards, so step one tick
-               forward first, then back a few ticks later */
+            // Flashback only reloads when going backwards, so step one tick forward first and then back a few ticks later
             backTo = server.getReplayTick();
             if (backTo + 1 >= server.getTotalReplayTicks()) {
                 waitTicks = -1;
@@ -96,8 +93,7 @@ public final class FlashbackPuppet {
         }
     }
 
-    /* mark every chunk section around the camera to be built again. like F3+A,
-       but F3+A also restarts voxy's renderer, and this doesn't */
+    /** Marks every chunk section around the camera to be built again, like F3 plus A but that also restarts the renderer of Voxy and this does not. */
     private static void rebuildSections(Minecraft client) {
         ClientLevel level = client.level;
         SectionPos camera = SectionPos.of(client.gameRenderer.mainCamera().position());
@@ -107,7 +103,7 @@ public final class FlashbackPuppet {
                 camera.x() + radius, level.getMaxSectionY(), camera.z() + radius);
     }
 
-    /* true if a portal here leads to a world with no chunks (the black door) */
+    /** True if a portal here leads to a world with no chunks, the black door. */
     private static boolean portalLeadsNowhere(Minecraft client) {
         if (client.level == null) return false;
         for (Entity entity : client.level.entitiesForRendering()) {
@@ -133,8 +129,7 @@ public final class FlashbackPuppet {
                 if (client.level != null && FlashbackChunksImpl.inReplay()) rebuildSections(client);
             }
             if (puppet == null || puppet.isRemoved()) return;
-            /* copy sprinting and sneaking from the hidden real one, so the copy
-               makes the sprint particles and poses itself */
+            // Copies sprinting and sneaking from the hidden real player so the copy makes the sprint particles and poses itself
             Entity real = client.level == null ? null : client.level.getEntity(realId);
             if (real != null) {
                 puppet.setSprinting(real.isSprinting());
@@ -142,7 +137,7 @@ public final class FlashbackPuppet {
                 puppet.setPose(real.getPose());
             }
             if (puppet.tickCount == lastTickCount) {
-                /* same as the game ticking an entity */
+                // Same as the game ticking an entity
                 puppet.commonTick();
                 puppet.tick();
             }
@@ -153,7 +148,7 @@ public final class FlashbackPuppet {
     private FlashbackPuppet() {
     }
 
-    /* reads flashback's "move entities" data. the caller resets the buffer after */
+    /** Reads the move entities data of Flashback, the caller resets the buffer after. */
     static void scan(ReplayServer server, RegistryFriendlyByteBuf buf) {
         try {
             int localId = server.getLocalPlayerId();
@@ -185,7 +180,7 @@ public final class FlashbackPuppet {
             if (real != null) break;
         }
         if (!exists) {
-            /* hide the real one, move the puppet */
+            // Hide the real one and move the puppet
             if (real != null && !real.isInvisible()) {
                 real.setInvisible(true);
                 hidden = true;
@@ -203,7 +198,7 @@ public final class FlashbackPuppet {
         }
     }
 
-    /* client thread */
+    /** Client thread. */
     private static void place(ResourceKey<Level> dim, GameProfile profile, double x, double y, double z,
                               float yaw, float pitch, float head, boolean onGround) {
         ClientLevel level = ClientWorldLoader.getOptionalWorld(dim);
@@ -217,8 +212,7 @@ public final class FlashbackPuppet {
             level.addEntity(puppet);
             return;
         }
-        /* the same way the game moves other players: it slides there over a few
-           ticks, and that movement is what swings the arms and legs */
+        // Same way the game moves other players, it slides there over a few ticks and that movement swings the arms and legs
         puppet.moveOrInterpolateTo(new Vec3(x, y, z), yaw, pitch);
         puppet.lerpHeadTo(head, 3);
         puppet.setOnGround(onGround);
@@ -228,7 +222,7 @@ public final class FlashbackPuppet {
         return hidden && entity.getId() == realId && entity != puppet;
     }
 
-    /* client thread */
+    /** Client thread. */
     public static void remove() {
         if (puppet == null) return;
         if (!puppet.isRemoved() && puppet.level() instanceof ClientLevel level) {

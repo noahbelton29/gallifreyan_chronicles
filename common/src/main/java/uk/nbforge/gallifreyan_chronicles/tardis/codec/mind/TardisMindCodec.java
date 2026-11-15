@@ -13,9 +13,6 @@ import uk.nbforge.gallifreyan_chronicles.tardis.codec.mind.data.MindIdsCodec;
 import uk.nbforge.gallifreyan_chronicles.tardis.codec.mind.disability.TardisDisabilityCodec;
 
 public final class TardisMindCodec {
-    /**
-     * Codec for loading and saving a TARDIS's mental state.
-     */
     public static final Codec<TardisMind> CODEC = RecordCodecBuilder.create(inst -> inst.group(
             MindIdsCodec.CODEC.fieldOf("personality").forGetter(TardisMind::personalityId),
             MindIdsCodec.CODEC.listOf().optionalFieldOf("traits", List.of()).forGetter(TardisMind::traitIds),

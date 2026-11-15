@@ -11,7 +11,7 @@ import uk.nbforge.gallifreyan_chronicles.tardis.control.NoopControl;
 import uk.nbforge.gallifreyan_chronicles.tardis.control.TardisControl;
 
 public class TardisControlRegistry {
-    // insertion ordered so iteration (datagen, console setup, suggestions) is stable
+    // Insertion ordered so the order stays the same for datagen, console setup and suggestions
     private static final Map<String, TardisControl> CONTROLS = new LinkedHashMap<>();
 
     public static void register(String id, TardisControl control) {
@@ -36,9 +36,7 @@ public class TardisControlRegistry {
         return Collections.unmodifiableMap(CONTROLS);
     }
 
-    /**
-     * The lang key for a control's display name, used at runtime and by the language provider.
-     */
+    /** The lang key for the display name of a control, used at runtime and by the language provider. */
     public static String translationKey(String id) {
         return "control." + Constants.MOD_ID + "." + id;
     }

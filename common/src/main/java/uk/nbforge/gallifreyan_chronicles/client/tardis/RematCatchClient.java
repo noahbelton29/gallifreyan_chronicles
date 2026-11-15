@@ -33,9 +33,11 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
-/* client side of a tardis materialising around a player.
-   - other players inside see that player fade in like the tardis
-   - that player keeps the floor, and the rest of the interior fades in around them */
+/**
+   Client side of a TARDIS materialising around a player.
+   Other players inside see that player fade in like the TARDIS.
+   That player keeps the floor and the rest of the interior fades in around them.
+*/
 public final class RematCatchClient {
     private static final int HIDE_FLAGS = Block.UPDATE_KNOWN_SHAPE | Block.UPDATE_SUPPRESS_DROPS;
     private static final int CAPTURE_TIMEOUT_TICKS = 100;
@@ -58,7 +60,7 @@ public final class RematCatchClient {
         }
     }
 
-    /* one block face drawn see-through, light and tint taken before the block was hidden */
+    /** One block face drawn see through, with the light and tint taken before the block was hidden. */
     private record GhostQuad(float x, float y, float z, BakedQuad quad, int[] colors, int[] lights) {
     }
 
@@ -89,12 +91,12 @@ public final class RematCatchClient {
         }
         restore();
         self = fade;
-        /* the teleport and the interior chunks may still be on their way */
+        // The teleport and the interior chunks may still be on their way
         pending = payload;
         pendingTicks = 0;
     }
 
-    /* how see-through another player is right now, 1 = normal */
+    /** How see through another player is right now, 1 is normal. */
     public static float playerAlpha(UUID player, float partialTick) {
         Fade fade = PLAYERS.get(player);
         Minecraft mc = Minecraft.getInstance();
@@ -135,8 +137,7 @@ public final class RematCatchClient {
         return level.hasChunkAt(payload.boxMin()) && level.hasChunkAt(payload.boxMax());
     }
 
-    /* tesselate everything above the floor first (so faces between blocks stay hidden),
-       then hide those blocks so only our fading copy shows */
+    /** Draw everything above the floor first so faces between blocks stay hidden, then hide those blocks so only our fading copy shows. */
     private static void capture(ClientLevel level, RematCatchPayload payload) {
         Minecraft mc = Minecraft.getInstance();
         ModelBlockRenderer renderer = new ModelBlockRenderer(mc.options.ambientOcclusion().get(), true, mc.getBlockColors());
@@ -146,7 +147,7 @@ public final class RematCatchClient {
             if (pos.getY() < payload.floorY()) continue;
             BlockState state = level.getBlockState(pos);
             if (state.isAir() || !state.getFluidState().isEmpty()) continue;
-            /* doors stay, their renderer fades them. the console is hidden and pops in once landed */
+            // Doors stay because their renderer fades them, the console is hidden and pops in once landed
             if (state.getBlock() instanceof InteriorDoorBlock) continue;
             BlockPos fixed = pos.immutable();
             if (state.getRenderShape() == RenderShape.MODEL) {
@@ -175,7 +176,7 @@ public final class RematCatchClient {
         selfDim = level.dimension();
     }
 
-    /* put the hidden blocks back. the server also sends the real chunks again right after */
+    /** Puts the hidden blocks back, the server also sends the real chunks again right after. */
     private static void restore() {
         ClientLevel level = Minecraft.getInstance().level;
         if (level != null && level.dimension().equals(selfDim)) {
@@ -191,17 +192,19 @@ public final class RematCatchClient {
         selfDim = null;
     }
 
-    /* same depth mask trick and tint as the fading exterior */
+    // Same depth mask trick and tint as the fading exterior
     public static final int MASK_ORDER = -1;
     public static final float MASK_PUSH = 1.00005f;
 
-    /* true while the picked player's interior is hidden for the fade */
+    /** True while the interior of the picked player is hidden for the fade. */
     public static boolean hidesBlocksIn(@Nullable Level level) {
         return level != null && !HIDDEN.isEmpty() && level.dimension().equals(selfDim);
     }
 
-    /* how solid things in this world are for you right now: 1 normally, the remat fade
-       while the interior is materialising around you (console, doors, other players) */
+    /**
+       How solid things in this world are for you right now, 1 normally.
+       It is the remat fade while the interior materialises around you, for the console, doors and other players.
+    */
     public static float opacityIn(@Nullable Level level) {
         Fade fade = self;
         Minecraft mc = Minecraft.getInstance();
@@ -209,8 +212,10 @@ public final class RematCatchClient {
         return fade.opacity(mc.level.getGameTime(), mc.getDeltaTracker().getGameTimeDeltaPartialTick(false));
     }
 
-    /* every frame, from the level renderer */
-    /* how far the build has got at this height: 0 not started, 1 done */
+    /**
+       Every frame, from the level renderer.
+       How far the build has got at this height, 0 is not started and 1 is done.
+    */
     private static float built(float progress, float y) {
         float height = Math.clamp((y - bottomY) / spanY, 0.0f, 1.0f);
         return Math.clamp((progress * (1.0f + SWEEP) - height) / SWEEP, 0.0f, 1.0f);
@@ -230,8 +235,8 @@ public final class RematCatchClient {
         double cy = camera.y;
         double cz = camera.z;
 
-        /* depth first (pushed a hair back), so only the front faces show, like the exterior.
-           layers that haven't started yet are skipped so they don't hide anything */
+        // Depth first and pushed a hair back so only the front faces show like the exterior
+        // Layers that have not started yet are skipped so they hide nothing
         collector.order(MASK_ORDER).submitCustomGeometry(poseStack, RenderTypes.waterMask(), (pose, buffer) -> {
             for (GhostQuad ghost : QUADS) {
                 if (opacity * built(progress, ghost.y()) < MIN_ALPHA) continue;

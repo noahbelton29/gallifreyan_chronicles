@@ -8,9 +8,10 @@ import net.minecraft.network.codec.StreamCodec;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 
-/* reads item component numbers the recording's way while a replay reads its packets.
-   see ReplayComponentIds. ordinal 0 = added components, 2 = removed ones
-   (ordinal 1 is the component's value) */
+/**
+   Reads item component numbers the way the recording did while a replay reads its packets, see ReplayComponentIds.
+   Ordinal 0 is added components and 2 is removed ones, ordinal 1 is the value of the component.
+*/
 @Mixin(targets = "net.minecraft.core.component.DataComponentPatch$3")
 public abstract class ComponentIdsDecodeMixin {
     @WrapOperation(method = "decode(Lnet/minecraft/network/RegistryFriendlyByteBuf;)Lnet/minecraft/core/component/DataComponentPatch;",

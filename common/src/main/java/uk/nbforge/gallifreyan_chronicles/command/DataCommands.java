@@ -23,7 +23,7 @@ import uk.nbforge.gallifreyan_chronicles.tardis.flight.TardisFlightState;
 import uk.nbforge.gallifreyan_chronicles.tardis.flight.TardisRemat;
 import uk.nbforge.gallifreyan_chronicles.tardis.flight.TardisTravel;
 import uk.nbforge.gallifreyan_chronicles.tardis.TardisManager;
-import uk.nbforge.gallifreyan_chronicles.tardis.mind.TardisMindSystem;
+import uk.nbforge.gallifreyan_chronicles.tardis.ecs.system.TardisMindSystem;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.SharedSuggestionProvider;
 import net.minecraft.commands.arguments.DimensionArgument;

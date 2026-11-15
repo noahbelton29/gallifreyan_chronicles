@@ -4,7 +4,7 @@ import net.minecraft.data.PackOutput;
 import uk.nbforge.gallifreyan_chronicles.datagen.util.GCJson;
 import uk.nbforge.gallifreyan_chronicles.datagen.util.GCJsonDataProvider;
 
-/** Generates data/gallifreyan_chronicles/tardis_fade/*.json. To add one, copy a line below and change the names. */
+/** Generates the tardis_fade json files, to add one copy a line below and change the names. */
 public class GCTardisFadeProvider extends GCJsonDataProvider {
     public GCTardisFadeProvider(PackOutput output) {
         super(output, "tardis_fade", "TARDIS Fade");
@@ -14,7 +14,7 @@ public class GCTardisFadeProvider extends GCJsonDataProvider {
     protected void addEntries() {
         fade("classicwho");
         pulse("newwho");
-        // name, pulse_ticks, pulse_ramp, pulse_depth, takeoff_delay_ticks, fade_out_ticks, fade_in_ticks
+        /** name, pulse_ticks, pulse_ramp, pulse_depth, takeoff_delay_ticks, fade_out_ticks, fade_in_ticks. */
         pulse("slow_pulse", 60, 1.5, 0.7, 40, 300, 360);
     }
 

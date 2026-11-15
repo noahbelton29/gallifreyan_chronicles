@@ -700,12 +700,12 @@ public class GCBlocks {
                         .setId(ResourceKey.create(Registries.ITEM, GCUtil.modIdentifier(name)))));
     }
 
-    /* every interior door block (the tardis one and the plain ones) */
+    /** Every interior door block, the TARDIS one and the plain ones. */
     public static Block[] interiorDoorBlocks() {
         return BLOCKS.stream().filter(block -> block instanceof InteriorDoorBlock).toArray(Block[]::new);
     }
 
-    /* the plain doors one door item scrolls between, in json priority order */
+    /** The plain doors that one door item scrolls between, in json priority order. */
     public static List<Block> pickableDoors() {
         return List.copyOf(PICKABLE_DOORS);
     }

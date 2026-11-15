@@ -54,14 +54,14 @@ public class GCTardisControls {
         Constants.LOG.info("Registered GC TARDIS Controls");
     }
 
-    /* the codec is built from the control's default animations, so each control only needs those and a constructor */
+    /** The codec is built from the default animations of the control so each control only needs those and a constructor. */
     private static <T extends BaseControl> void control(String id, ControlAnimations defaults, Function<ControlAnimations, T> ctor) {
         T instance = ctor.apply(defaults);
         TardisControlTypes.register(id, instance.getClass(), BaseControl.codec(defaults, ctor));
         TardisControlRegistry.register(id, instance);
     }
 
-    // writes every registered control out and reads it back, so a broken codec shows up in the log at startup
+    /** Writes every registered control out and reads it back so a broken codec shows up in the log at startup. */
     private static void verifyCodecs() {
         for (String id : TardisControlRegistry.allIds()) {
             TardisControl control = TardisControlRegistry.get(id);

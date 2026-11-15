@@ -41,12 +41,12 @@ public class TardisExteriorBlockRenderer extends GeoBlockRenderer<@NotNull Tardi
     public static final DataTicket<String> EXTERIOR_ID = DataTicket.create("exterior_id", String.class);
     public static final DataTicket<Float> YAW = DataTicket.create("tardis_yaw", Float.class);
     public static final DataTicket<Boolean> GLOWING = DataTicket.create("tardis_glowing", Boolean.class);
-    /* how bright the lamp is, 0 to 1, for the takeoff and landing flicker */
+    // How bright the lamp is from 0 to 1, for the flicker
     public static final DataTicket<Float> LAMP = DataTicket.create("tardis_lamp", Float.class);
     public static final DataTicket<Float> LAMP_ORB = DataTicket.create("tardis_lamp_orb", Float.class);
-    /* which way the camera is looking, saved each frame for the lamp orb */
+    // Which way the camera looks, saved each frame for the lamp orb
     public static final Quaternionf cameraOrientation = new Quaternionf();
-    /* where this block's corner is relative to the camera, saved each frame for the lamp orb */
+    // Where the corner of this block is relative to the camera, saved each frame for the lamp orb
     public static final Vector3f blockOrigin = new Vector3f();
     public static final DataTicket<Float> OPACITY = DataTicket.create("tardis_opacity", Float.class);
 
@@ -118,7 +118,7 @@ public class TardisExteriorBlockRenderer extends GeoBlockRenderer<@NotNull Tardi
     public void submitRenderTasks(RenderPassInfo<TardisExteriorBlockRenderState> renderPassInfo,
                                   OrderedSubmitNodeCollector renderTasks, @Nullable RenderType renderType) {
         float opacity = renderPassInfo.renderState().getOrDefaultGeckolibData(OPACITY, 1.0f);
-        /* the depth mask is only needed for the old way (shaders, portals) */
+        // The depth mask is only needed for the old way with shaders and portals
         if (renderType != null && opacity < 1.0f && FadeBoxRenderer.mode() == FadeBoxRenderer.Mode.MASK) {
             OrderedSubmitNodeCollector maskTasks = renderTasks instanceof SubmitNodeCollector collector
                     ? collector.order(DEPTH_MASK_ORDER)
@@ -135,7 +135,7 @@ public class TardisExteriorBlockRenderer extends GeoBlockRenderer<@NotNull Tardi
     @Override
     public void adjustModelBonesForRender(@NonNull RenderPassInfo<TardisExteriorBlockRenderState> renderPassInfo, @NonNull BoneSnapshots snapshots) {
         super.adjustModelBonesForRender(renderPassInfo, snapshots);
-        /* portal bone is only a marker */
+        // The portal bone is only a marker
         snapshots.ifPresent(PortalBone.BONE_NAME, snapshot -> snapshot.skipRender(true));
 
         float opacity = renderPassInfo.renderState().getOrDefaultGeckolibData(OPACITY, 1.0f);
@@ -159,13 +159,14 @@ public class TardisExteriorBlockRenderer extends GeoBlockRenderer<@NotNull Tardi
     public void submit(@NonNull TardisExteriorBlockRenderState renderState, @NonNull PoseStack poseStack,
                        @NonNull SubmitNodeCollector submitNodeCollector, @NonNull CameraRenderState cameraState) {
         if (RenderLevelGuard.belongsToOtherLevel(renderState)) return;
-        /* the lamp orb needs these to face the camera. skip iris's shadow pass, that's the sun's view not yours */
+        // The lamp orb needs these to face the camera
+        // Skip the shadow pass of Iris, that is the view of the sun and not yours
         if (!SkyShaderCompat.isRenderingShadowPass()) {
             cameraOrientation.set(cameraState.orientation);
             poseStack.last().pose().transformPosition(blockOrigin.set(0f, 0f, 0f));
         }
         super.submit(renderState, poseStack, submitNodeCollector, cameraState);
-        /* geckolib skips a fully see-through box, so the orb draws itself then */
+        // GeckoLib skips a fully see through box so the orb draws itself then
         if (renderState.getOrDefaultGeckolibData(OPACITY, 1.0f) <= 0.0f) {
             TardisLampOrbLayer.drawWithoutBox(renderState, poseStack, submitNodeCollector);
         }

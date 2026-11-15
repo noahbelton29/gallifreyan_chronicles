@@ -6,8 +6,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.resources.sounds.SoundInstance;
 import net.minecraft.client.sounds.ChannelAccess;
 
-/* muffles a playing sound (like hearing it through a wall).
-   1 = clear, lower = more muffled */
+/** Muffles a playing sound like hearing it through a wall, 1 is clear and lower is more muffled. */
 public final class SoundMuffle {
     private SoundMuffle() {
     }

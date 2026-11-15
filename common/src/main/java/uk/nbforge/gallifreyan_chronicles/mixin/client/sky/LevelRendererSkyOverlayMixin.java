@@ -13,7 +13,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(value = LevelRenderer.class, priority = 1500)
 public abstract class LevelRendererSkyOverlayMixin {
-    /* the sky canvas itself is drawn and laid on from LevelRendererFadeBoxMixin, so it goes under the fading box */
+    // The sky canvas is drawn and laid on from LevelRendererFadeBoxMixin so it goes under the fading box
     @Inject(method = "render", at = @At("HEAD"))
     private void gc$beginSkyFrame(GraphicsResourceAllocator resourceAllocator, boolean renderOutline,
                                      CameraRenderState cameraState, GpuBufferSlice terrainFog, Vector4f fogColor,

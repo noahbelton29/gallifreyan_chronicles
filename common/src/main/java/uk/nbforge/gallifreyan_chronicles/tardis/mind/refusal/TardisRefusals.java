@@ -4,7 +4,7 @@ package uk.nbforge.gallifreyan_chronicles.tardis.mind.refusal;
 import uk.nbforge.gallifreyan_chronicles.util.GCSparkUtil;
 import uk.nbforge.gallifreyan_chronicles.tardis.mind.MindMessages;
 
-import uk.nbforge.gallifreyan_chronicles.tardis.mind.TardisMindSystem;
+import uk.nbforge.gallifreyan_chronicles.tardis.ecs.system.TardisMindSystem;
 import uk.nbforge.gallifreyan_chronicles.tardis.mind.mood.TardisAlarm;
 
 import uk.nbforge.gallifreyan_chronicles.util.PlayerMotionUtil;
@@ -28,15 +28,11 @@ import org.jspecify.annotations.Nullable;
 import java.util.UUID;
 
 /**
- * Handles TARDIS refusals when a pilot attempts to take off.
- *
- * <p>The response depends on the TARDIS's mental state and anger, ranging
- * from a simple warning to physically attacking nearby players.
- */
+   Handles a TARDIS refusing when a pilot tries to take off.
+   The reaction depends on its mood and anger, from a simple warning to attacking players nearby.
+*/
 public final class TardisRefusals {
-    /**
-     * Delay before a rejected lever returns to its original position.
-     */
+    // How long before a rejected lever returns to where it was
     private static final int SNAP_BACK_TICKS = 8;
 
     private static final int WARNING_ANGER = 2;
@@ -46,7 +42,7 @@ public final class TardisRefusals {
     private static final double LASH_RANGE = 4.0;
     private static final float MAX_LASH_DAMAGE = 12.0F;
 
-    // Determines how forcefully the TARDIS rejects the pilot's input.
+    /** How forcefully the TARDIS rejects the input of the pilot. */
     private enum Force {
         GENTLE, AGITATED, ANGRY, VIOLENT
     }
@@ -55,21 +51,9 @@ public final class TardisRefusals {
     }
 
     /**
-     * Handles a TARDIS refusing a takeoff attempt based on its relationship
-     * with the pilot and its current mental state.
-     *
-     * <p>Some refusals only produce a warning, while others physically
-     * reject the lever and may cause the TARDIS to attack nearby players.
-     *
-     * @param level    server level containing the TARDIS
-     * @param console  console receiving the input
-     * @param leverId  ID of the takeoff lever
-     * @param soundPos position used for sounds and alarms
-     * @param leverPos world position of the lever
-     * @param tardis   TARDIS handling the takeoff attempt
-     * @param pilot    UUID of the player attempting takeoff, or {@code null}
-     * @return {@code true} if takeoff was refused, otherwise {@code false}
-     */
+       Some refusals only give a warning, others throw the lever back and may make the TARDIS attack players nearby.
+       Returns true if takeoff was refused.
+    */
     public static boolean refuseTakeoff(ServerLevel level, TardisConsoleBlockEntity console, String leverId,
                                         BlockPos soundPos, Vec3 leverPos, Tardis tardis, @Nullable UUID pilot) {
         TardisMindSystem.Refusal refusal = TardisMindSystem.refusesTakeoff(tardis, pilot);
@@ -114,7 +98,7 @@ public final class TardisRefusals {
         soundAlarm(level, soundPos, tardis, anger);
 
         if (anger >= LASH_ANGER) {
-            // Delay the attack until the lever has snapped back.
+            // The attack waits until the lever has snapped back
             GCSchedulerUtil.runLater(level.getServer(), SNAP_BACK_TICKS, () -> lashOut(level, leverPos, anger));
         }
     }
@@ -181,7 +165,7 @@ public final class TardisRefusals {
     private static void lashOut(ServerLevel level, Vec3 leverPos, int anger) {
         int strength = anger - LASH_ANGER + 1;
 
-        // Damage and knockback increase with anger, but damage has a fixed cap.
+        // Damage and knockback grow with anger but damage has a cap
         float damage = Math.min(2.0F * strength, MAX_LASH_DAMAGE);
         double push = 0.5 + 0.2 * strength;
 
@@ -202,7 +186,7 @@ public final class TardisRefusals {
     private static void throwBack(ServerPlayer player, Vec3 from, double push, double lift) {
         Vec3 away = player.position().subtract(from).multiply(1, 0, 1);
 
-        // Use a fixed direction if the player is directly on top of the source.
+        // Uses a fixed direction if the player is right on top of the source
         away = away.lengthSqr() < 1.0E-4 ? new Vec3(0, 0, 1) : away.normalize();
 
         PlayerMotionUtil.set(player, new Vec3(away.x * push, lift, away.z * push));

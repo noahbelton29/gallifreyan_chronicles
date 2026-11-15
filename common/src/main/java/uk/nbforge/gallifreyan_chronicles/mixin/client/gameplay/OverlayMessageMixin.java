@@ -10,8 +10,10 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import uk.nbforge.gallifreyan_chronicles.Constants;
 import uk.nbforge.gallifreyan_chronicles.config.GCConfig;
 
-/* hides the mod's own action-bar messages when the player has turned them off. vanilla and other mods' messages
-   are left alone: only translation keys in this mod's namespace are dropped */
+/**
+   Hides the action bar messages of this mod when the player has turned them off.
+   Messages from vanilla and other mods are left alone, only translation keys in the namespace of this mod are dropped.
+*/
 @Mixin(Gui.class)
 public abstract class OverlayMessageMixin {
     @Inject(method = "setOverlayMessage", at = @At("HEAD"), cancellable = true, require = 0)

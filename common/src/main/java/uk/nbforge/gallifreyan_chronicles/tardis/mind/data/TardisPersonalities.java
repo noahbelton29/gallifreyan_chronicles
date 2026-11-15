@@ -33,7 +33,7 @@ public final class TardisPersonalities {
         return Optional.ofNullable(ALL.get(MindIds.normalize(id)));
     }
 
-    /* never null, a removed personality falls back to obedient */
+    /** Never null, a removed personality falls back to obedient. */
     public static TardisPersonality get(String id) {
         return byId(id).orElseGet(() -> byId(TardisPersonality.FALLBACK.id()).orElse(TardisPersonality.FALLBACK));
     }

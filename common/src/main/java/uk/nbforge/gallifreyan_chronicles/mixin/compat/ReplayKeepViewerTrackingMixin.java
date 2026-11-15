@@ -12,6 +12,7 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.Entity;
 import org.spongepowered.asm.mixin.Final;
+import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
@@ -20,12 +21,11 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import qouteall.imm_ptl.core.network.PacketRedirection;
 import net.minecraft.network.protocol.Packet;
 
-/* immersive portals does its own "who can see this entity" check. the flashback
-   replay camera never looks loaded to it, so once a portal shows up it stopped
-   sending entities (like the recorded player) to the camera and they froze.
-   we never take the replay camera off an entity's watcher list.
-   ip_updateEntityTrackingStatus is added by immersive portals, so priority is
-   above theirs (1000) to run after it */
+/**
+   Immersive Portals does its own check for who can see an entity and the Flashback replay camera never looks loaded to it, so once a portal showed up it stopped sending entities like the recorded player to the camera and they froze.
+   We never take the replay camera off the watcher list of an entity.
+   ip_updateEntityTrackingStatus is added by Immersive Portals so our priority is above theirs at 1000 to run after it.
+*/
 @Mixin(targets = "net.minecraft.server.level.ChunkMap$TrackedEntity", priority = 1500)
 public abstract class ReplayKeepViewerTrackingMixin {
     @Shadow
@@ -38,22 +38,21 @@ public abstract class ReplayKeepViewerTrackingMixin {
     @Final
     private Set<ServerPlayerConnection> seenBy;
 
-    /* the other half: immersive portals never adds the replay camera either.
-       after jumping back on the timeline every entity is made again, so nothing
-       was sent to the camera and the player froze. add the camera ourselves */
+    // The other half, Immersive Portals never adds the replay camera either
+    // After jumping back on the timeline every entity is made again so nothing was sent to the camera and the player froze, so we add the camera ourselves
     @Inject(method = "ip_updateEntityTrackingStatus", at = @At("TAIL"), remap = false, require = 0)
     private void gc$addReplayCamera(CallbackInfo ci) {
         this.gc$ensureCamera();
     }
 
-    /* flashback sends recorded movement through here, also while paused or
-       jumping on the timeline (when immersive portals doesn't run). so make sure
-       the camera is on the list first, or the moves go to nobody */
+    // Flashback sends recorded movement through here, also while paused or jumping on the timeline when Immersive Portals does not run
+    // So make sure the camera is on the list first or the moves go to nobody
     @Inject(method = "sendToTrackingPlayers", at = @At("HEAD"), require = 0)
     private void gc$addCameraBeforeSend(Packet<?> packet, CallbackInfo ci) {
         this.gc$ensureCamera();
     }
 
+    @Unique
     private void gc$ensureCamera() {
         if (!(this.entity.level() instanceof ServerLevel level)) return;
         if (!level.getServer().getClass().getName().startsWith("com.moulberry.flashback.")) return;
@@ -74,6 +73,7 @@ public abstract class ReplayKeepViewerTrackingMixin {
         return original.call(seenBy, keepCamera);
     }
 
+    @Unique
     private static boolean gc$isReplayCamera(ServerPlayerConnection c) {
         return c.getPlayer().getClass().getName().equals("com.moulberry.flashback.playback.ReplayPlayer");
     }

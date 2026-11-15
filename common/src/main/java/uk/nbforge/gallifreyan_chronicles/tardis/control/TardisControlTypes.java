@@ -32,13 +32,13 @@ public final class TardisControlTypes {
         return IDS.get(codec);
     }
 
-    /* registers a control type and remembers its codec by class, so the control can find it again from itself */
+    /** Remembers the codec by class so a control can find it again from itself. */
     public static void register(String id, Class<? extends TardisControl> type, MapCodec<? extends TardisControl> codec) {
         register(id, codec);
         BY_CLASS.put(type, codec);
     }
 
-    /* the codec a control was registered with, found from its class or the nearest registered parent */
+    /** The codec a control was registered with, found from its class or the nearest registered parent. */
     public static MapCodec<? extends TardisControl> codecFor(TardisControl control) {
         for (Class<?> type = control.getClass(); type != null; type = type.getSuperclass()) {
             MapCodec<? extends TardisControl> codec = BY_CLASS.get(type);

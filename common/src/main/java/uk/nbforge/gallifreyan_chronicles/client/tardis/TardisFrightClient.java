@@ -5,9 +5,11 @@ import net.minecraft.util.Mth;
 import net.minecraft.world.level.Level;
 import org.jspecify.annotations.Nullable;
 
-/* what a player sees and hears when the tardis is afraid of them. the console hum warps and the lights
-   dip. the dips are soft, at most two a second, and they go through the power darkness
-   strength setting, so turning that down (or off) turns this down too */
+/**
+   What a player sees and hears when the TARDIS is afraid of them.
+   The console hum warps and the lights dip.
+   The dips are soft, at most two a second, and go through the power darkness strength setting so turning that down or off turns this down too.
+*/
 public final class TardisFrightClient {
     private static final long SLOT_MS = 500L;
     private static final long FADE_IN_NANOS = 500_000_000L;
@@ -54,14 +56,14 @@ public final class TardisFrightClient {
         return current.dimension.equals(level.dimension()) ? current : null;
     }
 
-    /* eases in, holds, then fades out so it never snaps on or off */
+    /** Eases in, holds, then fades out so it never snaps on or off. */
     private static float envelope(State s, long now) {
         float in = Mth.clamp((now - s.startNanos) / (float) FADE_IN_NANOS, 0f, 1f);
         float out = Mth.clamp((s.endNanos - now) / (float) FADE_OUT_NANOS, 0f, 1f);
         return Math.min(in, out);
     }
 
-    /* how much the lights are dipping right now, 0 to 1 */
+    /** How much the lights are dipping right now, 0 to 1. */
     public static float flickerOf(@Nullable Level level) {
         State s = active(level);
         if (s == null) return 0f;
@@ -79,7 +81,7 @@ public final class TardisFrightClient {
         return Math.min(MAX_DIP, dip);
     }
 
-    /* 0 when the hum is normal, up to 1 when it is badly warped */
+    /** 0 when the hum is normal, up to 1 when it is badly warped. */
     public static float humWarp(@Nullable Level level) {
         State s = active(level);
         return s == null ? 0f : envelope(s, System.nanoTime()) * s.severity;

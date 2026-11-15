@@ -16,9 +16,10 @@ public interface TardisControl {
         return InteractionResult.PASS;
     }
 
-    /* the sound this control makes when it's used. played for you after a
-       successful right click (and on consoles outside a tardis, which only animate),
-       so onRightClick doesn't need to play it */
+    /**
+       The sound this control makes when it is used.
+       It is played for you after a successful right click, and on consoles outside a TARDIS which only animate, so onRightClick does not need to play it.
+    */
     default void playClickSound(TardisControlEntity entity) {
     }
 

@@ -8,8 +8,7 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-/* in a replay, don't tell the replay server the camera went through a door, or where
-   it moves while it's in the tardis world. see ReplayVirtualDimension */
+/** In a replay, do not tell the replay server that the camera went through a door or where it moves while it is in the TARDIS world, see ReplayVirtualDimension. */
 @Mixin(ClientCommonPacketListenerImpl.class)
 public abstract class VirtualDimensionOutgoingMixin {
     @Inject(method = "send(Lnet/minecraft/network/protocol/Packet;)V", at = @At("HEAD"), cancellable = true, require = 0)

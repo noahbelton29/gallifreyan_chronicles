@@ -7,9 +7,10 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-/* seamless portals logs the steps of a crossing at info level for the next 80 ticks (it allows a
-   few hundred lines, and the callers build the strings first). these two methods are the
-   log-only part, so skip them */
+/**
+   Seamless Portals logs the steps of a crossing at info level for the next 80 ticks, it allows a few hundred lines and the callers build the strings first.
+   These two methods are the log only part so skip them.
+*/
 @Pseudo
 @Mixin(targets = "com.warwa.seamlessportals.passthrough.SeamRideProbe", remap = false)
 public abstract class PortalRideLogMixin {

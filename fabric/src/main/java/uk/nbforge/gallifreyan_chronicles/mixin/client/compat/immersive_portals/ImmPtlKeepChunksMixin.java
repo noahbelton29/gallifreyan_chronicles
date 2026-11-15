@@ -8,8 +8,7 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-/* in a replay the client must never throw its chunks away,
-   nothing sends them again. see FlashbackChunks.keepChunk */
+/** In a replay the client must never throw its chunks away because nothing sends them again, see FlashbackChunks keepChunk. */
 @Pseudo
 @Mixin(targets = "qouteall.imm_ptl.core.chunk_loading.ImmPtlClientChunkMap", remap = false)
 public abstract class ImmPtlKeepChunksMixin {

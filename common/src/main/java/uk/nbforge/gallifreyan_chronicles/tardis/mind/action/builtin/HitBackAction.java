@@ -3,7 +3,7 @@ package uk.nbforge.gallifreyan_chronicles.tardis.mind.action.builtin;
 import uk.nbforge.gallifreyan_chronicles.util.GCSparkUtil;
 import uk.nbforge.gallifreyan_chronicles.tardis.mind.MindMessages;
 import uk.nbforge.gallifreyan_chronicles.Constants;
-import uk.nbforge.gallifreyan_chronicles.tardis.mind.TardisMindSystem;
+import uk.nbforge.gallifreyan_chronicles.tardis.ecs.system.TardisMindSystem;
 import uk.nbforge.gallifreyan_chronicles.tardis.mind.action.MindAction;
 import uk.nbforge.gallifreyan_chronicles.tardis.mind.action.MindContext;
 import net.minecraft.ChatFormatting;
@@ -14,8 +14,10 @@ import net.minecraft.sounds.SoundSource;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.player.Player;
 
-/* {"type": "hit_back", "max_damage": 6, "min_damage": 2, "push": 0.9}
-   for "on_mallet_hit". zaps whoever hit it, weaker the more scared it is. does nothing once it's cowed */
+/**
+   Used for on_mallet_hit, it zaps whoever hit it and is weaker the more scared it is, and does nothing once it is cowed.
+   The json fields are max_damage, min_damage and push.
+*/
 public record HitBackAction(float maxDamage, float minDamage, float push) implements MindAction {
     public static final String TYPE = Constants.MOD_ID + ":hit_back";
 

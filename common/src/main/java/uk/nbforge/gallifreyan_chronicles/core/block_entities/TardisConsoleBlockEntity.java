@@ -88,11 +88,11 @@ public class TardisConsoleBlockEntity extends BlockEntity implements GeoBlockEnt
 
     @Override
     public void registerControllers(AnimatableManager.@NonNull ControllerRegistrar controllerRegistrar) {
-        /* the rotor stays still on a console outside a tardis */
+        // The rotor stays still on a console outside a TARDIS
         controllers.register(controllerRegistrar, () -> hasPower() && isInTardis(), () -> this.currentRotorState);
     }
 
-
+    /** Plays a rotor animation and tells every client to do the same. */
     public void triggerRotorAnimation(String animationName) {
         this.currentRotorState = animationName;
         animationDriver.triggerAnimation("rotor", animationName);
@@ -127,11 +127,13 @@ public class TardisConsoleBlockEntity extends BlockEntity implements GeoBlockEnt
         this.currentRotorState = rotorState;
     }
 
+    /** True if the console model has this animation for the control, or if there is no model yet. */
     private boolean hasAnimation(String controlId, String animation) {
         TardisConsole model = getConsole();
         return model == null || ConsoleAnimationCheck.exists(model.id(), controlId, animation);
     }
 
+    /** Client side, plays the animation the server sent and remembers if that control now shows on or off. */
     public void triggerAnimationClient(String animationName, String controllerName) {
         if (!"rotor".equals(controllerName) && !hasAnimation(controllerName, animationName)) return;
         if ("rotor".equals(controllerName)) {
@@ -151,6 +153,7 @@ public class TardisConsoleBlockEntity extends BlockEntity implements GeoBlockEnt
         return controls.getControlState(controlId);
     }
 
+    /** What the control looks like, on the client the state of the last animation played, otherwise the real state. */
     public boolean displayedControlState(String controlId) {
         if (level != null && level.isClientSide()) {
             Boolean applied = clientAppliedStates.get(controlId);
@@ -159,18 +162,18 @@ public class TardisConsoleBlockEntity extends BlockEntity implements GeoBlockEnt
         return controls.getControlState(controlId);
     }
 
+    /** How bright the console lights are, fading up and down with power. */
     public float glowLevel() {
-        /* no lights on a console that isn't inside a tardis */
+        // No lights on a console that is not inside a TARDIS
         return glowFade.update(hasPower() && isInTardis() ? 1.0F : 0.0F);
     }
 
-    /* true when this console is inside a tardis interior. one placed anywhere
-       else is just decoration: controls only animate, no lights, no hum */
+    /** True when this console is inside a TARDIS interior, one placed anywhere else is just decoration with controls that only animate and no lights or hum. */
     public boolean isInTardis() {
         return TardisDimensionUtil.isInterior(level);
     }
 
-    /* outside a tardis: move the control and play its animation, nothing else */
+    /** Outside a TARDIS, move the control and play its animation and nothing else. */
     public void playControlAnimationOnly(String id, boolean activated) {
         controls.playControlAnimation(id, activated, null);
     }
@@ -192,6 +195,7 @@ public class TardisConsoleBlockEntity extends BlockEntity implements GeoBlockEnt
         return entry == null ? fallback : entry.animation().animationFor(activated, fallback);
     }
 
+    /** Whether this control jumps straight back when not in use, the console setting wins over the control default. */
     @Override
     public boolean controlSnapsWhenInactive(String controlId) {
         boolean fallback = TardisControlRegistry.get(controlId).snapsWhenInactive();
@@ -204,6 +208,7 @@ public class TardisConsoleBlockEntity extends BlockEntity implements GeoBlockEnt
         return model == null ? null : model.controlEntry(controlId);
     }
 
+    /** How long a control waits before it can be used again, in ticks. */
     public int controlCooldownTicks(String controlId) {
         TardisConsole.ControlEntry entry = findControlEntry(controlId);
         float seconds = entry == null ? TardisConsole.ControlEntry.DEFAULT_COOLDOWN_SECONDS : entry.cooldown();
@@ -292,6 +297,7 @@ public class TardisConsoleBlockEntity extends BlockEntity implements GeoBlockEnt
         return controls.getControlStates().copy();
     }
 
+    /** Applies the control states from the old console after an interior change and sets the rotor to match the flight lever. */
     public void applyCarriedControlStates(CompoundTag states) {
         controls.mergeControlStates(states);
         this.currentRotorState = controls.getControlState("flight_lever") ? FLIGHT_STATE : IDLE_STATE;
@@ -341,6 +347,7 @@ public class TardisConsoleBlockEntity extends BlockEntity implements GeoBlockEnt
         return level;
     }
 
+    /** The way the console faces, north if the block has no facing. */
     @Override
     public Direction getHostFacing() {
         BlockState state = getBlockState();
@@ -407,6 +414,7 @@ public class TardisConsoleBlockEntity extends BlockEntity implements GeoBlockEnt
         }
     }
 
+    /** If the TARDIS is flying but the throttle on this console is not pulled, pull it and start the flight rotor. */
     private void reconcileFlightWithExterior() {
         if (isRemoved() || !(level instanceof ServerLevel)) return;
         TardisFlightState state = TardisApi.of(this).map(Tardis::flightState).orElse(TardisFlightState.IDLE);

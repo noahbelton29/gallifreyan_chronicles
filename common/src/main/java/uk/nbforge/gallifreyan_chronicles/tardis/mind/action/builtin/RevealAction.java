@@ -8,10 +8,11 @@ import uk.nbforge.gallifreyan_chronicles.tardis.mind.discovery.TardisDiscovery;
 
 import java.util.Optional;
 
-/* {"type": "reveal", "if_it_reacted": true}
-   the tardis just showed who it is, so the owner discovers its personality.
-   if_it_reacted: only if an action before this actually did something (like hit_back)
-   traits: also reveal traits with this "revealed_when" */
+/**
+   The TARDIS just showed who it is so the owner discovers its personality.
+   if_it_reacted means only if an action before this really did something, like hit_back.
+   traits also reveals traits with this revealed_when.
+*/
 public record RevealAction(boolean personality, boolean ifItReacted, Optional<Reveal> traits) implements MindAction {
     public static final String TYPE = Constants.MOD_ID + ":reveal";
 

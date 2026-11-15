@@ -38,6 +38,7 @@ public final class HudVisibility {
         }
     }
 
+    /** Looks for the flag the game uses for the HUD being hidden, its name changes between versions so it tries a list of fields and methods on a few objects and keeps the first one that works. */
     private static BooleanSupplier resolve() {
         Minecraft minecraft = Minecraft.getInstance();
         List<Object> roots = new ArrayList<>();

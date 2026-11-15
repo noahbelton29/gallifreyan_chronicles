@@ -2,6 +2,7 @@ package uk.nbforge.gallifreyan_chronicles.client.renderer.geo_layer;
 
 import uk.nbforge.gallifreyan_chronicles.client.sky.SkyShaderCompat;
 import uk.nbforge.gallifreyan_chronicles.client.renderer.fade.FadeBoxRenderer;
+import uk.nbforge.gallifreyan_chronicles.client.util.DetailLevelUtil;
 import uk.nbforge.gallifreyan_chronicles.tardis.TardisExterior;
 import java.util.Map;
 import java.util.HashMap;
@@ -26,12 +27,14 @@ import org.jspecify.annotations.NonNull;
 
 import java.util.function.BiConsumer;
 
-/* a glowing orb on the exterior's "lamp" bone, always facing you. only during a new who takeoff or landing,
-   where it pulses in and out */
+/**
+   A glowing orb on the lamp bone of the exterior that always faces you.
+   Only used during a new who takeoff or landing where it pulses in and out.
+*/
 public class TardisLampOrbLayer<T extends GeoAnimatable, O, R extends GeoRenderState> extends GeoRenderLayer<T, O, R> {
     public static final String LAMP_BONE = "lamp";
     private static final Identifier TEXTURE = GCUtil.modIdentifier("textures/effect/lamp_orb.png");
-    /* max block and sky light packed together */
+    // Block and sky light both at the max
     private static final int FULL_BRIGHT = 0xF000F0;
     private static final float SIZE = 1.8f;
     private static final float TOWARDS_CAMERA = 1.2f;
@@ -56,7 +59,7 @@ public class TardisLampOrbLayer<T extends GeoAnimatable, O, R extends GeoRenderS
         draw(state, centre, tasks);
     }
 
-    /* the box is fully see-through so geckolib skips it. draw the orb where the lamp was last seen */
+    /** The box is fully see through so GeckoLib skips it, draw the orb where the lamp was last seen. */
     public static void drawWithoutBox(GeoRenderState state, PoseStack poseStack, SubmitNodeCollector tasks) {
         if (SkyShaderCompat.isRenderingShadowPass()) return;
         if (state.getOrDefaultGeckolibData(TardisExteriorBlockRenderer.LAMP_ORB, 0f) <= 0.01f) return;
@@ -68,7 +71,7 @@ public class TardisLampOrbLayer<T extends GeoAnimatable, O, R extends GeoRenderS
         draw(state, centre, tasks);
     }
 
-    /* where the lamp sits on each exterior, relative to the block and with the box's turn taken off */
+    // Where the lamp sits on each exterior, relative to the block with the turn of the box taken off
     private static final Map<String, Vector3f> LAMP_SPOTS = new HashMap<>();
 
     private static void rememberLampSpot(GeoRenderState state, Vector3f centre) {
@@ -82,13 +85,15 @@ public class TardisLampOrbLayer<T extends GeoAnimatable, O, R extends GeoRenderS
         return new Quaternionf().rotateY((float) Math.toRadians(TardisExterior.modelRotationDegrees(yaw)));
     }
 
+    /** Draws the glowing orb on the lamp as a flat square that always faces the camera, pulse sets how big it is. */
     private static void draw(GeoRenderState state, Vector3f centre, SubmitNodeCollector tasks) {
-        /* the pulse only changes its size, it's always fully bright. the box going see-through doesn't touch it */
+        // The pulse only changes its size and it is always fully bright
+        // The box going see through does not touch it
         float pulse = Math.clamp(state.getOrDefaultGeckolibData(TardisExteriorBlockRenderer.LAMP_ORB, 0f), 0f, 1f);
-        if (pulse <= 0.01f) return;
+        if (pulse <= 0.01f || !DetailLevelUtil.highDetail()) return;
 
-        /* while fading on the canvas the box isn't in the world's depth and the orb draws after it,
-           so it's already in front and stays exactly on the lamp. only a solid box needs it pulled forward */
+        // While fading on the canvas the box is not in the depth of the world and the orb draws after it so it is already in front and stays exactly on the lamp
+        // Only a solid box needs it pulled forward
         boolean onCanvas = FadeBoxRenderer.active()
                 && state.getOrDefaultGeckolibData(TardisExteriorBlockRenderer.OPACITY, 1.0f) < 1.0f;
         float distance = centre.length();
@@ -101,7 +106,7 @@ public class TardisLampOrbLayer<T extends GeoAnimatable, O, R extends GeoRenderS
         orb.scale(size, size, size);
 
         int argb = 0xFFFFFFFF;
-        /* drawn after the box so the box never shows through it */
+        // Drawn after the box so the box never shows through it
         tasks.order(DRAW_AFTER_BOX).submitCustomGeometry(orb, GCRenderTypes.glowOrb(TEXTURE), (pose, buffer) -> {
             vertex(buffer, pose, -0.5f, -0.5f, 0f, 1f, argb);
             vertex(buffer, pose, 0.5f, -0.5f, 1f, 1f, argb);

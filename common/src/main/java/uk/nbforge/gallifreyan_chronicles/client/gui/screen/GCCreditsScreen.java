@@ -95,7 +95,7 @@ public class GCCreditsScreen extends Screen {
         this.addLine(Component.empty(), false);
     }
 
-    // centred paragraphs, one line each, for notices that aren't a name under a heading
+    /** Centred paragraphs with one line each, for notices that are not a name under a heading. */
     private void addNotice(String... lineKeys) {
         for (String key : lineKeys) {
             this.addLine(Component.translatable(key).withStyle(ChatFormatting.WHITE), true);

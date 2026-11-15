@@ -29,13 +29,8 @@ public final class TardisPersonalityCodec {
         ).apply(inst, Mallet::new));
     }
 
-    /**
-     * Codec for loading and saving TARDIS personalities.
-     *
-     * <p>Groups flight refusal thresholds and mallet behaviour into separate
-     * configuration sections, while keeping their values in the main record.
-     * Missing fields use their default values.
-     */
+    // Flight refusal limits and mallet behaviour are grouped into their own sections in the file, while the values stay in the main record
+    // Missing fields use their defaults
     public static final Codec<TardisPersonality> CODEC = RecordCodecBuilder.create(inst -> inst.group(
             Codec.STRING.optionalFieldOf("id", "").forGetter(TardisPersonality::id),
             Codec.INT.optionalFieldOf("how_common", 10).forGetter(TardisPersonality::weight),

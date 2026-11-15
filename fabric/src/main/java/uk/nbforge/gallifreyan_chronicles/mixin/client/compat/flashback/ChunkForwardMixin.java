@@ -10,8 +10,10 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-/* flashback has just put a recorded chunk in the replay world.
-   with immersive portals nothing sends it to the viewer, so we do. see FlashbackChunks */
+/**
+   Flashback has just put a recorded chunk in the replay world.
+   With Immersive Portals nothing sends it to the viewer so we do, see FlashbackChunks.
+*/
 @Pseudo
 @Mixin(targets = "com.moulberry.flashback.playback.ReplayGamePacketHandler", remap = false)
 public abstract class ChunkForwardMixin {

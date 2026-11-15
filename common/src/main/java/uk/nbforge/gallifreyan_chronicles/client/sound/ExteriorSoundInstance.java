@@ -7,7 +7,7 @@ import net.minecraft.sounds.SoundSource;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.phys.Vec3;
 
-/* a sound played at the exterior that gets louder, further reaching and clearer as the doors open */
+/** A sound played at the exterior that gets louder, reaches further and gets clearer as the doors open. */
 public abstract class ExteriorSoundInstance extends AbstractTickableSoundInstance {
     public static final double OPEN_RANGE = 6.0;
     public static final double CLOSED_RANGE = 3.0;

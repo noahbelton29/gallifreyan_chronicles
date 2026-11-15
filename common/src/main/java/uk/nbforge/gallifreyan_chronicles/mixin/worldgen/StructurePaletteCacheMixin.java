@@ -14,12 +14,16 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-/* vanilla bug MC-271899: structure palettes cache blocks in a plain HashMap. voxy's
-   worldgen builds chunks on its own threads at the same time as the game, two threads
-   write the map at once and it crashes. neoforge already fixes this, fabric doesn't */
+/**
+   Vanilla bug MC-271899, structure palettes cache blocks in a plain HashMap.
+   Voxy worldgen builds chunks on its own threads at the same time as the game so two threads write the map at once and it crashes.
+   NeoForge already fixes this and Fabric does not smh.
+*/
 @Mixin(StructureTemplate.Palette.class)
 public abstract class StructurePaletteCacheMixin {
-    @Shadow @Final @Mutable
+    @Shadow
+    @Final
+    @Mutable
     private Map<Block, List<StructureTemplate.StructureBlockInfo>> cache;
 
     @Inject(method = "<init>", at = @At("RETURN"))

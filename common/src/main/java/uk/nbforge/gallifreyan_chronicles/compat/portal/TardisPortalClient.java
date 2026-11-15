@@ -146,13 +146,9 @@ final class TardisPortalClient {
         return false;
     }
 
-
-    /**
-     * Doorway centres seen so far, per TARDIS interior dimension. Immersive Portals draws the outline of the
-     * remote hit while the client level is swapped to the destination dimension, where the entry portal is not
-     * listed, and the portal itself can disappear once the door is replaced. So the centres are remembered
-     * instead of being looked up from the current level.
-     */
+    // Doorway centres seen so far per TARDIS interior dimension
+    // Immersive Portals draws the outline of the remote hit while the client level is swapped to the destination dimension where the entry portal is not listed, and the portal can disappear once the door is replaced
+    // So the centres are remembered and not looked up from the current level
     private static final java.util.Map<ResourceKey<Level>, Set<Vec3>> DOOR_CENTRES = new java.util.HashMap<>();
 
     private static void rememberDoorCentres(Level playerLevel) {
@@ -164,10 +160,9 @@ final class TardisPortalClient {
     }
 
     /**
-     * True when {@code pos} lies inside the doorway footprint of a TARDIS interior seen through a portal,
-     * whatever block currently occupies it. This keeps the outline hidden after the interior door (or its
-     * barriers) has been replaced by another block.
-     */
+       True when the position is inside the doorway of a TARDIS interior seen through a portal, whatever block is there.
+       It keeps the outline hidden after the interior door or its barriers were replaced by another block.
+    */
     static boolean isInDoorFootprintOfAnyTardisPortal(BlockPos pos) {
         Minecraft mc = Minecraft.getInstance();
         if (mc.level == null || mc.player == null) {
@@ -182,7 +177,7 @@ final class TardisPortalClient {
         double y = pos.getY() + 0.5;
         double z = pos.getZ() + 0.5;
         for (var entry : DOOR_CENTRES.entrySet()) {
-            // Standing inside that TARDIS: the door area is ordinary, targetable space.
+            // Standing inside that TARDIS the door area is ordinary space that can be targeted
             if (entry.getKey().equals(playerLevel.dimension())) continue;
             for (Vec3 dest : entry.getValue()) {
                 double dx = x - dest.x;
@@ -196,10 +191,7 @@ final class TardisPortalClient {
         return false;
     }
 
-    /**
-     * True when the interior door behind {@code object} (a Portal) has a block flush against its back. Unknown
-     * (door or level not loaded) counts as not blocked.
-     */
+    /** True when the interior door behind the portal has a block flush against its back, unknown counts as not blocked because the door or level is not loaded. */
     static boolean isDoorBackBlocked(Object object) {
         if (!(object instanceof Portal portal)) return false;
         Level dest = ClientWorldLoader.peekWorld(portal.getDestDim());
@@ -214,9 +206,7 @@ final class TardisPortalClient {
         return false;
     }
 
-    /**
-     * Base block of the exterior TARDIS this portal sits in, or null when it cannot be found.
-     */
+    /** The base block of the exterior TARDIS this portal sits in, null when it cannot be found. */
     static @Nullable BlockPos exteriorBaseOf(Object object) {
         if (!(object instanceof Portal portal)) return null;
         Level level = portal.level();

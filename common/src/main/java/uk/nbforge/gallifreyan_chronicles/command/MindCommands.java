@@ -18,7 +18,7 @@ import uk.nbforge.gallifreyan_chronicles.tardis.mind.data.TardisPersonalities;
 import uk.nbforge.gallifreyan_chronicles.tardis.mind.data.TardisTraits;
 import uk.nbforge.gallifreyan_chronicles.tardis.mind.disability.TardisDisability;
 import uk.nbforge.gallifreyan_chronicles.tardis.mind.TardisMind;
-import uk.nbforge.gallifreyan_chronicles.tardis.mind.TardisMindSystem;
+import uk.nbforge.gallifreyan_chronicles.tardis.ecs.system.TardisMindSystem;
 import uk.nbforge.gallifreyan_chronicles.tardis.mind.TardisPersonality;
 import uk.nbforge.gallifreyan_chronicles.tardis.mind.TardisTrait;
 import net.minecraft.commands.CommandSourceStack;
@@ -96,7 +96,7 @@ public final class MindCommands {
             this.name = name;
         }
 
-        /* trust and fear are per player, null means the owner */
+        /** Trust and fear are per player, null means the owner. */
         private boolean perPlayer() {
             return this == TRUST || this == FEAR || this == TRAUMA || this == HITS;
         }
@@ -118,7 +118,7 @@ public final class MindCommands {
                 case STRESS -> TardisMindSystem.setStress(tardis, value);
                 case TRUST -> TardisMindSystem.setTrust(tardis, player, value);
                 case FEAR -> {
-                    /* trauma keeps fear from going below a floor, so lower it enough for the new fear to stick */
+                    // Trauma keeps fear from going below a floor, so lower it enough for the new fear to stick
                     float maxTrauma = value / TardisMind.TRAUMA_FEAR_SHARE;
                     if (TardisMindSystem.traumaFrom(tardis, player) > maxTrauma) {
                         TardisMindSystem.setTraumaFrom(tardis, player, maxTrauma);
@@ -159,7 +159,7 @@ public final class MindCommands {
         return builder.buildFuture();
     }
 
-    /* everything about its mind, and how it feels about every player it knows */
+    /** Everything about its mind and how it feels about every player it knows. */
     private static int inspect(CommandContext<CommandSourceStack> ctx) throws CommandSyntaxException {
         return withTardis(ctx, (tardis, idText) -> {
             TardisMind mind = TardisMindSystem.mind(tardis);
@@ -228,7 +228,6 @@ public final class MindCommands {
         });
     }
 
-    /* the optional player argument, or null for the owner */
     private static @Nullable UUID playerArg(CommandContext<CommandSourceStack> ctx) throws CommandSyntaxException {
         try {
             return EntityArgument.getPlayer(ctx, "player").getUUID();

@@ -22,6 +22,7 @@ public final class SoundDurations {
         return SECONDS.computeIfAbsent(event, SoundDurations::compute);
     }
 
+    /** Finds the length in seconds of the longest sound file of a sound event by reading sounds.json and then the ogg files, 0 if anything is missing. */
     private static double compute(Identifier event) {
         String soundsJson = "/assets/" + event.getNamespace() + "/sounds.json";
         try (InputStream in = SoundDurations.class.getResourceAsStream(soundsJson)) {

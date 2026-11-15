@@ -9,8 +9,10 @@ import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 
-/* tardis mind messages above the hotbar. one every few seconds per player so they don't
-   talk over each other. the important ones can always cut in */
+/**
+   TARDIS mind messages above the hotbar.
+   One every few seconds per player so they do not talk over each other, the important ones can always cut in.
+*/
 public final class MindMessages {
     private static final long GAP_TICKS = 60L;
     private static final Set<String> IMPORTANT = Set.of(

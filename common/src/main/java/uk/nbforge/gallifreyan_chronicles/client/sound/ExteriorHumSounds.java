@@ -10,20 +10,20 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.WeakHashMap;
 
-/* starts and stops the outside hum for each tardis exterior near the player */
+/** Starts and stops the outside hum for each TARDIS exterior near the player. */
 public final class ExteriorHumSounds {
     private static final int CHECK_INTERVAL_TICKS = 10;
     private static final double START_RANGE_SQR = (ExteriorHumSoundInstance.OPEN_RANGE + 2) * (ExteriorHumSoundInstance.OPEN_RANGE + 2);
 
     private static final Map<TardisExteriorBlockEntity, ExteriorHumSoundInstance> HUMS = new WeakHashMap<>();
-    /* last power state we saw for each exterior, to play the power on/off sound when it flips */
+    // The last power state seen for each exterior, to play the power sound when it flips
     private static final Map<TardisExteriorBlockEntity, Boolean> LAST_POWER = new WeakHashMap<>();
     private static int ticks;
 
     private ExteriorHumSounds() {
     }
 
-    /* every tick: did the power flip on an exterior near us? play the power sound there */
+    /** Every tick, did the power flip on an exterior near us, then play the power sound there. */
     private static void checkPowerChanges(Minecraft minecraft) {
         double maxRangeSqr = ExteriorHumSoundInstance.OPEN_RANGE * ExteriorHumSoundInstance.OPEN_RANGE;
         for (TardisExteriorBlockEntity exterior : HUMS.keySet()) {
@@ -46,6 +46,7 @@ public final class ExteriorHumSounds {
         HUMS.putIfAbsent(exterior, null);
     }
 
+    /** Every few ticks, start the hum of exteriors that are powered and near you and fade out the ones that are gone or in another world. */
     public static void tick() {
         Minecraft minecraft = Minecraft.getInstance();
         if (minecraft.level == null || minecraft.player == null) return;
@@ -60,7 +61,7 @@ public final class ExteriorHumSounds {
             TardisExteriorBlockEntity exterior = entry.getKey();
             ExteriorHumSoundInstance hum = entry.getValue();
 
-            /* the hum fades itself out, cutting it off made a pop */
+            // The hum fades itself out, cutting it off made a pop
             if (exterior.isRemoved()) {
                 if (hum != null) hum.fadeOut();
                 iterator.remove();

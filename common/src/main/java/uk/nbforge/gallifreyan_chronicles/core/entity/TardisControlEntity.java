@@ -97,9 +97,9 @@ public class TardisControlEntity extends Entity {
     public boolean hurtServer(@NonNull ServerLevel serverLevel, DamageSource damageSource, float v) {
         if (damageSource.getEntity() instanceof Player player) {
             TardisConsoleBlockEntity console = this.getConsole();
-            /* console outside a tardis: punching a control does nothing */
+            // Outside a TARDIS punching a control does nothing
             if (console != null && !console.isInTardis()) return false;
-            if (console != null && !TardisApi.canUseControls(console, player)) {
+            if (console != null && TardisApi.cannotUseControls(console, player)) {
                 IsomorphicPunishment.punish(player, console);
                 return false;
             }
@@ -109,7 +109,7 @@ public class TardisControlEntity extends Entity {
             if (isOnCooldown(console)) {
                 return false;
             }
-            /* a left click is still you working the controls, so a frightened or wary tardis can jam it too */
+            // A left click is still you working the controls so a frightened or wary TARDIS can jam it too
             if (console != null && TardisWariness.jams(this, console, player)) {
                 return false;
             }
@@ -217,15 +217,15 @@ public class TardisControlEntity extends Entity {
 
         TardisConsoleBlockEntity console = this.getConsole();
         if (console != null && !console.isInTardis()) {
-            /* console outside a tardis: the control just moves, it does nothing */
+            // Outside a TARDIS the control just moves and does nothing
             if (isOnCooldown(console)) return InteractionResult.FAIL;
-            /* sound first, like the real control (it reads the state before it flips) */
+            // Sound first like the real control, it reads the state before it flips
             TardisControlRegistry.get(this.getControlId()).playClickSound(this);
             boolean newState = !console.getControlState(this.getControlId());
             console.animateControlOnly(this.getControlId(), newState, player);
             return InteractionResult.SUCCESS;
         }
-        if (console != null && !TardisApi.canUseControls(console, player)) {
+        if (console != null && TardisApi.cannotUseControls(console, player)) {
             IsomorphicPunishment.punish(player, console);
             return InteractionResult.FAIL;
         }
@@ -262,7 +262,7 @@ public class TardisControlEntity extends Entity {
         InteractionResult result = control.onRightClick(this, player, hand);
 
         if (result == InteractionResult.SUCCESS) {
-            /* the control's own sound, before its state flips (pitch reads the old state) */
+            // The own sound of the control before its state flips, the pitch reads the old state
             control.playClickSound(this);
             TardisConsoleBlockEntity console = this.getConsole();
             if (console != null) {
@@ -335,9 +335,8 @@ public class TardisControlEntity extends Entity {
 
     @Override
     public boolean skipAttackInteraction(@NonNull Entity attacker) {
-        /* returning true makes vanilla drop the attack before it ever calls hurt, so a left click never
-           reached onLeftClick. handle it here on the server and swallow it, so it can't fall through
-           and chip or break the console behind the control */
+        // Returning true makes vanilla drop the attack before it calls hurt so a left click never reached onLeftClick
+        // Handle it here on the server and swallow it so it cannot fall through and chip or break the console behind the control
         if (attacker instanceof Player player && this.level() instanceof ServerLevel serverLevel) {
             this.hurtServer(serverLevel, serverLevel.damageSources().playerAttack(player), 0f);
         }

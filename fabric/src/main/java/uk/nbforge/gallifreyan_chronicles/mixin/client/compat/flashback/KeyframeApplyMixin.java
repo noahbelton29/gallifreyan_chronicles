@@ -8,8 +8,7 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Pseudo;
 import org.spongepowered.asm.mixin.injection.At;
 
-/* keyframe camera positions go through ReplayKeyframePortal, so a camera path can
-   fly in and out of doors */
+/** Keyframe camera positions go through ReplayKeyframePortal so a camera path can fly in and out of doors. */
 @Pseudo
 @Mixin(targets = "com.moulberry.flashback.keyframe.handler.MinecraftKeyframeHandler", remap = false)
 public abstract class KeyframeApplyMixin {

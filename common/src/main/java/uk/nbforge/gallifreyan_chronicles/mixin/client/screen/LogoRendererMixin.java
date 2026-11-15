@@ -33,7 +33,7 @@ public class LogoRendererMixin {
         int x = width / 2 - gallifreyan_chronicles_26_1_2$WIDTH / 2;
         float effectiveAlpha = self.keepLogoThroughFade() ? 1.0F : alpha;
         int color = ARGB.white(effectiveAlpha);
-        graphics.blit(RenderPipelines.GUI_TEXTURED, TITLE_LOGO, x, 18, 0.0F, 0.0F,  // 30 - 12 = 18
+        graphics.blit(RenderPipelines.GUI_TEXTURED, TITLE_LOGO, x, 18, 0.0F, 0.0F,  // 30 minus 12 is 18
                 gallifreyan_chronicles_26_1_2$WIDTH, gallifreyan_chronicles_26_1_2$HEIGHT,
                 gallifreyan_chronicles_26_1_2$WIDTH, gallifreyan_chronicles_26_1_2$HEIGHT, color);
     }

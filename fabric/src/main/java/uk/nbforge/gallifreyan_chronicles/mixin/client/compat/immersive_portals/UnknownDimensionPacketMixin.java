@@ -9,8 +9,10 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-/* when the replay jumps to the tardis world, packets for it can come before the client
-   is told about it. that threw "Missing Dimension" and kicked you out of the replay */
+/**
+   When the replay jumps to the TARDIS world, packets for it can come before the client is told about it.
+   That threw Missing Dimension and kicked you out of the replay.
+*/
 @Pseudo
 @Mixin(targets = "qouteall.imm_ptl.core.network.PacketRedirectionClient", remap = false)
 public abstract class UnknownDimensionPacketMixin {

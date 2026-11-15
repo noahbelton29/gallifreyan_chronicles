@@ -9,8 +9,10 @@ import net.minecraft.world.level.Level;
 import org.jspecify.annotations.Nullable;
 import qouteall.imm_ptl.core.ClientWorldLoader;
 
-/* see SnapshotOutsideWorldMixin. remembers the last world that isn't a tardis,
-   and takes snapshots from there while you're inside one */
+/**
+   See SnapshotOutsideWorldMixin.
+   Remembers the last world that is not a TARDIS and takes snapshots from there while you are inside one.
+*/
 final class FlashbackSnapshotRoot {
     private static @Nullable ResourceKey<Level> lastOutside;
 

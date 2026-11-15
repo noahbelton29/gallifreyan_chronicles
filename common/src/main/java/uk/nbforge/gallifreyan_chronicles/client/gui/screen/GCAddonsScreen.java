@@ -200,7 +200,7 @@ public class GCAddonsScreen extends Screen {
 
         @Override
         protected void extractContents(@NonNull GuiGraphicsExtractor graphics, int mouseX, int mouseY, float partialTick) {
-            // the screen draws the row itself
+            // The screen draws the row itself
         }
     }
 
@@ -216,7 +216,7 @@ public class GCAddonsScreen extends Screen {
     @Override
     public void tick() {
         super.tick();
-        // pick up addons added to or removed from the folder while this screen is open, for example from Explorer
+        // Picks up addons added to or removed from the folder while this screen is open, for example from Explorer
         if (++ticksSinceCheck < 20) return;
         ticksSinceCheck = 0;
         long signature = AddonManager.folderSignature();

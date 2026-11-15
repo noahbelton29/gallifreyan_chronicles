@@ -14,9 +14,10 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import uk.nbforge.gallifreyan_chronicles.compat.flashback.FlashbackChunks;
 
-/* when you jump back in a replay, flashback removes every entity one by one.
-   removing a portal also removes its linked portals, which broke flashback's
-   loop and kicked you out. so we loop over a copy of the list instead */
+/**
+   When you jump back in a replay Flashback removes every entity one by one.
+   Removing a portal also removes its linked portals, which broke the loop of Flashback and kicked you out, so we loop over a copy of the list instead.
+*/
 @Pseudo
 @Mixin(targets = "com.moulberry.flashback.Flashback", remap = false)
 public abstract class SafeEntityClearMixin {
@@ -29,7 +30,7 @@ public abstract class SafeEntityClearMixin {
         return copy.iterator();
     }
 
-    /* also drop tardis copy of the player */
+    // Also drop the TARDIS copy of the player
     @Inject(method = "lambda$onInitializeClient$3", at = @At("HEAD"), remap = false, require = 0)
     private static void gc$clearPuppet(CallbackInfo ci) {
         FlashbackChunks.clearPuppet();

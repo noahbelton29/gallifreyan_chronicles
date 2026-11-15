@@ -5,7 +5,7 @@ import uk.nbforge.gallifreyan_chronicles.tardis.mind.TardisTrait;
 import java.util.List;
 import java.util.Optional;
 
-/* the numbers a trait changes. "times" values default to 1, "by" values to 0 */
+/** The numbers a trait changes, times values default to 1 and by values to 0. */
 public record TraitModifiers(float stressGain, float stressFade, float fearFade, float trustGain, float trustLoss,
                              float refusalShift, float strangerShift, float crashSoftening, Optional<Float> startTrust,
                              Optional<Float> strangerStartTrust, float abuseTrustLoss, float traumaGain, boolean betrayable,
@@ -13,7 +13,7 @@ public record TraitModifiers(float stressGain, float stressFade, float fearFade,
     public static final TraitModifiers NONE = new TraitModifiers(1f, 1f, 1f, 1f, 1f, 0f, 0f, 1f, Optional.empty(),
             Optional.empty(), 1f, 1f, false, 1f, 1f, 1f);
 
-    /* everything a tardis's traits add up to */
+    /** Everything the traits of a TARDIS add up to. */
     public static TraitModifiers combine(List<TardisTrait> traits, boolean betrayed) {
         float stressGain = 1f, stressFade = 1f, fearFade = 1f, trustGain = 1f, trustLoss = 1f;
         float refusalShift = 0f, strangerShift = 0f, crashSoftening = 1f, abuse = 1f, trauma = 1f;

@@ -66,7 +66,7 @@ public final class SkyShaderCompat {
                 Class<?> api = Class.forName("net.irisshaders.iris.api.v0.IrisApi");
                 irisApi = api.getMethod("getInstance").invoke(null);
                 isShaderPackInUse = api.getMethod("isShaderPackInUse");
-                /* looked up on its own so an older iris without it still works */
+                // Looked up on its own so an older Iris without it still works
                 try {
                     isRenderingShadowPass = api.getMethod("isRenderingShadowPass");
                 } catch (NoSuchMethodException e) {
@@ -86,7 +86,10 @@ public final class SkyShaderCompat {
         }
     }
 
-    /* iris draws the world a second time from the sun's view to make shadows. true while it's doing that */
+    /**
+       Iris draws the world a second time from the view of the sun to make shadows, true while it does that.
+       shadow pass was drawing our sky twice and it looked awful.
+    */
     public static boolean isRenderingShadowPass() {
         if (!isShaderPackInUse() || isRenderingShadowPass == null) return false;
         try {

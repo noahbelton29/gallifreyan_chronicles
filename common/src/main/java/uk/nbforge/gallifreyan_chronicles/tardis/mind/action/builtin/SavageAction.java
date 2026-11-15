@@ -14,8 +14,10 @@ import net.minecraft.util.Mth;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.phys.Vec3;
 
-/* {"type": "savage", "max_damage": 10, "min_damage": 4, "burn_seconds": 3}
-   for "on_terror_hit". fights for its life, weaker the closer it is to breaking */
+/**
+   Used for on_terror_hit, it fights for its life and is weaker the closer it is to breaking.
+   The json fields are max_damage, min_damage and burn_seconds.
+*/
 public record SavageAction(float maxDamage, float minDamage, int burnSeconds) implements MindAction {
     public static final String TYPE = Constants.MOD_ID + ":savage";
 

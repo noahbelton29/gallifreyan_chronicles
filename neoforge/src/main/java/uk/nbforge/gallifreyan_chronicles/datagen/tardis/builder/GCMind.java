@@ -8,9 +8,9 @@ import java.util.Locale;
 import uk.nbforge.gallifreyan_chronicles.datagen.util.GCJson;
 
 /**
- * Things a TARDIS can do in reaction to events. Statically import this class and pass them to
- * {@code whenUnwilling(...)}, {@code whenHit(...)} and friends on a personality or trait.
- */
+   Things a TARDIS can do in reaction to events.
+   Statically import this class and pass them to whenUnwilling, whenHit and the others on a personality or trait.
+*/
 public final class GCMind {
     private GCMind() {
     }
@@ -23,7 +23,7 @@ public final class GCMind {
         return typed;
     }
 
-    /** Fights back, adding this much stress. */
+    /** Fights back and adds this much stress. */
     public static JsonObject fight(double stress) {
         return action("fight", "stress", stress);
     }
@@ -36,7 +36,7 @@ public final class GCMind {
         return action("slam_doors", "volume", volume, "shake", shake, "lock", lock);
     }
 
-    /** Lets the player notice the trait/personality. */
+    /** Lets the player notice the trait or personality. */
     public static JsonObject reveal() {
         return action("reveal");
     }
@@ -87,7 +87,7 @@ public final class GCMind {
         return action("lock_doors");
     }
 
-    /** Plays a sound; "name" without a namespace means this mod's sound. */
+    /** Plays a sound, a name without a namespace means a sound of this mod. */
     public static JsonObject sound(String name, double volume, double pitch) {
         String id = name.contains(":") ? name : uk.nbforge.gallifreyan_chronicles.Constants.MOD_ID + ":" + name;
         return action("sound", "sound", id, "volume", volume, "pitch", pitch);

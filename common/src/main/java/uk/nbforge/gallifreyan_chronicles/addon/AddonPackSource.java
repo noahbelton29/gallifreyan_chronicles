@@ -15,7 +15,7 @@ import java.nio.file.Files;
 import java.util.Optional;
 import java.util.function.Consumer;
 
-/* offers the enabled addons as required packs */
+/** Offers the enabled addons as required packs. */
 public final class AddonPackSource implements RepositorySource {
     public static final String ID_PREFIX = "gc_addon/";
 

@@ -265,6 +265,10 @@ public final class TardisInteriorSystem {
         if (carry != null) console.applyCarriedControlStates(carry.controlStates());
     }
 
+    /**
+       Swaps the interior of a TARDIS for another one and returns what happened.
+       It clears an area big enough for both rooms, builds the new one and puts the console, doors and players back.
+    */
     public static ChangeResult changeInterior(MinecraftServer server, UUID tardisId, String newId) {
         if (!TardisInteriorRegistry.contains(newId)) return ChangeResult.UNKNOWN_INTERIOR;
 
@@ -299,7 +303,7 @@ public final class TardisInteriorSystem {
                 Math.max(oldSize.getY(), newSize.getY()),
                 Math.max(oldSize.getZ(), newSize.getZ()));
 
-        // read before clearArea removes the old doors
+        // Read before clearArea removes the old doors
         DoorState carriedPrimary = primaryDoorState(level, tardisId);
 
         clearArea(level, size);
@@ -330,7 +334,7 @@ public final class TardisInteriorSystem {
         return door != null && door.getLevel() == interior ? door.getDoorState() : null;
     }
 
-    /* puts the new interior's primary doors in the state the old one's was in, snapped rather than animated */
+    /** Puts the primary doors of the new interior in the state the old ones were in, snapped and not animated. */
     private static void snapPrimaryDoors(ServerLevel interior, UUID tardisId, Vec3i size, DoorState state) {
         BlockPos stored = TardisManager.get(interior.getServer()).getInteriorOrigin(tardisId);
         BlockPos origin = stored != null ? stored : ORIGIN;

@@ -11,9 +11,10 @@ import org.spongepowered.asm.mixin.Unique;
 import qouteall.q_misc_util.dimension.DimIntIdMap;
 import qouteall.q_misc_util.dimension.DimensionIntId;
 
-/* flashback makes the tardis world partway through a replay, and immersive
-   portals never gave it a number, so the replay server crashed.
-   in a replay we give it a number when it's first asked for */
+/**
+   Flashback makes the TARDIS world partway through a replay and Immersive Portals never gave it a number so the replay server crashed.
+   In a replay we give it a number when it is first asked for.
+*/
 @Pseudo
 @Mixin(targets = "qouteall.imm_ptl.core.api.PortalAPI", remap = false)
 public abstract class ReplayDimIdMixin {
@@ -25,16 +26,14 @@ public abstract class ReplayDimIdMixin {
             if (!String.valueOf(e.getMessage()).startsWith("Missing Dimension")
                     || !server.getClass().getName().startsWith("com.moulberry.flashback.")) throw e;
         }
-        /* only the server list. telling the client would renumber the recorded
-           packets and put tardis blocks in the overworld */
+        // Only the server list, telling the client would renumber the recorded packets and put TARDIS blocks in the overworld
         DimIntIdMap map = DimensionIntId.getServerMap(server);
         if (!map.containsDimId(dim)) map.add(dim, gc$pickId(map, dim));
         return map.toIntegerId(dim);
     }
 
-    /* use the same number the recording used (the client already knows it from
-       the recording). a different number made recorded tardis chunks land in the
-       wrong world after jumping back, so the interior had the wrong blocks */
+    // Use the same number the recording used, the client already knows it from the recording
+    // A different number made recorded TARDIS chunks land in the wrong world after jumping back so the interior had the wrong blocks
     @Unique
     private static int gc$pickId(DimIntIdMap serverMap, ResourceKey<Level> dim) {
         DimIntIdMap clientMap = DimensionIntId.getClientMap();
@@ -42,7 +41,8 @@ public abstract class ReplayDimIdMixin {
             int id = clientMap.toIntegerId(dim);
             if (!serverMap.containsIntId(id)) return id;
         }
-        /* not known from the recording: pick a number the recording doesn't use either */
+        // Not known from the recording so pick a number the recording does not use either
+        // yes this looks pointless but without it the interior chunks end up in the wrong world
         int id = serverMap.getNextIntegerId();
         while (serverMap.containsIntId(id) || clientMap.containsIntId(id)) id++;
         return id;

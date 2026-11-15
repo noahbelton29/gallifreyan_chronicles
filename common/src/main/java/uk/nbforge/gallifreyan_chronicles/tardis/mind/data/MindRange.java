@@ -3,7 +3,7 @@ package uk.nbforge.gallifreyan_chronicles.tardis.mind.data;
 import net.minecraft.util.Mth;
 import net.minecraft.util.RandomSource;
 
-/* a min/max pair from json, picked from at random */
+/** A min and max pair from json, picked from at random. */
 public record MindRange(float min, float max) {
     public static MindRange of(float value) {
         return new MindRange(value, value);

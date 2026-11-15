@@ -3,6 +3,7 @@ package uk.nbforge.gallifreyan_chronicles.core;
 import uk.nbforge.gallifreyan_chronicles.Constants;
 import uk.nbforge.gallifreyan_chronicles.event_subscriber.GCCraftingHandler;
 import uk.nbforge.gallifreyan_chronicles.event_subscriber.TaraniumLavaDamageHandler;
+import uk.nbforge.gallifreyan_chronicles.event_subscriber.DoorRoundelHandler;
 import uk.nbforge.gallifreyan_chronicles.event_subscriber.TardisTrustHandler;
 import net.neoforged.neoforge.common.NeoForge;
 
@@ -11,6 +12,7 @@ public class GCEvents {
         NeoForge.EVENT_BUS.register(new TaraniumLavaDamageHandler());
         NeoForge.EVENT_BUS.register(new GCCraftingHandler());
         NeoForge.EVENT_BUS.register(new TardisTrustHandler());
+        NeoForge.EVENT_BUS.register(new DoorRoundelHandler());
 
         Constants.LOG.info("Registered GC Events (NeoForge)");
     }

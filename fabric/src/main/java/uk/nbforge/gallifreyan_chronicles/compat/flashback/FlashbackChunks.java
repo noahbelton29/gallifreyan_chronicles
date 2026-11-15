@@ -15,15 +15,16 @@ import net.minecraft.network.protocol.Packet;
 import net.minecraft.network.protocol.game.ClientGamePacketListener;
 import net.minecraft.world.entity.player.Player;
 
-/* immersive portals turns off vanilla chunk tracking and sending,
-   and flashback needs both to show the recorded world.
-   so with both installed we hand each replay chunk to the viewer ourselves.
-   this class never touches flashback classes, so it is safe without flashback. */
+/**
+   Immersive Portals turns off vanilla chunk tracking and sending, and Flashback needs both to show the recorded world.
+   With both installed we hand each replay chunk to the viewer ourselves.
+   This class never touches Flashback classes so it is safe without Flashback.
+*/
 public final class FlashbackChunks {
     private static final boolean ACTIVE = FabricLoader.getInstance().isModLoaded("flashback")
             && FabricLoader.getInstance().isModLoaded("seamlessportals");
-    /* replay features that threw once. each is logged once and the game carries on,
-       a broken replay feature should never kick you out of the replay */
+    // Replay features that threw once, each is logged once and the game carries on
+    // A broken replay feature should never kick you out of the replay
     private static final Set<String> FAILED = ConcurrentHashMap.newKeySet();
 
     private FlashbackChunks() {
@@ -33,7 +34,6 @@ public final class FlashbackChunks {
         if (FAILED.add(what)) Constants.LOG.warn("[replay] {} failed, skipping it from now on: {}", what, t.toString());
     }
 
-    /* true while a flashback replay is running */
     public static boolean inReplay() {
         try {
             return ACTIVE && FlashbackChunksImpl.inReplay();
@@ -43,13 +43,12 @@ public final class FlashbackChunks {
         }
     }
 
-    /* a chunk is about to be thrown away on the client. in a replay we keep it */
+    /** In a replay we keep a chunk the client is about to throw away. */
     public static boolean keepChunk(String what) {
         return inReplay();
     }
 
-    /* in a replay, a packet for a dimension the client doesn't know yet gets dropped
-       instead of kicking you out of the replay */
+    /** In a replay, a packet for a dimension the client does not know yet is dropped instead of kicking you out. */
     public static boolean dropUnknownDim(int dimId) {
         if (!inReplay()) return false;
         try {
@@ -60,8 +59,10 @@ public final class FlashbackChunks {
         }
     }
 
-    /* the replay server is about to unwrap a packet meant for another world.
-       true = we passed it on to the camera instead. see RedirectedPacketForwardMixin */
+    /**
+       The replay server is about to unwrap a packet meant for another world.
+       True means we passed it to the camera instead, see RedirectedPacketForwardMixin.
+    */
     public static boolean passOnFromReplayServer(Object listener, int dimId, Packet<?> packet) {
         if (!ACTIVE || !listener.getClass().getName().startsWith("com.moulberry.flashback.")) return false;
         try {
@@ -72,13 +73,13 @@ public final class FlashbackChunks {
         }
     }
 
-    /* flashback is writing a snapshot while recording. see SnapshotOutsideWorldMixin */
+    /** Flashback is writing a snapshot while recording, see SnapshotOutsideWorldMixin. */
     public static void writeSnapshotFromOutside(Runnable original) {
         if (!ACTIVE || FAILED.contains("snapshot from outside")) {
             original.run();
             return;
         }
-        /* if our part fails before flashback's snapshot ran, still let it run once */
+        // If our part fails before the snapshot of Flashback ran, still let it run once
         boolean[] started = {false};
         try {
             FlashbackChunksImpl.writeSnapshotFromOutside(() -> {
@@ -96,7 +97,7 @@ public final class FlashbackChunks {
         }
     }
 
-    /* immersive portals is moving the camera through a door (its argument is the portal) */
+    /** Immersive Portals is moving the camera through a door, the argument is the portal. */
     public static void onCameraTeleport(Object portal) {
         if (!inReplay()) return;
         try {
@@ -106,7 +107,6 @@ public final class FlashbackChunks {
         }
     }
 
-    /* true while flashback keyframes are moving the camera */
     public static boolean keyframesMovingCamera() {
         if (!inReplay()) return false;
         try {
@@ -117,7 +117,7 @@ public final class FlashbackChunks {
         }
     }
 
-    /* a keyframe camera position is about to be applied. returns {x, y, z, yaw, pitch} */
+    /** A keyframe camera position is about to be applied, returns x, y, z, yaw and pitch. */
     public static double[] keyframeCamera(double x, double y, double z, float yaw, float pitch) {
         if (!inReplay() || FAILED.contains("keyframes through doors")) return new double[]{x, y, z, yaw, pitch};
         try {
@@ -128,7 +128,7 @@ public final class FlashbackChunks {
         }
     }
 
-    /* a camera keyframe was just made from the camera, yawPitch = {yaw, pitch} */
+    /** A camera keyframe was just made from the camera, yawPitch holds yaw and pitch. */
     public static void onKeyframeCreated(Vector3d position, float[] yawPitch) {
         if (!inReplay()) return;
         try {
@@ -138,7 +138,7 @@ public final class FlashbackChunks {
         }
     }
 
-    /* a packet is about to go to the replay server. true = don't send it */
+    /** A packet is about to go to the replay server, true means do not send it. */
     public static boolean dropOutgoing(Packet<?> packet) {
         if (!inReplay()) return false;
         try {
@@ -149,7 +149,7 @@ public final class FlashbackChunks {
         }
     }
 
-    /* a packet from the replay server is about to be handled. true = we handled it */
+    /** A packet from the replay server is about to be handled, true means we handled it. */
     public static boolean handleIncoming(Packet<?> packet, Runnable original) {
         if (!inReplay() || FAILED.contains("camera through doors (receiving)")) return false;
         try {
@@ -173,8 +173,7 @@ public final class FlashbackChunks {
         return inReplay();
     }
 
-    /* a portal with no shape is about to come into the replay world. it crashes
-       immersive portals in lots of places, so it isn't added at all */
+    /** A portal with no shape is about to enter the replay world, it crashes Immersive Portals in lots of places so it is not added. */
     public static boolean isShapelessPortalInReplay(Entity entity) {
         if (!inReplay()) return false;
         try {
@@ -185,8 +184,7 @@ public final class FlashbackChunks {
         }
     }
 
-    /* true when a player should NOT be removed: we are in a replay and
-       the removal came through immersive portals' other-dimension packets */
+    /** True when a player should not be removed, we are in a replay and the removal came through the other dimension packets of Immersive Portals. */
     public static boolean keepPlayer(ClientLevel level, int id) {
         if (!inReplay()) return false;
         try {
@@ -197,7 +195,7 @@ public final class FlashbackChunks {
         }
     }
 
-    /* recorded movement is about to be applied. see FlashbackPuppet */
+    /** Recorded movement is about to be applied, see FlashbackPuppet. */
     public static void scanMoves(Object replayServer, RegistryFriendlyByteBuf buf) {
         if (!ACTIVE) return;
         try {
@@ -207,7 +205,7 @@ public final class FlashbackChunks {
         }
     }
 
-    /* flashback is writing a snapshot, add the portals. see FlashbackPortalSnapshot */
+    /** Flashback is writing a snapshot so add the portals, see FlashbackPortalSnapshot. */
     public static void writePortalSnapshot(Consumer<Packet<? super ClientGamePacketListener>> out) {
         if (!ACTIVE) return;
         try {
@@ -217,7 +215,7 @@ public final class FlashbackChunks {
         }
     }
 
-    /* the recorded player we hid while their copy is inside a tardis */
+    /** The recorded player we hid while their copy is inside a TARDIS. */
     public static boolean isHiddenRecordedPlayer(Entity entity) {
         if (!ACTIVE || !entity.level().isClientSide()) return false;
         try {
@@ -228,8 +226,7 @@ public final class FlashbackChunks {
         }
     }
 
-    /* immersive portals' dimension list just arrived.
-       true when the packet was handled merged, so the original should be skipped */
+    /** The dimension list of Immersive Portals just arrived, true means the packet was merged so the original is skipped. */
     public static boolean mergeDimSync(Object packet) {
         if (!ACTIVE) return false;
         try {
@@ -249,7 +246,7 @@ public final class FlashbackChunks {
         }
     }
 
-    /* jumping on the timeline: drop the tardis copy of the player (client thread) */
+    /** Jumping on the timeline drops the TARDIS copy of the player, client thread. */
     public static void clearPuppet() {
         if (!ACTIVE) return;
         try {

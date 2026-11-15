@@ -6,8 +6,10 @@ import uk.nbforge.gallifreyan_chronicles.tardis.mind.action.MindAction;
 import uk.nbforge.gallifreyan_chronicles.tardis.mind.action.MindContext;
 import net.minecraft.ChatFormatting;
 
-/* {"type": "message", "key": "mallet_seen_flinch", "colour": "gray"}
-   key is a message.gallifreyan_chronicles.<key> lang line, shown above the hotbar */
+/**
+   The key is a message lang line of the mod, shown above the hotbar.
+   The json fields are key and colour.
+*/
 public record MessageAction(String key, ChatFormatting colour) implements MindAction {
     public static final String TYPE = Constants.MOD_ID + ":message";
 

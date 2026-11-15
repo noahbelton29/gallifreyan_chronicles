@@ -12,7 +12,7 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-/* draws fading tardises on top once the world, water and clouds are all done */
+/** Draws fading TARDISes on top once the world, water and clouds are all done. */
 @Mixin(LevelRenderer.class)
 public abstract class LevelRendererFadeBoxMixin {
     @Shadow
@@ -24,15 +24,15 @@ public abstract class LevelRendererFadeBoxMixin {
         FadeBoxRenderer.clear();
     }
 
-    /* with a shader pack, this is after the pack has finished the frame */
+    // With a shader pack this is after the pack has finished the frame
     @Inject(method = "blitEntityOutline", at = @At("HEAD"))
     private void gc$layCanvasAfterShaders(CallbackInfo ci) {
-        /* sky first so the box goes on top of it */
+        // Sky first so the box goes on top of it
         CustomSkyRenderer.afterShaders(this.gameRenderer.mainRenderTarget());
         FadeBoxRenderer.afterShaders(this.gameRenderer.mainRenderTarget());
     }
 
-    /* runs right after the main and see-through-water passes have finished */
+    // Runs right after the main and see through water passes have finished
     @Inject(method = "executeOutline", at = @At("HEAD"))
     private void gc$drawFadingBoxes(FeatureRenderDispatcher.PreparedFrame featureFrame, CallbackInfo ci) {
         CustomSkyRenderer.drawCanvas(this.gameRenderer.mainRenderTarget());

@@ -38,7 +38,6 @@ public class GallifreyanChroniclesFabricClient implements ClientModInitializer {
 //                GCBlocks.TALL_GALLIFREYAN_GRASS
 //        );
 
-
         BlockTransformerHelper.registerStripping(GCBlocks.CADONWOOD_LOG, GCBlocks.STRIPPED_CADONWOOD_LOG);
         BlockEntityRenderers.register(GCBlockEntities.TARDIS_EXTERIOR_BLOCK_ENTITY_TYPE, TardisExteriorBlockRenderer::new);
         BlockEntityRenderers.register(GCBlockEntities.TARDIS_CONSOLE_BLOCK_ENTITY_TYPE, TardisConsoleBlockRenderer::new);
@@ -57,7 +56,7 @@ public class GallifreyanChroniclesFabricClient implements ClientModInitializer {
             FlashbackOptionsButton.register();
         }
 
-        // Hide the selection outline on interior doors (returning false cancels the outline)
+        // Hide the selection outline on interior doors, returning false cancels the outline
         LevelRenderEvents.BEFORE_BLOCK_OUTLINE.register((_, hit) ->
                 !OutlineHider.shouldHide(hit.pos()));
 

@@ -8,7 +8,7 @@ import net.minecraft.resources.Identifier;
 import net.minecraft.resources.ResourceKey;
 import org.jspecify.annotations.NonNull;
 
-/* the tardis is afraid of you: warps the console hum and makes the lights stutter for a while */
+/** The TARDIS is afraid of you, it warps the console hum and makes the lights stutter for a while. */
 public record TardisFrightPayload(float severity, int ticks, Identifier dimension) implements CustomPacketPayload {
     public static final Type<TardisFrightPayload> TYPE =
             new Type<>(GCUtil.modIdentifier("tardis_fright"));

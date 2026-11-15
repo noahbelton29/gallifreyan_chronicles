@@ -34,10 +34,12 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 import uk.nbforge.gallifreyan_chronicles.addon.ModAddonLoader;
 
-/* Runs the addon system.
-   Data addons: zip or folder in gc_addons, no code.
-   Java addons: mod jars in mods, the loader loads them.
-   Turning a java addon on or off needs a restart. */
+/**
+   Runs the addon system.
+   Data addons are a zip or folder in gc_addons and have no code.
+   Java addons are mod jars in the mods folder and the loader loads them.
+   Turning a java addon on or off needs a restart.
+*/
 public final class AddonManager {
     public static final String FOLDER_NAME = "gc_addons";
     public static final String DESCRIPTOR = "addon.json";
@@ -49,9 +51,9 @@ public final class AddonManager {
 
     private static volatile List<AddonInfo> addons = List.of();
     private static volatile Map<String, AddonProblem> problems = Map.of();
-    /* data addons the player turned off */
+    // Data addons the player turned off
     private static final Set<String> DISABLED = Collections.synchronizedSet(new LinkedHashSet<>());
-    /* java addons the player toggled, and what they picked */
+    // Java addons the player toggled and what they picked
     private static final Map<String, Boolean> MOD_STATE = Collections.synchronizedMap(new LinkedHashMap<>());
     private static boolean scanned;
     private static boolean initialised;
@@ -71,7 +73,7 @@ public final class AddonManager {
         return Services.PLATFORM.getConfigDir().resolve(STATE_FILE);
     }
 
-    /* load saved state and scan the folders, once */
+    /** Loads saved state and scans the folders, only once. */
     private static synchronized void ensureScanned() {
         if (scanned) return;
         scanned = true;
@@ -79,7 +81,7 @@ public final class AddonManager {
         scan();
     }
 
-    /* start java addons, after our own stuff is registered */
+    /** Starts java addons after our own things are registered. */
     public static synchronized void init() {
         if (initialised) return;
         initialised = true;
@@ -95,7 +97,6 @@ public final class AddonManager {
         return addons;
     }
 
-    /* our mod's version */
     public static String modVersion() {
         return Services.PLATFORM.getModVersion(Constants.MOD_ID);
     }
@@ -108,7 +109,7 @@ public final class AddonManager {
         return null;
     }
 
-    /* is it switched on? it can still have a problem */
+    /** It can still have a problem even when it is on. */
     public static boolean isEnabled(AddonInfo info) {
         ensureScanned();
         if (info.hasJava()) {
@@ -118,18 +119,15 @@ public final class AddonManager {
         return !DISABLED.contains(info.id());
     }
 
-    /* what's wrong, or null */
     public static @Nullable AddonProblem problem(AddonInfo info) {
         ensureScanned();
         return problems.get(info.id());
     }
 
-    /* on and nothing wrong */
     public static boolean isActive(AddonInfo info) {
         return isEnabled(info) && problem(info) == null;
     }
 
-    /* data addons to offer as packs */
     public static List<AddonInfo> enabledData() {
         ensureScanned();
         List<AddonInfo> result = new ArrayList<>();
@@ -139,7 +137,6 @@ public final class AddonManager {
         return result;
     }
 
-    /* a java addon was toggled, needs a restart */
     public static boolean restartRequired() {
         ensureScanned();
         for (AddonInfo info : addons) {
@@ -148,7 +145,6 @@ public final class AddonManager {
         return false;
     }
 
-    /* did the game start it? */
     public static boolean isRunning(String id) {
         return ModAddonLoader.isRunning(id);
     }
@@ -205,7 +201,6 @@ public final class AddonManager {
         }
     }
 
-    /* work out the problems for every addon */
     private static synchronized void refreshProblems() {
         Map<String, AddonProblem> found = new HashMap<>();
         for (AddonInfo info : addons) {
@@ -219,7 +214,6 @@ public final class AddonManager {
         problems = Map.copyOf(found);
     }
 
-    /* why it can't run */
     static @Nullable AddonProblem blockingProblem(AddonInfo info) {
         if (info.isInvalid()) return new AddonProblem(AddonProblem.Kind.INVALID, info.error());
         if (info.apiVersion() > AddonApi.VERSION) {
@@ -263,7 +257,7 @@ public final class AddonManager {
         try {
             return range.matches(Version.parse(version));
         } catch (IllegalArgumentException e) {
-            /* no numbers in the version, only * passes */
+            // Only a star has no numbers in the version range
             return range.toString().equals("*");
         }
     }
@@ -280,6 +274,10 @@ public final class AddonManager {
         Constants.LOG.info("Found {} addon(s)", found.size());
     }
 
+    /**
+       Goes through an addon folder and adds every addon it finds to found, skipping hidden files, other file types and ids that are already used.
+       In the mods folder only jars count and unreadable ones are ignored without a warning.
+    */
     private static void scanFolder(Path folder, boolean modsFolder, List<AddonInfo> found, Set<String> ids) {
         try {
             Files.createDirectories(folder);
@@ -304,7 +302,6 @@ public final class AddonManager {
             boolean folderAddon = Files.isDirectory(entry);
             boolean modJar = lower.endsWith(".jar") || lower.endsWith(".jar" + DISABLED_SUFFIX);
             if (modsFolder) {
-                /* skip jars that aren't addons */
                 if (!modJar) continue;
             } else if (!folderAddon && !lower.endsWith(".zip") && !lower.endsWith(".jar")) {
                 continue;
@@ -314,7 +311,7 @@ public final class AddonManager {
             try {
                 info = describe(entry, modsFolder);
             } catch (IOException | RuntimeException e) {
-                if (modsFolder) continue; /* not ours, skip it */
+                if (modsFolder) continue;
                 Constants.LOG.warn("Addon {} could not be read: {}", fileName, e.getMessage());
                 info = broken(entry, String.valueOf(e.getMessage()));
             }
@@ -344,7 +341,6 @@ public final class AddonManager {
                 """, StandardCharsets.UTF_8);
     }
 
-    /* couldn't read it, show the error */
     private static AddonInfo broken(Path path, String error) {
         String fileName = path.getFileName().toString();
         String base = fileName.contains(".") && !Files.isDirectory(path) ? fileName.substring(0, fileName.lastIndexOf('.')) : fileName;
@@ -360,7 +356,7 @@ public final class AddonManager {
                 ? fileName.substring(0, fileName.lastIndexOf('.')) : fileName;
 
         if (descriptor == null && !hasData) {
-            /* just another mod, or an empty zip */
+            // Just another mod or an empty zip
             if (!inModsFolder && (fileName.toLowerCase().endsWith(".zip") || Files.isDirectory(path))) {
                 return broken(path, "no addon.json or pack.mcmeta found");
             }
@@ -380,7 +376,7 @@ public final class AddonManager {
         if (json.has("java") && json.get("java").isJsonObject() && json.getAsJsonObject("java").has("main")) {
             javaMain = json.getAsJsonObject("java").get("main").getAsString();
         }
-        if (inModsFolder && javaMain == null) return null; /* not our mod */
+        if (inModsFolder && javaMain == null) return null;
         if (!inModsFolder && javaMain != null) {
             throw new IOException("this is a Java addon, which belongs in the mods folder, not gc_addons");
         }
@@ -426,7 +422,7 @@ public final class AddonManager {
             icon = null;
         }
 
-        /* java addon data is loaded by the loader */
+        // Java addon data is loaded by the loader
         return new AddonInfo(id, name, version, description, List.copyOf(authors), website, path,
                 hasData && javaMain == null, javaMain, icon, api, Map.copyOf(requires), null, null);
     }
@@ -435,7 +431,6 @@ public final class AddonManager {
         return json.has(key) && json.get(key).isJsonPrimitive() ? json.get(key).getAsString() : fallback;
     }
 
-    /* read one file from a zip, jar or folder */
     private static byte @Nullable [] read(Path container, String entry) throws IOException {
         if (Files.isDirectory(container)) {
             Path file = container.resolve(entry).normalize();
@@ -451,7 +446,7 @@ public final class AddonManager {
         }
     }
 
-    /* quick fingerprint of both folders */
+    /** Quick fingerprint of both folders. */
     public static long folderSignature() {
         long signature = 17;
         for (Path folder : List.of(folder(), modsFolder())) {
@@ -462,13 +457,13 @@ public final class AddonManager {
                     signature += name.hashCode() * 31L + Files.size(path) * 7L + Files.getLastModifiedTime(path).toMillis();
                 }
             } catch (IOException | RuntimeException ignored) {
-                /* missing folder, so a different fingerprint */
+                // A missing folder gives a different fingerprint
             }
         }
         return signature;
     }
 
-    /* copy dropped files in: java jars to mods, the rest to gc_addons */
+    /** Jars go to mods and everything else goes to gc_addons. */
     public static synchronized List<String> install(List<Path> dropped) {
         List<String> added = new ArrayList<>();
         for (Path source : dropped) {
@@ -486,7 +481,7 @@ public final class AddonManager {
                         javaAddon = json.has("java");
                     }
                 } catch (IOException | RuntimeException ignored) {
-                    /* can't read it, so it goes to gc_addons */
+                    // If it cannot be read it goes to gc_addons
                 }
             }
 
@@ -518,9 +513,10 @@ public final class AddonManager {
         }
     }
 
-    /* open jars can't be renamed on Windows,
-       so a helper renames them after the game closes.
-       Might not work, rename by hand then. */
+    /**
+       Open jars cannot be renamed on Windows, so a helper renames them after the game closes.
+       It might not work, then rename them by hand.
+    */
     private static void applyModFileStates() {
         List<String[]> moves = new ArrayList<>();
         for (AddonInfo info : addons) {
@@ -555,7 +551,6 @@ public final class AddonManager {
         }
     }
 
-    /* one summary in the log */
     private static void logReport() {
         for (AddonInfo info : addons) {
             AddonProblem problem = problem(info);

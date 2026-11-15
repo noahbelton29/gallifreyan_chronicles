@@ -7,10 +7,10 @@ import uk.nbforge.gallifreyan_chronicles.datagen.util.GCJsonDataProvider;
 import uk.nbforge.gallifreyan_chronicles.datagen.tardis.builder.GCTraitBuilder;
 
 /**
- * Generates data/gallifreyan_chronicles/tardis_trait/*.json.
- * To add one, copy a block below and change what you want. Multipliers ("times") default to 1 and shifts to 0,
- * so only list what the trait changes. Reactions to events come from {@link GCMind}.
- */
+   Generates the tardis_trait json files.
+   To add one copy a block below and change what you want, times values default to 1 and shifts to 0 so only list what the trait changes.
+   Reactions to events come from GCMind.
+*/
 public class GCTardisTraitProvider extends GCJsonDataProvider {
     public GCTardisTraitProvider(PackOutput output) {
         super(output, "tardis_trait", "TARDIS Trait");

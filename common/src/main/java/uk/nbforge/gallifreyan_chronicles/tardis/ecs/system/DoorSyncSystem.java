@@ -65,7 +65,7 @@ public final class DoorSyncSystem {
         applyControl(server, tardisId, GCTardisControls.INTERIOR_DOOR_CONTROL, !state.isClosed(), false);
     }
 
-    /* silently keeps the console's interior door switch matching the primary door's real state */
+    /** Quietly keeps the interior door switch of the console matching the real state of the primary door. */
     public static void reconcileInteriorDoorControl(MinecraftServer server, UUID tardisId, DoorState state) {
         applyControl(server, tardisId, GCTardisControls.INTERIOR_DOOR_CONTROL, !state.isClosed(), true);
     }

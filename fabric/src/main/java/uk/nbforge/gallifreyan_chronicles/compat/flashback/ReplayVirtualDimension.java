@@ -27,19 +27,18 @@ import qouteall.imm_ptl.core.ClientWorldLoader;
 import qouteall.imm_ptl.core.network.ImmPtlNetworking;
 import qouteall.imm_ptl.core.teleportation.ClientTeleportationManager;
 
-/* in a replay the camera really goes through doors now: immersive portals moves it
-   into the tardis world on the client like in the real game. the replay server only
-   has the overworld and can't follow, so only the client moves:
-   - the "i went through a portal" message and the camera's movement aren't sent while
-     it's in another world, so the server keeps it parked outside and doesn't pull it back
-   - packets from the replay server are for its world (the overworld), so while the
-     camera is somewhere else they're applied to that world, not the one we're in
-   flying back out through the door puts it back in the overworld */
+/**
+   In a replay the camera really goes through doors, Immersive Portals moves it into the TARDIS world on the client like in the real game.
+   The replay server only has the overworld and cannot follow, so only the client moves.
+   The message that I went through a portal and the movement of the camera are not sent while it is in another world, so the server keeps it parked outside and does not pull it back.
+   Packets from the replay server are for its world, the overworld, so while the camera is somewhere else they are applied to that world and not the one we are in.
+   Flying back out through the door puts it back in the overworld.
+*/
 final class ReplayVirtualDimension {
     private ReplayVirtualDimension() {
     }
 
-    /* the world the replay server has the camera in */
+    /** The world the replay server has the camera in. */
     static @Nullable ResourceKey<Level> serverDim() {
         ReplayServer server = Flashback.getReplayServer();
         if (server == null) return null;
@@ -47,7 +46,7 @@ final class ReplayVirtualDimension {
         return null;
     }
 
-    /* true while the camera is in a different world than the replay server thinks */
+    /** True while the camera is in a different world than the replay server thinks. */
     static boolean isAway() {
         Minecraft mc = Minecraft.getInstance();
         ResourceKey<Level> server = serverDim();
@@ -60,14 +59,15 @@ final class ReplayVirtualDimension {
         return packet instanceof ServerboundMovePlayerPacket && isAway();
     }
 
-    /* where the camera was before flashback reloaded the world (timeline jump) */
+    // Where the camera was before Flashback reloaded the world, a timeline jump
     private static @Nullable ResourceKey<Level> pendingDim;
     private static @Nullable Vec3 pendingEye;
     private static int pendingTicks;
 
-    /* going back on the timeline reloads the world, and the camera lands in whatever
-       world the replay has. put it back in the world it was in before, so only doors
-       ever change which world the camera is in */
+    /**
+       Going back on the timeline reloads the world and the camera lands in whatever world the replay has.
+       Put it back in the world it was in before so only doors ever change which world the camera is in.
+    */
     static void register() {
         ClientTickEvents.END_CLIENT_TICK.register(client -> {
             if (Flashback.getReplayServer() == null) {
@@ -83,7 +83,7 @@ final class ReplayVirtualDimension {
                 ClientTeleportationManager.forceTeleportPlayer(pendingDim, pendingEye);
                 pendingDim = null;
             } else if (pendingTicks < -100) {
-                /* that world never came back, give up */
+                // That world never came back so give up
                 pendingDim = null;
             }
         });
@@ -97,7 +97,7 @@ final class ReplayVirtualDimension {
         pendingTicks = 20;
     }
 
-    /* true when we handled it */
+    /** True when we handled it. */
     static boolean handleIncoming(Packet<?> packet, Runnable original) {
         if (packet instanceof ClientboundCustomPayloadPacket) return false;
         if (packet instanceof ClientboundLoginPacket || packet instanceof ClientboundRespawnPacket) {
@@ -112,7 +112,7 @@ final class ReplayVirtualDimension {
         }
         ResourceKey<Level> server = serverDim();
         if (packet instanceof ClientboundPlayerPositionPacket) {
-            /* flashback moving the camera: put it back in its world first */
+            /** Flashback moving the camera, put it back in its world first. */
             comeBack(server);
             return false;
         }
@@ -133,14 +133,14 @@ final class ReplayVirtualDimension {
         ClientTeleportationManager.forceTeleportPlayer(server, pos);
     }
 
-    /* our sounds: the world the camera is in */
+    /** For our sounds, the world the camera is in. */
     static ClientLevel heardLevel() {
         Minecraft mc = Minecraft.getInstance();
         if (mc.player != null && mc.player.level() instanceof ClientLevel level) return level;
         return mc.level;
     }
 
-    /* where flashback hears from: its "audio camera" when it's set, else the camera */
+    /** Where Flashback hears from, its audio camera if set and otherwise the camera. */
     static Vec3 heardPos() {
         Minecraft mc = Minecraft.getInstance();
         EditorState state = EditorStateManager.getCurrent();

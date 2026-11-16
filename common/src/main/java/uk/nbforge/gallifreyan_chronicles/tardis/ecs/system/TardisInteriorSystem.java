@@ -58,6 +58,9 @@ public final class TardisInteriorSystem {
     private static final int CLEAR_FLAGS = Block.UPDATE_CLIENTS | Block.UPDATE_KNOWN_SHAPE | Block.UPDATE_SUPPRESS_DROPS;
 
     private static final Map<Identifier, BlockPos> DOOR_OFFSET_CACHE = new ConcurrentHashMap<>();
+    // Same idea as DOOR_OFFSET_CACHE: a template always places its console at the same offset, so once
+    // we have found it for a given template we never need to scan the whole volume for it again
+    private static final Map<Identifier, BlockPos> CONSOLE_OFFSET_CACHE = new ConcurrentHashMap<>();
 
     private record ConsoleCarryover(TardisConsole console, @Nullable String variant, CompoundTag controlStates) {
     }
@@ -210,7 +213,7 @@ public final class TardisInteriorSystem {
             if (state.is(GCBlocks.TARDIS_INTERIOR_DOOR) && InteriorDoorBlock.isMaster(state)) {
                 return candidate.immutable();
             }
-            // The door moved or this interior predates caching that offset, fall through and re-scan once.
+            // The door moved or this interior predates caching that offset, fall through and re-scan once
         }
 
         BlockPos max = origin.offset(size.getX() - 1, size.getY() - 1, size.getZ() - 1);
@@ -241,9 +244,9 @@ public final class TardisInteriorSystem {
         loadInteriorChunks(interior, origin, size);
 
         template.get().placeInWorld(interior, origin, origin, new StructurePlaceSettings(),
-                interior.getRandom(), 3);
+                interior.getRandom(), Block.UPDATE_CLIENTS);
 
-        BlockPos consolePos = findConsole(interior, origin, size);
+        BlockPos consolePos = findConsole(interior, origin, size, templateId);
         if (consolePos == null) {
             consolePos = origin.offset(size.getX() / 2, 1, size.getZ() / 2);
             interior.setBlock(consolePos, GCBlocks.TARDIS_CONSOLE.defaultBlockState(), 3);
@@ -394,11 +397,22 @@ public final class TardisInteriorSystem {
         }
     }
 
-    private static @Nullable BlockPos findConsole(ServerLevel level, BlockPos origin, Vec3i size) {
+    private static @Nullable BlockPos findConsole(ServerLevel level, BlockPos origin, Vec3i size, Identifier templateId) {
+        BlockPos cachedOffset = CONSOLE_OFFSET_CACHE.get(templateId);
+        if (cachedOffset != null) {
+            BlockPos candidate = origin.offset(cachedOffset.getX(), cachedOffset.getY(), cachedOffset.getZ());
+            if (level.getBlockEntity(candidate) instanceof TardisConsoleBlockEntity) {
+                return candidate.immutable();
+            }
+            // Cached offset did not pan out for this build, fall through and scan once
+        }
+
         BlockPos max = origin.offset(size.getX() - 1, size.getY() - 1, size.getZ() - 1);
         for (BlockPos p : BlockPos.betweenClosed(ORIGIN, max)) {
             if (level.getBlockEntity(p) instanceof TardisConsoleBlockEntity) {
-                return p.immutable();
+                BlockPos found = p.immutable();
+                CONSOLE_OFFSET_CACHE.put(templateId, found.subtract(origin));
+                return found;
             }
         }
         return null;

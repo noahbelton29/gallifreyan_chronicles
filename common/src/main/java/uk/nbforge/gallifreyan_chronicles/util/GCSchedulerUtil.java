@@ -7,11 +7,13 @@ import java.util.Iterator;
 import java.util.List;
 
 public final class GCSchedulerUtil {
-    private record Task(MinecraftServer server, int[] ticksLeft, Runnable action) {}
+    private record Task(MinecraftServer server, int[] ticksLeft, Runnable action) {
+    }
 
     private static final List<Task> TASKS = new ArrayList<>();
 
-    private GCSchedulerUtil() {}
+    private GCSchedulerUtil() {
+    }
 
     public static void runLater(MinecraftServer server, int delayTicks, Runnable action) {
         TASKS.add(new Task(server, new int[]{Math.max(0, delayTicks)}, action));
@@ -20,18 +22,22 @@ public final class GCSchedulerUtil {
     public static void tick(MinecraftServer server) {
         if (TASKS.isEmpty()) return;
 
-        List<Runnable> due = new ArrayList<>();
+        List<Runnable> due = null;
         Iterator<Task> it = TASKS.iterator();
         while (it.hasNext()) {
             Task task = it.next();
             if (task.server() != server) continue;
             if (--task.ticksLeft()[0] <= 0) {
+                if (due == null) due = new ArrayList<>();
                 due.add(task.action());
                 it.remove();
             }
         }
 
-        due.forEach(Runnable::run);
+        if (due == null) return;
+        for (Runnable action : due) {
+            action.run();
+        }
     }
 
     public static void clear() {

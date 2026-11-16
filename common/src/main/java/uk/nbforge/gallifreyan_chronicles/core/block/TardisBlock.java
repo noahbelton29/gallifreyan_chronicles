@@ -78,6 +78,11 @@ public class TardisBlock extends BaseEntityBlock {
         stack.shrink(1);
         blockEntity.setYaw(snapYawTo45(placer.getYRot() + 180));
 
+        // Applied on both sides right away, so the client's own placement prediction shows the chosen
+        // exterior immediately instead of the block entity's default one, which would otherwise flick
+        // to the right exterior only once the server's real sync packet arrives a moment later
+        applyExteriorFromInterior(blockEntity.asEntity(), chosenInterior);
+
         if (!level.isClientSide()) {
             if (!(level instanceof ServerLevel serverLevel)) return;
             if (!(placer instanceof Player player)) return;
@@ -93,7 +98,7 @@ public class TardisBlock extends BaseEntityBlock {
             TardisApi.get(serverLevel.getServer(), record.tardisId()).ifPresent(tardis -> tardis.giveKeyTo(player));
 
             // Building the interior is heavy enough to stall the server for a noticeable moment, so it runs a tick later instead of inline here, keeping
-            // the block placement itself fast for the player and for any other code reacting to this event.
+            // the block placement itself fast for the player and for any other code reacting to this event
             MinecraftServer server = serverLevel.getServer();
             UUID tardisId = record.tardisId();
             GCSchedulerUtil.runLater(server, 1, () -> TardisPortalBridge.onExteriorPlaced(server, tardisId));
@@ -112,7 +117,14 @@ public class TardisBlock extends BaseEntityBlock {
         TardisInterior interior = TardisInteriorRegistry.get(chosen);
         TardisManager.get(level.getServer()).setInteriorId(record.tardisId(), interior.id());
 
-        String exteriorId = interior.resolveExteriorId();
+        applyExteriorFromInterior(entity, chosen);
+    }
+
+    /** Sets the entity's exterior to whichever one the chosen interior resolves to, works on either side since it only touches the local ECS component. */
+    private static void applyExteriorFromInterior(Entity entity, @Nullable String chosenInterior) {
+        if (chosenInterior == null || !TardisInteriorRegistry.contains(chosenInterior)) return;
+
+        String exteriorId = TardisInteriorRegistry.get(chosenInterior).resolveExteriorId();
         if (TardisExteriorRegistry.contains(exteriorId)) {
             ExteriorSystem.setExterior(entity, TardisExteriorRegistry.get(exteriorId));
         }

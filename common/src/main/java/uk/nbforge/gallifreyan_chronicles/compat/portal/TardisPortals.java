@@ -33,7 +33,6 @@ import qouteall.q_misc_util.dimension.DimensionIntId;
 import qouteall.q_misc_util.my_util.DQuaternion;
 
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -399,12 +398,21 @@ public final class TardisPortals {
         }
     }
 
+    // Runs every tick for every hot TARDIS, so this is a manual loop rather than a stream pipeline,
+    // no Stream/lambda/boxed-Long allocations per call, just a plain scan over what is usually one door
     private static @Nullable InteriorDoorBlockEntity findDoor(UUID tardisId) {
-        return DoorSyncSystem.doorsOf(tardisId).stream()
-                .filter(door -> door.isLinked() && door.getBlockState().is(GCBlocks.TARDIS_INTERIOR_DOOR))
-                .filter(door -> door.getLevel() instanceof ServerLevel)
-                .min(Comparator.comparingLong(door -> door.getBlockPos().asLong()))
-                .orElse(null);
+        InteriorDoorBlockEntity best = null;
+        long bestPos = 0L;
+        for (InteriorDoorBlockEntity door : DoorSyncSystem.doorsOf(tardisId)) {
+            if (!door.isLinked() || !door.getBlockState().is(GCBlocks.TARDIS_INTERIOR_DOOR)) continue;
+            if (!(door.getLevel() instanceof ServerLevel)) continue;
+            long pos = door.getBlockPos().asLong();
+            if (best == null || pos < bestPos) {
+                best = door;
+                bestPos = pos;
+            }
+        }
+        return best;
     }
 
     private static @Nullable Placement placementOf(MinecraftServer server, @Nullable TardisExteriorBlockEntity exterior,

@@ -40,7 +40,7 @@ public final class TardisDeletion {
     private static final int REMOVE_FLAGS = Block.UPDATE_ALL | Block.UPDATE_SUPPRESS_DROPS;
 
     // Deleting a dimension's save folder is pure disk I/O with nothing server-state related in it,
-    // so it runs off the main thread, otherwise the whole server freezes until every file is gone.
+    // so it runs off the main thread, otherwise the whole server freezes until every file is gone
     private static final ExecutorService DELETE_EXECUTOR = Executors.newSingleThreadExecutor(runnable -> {
         Thread thread = new Thread(runnable, "GC-TardisDeletion");
         thread.setDaemon(true);
@@ -106,10 +106,6 @@ public final class TardisDeletion {
             MinecraftServerAccessor accessor = (MinecraftServerAccessor) server;
             accessor.gallifreyan_chronicles$getLevels().remove(key);
 
-            // Both of these are heavy, pure I/O, and only safe once the level is fully detached from the
-            // server (no players, no longer in the levels map), so they run together, off the main thread,
-            // in order: closing (which would otherwise save every loaded chunk first) then the delete,
-            // never the other way, and never on separate threads racing each other over the same files.
             DELETE_EXECUTOR.execute(() -> {
                 try {
                     interior.close();

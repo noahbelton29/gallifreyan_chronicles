@@ -41,13 +41,15 @@ public class ControlIconProvider implements IEntityComponentProvider {
                 && accessor.getLevel().getBlockEntity(control.getConsolePos()) instanceof TardisConsoleBlockEntity console
                 && console.isPowerKnown()) {
             Component text = TardisControlRegistry.get(control.getControlId())
-                    .describeState(console.displayedControlState(control.getControlId()));
+                    .describeState(console.getControlState(control.getControlId()));
             if (text != null) tooltip.add(text);
             appendDestination(tooltip, control.getControlId(), accessor.getServerData());
         }
     }
 
-    /** The destination controls, what they would set or show, read from the server data. */
+    /**
+     * The destination controls, what they would set or show, read from the server data.
+     */
     private static void appendDestination(ITooltip tooltip, String id, CompoundTag data) {
         switch (id) {
             case GCTardisControls.X_INCREMENT_CONTROL -> coord(tooltip, "target_x", data);

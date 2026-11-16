@@ -43,6 +43,13 @@
     ],
     "subtitle": "sound.gallifreyan_chronicles.hartnell_door"
   },
+  "landing_notification": {
+    "replace": true,
+    "sounds": [
+      "gallifreyan_chronicles:block_entity/tardis/landing_notification"
+    ],
+    "subtitle": "sound.gallifreyan_chronicles.landing_notification"
+  },
   "lever": {
     "replace": true,
     "sounds": [
@@ -88,6 +95,13 @@
       }
     ],
     "subtitle": "sound.gallifreyan_chronicles.spark_explosion"
+  },
+  "stabilizers_on": {
+    "replace": true,
+    "sounds": [
+      "gallifreyan_chronicles:block_entity/tardis/stabilizers_on"
+    ],
+    "subtitle": "sound.gallifreyan_chronicles.stabilizers_on"
   },
   "stop_demat": {
     "replace": true,

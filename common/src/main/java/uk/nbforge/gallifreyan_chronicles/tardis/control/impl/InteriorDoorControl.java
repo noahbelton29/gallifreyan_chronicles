@@ -22,10 +22,6 @@ public class InteriorDoorControl extends BaseControl {
     public static final ControlAnimations DEFAULT_ANIMATIONS =
             new ControlAnimations("interior_door_control_on", "interior_door_control_off", false);
 
-    public InteriorDoorControl() {
-        this(DEFAULT_ANIMATIONS);
-    }
-
     public InteriorDoorControl(ControlAnimations animations) {
         super(animations);
     }

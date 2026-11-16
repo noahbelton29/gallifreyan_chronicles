@@ -75,7 +75,9 @@ public final class Tardis {
         return Optional.ofNullable(server.getPlayerList().getPlayer(ownerId()));
     }
 
-    /** The name of the owner, live from the player if they are online and saved for later, otherwise the last saved name. */
+    /**
+     * The name of the owner, live from the player if they are online and saved for later, otherwise the last saved name.
+     */
     public Optional<String> ownerName() {
         Optional<ServerPlayer> online = ownerPlayer();
         if (online.isPresent()) {
@@ -99,7 +101,9 @@ public final class Tardis {
         return Optional.ofNullable(server.getLevel(exteriorDimension()));
     }
 
-    /** The exterior block entity, loading its chunk if it has to, empty if there is none. */
+    /**
+     * The exterior block entity, loading its chunk if it has to, empty if there is none.
+     */
     public Optional<TardisExteriorBlockEntity> exterior() {
         Optional<BlockPos> pos = exteriorPos();
         Optional<ServerLevel> level = exteriorLevel();
@@ -110,7 +114,9 @@ public final class Tardis {
                 : Optional.empty();
     }
 
-    /** Same as exterior but never loads a chunk, empty if the chunk is not loaded. */
+    /**
+     * Same as exterior but never loads a chunk, empty if the chunk is not loaded.
+     */
     public Optional<TardisExteriorBlockEntity> exteriorIfLoaded() {
         Optional<BlockPos> pos = exteriorPos();
         Optional<ServerLevel> level = exteriorLevel();
@@ -128,7 +134,9 @@ public final class Tardis {
         return ConsoleSyncSystem.consolesOf(id);
     }
 
-    /** The console block entity, a live one first and if there is none it loads the chunk at the saved position. */
+    /**
+     * The console block entity, a live one first and if there is none it loads the chunk at the saved position.
+     */
     public Optional<TardisConsoleBlockEntity> console() {
         TardisConsoleBlockEntity live = ConsoleSyncSystem.firstLiveOf(id);
         if (live != null) return Optional.of(live);
@@ -186,19 +194,23 @@ public final class Tardis {
         return Optional.ofNullable(TardisDestinations.current(server, id));
     }
 
-    public boolean getControl(String controlId) {
+    public boolean getControlState(String controlId) {
         return console().map(console -> console.getControlState(controlId)).orElse(false);
     }
 
-    /** Puts a control on or off on the console, false if there is no console. */
-    public boolean setControl(String controlId, boolean on) {
+    /**
+     * Puts a control on or off on the console, false if there is no console.
+     */
+    public boolean setControlState(String controlId, boolean on) {
         TardisConsoleBlockEntity console = console().orElse(null);
         if (console == null) return false;
         if (console.getControlState(controlId) != on) console.triggerControl(controlId, on, null);
         return true;
     }
 
-    /** Whether the console has power right now, empty if no console is loaded. */
+    /**
+     * Whether the console has power right now, empty if no console is loaded.
+     */
     public Optional<Boolean> livePower() {
         TardisConsoleBlockEntity live = ConsoleSyncSystem.firstLiveOf(id);
         return live == null ? Optional.empty() : Optional.of(live.hasPower());
@@ -209,46 +221,56 @@ public final class Tardis {
     }
 
     public boolean toggleControl(String controlId) {
-        return setControl(controlId, !getControl(controlId));
+        return setControlState(controlId, !getControlState(controlId));
     }
 
     public void syncControl(String controlId, boolean on) {
         console().ifPresent(console -> console.reconcileControl(controlId, on));
     }
 
-    /** Opens the doors, false if they are locked or sealed for travel, doors that are already open count as success. */
+    /**
+     * Opens the doors, false if they are locked or sealed for travel, doors that are already open count as success.
+     */
     public boolean openDoors() {
         if (isLocked() || areDoorsSealedForTravel()) return false;
-        return !doorState().isClosed() || setControl(GCTardisControls.DOOR_CONTROL, true);
+        return !doorState().isClosed() || setControlState(GCTardisControls.DOOR_CONTROL, true);
     }
 
     public boolean closeDoors() {
-        return doorState().isClosed() || setControl(GCTardisControls.DOOR_CONTROL, false);
+        return doorState().isClosed() || setControlState(GCTardisControls.DOOR_CONTROL, false);
     }
 
-    /** Locks the doors, true if already locked and false if the doors are not fully shut. */
+    /**
+     * Locks the doors, true if already locked and false if the doors are not fully shut.
+     */
     public boolean lock() {
         if (isLocked()) return true;
-        return areDoorsFullyClosed() && setControl(GCTardisControls.DOOR_LOCK_CONTROL, true);
+        return areDoorsFullyClosed() && setControlState(GCTardisControls.DOOR_LOCK_CONTROL, true);
     }
 
     public boolean unlock() {
-        return !isLocked() || setControl(GCTardisControls.DOOR_LOCK_CONTROL, false);
+        return !isLocked() || setControlState(GCTardisControls.DOOR_LOCK_CONTROL, false);
     }
 
-    /** Pulls the throttle to take off, false if there is no power or the throttle is already pulled. */
+    /**
+     * Pulls the throttle to take off, false if there is no power or the throttle is already pulled.
+     */
     public boolean takeOff() {
-        if (!hasPower() || getControl(GCTardisControls.SPACE_TIME_THROTTLE)) return false;
+        if (!hasPower() || getControlState(GCTardisControls.SPACE_TIME_THROTTLE)) return false;
         return console().map(SpaceTimeThrottleControl::pull).orElse(false);
     }
 
-    /** Pulls the throttle back to land, false if there is no power or the throttle is not pulled. */
+    /**
+     * Pulls the throttle back to land, false if there is no power or the throttle is not pulled.
+     */
     public boolean land() {
-        if (!hasPower() || !getControl(GCTardisControls.SPACE_TIME_THROTTLE)) return false;
+        if (!hasPower() || !getControlState(GCTardisControls.SPACE_TIME_THROTTLE)) return false;
         return console().map(SpaceTimeThrottleControl::pull).orElse(false);
     }
 
-    /** Sets where it lands next, false inside a TARDIS interior or outside the build height. */
+    /**
+     * Sets where it lands next, false inside a TARDIS interior or outside the build height.
+     */
     public boolean setDestination(ServerLevel level, BlockPos pos, float yaw) {
         if (TardisApi.idOfLevel(level).isPresent()) return false;
         if (level.isOutsideBuildHeight(pos) || level.isOutsideBuildHeight(pos.above())) return false;
@@ -280,7 +302,9 @@ public final class Tardis {
         return data().setTrusted(id, playerId, false);
     }
 
-    /** Gives the key back to the player, false if there is no exterior or the key is not theirs to take. */
+    /**
+     * Gives the key back to the player, false if there is no exterior or the key is not theirs to take.
+     */
     public boolean returnKeyTo(Player player) {
         TardisExteriorBlockEntity exterior = exterior().orElse(null);
         if (exterior == null) return false;

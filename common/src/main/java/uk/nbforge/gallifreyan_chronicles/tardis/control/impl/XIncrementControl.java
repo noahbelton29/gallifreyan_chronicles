@@ -11,7 +11,6 @@ import java.util.UUID;
 public class XIncrementControl extends DestinationControl {
     public static final ControlAnimations DEFAULT_ANIMATIONS = new ControlAnimations("x_increment", "x_increment", false);
 
-    public XIncrementControl() { this(DEFAULT_ANIMATIONS); }
     public XIncrementControl(ControlAnimations animations) { super(animations); }
 
     @Override

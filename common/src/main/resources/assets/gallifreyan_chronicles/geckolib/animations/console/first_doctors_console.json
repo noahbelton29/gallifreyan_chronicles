@@ -841,6 +841,54 @@
           }
         }
       }
+    },
+    "gyroscopic_stabilizers_on": {
+      "loop": "hold_on_last_frame",
+      "animation_length": 0.5,
+      "bones": {
+        "gyroscopic_stabilizers": {
+          "rotation": {
+            "0.0": {
+              "vector": [
+                0,
+                0,
+                0
+              ]
+            },
+            "0.25": {
+              "vector": [
+                90,
+                0,
+                0
+              ]
+            }
+          }
+        }
+      }
+    },
+    "gyroscopic_stabilizers_off": {
+      "loop": "hold_on_last_frame",
+      "animation_length": 0.5,
+      "bones": {
+        "gyroscopic_stabilizers": {
+          "rotation": {
+            "0.0": {
+              "vector": [
+                90,
+                0,
+                0
+              ]
+            },
+            "0.25": {
+              "vector": [
+                0,
+                0,
+                0
+              ]
+            }
+          }
+        }
+      }
     }
   }
 }

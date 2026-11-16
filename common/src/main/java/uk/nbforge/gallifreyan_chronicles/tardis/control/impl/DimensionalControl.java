@@ -11,10 +11,6 @@ import java.util.UUID;
 public class DimensionalControl extends DestinationControl {
     public static final ControlAnimations DEFAULT_ANIMATIONS = new ControlAnimations("dimensional_control", "dimensional_control", false);
 
-    public DimensionalControl() {
-        this(DEFAULT_ANIMATIONS);
-    }
-
     public DimensionalControl(ControlAnimations animations) {
         super(animations);
     }

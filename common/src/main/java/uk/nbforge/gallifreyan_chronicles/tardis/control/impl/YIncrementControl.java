@@ -11,7 +11,6 @@ import java.util.UUID;
 public class YIncrementControl extends DestinationControl {
     public static final ControlAnimations DEFAULT_ANIMATIONS = new ControlAnimations("y_increment", "y_increment", false);
 
-    public YIncrementControl() { this(DEFAULT_ANIMATIONS); }
     public YIncrementControl(ControlAnimations animations) { super(animations); }
 
     @Override

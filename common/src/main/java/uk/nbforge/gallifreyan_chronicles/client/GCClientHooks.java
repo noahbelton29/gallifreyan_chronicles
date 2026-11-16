@@ -1,5 +1,6 @@
 package uk.nbforge.gallifreyan_chronicles.client;
 
+import uk.nbforge.gallifreyan_chronicles.core.GCTardisControls;
 import uk.nbforge.gallifreyan_chronicles.util.GameClockUtil;
 import uk.nbforge.gallifreyan_chronicles.client.tardis.RematCatchClient;
 import org.jspecify.annotations.Nullable;
@@ -29,7 +30,8 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
 
 public final class GCClientHooks {
-    private GCClientHooks() {}
+    private GCClientHooks() {
+    }
 
     static {
         // Fades use the time of the world you are standing in, the one the server keeps right
@@ -114,9 +116,10 @@ public final class GCClientHooks {
             }
 
             @Override
-            public boolean isInFlight() {
+            public boolean shouldPlayCameraShake() {
                 Minecraft minecraft = Minecraft.getInstance();
-                return be.isInFlight() && minecraft.player != null && be.getLevel() == minecraft.player.level();
+                return be.isInFlight() && minecraft.player != null && be.getLevel() == minecraft.player.level() &&
+                        !be.getControlState(GCTardisControls.GYROSCOPIC_STABILIZERS);
             }
 
             @Override

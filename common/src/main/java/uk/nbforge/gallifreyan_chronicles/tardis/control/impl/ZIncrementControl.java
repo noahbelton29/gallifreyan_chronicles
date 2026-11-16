@@ -11,7 +11,6 @@ import java.util.UUID;
 public class ZIncrementControl extends DestinationControl {
     public static final ControlAnimations DEFAULT_ANIMATIONS = new ControlAnimations("z_increment", "z_increment", false);
 
-    public ZIncrementControl() { this(DEFAULT_ANIMATIONS); }
     public ZIncrementControl(ControlAnimations animations) { super(animations); }
 
     @Override

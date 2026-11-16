@@ -1,6 +1,7 @@
 package uk.nbforge.gallifreyan_chronicles.tardis.control.impl;
 
 import uk.nbforge.gallifreyan_chronicles.tardis.ecs.system.TardisMindSystem;
+import uk.nbforge.gallifreyan_chronicles.tardis.flight.TardisDestinations;
 import uk.nbforge.gallifreyan_chronicles.tardis.mind.flight.TardisTurbulence;
 import uk.nbforge.gallifreyan_chronicles.tardis.mind.mood.TardisMoods;
 import uk.nbforge.gallifreyan_chronicles.util.MessageUtil;
@@ -53,10 +54,6 @@ import java.util.UUID;
 
 public class SpaceTimeThrottleControl extends BaseControl {
     public static final ControlAnimations DEFAULT_ANIMATIONS = new ControlAnimations("space_time_throttle_on", "space_time_throttle_off", false);
-
-    public SpaceTimeThrottleControl() {
-        this(DEFAULT_ANIMATIONS);
-    }
 
     public SpaceTimeThrottleControl(ControlAnimations animations) {
         super(animations);
@@ -192,7 +189,9 @@ public class SpaceTimeThrottleControl extends BaseControl {
         crashLand(console, "crash_landing");
     }
 
-    /** The message is the lang key shown as it falls out of the vortex. */
+    /**
+     * The message is the lang key shown as it falls out of the vortex.
+     */
     public static void crashLand(TardisConsoleBlockEntity console, String message) {
         if (!(console.getLevel() instanceof ServerLevel level)) return;
         Tardis tardis = linkedTardis(console).orElse(null);
@@ -210,9 +209,9 @@ public class SpaceTimeThrottleControl extends BaseControl {
     }
 
     /**
-       A stressed TARDIS dropping out of the vortex on its own.
-       Rough but not a crash, no damage and it gets most of the way there.
-    */
+     * A stressed TARDIS dropping out of the vortex on its own.
+     * Rough but not a crash, no damage and it gets most of the way there.
+     */
     public static boolean emergencyLand(TardisConsoleBlockEntity console, String message) {
         if (!(console.getLevel() instanceof ServerLevel level)) return false;
         Tardis tardis = linkedTardis(console).orElse(null);
@@ -264,7 +263,9 @@ public class SpaceTimeThrottleControl extends BaseControl {
         for (TardisConsoleBlockEntity each : ConsoleSyncSystem.liveConsolesWith(console)) {
             if (!(each.getLevel() instanceof ServerLevel eachLevel)) continue;
             Vec3 pos = each == console ? shakePos : Vec3.atCenterOf(each.getBlockPos());
-            TardisDrumShakePayload.broadcast(eachLevel, pos, 1.0F);
+            if (!console.getControlState(GCTardisControls.GYROSCOPIC_STABILIZERS)) {
+                TardisDrumShakePayload.broadcast(eachLevel, pos, 1.0F);
+            }
         }
     }
 
@@ -411,7 +412,7 @@ public class SpaceTimeThrottleControl extends BaseControl {
         if (tardis == null) return;
         BlockPos pos = tardis.exteriorPos().orElse(null);
         if (pos == null) return;
-        Component where = uk.nbforge.gallifreyan_chronicles.tardis.flight.TardisDestinations.dimensionName(tardis.exteriorDimension());
+        Component where = TardisDestinations.dimensionName(tardis.exteriorDimension());
         for (var player : interior.players()) {
             player.sendOverlayMessage(Component.translatable("overlay.gallifreyan_chronicles.flight_arrived", where,
                             Component.literal(pos.getX() + ", " + pos.getY() + ", " + pos.getZ()).withStyle(ChatFormatting.WHITE))
@@ -434,12 +435,19 @@ public class SpaceTimeThrottleControl extends BaseControl {
         List<TardisConsoleBlockEntity> live = landedConsoles(console);
         if (live.isEmpty()) return;
 
+        boolean stabilizersOn = console.getControlState(GCTardisControls.GYROSCOPIC_STABILIZERS);
         for (TardisConsoleBlockEntity each : live) {
             if (!(each.getLevel() instanceof ServerLevel eachLevel)) continue;
-            playAt(eachLevel, each.getBlockPos(), GCSounds.TARDIS_DRUM, 1.0F);
-            TardisDrumShakePayload.broadcast(eachLevel, Vec3.atCenterOf(each.getBlockPos()), 1.0F);
+            if (!stabilizersOn) {
+                playAt(eachLevel, each.getBlockPos(), GCSounds.TARDIS_DRUM, 1.0F);
+                TardisDrumShakePayload.broadcast(eachLevel, Vec3.atCenterOf(each.getBlockPos()), 1.0F);
+            }
         }
-        playAtExterior(console, level, GCSounds.TARDIS_DRUM);
+        if (!stabilizersOn) {
+            playAtExterior(console, level, GCSounds.TARDIS_DRUM);
+        } else {
+            playAtConsole(console, level, GCSounds.TARDIS_LANDING_NOTIFICATION);
+        }
     }
 
     @Override

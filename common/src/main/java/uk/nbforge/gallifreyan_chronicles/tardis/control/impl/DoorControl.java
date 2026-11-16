@@ -19,10 +19,6 @@ import net.minecraft.world.entity.player.Player;
 public class DoorControl extends BaseControl {
     public static final ControlAnimations DEFAULT_ANIMATIONS = new ControlAnimations("door_control_off", "door_control_on", true);
 
-    public DoorControl() {
-        this(DEFAULT_ANIMATIONS);
-    }
-
     public DoorControl(ControlAnimations animations) {
         super(animations);
     }

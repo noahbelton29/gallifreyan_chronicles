@@ -31,6 +31,7 @@ public class GCTardisControls {
     public static final String DIRECTIONAL_CONTROL = "directional_control";
     public static final String CLOAKING_DEVICE_CONTROL = "cloaking_device_control";
     public static final String INTERIOR_DOOR_CONTROL = "interior_door_control";
+    public static final String GYROSCOPIC_STABILIZERS = "gyroscopic_stabilizers";
 
     public static void registerTardisControls() {
         TardisControlTypes.register(NOOP_CONTROL, NoopControl.class, MapCodec.unit(NoopControl.INSTANCE));
@@ -48,20 +49,25 @@ public class GCTardisControls {
         control(DIRECTIONAL_CONTROL, DirectionalControl.DEFAULT_ANIMATIONS, DirectionalControl::new);
         control(CLOAKING_DEVICE_CONTROL, CloakingDeviceControl.DEFAULT_ANIMATIONS, CloakingDeviceControl::new);
         control(INTERIOR_DOOR_CONTROL, InteriorDoorControl.DEFAULT_ANIMATIONS, InteriorDoorControl::new);
+        control(GYROSCOPIC_STABILIZERS, GyroscopicStabilizersControl.DEFAULT_ANIMATIONS, GyroscopicStabilizersControl::new);
 
         verifyCodecs();
         ControlPower.validate();
         Constants.LOG.info("Registered GC TARDIS Controls");
     }
 
-    /** The codec is built from the default animations of the control so each control only needs those and a constructor. */
+    /**
+     * The codec is built from the default animations of the control so each control only needs those and a constructor.
+     */
     private static <T extends BaseControl> void control(String id, ControlAnimations defaults, Function<ControlAnimations, T> ctor) {
         T instance = ctor.apply(defaults);
         TardisControlTypes.register(id, instance.getClass(), BaseControl.codec(defaults, ctor));
         TardisControlRegistry.register(id, instance);
     }
 
-    /** Writes every registered control out and reads it back so a broken codec shows up in the log at startup. */
+    /**
+     * Writes every registered control out and reads it back so a broken codec shows up in the log at startup.
+     */
     private static void verifyCodecs() {
         for (String id : TardisControlRegistry.allIds()) {
             TardisControl control = TardisControlRegistry.get(id);

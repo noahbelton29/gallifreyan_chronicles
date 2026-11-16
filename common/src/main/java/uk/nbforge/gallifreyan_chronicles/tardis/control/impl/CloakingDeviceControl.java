@@ -22,10 +22,6 @@ public class CloakingDeviceControl extends BaseControl {
         super(animations);
     }
 
-    public CloakingDeviceControl() {
-        this(DEFAULT_ANIMATIONS);
-    }
-
     @Override
     public void playClickSound(TardisControlEntity entity) {
         playSound(entity, GCSounds.LEVER, 0.8f);

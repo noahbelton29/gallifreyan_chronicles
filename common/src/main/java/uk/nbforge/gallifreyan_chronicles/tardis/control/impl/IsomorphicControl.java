@@ -17,10 +17,6 @@ public class IsomorphicControl extends BaseControl {
     public static final ControlAnimations DEFAULT_ANIMATIONS = new ControlAnimations("isomorphic_control_on", "isomorphic_control_off", false);
     private static final int SECOND_SOUND_DELAY_TICKS = 10;
 
-    public IsomorphicControl() {
-        this(DEFAULT_ANIMATIONS);
-    }
-
     public IsomorphicControl(ControlAnimations animations) {
         super(animations);
     }

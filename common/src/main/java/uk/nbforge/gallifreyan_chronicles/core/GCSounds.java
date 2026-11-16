@@ -27,6 +27,8 @@ public class GCSounds {
     public static final SoundEvent TARDIS_UNCLOAK = registerFixedRange("uncloak", HEARING_RANGE);
     public static final SoundEvent HARTNELL_DOOR = registerFixedRange("hartnell_door", HEARING_RANGE);
     public static final SoundEvent TARDIS_STOP_DEMAT = registerFixedRange("stop_demat", HEARING_RANGE);
+    public static final SoundEvent TARDIS_LANDING_NOTIFICATION = registerFixedRange("landing_notification", HEARING_RANGE);
+    public static final SoundEvent TARDIS_STABILIZERS_ON = registerFixedRange("stabilizers_on", HEARING_RANGE);
     public static final float FX_HEARING_RANGE = 24.0F;
     public static final SoundEvent SPARK = registerFixedRange("spark", HEARING_RANGE);
     public static final SoundEvent SPARK_EXPLOSION = registerFixedRange("spark_explosion", FX_HEARING_RANGE);

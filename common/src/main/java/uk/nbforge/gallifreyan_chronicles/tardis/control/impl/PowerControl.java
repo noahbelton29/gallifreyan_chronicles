@@ -16,10 +16,6 @@ import net.minecraft.world.entity.player.Player;
 public class PowerControl extends BaseControl {
     public static final ControlAnimations DEFAULT_ANIMATIONS = new ControlAnimations("power_control_on", "power_control_off", false);
 
-    public PowerControl() {
-        this(DEFAULT_ANIMATIONS);
-    }
-
     public PowerControl(ControlAnimations animations) {
         super(animations);
     }

@@ -14,10 +14,6 @@ import java.util.UUID;
 public class CoordinateStepControl extends DestinationControl {
     public static final ControlAnimations DEFAULT_ANIMATIONS = new ControlAnimations("coordinate_step_control", "coordinate_step_control", false);
 
-    public CoordinateStepControl() {
-        this(DEFAULT_ANIMATIONS);
-    }
-
     public CoordinateStepControl(ControlAnimations animations) {
         super(animations);
     }

@@ -45,6 +45,8 @@ public class GCSoundsProvider extends SoundDefinitionsProvider {
         registerSimple(GCSounds.TARDIS_CLOAK, TARDIS);
         registerSimple(GCSounds.TARDIS_UNCLOAK, TARDIS);
         registerSimple(GCSounds.TARDIS_STOP_DEMAT, TARDIS);
+        registerSimple(GCSounds.TARDIS_LANDING_NOTIFICATION, TARDIS);
+        registerSimple(GCSounds.TARDIS_STABILIZERS_ON, TARDIS);
 
         /** Spark and explosion sounds. */
         registerVariants(GCSounds.SPARK, FX, 16, "spark_01", "spark_02");
@@ -70,7 +72,9 @@ public class GCSoundsProvider extends SoundDefinitionsProvider {
         registerSound(soundEvent, folder, false, attenuationDistance);
     }
 
-    /** One sound event that picks one of these files at random each time. */
+    /**
+     * One sound event that picks one of these files at random each time.
+     */
     private void registerVariants(SoundEvent soundEvent, String folder, int attenuationDistance, String... files) {
         SoundDefinition definition = SoundDefinition.definition()
                 .subtitle("sound." + Constants.MOD_ID + "." + soundEvent.location().getPath())

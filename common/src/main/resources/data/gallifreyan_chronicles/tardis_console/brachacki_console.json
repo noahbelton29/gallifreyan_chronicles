@@ -54,6 +54,10 @@
       "id": "isomorphic_control"
     },
     {
+      "cooldown": 0.5,
+      "id": "gyroscopic_stabilizers"
+    },
+    {
       "animation": false,
       "cooldown": 0.5,
       "id": "directional_control"

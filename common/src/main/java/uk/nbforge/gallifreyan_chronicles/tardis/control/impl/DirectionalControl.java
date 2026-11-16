@@ -11,10 +11,6 @@ import java.util.UUID;
 public class DirectionalControl extends DestinationControl {
     public static final ControlAnimations DEFAULT_ANIMATIONS = new ControlAnimations("directional_control_on", "directional_control_off", false);
 
-    public DirectionalControl() {
-        this(DEFAULT_ANIMATIONS);
-    }
-
     public DirectionalControl(ControlAnimations animations) {
         super(animations);
     }

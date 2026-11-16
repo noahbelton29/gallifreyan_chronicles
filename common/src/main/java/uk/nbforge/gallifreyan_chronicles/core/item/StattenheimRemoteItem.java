@@ -73,12 +73,12 @@ public class StattenheimRemoteItem extends Item {
         LandingTarget landingTarget = new LandingTarget(serverLevel.dimension(), target, yaw);
         tardis.data().setLandingTarget(tardisID, landingTarget);
 
-        boolean handbrakeWasOn = tardis.getControl(GCTardisControls.TIME_ROTOR_HANDBRAKE);
+        boolean handbrakeWasOn = tardis.getControlState(GCTardisControls.TIME_ROTOR_HANDBRAKE);
         if (handbrakeWasOn) {
-            tardis.setControl(GCTardisControls.TIME_ROTOR_HANDBRAKE, false);
+            tardis.setControlState(GCTardisControls.TIME_ROTOR_HANDBRAKE, false);
         }
         if (!tardis.takeOff()) {
-            if (handbrakeWasOn) tardis.setControl(GCTardisControls.TIME_ROTOR_HANDBRAKE, true);
+            if (handbrakeWasOn) tardis.setControlState(GCTardisControls.TIME_ROTOR_HANDBRAKE, true);
             say(player, "stattenheim_cannot_summon", ChatFormatting.RED);
             return InteractionResult.FAIL;
         }
@@ -118,12 +118,16 @@ public class StattenheimRemoteItem extends Item {
         return InteractionResult.SUCCESS;
     }
 
-    /** The owner and anyone they trust, a remote linked to the TARDIS of a stranger does nothing. */
+    /**
+     * The owner and anyone they trust, a remote linked to the TARDIS of a stranger does nothing.
+     */
     private static boolean mayUse(Tardis tardis, Player player) {
         return tardis.isOwner(player) || tardis.isTrusted(player.getUUID());
     }
 
-    /** A TARDIS cannot land inside the interior of another TARDIS. */
+    /**
+     * A TARDIS cannot land inside the interior of another TARDIS.
+     */
     private static boolean isInsideATardis(ServerLevel level) {
         return TardisApi.idOfLevel(level).isPresent() || TardisDimensionUtil.isInterior(level);
     }

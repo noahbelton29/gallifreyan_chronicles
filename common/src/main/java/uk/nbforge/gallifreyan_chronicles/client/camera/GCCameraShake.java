@@ -72,7 +72,7 @@ public final class GCCameraShake {
     public interface FlightSource {
         Vec3 position();
 
-        boolean isInFlight();
+        boolean shouldPlayCameraShake();
 
         boolean isValid();
     }
@@ -91,7 +91,8 @@ public final class GCCameraShake {
     private static final List<RumbleSource> RUMBLE_SOURCES = new ArrayList<>();
     private static long lastFrameNanos = 0L;
 
-    public record Sample(float pitch, float yaw, float roll) {}
+    public record Sample(float pitch, float yaw, float roll) {
+    }
 
     private record Wave(double slowHz, double slowPhase, double fastHz, double fastPhase) {
         static Wave random(ThreadLocalRandom r) {
@@ -106,7 +107,8 @@ public final class GCCameraShake {
         }
     }
 
-    private GCCameraShake() {}
+    private GCCameraShake() {
+    }
 
     public static void trigger(Vec3 origin, float strengthMultiplier) {
         LocalPlayer player = Minecraft.getInstance().player;
@@ -226,12 +228,12 @@ public final class GCCameraShake {
             }
 
             rumble.ageSeconds += dt;
-            if (rumble.ageSeconds < JOIN_SNAP_SECONDS && rumble.source.isInFlight()) {
+            if (rumble.ageSeconds < JOIN_SNAP_SECONDS && rumble.source.shouldPlayCameraShake()) {
                 rumble.flightSeconds = RUMBLE_DELAY + 1.0;
                 rumble.level = 1.0;
             }
 
-            if (rumble.source.isInFlight()) {
+            if (rumble.source.shouldPlayCameraShake()) {
                 rumble.flightSeconds += dt;
             } else {
                 rumble.flightSeconds = 0.0;

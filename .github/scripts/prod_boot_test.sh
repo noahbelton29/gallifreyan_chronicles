@@ -6,7 +6,7 @@ MOD_JAR="$2"
 SERVER_DIR="$3"
 BOOT_FLAG="-Dgallifreyan_chronicles.bootTest=true"
 PASS_LINE="BOOT TEST PASSED"
-TIMEOUT_SECONDS=600
+TIMEOUT_SECONDS=180
 
 prop() { grep "^$1=" gradle.properties | head -n1 | cut -d= -f2-; }
 MC="$(prop minecraft_version)"
@@ -49,7 +49,7 @@ case "$LOADER" in
       curl -fsSL -o "$SERVER_DIR/fabric-server-launch.jar" \
         "https://meta.fabricmc.net/v2/versions/loader/${MC}/$(prop fabric_loader_version)/${installer}/server/jar"
     fi
-    START=(java "$BOOT_FLAG" -Xmx3G -jar fabric-server-launch.jar nogui)
+    START=(java -Xmx3G -jar fabric-server-launch.jar nogui)
     ;;
   neoforge)
     version="$(prop neoforge_version)"
@@ -60,8 +60,6 @@ case "$LOADER" in
         || { echo "::error::NeoForge installer failed"; tail -50 "$SERVER_DIR/installer.log"; exit 1; }
       rm -f "$SERVER_DIR/installer.jar"
     fi
-    grep -qF -- "$BOOT_FLAG" "$SERVER_DIR/user_jvm_args.txt" 2>/dev/null \
-      || { echo "$BOOT_FLAG"; echo "-Xmx3G"; } >> "$SERVER_DIR/user_jvm_args.txt"
     START=(bash run.sh nogui)
     ;;
   *)
@@ -71,14 +69,17 @@ case "$LOADER" in
 esac
 
 echo "eula=true" > "$SERVER_DIR/eula.txt"
-printf 'online-mode=false\nspawn-protection=0\nmax-tick-time=-1\nsync-chunk-writes=false\n' > "$SERVER_DIR/server.properties"
+printf 'online-mode=false\nspawn-protection=0\nmax-tick-time=-1\nsync-chunk-writes=false\npause-when-empty-seconds=-1\n' > "$SERVER_DIR/server.properties"
 rm -rf "$SERVER_DIR/world" "$SERVER_DIR/crash-reports" "$SERVER_DIR/logs"
 
 echo "Starting the ${LOADER} server..."
-(cd "$SERVER_DIR" && timeout "$TIMEOUT_SECONDS" "${START[@]}" < /dev/null) 2>&1 | tee boot.log || true
+(cd "$SERVER_DIR" && JAVA_TOOL_OPTIONS="$BOOT_FLAG" timeout "$TIMEOUT_SECONDS" "${START[@]}" < /dev/null) 2>&1 | tee boot.log || true
 
 if grep -q "$PASS_LINE" boot.log; then
   echo "The ${LOADER} server started and ticked with only the mod and its required libraries"
+elif grep -q "Done (" boot.log && ! grep -q "Boot test: levels loaded" boot.log; then
+  echo "::error::The ${LOADER} server started but the boot test hook never ran, so it was not shut down"
+  exit 1
 else
   echo "::error::The ${LOADER} server did not finish booting. Check boot.log and the crash reports in the artifacts."
   exit 1

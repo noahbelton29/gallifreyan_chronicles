@@ -21,6 +21,9 @@ jobs:
     name: Build
     runs-on: ubuntu-24.04
     timeout-minutes: 30
+    permissions:
+      contents: read
+      pull-requests: write
     outputs:
       artifact: gc-dev-${{ steps.meta.outputs.short_sha }}
     steps:
@@ -43,6 +46,7 @@ jobs:
         run: echo "short_sha=${GITHUB_SHA::7}" >> "$GITHUB_OUTPUT"
 
       - name: Upload dev jars
+        id: upload
         uses: actions/upload-artifact@v7
         with:
           name: gc-dev-${{ steps.meta.outputs.short_sha }}
@@ -53,6 +57,33 @@ jobs:
             !**/*-javadoc.jar
           if-no-files-found: error
           retention-days: 14
+
+      - name: Comment the test jars on the PR
+        if: github.event_name == 'pull_request'
+        continue-on-error: true
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPO: ${{ github.repository }}
+          PR: ${{ github.event.pull_request.number }}
+          HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+          URL: ${{ steps.upload.outputs.artifact-url }}
+          LOCKED: ${{ secrets.DEV_LOCK_UUID != '' }}
+        run: |
+          marker='<!-- gc-pr-jars -->'
+          if [ "$LOCKED" = "true" ]; then
+            note="Locked to the accounts in the DEV_LOCK_UUID secret."
+          else
+            note="Locked to nobody (no DEV_LOCK_UUID secret), so they only run on servers."
+          fi
+          body="$(printf '%s\n### Test jars\n[Download the Fabric and NeoForge jars](%s) built from %s. %s Kept for 14 days.' \
+            "$marker" "$URL" "${HEAD_SHA::7}" "$note")"
+          id="$(gh api "repos/$REPO/issues/$PR/comments" --paginate \
+            --jq "[.[] | select(.body | contains(\"$marker\"))][0].id // empty")"
+          if [ -n "$id" ]; then
+            gh api -X PATCH "repos/$REPO/issues/comments/$id" -f body="$body" > /dev/null
+          else
+            gh api "repos/$REPO/issues/$PR/comments" -f body="$body" > /dev/null
+          fi
 
   datagen:
     name: Datagen is up to date

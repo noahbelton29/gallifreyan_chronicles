@@ -10,6 +10,7 @@ import uk.nbforge.gallifreyan_chronicles.tardis.ecs.system.ConsoleSyncSystem;
 import uk.nbforge.gallifreyan_chronicles.tardis.TardisDimensionManager;
 import uk.nbforge.gallifreyan_chronicles.tardis.manager.deletion.TardisDeletion;
 import uk.nbforge.gallifreyan_chronicles.util.GCSchedulerUtil;
+import uk.nbforge.gallifreyan_chronicles.core.lifecycle.CiBootTest;
 import uk.nbforge.gallifreyan_chronicles.core.lifecycle.ServerLifecycleHandler;
 import uk.nbforge.gallifreyan_chronicles.core.sound.timed.TimedSounds;
 import net.minecraft.server.MinecraftServer;
@@ -33,6 +34,7 @@ public abstract class MinecraftServerMixin {
         TardisAlarm.resumeCrashAlarms(server);
         TimedSounds.onServerStart(server);
         TardisPortalBridge.onDimensionsChanged(server);
+        CiBootTest.onLevelsCreated(server);
     }
 
     @Inject(method = "tickChildren", at = @At("HEAD"))

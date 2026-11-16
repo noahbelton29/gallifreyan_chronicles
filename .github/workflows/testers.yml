@@ -1,0 +1,104 @@
+name: Tester builds
+
+# Run from the Actions tab. Builds account-locked, watermarked Fabric and NeoForge jars
+# for each tester (the existing buildTesterJars task) and posts them to Discord.
+#
+# Secrets:
+#   TESTERS_PROPERTIES      the contents of your local testers.properties (name=uuid per line)
+#   TESTER_DISCORD_WEBHOOK  webhook for the private channel the jars are posted to
+
+on:
+  workflow_dispatch:
+    inputs:
+      testers:
+        description: "Only these testers (comma-separated names). Blank = everyone"
+        required: false
+        default: ""
+      expires_in:
+        description: "Expiry, like 7d, 12h or 1h30m. Blank = never"
+        required: false
+        default: ""
+      watermark:
+        description: "Watermark the jars"
+        type: choice
+        options: ["on", "off"]
+        default: "on"
+      upload_artifacts:
+        description: "Also attach the jars to this run (anyone who can see the repo's Actions can download them)"
+        type: boolean
+        default: false
+
+concurrency:
+  group: tester-builds
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+jobs:
+  testers:
+    name: Build tester jars
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: "25"
+
+      - uses: gradle/actions/setup-gradle@v5
+        with:
+          cache-read-only: true
+
+      - name: Write testers.properties
+        env:
+          TESTERS: ${{ secrets.TESTERS_PROPERTIES }}
+        run: |
+          if [ -z "$TESTERS" ]; then
+            echo "::error::Add a TESTERS_PROPERTIES secret with the contents of your testers.properties (one name=uuid per line)."
+            exit 1
+          fi
+          printf '%s\n' "$TESTERS" > testers.properties
+          echo "Testers: $(grep -cvE '^\s*(#|$)' testers.properties)"
+
+      - name: Build and post the jars
+        env:
+          GC_DISCORD_WEBHOOK: ${{ secrets.TESTER_DISCORD_WEBHOOK }}
+          INPUT_TESTERS: ${{ inputs.testers }}
+          INPUT_EXPIRES: ${{ inputs.expires_in }}
+          INPUT_WATERMARK: ${{ inputs.watermark }}
+          INPUT_UPLOAD: ${{ inputs.upload_artifacts }}
+        run: |
+          if [ -z "$GC_DISCORD_WEBHOOK" ] && [ "$INPUT_UPLOAD" != "true" ]; then
+            echo "::error::No TESTER_DISCORD_WEBHOOK secret and artifact upload is off, so the jars would go nowhere."
+            exit 1
+          fi
+          args=(buildTesterJars --console=plain)
+          [ -n "$INPUT_TESTERS" ] && args+=("-PtesterOnly=$INPUT_TESTERS")
+          [ -n "$INPUT_EXPIRES" ] && args+=("-PexpiresIn=$INPUT_EXPIRES")
+          [ "$INPUT_WATERMARK" = "off" ] && args+=("-Pwatermark=off")
+          ./gradlew "${args[@]}"
+
+      - name: Remove testers.properties
+        if: always()
+        run: rm -f testers.properties
+
+      # The ledger maps each watermark build ID to the tester it was made for
+      - name: Upload the build ledger
+        if: success() && inputs.watermark == 'on'
+        uses: actions/upload-artifact@v5
+        with:
+          name: build-ledger-${{ github.run_number }}
+          path: build-ledger.csv
+          if-no-files-found: warn
+          retention-days: 90
+
+      - name: Upload the jars
+        if: success() && inputs.upload_artifacts
+        uses: actions/upload-artifact@v5
+        with:
+          name: tester-jars-${{ github.run_number }}
+          path: build/tester-jars/
+          retention-days: 7

@@ -1,0 +1,110 @@
+name: Release
+
+# Push a tag like v0.2.0 (or v0.2.0-beta.1 for a pre-release) to run this.
+# It builds unlocked, unwatermarked jars with a clean version number and creates a
+# DRAFT GitHub release with notes from your commits. Nothing is public until you
+# press Publish on the draft.
+#
+# Optional Modrinth / CurseForge upload: set the repository variables MODRINTH_ID
+# and/or CURSEFORGE_ID and the secrets MODRINTH_TOKEN and/or CURSEFORGE_TOKEN.
+# Leave them unset and only the draft is made.
+
+on:
+  push:
+    tags: ["v*"]
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    name: Build and release
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          fetch-depth: 0 # full history for the release notes
+
+      - uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: "25"
+
+      - uses: gradle/actions/setup-gradle@v5
+        with:
+          cache-read-only: true
+
+      - name: Work out the version
+        id: version
+        run: |
+          version="${GITHUB_REF_NAME#v}"
+          if [[ "$version" == *-* ]]; then prerelease=true; type=beta; else prerelease=false; type=release; fi
+          case "$version" in *alpha*) type=alpha ;; esac
+          echo "version=$version" >> "$GITHUB_OUTPUT"
+          echo "prerelease=$prerelease" >> "$GITHUB_OUTPUT"
+          echo "type=$type" >> "$GITHUB_OUTPUT"
+          minecraft="$(grep '^minecraft_version=' gradle.properties | cut -d= -f2)"
+          echo "minecraft=$minecraft" >> "$GITHUB_OUTPUT"
+          echo "Releasing $version ($type) for Minecraft $minecraft"
+
+      - name: Build release jars
+        run: >
+          ./gradlew build
+          -PreleaseVersion=${{ steps.version.outputs.version }}
+          -Plock=off -Pwatermark=off -PdevBypass=false
+          --console=plain
+
+      - name: Write release notes
+        run: python3 .github/scripts/release_notes.py "$GITHUB_REF_NAME" | tee release-notes.md
+
+      - name: Create draft release
+        uses: softprops/action-gh-release@v2
+        with:
+          draft: true
+          prerelease: ${{ steps.version.outputs.prerelease }}
+          name: Gallifreyan Chronicles ${{ steps.version.outputs.version }}
+          body_path: release-notes.md
+          files: |
+            fabric/build/libs/gc-fabric-${{ steps.version.outputs.version }}.jar
+            neoforge/build/libs/gc-neoforge-${{ steps.version.outputs.version }}.jar
+          fail_on_unmatched_files: true
+
+      - name: Publish Fabric to Modrinth / CurseForge
+        if: vars.MODRINTH_ID != '' || vars.CURSEFORGE_ID != ''
+        uses: Kir-Antipov/mc-publish@v3.3
+        with:
+          modrinth-id: ${{ vars.MODRINTH_ID }}
+          modrinth-token: ${{ secrets.MODRINTH_TOKEN }}
+          curseforge-id: ${{ vars.CURSEFORGE_ID }}
+          curseforge-token: ${{ secrets.CURSEFORGE_TOKEN }}
+          files: fabric/build/libs/gc-fabric-${{ steps.version.outputs.version }}.jar
+          name: Gallifreyan Chronicles ${{ steps.version.outputs.version }} (Fabric)
+          version: ${{ steps.version.outputs.version }}+fabric
+          version-type: ${{ steps.version.outputs.type }}
+          changelog-file: release-notes.md
+          loaders: fabric
+          game-versions: ${{ steps.version.outputs.minecraft }}
+          dependencies: |
+            fabric-api(required)
+            geckolib(required)
+            jade(optional)
+
+      - name: Publish NeoForge to Modrinth / CurseForge
+        if: vars.MODRINTH_ID != '' || vars.CURSEFORGE_ID != ''
+        uses: Kir-Antipov/mc-publish@v3.3
+        with:
+          modrinth-id: ${{ vars.MODRINTH_ID }}
+          modrinth-token: ${{ secrets.MODRINTH_TOKEN }}
+          curseforge-id: ${{ vars.CURSEFORGE_ID }}
+          curseforge-token: ${{ secrets.CURSEFORGE_TOKEN }}
+          files: neoforge/build/libs/gc-neoforge-${{ steps.version.outputs.version }}.jar
+          name: Gallifreyan Chronicles ${{ steps.version.outputs.version }} (NeoForge)
+          version: ${{ steps.version.outputs.version }}+neoforge
+          version-type: ${{ steps.version.outputs.type }}
+          changelog-file: release-notes.md
+          loaders: neoforge
+          game-versions: ${{ steps.version.outputs.minecraft }}
+          dependencies: |
+            geckolib(required)
+            jade(optional)

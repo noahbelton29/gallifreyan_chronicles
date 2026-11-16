@@ -36,7 +36,6 @@ neoForge {
             server()
             this.file('runs/server').createParentDirectories()
             gameDirectory = this.mkdir(this.file('runs/server'))
-            // CI boot test: ./gradlew :neoforge:runServer -PbootTest
             if (project.hasProperty('bootTest')) {
                 systemProperty('gallifreyan_chronicles.bootTest', 'true')
             }

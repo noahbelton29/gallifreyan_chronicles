@@ -1,14 +1,5 @@
 name: Release
 
-# Push a tag like v0.2.0 (or v0.2.0-beta.1 for a pre-release) to run this.
-# It builds unlocked, unwatermarked jars with a clean version number and creates a
-# DRAFT GitHub release with notes from your commits. Nothing is public until you
-# press Publish on the draft.
-#
-# Optional Modrinth / CurseForge upload: set the repository variables MODRINTH_ID
-# and/or CURSEFORGE_ID and the secrets MODRINTH_TOKEN and/or CURSEFORGE_TOKEN.
-# Leave them unset and only the draft is made.
-
 on:
   push:
     tags: ["v*"]
@@ -24,7 +15,7 @@ jobs:
     steps:
       - uses: actions/checkout@v5
         with:
-          fetch-depth: 0 # full history for the release notes
+          fetch-depth: 0
 
       - uses: actions/setup-java@v5
         with:

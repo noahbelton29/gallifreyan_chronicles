@@ -10,6 +10,7 @@ import uk.nbforge.gallifreyan_chronicles.core.GCSounds;
 import uk.nbforge.gallifreyan_chronicles.tardis.ecs.system.ConsoleSyncSystem;
 import uk.nbforge.gallifreyan_chronicles.tardis.Tardis;
 import uk.nbforge.gallifreyan_chronicles.tardis.TardisApi;
+import uk.nbforge.gallifreyan_chronicles.core.block_entities.TardisExteriorBlockEntity;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
@@ -24,7 +25,9 @@ import org.jspecify.annotations.Nullable;
 import java.util.Optional;
 import java.util.function.Function;
 
-/** Base class for console controls with shared animations, sounds and door helpers. */
+/**
+ * Base class for console controls with shared animations, sounds and door helpers.
+ */
 public abstract class BaseControl implements TardisControl {
 
     private final ControlAnimations animations;
@@ -72,7 +75,9 @@ public abstract class BaseControl implements TardisControl {
         playSound(entity, GCSounds.SLIDER, 0.9F);
     }
 
-    /** The pitch depends on whether the control is active. */
+    /**
+     * The pitch depends on whether the control is active.
+     */
     protected static void playSound(TardisControlEntity entity, SoundEvent sound, float offPitch) {
         TardisConsoleBlockEntity console = entity.getConsole();
         boolean on = console != null && console.getControlState(entity.getControlId());
@@ -112,7 +117,9 @@ public abstract class BaseControl implements TardisControl {
         playAtExterior(console, level, sound);
     }
 
-    /** A red message above the hotbar. */
+    /**
+     * A red message above the hotbar.
+     */
     protected static void announce(@Nullable Player player, String translationKey) {
         if (player != null) {
             player.sendOverlayMessage(Component.translatable(translationKey).withStyle(ChatFormatting.GREEN));
@@ -132,10 +139,17 @@ public abstract class BaseControl implements TardisControl {
         }
     }
 
-    /** True if the doors are locked or sealed for travel, it tells the player if so. */
+    /**
+     * True if the doors are locked or sealed for travel, it tells the player if so.
+     */
     protected static boolean doorsBlocked(Tardis tardis, @Nullable Player player) {
         if (tardis.isLocked()) {
             tell(player, "message.gallifreyan_chronicles.doors_locked");
+            return true;
+        }
+
+        if (tardis.exterior().map(TardisExteriorBlockEntity::hasKeyRendered).orElse(false)) {
+            tell(player, "message.gallifreyan_chronicles.doors_key_in_lock");
             return true;
         }
 

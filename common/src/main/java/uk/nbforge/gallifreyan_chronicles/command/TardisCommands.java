@@ -20,6 +20,7 @@ import uk.nbforge.gallifreyan_chronicles.tardis.TardisExterior;
 import uk.nbforge.gallifreyan_chronicles.core.dynamic_registries.TardisExteriorRegistry;
 import uk.nbforge.gallifreyan_chronicles.tardis.manager.deletion.TardisDeletion;
 import uk.nbforge.gallifreyan_chronicles.tardis.manager.deletion.TardisDeletionMode;
+import uk.nbforge.gallifreyan_chronicles.util.TardisDimensionUtil;
 import net.minecraft.ChatFormatting;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.core.BlockPos;
@@ -86,7 +87,9 @@ public final class TardisCommands {
         });
     }
 
-    /** Teleports the player into the interior of that TARDIS. */
+    /**
+     * Teleports the player into the interior of that TARDIS.
+     */
     private static int tpInterior(CommandContext<CommandSourceStack> ctx) throws CommandSyntaxException {
         return withTardis(ctx, (tardis, idText) -> {
             ServerPlayer player = playerOrFail(ctx);
@@ -99,7 +102,9 @@ public final class TardisCommands {
         });
     }
 
-    /** The id of the TARDIS you are looking at or inside, click it to copy. */
+    /**
+     * The id of the TARDIS you are looking at or inside, click it to copy.
+     */
     private static int id(CommandContext<CommandSourceStack> ctx) {
         ServerPlayer player = playerOrFail(ctx);
         if (player == null) return 0;
@@ -120,7 +125,9 @@ public final class TardisCommands {
         return 1;
     }
 
-    /** The TARDIS of the exterior or console at this position, the top half of the exterior counts as the exterior. */
+    /**
+     * The TARDIS of the exterior or console at this position, the top half of the exterior counts as the exterior.
+     */
     private static Optional<Tardis> tardisAt(ServerLevel level, BlockPos pos) {
         BlockPos exteriorPos = level.getBlockState(pos).getBlock() instanceof TardisTopBlock ? pos.below() : pos;
         if (level.getBlockEntity(exteriorPos) instanceof TardisExteriorBlockEntity exterior)
@@ -149,7 +156,9 @@ public final class TardisCommands {
                         .then(tardisIdArgument().executes(TardisCommands::info)));
     }
 
-    /** Lists every TARDIS with its exterior and position. */
+    /**
+     * Lists every TARDIS with its exterior and position.
+     */
     private static int list(CommandContext<CommandSourceStack> ctx) {
         Collection<UUID> ids = manager(ctx).getAllIds();
         if (ids.isEmpty()) {
@@ -164,7 +173,9 @@ public final class TardisCommands {
         return 1;
     }
 
-    /** Shows the id, owner, exterior and position of the TARDIS. */
+    /**
+     * Shows the id, owner, exterior and position of the TARDIS.
+     */
     private static int info(CommandContext<CommandSourceStack> ctx) throws CommandSyntaxException {
         return withTardis(ctx, (tardis, idText) -> {
             BlockPos pos = manager(ctx).resolveExteriorBlockPos(tardis.id());
@@ -177,14 +188,18 @@ public final class TardisCommands {
         });
     }
 
-    /** The exterior id of the block entity at the position, unknown if there is none. */
+    /**
+     * The exterior id of the block entity at the position, unknown if there is none.
+     */
     private static String exteriorIdAt(CommandContext<CommandSourceStack> ctx, BlockPos pos) {
         return findBlockEntity(ctx, pos, TardisExteriorBlockEntity.class)
                 .map(be -> be.getExterior().id())
                 .orElse("unknown");
     }
 
-    /** Turns deletion mode on or off for the player who ran the command. */
+    /**
+     * Turns deletion mode on or off for the player who ran the command.
+     */
     private static int setDeletionMode(CommandContext<CommandSourceStack> ctx, boolean enabled) {
         ServerPlayer player = playerOrFail(ctx);
         if (player == null) return 0;
@@ -219,6 +234,7 @@ public final class TardisCommands {
         if (oldLevel == null || oldPos == null || tardis.exterior().isEmpty()) return fail(ctx, "no_exterior", idText);
 
         ServerLevel level = ctx.getSource().getLevel();
+        if (TardisDimensionUtil.isInterior(level)) return fail(ctx, "summon_inside_tardis");
         BlockPos pos = player.blockPosition().relative(player.getDirection(), SUMMON_DISTANCE);
         boolean samePlace = level == oldLevel && pos.equals(oldPos);
         if (!samePlace && !level.getBlockState(pos).canBeReplaced()) return fail(ctx, "summon_blocked");
@@ -227,7 +243,9 @@ public final class TardisCommands {
         return success(ctx, true, "summon_tardis", idText, pos.toShortString());
     }
 
-    /** Lists every exterior id. */
+    /**
+     * Lists every exterior id.
+     */
     private static int listExteriors(CommandContext<CommandSourceStack> ctx) {
         String ids = TardisExteriorRegistry.getAll().stream()
                 .map(TardisExterior::id)
@@ -235,7 +253,9 @@ public final class TardisCommands {
         return success(ctx, false, "list_exterior", ids);
     }
 
-    /** Lists the controls of the console you are looking at. */
+    /**
+     * Lists the controls of the console you are looking at.
+     */
     private static int listControls(CommandContext<CommandSourceStack> ctx) {
         Optional<TardisConsoleBlockEntity> console = lookedAtBlock(ctx)
                 .flatMap(pos -> findBlockEntity(ctx, pos, TardisConsoleBlockEntity.class));

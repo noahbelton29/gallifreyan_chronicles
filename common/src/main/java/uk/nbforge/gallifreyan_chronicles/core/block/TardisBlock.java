@@ -1,6 +1,7 @@
 package uk.nbforge.gallifreyan_chronicles.core.block;
 
 import uk.nbforge.gallifreyan_chronicles.util.MessageUtil;
+import uk.nbforge.gallifreyan_chronicles.util.TardisDimensionUtil;
 import uk.nbforge.gallifreyan_chronicles.util.ExteriorCollisionUtil;
 
 import uk.nbforge.gallifreyan_chronicles.compat.portal.TardisPortalBridge;
@@ -70,6 +71,12 @@ public class TardisBlock extends BaseEntityBlock {
     }
 
     @Override
+    public boolean canSurvive(@NonNull BlockState state, @NonNull LevelReader level, @NonNull BlockPos pos) {
+        if (level instanceof Level realLevel && TardisDimensionUtil.isInterior(realLevel)) return false;
+        return super.canSurvive(state, level, pos);
+    }
+
+    @Override
     public void setPlacedBy(@NonNull Level level, @NonNull BlockPos pos, @NonNull BlockState state, LivingEntity placer,
                             @NonNull ItemStack stack) {
         super.setPlacedBy(level, pos, state, placer, stack);
@@ -120,7 +127,9 @@ public class TardisBlock extends BaseEntityBlock {
         applyExteriorFromInterior(entity, chosen);
     }
 
-    /** Sets the entity's exterior to whichever one the chosen interior resolves to, works on either side since it only touches the local ECS component. */
+    /**
+     * Sets the entity's exterior to whichever one the chosen interior resolves to, works on either side since it only touches the local ECS component.
+     */
     private static void applyExteriorFromInterior(Entity entity, @Nullable String chosenInterior) {
         if (chosenInterior == null || !TardisInteriorRegistry.contains(chosenInterior)) return;
 

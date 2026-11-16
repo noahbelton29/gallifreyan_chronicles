@@ -14,6 +14,7 @@ import net.minecraft.core.Direction;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.Blocks;
 
 import java.util.UUID;
@@ -91,7 +92,10 @@ public final class TardisLandingSystem {
         if (old == null || !(old.getLevel() instanceof ServerLevel oldLevel)) return null;
         BlockPos oldPos = old.getBlockPos();
 
-        boolean glowing = old.getBlockState().getValue(TardisBlock.GLOWING);
+        BlockState oldState = old.getBlockState();
+        boolean glowing = oldState.getValue(TardisBlock.GLOWING);
+        boolean inFlight = oldState.getValue(TardisBlock.IN_FLIGHT);
+        int light = oldState.getValue(TardisBlock.LIGHT);
 
         BlockPos oldTopPos = oldPos.above();
         if (oldLevel.getBlockState(oldTopPos).is(GCBlocks.TARDIS_TOP)) {
@@ -102,7 +106,10 @@ public final class TardisLandingSystem {
 
         newLevel.setBlock(
                 pos,
-                GCBlocks.TARDIS.defaultBlockState().setValue(TardisBlock.GLOWING, glowing),
+                GCBlocks.TARDIS.defaultBlockState()
+                        .setValue(TardisBlock.GLOWING, glowing)
+                        .setValue(TardisBlock.IN_FLIGHT, inFlight)
+                        .setValue(TardisBlock.LIGHT, light),
                 Block.UPDATE_ALL
         );
         if (!(newLevel.getBlockEntity(pos) instanceof TardisExteriorBlockEntity fresh)) return null;

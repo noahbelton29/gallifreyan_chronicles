@@ -15,6 +15,7 @@ public class TardisOwnerProvider implements IBlockComponentProvider {
 
     @Override
     public void appendTooltip(@NonNull ITooltip tooltip, @NonNull BlockAccessor accessor, @NonNull IPluginConfig config) {
+        if (!accessor.getServerData().contains(TardisOwnerDataProvider.KEY)) return;
         String name = accessor.getServerData().getStringOr(TardisOwnerDataProvider.KEY, "");
 
         Component value = name.isEmpty()

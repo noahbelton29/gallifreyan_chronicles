@@ -346,6 +346,8 @@ public class TardisExteriorBlockEntity extends BlockEntity implements GeoBlockEn
             }
         }
         this.locked = other.locked;
+        this.powered = other.powered;
+        this.portalActive = other.portalActive;
         this.flight.copyFrom(other.flight);
         this.cloak.copyFrom(other.cloak);
         this.heldKey.copyFrom(other.heldKey);

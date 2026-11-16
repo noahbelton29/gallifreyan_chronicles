@@ -181,7 +181,7 @@ public class SpaceTimeThrottleControl extends BaseControl {
         } else {
             land(level, console, tardisId);
         }
-        console.triggerControl(GCTardisControls.SPACE_TIME_THROTTLE, false, null);
+        console.triggerControl(GCTardisControls.SPACE_TIME_THROTTLE, takingOff, null);
         return true;
     }
 

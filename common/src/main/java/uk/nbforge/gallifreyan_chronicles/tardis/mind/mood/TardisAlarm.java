@@ -29,9 +29,9 @@ import java.util.Set;
 import java.util.UUID;
 
 /**
-   Alarms with flashing lights and cloister bell sounds.
-   They run for a set number of flashes, until the TARDIS calms down, or until a crashed TARDIS is repaired.
-*/
+ * Alarms with flashing lights and cloister bell sounds.
+ * They run for a set number of flashes, until the TARDIS calms down, or until a crashed TARDIS is repaired.
+ */
 public final class TardisAlarm {
     // Length of each flash and the gap between repeated sounds, in ticks
     public static final int FLASH_TICKS = 30;
@@ -68,7 +68,9 @@ public final class TardisAlarm {
         }
     }
 
-    /** So alarms start again after the server restarts. */
+    /**
+     * So alarms start again after the server restarts.
+     */
     public static void resumeCrashAlarms(MinecraftServer server) {
         for (Tardis tardis : TardisApi.all(server)) {
             if (tardis.data().isCrashed(tardis.id())) {
@@ -78,7 +80,9 @@ public final class TardisAlarm {
         }
     }
 
-    /** While it stays crashed the alarm keeps flashing and ringing, when repaired or removed it stops. */
+    /**
+     * While it stays crashed the alarm keeps flashing and ringing, when repaired or removed it stops.
+     */
     private static void repairTick(Tardis tardis) {
         if (!UNTIL_REPAIRED.contains(tardis.id())) return;
         ServerLevel level = tardis.interiorLevel().orElse(null);
@@ -105,7 +109,9 @@ public final class TardisAlarm {
         flashWithBell(level, times, () -> loudBell(level));
     }
 
-    /** Each sound is one flash apart. */
+    /**
+     * Each sound is one flash apart.
+     */
     private static void flashWithBell(ServerLevel level, int times, Runnable ring) {
         TardisAlarmPayload.broadcast(level, times);
         for (int i = 0; i < times; i++) {
@@ -113,7 +119,9 @@ public final class TardisAlarm {
         }
     }
 
-    /** Runs until the stress falls below the calm level. */
+    /**
+     * Runs until the stress falls below the calm level.
+     */
     public static void untilCalm(Tardis tardis, ServerLevel level, BlockPos bellPos) {
         if (!RUNNING.add(tardis.id())) return;
         TardisAlarmPayload.broadcast(level, TardisAlarmPayload.FOREVER);
@@ -141,7 +149,9 @@ public final class TardisAlarm {
         }
     }
 
-    /** Full volume inside and quieter outside. */
+    /**
+     * Full volume inside and quieter outside.
+     */
     private static void bell(ServerLevel level) {
         for (ServerPlayer player : level.players()) {
             ringAt(player, INSIDE_VOLUME);
@@ -157,12 +167,15 @@ public final class TardisAlarm {
                 player.getX(), player.getEyeY(), player.getZ(), volume, 1.0F, player.getRandom().nextLong()));
     }
 
-    /** The distance is measured from the exterior block position. */
+    /**
+     * The distance is measured from the exterior block position.
+     */
     public static List<ServerPlayer> playersOutside(ServerLevel interior) {
         Tardis tardis = TardisApi.ofLevel(interior).orElse(null);
         if (tardis == null) return List.of();
         TardisExteriorBlockEntity exterior = tardis.exterior().orElse(null);
         if (exterior == null || !(exterior.getLevel() instanceof ServerLevel outside)) return List.of();
+        if (exterior.isFullyInvisible()) return List.of();
         Vec3 doors = Vec3.atCenterOf(exterior.getBlockPos());
         List<ServerPlayer> near = new ArrayList<>();
         for (ServerPlayer player : outside.players()) {

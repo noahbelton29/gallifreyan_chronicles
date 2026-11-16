@@ -2,6 +2,7 @@ package uk.nbforge.gallifreyan_chronicles.core.item;
 
 import uk.nbforge.gallifreyan_chronicles.core.block_entities.TardisExteriorBlockEntity;
 import uk.nbforge.gallifreyan_chronicles.core.GCDataComponents;
+import uk.nbforge.gallifreyan_chronicles.core.item.tooltip.ItemInfoTooltip;
 import uk.nbforge.gallifreyan_chronicles.core.GCTardisControls;
 import uk.nbforge.gallifreyan_chronicles.tardis.Tardis;
 import uk.nbforge.gallifreyan_chronicles.tardis.TardisApi;
@@ -28,7 +29,7 @@ public class StattenheimRemoteItem extends Item {
     private static final int SUMMON_COOLDOWN_TICKS = 400;
 
     public StattenheimRemoteItem(Properties properties) {
-        super(properties);
+        super(properties.component(GCDataComponents.ITEM_INFO, ItemInfoTooltip.STATTENHEIM_REMOTE));
     }
 
     @Override

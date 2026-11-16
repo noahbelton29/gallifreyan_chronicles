@@ -28,7 +28,8 @@ public enum ItemInfoTooltip implements TooltipProvider {
     DOOR,
     INTERIOR_DOOR,
     KEY,
-    MASTER_KEY;
+    MASTER_KEY,
+    STATTENHEIM_REMOTE;
 
     @Override
     public void addToTooltip(Item.TooltipContext context, Consumer<Component> tooltip, TooltipFlag flag,
@@ -40,6 +41,7 @@ public enum ItemInfoTooltip implements TooltipProvider {
             case INTERIOR_DOOR -> addInteriorDoor(tooltip, flag, components);
             case KEY -> addKey(tooltip, flag, components);
             case MASTER_KEY -> addMasterKey(tooltip, flag, components);
+            case STATTENHEIM_REMOTE -> addStattenheimRemote(tooltip, flag, components);
         }
     }
 
@@ -151,5 +153,16 @@ public enum ItemInfoTooltip implements TooltipProvider {
         addKeyStyle(tooltip, flag, components);
         tooltip.accept(Component.translatable("tooltip.gallifreyan_chronicles.key.master")
                 .withStyle(ChatFormatting.GOLD));
+    }
+
+    private static void addStattenheimRemote(Consumer<Component> tooltip, TooltipFlag flag, DataComponentGetter components) {
+        UUID tardisId = components.get(GCDataComponents.TARDIS_ID);
+        if (tardisId == null) {
+            tooltip.accept(Component.translatable("tooltip.gallifreyan_chronicles.key.unlinked")
+                    .withStyle(ChatFormatting.DARK_GRAY));
+        } else {
+            tooltip.accept(SelectionTooltip.line("tooltip.gallifreyan_chronicles.key.linked",
+                    SelectionTooltip.highlight(Component.literal(tardisId.toString()))));
+        }
     }
 }

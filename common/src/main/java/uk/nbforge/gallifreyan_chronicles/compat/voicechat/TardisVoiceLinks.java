@@ -66,12 +66,13 @@ public final class TardisVoiceLinks {
         for (Tardis tardis : TardisApi.all(server)) {
             Optional<TardisExteriorBlockEntity> exterior = tardis.exteriorIfLoaded();
             if (exterior.isEmpty()) continue;
+            TardisExteriorBlockEntity ext = exterior.get();
+            if (ext.isFullyInvisible()) continue;
             InteriorDoorBlockEntity door = pickDoor(tardis.interiorDoors());
             if (door == null || !(door.getLevel() instanceof ServerLevel interiorLevel)) continue;
-
-            TardisExteriorBlockEntity ext = exterior.get();
             BlockPos exteriorPos = ext.getBlockPos();
             BlockPos doorPos = door.getBlockPos();
+            assert ext.getLevel() != null;
             linkSnapshot.add(new Link(tardis.id(),
                     ext.getLevel().dimension(), exteriorPos.getX() + 0.5, exteriorPos.getY() + 1.0, exteriorPos.getZ() + 0.5,
                     interiorLevel.dimension(), doorPos.getX() + 0.5, doorPos.getY() + 1.0, doorPos.getZ() + 0.5,

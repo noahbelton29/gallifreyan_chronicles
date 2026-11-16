@@ -30,6 +30,7 @@ public final class GCConfig {
         int max_rendered_portals = 8;
         boolean immersive_portals = true;
         boolean debug_replay = false;
+        boolean show_control_names = false;
     }
 
     private static Data data = new Data();
@@ -211,5 +212,13 @@ public final class GCConfig {
 
     public static void setShowVersionHud(boolean show) {
         data.show_version_hud = show;
+    }
+
+    public static boolean showControlNames() {
+        return data.show_control_names;
+    }
+
+    public static void setShowControlNames(boolean show) {
+        data.show_control_names = show;
     }
 }

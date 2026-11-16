@@ -13,7 +13,11 @@ import java.util.Map;
 import java.util.WeakHashMap;
 
 public final class ConsoleHumSounds {
-    private static final int CHECK_INTERVAL_TICKS = 10;
+    // Checked every tick (was throttled to every 10 ticks): the interior hum stopping on
+    // one poll and the exterior hum starting on the next, independent, poll left a gap of
+    // up to half a second of true silence when walking out through the door, which stood
+    // out once the exterior hum stopped masking it with its own fade-in
+    private static final int CHECK_INTERVAL_TICKS = 1;
     private static final double START_RANGE_SQR = TardisConsoleHumSoundInstance.HEARING_RANGE * TardisConsoleHumSoundInstance.HEARING_RANGE;
 
     private static final Map<TardisConsoleBlockEntity, TardisConsoleHumSoundInstance> HUMS = new WeakHashMap<>();

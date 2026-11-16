@@ -17,7 +17,8 @@ public class TardisOwnerDataProvider implements IServerDataProvider<BlockAccesso
     @Override
     public void appendServerData(CompoundTag data, BlockAccessor accessor) {
         if (accessor.getBlockEntity() instanceof TardisExteriorBlockEntity exterior) {
-            TardisApi.of(exterior).flatMap(Tardis::ownerName).ifPresent(name -> data.putString(KEY, name));
+            String name = TardisApi.of(exterior).flatMap(Tardis::ownerName).orElse("");
+            data.putString(KEY, name);
         }
     }
 

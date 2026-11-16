@@ -36,7 +36,7 @@ public class TardisLampOrbLayer<T extends GeoAnimatable, O, R extends GeoRenderS
     private static final Identifier TEXTURE = GCUtil.modIdentifier("textures/effect/lamp_orb.png");
     // Block and sky light both at the max
     private static final int FULL_BRIGHT = 0xF000F0;
-    private static final float SIZE = 1.8f;
+    private static final float SIZE = 0.45f;
     private static final float TOWARDS_CAMERA = 1.2f;
     private static final int DRAW_AFTER_BOX = 10;
 

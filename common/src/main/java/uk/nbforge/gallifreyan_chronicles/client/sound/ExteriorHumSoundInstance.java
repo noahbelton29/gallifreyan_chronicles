@@ -20,8 +20,10 @@ public class ExteriorHumSoundInstance extends ExteriorSoundInstance {
 
     public ExteriorHumSoundInstance(TardisExteriorBlockEntity exterior) {
         super(exterior, GCSounds.FIRST_DOCTORS_HUM, true);
-        // Start silent and fade in with the power
-        this.power = 0.0F;
+        // Start at the current power level right away, walking out through the door or coming back
+        // into range should sound the same instantly, the fade is only for an actual power change
+        // (approach() in tick() still ramps this if isPowered() flips while this instance is alive)
+        this.power = exterior.isPowered() ? 1.0F : 0.0F;
         this.volume = 0.0F;
     }
 

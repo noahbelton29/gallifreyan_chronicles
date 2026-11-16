@@ -7,8 +7,8 @@
 				"texture_width": 256,
 				"texture_height": 256,
 				"visible_bounds_width": 3,
-				"visible_bounds_height": 4.5,
-				"visible_bounds_offset": [0, 1.75, 0]
+				"visible_bounds_height": 7.5,
+				"visible_bounds_offset": [0, 3.25, 0]
 			},
 			"bones": [
 				{
@@ -77,7 +77,7 @@
 				},
 				{
 					"name": "lamp",
-					"pivot": [0, 0, 0],
+					"pivot": [0, 44.5, 0],
 					"cubes": [
 						{"origin": [-1, 43, -1], "size": [2, 3, 2], "uv": [128, 20]}
 					]

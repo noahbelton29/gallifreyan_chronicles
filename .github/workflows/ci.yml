@@ -1,0 +1,183 @@
+name: CI
+
+# Runs on every push and pull request: builds both loaders, checks datagen output
+# and translations, boots a dedicated server on each loader, and posts the result to Discord.
+
+on:
+  push:
+    branches: [ "**" ]
+  pull_request:
+  workflow_dispatch:
+
+# A newer push to the same branch cancels the older run
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+env:
+  JAVA_VERSION: "25"
+
+jobs:
+  build:
+    name: Build
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: ${{ env.JAVA_VERSION }}
+
+      # Caches Gradle, Loom and NeoForm downloads between runs
+      - uses: gradle/actions/setup-gradle@v5
+
+      - name: Build Fabric and NeoForge (with Javadoc)
+        env:
+          GC_LOCK_UUID: ${{ secrets.DEV_LOCK_UUID }}
+        run: ./gradlew build -Pwatermark=off --console=plain
+
+      - name: Name the artifact
+        id: meta
+        run: echo "short_sha=${GITHUB_SHA::7}" >> "$GITHUB_OUTPUT"
+
+      - name: Upload dev jars
+        uses: actions/upload-artifact@v5
+        with:
+          name: gc-dev-${{ steps.meta.outputs.short_sha }}
+          path: |
+            fabric/build/libs/*.jar
+            neoforge/build/libs/*.jar
+            !**/*-sources.jar
+            !**/*-javadoc.jar
+          if-no-files-found: error
+          retention-days: 14
+
+  datagen:
+    name: Datagen is up to date
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: ${{ env.JAVA_VERSION }}
+
+      - uses: gradle/actions/setup-gradle@v5
+
+      - name: Run datagen
+        run: ./gradlew :neoforge:runData -Pwatermark=off --console=plain
+
+      - name: Check the generated files are committed
+        run: |
+          changes="$(git status --porcelain -- common/src/main/resources)"
+          if [ -n "$changes" ]; then
+            echo "::error::Datagen output does not match what is committed. Run ./gradlew :neoforge:runData and commit the result."
+            echo "$changes"
+            git --no-pager diff --stat -- common/src/main/resources
+            git --no-pager diff -- common/src/main/resources | head -200
+            exit 1
+          fi
+          echo "Datagen output matches the committed files"
+
+  translations:
+    name: Translations
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v5
+      - name: Check translation keys
+        run: python3 .github/scripts/check_translations.py
+
+  boot-test:
+    name: Server boots (${{ matrix.loader }})
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    strategy:
+      fail-fast: false
+      matrix:
+        loader: [ fabric, neoforge ]
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: ${{ env.JAVA_VERSION }}
+
+      - uses: gradle/actions/setup-gradle@v5
+
+      - name: Prepare the server folder
+        run: |
+          dir="${{ matrix.loader }}/runs/server"
+          mkdir -p "$dir"
+          echo "eula=true" > "$dir/eula.txt"
+          printf 'online-mode=false\nspawn-protection=0\nmax-tick-time=-1\nsync-chunk-writes=false\n' > "$dir/server.properties"
+
+      - name: Start the server
+        # The mod shuts the server down after a few seconds of ticking when -PbootTest is set
+        timeout-minutes: 20
+        run: |
+          set -o pipefail
+          ./gradlew :${{ matrix.loader }}:runServer -PbootTest -Pwatermark=off --console=plain 2>&1 | tee boot.log || true
+          if grep -q "BOOT TEST PASSED" boot.log; then
+            echo "Server started and ticked with the mod loaded"
+          else
+            echo "::error::The ${{ matrix.loader }} server did not finish booting. Check boot.log and the crash reports in the artifacts."
+            exit 1
+          fi
+
+      - name: Upload logs on failure
+        if: failure()
+        uses: actions/upload-artifact@v5
+        with:
+          name: boot-test-logs-${{ matrix.loader }}
+          path: |
+            boot.log
+            ${{ matrix.loader }}/runs/server/logs/
+            ${{ matrix.loader }}/runs/server/crash-reports/
+          if-no-files-found: ignore
+          retention-days: 7
+
+  notify:
+    name: Discord
+    needs: [ build, datagen, translations, boot-test ]
+    # Pushes only (not pull requests), and only when the webhook secret is set
+    if: always() && github.event_name == 'push'
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Post the result
+        env:
+          WEBHOOK: ${{ secrets.CI_DISCORD_WEBHOOK }}
+          RESULTS: ${{ toJSON(needs) }}
+          BRANCH: ${{ github.ref_name }}
+          COMMIT_MESSAGE: ${{ github.event.head_commit.message }}
+          AUTHOR: ${{ github.event.head_commit.author.name }}
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+          COMMIT_URL: ${{ github.server_url }}/${{ github.repository }}/commit/${{ github.sha }}
+        run: |
+          if [ -z "$WEBHOOK" ]; then
+            echo "No CI_DISCORD_WEBHOOK secret, skipping"
+            exit 0
+          fi
+          failed="$(echo "$RESULTS" | jq -r 'to_entries | map(select(.value.result == "failure" or .value.result == "cancelled")) | map(.key) | join(", ")')"
+          if [ -z "$failed" ]; then
+            title="✅ Build passed"; colour=5763719
+          else
+            title="❌ Build failed: $failed"; colour=15548997
+          fi
+          summary="$(printf '%s' "$COMMIT_MESSAGE" | head -n 1 | cut -c1-200)"
+          jq -n \
+            --arg title "$title" --arg url "$RUN_URL" --argjson colour "$colour" \
+            --arg desc "[\`${GITHUB_SHA::7}\`]($COMMIT_URL) $summary" \
+            --arg branch "$BRANCH" --arg author "$AUTHOR" \
+            '{username: "GC CI", allowed_mentions: {parse: []}, embeds: [{title: $title, url: $url, color: $colour, description: $desc,
+              fields: [{name: "Branch", value: $branch, inline: true}, {name: "Author", value: $author, inline: true}]}]}' \
+            | curl -sS -f -X POST -H "Content-Type: application/json" -d @- "$WEBHOOK"

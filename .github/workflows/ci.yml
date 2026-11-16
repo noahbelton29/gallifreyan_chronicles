@@ -1,15 +1,11 @@
 name: CI
 
-# Runs on every push and pull request: builds both loaders, checks datagen output
-# and translations, boots a dedicated server on each loader, and posts the result to Discord.
-
 on:
   push:
-    branches: [ "**" ]
+    branches: ["**"]
   pull_request:
   workflow_dispatch:
 
-# A newer push to the same branch cancels the older run
 concurrency:
   group: ci-${{ github.ref }}
   cancel-in-progress: true
@@ -25,6 +21,8 @@ jobs:
     name: Build
     runs-on: ubuntu-latest
     timeout-minutes: 30
+    outputs:
+      artifact: gc-dev-${{ steps.meta.outputs.short_sha }}
     steps:
       - uses: actions/checkout@v5
 
@@ -33,7 +31,6 @@ jobs:
           distribution: temurin
           java-version: ${{ env.JAVA_VERSION }}
 
-      # Caches Gradle, Loom and NeoForm downloads between runs
       - uses: gradle/actions/setup-gradle@v5
 
       - name: Build Fabric and NeoForge (with Javadoc)
@@ -97,12 +94,13 @@ jobs:
 
   boot-test:
     name: Server boots (${{ matrix.loader }})
+    needs: build
     runs-on: ubuntu-latest
-    timeout-minutes: 30
+    timeout-minutes: 20
     strategy:
       fail-fast: false
       matrix:
-        loader: [ fabric, neoforge ]
+        loader: [fabric, neoforge]
     steps:
       - uses: actions/checkout@v5
 
@@ -111,27 +109,32 @@ jobs:
           distribution: temurin
           java-version: ${{ env.JAVA_VERSION }}
 
-      - uses: gradle/actions/setup-gradle@v5
+      - name: Download the built jars
+        uses: actions/download-artifact@v5
+        with:
+          name: ${{ needs.build.outputs.artifact }}
+          path: jars
 
-      - name: Prepare the server folder
-        run: |
-          dir="${{ matrix.loader }}/runs/server"
-          mkdir -p "$dir"
-          echo "eula=true" > "$dir/eula.txt"
-          printf 'online-mode=false\nspawn-protection=0\nmax-tick-time=-1\nsync-chunk-writes=false\n' > "$dir/server.properties"
+      - name: Cache the server files
+        uses: actions/cache@v4
+        with:
+          path: |
+            boot-server/${{ matrix.loader }}/libraries
+            boot-server/${{ matrix.loader }}/versions
+            boot-server/${{ matrix.loader }}/.fabric
+            boot-server/${{ matrix.loader }}/fabric-server-launch.jar
+            boot-server/${{ matrix.loader }}/run.sh
+            boot-server/${{ matrix.loader }}/user_jvm_args.txt
+          key: boot-server-${{ matrix.loader }}-${{ hashFiles('gradle.properties') }}
 
       - name: Start the server
-        # The mod shuts the server down after a few seconds of ticking when -PbootTest is set
-        timeout-minutes: 20
         run: |
-          set -o pipefail
-          ./gradlew :${{ matrix.loader }}:runServer -PbootTest -Pwatermark=off --console=plain 2>&1 | tee boot.log || true
-          if grep -q "BOOT TEST PASSED" boot.log; then
-            echo "Server started and ticked with the mod loaded"
-          else
-            echo "::error::The ${{ matrix.loader }} server did not finish booting. Check boot.log and the crash reports in the artifacts."
+          jar="$(find jars -path "*${{ matrix.loader }}/build/libs/gc-${{ matrix.loader }}-*.jar" | head -n1)"
+          if [ -z "$jar" ]; then
+            echo "::error::No ${{ matrix.loader }} jar in the build artifact"
             exit 1
           fi
+          bash .github/scripts/prod_boot_test.sh "${{ matrix.loader }}" "$jar" "boot-server/${{ matrix.loader }}"
 
       - name: Upload logs on failure
         if: failure()
@@ -140,15 +143,15 @@ jobs:
           name: boot-test-logs-${{ matrix.loader }}
           path: |
             boot.log
-            ${{ matrix.loader }}/runs/server/logs/
-            ${{ matrix.loader }}/runs/server/crash-reports/
+            boot-server/${{ matrix.loader }}/logs/
+            boot-server/${{ matrix.loader }}/crash-reports/
+            boot-server/${{ matrix.loader }}/installer.log
           if-no-files-found: ignore
           retention-days: 7
 
   notify:
     name: Discord
-    needs: [ build, datagen, translations, boot-test ]
-    # Pushes only (not pull requests), and only when the webhook secret is set
+    needs: [build, datagen, translations, boot-test]
     if: always() && github.event_name == 'push'
     runs-on: ubuntu-latest
     timeout-minutes: 5

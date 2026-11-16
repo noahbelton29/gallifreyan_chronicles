@@ -1,12 +1,5 @@
 name: Tester builds
 
-# Run from the Actions tab. Builds account-locked, watermarked Fabric and NeoForge jars
-# for each tester (the existing buildTesterJars task) and posts them to Discord.
-#
-# Secrets:
-#   TESTERS_PROPERTIES      the contents of your local testers.properties (name=uuid per line)
-#   TESTER_DISCORD_WEBHOOK  webhook for the private channel the jars are posted to
-
 on:
   workflow_dispatch:
     inputs:
@@ -85,7 +78,6 @@ jobs:
         if: always()
         run: rm -f testers.properties
 
-      # The ledger maps each watermark build ID to the tester it was made for
       - name: Upload the build ledger
         if: success() && inputs.watermark == 'on'
         uses: actions/upload-artifact@v5

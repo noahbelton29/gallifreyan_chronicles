@@ -97,7 +97,6 @@ loom {
             setConfigName('Fabric Server')
             ideConfigGenerated(true)
             runDir('runs/server')
-            // CI boot test: ./gradlew :fabric:runServer -PbootTest
             if (project.hasProperty('bootTest')) {
                 property('gallifreyan_chronicles.bootTest', 'true')
             }

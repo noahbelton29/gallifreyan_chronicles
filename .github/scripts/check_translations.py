@@ -7,16 +7,13 @@ import sys
 MOD_ID = "gallifreyan_chronicles"
 LANG_DIR = f"common/src/main/resources/assets/{MOD_ID}/lang"
 SOURCE_DIRS = ["common/src/main/java", "fabric/src/main/java", "neoforge/src/main/java"]
-# Datagen defines keys rather than using them
 SKIP_DIRS = ["datagen"]
 
 KEY_LITERAL = re.compile(r'"([a-z0-9_]+\.' + MOD_ID + r'\.[a-z0-9_.]*[a-z0-9_])"(\s*\+)?')
 STATE_CALL = re.compile(r'\bstate\(\s*"([a-z0-9_]+)"\s*,\s*"([a-z0-9_]+)"')
 STATE_PREFIX = f"tooltip.{MOD_ID}.control_state."
 
-# Literals that match the key shape but are not translation keys
 NOT_KEYS_PREFIXES = ("mixins.", "fabric.", "neoforge.")
-
 
 def github(kind, message, path=None, line=None):
     if os.environ.get("GITHUB_ACTIONS") == "true":
@@ -26,15 +23,13 @@ def github(kind, message, path=None, line=None):
         loc = f"{path}:{line}: " if path else ""
         print(f"{kind.upper()}: {loc}{message}")
 
-
 def load_lang(name):
     path = os.path.join(LANG_DIR, name)
     with open(path, encoding="utf-8") as f:
         return json.load(f)
 
-
 def find_used_keys():
-    used = {}  # key -> first (path, line)
+    used = {}
     for root_dir in SOURCE_DIRS:
         for dirpath, dirnames, filenames in os.walk(root_dir):
             if any(part in SKIP_DIRS for part in dirpath.replace("\\", "/").split("/")):
@@ -58,7 +53,6 @@ def find_used_keys():
                             used.setdefault(f"{STATE_PREFIX}label.{label}", (path, number))
                             used.setdefault(f"{STATE_PREFIX}value.{value}", (path, number))
     return used
-
 
 def main():
     english = load_lang("en_us.json")
@@ -84,7 +78,6 @@ def main():
     print(f"Checked {len(used)} keys used in code against {len(english)} English translations "
           f"and {len(others)} other language(s): {len(missing_english)} missing, {warnings} warning(s)")
     return 1 if missing_english else 0
-
 
 if __name__ == "__main__":
     sys.exit(main())

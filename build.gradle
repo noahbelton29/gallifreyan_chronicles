@@ -7,7 +7,6 @@ plugins {
 
 def baseVersion = project.version.toString()
 def buildStamp = java.time.LocalDateTime.now().format(java.time.format.DateTimeFormatter.ofPattern('yyddMM-HHmm'))
-// CI release builds pass -PreleaseVersion=1.2.3 (from the git tag) for a clean version with no dev stamp
 def releaseVersion = providers.gradleProperty('releaseVersion').orNull
 allprojects {
     version = releaseVersion ?: "${baseVersion}-dev-${buildStamp}"

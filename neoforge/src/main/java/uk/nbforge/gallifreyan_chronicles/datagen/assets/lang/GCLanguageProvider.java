@@ -398,6 +398,7 @@ public class GCLanguageProvider extends LanguageProvider {
         add("death.attack.gallifreyan_chronicles.smoke", "%1$s choked on the smoke of a crashed TARDIS");
         add("death.attack.gallifreyan_chronicles.smoke.player", "%1$s choked on the smoke of a crashed TARDIS while fighting %2$s");
         add("message.gallifreyan_chronicles.power_locked_crashing", "The TARDIS is crashing, the power won't budge!");
+        add("message.gallifreyan_chronicles.cloister_bell_locked_crashing", "The TARDIS is crashing, the cloister bell won't stop!");
         add("message.gallifreyan_chronicles.mallet_shudders", "The TARDIS shudders...");
         add("message.gallifreyan_chronicles.mallet_flinches", "The TARDIS flinches away from you...");
         add("message.gallifreyan_chronicles.mallet_cowers", "The TARDIS cowers...");
@@ -607,6 +608,8 @@ public class GCLanguageProvider extends LanguageProvider {
         add("tooltip.gallifreyan_chronicles.control_state.label.isomorphic", "Isomorphic Security");
         add("tooltip.gallifreyan_chronicles.control_state.label.handbrake", "Handbrake");
         add("tooltip.gallifreyan_chronicles.control_state.label.throttle", "Throttle");
+        add("tooltip.gallifreyan_chronicles.control_state.label.stabilizers", "Stabilizers");
+        add("tooltip.gallifreyan_chronicles.control_state.label.cloister_bell", "Cloister Bell");
         add("tooltip.gallifreyan_chronicles.control_state.value.open", "Open");
         add("tooltip.gallifreyan_chronicles.control_state.value.closed", "Closed");
         add("tooltip.gallifreyan_chronicles.control_state.value.locked", "Locked");

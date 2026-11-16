@@ -33,7 +33,7 @@ public final class DestinationCommands {
     private DestinationCommands() {
     }
 
-    /** data destination [here|clear|<dimension> <pos> <facing>] */
+    /** {@code data destination [here|clear|<dimension> <pos> <facing>]} */
     public static LiteralArgumentBuilder<CommandSourceStack> destinationData() {
         return literal("destination")
                 .executes(DestinationCommands::get)

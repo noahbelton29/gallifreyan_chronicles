@@ -32,6 +32,7 @@ public class GCTardisControls {
     public static final String CLOAKING_DEVICE_CONTROL = "cloaking_device_control";
     public static final String INTERIOR_DOOR_CONTROL = "interior_door_control";
     public static final String GYROSCOPIC_STABILIZERS = "gyroscopic_stabilizers";
+    public static final String CLOISTER_BELL_CONTROL = "cloister_bell_control";
 
     public static void registerTardisControls() {
         TardisControlTypes.register(NOOP_CONTROL, NoopControl.class, MapCodec.unit(NoopControl.INSTANCE));
@@ -50,6 +51,7 @@ public class GCTardisControls {
         control(CLOAKING_DEVICE_CONTROL, CloakingDeviceControl.DEFAULT_ANIMATIONS, CloakingDeviceControl::new);
         control(INTERIOR_DOOR_CONTROL, InteriorDoorControl.DEFAULT_ANIMATIONS, InteriorDoorControl::new);
         control(GYROSCOPIC_STABILIZERS, GyroscopicStabilizersControl.DEFAULT_ANIMATIONS, GyroscopicStabilizersControl::new);
+        control(CLOISTER_BELL_CONTROL, CloisterBellControl.DEFAULT_ANIMATIONS, CloisterBellControl::new);
 
         verifyCodecs();
         ControlPower.validate();

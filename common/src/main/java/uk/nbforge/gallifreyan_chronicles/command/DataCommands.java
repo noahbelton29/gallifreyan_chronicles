@@ -107,7 +107,7 @@ public final class DataCommands {
     }
 
     /**
-     * data yaw [<degrees>]
+     * {@code data yaw [<degrees>]}
      */
     private static LiteralArgumentBuilder<CommandSourceStack> yawData() {
         return literal("yaw")
@@ -158,7 +158,7 @@ public final class DataCommands {
     }
 
     /**
-     * data flight_remaining [skip|<seconds>], how long is left of the CURRENT flight, lets you fast-forward through
+     * {@code data flight_remaining [skip|<seconds>]}, how long is left of the CURRENT flight, lets you fast-forward through
      * it (or push it out to an absurd length) instead of waiting. It works by writing the flight's duration
      * override so that, given how long it's already been travelling, exactly the requested amount is left, the
      * override is cleared the moment the TARDIS lands, so it only ever affects the flight that's happening right

@@ -35,7 +35,7 @@ public final class ConsoleCommands {
     }
 
     /**
-     * data console [<console_id>] [variant [<variant_id>]]
+     * {@code data console [<console_id>] [variant [<variant_id>]]}
      */
     public static LiteralArgumentBuilder<CommandSourceStack> consoleData() {
         return literal("console")

@@ -36,7 +36,7 @@ public final class ExteriorCommands {
     }
 
     /**
-     * data exterior [<exterior_id>]
+     * {@code data exterior [<exterior_id>]}
      */
     public static LiteralArgumentBuilder<CommandSourceStack> exteriorData() {
         return literal("exterior")
@@ -57,7 +57,7 @@ public final class ExteriorCommands {
     }
 
     /**
-     * data fade [<fade_type>]
+     * {@code data fade [<fade_type>]}
      */
     public static LiteralArgumentBuilder<CommandSourceStack> fadeData() {
         return literal("fade")

@@ -1,5 +1,8 @@
 package uk.nbforge.gallifreyan_chronicles.tardis.control.impl;
 
+import net.minecraft.ChatFormatting;
+import net.minecraft.network.chat.Component;
+
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
@@ -30,5 +33,10 @@ public class GyroscopicStabilizersControl extends BaseControl {
     @Override
     public void playClickSound(TardisControlEntity entity) {
         playSound(entity, GCSounds.SWITCH, 0.8f);
+    }
+
+    @Override
+    public Component describeState(boolean activated) {
+        return activated ? state("stabilizers", "engaged", ChatFormatting.GREEN) : state("stabilizers", "disengaged", ChatFormatting.RED);
     }
 }

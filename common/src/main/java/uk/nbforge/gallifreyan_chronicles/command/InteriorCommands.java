@@ -25,7 +25,7 @@ public final class InteriorCommands {
     private InteriorCommands() {
     }
 
-    /** data interior [<interior_id>] */
+    /** {@code data interior [<interior_id>]} */
     public static LiteralArgumentBuilder<CommandSourceStack> interiorData() {
         return literal("interior")
                 .executes(InteriorCommands::get)
@@ -34,7 +34,7 @@ public final class InteriorCommands {
                         .executes(InteriorCommands::set));
     }
 
-    /** data door variant [<variant_id>] */
+    /** {@code data door variant [<variant_id>]} */
     public static LiteralArgumentBuilder<CommandSourceStack> doorVariantData() {
         return literal("door")
                 .then(literal("variant")

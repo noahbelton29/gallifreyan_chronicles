@@ -61,6 +61,10 @@
       "animation": false,
       "cooldown": 0.5,
       "id": "directional_control"
+    },
+    {
+      "cooldown": 0.5,
+      "id": "cloister_bell_control"
     }
   ],
   "default_variant": "first_doctors_console",

@@ -20,25 +20,29 @@ public final class TardisApi {
     // The start of the name of every interior world, what follows it is the TARDIS id
     private static final String INTERIOR_PREFIX = TardisDimensionUtil.INTERIOR_PREFIX;
 
-    private TardisApi() {
+    public TardisApi() {
     }
 
-    /** Finds a TARDIS by its id, empty if the id is null or no TARDIS has it. */
+    /**
+     * Finds a TARDIS by its id, empty if the id is null or no TARDIS has it.
+     */
     public static Optional<Tardis> get(MinecraftServer server, @Nullable UUID tardisId) {
         if (tardisId == null) return Optional.empty();
         return TardisManager.get(server).get(tardisId).map(record -> new Tardis(server, record.tardisId()));
     }
 
-    /** The TARDIS whose interior world this is, empty on the client and in any world that is not a TARDIS interior. */
+    /**
+     * The TARDIS whose interior world this is, empty on the client and in any world that is not a TARDIS interior.
+     */
     public static Optional<Tardis> ofLevel(Level level) {
         if (!(level instanceof ServerLevel serverLevel)) return Optional.empty();
         return idOfLevel(level).flatMap(id -> get(serverLevel.getServer(), id));
     }
 
     /**
-       The TARDIS a block entity belongs to, it uses the TARDIS the block is linked to and if there is none, the TARDIS whose interior it is standing in.
-       Empty on the client.
-    */
+     * The TARDIS a block entity belongs to, it uses the TARDIS the block is linked to and if there is none, the TARDIS whose interior it is standing in.
+     * Empty on the client.
+     */
     public static <T extends BlockEntity & TardisLinkable> Optional<Tardis> of(T blockEntity) {
         if (!(blockEntity.getLevel() instanceof ServerLevel level)) return Optional.empty();
         UUID id = blockEntity.getLinkedTardisId().orElseGet(() -> idOfLevel(level).orElse(null));
@@ -46,14 +50,16 @@ public final class TardisApi {
     }
 
     /**
-       True when this player is not allowed to use the controls of the TARDIS the console belongs to.
-       A console with no TARDIS never blocks anyone.
-    */
+     * True when this player is not allowed to use the controls of the TARDIS the console belongs to.
+     * A console with no TARDIS never blocks anyone.
+     */
     public static <T extends BlockEntity & TardisLinkable> boolean cannotUseControls(T console, Player player) {
         return of(console).map(tardis -> !tardis.canUseControls(player)).orElse(false);
     }
 
-    /** Every TARDIS owned by this player. */
+    /**
+     * Every TARDIS owned by this player.
+     */
     @SuppressWarnings("unused")
     public static List<Tardis> ownedBy(MinecraftServer server, UUID ownerId) {
         return TardisManager.get(server).getByOwner(ownerId).stream()
@@ -61,7 +67,9 @@ public final class TardisApi {
                 .toList();
     }
 
-    /** Every TARDIS that exists on the server. */
+    /**
+     * Every TARDIS that exists on the server.
+     */
     public static List<Tardis> all(MinecraftServer server) {
         return TardisManager.get(server).getAllIds().stream()
                 .map(id -> new Tardis(server, id))
@@ -69,9 +77,9 @@ public final class TardisApi {
     }
 
     /**
-       Gets the TARDIS id out of the name of an interior world.
-       Interior worlds are named after the mod, a prefix and the id, so this returns empty for any other world or a name with a bad id.
-    */
+     * Gets the TARDIS id out of the name of an interior world.
+     * Interior worlds are named after the mod, a prefix and the id, so this returns empty for any other world or a name with a bad id.
+     */
     public static Optional<UUID> idOfLevel(Level level) {
         Identifier dimension = level.dimension().identifier();
         if (!dimension.getNamespace().equals(Constants.MOD_ID)) return Optional.empty();

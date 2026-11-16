@@ -1,8 +1,7 @@
 {
-  "default_exterior": "gallifreyan_chronicles:first_doctors_exterior",
-  "default_console": "gallifreyan_chronicles:brachacki_console",
-  "default_interior": "gallifreyan_chronicles:first_doctors_interior",
   "show_version_hud": true,
+  "show_overlay_messages": true,
+  "show_flight_messages": true,
   "tardis_hum_volume": 1.0,
   "camera_shake_intensity": 1.0,
   "power_darkness_strength": 1.0,
@@ -11,5 +10,6 @@
   "portal_render_distance": 20,
   "max_rendered_portals": 8,
   "immersive_portals": true,
-  "debug_replay": false
+  "debug_replay": false,
+  "show_control_names": false
 }

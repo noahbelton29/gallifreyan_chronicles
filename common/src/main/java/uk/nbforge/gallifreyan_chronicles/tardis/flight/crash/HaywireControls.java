@@ -17,9 +17,11 @@ public final class HaywireControls {
     public static void flick(Tardis tardis, RandomSource random) {
         for (TardisConsoleBlockEntity console : tardis.consoles()) {
             List<TardisControlEntity> controls = console.getControlEntities().stream()
-                    // Power and handbrake stay put
+                    // Power, handbrake and cloister bell stay put
                     .filter(control -> !control.getControlId().equals(GCTardisControls.POWER_CONTROL))
                     .filter(control -> !control.getControlId().equals(GCTardisControls.TIME_ROTOR_HANDBRAKE))
+                    // The cloister bell shows whether the alarm is ringing
+                    .filter(control -> !control.getControlId().equals(GCTardisControls.CLOISTER_BELL_CONTROL))
                     .toList();
             if (controls.isEmpty()) continue;
 

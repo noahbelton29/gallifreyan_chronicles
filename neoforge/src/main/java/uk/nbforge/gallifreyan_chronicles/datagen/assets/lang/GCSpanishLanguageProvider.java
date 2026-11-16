@@ -4,7 +4,9 @@ import uk.nbforge.gallifreyan_chronicles.Constants;
 import net.minecraft.data.PackOutput;
 import net.neoforged.neoforge.common.data.LanguageProvider;
 
-/** Spanish translations for Spain, the keys must match GCLanguageProvider. */
+/**
+ * Spanish translations for Spain, the keys must match GCLanguageProvider.
+ */
 public class GCSpanishLanguageProvider extends LanguageProvider {
     public GCSpanishLanguageProvider(PackOutput output) {
         super(output, Constants.MOD_ID, "es_es");
@@ -425,6 +427,8 @@ public class GCSpanishLanguageProvider extends LanguageProvider {
         add("tooltip.gallifreyan_chronicles.control_state.label.isomorphic", "Seguridad isomórfica");
         add("tooltip.gallifreyan_chronicles.control_state.label.handbrake", "Freno de mano");
         add("tooltip.gallifreyan_chronicles.control_state.label.throttle", "Acelerador");
+        add("tooltip.gallifreyan_chronicles.control_state.label.stabilizers", "Estabilizadores");
+        add("tooltip.gallifreyan_chronicles.control_state.label.cloister_bell", "Campana del claustro");
         add("tooltip.gallifreyan_chronicles.control_state.value.open", "Abierta");
         add("tooltip.gallifreyan_chronicles.control_state.value.closed", "Cerrada");
         add("tooltip.gallifreyan_chronicles.control_state.value.locked", "Bloqueada");
@@ -457,6 +461,7 @@ public class GCSpanishLanguageProvider extends LanguageProvider {
         add("message.gallifreyan_chronicles.no_destination_to_set", "¡Esta consola no tiene ningún destino de TARDIS que establecer!");
         add("message.gallifreyan_chronicles.not_your_key", "¡Esa no es tu llave!");
         add("message.gallifreyan_chronicles.power_locked_crashing", "¡La TARDIS se está estrellando, la palanca de energía no cede!");
+        add("message.gallifreyan_chronicles.cloister_bell_locked_crashing", "¡La TARDIS se está estrellando, la campana del claustro no se detiene!");
         add("message.gallifreyan_chronicles.still_travelling", "Aún en el vórtice, faltan %s segundos para poder aterrizar");
         add("message.gallifreyan_chronicles.tardis_balks.distrust", "La TARDIS no confía lo suficiente en ti como para despegar... tira de nuevo para obligarla");
         add("message.gallifreyan_chronicles.tardis_balks.stressed", "La TARDIS está estresada y no quiere despegar... tira de nuevo para obligarla");

@@ -152,7 +152,7 @@ public final class CommandUtil {
     }
 
     /**
-     * A "=== <title>: <short id> ===" header for a multi-line dump.
+     * A {@code "=== <title>: <short id> ==="} header for a multi-line dump.
      */
     public static MutableComponent dataHeader(String title, UUID id) {
         return Component.literal("=== " + title + ": ").withStyle(ChatFormatting.GOLD)

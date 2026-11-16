@@ -25,7 +25,7 @@ public final class ControlCommands {
     private ControlCommands() {
     }
 
-    /** data control <control_id> [on|off] */
+    /** {@code data control <control_id> [on|off]} */
     public static LiteralArgumentBuilder<CommandSourceStack> controlData() {
         return literal("control")
                 .then(argument("control", StringArgumentType.word())

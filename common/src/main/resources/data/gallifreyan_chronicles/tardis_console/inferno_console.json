@@ -87,6 +87,10 @@
         0.1875,
         0.1875
       ]
+    },
+    {
+      "cooldown": 0.5,
+      "id": "cloister_bell_control"
     }
   ],
   "glow_groups": [

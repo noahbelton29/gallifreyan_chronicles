@@ -100,7 +100,8 @@ public final class GCConsoleBuilder {
                 .control(GCTardisControls.Z_INCREMENT_CONTROL, 1)
                 .control(GCTardisControls.ISOMORPHIC_CONTROL, 0.5)
                 .control(GCTardisControls.GYROSCOPIC_STABILIZERS, 0.5)
-                .control(GCTardisControls.DIRECTIONAL_CONTROL, 0.5, Control::noAnimation);
+                .control(GCTardisControls.DIRECTIONAL_CONTROL, 0.5, Control::noAnimation)
+                .control(GCTardisControls.CLOISTER_BELL_CONTROL, 0.5);
     }
 
     /**

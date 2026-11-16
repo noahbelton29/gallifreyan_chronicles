@@ -130,6 +130,7 @@
       "tardis_console_info": true,
       "tardis_owner": true,
       "tardis_block_icon": true,
+      "interior_door_lock": true,
       "tardis_control": true,
       "tardis_exterior_info": true
     }

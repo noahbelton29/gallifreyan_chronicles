@@ -13,7 +13,7 @@ def git(*args):
 
 def previous_tag(tag):
     try:
-        return git("describe", "--tags", "--abbrev=0", f"{tag}^")
+        return git("describe", "--tags", "--abbrev=0", "--match", "v*", f"{tag}^")
     except subprocess.CalledProcessError:
         return None
 

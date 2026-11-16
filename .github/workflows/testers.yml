@@ -1,10 +1,12 @@
 name: Tester builds
 
 on:
+  schedule:
+    - cron: "0 0 * * *"
   workflow_dispatch:
     inputs:
       testers:
-        description: "Only these testers (comma-separated names). Blank = everyone"
+        description: "Only lock to these testers (comma-separated names). Blank = everyone"
         required: false
         default: ""
       expires_in:
@@ -27,12 +29,55 @@ concurrency:
 
 permissions:
   contents: read
+  actions: read
 
 jobs:
+  check:
+    name: Anything new?
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    outputs:
+      run: ${{ steps.check.outputs.run }}
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+
+      - name: Check for new commits that passed CI
+        id: check
+        env:
+          GH_TOKEN: ${{ github.token }}
+          EVENT: ${{ github.event_name }}
+        run: |
+          if [ "$EVENT" != "schedule" ]; then
+            echo "run=true" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          head="$(git rev-parse HEAD)"
+          last="$(git rev-parse -q --verify 'refs/tags/tester-build^{commit}' || true)"
+          if [ "$head" = "$last" ]; then
+            echo "::notice::No new commits since the last tester build (${head::7}), nothing to send"
+            echo "run=false" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          ci="$(gh run list --workflow ci.yml --commit "$head" --event push --json status,conclusion \
+            --jq '[.[] | select(.status == "completed")][0].conclusion // ""')"
+          if [ "$ci" != "success" ]; then
+            echo "::notice::Skipping tonight: CI on ${head::7} is '${ci:-not finished}'"
+            echo "run=false" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          echo "New commits since ${last:0:7}, CI passed on ${head::7}"
+          echo "run=true" >> "$GITHUB_OUTPUT"
+
   testers:
     name: Build tester jars
+    needs: check
+    if: needs.check.outputs.run == 'true'
     runs-on: ubuntu-latest
     timeout-minutes: 90
+    permissions:
+      contents: write
     steps:
       - uses: actions/checkout@v5
 
@@ -68,7 +113,7 @@ jobs:
             echo "::error::No TESTER_DISCORD_WEBHOOK secret and artifact upload is off, so the jars would go nowhere."
             exit 1
           fi
-          args=(buildTesterJars --console=plain)
+          args=(buildSharedTesterJars --console=plain)
           [ -n "$INPUT_TESTERS" ] && args+=("-PtesterOnly=$INPUT_TESTERS")
           [ -n "$INPUT_EXPIRES" ] && args+=("-PexpiresIn=$INPUT_EXPIRES")
           [ "$INPUT_WATERMARK" = "off" ] && args+=("-Pwatermark=off")
@@ -78,8 +123,14 @@ jobs:
         if: always()
         run: rm -f testers.properties
 
+      - name: Remember the commit that was sent
+        if: success() && github.ref == format('refs/heads/{0}', github.event.repository.default_branch) && inputs.testers == ''
+        run: |
+          git tag -f tester-build
+          git push -f origin tester-build
+
       - name: Upload the build ledger
-        if: success() && inputs.watermark == 'on'
+        if: success() && inputs.watermark != 'off'
         uses: actions/upload-artifact@v5
         with:
           name: build-ledger-${{ github.run_number }}

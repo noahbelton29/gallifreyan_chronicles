@@ -90,8 +90,12 @@ def gcRunWrapper = { File dir, List<String> args ->
 
     def process = new ProcessBuilder(command)
             .directory(dir)
-            .inheritIO()
+            .redirectErrorStream(true)
             .start()
+    process.outputStream.close()
+    process.inputStream.withReader('UTF-8') { reader ->
+        reader.eachLine { line -> logger.lifecycle("  | ${line}") }
+    }
 
     int exitCode = process.waitFor()
 
@@ -185,32 +189,42 @@ def gcDiscordSend = { String webhook, String content, File file ->
 
 def gcFormatSize = { File f -> String.format(Locale.ROOT, '%.1f MB', f.length() / (1024d * 1024d)) }
 
+def gcSelectTesters = {
+    def testers = gcParseTesters(gcTestersFile)
+    def only = gcTesterOnly.get().split(',').collect { it.trim() }.findAll { !it.isEmpty() }
+    if (!only.isEmpty()) {
+        def unknown = only.findAll { name -> !testers.keySet().any { it.equalsIgnoreCase(name) } }
+        if (!unknown.isEmpty()) {
+            throw new GradleException("testerOnly names not in testers.properties: ${unknown.join(', ')}")
+        }
+        testers = testers.findAll { label, ids -> only.any { it.equalsIgnoreCase(label) } }
+    }
+    return testers
+}
+
+def gcWebhookTarget = {
+    def webhook = gcWebhookProvider.get().trim()
+    def enabled = !gcDiscordOff.get() && !webhook.isEmpty()
+    if (enabled && !webhook.matches('https://(?:(?:ptb|canary)\\.)?discord(?:app)?\\.com/api/webhooks/\\d+/[\\w-]+(?:\\?.*)?')) {
+        throw new GradleException('gcDiscordWebhook / GC_DISCORD_WEBHOOK is not a Discord webhook URL')
+    }
+    if (!enabled) {
+        logger.lifecycle(gcDiscordOff.get()
+                ? 'Discord upload disabled (-Pdiscord=off)'
+                : 'No Discord webhook configured (gcDiscordWebhook / GC_DISCORD_WEBHOOK); jars will only be built locally')
+    }
+    return enabled ? webhook : null
+}
+
 tasks.register('buildTesterJars') {
     group = 'gallifreyan'
     description = 'Builds a Fabric and a NeoForge jar per tester in testers.properties (locked to their UUIDs) and posts them to Discord'
     doLast {
-        def testers = gcParseTesters(gcTestersFile)
-
-        def only = gcTesterOnly.get().split(',').collect { it.trim() }.findAll { !it.isEmpty() }
-        if (!only.isEmpty()) {
-            def unknown = only.findAll { name -> !testers.keySet().any { it.equalsIgnoreCase(name) } }
-            if (!unknown.isEmpty()) {
-                throw new GradleException("testerOnly names not in testers.properties: ${unknown.join(', ')}")
-            }
-            testers = testers.findAll { label, ids -> only.any { it.equalsIgnoreCase(label) } }
-        }
+        def testers = gcSelectTesters()
 
         // check the webhook before spending minutes building
-        def webhook = gcWebhookProvider.get().trim()
-        def uploadEnabled = !gcDiscordOff.get() && !webhook.isEmpty()
-        if (uploadEnabled && !webhook.matches('https://(?:(?:ptb|canary)\\.)?discord(?:app)?\\.com/api/webhooks/\\d+/[\\w-]+(?:\\?.*)?')) {
-            throw new GradleException('gcDiscordWebhook / GC_DISCORD_WEBHOOK is not a Discord webhook URL')
-        }
-        if (!uploadEnabled) {
-            logger.lifecycle(gcDiscordOff.get()
-                    ? 'Discord upload disabled (-Pdiscord=off)'
-                    : 'No Discord webhook configured (gcDiscordWebhook / GC_DISCORD_WEBHOOK); jars will only be built locally')
-        }
+        def webhook = gcWebhookTarget()
+        def uploadEnabled = webhook != null
 
         def runStamp = java.time.LocalDateTime.now().format(java.time.format.DateTimeFormatter.ofPattern('yyyy-MM-dd_HH-mm-ss'))
         def outDir = rootProject.layout.buildDirectory.dir("tester-jars/${runStamp}").get().asFile
@@ -276,5 +290,60 @@ tasks.register('buildTesterJars') {
             throw new GradleException("Some Discord posts failed (the jars are still in ${outDir}):\n  " + failures.join('\n  '))
         }
         logger.lifecycle('All jars posted to Discord')
+    }
+}
+
+tasks.register('buildSharedTesterJars') {
+    group = 'gallifreyan'
+    description = 'Builds one Fabric and one NeoForge jar that work for every tester in testers.properties (locked to all their UUIDs) and posts them to Discord'
+    doLast {
+        def testers = gcSelectTesters()
+        def uuids = testers.values().flatten().unique()
+        def webhook = gcWebhookTarget()
+
+        logger.lifecycle("=== Building one jar for ${testers.size()} testers: ${testers.keySet().join(', ')} ===")
+        def args = [':fabric:jar', ':neoforge:jar', '-PtesterLabel=all-testers', "-PlockUuid=${uuids.join(',')}".toString(), '--console=plain']
+        if (!gcExpiresIn.get().trim().isEmpty()) args << "-PexpiresIn=${gcExpiresIn.get().trim()}".toString()
+        if (!gcWatermark.get().trim().isEmpty()) args << "-Pwatermark=${gcWatermark.get().trim()}".toString()
+
+        long startedAt = System.currentTimeMillis()
+        int code = gcRunWrapper(rootProject.projectDir, args)
+        if (code != 0) {
+            throw new GradleException("Build failed (exit ${code}); nothing was uploaded")
+        }
+
+        def runStamp = java.time.LocalDateTime.now().format(java.time.format.DateTimeFormatter.ofPattern('yyyy-MM-dd_HH-mm-ss'))
+        def outDir = rootProject.layout.buildDirectory.dir("tester-jars/${runStamp}").get().asFile
+        outDir.mkdirs()
+
+        def built = []
+        gcLoaders.each { String loader ->
+            def jar = gcFindJar(loader, startedAt)
+            def props = gcReadBuildProps(jar)
+            def baked = props.getProperty('lock_uuids', '').split(',').collect { it.trim() }.findAll { !it.isEmpty() } as Set
+            if (baked != (uuids as Set)) {
+                throw new GradleException("${jar.name} is locked to ${baked}, expected ${uuids}; refusing to ship it")
+            }
+            def target = new File(outDir, jar.name.substring(0, jar.name.length() - 4) + '-testers.jar')
+            Files.copy(jar.toPath(), target.toPath(), StandardCopyOption.REPLACE_EXISTING)
+            built << [loader: loader, file: target, props: props]
+            logger.lifecycle("  ${loader}: ${target.name} (${gcFormatSize(target)}), lock verified for ${uuids.size()} accounts")
+        }
+
+        if (webhook == null) return
+
+        def header = "**GC tester build** - `${rootProject.version}` - works for: ${testers.keySet().join(', ')}".toString()
+        def expires = built[0].props.getProperty('expires_at', '').trim()
+        if (!expires.isEmpty()) header += " - expires <t:${(long) (Long.parseLong(expires) / 1000L)}:R>"
+        gcDiscordSend(webhook, header, null)
+        built.each { entry ->
+            def text = "**${entry.loader == 'fabric' ? 'Fabric' : 'NeoForge'}**".toString()
+            def buildId = entry.props.getProperty('build_id', '-')
+            if (buildId != '-') text += " - build `${buildId}`"
+            gcDiscordSend(webhook, text, entry.file)
+            logger.lifecycle("  posted ${entry.file.name}")
+            Thread.sleep(700L)
+        }
+        logger.lifecycle('Both jars posted to Discord')
     }
 }

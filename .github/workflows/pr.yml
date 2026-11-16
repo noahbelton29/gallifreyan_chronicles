@@ -1,0 +1,26 @@
+name: Pull request
+
+on:
+  pull_request:
+    types: [opened, edited, reopened, synchronize]
+
+permissions: {}
+
+jobs:
+  title:
+    name: PR title
+    runs-on: ubuntu-24.04
+    timeout-minutes: 2
+    steps:
+      - name: Check the title follows the commit convention
+        env:
+          TITLE: ${{ github.event.pull_request.title }}
+        run: |
+          re='^(feat|fix|refactor|perf|style|docs|test|build|ci|chore|revert)(\([a-z0-9_/-]+\))?!?: .+'
+          if [[ "$TITLE" =~ $re ]]; then
+            echo "Title is fine: $TITLE"
+          else
+            echo "::error::The PR title becomes the commit on master and the line in the release notes, so it must look like 'feat: gyroscopic stabilizers' or 'fix(jade): server crash'. Allowed types: feat, fix, refactor, perf, style, docs, test, build, ci, chore, revert."
+            echo "Current title: $TITLE"
+            exit 1
+          fi

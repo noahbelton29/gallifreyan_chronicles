@@ -258,6 +258,7 @@ public class SpaceTimeThrottleControl extends BaseControl {
                     SoundSource.BLOCKS, 1.0F, pitch, VWORP_VOLUME);
         }
         playAtExterior(console, level, GCSounds.TARDIS_TAKEOFF);
+        // TODO: make the stabilizers play different takeoff sound and in flight sound
         linkedTardis(console).ifPresent(TardisEvents.TAKE_OFF::fire);
 
         for (TardisConsoleBlockEntity each : ConsoleSyncSystem.liveConsolesWith(console)) {

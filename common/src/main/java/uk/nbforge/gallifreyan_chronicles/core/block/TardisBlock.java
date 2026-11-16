@@ -17,7 +17,9 @@ import uk.nbforge.gallifreyan_chronicles.core.dynamic_registries.TardisInteriorR
 import uk.nbforge.gallifreyan_chronicles.tardis.manager.deletion.TardisDeletion;
 import uk.nbforge.gallifreyan_chronicles.tardis.TardisManager;
 import uk.nbforge.gallifreyan_chronicles.tardis.ecs.component.TardisComponent;
+import uk.nbforge.gallifreyan_chronicles.util.GCSchedulerUtil;
 import net.minecraft.core.BlockPos;
+import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.LivingEntity;
@@ -89,7 +91,12 @@ public class TardisBlock extends BaseEntityBlock {
             blockEntity.spawnKeyEntity();
 
             TardisApi.get(serverLevel.getServer(), record.tardisId()).ifPresent(tardis -> tardis.giveKeyTo(player));
-            TardisPortalBridge.onExteriorPlaced(serverLevel.getServer(), record.tardisId());
+
+            // Building the interior is heavy enough to stall the server for a noticeable moment, so it runs a tick later instead of inline here, keeping
+            // the block placement itself fast for the player and for any other code reacting to this event.
+            MinecraftServer server = serverLevel.getServer();
+            UUID tardisId = record.tardisId();
+            GCSchedulerUtil.runLater(server, 1, () -> TardisPortalBridge.onExteriorPlaced(server, tardisId));
 
             Constants.LOG.debug(
                     "Registered TARDIS {} for player {}",

@@ -1,5 +1,6 @@
 package uk.nbforge.gallifreyan_chronicles.tardis.manager.deletion;
 
+import org.jspecify.annotations.NonNull;
 import uk.nbforge.gallifreyan_chronicles.Constants;
 import uk.nbforge.gallifreyan_chronicles.compat.portal.TardisPortalBridge;
 import uk.nbforge.gallifreyan_chronicles.core.GCBlocks;
@@ -16,15 +17,19 @@ import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.phys.Vec3;
 
 import java.io.IOException;
+import java.nio.file.FileVisitResult;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.Comparator;
+import java.nio.file.SimpleFileVisitor;
+import java.nio.file.attribute.BasicFileAttributes;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
-import java.util.stream.Stream;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+
 import uk.nbforge.gallifreyan_chronicles.tardis.TardisManager;
 
 public final class TardisDeletion {
@@ -33,6 +38,14 @@ public final class TardisDeletion {
 
     private static final Map<UUID, Request> PENDING = new LinkedHashMap<>();
     private static final int REMOVE_FLAGS = Block.UPDATE_ALL | Block.UPDATE_SUPPRESS_DROPS;
+
+    // Deleting a dimension's save folder is pure disk I/O with nothing server-state related in it,
+    // so it runs off the main thread, otherwise the whole server freezes until every file is gone.
+    private static final ExecutorService DELETE_EXECUTOR = Executors.newSingleThreadExecutor(runnable -> {
+        Thread thread = new Thread(runnable, "GC-TardisDeletion");
+        thread.setDaemon(true);
+        return thread;
+    });
 
     private TardisDeletion() {
     }
@@ -80,6 +93,8 @@ public final class TardisDeletion {
 
         ResourceKey<Level> key = TardisDimensionManager.levelKey(tardisId);
         ServerLevel interior = server.getLevel(key);
+        Path dimensionPath = ((MinecraftServerAccessor) server).gallifreyan_chronicles$getStorageSource().getDimensionPath(key);
+
         if (interior != null) {
             ServerLevel exit = server.getLevel(request.exitDimension());
             if (exit == null) exit = server.overworld();
@@ -90,24 +105,46 @@ public final class TardisDeletion {
             TardisPortalBridge.beforeDimensionRemoved(interior);
             MinecraftServerAccessor accessor = (MinecraftServerAccessor) server;
             accessor.gallifreyan_chronicles$getLevels().remove(key);
-            try {
-                interior.close();
-            } catch (IOException e) {
-                Constants.LOG.error("[GC] Failed to close TARDIS dimension {}", key.identifier(), e);
-            }
+
+            // Both of these are heavy, pure I/O, and only safe once the level is fully detached from the
+            // server (no players, no longer in the levels map), so they run together, off the main thread,
+            // in order: closing (which would otherwise save every loaded chunk first) then the delete,
+            // never the other way, and never on separate threads racing each other over the same files.
+            DELETE_EXECUTOR.execute(() -> {
+                try {
+                    interior.close();
+                } catch (IOException e) {
+                    Constants.LOG.error("[GC] Failed to close TARDIS dimension {}", key.identifier(), e);
+                }
+                deleteFolder(dimensionPath);
+            });
+        } else {
+            DELETE_EXECUTOR.execute(() -> deleteFolder(dimensionPath));
         }
-        deleteFolder(((MinecraftServerAccessor) server).gallifreyan_chronicles$getStorageSource().getDimensionPath(key));
 
         TardisManager.get(server).remove(tardisId);
         Constants.LOG.info("[GC] Deleted TARDIS {} and its dimension", tardisId);
     }
 
+    /**
+     * Runs on {@link #DELETE_EXECUTOR}, never the main thread; walks depth-first so a folder empties before it is removed.
+     */
     private static void deleteFolder(Path folder) {
         if (!Files.exists(folder)) return;
-        try (Stream<Path> paths = Files.walk(folder)) {
-            for (Path path : paths.sorted(Comparator.reverseOrder()).toList()) {
-                Files.deleteIfExists(path);
-            }
+        try {
+            Files.walkFileTree(folder, new SimpleFileVisitor<>() {
+                @Override
+                public @NonNull FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
+                    Files.deleteIfExists(file);
+                    return FileVisitResult.CONTINUE;
+                }
+
+                @Override
+                public @NonNull FileVisitResult postVisitDirectory(Path dir, IOException exc) throws IOException {
+                    Files.deleteIfExists(dir);
+                    return FileVisitResult.CONTINUE;
+                }
+            });
         } catch (IOException e) {
             Constants.LOG.error("[GC] Failed to delete TARDIS dimension folder {}", folder, e);
         }

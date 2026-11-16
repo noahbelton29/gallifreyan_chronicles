@@ -34,6 +34,7 @@ import net.minecraft.world.phys.Vec3;
 import org.jspecify.annotations.Nullable;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.Set;
@@ -55,6 +56,8 @@ public final class TardisInteriorSystem {
 
     private static final Vec3i FALLBACK_CLEAR_SIZE = new Vec3i(64, 64, 64);
     private static final int CLEAR_FLAGS = Block.UPDATE_CLIENTS | Block.UPDATE_KNOWN_SHAPE | Block.UPDATE_SUPPRESS_DROPS;
+
+    private static final Map<Identifier, BlockPos> DOOR_OFFSET_CACHE = new ConcurrentHashMap<>();
 
     private record ConsoleCarryover(TardisConsole console, @Nullable String variant, CompoundTag controlStates) {
     }
@@ -200,11 +203,23 @@ public final class TardisInteriorSystem {
         BlockPos origin = stored != null ? stored : ORIGIN;
         loadInteriorChunks(interior, origin, size);
 
+        BlockPos cachedOffset = DOOR_OFFSET_CACHE.get(templateId);
+        if (cachedOffset != null) {
+            BlockPos candidate = origin.offset(cachedOffset.getX(), cachedOffset.getY(), cachedOffset.getZ());
+            BlockState state = interior.getBlockState(candidate);
+            if (state.is(GCBlocks.TARDIS_INTERIOR_DOOR) && InteriorDoorBlock.isMaster(state)) {
+                return candidate.immutable();
+            }
+            // The door moved or this interior predates caching that offset, fall through and re-scan once.
+        }
+
         BlockPos max = origin.offset(size.getX() - 1, size.getY() - 1, size.getZ() - 1);
         for (BlockPos p : BlockPos.betweenClosed(origin, max)) {
             BlockState state = interior.getBlockState(p);
             if (state.is(GCBlocks.TARDIS_INTERIOR_DOOR) && InteriorDoorBlock.isMaster(state)) {
-                return p.immutable();
+                BlockPos found = p.immutable();
+                DOOR_OFFSET_CACHE.put(templateId, found.subtract(origin));
+                return found;
             }
         }
         return null;
@@ -266,9 +281,9 @@ public final class TardisInteriorSystem {
     }
 
     /**
-       Swaps the interior of a TARDIS for another one and returns what happened.
-       It clears an area big enough for both rooms, builds the new one and puts the console, doors and players back.
-    */
+     * Swaps the interior of a TARDIS for another one and returns what happened.
+     * It clears an area big enough for both rooms, builds the new one and puts the console, doors and players back.
+     */
     public static ChangeResult changeInterior(MinecraftServer server, UUID tardisId, String newId) {
         if (!TardisInteriorRegistry.contains(newId)) return ChangeResult.UNKNOWN_INTERIOR;
 
@@ -334,7 +349,9 @@ public final class TardisInteriorSystem {
         return door != null && door.getLevel() == interior ? door.getDoorState() : null;
     }
 
-    /** Puts the primary doors of the new interior in the state the old ones were in, snapped and not animated. */
+    /**
+     * Puts the primary doors of the new interior in the state the old ones were in, snapped and not animated.
+     */
     private static void snapPrimaryDoors(ServerLevel interior, UUID tardisId, Vec3i size, DoorState state) {
         BlockPos stored = TardisManager.get(interior.getServer()).getInteriorOrigin(tardisId);
         BlockPos origin = stored != null ? stored : ORIGIN;

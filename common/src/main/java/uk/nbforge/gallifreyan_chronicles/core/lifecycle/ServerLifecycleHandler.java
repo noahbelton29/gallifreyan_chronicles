@@ -7,6 +7,7 @@ import uk.nbforge.gallifreyan_chronicles.tardis.flight.crash.TardisCrash;
 
 import uk.nbforge.gallifreyan_chronicles.loader.GCJsonReloadListener;
 import uk.nbforge.gallifreyan_chronicles.tardis.control.impl.SpaceTimeThrottleControl;
+import uk.nbforge.gallifreyan_chronicles.tardis.flight.TardisAutopilot;
 import uk.nbforge.gallifreyan_chronicles.tardis.ecs.system.ConsoleSyncSystem;
 import uk.nbforge.gallifreyan_chronicles.tardis.ecs.system.DoorSyncSystem;
 import uk.nbforge.gallifreyan_chronicles.tardis.ecs.system.TardisMindSystem;
@@ -22,12 +23,14 @@ public final class ServerLifecycleHandler {
         IsomorphicPunishment.reset();
         SpaceTimeThrottleControl.resetState();
         TardisMindSystem.resetState();
+        TardisAutopilot.reset();
     }
 
     public static void onServerStop() {
         GCSchedulerUtil.clear();
         SpaceTimeThrottleControl.resetState();
         TardisMindSystem.resetState();
+        TardisAutopilot.reset();
         TardisAlarm.reset();
         TardisCrash.reset();
         CrashSmoke.reset();

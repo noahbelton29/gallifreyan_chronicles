@@ -5,6 +5,7 @@ import uk.nbforge.gallifreyan_chronicles.addon.AddonManager;
 import uk.nbforge.gallifreyan_chronicles.config.GCConfig;
 import uk.nbforge.gallifreyan_chronicles.tardis.ecs.system.TardisMindSystem;
 import uk.nbforge.gallifreyan_chronicles.tardis.flight.TardisTravel;
+import uk.nbforge.gallifreyan_chronicles.tardis.flight.TardisAutopilot;
 
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -32,6 +33,7 @@ public class CommonClass {
         GCEffects.registerEffects();
         TardisMindSystem.init();
         TardisTravel.init();
+        TardisAutopilot.init();
         AddonManager.init();
     }
 }

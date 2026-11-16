@@ -18,6 +18,9 @@ import static uk.nbforge.gallifreyan_chronicles.util.CommandUtil.*;
 import static net.minecraft.commands.Commands.argument;
 import static net.minecraft.commands.Commands.literal;
 
+/**
+ * Subsystem health lives entirely under "data" now.
+ */
 public final class SubsystemCommands {
     private interface SubsystemAction {
         int run(TardisExteriorBlockEntity exterior, TardisSubsystem subsystem, String idText);
@@ -26,15 +29,14 @@ public final class SubsystemCommands {
     private SubsystemCommands() {
     }
 
-    public static LiteralArgumentBuilder<CommandSourceStack> subsystem() {
+    public static LiteralArgumentBuilder<CommandSourceStack> subsystemData() {
         return literal("subsystem")
                 .then(argument("subsystem", StringArgumentType.word())
                         .suggests(SubsystemCommands::suggestSubsystems)
                         .then(literal("health")
-                                .then(literal("get").executes(SubsystemCommands::getHealth))
-                                .then(literal("set")
-                                        .then(argument("health", FloatArgumentType.floatArg(0f, 100f))
-                                                .executes(SubsystemCommands::setHealth)))));
+                                .executes(SubsystemCommands::getHealth)
+                                .then(argument("health", FloatArgumentType.floatArg(0f, 100f))
+                                        .executes(SubsystemCommands::setHealth))));
     }
 
     private static CompletableFuture<Suggestions> suggestSubsystems(CommandContext<CommandSourceStack> ctx,
@@ -70,8 +72,7 @@ public final class SubsystemCommands {
         return withTardis(ctx, (tardis, idText) -> {
             Optional<TardisExteriorBlockEntity> exterior = findBlockEntity(ctx,
                     manager(ctx).resolveExteriorBlockPos(tardis.id()), TardisExteriorBlockEntity.class);
-            if (exterior.isEmpty()) return fail(ctx, "no_exterior", idText);
-            return action.run(exterior.get(), subsystem.get(), idText);
+            return exterior.map(tardisExteriorBlockEntity -> action.run(tardisExteriorBlockEntity, subsystem.get(), idText)).orElseGet(() -> fail(ctx, "no_exterior", idText));
         });
     }
 }

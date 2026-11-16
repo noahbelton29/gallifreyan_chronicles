@@ -24,7 +24,8 @@ public final class TardisManagerCodec {
             EcsComponentCodec.UUID_CODEC.listOf().optionalFieldOf("trusted").forGetter(TardisManager.Entry::trusted),
             TardisMindCodec.CODEC.optionalFieldOf("mind").forGetter(TardisManager.Entry::mind),
             Codec.LONG.optionalFieldOf("flight_start").forGetter(TardisManager.Entry::flightStart),
-            Codec.BOOL.optionalFieldOf("crashed").forGetter(TardisManager.Entry::crashed)
+            Codec.BOOL.optionalFieldOf("crashed").forGetter(TardisManager.Entry::crashed),
+            Codec.LONG.optionalFieldOf("flight_duration_override").forGetter(TardisManager.Entry::flightDurationOverride)
     ).apply(inst, TardisManager.Entry::new));
 
     public static final Codec<TardisManager> CODEC = RecordCodecBuilder.create(inst -> inst.group(

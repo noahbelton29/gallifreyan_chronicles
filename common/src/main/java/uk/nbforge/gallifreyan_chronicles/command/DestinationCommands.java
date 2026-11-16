@@ -33,17 +33,17 @@ public final class DestinationCommands {
     private DestinationCommands() {
     }
 
-    public static LiteralArgumentBuilder<CommandSourceStack> destination() {
+    /** data destination [here|clear|<dimension> <pos> <facing>] */
+    public static LiteralArgumentBuilder<CommandSourceStack> destinationData() {
         return literal("destination")
-                .then(literal("get").executes(DestinationCommands::get))
+                .executes(DestinationCommands::get)
                 .then(literal("here").executes(DestinationCommands::setHere))
-                .then(literal("set")
-                        .then(argument("dimension", DimensionArgument.dimension())
-                                .then(argument("pos", BlockPosArgument.blockPos())
-                                        .then(argument("facing", StringArgumentType.word())
-                                                .suggests(DestinationCommands::suggestFacings)
-                                                .executes(DestinationCommands::set)))))
-                .then(literal("clear").executes(DestinationCommands::clear));
+                .then(literal("clear").executes(DestinationCommands::clear))
+                .then(argument("dimension", DimensionArgument.dimension())
+                        .then(argument("pos", BlockPosArgument.blockPos())
+                                .then(argument("facing", StringArgumentType.word())
+                                        .suggests(DestinationCommands::suggestFacings)
+                                        .executes(DestinationCommands::set))));
     }
 
     private static CompletableFuture<Suggestions> suggestFacings(CommandContext<CommandSourceStack> ctx,

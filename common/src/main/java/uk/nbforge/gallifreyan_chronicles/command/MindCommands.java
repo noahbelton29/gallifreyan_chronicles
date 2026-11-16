@@ -1,9 +1,11 @@
 package uk.nbforge.gallifreyan_chronicles.command;
 
 import net.minecraft.server.level.ServerPlayer;
+
 import java.util.Map;
 import java.util.Locale;
 import java.util.LinkedHashMap;
+
 import com.mojang.brigadier.arguments.BoolArgumentType;
 import com.mojang.brigadier.arguments.FloatArgumentType;
 import com.mojang.brigadier.arguments.StringArgumentType;
@@ -22,7 +24,9 @@ import uk.nbforge.gallifreyan_chronicles.tardis.ecs.system.TardisMindSystem;
 import uk.nbforge.gallifreyan_chronicles.tardis.mind.TardisPersonality;
 import uk.nbforge.gallifreyan_chronicles.tardis.mind.TardisTrait;
 import net.minecraft.commands.CommandSourceStack;
+
 import java.util.UUID;
+
 import org.jspecify.annotations.Nullable;
 import net.minecraft.commands.arguments.EntityArgument;
 
@@ -39,22 +43,36 @@ public final class MindCommands {
     private MindCommands() {
     }
 
+    /**
+     * Actions that don't fit the get/set shape of "data": rolling, forgetting and forgiving. Everything else about the mind lives under "data mind" now.
+     */
     public static LiteralArgumentBuilder<CommandSourceStack> mind() {
         return literal("mind")
                 .then(literal("inspect").executes(MindCommands::inspect))
                 .then(literal("reroll").executes(MindCommands::reroll))
                 .then(literal("undiscover").executes(MindCommands::undiscover))
+                .then(literal("forgive").executes(MindCommands::forgive)
+                        .then(argument("player", EntityArgument.player()).executes(MindCommands::forgive)));
+    }
+
+    /**
+     * data mind ... : personality, traits, disabilities, betrayed status and every numeric mind value.
+     */
+    public static LiteralArgumentBuilder<CommandSourceStack> mindData() {
+        return literal("mind")
                 .then(literal("betrayed")
-                        .then(argument("betrayed", BoolArgumentType.bool()).executes(MindCommands::setBetrayed)
-                                .then(argument("player", EntityArgument.player()).executes(MindCommands::setBetrayed))))
+                        .executes(MindCommands::getBetrayed)
+                        .then(argument("betrayed", BoolArgumentType.bool()).executes(MindCommands::setBetrayed))
+                        .then(argument("player", EntityArgument.player())
+                                .executes(MindCommands::getBetrayed)
+                                .then(argument("betrayed", BoolArgumentType.bool()).executes(MindCommands::setBetrayed))))
                 .then(literal("personality")
-                        .then(literal("get").executes(MindCommands::getPersonality))
-                        .then(literal("set")
-                                .then(argument("personality", StringArgumentType.greedyString())
-                                        .suggests(MindCommands::suggestPersonalities)
-                                        .executes(MindCommands::setPersonality))))
+                        .executes(MindCommands::getPersonality)
+                        .then(argument("personality", StringArgumentType.greedyString())
+                                .suggests(MindCommands::suggestPersonalities)
+                                .executes(MindCommands::setPersonality)))
                 .then(literal("traits")
-                        .then(literal("get").executes(MindCommands::getTraits))
+                        .executes(MindCommands::getTraits)
                         .then(literal("add")
                                 .then(argument("trait", StringArgumentType.greedyString())
                                         .suggests(MindCommands::suggestTraits)
@@ -65,7 +83,7 @@ public final class MindCommands {
                                         .executes(MindCommands::removeTrait)))
                         .then(literal("clear").executes(MindCommands::clearTraits)))
                 .then(literal("disabilities")
-                        .then(literal("get").executes(MindCommands::getDisabilities))
+                        .executes(MindCommands::getDisabilities)
                         .then(literal("add")
                                 .then(argument("disability", StringArgumentType.word())
                                         .suggests(MindCommands::suggestDisabilities)
@@ -75,15 +93,34 @@ public final class MindCommands {
                                         .suggests(MindCommands::suggestDisabilities)
                                         .executes(ctx -> changeDisability(ctx, false))))
                         .then(literal("clear").executes(MindCommands::clearDisabilities)))
+                .then(value(MindValue.STRESS))
+                .then(value(MindValue.TRUST))
+                .then(value(MindValue.FEAR))
                 .then(value(MindValue.SKILL))
                 .then(value(MindValue.TRAUMA))
                 .then(value(MindValue.TOTAL_TRAUMA))
                 .then(value(MindValue.HITS))
-                .then(literal("forgive").executes(MindCommands::forgive)
-                        .then(argument("player", EntityArgument.player()).executes(MindCommands::forgive)))
-                .then(value(MindValue.STRESS))
-                .then(value(MindValue.TRUST))
-                .then(value(MindValue.FEAR));
+                .then(literal("dump").executes(MindCommands::dump));
+    }
+
+    /**
+     * data mind dump, every low-level mind field for the owner at once, read only, in the same compact coloured
+     * format as "data dump".
+     */
+    private static int dump(CommandContext<CommandSourceStack> ctx) throws CommandSyntaxException {
+        return withTardis(ctx, (tardis, idText) -> {
+            send(ctx, dataHeader("TARDIS mind dump", tardis.id()), false);
+
+            TardisMind mind = TardisMindSystem.mind(tardis);
+            sendLine(ctx, dataLine("personality", shortId(mind.personality().id())));
+            sendLine(ctx, dataLine("traits", traitList(mind)));
+            sendLine(ctx, dataLine("disabilities", disabilityList(mind)));
+            sendLine(ctx, dataLine("betrayed", String.valueOf(TardisMindSystem.bond(tardis, null).betrayed())));
+            for (MindValue which : MindValue.values()) {
+                sendLine(ctx, dataLine(which.name, oneDecimal(which.get(tardis, null))));
+            }
+            return 1;
+        });
     }
 
     private enum MindValue {
@@ -96,7 +133,9 @@ public final class MindCommands {
             this.name = name;
         }
 
-        /** Trust and fear are per player, null means the owner. */
+        /**
+         * Trust and fear are per player, null means the owner.
+         */
         private boolean perPlayer() {
             return this == TRUST || this == FEAR || this == TRAUMA || this == HITS;
         }
@@ -133,14 +172,19 @@ public final class MindCommands {
         }
     }
 
+    /**
+     * Bare = get for the owner, a trailing float = set for the owner; a per-player value also takes an optional player before either.
+     */
     private static LiteralArgumentBuilder<CommandSourceStack> value(MindValue which) {
-        var get = literal("get").executes(ctx -> getValue(ctx, which));
-        var setValue = argument("value", FloatArgumentType.floatArg(0f, 100f)).executes(ctx -> setValue(ctx, which));
+        LiteralArgumentBuilder<CommandSourceStack> node = literal(which.name)
+                .executes(ctx -> getValue(ctx, which))
+                .then(argument("value", FloatArgumentType.floatArg(0f, 100f)).executes(ctx -> setValue(ctx, which)));
         if (which.perPlayer()) {
-            get.then(argument("player", EntityArgument.player()).executes(ctx -> getValue(ctx, which)));
-            setValue.then(argument("player", EntityArgument.player()).executes(ctx -> setValue(ctx, which)));
+            node.then(argument("player", EntityArgument.player())
+                    .executes(ctx -> getValue(ctx, which))
+                    .then(argument("value", FloatArgumentType.floatArg(0f, 100f)).executes(ctx -> setValue(ctx, which))));
         }
-        return literal(which.name).then(get).then(literal("set").then(setValue));
+        return node;
     }
 
     private static CompletableFuture<Suggestions> suggestPersonalities(CommandContext<CommandSourceStack> ctx,
@@ -159,7 +203,9 @@ public final class MindCommands {
         return builder.buildFuture();
     }
 
-    /** Everything about its mind and how it feels about every player it knows. */
+    /**
+     * Everything about its mind and how it feels about every player it knows.
+     */
     private static int inspect(CommandContext<CommandSourceStack> ctx) throws CommandSyntaxException {
         return withTardis(ctx, (tardis, idText) -> {
             TardisMind mind = TardisMindSystem.mind(tardis);
@@ -202,6 +248,12 @@ public final class MindCommands {
             TardisMindSystem.reroll(tardis);
             return inspect(ctx);
         });
+    }
+
+    private static int getBetrayed(CommandContext<CommandSourceStack> ctx) throws CommandSyntaxException {
+        UUID player = playerArg(ctx);
+        return withTardis(ctx, (tardis, idText) ->
+                reply(ctx, tardis, "betrayed", String.valueOf(TardisMindSystem.bond(tardis, player).betrayed()), false));
     }
 
     private static int setBetrayed(CommandContext<CommandSourceStack> ctx) throws CommandSyntaxException {

@@ -1,319 +1,237 @@
 package uk.nbforge.gallifreyan_chronicles.command;
 
-import com.mojang.brigadier.arguments.BoolArgumentType;
 import com.mojang.brigadier.arguments.FloatArgumentType;
-import com.mojang.brigadier.arguments.IntegerArgumentType;
-import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
-import com.mojang.brigadier.builder.RequiredArgumentBuilder;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
-import com.mojang.brigadier.suggestion.Suggestions;
-import com.mojang.brigadier.suggestion.SuggestionsBuilder;
+import uk.nbforge.gallifreyan_chronicles.core.block_entities.InteriorDoorBlockEntity;
 import uk.nbforge.gallifreyan_chronicles.core.block_entities.TardisConsoleBlockEntity;
 import uk.nbforge.gallifreyan_chronicles.core.block_entities.TardisExteriorBlockEntity;
-import uk.nbforge.gallifreyan_chronicles.core.entity.TardisControlEntity;
 import uk.nbforge.gallifreyan_chronicles.tardis.Tardis;
-import uk.nbforge.gallifreyan_chronicles.tardis.ecs.system.TardisLandingSystem;
-import uk.nbforge.gallifreyan_chronicles.tardis.flight.LandingTarget;
-import uk.nbforge.gallifreyan_chronicles.tardis.flight.crash.TardisCrash;
-import uk.nbforge.gallifreyan_chronicles.tardis.flight.crash.TardisDamage;
-import uk.nbforge.gallifreyan_chronicles.tardis.flight.TardisDestinations;
-import uk.nbforge.gallifreyan_chronicles.tardis.flight.TardisFlightState;
-import uk.nbforge.gallifreyan_chronicles.tardis.flight.TardisRemat;
+import uk.nbforge.gallifreyan_chronicles.tardis.ecs.system.DoorSyncSystem;
+import uk.nbforge.gallifreyan_chronicles.tardis.ecs.system.TardisInteriorSystem;
 import uk.nbforge.gallifreyan_chronicles.tardis.flight.TardisTravel;
-import uk.nbforge.gallifreyan_chronicles.tardis.TardisManager;
-import uk.nbforge.gallifreyan_chronicles.tardis.ecs.system.TardisMindSystem;
+import uk.nbforge.gallifreyan_chronicles.tardis.flight.crash.TardisDamage;
 import net.minecraft.commands.CommandSourceStack;
-import net.minecraft.commands.SharedSuggestionProvider;
-import net.minecraft.commands.arguments.DimensionArgument;
-import net.minecraft.commands.arguments.EntityArgument;
-import net.minecraft.commands.arguments.coordinates.BlockPosArgument;
-import net.minecraft.core.BlockPos;
-import net.minecraft.server.level.ServerLevel;
-import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.util.Mth;
 
-import java.util.Arrays;
-import java.util.LinkedHashMap;
-import java.util.Map;
+import java.util.List;
 import java.util.Optional;
-import java.util.UUID;
-import java.util.concurrent.CompletableFuture;
 
 import static uk.nbforge.gallifreyan_chronicles.util.CommandUtil.*;
 import static net.minecraft.commands.Commands.argument;
 import static net.minecraft.commands.Commands.literal;
 
+/**
+ * Every low-level piece of TARDIS state, in one tree: bare = get, a trailing value = set.
+ * Every setter here either calls straight through to the mod's own validated logic (the control's real
+ * activate(), the door-lock control's setLockedFromConsole, TardisDamage's crash/repair, etc.) or, for the
+ * handful of plain fields that have no side effects to protect (exterior model, glow, cloak, yaw...), writes
+ * directly to the block entity the same way the mod's own systems do. Nothing here pokes ECS components or
+ * flight state directly, so a player with permission to use this command can't get the TARDIS into a state the
+ * mod wouldn't reach on its own.
+ */
 public final class DataCommands {
-    private interface ExteriorAction {
-        int run(TardisExteriorBlockEntity exterior, String idText) throws CommandSyntaxException;
-    }
-
-    private interface ConsoleAction {
-        int run(TardisConsoleBlockEntity console, String idText) throws CommandSyntaxException;
-    }
+    // Deliberately generous: this is meant to allow a silly number of seconds, not just a sane one.
+    private static final float MAX_FLIGHT_SECONDS = 1_000_000f;
 
     private DataCommands() {
     }
 
     public static LiteralArgumentBuilder<CommandSourceStack> data() {
         return literal("data")
-                .then(tardisIdArgument()
-                        .executes(DataCommands::dump)
-                        .then(literal("get").executes(DataCommands::dump))
-                        .then(literal("remat").executes(DataCommands::remat))
-                        .then(literal("vanish").executes(DataCommands::vanish))
-                        .then(owner())
-                        .then(position())
-                        .then(target())
-                        .then(flightState())
-                        .then(flightStart())
-                        .then(crashed())
-                        .then(increment())
-                        .then(trusted())
-                        .then(exteriorFlag("locked", (exterior, on) -> exterior.setLockedFromConsole(on)))
-                        .then(exteriorFlag("cloaked", TardisExteriorBlockEntity::setCloaked))
-                        .then(exteriorFlag("in_flight", TardisExteriorBlockEntity::setInFlight))
-                        .then(exteriorFlag("glowing", TardisExteriorBlockEntity::setGlowing))
-                        .then(yaw())
-                        .then(controlState()));
+                .then(ExteriorCommands.exteriorData())
+                .then(ExteriorCommands.glowData())
+                .then(ExteriorCommands.fadeData())
+                .then(InteriorCommands.interiorData())
+                .then(InteriorCommands.doorVariantData())
+                .then(ConsoleCommands.consoleData())
+                .then(DestinationCommands.destinationData())
+                .then(ControlCommands.controlData())
+                .then(SubsystemCommands.subsystemData())
+                .then(MindCommands.mindData())
+                .then(lockedData())
+                .then(cloakedData())
+                .then(yawData())
+                .then(crashedData())
+                .then(flightRemainingData())
+                .then(literal("dump").executes(DataCommands::dump));
     }
 
+    /**
+     * data locked [on|off], the same door lock the DOOR_LOCK control and the key use.
+     */
+    private static LiteralArgumentBuilder<CommandSourceStack> lockedData() {
+        return literal("locked")
+                .executes(DataCommands::getLocked)
+                .then(literal("on").executes(ctx -> setLocked(ctx, true)))
+                .then(literal("off").executes(ctx -> setLocked(ctx, false)));
+    }
+
+    private static int getLocked(CommandContext<CommandSourceStack> ctx) throws CommandSyntaxException {
+        return withTardis(ctx, (tardis, idText) -> success(ctx, false, "get_locked", idText, String.valueOf(tardis.isLocked())));
+    }
+
+    private static int setLocked(CommandContext<CommandSourceStack> ctx, boolean locked) throws CommandSyntaxException {
+        return withTardis(ctx, (tardis, idText) -> {
+            boolean ok = locked ? tardis.lock() : tardis.unlock();
+            if (!ok) return fail(ctx, "set_locked_failed", idText, String.valueOf(locked));
+            return success(ctx, true, "set_locked", idText, String.valueOf(locked));
+        });
+    }
+
+    /**
+     * data cloaked [on|off]
+     */
+    private static LiteralArgumentBuilder<CommandSourceStack> cloakedData() {
+        return literal("cloaked")
+                .executes(DataCommands::getCloaked)
+                .then(literal("on").executes(ctx -> setCloaked(ctx, true)))
+                .then(literal("off").executes(ctx -> setCloaked(ctx, false)));
+    }
+
+    private static int getCloaked(CommandContext<CommandSourceStack> ctx) throws CommandSyntaxException {
+        return withTardis(ctx, (tardis, idText) -> {
+            Optional<TardisExteriorBlockEntity> be = tardis.exterior();
+            return be.map(tardisExteriorBlockEntity -> success(ctx, false, "get_cloaked", idText, String.valueOf(tardisExteriorBlockEntity.isCloaked()))).orElseGet(() -> fail(ctx, "no_exterior", idText));
+        });
+    }
+
+    private static int setCloaked(CommandContext<CommandSourceStack> ctx, boolean cloaked) throws CommandSyntaxException {
+        return withTardis(ctx, (tardis, idText) -> {
+            Optional<TardisExteriorBlockEntity> be = tardis.exterior();
+            if (be.isEmpty()) return fail(ctx, "no_exterior", idText);
+            be.get().setCloaked(cloaked);
+            return success(ctx, true, "set_cloaked", idText, String.valueOf(cloaked));
+        });
+    }
+
+    /**
+     * data yaw [<degrees>]
+     */
+    private static LiteralArgumentBuilder<CommandSourceStack> yawData() {
+        return literal("yaw")
+                .executes(DataCommands::getYaw)
+                .then(argument("degrees", FloatArgumentType.floatArg())
+                        .executes(DataCommands::setYaw));
+    }
+
+    private static int getYaw(CommandContext<CommandSourceStack> ctx) throws CommandSyntaxException {
+        return withTardis(ctx, (tardis, idText) -> {
+            Optional<TardisExteriorBlockEntity> be = tardis.exterior();
+            return be.map(tardisExteriorBlockEntity -> success(ctx, false, "get_yaw", idText, String.valueOf(tardisExteriorBlockEntity.getYaw()))).orElseGet(() -> fail(ctx, "no_exterior", idText));
+        });
+    }
+
+    private static int setYaw(CommandContext<CommandSourceStack> ctx) throws CommandSyntaxException {
+        float yaw = Mth.positiveModulo(FloatArgumentType.getFloat(ctx, "degrees"), 360f);
+        return withTardis(ctx, (tardis, idText) -> {
+            Optional<TardisExteriorBlockEntity> be = tardis.exterior();
+            if (be.isEmpty()) return fail(ctx, "no_exterior", idText);
+            be.get().setYaw(yaw);
+            return success(ctx, true, "set_yaw", idText, String.valueOf(yaw));
+        });
+    }
+
+    /**
+     * data crashed [on|off], goes through TardisDamage so the alarm, smoke and repair gating all still happen.
+     */
+    private static LiteralArgumentBuilder<CommandSourceStack> crashedData() {
+        return literal("crashed")
+                .executes(DataCommands::getCrashed)
+                .then(literal("on").executes(ctx -> setCrashed(ctx, true)))
+                .then(literal("off").executes(ctx -> setCrashed(ctx, false)));
+    }
+
+    private static int getCrashed(CommandContext<CommandSourceStack> ctx) throws CommandSyntaxException {
+        return withTardis(ctx, (tardis, idText) -> success(ctx, false, "get_crashed", idText, String.valueOf(TardisDamage.isCrashed(tardis))));
+    }
+
+    private static int setCrashed(CommandContext<CommandSourceStack> ctx, boolean crashed) throws CommandSyntaxException {
+        return withTardis(ctx, (tardis, idText) -> {
+            if (TardisDamage.isCrashed(tardis) == crashed)
+                return fail(ctx, "crashed_already", idText, String.valueOf(crashed));
+            if (crashed) TardisDamage.markCrashed(tardis);
+            else TardisDamage.repair(tardis);
+            return success(ctx, true, "set_crashed", idText, String.valueOf(crashed));
+        });
+    }
+
+    /**
+     * data flight_remaining [skip|<seconds>], how long is left of the CURRENT flight, lets you fast-forward through
+     * it (or push it out to an absurd length) instead of waiting. It works by writing the flight's duration
+     * override so that, given how long it's already been travelling, exactly the requested amount is left, the
+     * override is cleared the moment the TARDIS lands, so it only ever affects the flight that's happening right
+     * now, never the next one. Nothing is landed directly: the throttle lever's "still travelling" check, the
+     * overlay and the autopilot all just see a different number, same as if the formula had produced it.
+     */
+    private static LiteralArgumentBuilder<CommandSourceStack> flightRemainingData() {
+        return literal("flight_remaining")
+                .executes(DataCommands::getFlightRemaining)
+                .then(literal("skip").executes(ctx -> setFlightRemaining(ctx, 0f)))
+                .then(argument("seconds", FloatArgumentType.floatArg(0f, MAX_FLIGHT_SECONDS))
+                        .executes(ctx -> setFlightRemaining(ctx, FloatArgumentType.getFloat(ctx, "seconds"))));
+    }
+
+    private static int getFlightRemaining(CommandContext<CommandSourceStack> ctx) throws CommandSyntaxException {
+        return withTardis(ctx, (tardis, idText) -> {
+            if (tardis.data().getFlightStart(tardis.id()) == null) return fail(ctx, "not_travelling", idText);
+            double seconds = TardisTravel.remainingTicks(tardis) / 20.0;
+            return success(ctx, false, "get_flight_remaining", idText, formatSeconds(seconds));
+        });
+    }
+
+    private static int setFlightRemaining(CommandContext<CommandSourceStack> ctx, float seconds) throws CommandSyntaxException {
+        return withTardis(ctx, (tardis, idText) -> {
+            if (tardis.data().getFlightStart(tardis.id()) == null) return fail(ctx, "not_travelling", idText);
+
+            long elapsed = TardisTravel.vortexTicks(tardis);
+            long desiredRemaining = Math.round(seconds * 20.0);
+            tardis.data().setFlightDurationOverride(tardis.id(), elapsed + desiredRemaining);
+
+            return success(ctx, true, "set_flight_remaining", idText, formatSeconds(desiredRemaining / 20.0));
+        });
+    }
+
+    /**
+     * data dump, every low-level scalar field at once, read only, formatted as one short-id header and compact coloured
+     * lines instead of a full sentence per field. Keyed fields (subsystems, controls, mind values) aren't enumerated
+     * here, get those individually, or see "data mind dump" for the mind's fields.
+     */
     private static int dump(CommandContext<CommandSourceStack> ctx) throws CommandSyntaxException {
-        return withTardis(ctx, (tardis, idText) -> {
-            Map<String, String> lines = new LinkedHashMap<>();
-            TardisManager data = tardis.data();
-            UUID id = tardis.id();
+        return withTardis(ctx, (Tardis tardis, String idText) -> {
+            send(ctx, dataHeader("TARDIS data dump", tardis.id()), false);
 
-            lines.put("owner", tardis.ownerId() + " (" + tardis.ownerName().orElse("?") + ")");
-            lines.put("exterior_dimension", tardis.exteriorDimension().identifier().toString());
-            lines.put("exterior_pos", describe(data.resolveExteriorBlockPos(id)));
-            lines.put("console_pos", describe(data.getConsoleBlockPos(id)));
-            lines.put("interior_id", String.valueOf(data.getInteriorId(id)));
-            lines.put("interior_origin", describe(data.getInteriorOrigin(id)));
-            lines.put("target", data.getLandingTarget(id) == null ? "none" : describeTarget(data.getLandingTarget(id)));
-            int incrementIndex = Math.clamp(data.getCoordIncrementIndex(id), 0, TardisDestinations.INCREMENTS.length - 1);
-            lines.put("coord_increment", TardisDestinations.INCREMENTS[incrementIndex]
-                    + (data.isCoordIncrementNegative(id) ? " (negative)" : ""));
-            lines.put("trusted", data.trustedOf(id).toString());
-            lines.put("flight_start", String.valueOf(data.getFlightStart(id)));
-            lines.put("travel_ticks_left", String.valueOf(TardisTravel.remainingTicks(tardis)));
-            lines.put("crashed", String.valueOf(data.isCrashed(id)));
-            lines.put("crashing", String.valueOf(TardisCrash.isCrashing(tardis)));
-            lines.put("stress / trust / fear", TardisMindSystem.stress(tardis) + " / "
-                    + TardisMindSystem.trust(tardis, null) + " / " + TardisMindSystem.fear(tardis, null));
+            Optional<TardisExteriorBlockEntity> exteriorAtResolved =
+                    ExteriorCommands.exteriorAt(ctx, manager(ctx).resolveExteriorBlockPos(tardis.id()));
+            sendLine(ctx, dataLine("exterior", exteriorAtResolved.map(be -> stripModId(be.getExterior().id())).orElse("unknown")));
 
-            tardis.exterior().ifPresent(exterior -> {
-                lines.put("flight_state", exterior.getFlightState().name());
-                lines.put("fully_invisible", String.valueOf(exterior.isFullyInvisible()));
-                lines.put("locked", String.valueOf(exterior.isLocked()));
-                lines.put("cloaked", String.valueOf(exterior.isCloaked()));
-                lines.put("powered", String.valueOf(exterior.isPowered()));
-                lines.put("glowing", String.valueOf(exterior.isGlowing()));
-                lines.put("door_state", exterior.getDoorState().name());
-                lines.put("fade", exterior.getFadeType().id());
-                lines.put("yaw", String.valueOf(exterior.getYaw()));
-            });
+            Optional<TardisExteriorBlockEntity> exteriorAtRegistered =
+                    ExteriorCommands.exteriorAt(ctx, manager(ctx).getRegisteredBlockPos(tardis.id()));
+            sendLine(ctx, dataLine("fade", exteriorAtRegistered.map(be -> stripModId(be.getFadeType().id())).orElse("unknown")));
+            sendLine(ctx, dataLine("glow", exteriorAtRegistered.map(be -> String.valueOf(be.isGlowing())).orElse("unknown")));
 
-            success(ctx, false, "data_header", idText);
-            lines.forEach((key, value) -> success(ctx, false, "data_line", key, value));
-            return lines.size();
-        });
-    }
+            sendLine(ctx, dataLine("interior", stripModId(TardisInteriorSystem.getInteriorDefinition(tardis.server(), tardis.id()).id())));
 
-    private static String describeTarget(LandingTarget target) {
-        return target.dimension().identifier() + " " + describe(target.pos()) + " yaw " + target.yaw();
-    }
+            List<InteriorDoorBlockEntity> doors = DoorSyncSystem.doorsOf(tardis.id());
+            sendLine(ctx, dataLine("door variant", doors.isEmpty() ? "none" : stripModId(doors.get(0).getDoorVariantId())));
 
-    private static int remat(CommandContext<CommandSourceStack> ctx) throws CommandSyntaxException {
-        return withTardis(ctx, (tardis, idText) -> {
-            if (tardis.landingTarget().isEmpty()) return fail(ctx, "data_no_target", idText);
-            if (!TardisRemat.rematerialise(tardis)) return fail(ctx, "no_exterior", idText);
-            return success(ctx, true, "data_remat", idText);
-        });
-    }
+            Optional<TardisConsoleBlockEntity> console = ConsoleCommands.consoleOf(ctx, tardis.id());
+            sendLine(ctx, dataLine("console", console.map(be -> stripModId(be.getConsole().id())).orElse("unknown")));
+            sendLine(ctx, dataLine("console variant", console.map(be -> stripModId(be.getVariant())).orElse("unknown")));
 
-    private static int vanish(CommandContext<CommandSourceStack> ctx) throws CommandSyntaxException {
-        return withTardis(ctx, (tardis, idText) -> {
-            if (!TardisRemat.vanish(tardis)) return fail(ctx, "no_exterior", idText);
-            return success(ctx, true, "data_vanish", idText);
-        });
-    }
+            sendLine(ctx, dataLine("locked", String.valueOf(tardis.isLocked())));
 
-    private static LiteralArgumentBuilder<CommandSourceStack> owner() {
-        return literal("owner").then(literal("set")
-                .then(argument("player", EntityArgument.player()).executes(ctx -> withTardis(ctx, (tardis, idText) -> {
-                    ServerPlayer player = EntityArgument.getPlayer(ctx, "player");
-                    tardis.data().setOwner(tardis.id(), player.getUUID(), player.getGameProfile().name());
-                    return changed(ctx, idText, "owner", player.getGameProfile().name());
-                }))));
-    }
-
-    private static LiteralArgumentBuilder<CommandSourceStack> position() {
-        return literal("position").then(literal("set")
-                .then(argument("dimension", DimensionArgument.dimension())
-                        .then(argument("pos", BlockPosArgument.blockPos()).executes(ctx -> withTardis(ctx, (tardis, idText) -> {
-                            ServerLevel level = DimensionArgument.getDimension(ctx, "dimension");
-                            BlockPos pos = BlockPosArgument.getBlockPos(ctx, "pos");
-                            if (TardisLandingSystem.moveExterior(tardis, level, pos) == null) return fail(ctx, "no_exterior", idText);
-                            return changed(ctx, idText, "position", level.dimension().identifier() + " " + describe(pos));
-                        })))));
-    }
-
-    private static LiteralArgumentBuilder<CommandSourceStack> target() {
-        return literal("target")
-                .then(literal("clear").executes(ctx -> withTardis(ctx, (tardis, idText) -> {
-                    tardis.clearDestination();
-                    return changed(ctx, idText, "target", "none");
-                })))
-                .then(literal("set")
-                        .then(argument("dimension", DimensionArgument.dimension())
-                                .then(argument("pos", BlockPosArgument.blockPos())
-                                        .then(argument("yaw", FloatArgumentType.floatArg(0f, 360f))
-                                                .executes(ctx -> withTardis(ctx, (tardis, idText) -> {
-                                                    ServerLevel level = DimensionArgument.getDimension(ctx, "dimension");
-                                                    BlockPos pos = BlockPosArgument.getBlockPos(ctx, "pos");
-                                                    float yaw = FloatArgumentType.getFloat(ctx, "yaw");
-                                                    if (!tardis.setDestination(level, pos, yaw)) return fail(ctx, "destination_out_of_world");
-                                                    return changed(ctx, idText, "target", describeTarget(new LandingTarget(level.dimension(), pos, yaw)));
-                                                }))))));
-    }
-
-    private static LiteralArgumentBuilder<CommandSourceStack> flightState() {
-        return literal("flight_state").then(literal("set")
-                .then(argument("state", StringArgumentType.word())
-                        .suggests(DataCommands::suggestFlightStates)
-                        .then(argument("ticks", IntegerArgumentType.integer(0))
-                                .executes(ctx -> withExterior(ctx, (exterior, idText) -> {
-                                    String name = StringArgumentType.getString(ctx, "state").toUpperCase();
-                                    TardisFlightState state = TardisFlightState.parse(name, null);
-                                    if (state == null) return fail(ctx, "data_bad_value", name);
-                                    exterior.setFlightState(state, IntegerArgumentType.getInteger(ctx, "ticks"));
-                                    exterior.sync();
-                                    return changed(ctx, idText, "flight_state", state.name());
-                                })))));
-    }
-
-    private static CompletableFuture<Suggestions> suggestFlightStates(CommandContext<CommandSourceStack> ctx,
-                                                                      SuggestionsBuilder builder) {
-        return SharedSuggestionProvider.suggest(
-                Arrays.stream(TardisFlightState.values()).map(state -> state.name().toLowerCase()), builder);
-    }
-
-    private static LiteralArgumentBuilder<CommandSourceStack> flightStart() {
-        return literal("flight_start")
-                .then(literal("clear").executes(ctx -> withTardis(ctx, (tardis, idText) -> {
-                    tardis.data().setFlightStart(tardis.id(), null);
-                    return changed(ctx, idText, "flight_start", "none");
-                })))
-                .then(literal("now").executes(ctx -> withTardis(ctx, (tardis, idText) -> {
-                    long now = tardis.server().overworld().getGameTime();
-                    tardis.data().setFlightStart(tardis.id(), now);
-                    return changed(ctx, idText, "flight_start", String.valueOf(now));
-                })));
-    }
-
-    private static LiteralArgumentBuilder<CommandSourceStack> crashed() {
-        return literal("crashed").then(argument("value", BoolArgumentType.bool())
-                .executes(ctx -> withTardis(ctx, (tardis, idText) -> {
-                    boolean value = BoolArgumentType.getBool(ctx, "value");
-                    if (value) TardisDamage.markCrashed(tardis);
-                    else TardisDamage.repair(tardis);
-                    return changed(ctx, idText, "crashed", String.valueOf(value));
-                })));
-    }
-
-    private static LiteralArgumentBuilder<CommandSourceStack> increment() {
-        return literal("coord_increment")
-                .then(argument("index", IntegerArgumentType.integer(0, TardisDestinations.INCREMENTS.length - 1))
-                        .then(argument("negative", BoolArgumentType.bool())
-                                .executes(ctx -> withTardis(ctx, (tardis, idText) -> {
-                                    int index = IntegerArgumentType.getInteger(ctx, "index");
-                                    boolean negative = BoolArgumentType.getBool(ctx, "negative");
-                                    tardis.data().setCoordIncrementIndex(tardis.id(), index);
-                                    tardis.data().setCoordIncrementNegative(tardis.id(), negative);
-                                    return changed(ctx, idText, "coord_increment",
-                                            (negative ? "-" : "") + TardisDestinations.INCREMENTS[index]);
-                                }))));
-    }
-
-    private static LiteralArgumentBuilder<CommandSourceStack> trusted() {
-        return literal("trusted")
-                .then(literal("add").then(trustArgument(true)))
-                .then(literal("remove").then(trustArgument(false)));
-    }
-
-    private static RequiredArgumentBuilder<CommandSourceStack, ?> trustArgument(boolean add) {
-        return argument("player", EntityArgument.player()).executes(ctx -> withTardis(ctx, (tardis, idText) -> {
-            ServerPlayer player = EntityArgument.getPlayer(ctx, "player");
-            tardis.data().setTrusted(tardis.id(), player.getUUID(), add);
-            return changed(ctx, idText, add ? "trusted +" : "trusted -", player.getGameProfile().name());
-        }));
-    }
-
-    private interface ExteriorFlagSetter {
-        void set(TardisExteriorBlockEntity exterior, boolean on);
-    }
-
-    private static LiteralArgumentBuilder<CommandSourceStack> exteriorFlag(String name, ExteriorFlagSetter setter) {
-        return literal(name).then(argument("value", BoolArgumentType.bool())
-                .executes(ctx -> withExterior(ctx, (exterior, idText) -> {
-                    boolean value = BoolArgumentType.getBool(ctx, "value");
-                    setter.set(exterior, value);
-                    exterior.sync();
-                    return changed(ctx, idText, name, String.valueOf(value));
-                })));
-    }
-
-    private static LiteralArgumentBuilder<CommandSourceStack> yaw() {
-        return literal("yaw").then(argument("degrees", FloatArgumentType.floatArg(0f, 360f))
-                .executes(ctx -> withExterior(ctx, (exterior, idText) -> {
-                    float yaw = FloatArgumentType.getFloat(ctx, "degrees");
-                    exterior.setYaw(yaw);
-                    exterior.sync();
-                    return changed(ctx, idText, "yaw", String.valueOf(yaw));
-                })));
-    }
-
-    private static LiteralArgumentBuilder<CommandSourceStack> controlState() {
-        return literal("control_state")
-                .then(argument("control", StringArgumentType.word())
-                        .suggests(DataCommands::suggestControls)
-                        .then(argument("value", BoolArgumentType.bool())
-                                .executes(ctx -> withConsole(ctx, (console, idText) -> {
-                                    String control = StringArgumentType.getString(ctx, "control");
-                                    boolean value = BoolArgumentType.getBool(ctx, "value");
-                                    console.setControlActivated(control, value);
-                                    return changed(ctx, idText, "control_state " + control, String.valueOf(value));
-                                }))));
-    }
-
-    private static CompletableFuture<Suggestions> suggestControls(CommandContext<CommandSourceStack> ctx,
-                                                                  SuggestionsBuilder builder) {
-        idArgument(ctx).flatMap(id -> ConsoleCommands.consoleOf(ctx, id))
-                .ifPresent(console -> console.getControlEntities().stream()
-                        .map(TardisControlEntity::getControlId)
-                        .forEach(builder::suggest));
-        return builder.buildFuture();
-    }
-
-    private static int withExterior(CommandContext<CommandSourceStack> ctx, ExteriorAction action) throws CommandSyntaxException {
-        return withTardis(ctx, (tardis, idText) -> {
             Optional<TardisExteriorBlockEntity> exterior = tardis.exterior();
-            if (exterior.isEmpty()) return fail(ctx, "no_exterior", idText);
-            return action.run(exterior.get(), idText);
-        });
-    }
+            sendLine(ctx, dataLine("cloaked", exterior.map(be -> String.valueOf(be.isCloaked())).orElse("unknown")));
+            sendLine(ctx, dataLine("yaw", exterior.map(be -> String.valueOf(be.getYaw())).orElse("unknown")));
 
-    private static int withConsole(CommandContext<CommandSourceStack> ctx, ConsoleAction action) throws CommandSyntaxException {
-        return withTardis(ctx, (tardis, idText) -> {
-            Optional<TardisConsoleBlockEntity> console = tardis.console();
-            if (console.isEmpty()) return fail(ctx, "no_console", idText);
-            return action.run(console.get(), idText);
-        });
-    }
+            sendLine(ctx, dataLine("crashed", String.valueOf(TardisDamage.isCrashed(tardis))));
 
-    private static int changed(CommandContext<CommandSourceStack> ctx, String idText, String field, String value) {
-        return success(ctx, true, "data_set", field, idText, value);
+            Long flightStart = tardis.data().getFlightStart(tardis.id());
+            sendLine(ctx, dataLine("flight_remaining",
+                    flightStart == null ? "not travelling" : formatSeconds(TardisTravel.remainingTicks(tardis) / 20.0)));
+            return 1;
+        });
     }
 }

@@ -277,13 +277,7 @@ public class GCLanguageProvider extends LanguageProvider {
         add("command.gallifreyan_chronicles.traits_full", "A TARDIS can only have %s traits");
         add("command.gallifreyan_chronicles.repaired", "Repaired TARDIS %s");
         add("command.gallifreyan_chronicles.not_crashed", "TARDIS %s isn't damaged");
-        add("command.gallifreyan_chronicles.data_header", "TARDIS %s data:");
         add("command.gallifreyan_chronicles.data_line", "  %s: %s");
-        add("command.gallifreyan_chronicles.data_set", "Set %s of TARDIS %s to %s");
-        add("command.gallifreyan_chronicles.data_remat", "TARDIS %s rematerialised at its target");
-        add("command.gallifreyan_chronicles.data_vanish", "TARDIS %s vanished into the vortex");
-        add("command.gallifreyan_chronicles.data_no_target", "TARDIS %s has no target to rematerialise at");
-        add("command.gallifreyan_chronicles.data_bad_value", "Unknown value: %s");
         add("command.gallifreyan_chronicles.set_mind",
                 "Set %s of TARDIS %s to %s");
 
@@ -338,6 +332,44 @@ public class GCLanguageProvider extends LanguageProvider {
         /** Commands, debug listing. */
         add("command.gallifreyan_chronicles.list_exterior",
                 "Exteriors: %s");
+
+        /** Commands, low-level data fields. */
+        add("command.gallifreyan_chronicles.get_glow",
+                "Exterior glow of TARDIS %s: %s");
+        add("command.gallifreyan_chronicles.get_console_variant",
+                "Console variant of TARDIS %s: %s");
+        add("command.gallifreyan_chronicles.get_door_variant",
+                "Door variant of TARDIS %s: %s");
+        add("command.gallifreyan_chronicles.get_control",
+                "Control %s of TARDIS %s: %s");
+        add("command.gallifreyan_chronicles.get_locked",
+                "TARDIS %s locked: %s");
+        add("command.gallifreyan_chronicles.set_locked",
+                "Set locked state of TARDIS %s to %s");
+        add("command.gallifreyan_chronicles.set_locked_failed",
+                "Couldn't set locked state of TARDIS %s to %s, the doors aren't fully shut");
+        add("command.gallifreyan_chronicles.get_cloaked",
+                "TARDIS %s cloaked: %s");
+        add("command.gallifreyan_chronicles.set_cloaked",
+                "Set cloak of TARDIS %s to %s");
+        add("command.gallifreyan_chronicles.get_yaw",
+                "Yaw of TARDIS %s: %s degrees");
+        add("command.gallifreyan_chronicles.set_yaw",
+                "Set yaw of TARDIS %s to %s degrees");
+        add("command.gallifreyan_chronicles.get_crashed",
+                "TARDIS %s crashed: %s");
+        add("command.gallifreyan_chronicles.set_crashed",
+                "Set crashed state of TARDIS %s to %s");
+        add("command.gallifreyan_chronicles.crashed_already",
+                "TARDIS %s is already set to crashed: %s");
+        add("command.gallifreyan_chronicles.data_dump_header",
+                "=== TARDIS data dump: %s ===");
+        add("command.gallifreyan_chronicles.not_travelling",
+                "TARDIS %s isn't currently travelling");
+        add("command.gallifreyan_chronicles.get_flight_remaining",
+                "TARDIS %s has %s seconds left of its flight");
+        add("command.gallifreyan_chronicles.set_flight_remaining",
+                "Skipped ahead, TARDIS %s now has %s seconds left of its flight");
 
         /** Overlays. */
         add("overlay.gallifreyan_chronicles.destination",

@@ -20,36 +20,38 @@ import static uk.nbforge.gallifreyan_chronicles.util.CommandUtil.*;
 import static net.minecraft.commands.Commands.argument;
 import static net.minecraft.commands.Commands.literal;
 
+/** The interior template and the door model/variant of a TARDIS are entirely gotten/set under "data" now; see interiorData() and doorVariantData(). */
 public final class InteriorCommands {
     private InteriorCommands() {
     }
 
-    public static LiteralArgumentBuilder<CommandSourceStack> interior() {
+    /** data interior [<interior_id>] */
+    public static LiteralArgumentBuilder<CommandSourceStack> interiorData() {
         return literal("interior")
-                .then(literal("get").executes(InteriorCommands::get))
-                .then(literal("set")
-                        .then(argument("interior_id", StringArgumentType.greedyString())
-                                .suggests(InteriorCommands::suggestInteriors)
-                                .executes(InteriorCommands::set)));
+                .executes(InteriorCommands::get)
+                .then(argument("interior_id", StringArgumentType.greedyString())
+                        .suggests(InteriorCommands::suggestInteriors)
+                        .executes(InteriorCommands::set));
     }
 
-    public static LiteralArgumentBuilder<CommandSourceStack> door() {
+    /** data door variant [<variant_id>] */
+    public static LiteralArgumentBuilder<CommandSourceStack> doorVariantData() {
         return literal("door")
                 .then(literal("variant")
-                        .then(literal("set")
-                                .then(argument("variant_id", StringArgumentType.greedyString())
-                                        .suggests(InteriorCommands::suggestDoorVariants)
-                                        .executes(InteriorCommands::setDoorVariant))));
+                        .executes(InteriorCommands::getDoorVariant)
+                        .then(argument("variant_id", StringArgumentType.greedyString())
+                                .suggests(InteriorCommands::suggestDoorVariants)
+                                .executes(InteriorCommands::setDoorVariant)));
     }
 
     private static CompletableFuture<Suggestions> suggestInteriors(CommandContext<CommandSourceStack> ctx,
-                                                                   SuggestionsBuilder builder) {
+                                                                    SuggestionsBuilder builder) {
         TardisInteriorRegistry.getAll().forEach(interior -> builder.suggest(interior.id()));
         return builder.buildFuture();
     }
 
     private static CompletableFuture<Suggestions> suggestDoorVariants(CommandContext<CommandSourceStack> ctx,
-                                                                      SuggestionsBuilder builder) {
+                                                                       SuggestionsBuilder builder) {
         idArgument(ctx).flatMap(id -> DoorSyncSystem.doorsOf(id).stream().findFirst()).ifPresent(door -> {
             List<String> ids = door.isLinked()
                     ? TardisDoorRegistry.interiorVariantIds()
@@ -59,7 +61,7 @@ public final class InteriorCommands {
         return builder.buildFuture();
     }
 
-    private static int get(CommandContext<CommandSourceStack> ctx) throws CommandSyntaxException {
+    static int get(CommandContext<CommandSourceStack> ctx) throws CommandSyntaxException {
         return withTardis(ctx, (tardis, idText) -> {
             String interiorId = TardisInteriorSystem.getInteriorDefinition(tardis.server(), tardis.id()).id();
             return success(ctx, false, "get_interior", idText, interiorId);
@@ -73,6 +75,14 @@ public final class InteriorCommands {
             case MISSING_TEMPLATE -> fail(ctx, "missing_interior_template", interiorId);
             case UNCHANGED -> fail(ctx, "interior_unchanged", idText, interiorId);
             case CHANGED -> success(ctx, true, "set_interior", idText, interiorId);
+        });
+    }
+
+    static int getDoorVariant(CommandContext<CommandSourceStack> ctx) throws CommandSyntaxException {
+        return withTardisId(ctx, (id, idText) -> {
+            List<InteriorDoorBlockEntity> doors = DoorSyncSystem.doorsOf(id);
+            if (doors.isEmpty()) return fail(ctx, "no_interior_door", idText);
+            return success(ctx, false, "get_door_variant", idText, doors.get(0).getDoorVariantId());
         });
     }
 

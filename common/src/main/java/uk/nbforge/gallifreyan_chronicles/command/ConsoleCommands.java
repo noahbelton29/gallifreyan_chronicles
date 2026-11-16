@@ -25,20 +25,29 @@ public final class ConsoleCommands {
     private ConsoleCommands() {
     }
 
+    /**
+     * Linking and unlinking a console block to a TARDIS. Getting/setting which console and its variant live under "data" now.
+     */
     public static LiteralArgumentBuilder<CommandSourceStack> console() {
         return literal("console")
-                .then(literal("get").executes(ConsoleCommands::get))
-                .then(literal("set")
-                        .then(argument("console_id", StringArgumentType.greedyString())
-                                .suggests(ConsoleCommands::suggestConsoles)
-                                .executes(ConsoleCommands::set)))
                 .then(literal("link").executes(ConsoleCommands::link))
-                .then(literal("unlink").executes(ConsoleCommands::unlink))
+                .then(literal("unlink").executes(ConsoleCommands::unlink));
+    }
+
+    /**
+     * data console [<console_id>] [variant [<variant_id>]]
+     */
+    public static LiteralArgumentBuilder<CommandSourceStack> consoleData() {
+        return literal("console")
+                .executes(ConsoleCommands::get)
+                .then(argument("console_id", StringArgumentType.greedyString())
+                        .suggests(ConsoleCommands::suggestConsoles)
+                        .executes(ConsoleCommands::set))
                 .then(literal("variant")
-                        .then(literal("set")
-                                .then(argument("variant_id", StringArgumentType.greedyString())
-                                        .suggests(ConsoleCommands::suggestVariants)
-                                        .executes(ConsoleCommands::setVariant))));
+                        .executes(ConsoleCommands::getVariant)
+                        .then(argument("variant_id", StringArgumentType.greedyString())
+                                .suggests(ConsoleCommands::suggestVariants)
+                                .executes(ConsoleCommands::setVariant)));
     }
 
     private static CompletableFuture<Suggestions> suggestConsoles(CommandContext<CommandSourceStack> ctx,
@@ -60,7 +69,7 @@ public final class ConsoleCommands {
         return findBlockEntity(ctx, pos, TardisConsoleBlockEntity.class);
     }
 
-    private static int get(CommandContext<CommandSourceStack> ctx) throws CommandSyntaxException {
+    static int get(CommandContext<CommandSourceStack> ctx) throws CommandSyntaxException {
         return withTardis(ctx, (tardis, idText) -> {
             String consoleId = consoleOf(ctx, tardis.id()).map(be -> be.getConsole().id()).orElse("unknown");
             return success(ctx, false, "get_console", idText, consoleId);
@@ -79,6 +88,13 @@ public final class ConsoleCommands {
             ConsoleLinkSystem.spawnDefaultControls(be.get());
             syncConsolesTo(ctx);
             return success(ctx, true, "set_console", idText, consoleId);
+        });
+    }
+
+    static int getVariant(CommandContext<CommandSourceStack> ctx) throws CommandSyntaxException {
+        return withTardis(ctx, (tardis, idText) -> {
+            Optional<TardisConsoleBlockEntity> be = consoleOf(ctx, tardis.id());
+            return be.map(tardisConsoleBlockEntity -> success(ctx, false, "get_console_variant", idText, tardisConsoleBlockEntity.getVariant())).orElseGet(() -> fail(ctx, "no_console", idText));
         });
     }
 

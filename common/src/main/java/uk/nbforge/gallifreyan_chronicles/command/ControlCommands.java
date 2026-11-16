@@ -20,25 +20,19 @@ import static uk.nbforge.gallifreyan_chronicles.util.CommandUtil.*;
 import static net.minecraft.commands.Commands.argument;
 import static net.minecraft.commands.Commands.literal;
 
+/** Whether a console control is on or off lives entirely under "data" now, since it goes through the control's real activate() logic. */
 public final class ControlCommands {
     private ControlCommands() {
     }
 
-    public static LiteralArgumentBuilder<CommandSourceStack> control() {
+    /** data control <control_id> [on|off] */
+    public static LiteralArgumentBuilder<CommandSourceStack> controlData() {
         return literal("control")
                 .then(argument("control", StringArgumentType.word())
                         .suggests(ControlCommands::suggestControls)
+                        .executes(ControlCommands::get)
                         .then(literal("on").executes(ctx -> set(ctx, true)))
                         .then(literal("off").executes(ctx -> set(ctx, false))));
-    }
-
-    public static LiteralArgumentBuilder<CommandSourceStack> controlsLegacy() {
-        return literal("controls")
-                .then(argument("control", StringArgumentType.word())
-                        .suggests(ControlCommands::suggestControls)
-                        .then(literal("set")
-                                .then(literal("on").executes(ctx -> set(ctx, true)))
-                                .then(literal("off").executes(ctx -> set(ctx, false)))));
     }
 
     private static CompletableFuture<Suggestions> suggestControls(CommandContext<CommandSourceStack> ctx,
@@ -50,6 +44,20 @@ public final class ControlCommands {
             TardisControlRegistry.allIds().forEach(builder::suggest);
         }
         return builder.buildFuture();
+    }
+
+    private static int get(CommandContext<CommandSourceStack> ctx) throws CommandSyntaxException {
+        String controlId = StringArgumentType.getString(ctx, "control");
+        return withTardis(ctx, (tardis, idText) -> {
+            if (!TardisControlRegistry.allIds().contains(controlId)) return fail(ctx, "unknown_control", controlId);
+
+            Optional<TardisConsoleBlockEntity> console = tardis.console();
+            if (console.isEmpty()) return fail(ctx, "no_console", idText);
+            if (findControl(console.get(), controlId) == null) return fail(ctx, "control_not_on_console", controlId, idText);
+
+            boolean on = console.get().getControlState(controlId);
+            return success(ctx, false, "get_control", controlId, idText, on ? "on" : "off");
+        });
     }
 
     private static int set(CommandContext<CommandSourceStack> ctx, boolean on) throws CommandSyntaxException {

@@ -25,7 +25,8 @@ public class TardisManager extends SavedData {
                         Optional<String> interiorId, Optional<LandingTarget> landingTarget,
                         Optional<Integer> coordIncrement, Optional<Boolean> coordIncrementNegative,
                         Optional<List<UUID>> trusted, Optional<TardisMind> mind,
-                        Optional<Long> flightStart, Optional<Boolean> crashed) {
+                        Optional<Long> flightStart, Optional<Boolean> crashed,
+                        Optional<Long> flightDurationOverride) {
     }
 
     public static final SavedDataType<TardisManager> TYPE = new SavedDataType<>(
@@ -50,6 +51,7 @@ public class TardisManager extends SavedData {
     private final Map<UUID, TardisMind> mindById = new HashMap<>();
     private final Map<UUID, Long> flightStartById = new HashMap<>();
     private final Set<UUID> crashed = new HashSet<>();
+    private final Map<UUID, Long> flightDurationOverrideById = new HashMap<>();
 
     public List<Entry> toEntries() {
         List<Entry> entries = new ArrayList<>();
@@ -71,7 +73,8 @@ public class TardisManager extends SavedData {
                             : Optional.empty(),
                     Optional.ofNullable(mindById.get(id)),
                     Optional.ofNullable(flightStartById.get(id)),
-                    crashed.contains(id) ? Optional.of(true) : Optional.empty()
+                    crashed.contains(id) ? Optional.of(true) : Optional.empty(),
+                    Optional.ofNullable(flightDurationOverrideById.get(id))
             ));
         }
         return entries;
@@ -102,6 +105,7 @@ public class TardisManager extends SavedData {
             entry.mind().ifPresent(mind -> manager.mindById.put(id, mind));
             entry.flightStart().ifPresent(start -> manager.flightStartById.put(id, start));
             if (entry.crashed().orElse(false)) manager.crashed.add(id);
+            entry.flightDurationOverride().ifPresent(ticks -> manager.flightDurationOverrideById.put(id, ticks));
         }
         return manager;
     }
@@ -190,6 +194,7 @@ public class TardisManager extends SavedData {
         mindById.remove(tardisId);
         flightStartById.remove(tardisId);
         crashed.remove(tardisId);
+        flightDurationOverrideById.remove(tardisId);
         setDirty();
     }
 
@@ -210,6 +215,17 @@ public class TardisManager extends SavedData {
     public void setFlightStart(UUID tardisId, @Nullable Long start) {
         if (start == null) flightStartById.remove(tardisId);
         else flightStartById.put(tardisId, start);
+        setDirty();
+    }
+
+    /** Ticks a TARDIS must spend in flight before it can land, overriding the normal distance formula. Null means use the default. */
+    public @Nullable Long getFlightDurationOverride(UUID tardisId) {
+        return flightDurationOverrideById.get(tardisId);
+    }
+
+    public void setFlightDurationOverride(UUID tardisId, @Nullable Long ticks) {
+        if (ticks == null) flightDurationOverrideById.remove(tardisId);
+        else flightDurationOverrideById.put(tardisId, ticks);
         setDirty();
     }
 

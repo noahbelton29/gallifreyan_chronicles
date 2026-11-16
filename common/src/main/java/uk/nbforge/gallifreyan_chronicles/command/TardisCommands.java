@@ -1,8 +1,5 @@
 package uk.nbforge.gallifreyan_chronicles.command;
 
-import net.minecraft.network.chat.HoverEvent;
-import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.ClickEvent;
 import uk.nbforge.gallifreyan_chronicles.tardis.ecs.system.TardisInteriorSystem;
 import uk.nbforge.gallifreyan_chronicles.tardis.TardisDimensionManager;
 import uk.nbforge.gallifreyan_chronicles.tardis.TardisApi;
@@ -115,13 +112,7 @@ public final class TardisCommands {
                 .or(() -> TardisApi.ofLevel(level));
         if (tardis.isEmpty()) return fail(ctx, "no_tardis_here");
 
-        String id = tardis.get().id().toString();
-        Component copy = Component.literal(id).withStyle(style -> style
-                .withColor(ChatFormatting.GREEN)
-                .withUnderlined(true)
-                .withClickEvent(new ClickEvent.CopyToClipboard(id))
-                .withHoverEvent(new HoverEvent.ShowText(text("click_to_copy"))));
-        send(ctx, text("tardis_id", copy), false);
+        send(ctx, text("tardis_id", idLink(tardis.get().id())), false);
         return 1;
     }
 

@@ -13,13 +13,19 @@ public final class TardisTravel {
     private static final double POWER = 0.557;
     private static final double MIN_SECONDS = 3.0;
     private static final double DIMENSION_SECONDS = 15.0;
+    // Generous rather than tight: "data flight_remaining" is meant to allow a deliberately absurd number of seconds.
+    private static final long MIN_OVERRIDE_TICKS = 0L;
+    private static final long MAX_OVERRIDE_TICKS = 20_000_000L;
 
     private TardisTravel() {
     }
 
     public static void init() {
         TardisEvents.TAKE_OFF.register(tardis -> tardis.data().setFlightStart(tardis.id(), now(tardis.server())));
-        TardisEvents.LAND.register(tardis -> tardis.data().setFlightStart(tardis.id(), null));
+        TardisEvents.LAND.register(tardis -> {
+            tardis.data().setFlightStart(tardis.id(), null);
+            tardis.data().setFlightDurationOverride(tardis.id(), null);
+        });
     }
 
     private static long now(MinecraftServer server) {
@@ -34,6 +40,9 @@ public final class TardisTravel {
         LandingTarget target = tardis.landingTarget().orElse(null);
         BlockPos from = tardis.exteriorPos().orElse(null);
         if (target == null || from == null) return 0L;
+
+        Long override = tardis.data().getFlightDurationOverride(tardis.id());
+        if (override != null) return Math.clamp(override, MIN_OVERRIDE_TICKS, MAX_OVERRIDE_TICKS);
 
         double blocks = Math.sqrt(from.distSqr(target.pos()));
         double seconds = secondsFor(blocks);
@@ -64,7 +73,9 @@ public final class TardisTravel {
         return partWayTarget(tardis, 0F);
     }
 
-    /** Where it ends up if it drops out early, atLeast is never less than this far along. */
+    /**
+     * Where it ends up if it drops out early, atLeast is never less than this far along.
+     */
     public static LandingTarget partWayTarget(Tardis tardis, float atLeast) {
         LandingTarget target = tardis.landingTarget().orElse(null);
         BlockPos from = tardis.exteriorPos().orElse(BlockPos.ZERO);

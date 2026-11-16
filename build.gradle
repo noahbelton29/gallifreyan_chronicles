@@ -3,6 +3,7 @@ plugins {
     id 'net.fabricmc.fabric-loom' version '1.18-SNAPSHOT' apply false
     // see https://projects.neoforged.net/neoforged/moddevgradle for new versions
     id 'net.neoforged.moddev' version '2.0.147' apply false
+    id 'com.diffplug.spotless' version '8.11.0'
 }
 
 def baseVersion = project.version.toString()
@@ -22,3 +23,20 @@ subprojects {
 }
 
 apply from: 'gradle/tester-builds.gradle'
+
+spotless {
+    java {
+        target 'common/src/**/*.java', 'fabric/src/**/*.java', 'neoforge/src/**/*.java'
+        targetExclude '**/build/**', '**/generated/**'
+        palantirJavaFormat().formatJavadoc(false)
+        trimTrailingWhitespace()
+        endWithNewline()
+    }
+    format 'gradle', {
+        target '*.gradle', '*/build.gradle', 'gradle/*.gradle', 'build-logic/**/*.gradle'
+        targetExclude '**/build/**'
+        leadingTabsToSpaces(4)
+        trimTrailingWhitespace()
+        endWithNewline()
+    }
+}

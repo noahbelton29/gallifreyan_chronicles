@@ -1,17 +1,17 @@
 package uk.nbforge.gallifreyan_chronicles.core.item.tooltip;
 
+import java.util.Locale;
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
 
-import java.util.Locale;
-
 public final class SelectionTooltip {
-    private SelectionTooltip() {
-    }
+    private SelectionTooltip() {}
 
     public static Component line(String labelKey, Component value) {
-        return Component.translatable(labelKey).withStyle(ChatFormatting.GRAY)
-                .append(Component.translatable("tooltip.gallifreyan_chronicles.label_separator").withStyle(ChatFormatting.GRAY))
+        return Component.translatable(labelKey)
+                .withStyle(ChatFormatting.GRAY)
+                .append(Component.translatable("tooltip.gallifreyan_chronicles.label_separator")
+                        .withStyle(ChatFormatting.GRAY))
                 .append(value);
     }
 
@@ -20,8 +20,7 @@ public final class SelectionTooltip {
     }
 
     public static Component scrollHint() {
-        return Component.translatable("tooltip.gallifreyan_chronicles.scroll")
-                .withStyle(ChatFormatting.DARK_GRAY);
+        return Component.translatable("tooltip.gallifreyan_chronicles.scroll").withStyle(ChatFormatting.DARK_GRAY);
     }
 
     public static Component displayName(String kind, String id) {
@@ -30,7 +29,7 @@ public final class SelectionTooltip {
         String path = colon >= 0 ? id.substring(colon + 1) : id;
 
         String base = path;
-        for (String suffix : new String[]{"_interior", "_exterior"}) {
+        for (String suffix : new String[] {"_interior", "_exterior"}) {
             if (base.endsWith(suffix)) {
                 base = base.substring(0, base.length() - suffix.length());
                 break;

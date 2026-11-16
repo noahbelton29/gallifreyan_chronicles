@@ -1,48 +1,45 @@
 package uk.nbforge.gallifreyan_chronicles.tardis.ecs.system;
 
-import uk.nbforge.gallifreyan_chronicles.tardis.mind.TardisMind;
-import uk.nbforge.gallifreyan_chronicles.tardis.mind.TardisBond;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
+import java.util.function.Function;
+import net.minecraft.ChatFormatting;
+import net.minecraft.server.MinecraftServer;
+import net.minecraft.server.level.ServerPlayer;
+import org.jspecify.annotations.Nullable;
+import uk.nbforge.gallifreyan_chronicles.tardis.Tardis;
+import uk.nbforge.gallifreyan_chronicles.tardis.TardisEvents;
 import uk.nbforge.gallifreyan_chronicles.tardis.mind.FearLevel;
 import uk.nbforge.gallifreyan_chronicles.tardis.mind.MindMessages;
+import uk.nbforge.gallifreyan_chronicles.tardis.mind.TardisBond;
+import uk.nbforge.gallifreyan_chronicles.tardis.mind.TardisMind;
 import uk.nbforge.gallifreyan_chronicles.tardis.mind.TardisPersonality;
 import uk.nbforge.gallifreyan_chronicles.tardis.mind.TardisTrait;
-import uk.nbforge.gallifreyan_chronicles.tardis.mind.flight.TardisTurbulence;
 import uk.nbforge.gallifreyan_chronicles.tardis.mind.abuse.TardisMallet;
 import uk.nbforge.gallifreyan_chronicles.tardis.mind.abuse.TardisTerror;
 import uk.nbforge.gallifreyan_chronicles.tardis.mind.abuse.TardisTrauma;
-import uk.nbforge.gallifreyan_chronicles.tardis.mind.disability.TardisDisability;
-import uk.nbforge.gallifreyan_chronicles.tardis.mind.disability.TardisDyslexia;
-import uk.nbforge.gallifreyan_chronicles.tardis.mind.discovery.TardisDiscovery;
-import uk.nbforge.gallifreyan_chronicles.tardis.mind.feedback.TardisFeedback;
-import uk.nbforge.gallifreyan_chronicles.tardis.mind.fright.TardisFright;
-import uk.nbforge.gallifreyan_chronicles.tardis.mind.offering.TardisPeaceOffering;
-import uk.nbforge.gallifreyan_chronicles.tardis.mind.mood.TardisMoods;
-import uk.nbforge.gallifreyan_chronicles.tardis.mind.refusal.TardisAnger;
-import uk.nbforge.gallifreyan_chronicles.tardis.mind.refusal.TardisConvincing;
-
-import uk.nbforge.gallifreyan_chronicles.tardis.Tardis;
-import uk.nbforge.gallifreyan_chronicles.tardis.TardisEvents;
 import uk.nbforge.gallifreyan_chronicles.tardis.mind.action.MindAction;
 import uk.nbforge.gallifreyan_chronicles.tardis.mind.action.MindActions;
 import uk.nbforge.gallifreyan_chronicles.tardis.mind.action.MindContext;
 import uk.nbforge.gallifreyan_chronicles.tardis.mind.data.MindEnums.Reveal;
 import uk.nbforge.gallifreyan_chronicles.tardis.mind.data.TraitModifiers;
-import net.minecraft.server.MinecraftServer;
-
-import java.util.List;
-import java.util.Map;
-import java.util.HashMap;
-import java.util.UUID;
-import java.util.function.Function;
-
-import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.ChatFormatting;
-import org.jspecify.annotations.Nullable;
+import uk.nbforge.gallifreyan_chronicles.tardis.mind.disability.TardisDisability;
+import uk.nbforge.gallifreyan_chronicles.tardis.mind.disability.TardisDyslexia;
+import uk.nbforge.gallifreyan_chronicles.tardis.mind.discovery.TardisDiscovery;
+import uk.nbforge.gallifreyan_chronicles.tardis.mind.feedback.TardisFeedback;
+import uk.nbforge.gallifreyan_chronicles.tardis.mind.flight.TardisTurbulence;
+import uk.nbforge.gallifreyan_chronicles.tardis.mind.fright.TardisFright;
+import uk.nbforge.gallifreyan_chronicles.tardis.mind.mood.TardisMoods;
+import uk.nbforge.gallifreyan_chronicles.tardis.mind.offering.TardisPeaceOffering;
+import uk.nbforge.gallifreyan_chronicles.tardis.mind.refusal.TardisAnger;
+import uk.nbforge.gallifreyan_chronicles.tardis.mind.refusal.TardisConvincing;
 
 /**
-   Handles the mood of every TARDIS, stress, fear and trust.
-   It uses the personality and traits to decide how the TARDIS reacts to its pilot.
-*/
+ * Handles the mood of every TARDIS, stress, fear and trust.
+ * It uses the personality and traits to decide how the TARDIS reacts to its pilot.
+ */
 public final class TardisMindSystem {
 
     private static final float COWED_STRESS = 4f;
@@ -84,8 +81,7 @@ public final class TardisMindSystem {
         REFUSE
     }
 
-    private TardisMindSystem() {
-    }
+    private TardisMindSystem() {}
 
     public static void init() {
         TardisMoods.init();
@@ -94,11 +90,9 @@ public final class TardisMindSystem {
         TardisDiscovery.init();
         TardisTrauma.init();
 
-        TardisEvents.TAKE_OFF.register(tardis ->
-                runHook(tardis, TardisPersonality::onTakeOff, TardisTrait::onTakeOff));
+        TardisEvents.TAKE_OFF.register(tardis -> runHook(tardis, TardisPersonality::onTakeOff, TardisTrait::onTakeOff));
 
-        TardisEvents.LAND.register(tardis ->
-                runHook(tardis, TardisPersonality::onLand, TardisTrait::onLand));
+        TardisEvents.LAND.register(tardis -> runHook(tardis, TardisPersonality::onLand, TardisTrait::onLand));
     }
 
     /** Only clears temporary state, the saved personality and traits stay. */
@@ -230,9 +224,9 @@ public final class TardisMindSystem {
     }
 
     /**
-       Only gains are changed by traits and disabilities, PTSD makes them bigger and high trust in the owner makes them smaller.
-       Losses are left alone.
-    */
+     * Only gains are changed by traits and disabilities, PTSD makes them bigger and high trust in the owner makes them smaller.
+     * Losses are left alone.
+     */
     public static void addStress(Tardis tardis, float amount) {
         TardisMind mind = mind(tardis);
 
@@ -268,14 +262,11 @@ public final class TardisMindSystem {
         if (forgiven) updated = updated.withBetrayed(false);
         saveBond(tardis, player, updated);
 
-        TardisFeedback.trustChanged(
-                tardis,
-                updated.trust() - bond.trust(),
-                TardisFeedback.Cause.NORMAL
-        );
+        TardisFeedback.trustChanged(tardis, updated.trust() - bond.trust(), TardisFeedback.Cause.NORMAL);
         if (forgiven) {
             ServerPlayer forgivenPlayer = tardis.server().getPlayerList().getPlayer(who(tardis, player));
-            if (forgivenPlayer != null) MindMessages.say(forgivenPlayer, ChatFormatting.LIGHT_PURPLE, "tardis_forgives_you");
+            if (forgivenPlayer != null)
+                MindMessages.say(forgivenPlayer, ChatFormatting.LIGHT_PURPLE, "tardis_forgives_you");
         }
 
         if (amount < 0f) TardisDiscovery.reveal(tardis, Reveal.IT_LOSES_TRUST);
@@ -289,17 +280,13 @@ public final class TardisMindSystem {
         TardisBond updated = bond.withHits(bond.hits() + 1).withTrust(bond.trust() - loss);
         saveBond(tardis, player, updated);
 
-        TardisFeedback.trustChanged(
-                tardis,
-                updated.trust() - bond.trust(),
-                TardisFeedback.Cause.ABUSE
-        );
+        TardisFeedback.trustChanged(tardis, updated.trust() - bond.trust(), TardisFeedback.Cause.ABUSE);
     }
 
     /**
-       Only works once per player unless the betrayal is reset.
-       Returns false if it cannot be betrayed or already was.
-    */
+     * Only works once per player unless the betrayal is reset.
+     * Returns false if it cannot be betrayed or already was.
+     */
     public static boolean betray(Tardis tardis, UUID player) {
         TardisBond bond = bond(tardis, player);
 
@@ -308,11 +295,7 @@ public final class TardisMindSystem {
         TardisBond updated = bond.withBetrayed(true).withTrust(bond.trust() - BETRAYAL_TRUST_LOSS);
         saveBond(tardis, player, updated);
 
-        TardisFeedback.trustChanged(
-                tardis,
-                updated.trust() - bond.trust(),
-                TardisFeedback.Cause.BETRAYAL
-        );
+        TardisFeedback.trustChanged(tardis, updated.trust() - bond.trust(), TardisFeedback.Cause.BETRAYAL);
 
         return true;
     }
@@ -342,7 +325,10 @@ public final class TardisMindSystem {
     public static void forgive(Tardis tardis, @Nullable UUID player) {
         long now = now(tardis.server());
         TardisBond bond = bond(tardis, player);
-        saveBond(tardis, player, bond.withFear(0f, now).withTrauma(0f, now).withHits(0).withBetrayed(false));
+        saveBond(
+                tardis,
+                player,
+                bond.withFear(0f, now).withTrauma(0f, now).withHits(0).withBetrayed(false));
     }
 
     /** Kindness forgives one hit and eases the scars from that player. */
@@ -401,9 +387,9 @@ public final class TardisMindSystem {
     }
 
     /**
-       Positive makes it more likely to refuse, it lowers the stress limit and raises the trust needed.
-       Strangers get an extra modifier on top.
-    */
+     * Positive makes it more likely to refuse, it lowers the stress limit and raises the trust needed.
+     * Strangers get an extra modifier on top.
+     */
     private static float limitShift(Tardis tardis, TardisMind mind, @Nullable UUID pilot) {
         TraitModifiers modifiers = mind.modifiers();
         float shift = modifiers.refusalShift();
@@ -424,9 +410,9 @@ public final class TardisMindSystem {
     }
 
     /**
-       If it is willing, the temporary refusal state is cleared.
-       A scared TARDIS goes along with it but gets more stressed and trusts the pilot less.
-    */
+     * If it is willing, the temporary refusal state is cleared.
+     * A scared TARDIS goes along with it but gets more stressed and trusts the pilot less.
+     */
     public static Refusal refusesTakeoff(Tardis tardis, @Nullable UUID pilot) {
         revealStrangerTraits(tardis, pilot);
 
@@ -479,8 +465,7 @@ public final class TardisMindSystem {
     private static void runHook(
             Tardis tardis,
             Function<TardisPersonality, List<MindAction>> personalityHook,
-            Function<TardisTrait, List<MindAction>> traitHook
-    ) {
+            Function<TardisTrait, List<MindAction>> traitHook) {
         TardisMind mind = mind(tardis);
         MindContext context = MindContext.of(tardis);
 

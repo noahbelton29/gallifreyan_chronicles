@@ -1,27 +1,29 @@
 package uk.nbforge.gallifreyan_chronicles.client.protection.watermark;
 
 import com.mojang.blaze3d.platform.NativeImage;
-import uk.nbforge.gallifreyan_chronicles.Constants;
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.User;
-
 import java.util.Collections;
 import java.util.Set;
 import java.util.WeakHashMap;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.User;
+import uk.nbforge.gallifreyan_chronicles.Constants;
 
 public final class ScreenshotWatermark {
     private static final int MIN_SIZE = 256;
 
-    private static final Set<NativeImage> DONE = Collections.synchronizedSet(Collections.newSetFromMap(new WeakHashMap<>()));
+    private static final Set<NativeImage> DONE =
+            Collections.synchronizedSet(Collections.newSetFromMap(new WeakHashMap<>()));
 
-    private ScreenshotWatermark() {
-    }
+    private ScreenshotWatermark() {}
 
     public static void apply(NativeImage image) {
         if (DONE.contains(image)) return;
         try {
-            Constants.LOG.debug("[GC] Screenshot callback: {}x{}, watermark enabled={}",
-                    image.getWidth(), image.getHeight(), WatermarkIdentity.enabled());
+            Constants.LOG.debug(
+                    "[GC] Screenshot callback: {}x{}, watermark enabled={}",
+                    image.getWidth(),
+                    image.getHeight(),
+                    WatermarkIdentity.enabled());
             if (!WatermarkIdentity.enabled()) return;
             if (image.getWidth() < MIN_SIZE || image.getHeight() < MIN_SIZE) return;
 

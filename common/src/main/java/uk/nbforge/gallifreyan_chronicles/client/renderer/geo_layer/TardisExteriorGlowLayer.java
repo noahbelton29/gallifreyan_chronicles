@@ -1,20 +1,20 @@
 package uk.nbforge.gallifreyan_chronicles.client.renderer.geo_layer;
 
-import uk.nbforge.gallifreyan_chronicles.client.renderer.fade.FadeBoxRenderer;
-import uk.nbforge.gallifreyan_chronicles.client.util.DetailLevelUtil;
-import net.minecraft.client.renderer.SubmitNodeCollector;
-import com.geckolib.renderer.base.RenderPassInfo;
-import com.geckolib.constant.DataTickets;
 import com.geckolib.animatable.GeoAnimatable;
-import com.geckolib.renderer.layer.builtin.AutoGlowingGeoLayer;
-import com.geckolib.renderer.base.GeoRenderer;
+import com.geckolib.constant.DataTickets;
 import com.geckolib.renderer.base.GeoRenderState;
-import uk.nbforge.gallifreyan_chronicles.client.renderer.GCRenderTypes;
-import uk.nbforge.gallifreyan_chronicles.client.renderer.block.TardisExteriorBlockRenderer;
-import uk.nbforge.gallifreyan_chronicles.util.GCUtil;
+import com.geckolib.renderer.base.GeoRenderer;
+import com.geckolib.renderer.base.RenderPassInfo;
+import com.geckolib.renderer.layer.builtin.AutoGlowingGeoLayer;
+import net.minecraft.client.renderer.SubmitNodeCollector;
 import net.minecraft.client.renderer.rendertype.RenderType;
 import net.minecraft.resources.Identifier;
 import org.jspecify.annotations.NonNull;
+import uk.nbforge.gallifreyan_chronicles.client.renderer.GCRenderTypes;
+import uk.nbforge.gallifreyan_chronicles.client.renderer.block.TardisExteriorBlockRenderer;
+import uk.nbforge.gallifreyan_chronicles.client.renderer.fade.FadeBoxRenderer;
+import uk.nbforge.gallifreyan_chronicles.client.util.DetailLevelUtil;
+import uk.nbforge.gallifreyan_chronicles.util.GCUtil;
 
 public class TardisExteriorGlowLayer<T extends GeoAnimatable, O, R extends GeoRenderState>
         extends AutoGlowingGeoLayer<T, O, R> {

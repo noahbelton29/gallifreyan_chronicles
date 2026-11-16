@@ -22,21 +22,20 @@ public final class TardisLandingSite {
     // Penalty for spots surrounded by solid blocks
     private static final double ENCLOSED_PENALTY = 100.0;
 
-    private record Candidate(BlockPos feet, double score) {
-    }
+    private record Candidate(BlockPos feet, double score) {}
 
-    private TardisLandingSite() {
-    }
+    private TardisLandingSite() {}
 
     /**
-       If nothing is found in the radius it checks the original column for the nearest spot.
-       Returns null if nothing is available.
-    */
+     * If nothing is found in the radius it checks the original column for the nearest spot.
+     * Returns null if nothing is available.
+     */
     public static @Nullable BlockPos find(ServerLevel level, BlockPos target, @Nullable BlockPos own) {
         Candidate best = null;
 
         for (int radius = 0; radius <= MAX_RADIUS; radius++) {
-            // Everything outside this radius is at least this far away sideways, if it cannot beat the best score there is no reason to keep searching
+            // Everything outside this radius is at least this far away sideways, if it cannot beat the best score there
+            // is no reason to keep searching
             if (best != null && (double) radius * radius >= best.score()) break;
 
             for (int dx = -radius; dx <= radius; dx++) {
@@ -69,8 +68,8 @@ public final class TardisLandingSite {
         return nearestInColumn(level, target, own);
     }
 
-    private static @Nullable Candidate bestInColumn(ServerLevel level, BlockPos column, double horizontal,
-                                                    @Nullable BlockPos own) {
+    private static @Nullable Candidate bestInColumn(
+            ServerLevel level, BlockPos column, double horizontal, @Nullable BlockPos own) {
         int minY = level.getMinY() + 1;
         int maxY = highestFeet(level);
         Candidate best = null;
@@ -181,12 +180,19 @@ public final class TardisLandingSite {
 
         if (state.is(BlockTags.LEAVES) || state.is(BlockTags.FLOWERS) || state.is(BlockTags.SAPLINGS)) return true;
 
-        return state.is(Blocks.VINE) || state.is(Blocks.GLOW_LICHEN) || state.is(Blocks.SNOW)
-                || state.is(Blocks.RED_MUSHROOM) || state.is(Blocks.BROWN_MUSHROOM)
-                || state.is(Blocks.SWEET_BERRY_BUSH) || state.is(Blocks.HANGING_ROOTS)
-                || state.is(Blocks.CAVE_VINES) || state.is(Blocks.CAVE_VINES_PLANT)
-                || state.is(Blocks.WEEPING_VINES) || state.is(Blocks.WEEPING_VINES_PLANT)
-                || state.is(Blocks.TWISTING_VINES) || state.is(Blocks.TWISTING_VINES_PLANT);
+        return state.is(Blocks.VINE)
+                || state.is(Blocks.GLOW_LICHEN)
+                || state.is(Blocks.SNOW)
+                || state.is(Blocks.RED_MUSHROOM)
+                || state.is(Blocks.BROWN_MUSHROOM)
+                || state.is(Blocks.SWEET_BERRY_BUSH)
+                || state.is(Blocks.HANGING_ROOTS)
+                || state.is(Blocks.CAVE_VINES)
+                || state.is(Blocks.CAVE_VINES_PLANT)
+                || state.is(Blocks.WEEPING_VINES)
+                || state.is(Blocks.WEEPING_VINES_PLANT)
+                || state.is(Blocks.TWISTING_VINES)
+                || state.is(Blocks.TWISTING_VINES_PLANT);
     }
 
     /** Destroyed without drops, blocks with fluids are left alone. */

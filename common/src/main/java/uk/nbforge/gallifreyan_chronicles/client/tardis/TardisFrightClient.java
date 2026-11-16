@@ -6,10 +6,10 @@ import net.minecraft.world.level.Level;
 import org.jspecify.annotations.Nullable;
 
 /**
-   What a player sees and hears when the TARDIS is afraid of them.
-   The console hum warps and the lights dip.
-   The dips are soft, at most two a second, and go through the power darkness strength setting so turning that down or off turns this down too.
-*/
+ * What a player sees and hears when the TARDIS is afraid of them.
+ * The console hum warps and the lights dip.
+ * The dips are soft, at most two a second, and go through the power darkness strength setting so turning that down or off turns this down too.
+ */
 public final class TardisFrightClient {
     private static final long SLOT_MS = 500L;
     private static final long FADE_IN_NANOS = 500_000_000L;
@@ -34,8 +34,7 @@ public final class TardisFrightClient {
         }
     }
 
-    private TardisFrightClient() {
-    }
+    private TardisFrightClient() {}
 
     public static void start(float severity, int ticks, ResourceKey<Level> dimension) {
         long now = System.nanoTime();

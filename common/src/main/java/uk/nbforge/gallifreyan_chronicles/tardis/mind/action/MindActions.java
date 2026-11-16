@@ -1,10 +1,11 @@
 package uk.nbforge.gallifreyan_chronicles.tardis.mind.action;
 
-import uk.nbforge.gallifreyan_chronicles.tardis.mind.action.builtin.SparksAction;
-import uk.nbforge.gallifreyan_chronicles.tardis.mind.action.builtin.ShieldAction;
-import uk.nbforge.gallifreyan_chronicles.tardis.mind.action.builtin.SlamDoorsAction;
-import uk.nbforge.gallifreyan_chronicles.tardis.mind.action.builtin.RevealAction;
 import com.mojang.serialization.MapCodec;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+import org.jspecify.annotations.Nullable;
+import uk.nbforge.gallifreyan_chronicles.tardis.codec.mind.action.MindActionBuiltinCodec;
 import uk.nbforge.gallifreyan_chronicles.tardis.mind.action.builtin.AddFearAction;
 import uk.nbforge.gallifreyan_chronicles.tardis.mind.action.builtin.AddStressAction;
 import uk.nbforge.gallifreyan_chronicles.tardis.mind.action.builtin.AddTrustAction;
@@ -16,16 +17,14 @@ import uk.nbforge.gallifreyan_chronicles.tardis.mind.action.builtin.LockDoorsAct
 import uk.nbforge.gallifreyan_chronicles.tardis.mind.action.builtin.MessageAction;
 import uk.nbforge.gallifreyan_chronicles.tardis.mind.action.builtin.ParticlesAction;
 import uk.nbforge.gallifreyan_chronicles.tardis.mind.action.builtin.RefuseAction;
+import uk.nbforge.gallifreyan_chronicles.tardis.mind.action.builtin.RevealAction;
 import uk.nbforge.gallifreyan_chronicles.tardis.mind.action.builtin.SavageAction;
+import uk.nbforge.gallifreyan_chronicles.tardis.mind.action.builtin.ShieldAction;
 import uk.nbforge.gallifreyan_chronicles.tardis.mind.action.builtin.ShockAction;
+import uk.nbforge.gallifreyan_chronicles.tardis.mind.action.builtin.SlamDoorsAction;
 import uk.nbforge.gallifreyan_chronicles.tardis.mind.action.builtin.SoundAction;
+import uk.nbforge.gallifreyan_chronicles.tardis.mind.action.builtin.SparksAction;
 import uk.nbforge.gallifreyan_chronicles.tardis.mind.data.MindIds;
-
-import java.util.List;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
-import org.jspecify.annotations.Nullable;
-import uk.nbforge.gallifreyan_chronicles.tardis.codec.mind.action.MindActionBuiltinCodec;
 
 /** Every action type json can use, addons call register to add their own. */
 public final class MindActions {
@@ -52,8 +51,7 @@ public final class MindActions {
         register(SparksAction.TYPE, MindActionBuiltinCodec.SPARKS);
     }
 
-    private MindActions() {
-    }
+    private MindActions() {}
 
     public static @Nullable MapCodec<? extends MindAction> byType(String id) {
         return TYPES.get(MindIds.normalize(id));

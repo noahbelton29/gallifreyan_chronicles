@@ -1,13 +1,12 @@
 package uk.nbforge.gallifreyan_chronicles.tardis.ecs.system;
 
 import uk.nbforge.gallifreyan_chronicles.ecs.Entity;
-import uk.nbforge.gallifreyan_chronicles.tardis.ecs.component.ExteriorComponent;
-import uk.nbforge.gallifreyan_chronicles.tardis.ecs.TardisComponentTypes;
 import uk.nbforge.gallifreyan_chronicles.tardis.TardisExterior;
+import uk.nbforge.gallifreyan_chronicles.tardis.ecs.TardisComponentTypes;
+import uk.nbforge.gallifreyan_chronicles.tardis.ecs.component.ExteriorComponent;
 
 public final class ExteriorSystem {
-    private ExteriorSystem() {
-    }
+    private ExteriorSystem() {}
 
     public static TardisExterior exteriorOf(Entity entity) {
         return entity.get(TardisComponentTypes.EXTERIOR).exterior();

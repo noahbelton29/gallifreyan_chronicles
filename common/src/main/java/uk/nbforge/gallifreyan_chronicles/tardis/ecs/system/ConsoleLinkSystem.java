@@ -1,26 +1,23 @@
 package uk.nbforge.gallifreyan_chronicles.tardis.ecs.system;
 
-import uk.nbforge.gallifreyan_chronicles.tardis.TardisApi;
-import uk.nbforge.gallifreyan_chronicles.tardis.Tardis;
-import uk.nbforge.gallifreyan_chronicles.Constants;
-import uk.nbforge.gallifreyan_chronicles.core.block.ConsoleBlock;
-import uk.nbforge.gallifreyan_chronicles.core.block_entities.TardisConsoleBlockEntity;
-import uk.nbforge.gallifreyan_chronicles.core.GCBlocks;
-import uk.nbforge.gallifreyan_chronicles.core.GCTardisControls;
-import uk.nbforge.gallifreyan_chronicles.tardis.console.TardisConsole;
-import uk.nbforge.gallifreyan_chronicles.core.dynamic_registries.TardisConsoleRegistry;
-import uk.nbforge.gallifreyan_chronicles.tardis.control.impl.SpaceTimeThrottleControl;
-import uk.nbforge.gallifreyan_chronicles.tardis.TardisManager;
+import java.util.Optional;
+import java.util.UUID;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.block.state.BlockState;
-
-import java.util.Optional;
-import java.util.UUID;
+import uk.nbforge.gallifreyan_chronicles.Constants;
+import uk.nbforge.gallifreyan_chronicles.core.GCBlocks;
+import uk.nbforge.gallifreyan_chronicles.core.GCTardisControls;
+import uk.nbforge.gallifreyan_chronicles.core.block.ConsoleBlock;
+import uk.nbforge.gallifreyan_chronicles.core.block_entities.TardisConsoleBlockEntity;
+import uk.nbforge.gallifreyan_chronicles.core.dynamic_registries.TardisConsoleRegistry;
+import uk.nbforge.gallifreyan_chronicles.tardis.Tardis;
+import uk.nbforge.gallifreyan_chronicles.tardis.TardisApi;
+import uk.nbforge.gallifreyan_chronicles.tardis.TardisManager;
+import uk.nbforge.gallifreyan_chronicles.tardis.console.TardisConsole;
 
 public final class ConsoleLinkSystem {
-    private ConsoleLinkSystem() {
-    }
+    private ConsoleLinkSystem() {}
 
     private static final int CONSOLE_OFFSET_DISTANCE = 3;
 
@@ -40,7 +37,8 @@ public final class ConsoleLinkSystem {
     }
 
     public static void unlink(ServerLevel level, UUID tardisId) {
-        TardisApi.get(level.getServer(), tardisId).flatMap(Tardis::console)
+        TardisApi.get(level.getServer(), tardisId)
+                .flatMap(Tardis::console)
                 .ifPresent(TardisConsoleBlockEntity::unlinkFromTardis);
         TardisManager.get(level.getServer()).unlinkConsole(tardisId);
     }
@@ -48,7 +46,8 @@ public final class ConsoleLinkSystem {
     public static void spawnAndLink(ServerLevel level, UUID tardisId, BlockPos exteriorPos) {
         TardisManager manager = TardisManager.get(level.getServer());
         if (manager.getConsoleBlockPos(tardisId) != null) {
-            TardisApi.get(level.getServer(), tardisId).flatMap(Tardis::console)
+            TardisApi.get(level.getServer(), tardisId)
+                    .flatMap(Tardis::console)
                     .ifPresent(console -> console.linkToTardis(tardisId));
             return;
         }
@@ -116,7 +115,8 @@ public final class ConsoleLinkSystem {
         assert current != null;
         if (pos.equals(current)) return;
 
-        boolean stale = level.hasChunkAt(current) && !(level.getBlockState(current).getBlock() instanceof ConsoleBlock);
+        boolean stale =
+                level.hasChunkAt(current) && !(level.getBlockState(current).getBlock() instanceof ConsoleBlock);
         if (stale) {
             manager.setConsoleBlockPos(tardisId, pos);
         }

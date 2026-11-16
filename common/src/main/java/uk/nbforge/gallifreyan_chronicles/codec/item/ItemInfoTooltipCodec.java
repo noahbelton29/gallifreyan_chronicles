@@ -14,9 +14,7 @@ public final class ItemInfoTooltipCodec {
                     return DataResult.error(() -> "Unknown item info tooltip: " + name);
                 }
             },
-            kind -> kind.name().toLowerCase(Locale.ROOT)
-    );
+            kind -> kind.name().toLowerCase(Locale.ROOT));
 
-    private ItemInfoTooltipCodec() {
-    }
+    private ItemInfoTooltipCodec() {}
 }

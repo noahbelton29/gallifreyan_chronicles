@@ -1,16 +1,15 @@
 package uk.nbforge.gallifreyan_chronicles.compat.portal;
 
-import uk.nbforge.gallifreyan_chronicles.config.GCConfig;
-import net.minecraft.server.MinecraftServer;
-import net.minecraft.server.level.ServerLevel;
-import net.minecraft.resources.ResourceKey;
-import net.minecraft.world.level.Level;
-import net.minecraft.world.phys.Vec3;
-import org.jspecify.annotations.Nullable;
-
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.server.MinecraftServer;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.phys.Vec3;
+import org.jspecify.annotations.Nullable;
+import uk.nbforge.gallifreyan_chronicles.config.GCConfig;
 
 public final class TardisPortalBridge {
     public static final String PORTAL_TAG = "gallifreyan_chronicles.tardis_portal";
@@ -18,8 +17,7 @@ public final class TardisPortalBridge {
     private static final Set<UUID> ACTIVE = ConcurrentHashMap.newKeySet();
     private static @Nullable Boolean available;
 
-    private TardisPortalBridge() {
-    }
+    private TardisPortalBridge() {}
 
     public static boolean isAvailable() {
         if (available == null) {

@@ -1,38 +1,11 @@
 package uk.nbforge.gallifreyan_chronicles.core.block_entities;
 
-import uk.nbforge.gallifreyan_chronicles.util.BlockEntitySyncUtil;
-
-import uk.nbforge.gallifreyan_chronicles.util.TardisDimensionUtil;
-import uk.nbforge.gallifreyan_chronicles.tardis.flight.TardisFlightState;
-import uk.nbforge.gallifreyan_chronicles.tardis.Tardis;
-import uk.nbforge.gallifreyan_chronicles.tardis.TardisApi;
-import uk.nbforge.gallifreyan_chronicles.util.GCSchedulerUtil;
-import uk.nbforge.gallifreyan_chronicles.core.GCTardisControls;
 import com.geckolib.animatable.GeoBlockEntity;
 import com.geckolib.animatable.instance.AnimatableInstanceCache;
 import com.geckolib.animatable.manager.AnimatableManager;
 import com.geckolib.util.GeckoLibUtil;
-import uk.nbforge.gallifreyan_chronicles.core.block.ConsoleBlock;
-import uk.nbforge.gallifreyan_chronicles.client.GCClientHooks;
-import uk.nbforge.gallifreyan_chronicles.ecs.ComponentHolder;
-import uk.nbforge.gallifreyan_chronicles.ecs.ComponentStore;
-import uk.nbforge.gallifreyan_chronicles.ecs.Entity;
-import uk.nbforge.gallifreyan_chronicles.core.entity.TardisControlEntity;
-import uk.nbforge.gallifreyan_chronicles.network.tardis.TardisConsoleRotorStatePayload;
-import uk.nbforge.gallifreyan_chronicles.platform.Services;
-import uk.nbforge.gallifreyan_chronicles.tardis.console.animation.ConsoleAnimationDriver;
-import uk.nbforge.gallifreyan_chronicles.tardis.console.animation.ConsoleControllers;
-import uk.nbforge.gallifreyan_chronicles.client.tardis.ConsoleAnimationCheck;
-import uk.nbforge.gallifreyan_chronicles.util.FadingValue;
-import uk.nbforge.gallifreyan_chronicles.tardis.control.ConsoleControlHost;
-import uk.nbforge.gallifreyan_chronicles.tardis.control.ConsoleControlManager;
-import uk.nbforge.gallifreyan_chronicles.tardis.console.TardisConsole;
-import uk.nbforge.gallifreyan_chronicles.tardis.control.TardisControl;
-import uk.nbforge.gallifreyan_chronicles.core.dynamic_registries.TardisControlRegistry;
-import uk.nbforge.gallifreyan_chronicles.tardis.ecs.TardisComponentTypes;
-import uk.nbforge.gallifreyan_chronicles.tardis.ecs.TardisLinkable;
-import uk.nbforge.gallifreyan_chronicles.tardis.ecs.system.ConsoleSyncSystem;
-import uk.nbforge.gallifreyan_chronicles.tardis.ecs.system.ConsoleSystem;
+import java.util.*;
+import java.util.function.Supplier;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.HolderLookup;
@@ -51,13 +24,38 @@ import net.minecraft.world.level.storage.ValueOutput;
 import net.minecraft.world.phys.Vec3;
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
-
-import java.util.*;
-import java.util.function.Supplier;
-
+import uk.nbforge.gallifreyan_chronicles.client.GCClientHooks;
+import uk.nbforge.gallifreyan_chronicles.client.tardis.ConsoleAnimationCheck;
+import uk.nbforge.gallifreyan_chronicles.core.GCTardisControls;
+import uk.nbforge.gallifreyan_chronicles.core.block.ConsoleBlock;
+import uk.nbforge.gallifreyan_chronicles.core.dynamic_registries.TardisControlRegistry;
+import uk.nbforge.gallifreyan_chronicles.core.entity.TardisControlEntity;
+import uk.nbforge.gallifreyan_chronicles.ecs.ComponentHolder;
+import uk.nbforge.gallifreyan_chronicles.ecs.ComponentStore;
+import uk.nbforge.gallifreyan_chronicles.ecs.Entity;
+import uk.nbforge.gallifreyan_chronicles.network.tardis.TardisConsoleRotorStatePayload;
+import uk.nbforge.gallifreyan_chronicles.platform.Services;
+import uk.nbforge.gallifreyan_chronicles.tardis.Tardis;
+import uk.nbforge.gallifreyan_chronicles.tardis.TardisApi;
 import uk.nbforge.gallifreyan_chronicles.tardis.codec.control.ControlSpecCodec;
+import uk.nbforge.gallifreyan_chronicles.tardis.console.TardisConsole;
+import uk.nbforge.gallifreyan_chronicles.tardis.console.animation.ConsoleAnimationDriver;
+import uk.nbforge.gallifreyan_chronicles.tardis.console.animation.ConsoleControllers;
+import uk.nbforge.gallifreyan_chronicles.tardis.control.ConsoleControlHost;
+import uk.nbforge.gallifreyan_chronicles.tardis.control.ConsoleControlManager;
+import uk.nbforge.gallifreyan_chronicles.tardis.control.TardisControl;
+import uk.nbforge.gallifreyan_chronicles.tardis.ecs.TardisComponentTypes;
+import uk.nbforge.gallifreyan_chronicles.tardis.ecs.TardisLinkable;
+import uk.nbforge.gallifreyan_chronicles.tardis.ecs.system.ConsoleSyncSystem;
+import uk.nbforge.gallifreyan_chronicles.tardis.ecs.system.ConsoleSystem;
+import uk.nbforge.gallifreyan_chronicles.tardis.flight.TardisFlightState;
+import uk.nbforge.gallifreyan_chronicles.util.BlockEntitySyncUtil;
+import uk.nbforge.gallifreyan_chronicles.util.FadingValue;
+import uk.nbforge.gallifreyan_chronicles.util.GCSchedulerUtil;
+import uk.nbforge.gallifreyan_chronicles.util.TardisDimensionUtil;
 
-public class TardisConsoleBlockEntity extends BlockEntity implements GeoBlockEntity, ComponentHolder, TardisLinkable, ConsoleControlHost {
+public class TardisConsoleBlockEntity extends BlockEntity
+        implements GeoBlockEntity, ComponentHolder, TardisLinkable, ConsoleControlHost {
     public static Supplier<BlockEntityType<TardisConsoleBlockEntity>> TYPE;
     private static final int FLIGHT_RECONCILE_DELAY_TICKS = 5;
     private static final String IDLE_STATE = ConsoleControllers.IDLE_STATE;
@@ -101,8 +99,8 @@ public class TardisConsoleBlockEntity extends BlockEntity implements GeoBlockEnt
         if (level instanceof ServerLevel serverLevel) {
             Services.NETWORK.broadcastTardisConsoleRotorState(
                     serverLevel.getServer(),
-                    new TardisConsoleRotorStatePayload(serverLevel.dimension().identifier(), getBlockPos(), currentRotorState)
-            );
+                    new TardisConsoleRotorStatePayload(
+                            serverLevel.dimension().identifier(), getBlockPos(), currentRotorState));
         }
     }
 
@@ -370,9 +368,7 @@ public class TardisConsoleBlockEntity extends BlockEntity implements GeoBlockEnt
     @Override
     public Direction getHostFacing() {
         BlockState state = getBlockState();
-        return state.hasProperty(ConsoleBlock.FACING)
-                ? state.getValue(ConsoleBlock.FACING)
-                : Direction.NORTH;
+        return state.hasProperty(ConsoleBlock.FACING) ? state.getValue(ConsoleBlock.FACING) : Direction.NORTH;
     }
 
     @Override
@@ -402,8 +398,7 @@ public class TardisConsoleBlockEntity extends BlockEntity implements GeoBlockEnt
     public void loadAdditional(@NonNull ValueInput input) {
         super.loadAdditional(input);
         components.load(input, TardisComponentTypes.ALL);
-        input.read("Controls", ControlSpecCodec.CODEC.listOf())
-                .ifPresent(controls::replaceControlSpecs);
+        input.read("Controls", ControlSpecCodec.CODEC.listOf()).ifPresent(controls::replaceControlSpecs);
         input.read("ControlStates", CompoundTag.CODEC).ifPresent(tag -> {
             controls.mergeControlStates(tag);
             controlStatesLoaded = true;
@@ -419,12 +414,18 @@ public class TardisConsoleBlockEntity extends BlockEntity implements GeoBlockEnt
             ConsoleSyncSystem.register(this);
         }
         getAnimatableInstanceCache().getManagerForId(0);
-        animationDriver.bind(() -> this.level, () -> this.currentRotorState, controllers.rotor(), controllers.rotor(), controllers.controls());
+        animationDriver.bind(
+                () -> this.level,
+                () -> this.currentRotorState,
+                controllers.rotor(),
+                controllers.rotor(),
+                controllers.controls());
         this.respawnControls();
         settleControlAnimations();
 
         if (level instanceof ServerLevel serverLevel) {
-            GCSchedulerUtil.runLater(serverLevel.getServer(), FLIGHT_RECONCILE_DELAY_TICKS, this::reconcileFlightWithExterior);
+            GCSchedulerUtil.runLater(
+                    serverLevel.getServer(), FLIGHT_RECONCILE_DELAY_TICKS, this::reconcileFlightWithExterior);
         }
 
         if (level.isClientSide() && !clientEffectsStarted) {

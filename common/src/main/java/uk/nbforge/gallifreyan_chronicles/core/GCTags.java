@@ -1,10 +1,10 @@
 package uk.nbforge.gallifreyan_chronicles.core;
 
-import uk.nbforge.gallifreyan_chronicles.util.GCUtil;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.block.Block;
+import uk.nbforge.gallifreyan_chronicles.util.GCUtil;
 
 public class GCTags {
     public static class Blocks {

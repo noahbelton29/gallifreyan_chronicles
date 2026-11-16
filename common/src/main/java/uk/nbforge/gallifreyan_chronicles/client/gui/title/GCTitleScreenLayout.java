@@ -1,11 +1,6 @@
 package uk.nbforge.gallifreyan_chronicles.client.gui.title;
 
-import uk.nbforge.gallifreyan_chronicles.Constants;
-import uk.nbforge.gallifreyan_chronicles.client.gui.screen.GCAddonsScreen;
-import uk.nbforge.gallifreyan_chronicles.client.gui.screen.GCConfigScreen;
-import uk.nbforge.gallifreyan_chronicles.client.gui.screen.GCCreditsScreen;
-import uk.nbforge.gallifreyan_chronicles.platform.Services;
-import uk.nbforge.gallifreyan_chronicles.util.GCUtil;
+import java.util.function.Consumer;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
@@ -22,8 +17,12 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.resources.Identifier;
 import net.minecraft.util.ARGB;
 import net.minecraft.util.Mth;
-
-import java.util.function.Consumer;
+import uk.nbforge.gallifreyan_chronicles.Constants;
+import uk.nbforge.gallifreyan_chronicles.client.gui.screen.GCAddonsScreen;
+import uk.nbforge.gallifreyan_chronicles.client.gui.screen.GCConfigScreen;
+import uk.nbforge.gallifreyan_chronicles.client.gui.screen.GCCreditsScreen;
+import uk.nbforge.gallifreyan_chronicles.platform.Services;
+import uk.nbforge.gallifreyan_chronicles.util.GCUtil;
 
 public final class GCTitleScreenLayout {
     private static final Identifier LOGO = GCUtil.modIdentifier("textures/gui/title/logo.png");
@@ -49,8 +48,7 @@ public final class GCTitleScreenLayout {
     private static final int NEOFORGE_COLOR = 0xFF8080;
     private static final String DEV_MARKER = "-dev";
 
-    private GCTitleScreenLayout() {
-    }
+    private GCTitleScreenLayout() {}
 
     public static int panelWidth(int screenWidth) {
         return Mth.clamp(Math.round(screenWidth * 0.42F), 180, 240);
@@ -73,19 +71,31 @@ public final class GCTitleScreenLayout {
         return logoWidth(screenWidth) * LOGO_TEXTURE_HEIGHT / LOGO_TEXTURE_WIDTH;
     }
 
-    public static void build(Screen screen, Minecraft minecraft, Font font, int width, int height, Consumer<AbstractWidget> add) {
+    public static void build(
+            Screen screen, Minecraft minecraft, Font font, int width, int height, Consumer<AbstractWidget> add) {
         int buttonWidth = panelWidth(width) - PADDING * 2;
         int halfWidth = (buttonWidth - 4) / 2;
         int y = contentTop(width, height) + logoHeight(width) + LOGO_GAP;
 
-        add.accept(new GCButton(PADDING, y, buttonWidth, BUTTON_HEIGHT, Component.translatable("menu.singleplayer"),
+        add.accept(new GCButton(
+                PADDING,
+                y,
+                buttonWidth,
+                BUTTON_HEIGHT,
+                Component.translatable("menu.singleplayer"),
                 button -> minecraft.gui.setScreen(new SelectWorldScreen(screen))));
         y += BUTTON_STEP;
 
-        GCButton multiplayer = new GCButton(PADDING, y, buttonWidth, BUTTON_HEIGHT, Component.translatable("menu.multiplayer"),
-                button -> minecraft.gui.setScreen(minecraft.options.skipMultiplayerWarning
-                        ? new JoinMultiplayerScreen(screen)
-                        : new SafetyScreen(screen)));
+        GCButton multiplayer = new GCButton(
+                PADDING,
+                y,
+                buttonWidth,
+                BUTTON_HEIGHT,
+                Component.translatable("menu.multiplayer"),
+                button -> minecraft.gui.setScreen(
+                        minecraft.options.skipMultiplayerWarning
+                                ? new JoinMultiplayerScreen(screen)
+                                : new SafetyScreen(screen)));
         if (!minecraft.allowsMultiplayer()) {
             multiplayer.active = false;
             multiplayer.setTooltip(Tooltip.create(Component.translatable("title.multiplayer.disabled")));
@@ -94,7 +104,12 @@ public final class GCTitleScreenLayout {
         y += BUTTON_STEP;
 
         if (ModListScreens.available()) {
-            add.accept(new GCButton(PADDING, y, buttonWidth, BUTTON_HEIGHT, Component.translatable("menu.gallifreyan_chronicles.mods"),
+            add.accept(new GCButton(
+                    PADDING,
+                    y,
+                    buttonWidth,
+                    BUTTON_HEIGHT,
+                    Component.translatable("menu.gallifreyan_chronicles.mods"),
                     button -> {
                         Screen mods = ModListScreens.create(screen);
                         if (mods != null) minecraft.gui.setScreen(mods);
@@ -102,26 +117,56 @@ public final class GCTitleScreenLayout {
             y += BUTTON_STEP;
         }
 
-        add.accept(new GCButton(PADDING, y, halfWidth, BUTTON_HEIGHT, Component.translatable("menu.gallifreyan_chronicles.settings"),
+        add.accept(new GCButton(
+                PADDING,
+                y,
+                halfWidth,
+                BUTTON_HEIGHT,
+                Component.translatable("menu.gallifreyan_chronicles.settings"),
                 button -> minecraft.gui.setScreen(new GCConfigScreen(screen, minecraft.options))));
-        add.accept(new GCButton(PADDING + buttonWidth - halfWidth, y, halfWidth, BUTTON_HEIGHT,
+        add.accept(new GCButton(
+                PADDING + buttonWidth - halfWidth,
+                y,
+                halfWidth,
+                BUTTON_HEIGHT,
                 Component.translatable("menu.gallifreyan_chronicles.addons"),
                 button -> minecraft.gui.setScreen(new GCAddonsScreen(screen))));
         y += BUTTON_STEP;
 
-        add.accept(new GCButton(PADDING, y, buttonWidth, BUTTON_HEIGHT, Component.translatable("menu.gallifreyan_chronicles.credits"),
+        add.accept(new GCButton(
+                PADDING,
+                y,
+                buttonWidth,
+                BUTTON_HEIGHT,
+                Component.translatable("menu.gallifreyan_chronicles.credits"),
                 button -> minecraft.gui.setScreen(new GCCreditsScreen(screen))));
         y += BUTTON_STEP + SECTION_GAP;
 
-        add.accept(new GCButton(PADDING, y, halfWidth, BUTTON_HEIGHT, Component.translatable("menu.options"),
+        add.accept(new GCButton(
+                PADDING,
+                y,
+                halfWidth,
+                BUTTON_HEIGHT,
+                Component.translatable("menu.options"),
                 button -> minecraft.gui.setScreen(new GCOptionsMenuScreen(screen))));
-        add.accept(new GCButton(PADDING + buttonWidth - halfWidth, y, halfWidth, BUTTON_HEIGHT, Component.translatable("menu.quit"),
+        add.accept(new GCButton(
+                PADDING + buttonWidth - halfWidth,
+                y,
+                halfWidth,
+                BUTTON_HEIGHT,
+                Component.translatable("menu.quit"),
                 button -> minecraft.stop()));
 
         Component copyright = Component.translatable("title.credits");
         int copyrightWidth = font.width(copyright);
-        add.accept(new PlainTextButton(width - copyrightWidth - 2, height - 10, copyrightWidth, 10, copyright,
-                button -> minecraft.gui.setScreen(new CreditsAndAttributionScreen(screen)), font));
+        add.accept(new PlainTextButton(
+                width - copyrightWidth - 2,
+                height - 10,
+                copyrightWidth,
+                10,
+                copyright,
+                button -> minecraft.gui.setScreen(new CreditsAndAttributionScreen(screen)),
+                font));
     }
 
     public static void renderBackdrop(GuiGraphicsExtractor graphics, int width, int height) {
@@ -134,8 +179,18 @@ public final class GCTitleScreenLayout {
 
         int logoWidth = logoWidth(width);
         int logoHeight = logoHeight(width);
-        graphics.blit(RenderPipelines.GUI_TEXTURED, LOGO, LOGO_PADDING, contentTop(width, height), 0.0F, 0.0F,
-                logoWidth, logoHeight, logoWidth, logoHeight, ARGB.white(1.0F));
+        graphics.blit(
+                RenderPipelines.GUI_TEXTURED,
+                LOGO,
+                LOGO_PADDING,
+                contentTop(width, height),
+                0.0F,
+                0.0F,
+                logoWidth,
+                logoHeight,
+                logoWidth,
+                logoHeight,
+                ARGB.white(1.0F));
     }
 
     public static void renderOverlay(GuiGraphicsExtractor graphics, Font font, int width, int height) {
@@ -145,7 +200,8 @@ public final class GCTitleScreenLayout {
         Component modLine = Component.translatable("menu.gallifreyan_chronicles.version", shortVersion);
         String platform = Services.PLATFORM.getPlatformName();
         int platformColor = platform.equalsIgnoreCase("NeoForge") ? NEOFORGE_COLOR : FABRIC_COLOR;
-        Component gameLine = Component.translatable("menu.gallifreyan_chronicles.game_version",
+        Component gameLine = Component.translatable(
+                "menu.gallifreyan_chronicles.game_version",
                 Component.literal(Services.PLATFORM.getModVersion("minecraft")).withColor(GAME_VERSION_COLOR),
                 Component.literal(platform).withColor(platformColor));
         graphics.text(font, modLine, PADDING, height - 22, VERSION_COLOR, true);

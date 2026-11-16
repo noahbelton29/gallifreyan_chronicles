@@ -1,17 +1,16 @@
 package uk.nbforge.gallifreyan_chronicles.datagen.util;
 
 import com.google.gson.JsonElement;
-import uk.nbforge.gallifreyan_chronicles.util.GCUtil;
-import net.minecraft.data.CachedOutput;
-import net.minecraft.data.DataProvider;
-import net.minecraft.data.PackOutput;
-import org.jspecify.annotations.NonNull;
-
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
+import net.minecraft.data.CachedOutput;
+import net.minecraft.data.DataProvider;
+import net.minecraft.data.PackOutput;
+import org.jspecify.annotations.NonNull;
+import uk.nbforge.gallifreyan_chronicles.util.GCUtil;
 
 /** Base for providers that write one data pack json per entry into a mod data folder. */
 public abstract class GCJsonDataProvider implements DataProvider {

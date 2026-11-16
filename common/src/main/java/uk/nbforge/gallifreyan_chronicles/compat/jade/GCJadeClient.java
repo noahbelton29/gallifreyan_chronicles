@@ -22,8 +22,7 @@ import uk.nbforge.gallifreyan_chronicles.core.entity.TardisControlEntity;
 final class GCJadeClient {
     private static final String PORTAL_PACKAGE = "qouteall.imm_ptl.";
 
-    private GCJadeClient() {
-    }
+    private GCJadeClient() {}
 
     static void register(IWailaClientRegistration registration) {
         registration.addRayTraceCallback((hitResult, accessor, originalAccessor) -> {
@@ -62,7 +61,8 @@ final class GCJadeClient {
             if (accessor instanceof BlockAccessor doorAccessor
                     && doorAccessor.getBlockState().getBlock() instanceof InteriorDoorBlock
                     && !InteriorDoorBlock.isMaster(doorAccessor.getBlockState())) {
-                BlockPos master = InteriorDoorBlock.masterBlockPos(doorAccessor.getBlockState(), doorAccessor.getPosition());
+                BlockPos master =
+                        InteriorDoorBlock.masterBlockPos(doorAccessor.getBlockState(), doorAccessor.getPosition());
                 return blockAccessor(registration, master);
             }
 
@@ -84,7 +84,8 @@ final class GCJadeClient {
         if (level == null || player == null) return null;
 
         BlockState state = level.getBlockState(pos);
-        return registration.blockAccessor()
+        return registration
+                .blockAccessor()
                 .level(level)
                 .player(player)
                 .blockState(state)

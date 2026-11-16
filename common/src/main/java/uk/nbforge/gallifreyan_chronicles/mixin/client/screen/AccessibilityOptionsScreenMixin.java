@@ -1,6 +1,5 @@
 package uk.nbforge.gallifreyan_chronicles.mixin.client.screen;
 
-import uk.nbforge.gallifreyan_chronicles.client.gui.options.GCOptions;
 import net.minecraft.client.Options;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.options.AccessibilityOptionsScreen;
@@ -10,6 +9,7 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+import uk.nbforge.gallifreyan_chronicles.client.gui.options.GCOptions;
 
 @Mixin(AccessibilityOptionsScreen.class)
 public abstract class AccessibilityOptionsScreenMixin extends OptionsSubScreen {

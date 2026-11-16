@@ -1,15 +1,14 @@
 package uk.nbforge.gallifreyan_chronicles.client.model;
 
-import uk.nbforge.gallifreyan_chronicles.client.model.GeoAssets;
 import com.geckolib.model.GeoModel;
 import com.geckolib.renderer.base.GeoRenderState;
-import uk.nbforge.gallifreyan_chronicles.core.block_entities.InteriorDoorBlockEntity;
-import uk.nbforge.gallifreyan_chronicles.client.renderer.block.InteriorDoorBlockRenderer;
-import uk.nbforge.gallifreyan_chronicles.util.GCUtil;
-import uk.nbforge.gallifreyan_chronicles.client.renderer.util.DoorRoundelTextures;
 import net.minecraft.resources.Identifier;
-import uk.nbforge.gallifreyan_chronicles.client.util.DetailLevelUtil;
 import org.jspecify.annotations.NonNull;
+import uk.nbforge.gallifreyan_chronicles.client.renderer.block.InteriorDoorBlockRenderer;
+import uk.nbforge.gallifreyan_chronicles.client.renderer.util.DoorRoundelTextures;
+import uk.nbforge.gallifreyan_chronicles.client.util.DetailLevelUtil;
+import uk.nbforge.gallifreyan_chronicles.core.block_entities.InteriorDoorBlockEntity;
+import uk.nbforge.gallifreyan_chronicles.util.GCUtil;
 
 public class InteriorDoorBlockModel extends GeoModel<InteriorDoorBlockEntity> {
     private static final String DEFAULT_VARIANT = "brachacki_doors";
@@ -25,13 +24,14 @@ public class InteriorDoorBlockModel extends GeoModel<InteriorDoorBlockEntity> {
     }
 
     /**
-       The texture this door is drawn with, its skin with the texture of the roundel block painted on if it has one.
-       Static so the renderer can ask for it directly when it picks the render type.
-    */
+     * The texture this door is drawn with, its skin with the texture of the roundel block painted on if it has one.
+     * Static so the renderer can ask for it directly when it picks the render type.
+     */
     public static Identifier textureFor(GeoRenderState renderState) {
         Identifier base = baseTexture(renderState);
         String roundel = renderState.hasGeckolibData(InteriorDoorBlockRenderer.ROUNDEL)
-                ? renderState.getGeckolibData(InteriorDoorBlockRenderer.ROUNDEL) : null;
+                ? renderState.getGeckolibData(InteriorDoorBlockRenderer.ROUNDEL)
+                : null;
         if (roundel == null || roundel.isEmpty() || !DetailLevelUtil.highDetail()) return base;
         return DoorRoundelTextures.get(GeoAssets.INTERIOR_DOOR.model(getVariantId(renderState)), base, roundel);
     }

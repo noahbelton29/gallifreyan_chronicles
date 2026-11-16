@@ -1,15 +1,14 @@
 package uk.nbforge.gallifreyan_chronicles.client.render.detail;
 
-import uk.nbforge.gallifreyan_chronicles.Constants;
-import uk.nbforge.gallifreyan_chronicles.platform.Services;
+import java.io.InputStream;
+import java.time.Instant;
+import java.util.Properties;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.DisconnectedScreen;
 import net.minecraft.client.gui.screens.TitleScreen;
 import net.minecraft.network.chat.Component;
-
-import java.io.InputStream;
-import java.time.Instant;
-import java.util.Properties;
+import uk.nbforge.gallifreyan_chronicles.Constants;
+import uk.nbforge.gallifreyan_chronicles.platform.Services;
 
 public final class TrialTimer {
     private static final String RESOURCE = "/gc_build.properties";
@@ -20,8 +19,7 @@ public final class TrialTimer {
     private static long expiresAt = -1L;
     private static int ticks;
 
-    private TrialTimer() {
-    }
+    private TrialTimer() {}
 
     private static synchronized void load() {
         if (loaded) return;

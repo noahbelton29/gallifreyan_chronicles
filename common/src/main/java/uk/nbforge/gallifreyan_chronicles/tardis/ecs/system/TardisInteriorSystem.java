@@ -1,16 +1,11 @@
 package uk.nbforge.gallifreyan_chronicles.tardis.ecs.system;
 
-import uk.nbforge.gallifreyan_chronicles.compat.portal.TardisPortalBridge;
-import uk.nbforge.gallifreyan_chronicles.Constants;
-import uk.nbforge.gallifreyan_chronicles.core.block.InteriorDoorBlock;
-import uk.nbforge.gallifreyan_chronicles.core.block_entities.TardisConsoleBlockEntity;
-import uk.nbforge.gallifreyan_chronicles.core.block_entities.InteriorDoorBlockEntity;
-import uk.nbforge.gallifreyan_chronicles.core.block_entities.TardisExteriorBlockEntity;
-import uk.nbforge.gallifreyan_chronicles.core.GCBlocks;
-import uk.nbforge.gallifreyan_chronicles.tardis.*;
-import uk.nbforge.gallifreyan_chronicles.tardis.console.TardisConsole;
-import uk.nbforge.gallifreyan_chronicles.core.dynamic_registries.TardisConsoleRegistry;
-import uk.nbforge.gallifreyan_chronicles.tardis.ecs.component.DoorState;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
+import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.Vec3i;
@@ -22,25 +17,28 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.Clearable;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.level.Level;
 import net.minecraft.world.level.levelgen.structure.templatesystem.StructurePlaceSettings;
 import net.minecraft.world.level.levelgen.structure.templatesystem.StructureTemplate;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import org.jspecify.annotations.Nullable;
-
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.Set;
-import java.util.UUID;
-
+import uk.nbforge.gallifreyan_chronicles.Constants;
+import uk.nbforge.gallifreyan_chronicles.compat.portal.TardisPortalBridge;
+import uk.nbforge.gallifreyan_chronicles.core.GCBlocks;
+import uk.nbforge.gallifreyan_chronicles.core.block.InteriorDoorBlock;
+import uk.nbforge.gallifreyan_chronicles.core.block_entities.InteriorDoorBlockEntity;
+import uk.nbforge.gallifreyan_chronicles.core.block_entities.TardisConsoleBlockEntity;
+import uk.nbforge.gallifreyan_chronicles.core.block_entities.TardisExteriorBlockEntity;
+import uk.nbforge.gallifreyan_chronicles.core.dynamic_registries.TardisConsoleRegistry;
 import uk.nbforge.gallifreyan_chronicles.core.dynamic_registries.TardisInteriorRegistry;
+import uk.nbforge.gallifreyan_chronicles.tardis.*;
+import uk.nbforge.gallifreyan_chronicles.tardis.console.TardisConsole;
+import uk.nbforge.gallifreyan_chronicles.tardis.ecs.component.DoorState;
 
 public final class TardisInteriorSystem {
     private static final double ZONE_NEAR = -0.5;
@@ -55,20 +53,25 @@ public final class TardisInteriorSystem {
     private static final double ARRIVAL_DISTANCE = 1.0;
 
     private static final Vec3i FALLBACK_CLEAR_SIZE = new Vec3i(64, 64, 64);
-    private static final int CLEAR_FLAGS = Block.UPDATE_CLIENTS | Block.UPDATE_KNOWN_SHAPE | Block.UPDATE_SUPPRESS_DROPS;
+    private static final int CLEAR_FLAGS =
+            Block.UPDATE_CLIENTS | Block.UPDATE_KNOWN_SHAPE | Block.UPDATE_SUPPRESS_DROPS;
 
     private static final Map<Identifier, BlockPos> DOOR_OFFSET_CACHE = new ConcurrentHashMap<>();
     // Same idea as DOOR_OFFSET_CACHE: a template always places its console at the same offset, so once
     // we have found it for a given template we never need to scan the whole volume for it again
     private static final Map<Identifier, BlockPos> CONSOLE_OFFSET_CACHE = new ConcurrentHashMap<>();
 
-    private record ConsoleCarryover(TardisConsole console, @Nullable String variant, CompoundTag controlStates) {
+    private record ConsoleCarryover(
+            TardisConsole console, @Nullable String variant, CompoundTag controlStates) {}
+
+    public enum ChangeResult {
+        CHANGED,
+        UNCHANGED,
+        UNKNOWN_INTERIOR,
+        MISSING_TEMPLATE
     }
 
-    public enum ChangeResult {CHANGED, UNCHANGED, UNKNOWN_INTERIOR, MISSING_TEMPLATE}
-
-    private TardisInteriorSystem() {
-    }
+    private TardisInteriorSystem() {}
 
     public static void tickEntryZone(Level level, TardisExteriorBlockEntity exterior) {
         if (!(level instanceof ServerLevel serverLevel)) return;
@@ -100,9 +103,11 @@ public final class TardisInteriorSystem {
         double forward = dx * frontX + dz * frontZ;
         double lateral = dx * frontZ - dz * frontX;
 
-        return forward >= ZONE_NEAR && forward <= ZONE_FAR
+        return forward >= ZONE_NEAR
+                && forward <= ZONE_FAR
                 && Math.abs(lateral) <= ZONE_HALF_WIDTH
-                && dy >= ZONE_BOTTOM && dy <= ZONE_TOP;
+                && dy >= ZONE_BOTTOM
+                && dy <= ZONE_TOP;
     }
 
     public static void exitInterior(MinecraftServer server, ServerPlayer player, UUID tardisId) {
@@ -116,7 +121,8 @@ public final class TardisInteriorSystem {
         Vec3 spot = Vec3.atBottomCenterOf(exteriorPos).add(0.0, 1.0, 0.0);
         float yaw = 0.0f;
 
-        Optional<TardisExteriorBlockEntity> exterior = TardisApi.get(server, tardisId).flatMap(Tardis::exterior);
+        Optional<TardisExteriorBlockEntity> exterior =
+                TardisApi.get(server, tardisId).flatMap(Tardis::exterior);
         if (exterior.isPresent()) {
             double yawRad = Math.toRadians(exterior.get().getYaw());
             spot = Vec3.atBottomCenterOf(exteriorPos)
@@ -128,8 +134,7 @@ public final class TardisInteriorSystem {
         player.teleportTo(target, spot.x, spot.y, spot.z, Set.of(), yaw, 0.0f, true);
     }
 
-    public record Arrival(Vec3 pos, float yaw) {
-    }
+    public record Arrival(Vec3 pos, float yaw) {}
 
     private static final Set<UUID> ARRIVING = ConcurrentHashMap.newKeySet();
 
@@ -199,7 +204,8 @@ public final class TardisInteriorSystem {
     public static @Nullable BlockPos findInteriorDoor(ServerLevel interior, UUID tardisId) {
         MinecraftServer server = interior.getServer();
         Identifier templateId = getInteriorDefinition(server, tardisId).structure();
-        Vec3i size = server.getStructureTemplateManager().get(templateId)
+        Vec3i size = server.getStructureTemplateManager()
+                .get(templateId)
                 .map(StructureTemplate::getSize)
                 .orElse(FALLBACK_CLEAR_SIZE);
         BlockPos stored = TardisManager.get(server).getInteriorOrigin(tardisId);
@@ -228,12 +234,15 @@ public final class TardisInteriorSystem {
         return null;
     }
 
-    private static boolean buildInteriorIfMissing(ServerLevel interior, UUID tardisId, @Nullable ConsoleCarryover carry) {
+    private static boolean buildInteriorIfMissing(
+            ServerLevel interior, UUID tardisId, @Nullable ConsoleCarryover carry) {
         TardisManager manager = TardisManager.get(interior.getServer());
         if (manager.getInteriorOrigin(tardisId) != null) return false;
 
-        Identifier templateId = getInteriorDefinition(interior.getServer(), tardisId).structure();
-        Optional<StructureTemplate> template = interior.getServer().getStructureTemplateManager().get(templateId);
+        Identifier templateId =
+                getInteriorDefinition(interior.getServer(), tardisId).structure();
+        Optional<StructureTemplate> template =
+                interior.getServer().getStructureTemplateManager().get(templateId);
         if (template.isEmpty()) {
             Constants.LOG.error("missing interior template {}", templateId);
             return false;
@@ -243,8 +252,14 @@ public final class TardisInteriorSystem {
         Vec3i size = template.get().getSize();
         loadInteriorChunks(interior, origin, size);
 
-        template.get().placeInWorld(interior, origin, origin, new StructurePlaceSettings(),
-                interior.getRandom(), Block.UPDATE_CLIENTS);
+        template.get()
+                .placeInWorld(
+                        interior,
+                        origin,
+                        origin,
+                        new StructurePlaceSettings(),
+                        interior.getRandom(),
+                        Block.UPDATE_CLIENTS);
 
         BlockPos consolePos = findConsole(interior, origin, size, templateId);
         if (consolePos == null) {
@@ -295,7 +310,8 @@ public final class TardisInteriorSystem {
         TardisInterior newDef = TardisInteriorRegistry.get(newId);
         if (oldDef.id().equals(newDef.id())) return ChangeResult.UNCHANGED;
 
-        Optional<StructureTemplate> newTemplate = server.getStructureTemplateManager().get(newDef.structure());
+        Optional<StructureTemplate> newTemplate =
+                server.getStructureTemplateManager().get(newDef.structure());
         if (newTemplate.isEmpty()) return ChangeResult.MISSING_TEMPLATE;
 
         if (manager.getInteriorOrigin(tardisId) == null) {
@@ -306,18 +322,24 @@ public final class TardisInteriorSystem {
         ServerLevel level = TardisDimensionManager.getOrCreate(server, tardisId);
 
         ConsoleCarryover carry = null;
-        Optional<TardisConsoleBlockEntity> oldConsole = TardisApi.get(server, tardisId).flatMap(Tardis::console);
+        Optional<TardisConsoleBlockEntity> oldConsole =
+                TardisApi.get(server, tardisId).flatMap(Tardis::console);
         if (oldConsole.isPresent() && oldConsole.get().getConsole() != null) {
-            carry = new ConsoleCarryover(oldConsole.get().getConsole(), oldConsole.get().getVariant(),
+            carry = new ConsoleCarryover(
+                    oldConsole.get().getConsole(),
+                    oldConsole.get().getVariant(),
                     oldConsole.get().copyControlStates());
         }
 
         List<ServerPlayer> occupants = List.copyOf(level.players());
 
-        Vec3i oldSize = server.getStructureTemplateManager().get(oldDef.structure())
-                .map(StructureTemplate::getSize).orElse(FALLBACK_CLEAR_SIZE);
+        Vec3i oldSize = server.getStructureTemplateManager()
+                .get(oldDef.structure())
+                .map(StructureTemplate::getSize)
+                .orElse(FALLBACK_CLEAR_SIZE);
         Vec3i newSize = newTemplate.get().getSize();
-        Vec3i size = new Vec3i(Math.max(oldSize.getX(), newSize.getX()),
+        Vec3i size = new Vec3i(
+                Math.max(oldSize.getX(), newSize.getX()),
                 Math.max(oldSize.getY(), newSize.getY()),
                 Math.max(oldSize.getZ(), newSize.getZ()));
 
@@ -342,7 +364,8 @@ public final class TardisInteriorSystem {
         Arrival arrival = arrival(level, tardisId);
         for (ServerPlayer player : occupants) {
             markArriving(player);
-            player.teleportTo(level, arrival.pos().x, arrival.pos().y, arrival.pos().z, Set.of(), arrival.yaw(), 0.0f, true);
+            player.teleportTo(
+                    level, arrival.pos().x, arrival.pos().y, arrival.pos().z, Set.of(), arrival.yaw(), 0.0f, true);
         }
         return ChangeResult.CHANGED;
     }
@@ -378,8 +401,7 @@ public final class TardisInteriorSystem {
             }
         }
 
-        AABB box = new AABB(
-                Vec3.atLowerCornerOf(ORIGIN), Vec3.atLowerCornerOf(max.offset(1, 1, 1)));
+        AABB box = new AABB(Vec3.atLowerCornerOf(ORIGIN), Vec3.atLowerCornerOf(max.offset(1, 1, 1)));
         for (Entity entity : level.getEntities((Entity) null, box, e -> !(e instanceof Player))) {
             entity.discard();
         }
@@ -397,7 +419,8 @@ public final class TardisInteriorSystem {
         }
     }
 
-    private static @Nullable BlockPos findConsole(ServerLevel level, BlockPos origin, Vec3i size, Identifier templateId) {
+    private static @Nullable BlockPos findConsole(
+            ServerLevel level, BlockPos origin, Vec3i size, Identifier templateId) {
         BlockPos cachedOffset = CONSOLE_OFFSET_CACHE.get(templateId);
         if (cachedOffset != null) {
             BlockPos candidate = origin.offset(cachedOffset.getX(), cachedOffset.getY(), cachedOffset.getZ());

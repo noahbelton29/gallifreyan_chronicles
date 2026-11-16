@@ -1,6 +1,5 @@
 package uk.nbforge.gallifreyan_chronicles.mixin.client.screen;
 
-import uk.nbforge.gallifreyan_chronicles.client.gui.options.GCOptions;
 import net.minecraft.client.Options;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.options.OptionsSubScreen;
@@ -10,6 +9,7 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+import uk.nbforge.gallifreyan_chronicles.client.gui.options.GCOptions;
 
 @Mixin(SoundOptionsScreen.class)
 public abstract class SoundOptionsScreenMixin extends OptionsSubScreen {
@@ -19,13 +19,13 @@ public abstract class SoundOptionsScreenMixin extends OptionsSubScreen {
 
     @Inject(
             method = "addOptions",
-            at = @At(
-                    value = "INVOKE",
-                    target = "Lnet/minecraft/client/gui/components/OptionsList;addSmall([Lnet/minecraft/client/OptionInstance;)V",
-                    ordinal = 0,
-                    shift = At.Shift.AFTER
-            )
-    )
+            at =
+                    @At(
+                            value = "INVOKE",
+                            target =
+                                    "Lnet/minecraft/client/gui/components/OptionsList;addSmall([Lnet/minecraft/client/OptionInstance;)V",
+                            ordinal = 0,
+                            shift = At.Shift.AFTER))
     private void gc$addTardisHumSlider(CallbackInfo ci) {
         if (this.list != null) {
             this.list.addBig(GCOptions.tardisHum());

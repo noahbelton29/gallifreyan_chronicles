@@ -1,11 +1,11 @@
 package uk.nbforge.gallifreyan_chronicles.tardis.ecs.system;
 
+import net.minecraft.util.RandomSource;
 import uk.nbforge.gallifreyan_chronicles.ecs.Entity;
 import uk.nbforge.gallifreyan_chronicles.tardis.ecs.TardisComponentTypes;
 import uk.nbforge.gallifreyan_chronicles.tardis.ecs.component.HealthComponent;
 import uk.nbforge.gallifreyan_chronicles.tardis.ecs.component.SubsystemsComponent;
 import uk.nbforge.gallifreyan_chronicles.tardis.ecs.component.TardisSubsystem;
-import net.minecraft.util.RandomSource;
 
 public final class SubsystemSystem {
     public static final float JAM_THRESHOLD = 80f;
@@ -18,8 +18,7 @@ public final class SubsystemSystem {
     private static final float LIGHT_JAM_CHANCE = 0.15f;
     private static final float HEAVY_JAM_CHANCE_START = 0.50f;
 
-    private SubsystemSystem() {
-    }
+    private SubsystemSystem() {}
 
     public static HealthComponent healthComponentOf(Entity entity, TardisSubsystem subsystem) {
         return entity.get(TardisComponentTypes.SUBSYSTEMS).healthOf(subsystem);

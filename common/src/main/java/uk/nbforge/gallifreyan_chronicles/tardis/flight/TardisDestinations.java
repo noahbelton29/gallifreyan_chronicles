@@ -1,15 +1,13 @@
 package uk.nbforge.gallifreyan_chronicles.tardis.flight;
 
-import uk.nbforge.gallifreyan_chronicles.tardis.TardisApi;
-import uk.nbforge.gallifreyan_chronicles.tardis.Tardis;
-import uk.nbforge.gallifreyan_chronicles.core.block_entities.TardisExteriorBlockEntity;
-import uk.nbforge.gallifreyan_chronicles.tardis.TardisManager;
-import uk.nbforge.gallifreyan_chronicles.Constants;
-import uk.nbforge.gallifreyan_chronicles.core.GCDimensions;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.List;
+import java.util.UUID;
 import net.minecraft.ChatFormatting;
-import net.minecraft.resources.Identifier;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
+import net.minecraft.resources.Identifier;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
@@ -17,11 +15,12 @@ import net.minecraft.util.Mth;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 import org.jspecify.annotations.Nullable;
-
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.List;
-import java.util.UUID;
+import uk.nbforge.gallifreyan_chronicles.Constants;
+import uk.nbforge.gallifreyan_chronicles.core.GCDimensions;
+import uk.nbforge.gallifreyan_chronicles.core.block_entities.TardisExteriorBlockEntity;
+import uk.nbforge.gallifreyan_chronicles.tardis.Tardis;
+import uk.nbforge.gallifreyan_chronicles.tardis.TardisApi;
+import uk.nbforge.gallifreyan_chronicles.tardis.TardisManager;
 
 public final class TardisDestinations {
     public static final int[] INCREMENTS = {1, 10, 100, 1000, 10000};
@@ -30,20 +29,23 @@ public final class TardisDestinations {
 
     private static final float[] FACING_YAWS = {180f, 225f, 270f, 315f, 0f, 45f, 90f, 135f};
     private static final String[] FACING_KEYS = {
-            "facing.gallifreyan_chronicles.north",
-            "facing.gallifreyan_chronicles.north_east",
-            "facing.gallifreyan_chronicles.east",
-            "facing.gallifreyan_chronicles.south_east",
-            "facing.gallifreyan_chronicles.south",
-            "facing.gallifreyan_chronicles.south_west",
-            "facing.gallifreyan_chronicles.west",
-            "facing.gallifreyan_chronicles.north_west"
+        "facing.gallifreyan_chronicles.north",
+        "facing.gallifreyan_chronicles.north_east",
+        "facing.gallifreyan_chronicles.east",
+        "facing.gallifreyan_chronicles.south_east",
+        "facing.gallifreyan_chronicles.south",
+        "facing.gallifreyan_chronicles.south_west",
+        "facing.gallifreyan_chronicles.west",
+        "facing.gallifreyan_chronicles.north_west"
     };
 
-    public enum Axis {X, Y, Z}
-
-    private TardisDestinations() {
+    public enum Axis {
+        X,
+        Y,
+        Z
     }
+
+    private TardisDestinations() {}
 
     public static int increment(MinecraftServer server, UUID tardisId) {
         int index = TardisManager.get(server).getCoordIncrementIndex(tardisId);
@@ -160,13 +162,14 @@ public final class TardisDestinations {
                 break;
             }
         }
-        int nextIndex = index < 0 ? (direction > 0 ? 0 : levels.size() - 1)
-                : Math.floorMod(index + direction, levels.size());
+        int nextIndex =
+                index < 0 ? (direction > 0 ? 0 : levels.size() - 1) : Math.floorMod(index + direction, levels.size());
         ServerLevel next = levels.get(nextIndex);
 
         BlockPos pos = target.pos();
         int y = Mth.clamp(pos.getY(), next.getMinY(), next.getMaxY() - 1);
-        LandingTarget updated = new LandingTarget(next.dimension(), new BlockPos(pos.getX(), y, pos.getZ()), target.yaw());
+        LandingTarget updated =
+                new LandingTarget(next.dimension(), new BlockPos(pos.getX(), y, pos.getZ()), target.yaw());
         TardisManager.get(server).setLandingTarget(tardisId, updated);
         return updated;
     }
@@ -188,7 +191,8 @@ public final class TardisDestinations {
         for (ServerLevel level : server.getAllLevels()) {
             if (!isTardisInterior(level)) levels.add(level);
         }
-        levels.sort(Comparator.comparing((ServerLevel level) -> level.dimension().identifier().toString()));
+        levels.sort(Comparator.comparing(
+                (ServerLevel level) -> level.dimension().identifier().toString()));
         return levels;
     }
 
@@ -219,29 +223,35 @@ public final class TardisDestinations {
             case Y -> pos.getY();
             case Z -> pos.getZ();
         };
-        player.sendOverlayMessage(Component.translatable("overlay.gallifreyan_chronicles.destination",
-                Component.literal(axis.name() + " " + value).withStyle(ChatFormatting.WHITE),
-                dimensionName(target.dimension())).withStyle(ChatFormatting.GOLD));
+        player.sendOverlayMessage(Component.translatable(
+                        "overlay.gallifreyan_chronicles.destination",
+                        Component.literal(axis.name() + " " + value).withStyle(ChatFormatting.WHITE),
+                        dimensionName(target.dimension()))
+                .withStyle(ChatFormatting.GOLD));
     }
 
     public static void showDimension(@Nullable Player player, MinecraftServer server, LandingTarget target) {
         if (player == null) return;
-        player.sendOverlayMessage(Component.translatable("overlay.gallifreyan_chronicles.destination_dimension",
-                dimensionName(target.dimension()),
-                Component.literal(landableIndex(server, target.dimension()) + "/" + landableCount(server))
-                        .withStyle(ChatFormatting.GRAY)).withStyle(ChatFormatting.GOLD));
+        player.sendOverlayMessage(Component.translatable(
+                        "overlay.gallifreyan_chronicles.destination_dimension",
+                        dimensionName(target.dimension()),
+                        Component.literal(landableIndex(server, target.dimension()) + "/" + landableCount(server))
+                                .withStyle(ChatFormatting.GRAY))
+                .withStyle(ChatFormatting.GOLD));
     }
 
     public static void showDirection(@Nullable Player player, LandingTarget target) {
         if (player == null) return;
-        player.sendOverlayMessage(Component.translatable("overlay.gallifreyan_chronicles.destination_direction",
+        player.sendOverlayMessage(Component.translatable(
+                        "overlay.gallifreyan_chronicles.destination_direction",
                         facingName(target.yaw()).copy().withStyle(ChatFormatting.WHITE))
                 .withStyle(ChatFormatting.GOLD));
     }
 
     public static void showIncrement(@Nullable Player player, int increment) {
         if (player == null) return;
-        player.sendOverlayMessage(Component.translatable("overlay.gallifreyan_chronicles.coord_increment",
+        player.sendOverlayMessage(Component.translatable(
+                        "overlay.gallifreyan_chronicles.coord_increment",
                         Component.literal(String.valueOf(increment)).withStyle(ChatFormatting.WHITE))
                 .withStyle(ChatFormatting.GOLD));
     }

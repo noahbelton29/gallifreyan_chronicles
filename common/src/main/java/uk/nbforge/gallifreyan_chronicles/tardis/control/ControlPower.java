@@ -1,23 +1,18 @@
 package uk.nbforge.gallifreyan_chronicles.tardis.control;
 
-import uk.nbforge.gallifreyan_chronicles.core.block_entities.TardisConsoleBlockEntity;
-import uk.nbforge.gallifreyan_chronicles.core.GCTardisControls;
-import uk.nbforge.gallifreyan_chronicles.tardis.Tardis;
-import uk.nbforge.gallifreyan_chronicles.tardis.TardisApi;
-
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.function.Predicate;
-
+import uk.nbforge.gallifreyan_chronicles.core.GCTardisControls;
+import uk.nbforge.gallifreyan_chronicles.core.block_entities.TardisConsoleBlockEntity;
 import uk.nbforge.gallifreyan_chronicles.core.dynamic_registries.TardisControlRegistry;
+import uk.nbforge.gallifreyan_chronicles.tardis.Tardis;
+import uk.nbforge.gallifreyan_chronicles.tardis.TardisApi;
 
 public final class ControlPower {
-    private static final Set<String> USABLE_WITHOUT_POWER = Set.of(
-            GCTardisControls.POWER_CONTROL,
-            GCTardisControls.DOOR_CONTROL,
-            GCTardisControls.DOOR_LOCK_CONTROL
-    );
+    private static final Set<String> USABLE_WITHOUT_POWER =
+            Set.of(GCTardisControls.POWER_CONTROL, GCTardisControls.DOOR_CONTROL, GCTardisControls.DOOR_LOCK_CONTROL);
 
     private static final Predicate<TardisConsoleBlockEntity> TRAVELLING =
             console -> TardisApi.of(console).map(Tardis::isTravelling).orElse(false);
@@ -27,11 +22,9 @@ public final class ControlPower {
 
     private static final Map<String, List<Predicate<TardisConsoleBlockEntity>>> BLOCKED_WHEN = Map.of(
             GCTardisControls.POWER_CONTROL, List.of(TRAVELLING, CLOAKED),
-            GCTardisControls.SPACE_TIME_THROTTLE, List.of(CLOAKED)
-    );
+            GCTardisControls.SPACE_TIME_THROTTLE, List.of(CLOAKED));
 
-    private ControlPower() {
-    }
+    private ControlPower() {}
 
     public static void validate() {
         for (String id : USABLE_WITHOUT_POWER) requireRegistered(id);

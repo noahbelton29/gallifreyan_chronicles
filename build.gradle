@@ -24,7 +24,13 @@ subprojects {
 
 apply from: 'gradle/tester-builds.gradle'
 
+repositories {
+    mavenCentral()
+}
+
 spotless {
+    enforceCheck false
+
     java {
         target 'common/src/**/*.java', 'fabric/src/**/*.java', 'neoforge/src/**/*.java'
         targetExclude '**/build/**', '**/generated/**'

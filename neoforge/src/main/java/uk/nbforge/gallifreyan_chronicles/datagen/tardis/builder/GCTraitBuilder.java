@@ -2,15 +2,14 @@ package uk.nbforge.gallifreyan_chronicles.datagen.tardis.builder;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
-import uk.nbforge.gallifreyan_chronicles.tardis.mind.data.MindEnums.Reveal;
-
 import java.util.Locale;
 import uk.nbforge.gallifreyan_chronicles.datagen.util.GCJson;
+import uk.nbforge.gallifreyan_chronicles.tardis.mind.data.MindEnums.Reveal;
 
 /**
-   Describes a TARDIS trait, every method is optional.
-   Multipliers called times default to 1 and shifts called by default to 0 so only set what the trait changes.
-*/
+ * Describes a TARDIS trait, every method is optional.
+ * Multipliers called times default to 1 and shifts called by default to 0 so only set what the trait changes.
+ */
 public final class GCTraitBuilder {
     private final JsonObject json;
 
@@ -82,8 +81,15 @@ public final class GCTraitBuilder {
 
     /** Different multipliers once the player betrayed it. */
     public GCTraitBuilder ifBetrayed(double trustGainedTimes, double trustLostTimes, double traumaTakenTimes) {
-        json.add("if_betrayed", GCJson.obj("trust_gained", trustGainedTimes, "trust_lost", trustLostTimes,
-                "trauma_taken", traumaTakenTimes));
+        json.add(
+                "if_betrayed",
+                GCJson.obj(
+                        "trust_gained",
+                        trustGainedTimes,
+                        "trust_lost",
+                        trustLostTimes,
+                        "trauma_taken",
+                        traumaTakenTimes));
         return this;
     }
 

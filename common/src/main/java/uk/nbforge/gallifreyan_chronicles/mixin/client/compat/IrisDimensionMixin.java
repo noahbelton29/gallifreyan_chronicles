@@ -1,11 +1,11 @@
 package uk.nbforge.gallifreyan_chronicles.mixin.client.compat;
 
-import uk.nbforge.gallifreyan_chronicles.client.sky.SkyShaderCompat;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Pseudo;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
+import uk.nbforge.gallifreyan_chronicles.client.sky.SkyShaderCompat;
 
 @Pseudo
 @Mixin(targets = "net.irisshaders.iris.Iris", remap = false)

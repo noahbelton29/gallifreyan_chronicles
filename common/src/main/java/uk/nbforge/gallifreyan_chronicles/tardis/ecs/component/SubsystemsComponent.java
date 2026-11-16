@@ -1,10 +1,9 @@
 package uk.nbforge.gallifreyan_chronicles.tardis.ecs.component;
 
-import uk.nbforge.gallifreyan_chronicles.ecs.Component;
-
 import java.util.Collections;
 import java.util.EnumMap;
 import java.util.Map;
+import uk.nbforge.gallifreyan_chronicles.ecs.Component;
 
 public record SubsystemsComponent(Map<TardisSubsystem, HealthComponent> healths) implements Component {
     public SubsystemsComponent {

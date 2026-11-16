@@ -1,7 +1,5 @@
 package uk.nbforge.gallifreyan_chronicles.core.world.biomes;
 
-import uk.nbforge.gallifreyan_chronicles.core.GCBiomes;
-import uk.nbforge.gallifreyan_chronicles.core.GCBlocks;
 import net.minecraft.core.HolderGetter;
 import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.block.Block;
@@ -11,12 +9,15 @@ import net.minecraft.world.level.levelgen.material.MaterialRules;
 import net.minecraft.world.level.levelgen.material.condition.MaterialCondition;
 import net.minecraft.world.level.levelgen.material.rule.MaterialRule;
 import net.minecraft.world.level.levelgen.placement.CaveSurface;
+import uk.nbforge.gallifreyan_chronicles.core.GCBiomes;
+import uk.nbforge.gallifreyan_chronicles.core.GCBlocks;
 
 public class GCMaterialRules {
     private static final MaterialCondition ON_FLOOR = MaterialRules.stoneDepthCheck(0, false, CaveSurface.FLOOR);
     private static final MaterialCondition UNDER_FLOOR = MaterialRules.not(ON_FLOOR);
     private static final MaterialRule BEDROCK_FLOOR = MaterialRules.ifTrue(
-            MaterialRules.verticalGradient("gallifreyan_chronicles:bedrock_floor", VerticalAnchor.bottom(), VerticalAnchor.aboveBottom(5)),
+            MaterialRules.verticalGradient(
+                    "gallifreyan_chronicles:bedrock_floor", VerticalAnchor.bottom(), VerticalAnchor.aboveBottom(5)),
             block(Blocks.BEDROCK));
 
     private static MaterialRule block(Block block) {
@@ -24,7 +25,8 @@ public class GCMaterialRules {
     }
 
     private static MaterialRule belowYZero(Block block) {
-        return MaterialRules.ifTrue(MaterialRules.not(MaterialRules.yBlockCheck(VerticalAnchor.absolute(0), 0)), block(block));
+        return MaterialRules.ifTrue(
+                MaterialRules.not(MaterialRules.yBlockCheck(VerticalAnchor.absolute(0), 0)), block(block));
     }
 
     private static MaterialRule onFloor(Block block) {
@@ -55,16 +57,12 @@ public class GCMaterialRules {
                                         MaterialRules.sequence(
                                                 onFloor(GCBlocks.GALLIFREYAN_GRASS_BLOCK),
                                                 withinFloorDepth(4, GCBlocks.GALLIFREYAN_DIRT),
-                                                withinFloorDepth(8, GCBlocks.GALLIFREYAN_MUD)
-                                        )
-                                ),
+                                                withinFloorDepth(8, GCBlocks.GALLIFREYAN_MUD))),
                                 MaterialRules.ifTrue(
                                         MaterialRules.isBiome(biomes, GCBiomes.GALLIFREYAN_DESERT),
                                         MaterialRules.sequence(
                                                 onFloor(GCBlocks.GALLIFREYAN_SAND),
-                                                underFloor(GCBlocks.GALLIFREYAN_SAND)
-                                        )
-                                ),
+                                                underFloor(GCBlocks.GALLIFREYAN_SAND))),
                                 MaterialRules.ifTrue(
                                         MaterialRules.isBiome(biomes, GCBiomes.GALLIFREYAN_BADLANDS),
                                         MaterialRules.sequence(
@@ -78,12 +76,7 @@ public class GCMaterialRules {
                                                 layerFrom(80, GCBlocks.ARCADIAN_SHALE),
                                                 layerFrom(72, GCBlocks.GALLIFREYAN_GRAVEL),
                                                 layerFrom(64, GCBlocks.GALLIFREYAN_MUD),
-                                                block(GCBlocks.ARCADIAN_SHALE)
-                                        )
-                                )
-                        )
-                )
-        );
+                                                block(GCBlocks.ARCADIAN_SHALE))))));
     }
 
     public static MaterialRule moon(HolderGetter<Biome> biomes) {
@@ -92,16 +85,9 @@ public class GCMaterialRules {
                 belowYZero(GCBlocks.MOONSLATE),
                 MaterialRules.ifTrue(
                         MaterialRules.abovePreliminarySurface(),
-                        MaterialRules.sequence(
-                                MaterialRules.ifTrue(
-                                        MaterialRules.isBiome(biomes, GCBiomes.MOON),
-                                        MaterialRules.sequence(
-                                                onFloor(GCBlocks.MOON_DUST),
-                                                withinFloorDepth(4, GCBlocks.LUNAR_REGOLITH)
-                                        )
-                                )
-                        )
-                )
-        );
+                        MaterialRules.sequence(MaterialRules.ifTrue(
+                                MaterialRules.isBiome(biomes, GCBiomes.MOON),
+                                MaterialRules.sequence(
+                                        onFloor(GCBlocks.MOON_DUST), withinFloorDepth(4, GCBlocks.LUNAR_REGOLITH))))));
     }
 }

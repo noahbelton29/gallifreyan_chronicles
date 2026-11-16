@@ -1,12 +1,12 @@
 package uk.nbforge.gallifreyan_chronicles.datagen.assets;
 
-import uk.nbforge.gallifreyan_chronicles.Constants;
-import uk.nbforge.gallifreyan_chronicles.core.GCSounds;
-import uk.nbforge.gallifreyan_chronicles.util.GCUtil;
 import net.minecraft.data.PackOutput;
 import net.minecraft.sounds.SoundEvent;
 import net.neoforged.neoforge.common.data.SoundDefinition;
 import net.neoforged.neoforge.common.data.SoundDefinitionsProvider;
+import uk.nbforge.gallifreyan_chronicles.Constants;
+import uk.nbforge.gallifreyan_chronicles.core.GCSounds;
+import uk.nbforge.gallifreyan_chronicles.util.GCUtil;
 
 public class GCSoundsProvider extends SoundDefinitionsProvider {
     private static final int DEFAULT_ATTENUATION = 16;
@@ -77,7 +77,8 @@ public class GCSoundsProvider extends SoundDefinitionsProvider {
      */
     private void registerVariants(SoundEvent soundEvent, String folder, int attenuationDistance, String... files) {
         SoundDefinition definition = SoundDefinition.definition()
-                .subtitle("sound." + Constants.MOD_ID + "." + soundEvent.location().getPath())
+                .subtitle("sound." + Constants.MOD_ID + "."
+                        + soundEvent.location().getPath())
                 .replace(true);
         for (String file : files) {
             definition.with(sound(GCUtil.modIdentifier(folder + file), SoundDefinition.SoundType.SOUND)
@@ -92,11 +93,12 @@ public class GCSoundsProvider extends SoundDefinitionsProvider {
 
     private void registerSound(SoundEvent soundEvent, String folder, boolean stream, int attenuationDistance) {
         String name = soundEvent.location().getPath();
-        add(soundEvent, SoundDefinition.definition()
-                .with(sound(GCUtil.modIdentifier(folder + name), SoundDefinition.SoundType.SOUND)
-                        .stream(stream)
-                        .attenuationDistance(attenuationDistance))
-                .subtitle("sound." + Constants.MOD_ID + "." + name)
-                .replace(true));
+        add(
+                soundEvent,
+                SoundDefinition.definition()
+                        .with(sound(GCUtil.modIdentifier(folder + name), SoundDefinition.SoundType.SOUND).stream(stream)
+                                .attenuationDistance(attenuationDistance))
+                        .subtitle("sound." + Constants.MOD_ID + "." + name)
+                        .replace(true));
     }
 }

@@ -17,17 +17,21 @@ public class TardisExteriorInfoProvider implements IBlockComponentProvider {
     public static final TardisExteriorInfoProvider INSTANCE = new TardisExteriorInfoProvider();
 
     @Override
-    public void appendTooltip(@NonNull ITooltip tooltip, @NonNull BlockAccessor accessor, @NonNull IPluginConfig config) {
+    public void appendTooltip(
+            @NonNull ITooltip tooltip, @NonNull BlockAccessor accessor, @NonNull IPluginConfig config) {
         if (!(accessor.getBlockEntity() instanceof TardisExteriorBlockEntity tardis)) return;
         TardisExterior exterior = tardis.getExterior();
         if (exterior == null) return;
 
-        tooltip.add(SelectionTooltip.line("tooltip.gallifreyan_chronicles.tardis.exterior",
+        tooltip.add(SelectionTooltip.line(
+                "tooltip.gallifreyan_chronicles.tardis.exterior",
                 SelectionTooltip.highlight(SelectionTooltip.displayName("tardis_exterior", exterior.id()))));
 
         Component state = tardis.isLocked()
-                ? Component.translatable("tooltip.gallifreyan_chronicles.tardis.locked").withStyle(ChatFormatting.RED)
-                : Component.translatable("tooltip.gallifreyan_chronicles.tardis.unlocked").withStyle(ChatFormatting.GREEN);
+                ? Component.translatable("tooltip.gallifreyan_chronicles.tardis.locked")
+                        .withStyle(ChatFormatting.RED)
+                : Component.translatable("tooltip.gallifreyan_chronicles.tardis.unlocked")
+                        .withStyle(ChatFormatting.GREEN);
 
         tooltip.add(Component.translatable("tooltip.gallifreyan_chronicles.tardis.door")
                 .append(Component.translatable("tooltip.gallifreyan_chronicles.label_separator"))

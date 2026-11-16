@@ -1,20 +1,16 @@
 package uk.nbforge.gallifreyan_chronicles.tardis;
 
-
 import java.util.Comparator;
 import java.util.List;
-
 import uk.nbforge.gallifreyan_chronicles.core.dynamic_registries.TardisInteriorRegistry;
 
 public final class TardisInteriorOptions {
-    public record Option(String interiorId, String exteriorId) {
-    }
+    public record Option(String interiorId, String exteriorId) {}
 
     private static volatile List<Option> clientOptions = List.of();
     private static volatile String clientDefaultId = "";
 
-    private TardisInteriorOptions() {
-    }
+    private TardisInteriorOptions() {}
 
     public static List<Option> fromRegistry() {
         return TardisInteriorRegistry.getAll().stream()

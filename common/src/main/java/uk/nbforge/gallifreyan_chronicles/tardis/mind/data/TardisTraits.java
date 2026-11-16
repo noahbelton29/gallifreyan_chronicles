@@ -1,18 +1,16 @@
 package uk.nbforge.gallifreyan_chronicles.tardis.mind.data;
 
-import uk.nbforge.gallifreyan_chronicles.tardis.mind.TardisTrait;
-
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentSkipListMap;
+import uk.nbforge.gallifreyan_chronicles.tardis.mind.TardisTrait;
 
 public final class TardisTraits {
     private static final Map<String, TardisTrait> ALL = new ConcurrentSkipListMap<>();
 
-    private TardisTraits() {
-    }
+    private TardisTraits() {}
 
     public static void clear() {
         ALL.clear();

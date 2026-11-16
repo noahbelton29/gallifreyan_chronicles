@@ -1,12 +1,12 @@
 package uk.nbforge.gallifreyan_chronicles.core;
 
-import uk.nbforge.gallifreyan_chronicles.util.GCUtil;
-import uk.nbforge.gallifreyan_chronicles.core.world.biomes.GCGallifreyBiomes;
-import uk.nbforge.gallifreyan_chronicles.core.world.biomes.GCMoonBiomes;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.data.worldgen.BootstrapContext;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.level.biome.Biome;
+import uk.nbforge.gallifreyan_chronicles.core.world.biomes.GCGallifreyBiomes;
+import uk.nbforge.gallifreyan_chronicles.core.world.biomes.GCMoonBiomes;
+import uk.nbforge.gallifreyan_chronicles.util.GCUtil;
 
 public class GCBiomes {
     public static final ResourceKey<Biome> GALLIFREYAN_DESERT = registerBiomeKey("gallifreyan_desert");

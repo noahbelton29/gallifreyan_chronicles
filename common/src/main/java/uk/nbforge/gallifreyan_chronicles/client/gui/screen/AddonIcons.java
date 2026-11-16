@@ -1,26 +1,24 @@
 package uk.nbforge.gallifreyan_chronicles.client.gui.screen;
 
 import com.mojang.blaze3d.platform.NativeImage;
-import uk.nbforge.gallifreyan_chronicles.Constants;
-import uk.nbforge.gallifreyan_chronicles.addon.AddonInfo;
-import uk.nbforge.gallifreyan_chronicles.util.GCUtil;
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.texture.DynamicTexture;
-import net.minecraft.resources.Identifier;
-
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.renderer.texture.DynamicTexture;
+import net.minecraft.resources.Identifier;
+import uk.nbforge.gallifreyan_chronicles.Constants;
+import uk.nbforge.gallifreyan_chronicles.addon.AddonInfo;
+import uk.nbforge.gallifreyan_chronicles.util.GCUtil;
 
 final class AddonIcons {
-    record Icon(Identifier texture, int width, int height) {
-    }
+    record Icon(Identifier texture, int width, int height) {}
 
-    private static final Icon PLACEHOLDER = new Icon(Identifier.withDefaultNamespace("textures/misc/unknown_pack.png"), 64, 64);
+    private static final Icon PLACEHOLDER =
+            new Icon(Identifier.withDefaultNamespace("textures/misc/unknown_pack.png"), 64, 64);
     private static final Map<String, Icon> CACHE = new HashMap<>();
 
-    private AddonIcons() {
-    }
+    private AddonIcons() {}
 
     static Icon get(AddonInfo info) {
         if (info.icon() == null) return PLACEHOLDER;
@@ -32,7 +30,9 @@ final class AddonIcons {
         try {
             NativeImage image = NativeImage.read(info.icon());
             Identifier id = GCUtil.modIdentifier("addon_icon/" + key.replaceAll("[^a-z0-9/._-]", "_"));
-            Minecraft.getInstance().getTextureManager().register(id, new DynamicTexture(() -> "GC addon icon " + id, image));
+            Minecraft.getInstance()
+                    .getTextureManager()
+                    .register(id, new DynamicTexture(() -> "GC addon icon " + id, image));
             icon = new Icon(id, image.getWidth(), image.getHeight());
         } catch (Exception e) {
             Constants.LOG.warn("Addon '{}' has an icon that could not be read", info.id(), e);

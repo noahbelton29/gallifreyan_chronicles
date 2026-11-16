@@ -1,11 +1,11 @@
 package uk.nbforge.gallifreyan_chronicles.core.world.world_features;
 
+import java.util.List;
 import net.minecraft.world.level.levelgen.placement.*;
 
-import java.util.List;
-
 public class GCOrePlacements {
-    public static List<PlacementModifier> orePlacement(final PlacementModifier frequencyModifier, final PlacementModifier heightRange) {
+    public static List<PlacementModifier> orePlacement(
+            final PlacementModifier frequencyModifier, final PlacementModifier heightRange) {
         return List.of(frequencyModifier, InSquarePlacement.spread(), heightRange, BiomeFilter.biome());
     }
 

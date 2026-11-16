@@ -26,8 +26,24 @@ public class GCTardisFadeProvider extends GCJsonDataProvider {
         add(name, GCJson.obj("type", "pulse"));
     }
 
-    private void pulse(String name, int pulseTicks, double ramp, double depth, int takeoffDelay, int fadeOut, int fadeIn) {
-        add(name, GCJson.obj("type", "pulse", "pulse_ticks", pulseTicks, "pulse_ramp", ramp, "pulse_depth", depth,
-                "takeoff_delay_ticks", takeoffDelay, "fade_out_ticks", fadeOut, "fade_in_ticks", fadeIn));
+    private void pulse(
+            String name, int pulseTicks, double ramp, double depth, int takeoffDelay, int fadeOut, int fadeIn) {
+        add(
+                name,
+                GCJson.obj(
+                        "type",
+                        "pulse",
+                        "pulse_ticks",
+                        pulseTicks,
+                        "pulse_ramp",
+                        ramp,
+                        "pulse_depth",
+                        depth,
+                        "takeoff_delay_ticks",
+                        takeoffDelay,
+                        "fade_out_ticks",
+                        fadeOut,
+                        "fade_in_ticks",
+                        fadeIn));
     }
 }

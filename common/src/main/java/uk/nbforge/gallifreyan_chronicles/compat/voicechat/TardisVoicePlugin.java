@@ -1,8 +1,5 @@
 package uk.nbforge.gallifreyan_chronicles.compat.voicechat;
 
-import uk.nbforge.gallifreyan_chronicles.Constants;
-import uk.nbforge.gallifreyan_chronicles.tardis.ecs.component.DoorState;
-import de.maxhenkel.voicechat.api.VoicechatApi;
 import de.maxhenkel.voicechat.api.VoicechatConnection;
 import de.maxhenkel.voicechat.api.VoicechatPlugin;
 import de.maxhenkel.voicechat.api.VoicechatServerApi;
@@ -15,11 +12,12 @@ import de.maxhenkel.voicechat.api.opus.OpusDecoder;
 import de.maxhenkel.voicechat.api.opus.OpusEncoder;
 import de.maxhenkel.voicechat.api.packets.LocationalSoundPacket;
 import de.maxhenkel.voicechat.api.packets.MicrophonePacket;
-import net.minecraft.server.level.ServerPlayer;
-
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
+import net.minecraft.server.level.ServerPlayer;
+import uk.nbforge.gallifreyan_chronicles.Constants;
+import uk.nbforge.gallifreyan_chronicles.tardis.ecs.component.DoorState;
 
 public class TardisVoicePlugin implements VoicechatPlugin {
     private static final float SAMPLE_RATE = 48000.0F;
@@ -90,9 +88,18 @@ public class TardisVoicePlugin implements VoicechatPlugin {
         }
     }
 
-    private void relay(VoicechatServerApi voicechat, MicrophonePacket packet, byte[] data, boolean endOfSpeech,
-                       double range, UUID senderId, double sx, double sy, double sz,
-                       TardisVoiceLinks.Link link, boolean towardsInterior) {
+    private void relay(
+            VoicechatServerApi voicechat,
+            MicrophonePacket packet,
+            byte[] data,
+            boolean endOfSpeech,
+            double range,
+            UUID senderId,
+            double sx,
+            double sy,
+            double sz,
+            TardisVoiceLinks.Link link,
+            boolean towardsInterior) {
         double srcX = towardsInterior ? link.exteriorX() : link.doorX();
         double srcY = towardsInterior ? link.exteriorY() : link.doorY();
         double srcZ = towardsInterior ? link.exteriorZ() : link.doorZ();
@@ -147,13 +154,14 @@ public class TardisVoicePlugin implements VoicechatPlugin {
 
     private static UUID streamKey(UUID sender, TardisVoiceLinks.Link link, boolean towardsInterior) {
         long salt = towardsInterior ? 0L : 0x5DEECE66DL;
-        return new UUID(sender.getMostSignificantBits() ^ link.tardisId().getLeastSignificantBits() ^ salt,
+        return new UUID(
+                sender.getMostSignificantBits() ^ link.tardisId().getLeastSignificantBits() ^ salt,
                 sender.getLeastSignificantBits() ^ link.tardisId().getMostSignificantBits());
     }
 
     private void closeStreamsOf(UUID sender) {
         for (TardisVoiceLinks.Link link : TardisVoiceLinks.links()) {
-            for (boolean towardsInterior : new boolean[]{true, false}) {
+            for (boolean towardsInterior : new boolean[] {true, false}) {
                 Stream stream = streams.remove(streamKey(sender, link, towardsInterior));
                 if (stream != null) stream.close();
             }

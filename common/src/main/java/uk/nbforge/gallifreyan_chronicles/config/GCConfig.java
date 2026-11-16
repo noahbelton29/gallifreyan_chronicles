@@ -2,12 +2,11 @@ package uk.nbforge.gallifreyan_chronicles.config;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import uk.nbforge.gallifreyan_chronicles.Constants;
-import uk.nbforge.gallifreyan_chronicles.platform.Services;
-
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import uk.nbforge.gallifreyan_chronicles.Constants;
+import uk.nbforge.gallifreyan_chronicles.platform.Services;
 
 public final class GCConfig {
     private static final long SAVE_DELAY_NANOS = 1_000_000_000L;
@@ -35,8 +34,7 @@ public final class GCConfig {
 
     private static Data data = new Data();
 
-    private GCConfig() {
-    }
+    private GCConfig() {}
 
     private static Path configFile() {
         return Services.PLATFORM.getConfigDir().resolve(Constants.MOD_ID + ".json");

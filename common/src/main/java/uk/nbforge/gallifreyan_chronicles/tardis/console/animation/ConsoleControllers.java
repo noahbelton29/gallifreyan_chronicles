@@ -1,17 +1,16 @@
 package uk.nbforge.gallifreyan_chronicles.tardis.console.animation;
 
+import com.geckolib.animatable.manager.AnimatableManager;
 import com.geckolib.animation.AnimationController;
 import com.geckolib.animation.RawAnimation;
 import com.geckolib.animation.object.PlayState;
-import com.geckolib.animatable.manager.AnimatableManager;
-import uk.nbforge.gallifreyan_chronicles.core.block_entities.TardisConsoleBlockEntity;
-import uk.nbforge.gallifreyan_chronicles.core.dynamic_registries.TardisControlRegistry;
-
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.function.BooleanSupplier;
 import java.util.function.Supplier;
+import uk.nbforge.gallifreyan_chronicles.core.block_entities.TardisConsoleBlockEntity;
+import uk.nbforge.gallifreyan_chronicles.core.dynamic_registries.TardisControlRegistry;
 
 public final class ConsoleControllers {
     public static final String IDLE_STATE = "rotor_idle";
@@ -26,8 +25,8 @@ public final class ConsoleControllers {
     private Map<String, AnimationController<TardisConsoleBlockEntity>> controlControllers = Map.of();
     private AnimationController<TardisConsoleBlockEntity> rotorController;
 
-    public void register(AnimatableManager.ControllerRegistrar registrar, BooleanSupplier hasPower,
-                         Supplier<String> rotorState) {
+    public void register(
+            AnimatableManager.ControllerRegistrar registrar, BooleanSupplier hasPower, Supplier<String> rotorState) {
         this.rotorController = new AnimationController<>("rotor", 15, test -> {
             if (!hasPower.getAsBoolean()) {
                 if (test.controller().getCurrentRawAnimation() == null) {

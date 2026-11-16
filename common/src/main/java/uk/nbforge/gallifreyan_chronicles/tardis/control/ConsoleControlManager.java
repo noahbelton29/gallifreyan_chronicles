@@ -1,11 +1,9 @@
 package uk.nbforge.gallifreyan_chronicles.tardis.control;
 
-import uk.nbforge.gallifreyan_chronicles.core.GCTardisControls;
-import uk.nbforge.gallifreyan_chronicles.Constants;
-import uk.nbforge.gallifreyan_chronicles.core.block_entities.TardisConsoleBlockEntity;
-import uk.nbforge.gallifreyan_chronicles.core.entity.TardisControlEntity;
-import uk.nbforge.gallifreyan_chronicles.tardis.console.animation.ConsoleAnimatable;
-import uk.nbforge.gallifreyan_chronicles.core.dynamic_registries.TardisControlRegistry;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.level.ServerLevel;
@@ -13,11 +11,12 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import org.jspecify.annotations.Nullable;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
+import uk.nbforge.gallifreyan_chronicles.Constants;
+import uk.nbforge.gallifreyan_chronicles.core.GCTardisControls;
+import uk.nbforge.gallifreyan_chronicles.core.block_entities.TardisConsoleBlockEntity;
+import uk.nbforge.gallifreyan_chronicles.core.dynamic_registries.TardisControlRegistry;
+import uk.nbforge.gallifreyan_chronicles.core.entity.TardisControlEntity;
+import uk.nbforge.gallifreyan_chronicles.tardis.console.animation.ConsoleAnimatable;
 
 public class ConsoleControlManager {
     private static final double STRAY_SEARCH_RADIUS = 4.0;
@@ -63,11 +62,13 @@ public class ConsoleControlManager {
     }
 
     public static Vec3 unrotateOffset(Vec3 o, Direction facing) {
-        return rotateOffset(o, switch (facing) {
-            case WEST -> Direction.EAST;
-            case EAST -> Direction.WEST;
-            default -> facing;
-        });
+        return rotateOffset(
+                o,
+                switch (facing) {
+                    case WEST -> Direction.EAST;
+                    case EAST -> Direction.WEST;
+                    default -> facing;
+                });
     }
 
     @Nullable
@@ -88,8 +89,8 @@ public class ConsoleControlManager {
         TardisControlEntity entity = TardisControlEntity.create(serverLevel, host.getHostPos(), spec.id(), worldPos);
 
         boolean quarterTurn = facing.getAxis() == Direction.Axis.X;
-        entity.setControlSize(quarterTurn ? spec.depth() : spec.width(), spec.height(),
-                quarterTurn ? spec.width() : spec.depth());
+        entity.setControlSize(
+                quarterTurn ? spec.depth() : spec.width(), spec.height(), quarterTurn ? spec.width() : spec.depth());
         serverLevel.addFreshEntity(entity);
         controlEntities.add(entity);
 
@@ -107,8 +108,8 @@ public class ConsoleControlManager {
         }
         controlEntities.clear();
         AABB area = new AABB(host.getHostPos()).inflate(STRAY_SEARCH_RADIUS);
-        for (TardisControlEntity stray : serverLevel.getEntitiesOfClass(TardisControlEntity.class, area,
-                entity -> host.getHostPos().equals(entity.getConsolePos()))) {
+        for (TardisControlEntity stray : serverLevel.getEntitiesOfClass(
+                TardisControlEntity.class, area, entity -> host.getHostPos().equals(entity.getConsolePos()))) {
             stray.discard();
         }
         for (ControlSpec spec : controlSpecs) {
@@ -131,9 +132,7 @@ public class ConsoleControlManager {
 
     public void removeControl(String id) {
         controlSpecs.removeIf(spec -> spec.id().equals(id));
-        controlEntities.stream()
-                .filter(e -> e.getControlId().equals(id))
-                .forEach(TardisControlEntity::discard);
+        controlEntities.stream().filter(e -> e.getControlId().equals(id)).forEach(TardisControlEntity::discard);
         controlEntities.removeIf(e -> e.getControlId().equals(id));
         controlAnimations.remove(id);
         controlStates.remove(id);
@@ -164,7 +163,8 @@ public class ConsoleControlManager {
         triggerControl(console, id, activated, null);
     }
 
-    public void triggerControl(TardisConsoleBlockEntity console, String id, boolean activated, @Nullable Player triggeringPlayer) {
+    public void triggerControl(
+            TardisConsoleBlockEntity console, String id, boolean activated, @Nullable Player triggeringPlayer) {
         Constants.LOG.debug("Triggering control: {} with state: {}", id, activated);
 
         setControlState(id, activated);
@@ -180,7 +180,8 @@ public class ConsoleControlManager {
 
     public void playControlAnimation(String controlId, boolean activated, @Nullable Player triggeringPlayer) {
         String animationName = host.resolveControlAnimation(controlId, activated);
-        Constants.LOG.debug("Playing animation: {} for control: {} (activated: {})", animationName, controlId, activated);
+        Constants.LOG.debug(
+                "Playing animation: {} for control: {} (activated: {})", animationName, controlId, activated);
 
         if (animationName != null) {
             animatable.triggerAnimation(controlId, animationName, triggeringPlayer);

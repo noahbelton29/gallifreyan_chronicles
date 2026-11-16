@@ -1,38 +1,37 @@
 package uk.nbforge.gallifreyan_chronicles.client.renderer.block;
 
-import uk.nbforge.gallifreyan_chronicles.client.util.FadeTintUtil;
-
-import uk.nbforge.gallifreyan_chronicles.client.util.ModelRenderRangeUtil;
-
-import org.jspecify.annotations.Nullable;
-import net.minecraft.util.ARGB;
-import net.minecraft.resources.Identifier;
-import net.minecraft.client.renderer.rendertype.RenderTypes;
-import net.minecraft.client.renderer.rendertype.RenderType;
-import net.minecraft.client.renderer.OrderedSubmitNodeCollector;
-import uk.nbforge.gallifreyan_chronicles.client.tardis.RematCatchClient;
 import com.geckolib.constant.dataticket.DataTicket;
 import com.geckolib.renderer.GeoBlockRenderer;
-import net.minecraft.world.phys.Vec3;
-import net.minecraft.client.renderer.state.level.CameraRenderState;
-import net.minecraft.client.renderer.SubmitNodeCollector;
-import com.mojang.blaze3d.vertex.PoseStack;
-import com.geckolib.renderer.base.RenderPassInfo;
 import com.geckolib.renderer.base.BoneSnapshots;
-import uk.nbforge.gallifreyan_chronicles.compat.portal.PortalBone;
+import com.geckolib.renderer.base.RenderPassInfo;
+import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.math.Axis;
-import uk.nbforge.gallifreyan_chronicles.core.block.InteriorDoorBlock;
-import uk.nbforge.gallifreyan_chronicles.config.GCConfig;
-import uk.nbforge.gallifreyan_chronicles.client.model.InteriorDoorBlockModel;
-import uk.nbforge.gallifreyan_chronicles.core.block_entities.InteriorDoorBlockEntity;
-import uk.nbforge.gallifreyan_chronicles.tardis.TardisExterior;
+import net.minecraft.client.renderer.OrderedSubmitNodeCollector;
+import net.minecraft.client.renderer.SubmitNodeCollector;
 import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
+import net.minecraft.client.renderer.rendertype.RenderType;
+import net.minecraft.client.renderer.rendertype.RenderTypes;
+import net.minecraft.client.renderer.state.level.CameraRenderState;
 import net.minecraft.core.Direction;
+import net.minecraft.resources.Identifier;
+import net.minecraft.util.ARGB;
+import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.NotNull;
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
+import uk.nbforge.gallifreyan_chronicles.client.model.InteriorDoorBlockModel;
 import uk.nbforge.gallifreyan_chronicles.client.renderer.util.RenderLevelGuard;
+import uk.nbforge.gallifreyan_chronicles.client.tardis.RematCatchClient;
+import uk.nbforge.gallifreyan_chronicles.client.util.FadeTintUtil;
+import uk.nbforge.gallifreyan_chronicles.client.util.ModelRenderRangeUtil;
+import uk.nbforge.gallifreyan_chronicles.compat.portal.PortalBone;
+import uk.nbforge.gallifreyan_chronicles.config.GCConfig;
+import uk.nbforge.gallifreyan_chronicles.core.block.InteriorDoorBlock;
+import uk.nbforge.gallifreyan_chronicles.core.block_entities.InteriorDoorBlockEntity;
+import uk.nbforge.gallifreyan_chronicles.tardis.TardisExterior;
 
-public class InteriorDoorBlockRenderer extends GeoBlockRenderer<@NotNull InteriorDoorBlockEntity, @NotNull TardisExteriorBlockRenderState> {
+public class InteriorDoorBlockRenderer
+        extends GeoBlockRenderer<@NotNull InteriorDoorBlockEntity, @NotNull TardisExteriorBlockRenderState> {
     public static final DataTicket<String> VARIANT = DataTicket.create("interior_door_variant", String.class);
     public static final DataTicket<String> TEXTURE_ID = DataTicket.create("interior_door_texture_id", String.class);
     public static final DataTicket<String> ROUNDEL = DataTicket.create("interior_door_roundel", String.class);
@@ -54,8 +53,11 @@ public class InteriorDoorBlockRenderer extends GeoBlockRenderer<@NotNull Interio
     }
 
     @Override
-    public void addRenderData(InteriorDoorBlockEntity animatable, Void relatedObject,
-                              TardisExteriorBlockRenderState renderState, float partialTick) {
+    public void addRenderData(
+            InteriorDoorBlockEntity animatable,
+            Void relatedObject,
+            TardisExteriorBlockRenderState renderState,
+            float partialTick) {
         RenderLevelGuard.tag(renderState, animatable.getLevel());
         renderState.addGeckolibData(VARIANT, animatable.getVariant());
         renderState.addGeckolibData(TEXTURE_ID, animatable.getTextureId());
@@ -78,8 +80,12 @@ public class InteriorDoorBlockRenderer extends GeoBlockRenderer<@NotNull Interio
         Direction right = InteriorDoorBlock.rightDirectionOf(facing, flipped);
 
         if (flush) {
-            renderPassInfo.poseStack().translate(right.getStepX() * 0.5f - facing.getStepX() * 0.5f, 0.75f,
-                    right.getStepZ() * 0.5f - facing.getStepZ() * 0.5f);
+            renderPassInfo
+                    .poseStack()
+                    .translate(
+                            right.getStepX() * 0.5f - facing.getStepX() * 0.5f,
+                            0.75f,
+                            right.getStepZ() * 0.5f - facing.getStepZ() * 0.5f);
             renderPassInfo.poseStack().rotateDegrees(Axis.YP, TardisExterior.modelRotationDegrees(yaw));
             renderPassInfo.poseStack().rotateDegrees(Axis.XP, -90f);
             return;
@@ -95,8 +101,11 @@ public class InteriorDoorBlockRenderer extends GeoBlockRenderer<@NotNull Interio
     }
 
     @Override
-    public void submit(@NonNull TardisExteriorBlockRenderState renderState, @NonNull PoseStack poseStack,
-                       @NonNull SubmitNodeCollector submitNodeCollector, @NonNull CameraRenderState cameraState) {
+    public void submit(
+            @NonNull TardisExteriorBlockRenderState renderState,
+            @NonNull PoseStack poseStack,
+            @NonNull SubmitNodeCollector submitNodeCollector,
+            @NonNull CameraRenderState cameraState) {
         if (RenderLevelGuard.belongsToOtherLevel(renderState)) return;
         super.submit(renderState, poseStack, submitNodeCollector, cameraState);
     }
@@ -112,7 +121,8 @@ public class InteriorDoorBlockRenderer extends GeoBlockRenderer<@NotNull Interio
     }
 
     @Override
-    public void adjustModelBonesForRender(@NonNull RenderPassInfo<TardisExteriorBlockRenderState> renderPassInfo, @NonNull BoneSnapshots snapshots) {
+    public void adjustModelBonesForRender(
+            @NonNull RenderPassInfo<TardisExteriorBlockRenderState> renderPassInfo, @NonNull BoneSnapshots snapshots) {
         super.adjustModelBonesForRender(renderPassInfo, snapshots);
         // The portal bone is only a marker
         snapshots.ifPresent(PortalBone.BONE_NAME, snapshot -> snapshot.skipRender(true));
@@ -134,7 +144,8 @@ public class InteriorDoorBlockRenderer extends GeoBlockRenderer<@NotNull Interio
         Identifier skin = InteriorDoorBlockModel.textureFor(renderState);
         if (!skin.equals(texture) || skin.getPath().startsWith("dynamic/")) {
             if (LOGGED_SKINS.add(skin)) {
-                uk.nbforge.gallifreyan_chronicles.Constants.LOG.info("Interior door is drawn with {} (GeckoLib offered {})", skin, texture);
+                uk.nbforge.gallifreyan_chronicles.Constants.LOG.info(
+                        "Interior door is drawn with {} (GeckoLib offered {})", skin, texture);
             }
         }
         if (opacity < 1.0f) return RenderTypes.entityTranslucentCull(skin);
@@ -142,8 +153,10 @@ public class InteriorDoorBlockRenderer extends GeoBlockRenderer<@NotNull Interio
     }
 
     @Override
-    public void submitRenderTasks(RenderPassInfo<TardisExteriorBlockRenderState> renderPassInfo,
-                                  OrderedSubmitNodeCollector renderTasks, @Nullable RenderType renderType) {
+    public void submitRenderTasks(
+            RenderPassInfo<TardisExteriorBlockRenderState> renderPassInfo,
+            OrderedSubmitNodeCollector renderTasks,
+            @Nullable RenderType renderType) {
         float opacity = renderPassInfo.renderState().getOrDefaultGeckolibData(REMAT, 1.0f);
         if (renderType != null && opacity < 1.0f) {
             OrderedSubmitNodeCollector maskTasks = renderTasks instanceof SubmitNodeCollector collector
@@ -151,7 +164,10 @@ public class InteriorDoorBlockRenderer extends GeoBlockRenderer<@NotNull Interio
                     : renderTasks;
             PoseStack poseStack = renderPassInfo.poseStack();
             poseStack.pushPose();
-            poseStack.last().pose().scaleLocal(RematCatchClient.MASK_PUSH, RematCatchClient.MASK_PUSH, RematCatchClient.MASK_PUSH);
+            poseStack
+                    .last()
+                    .pose()
+                    .scaleLocal(RematCatchClient.MASK_PUSH, RematCatchClient.MASK_PUSH, RematCatchClient.MASK_PUSH);
             super.submitRenderTasks(renderPassInfo, maskTasks, RenderTypes.waterMask());
             poseStack.popPose();
         }

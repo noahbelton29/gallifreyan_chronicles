@@ -12,17 +12,16 @@ import com.mojang.renderpearl.api.pipeline.RenderPipeline;
 import com.mojang.renderpearl.api.textures.FilterMode;
 import com.mojang.renderpearl.api.textures.GpuTexture;
 import com.mojang.renderpearl.api.textures.GpuTextureView;
-import uk.nbforge.gallifreyan_chronicles.Constants;
+import java.nio.ByteBuffer;
+import java.util.Optional;
+import java.util.OptionalDouble;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.BindGroupLayouts;
 import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.resources.Identifier;
 import net.minecraft.util.Mth;
 import org.jspecify.annotations.Nullable;
-
-import java.nio.ByteBuffer;
-import java.util.Optional;
-import java.util.OptionalDouble;
+import uk.nbforge.gallifreyan_chronicles.Constants;
 
 public final class PowerDarknessTint {
     private static @Nullable RenderPipeline pipeline;
@@ -31,8 +30,7 @@ public final class PowerDarknessTint {
     private static int uploadedArgb = 0;
     private static boolean failed;
 
-    private PowerDarknessTint() {
-    }
+    private PowerDarknessTint() {}
 
     private static @Nullable RenderPipeline pipeline() {
         if (pipeline == null && !failed) {
@@ -59,9 +57,14 @@ public final class PowerDarknessTint {
     private static GpuTextureView textureFor(int alpha, int rgb) {
         GpuDevice device = RenderSystem.getDevice();
         if (texture == null) {
-            texture = device.createTexture(Constants.MOD_ID + " power darkness tint",
+            texture = device.createTexture(
+                    Constants.MOD_ID + " power darkness tint",
                     GpuTexture.USAGE_TEXTURE_BINDING | GpuTexture.USAGE_COPY_DST,
-                    GpuFormat.RGBA8_UNORM, 1, 1, 1, 1);
+                    GpuFormat.RGBA8_UNORM,
+                    1,
+                    1,
+                    1,
+                    1);
             textureView = device.createTextureView(texture);
             uploadedArgb = 0;
         }
@@ -89,13 +92,15 @@ public final class PowerDarknessTint {
         if (target.getColorTextureView() == null || target.getDepthTextureView() == null) return;
         GpuTextureView view = textureFor(alpha, rgb);
 
-        try (RenderPass pass = RenderSystem.getDevice().createCommandEncoder().createRenderPass(
-                () -> Constants.MOD_ID + " power darkness tint",
-                target.getColorTextureView(),
-                Optional.empty(),
-                target.getDepthTextureView(),
-                OptionalDouble.empty(),
-                new RenderPass.RenderArea(0, 0, target.width, target.height))) {
+        try (RenderPass pass = RenderSystem.getDevice()
+                .createCommandEncoder()
+                .createRenderPass(
+                        () -> Constants.MOD_ID + " power darkness tint",
+                        target.getColorTextureView(),
+                        Optional.empty(),
+                        target.getDepthTextureView(),
+                        OptionalDouble.empty(),
+                        new RenderPass.RenderArea(0, 0, target.width, target.height))) {
             pass.setPipeline(RenderSystem.getCompiledPipeline(tintPipeline));
             RenderSystem.bindDefaultUniforms(pass);
             pass.setUniform("InSampler", view, RenderSystem.getSamplerCache().getClampToEdge(FilterMode.NEAREST));

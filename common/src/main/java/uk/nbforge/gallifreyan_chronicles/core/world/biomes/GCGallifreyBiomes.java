@@ -1,6 +1,7 @@
 package uk.nbforge.gallifreyan_chronicles.core.world.biomes;
 
-import uk.nbforge.gallifreyan_chronicles.core.world.world_features.GCPlacedFeatures;
+import static uk.nbforge.gallifreyan_chronicles.util.GCUtil.rgb;
+
 import net.minecraft.core.HolderGetter;
 import net.minecraft.data.worldgen.BiomeDefaultFeatures;
 import net.minecraft.world.attribute.EnvironmentAttributes;
@@ -11,25 +12,31 @@ import net.minecraft.world.level.biome.MobSpawnSettings;
 import net.minecraft.world.level.levelgen.GenerationStep;
 import net.minecraft.world.level.levelgen.carver.WorldCarver;
 import net.minecraft.world.level.levelgen.placement.PlacedFeature;
-
-import static uk.nbforge.gallifreyan_chronicles.util.GCUtil.rgb;
+import uk.nbforge.gallifreyan_chronicles.core.world.world_features.GCPlacedFeatures;
 
 public class GCGallifreyBiomes {
     public static void addOres(BiomeGenerationSettings.Builder biomeBuilder) {
-        biomeBuilder.addFeature(GenerationStep.Decoration.UNDERGROUND_ORES, GCPlacedFeatures.IRON_GALLIFREY_ORES_UPPER_KEY);
-        biomeBuilder.addFeature(GenerationStep.Decoration.UNDERGROUND_ORES, GCPlacedFeatures.IRON_GALLIFREY_ORES_MIDDLE_KEY);
-        biomeBuilder.addFeature(GenerationStep.Decoration.UNDERGROUND_ORES, GCPlacedFeatures.IRON_GALLIFREY_ORES_SMALL_KEY);
+        biomeBuilder.addFeature(
+                GenerationStep.Decoration.UNDERGROUND_ORES, GCPlacedFeatures.IRON_GALLIFREY_ORES_UPPER_KEY);
+        biomeBuilder.addFeature(
+                GenerationStep.Decoration.UNDERGROUND_ORES, GCPlacedFeatures.IRON_GALLIFREY_ORES_MIDDLE_KEY);
+        biomeBuilder.addFeature(
+                GenerationStep.Decoration.UNDERGROUND_ORES, GCPlacedFeatures.IRON_GALLIFREY_ORES_SMALL_KEY);
 
-        biomeBuilder.addFeature(GenerationStep.Decoration.UNDERGROUND_ORES, GCPlacedFeatures.COAL_GALLIFREY_ORES_LOWER_KEY);
-        biomeBuilder.addFeature(GenerationStep.Decoration.UNDERGROUND_ORES, GCPlacedFeatures.COAL_GALLIFREY_ORES_UPPER_KEY);
+        biomeBuilder.addFeature(
+                GenerationStep.Decoration.UNDERGROUND_ORES, GCPlacedFeatures.COAL_GALLIFREY_ORES_LOWER_KEY);
+        biomeBuilder.addFeature(
+                GenerationStep.Decoration.UNDERGROUND_ORES, GCPlacedFeatures.COAL_GALLIFREY_ORES_UPPER_KEY);
 
         biomeBuilder.addFeature(GenerationStep.Decoration.UNDERGROUND_ORES, GCPlacedFeatures.GRAVEL_GALLIFREY_ORES_KEY);
-        biomeBuilder.addFeature(GenerationStep.Decoration.UNDERGROUND_ORES, GCPlacedFeatures.COBBLED_LIMESTONE_GALLIFREY_ORES_KEY);
+        biomeBuilder.addFeature(
+                GenerationStep.Decoration.UNDERGROUND_ORES, GCPlacedFeatures.COBBLED_LIMESTONE_GALLIFREY_ORES_KEY);
     }
 
-    private static BiomeGenerationSettings.Builder undergroundBuilder(HolderGetter<PlacedFeature> placedFeatureGetter,
-                                                                      HolderGetter<WorldCarver> carverGetter) {
-        BiomeGenerationSettings.Builder biomeBuilder = new BiomeGenerationSettings.Builder(placedFeatureGetter, carverGetter);
+    private static BiomeGenerationSettings.Builder undergroundBuilder(
+            HolderGetter<PlacedFeature> placedFeatureGetter, HolderGetter<WorldCarver> carverGetter) {
+        BiomeGenerationSettings.Builder biomeBuilder =
+                new BiomeGenerationSettings.Builder(placedFeatureGetter, carverGetter);
         BiomeDefaultFeatures.addDefaultMonsterRoom(biomeBuilder);
         BiomeDefaultFeatures.addDefaultUndergroundVariety(biomeBuilder);
         BiomeDefaultFeatures.addDefaultOres(biomeBuilder);
@@ -37,16 +44,17 @@ public class GCGallifreyBiomes {
     }
 
     public static Biome gallifreyanDesert(
-            HolderGetter<PlacedFeature> placedFeatureGetter,
-            HolderGetter<WorldCarver> carverGetter
-    ) {
+            HolderGetter<PlacedFeature> placedFeatureGetter, HolderGetter<WorldCarver> carverGetter) {
         MobSpawnSettings.Builder spawnBuilder = new MobSpawnSettings.Builder();
         BiomeGenerationSettings.Builder biomeBuilder = undergroundBuilder(placedFeatureGetter, carverGetter);
 
-        biomeBuilder.addFeature(GenerationStep.Decoration.VEGETAL_DECORATION, GCPlacedFeatures.PATCH_GALLIFREY_DRY_GRASS);
+        biomeBuilder.addFeature(
+                GenerationStep.Decoration.VEGETAL_DECORATION, GCPlacedFeatures.PATCH_GALLIFREY_DRY_GRASS);
         addOres(biomeBuilder);
-        biomeBuilder.addFeature(GenerationStep.Decoration.TOP_LAYER_MODIFICATION, GCPlacedFeatures.GALLIFREYAN_STONE_BOULDER);
-        biomeBuilder.addFeature(GenerationStep.Decoration.TOP_LAYER_MODIFICATION, GCPlacedFeatures.GALLIFREYAN_STONE_PATCH);
+        biomeBuilder.addFeature(
+                GenerationStep.Decoration.TOP_LAYER_MODIFICATION, GCPlacedFeatures.GALLIFREYAN_STONE_BOULDER);
+        biomeBuilder.addFeature(
+                GenerationStep.Decoration.TOP_LAYER_MODIFICATION, GCPlacedFeatures.GALLIFREYAN_STONE_PATCH);
 
         biomeBuilder.addFeature(GenerationStep.Decoration.VEGETAL_DECORATION, GCPlacedFeatures.PATCH_THORIVINE);
 
@@ -54,9 +62,8 @@ public class GCGallifreyBiomes {
                 .hasPrecipitation(false)
                 .temperature(4.0F)
                 .downfall(0.0F)
-                .specialEffects(new BiomeSpecialEffects.Builder()
-                        .waterColor(0xBDB133)
-                        .build())
+                .specialEffects(
+                        new BiomeSpecialEffects.Builder().waterColor(0xBDB133).build())
                 .setAttribute(EnvironmentAttributes.SKY_COLOR, rgb(0xFF8833))
                 .setAttribute(EnvironmentAttributes.AMBIENT_LIGHT_COLOR, rgb(0xFF9944))
                 .setAttribute(EnvironmentAttributes.FOG_COLOR, rgb(0xF0964A))
@@ -68,26 +75,22 @@ public class GCGallifreyBiomes {
     }
 
     public static Biome gallifreyanPlains(
-            HolderGetter<PlacedFeature> placedFeatureGetter,
-            HolderGetter<WorldCarver> carverGetter
-    ) {
+            HolderGetter<PlacedFeature> placedFeatureGetter, HolderGetter<WorldCarver> carverGetter) {
         MobSpawnSettings.Builder spawnBuilder = new MobSpawnSettings.Builder();
         BiomeGenerationSettings.Builder biomeBuilder = undergroundBuilder(placedFeatureGetter, carverGetter);
 
-        biomeBuilder.addFeature(GenerationStep.Decoration.VEGETAL_DECORATION,
-                GCPlacedFeatures.CADONWOOD_TREE_PLACED);
+        biomeBuilder.addFeature(GenerationStep.Decoration.VEGETAL_DECORATION, GCPlacedFeatures.CADONWOOD_TREE_PLACED);
 
-        biomeBuilder.addFeature(GenerationStep.Decoration.VEGETAL_DECORATION,
-                GCPlacedFeatures.CADONWOOD_FALLEN_LOG);
+        biomeBuilder.addFeature(GenerationStep.Decoration.VEGETAL_DECORATION, GCPlacedFeatures.CADONWOOD_FALLEN_LOG);
 
-        biomeBuilder.addFeature(GenerationStep.Decoration.VEGETAL_DECORATION,
-                GCPlacedFeatures.PATCH_GALLIFREY_TALL_GRASS_PLAIN);
+        biomeBuilder.addFeature(
+                GenerationStep.Decoration.VEGETAL_DECORATION, GCPlacedFeatures.PATCH_GALLIFREY_TALL_GRASS_PLAIN);
 
-        biomeBuilder.addFeature(GenerationStep.Decoration.VEGETAL_DECORATION,
-                GCPlacedFeatures.PATCH_GALLIFREY_TALL_GRASS_PLAIN_2);
+        biomeBuilder.addFeature(
+                GenerationStep.Decoration.VEGETAL_DECORATION, GCPlacedFeatures.PATCH_GALLIFREY_TALL_GRASS_PLAIN_2);
 
-        biomeBuilder.addFeature(GenerationStep.Decoration.VEGETAL_DECORATION,
-                GCPlacedFeatures.PATCH_GALLIFREY_GRASS_PLAIN);
+        biomeBuilder.addFeature(
+                GenerationStep.Decoration.VEGETAL_DECORATION, GCPlacedFeatures.PATCH_GALLIFREY_GRASS_PLAIN);
 
         addOres(biomeBuilder);
 
@@ -110,24 +113,23 @@ public class GCGallifreyBiomes {
     }
 
     public static Biome gallifreyanBadlands(
-            HolderGetter<PlacedFeature> placedFeatureGetter,
-            HolderGetter<WorldCarver> carverGetter
-    ) {
+            HolderGetter<PlacedFeature> placedFeatureGetter, HolderGetter<WorldCarver> carverGetter) {
         MobSpawnSettings.Builder spawnBuilder = new MobSpawnSettings.Builder();
         BiomeGenerationSettings.Builder biomeBuilder = undergroundBuilder(placedFeatureGetter, carverGetter);
 
         addOres(biomeBuilder);
 
-        biomeBuilder.addFeature(GenerationStep.Decoration.TOP_LAYER_MODIFICATION, GCPlacedFeatures.GALLIFREYAN_ARCADIAN_SHALE_BOULDER);
-        biomeBuilder.addFeature(GenerationStep.Decoration.TOP_LAYER_MODIFICATION, GCPlacedFeatures.GALLIFREYAN_MUDSTONE_PATCH);
+        biomeBuilder.addFeature(
+                GenerationStep.Decoration.TOP_LAYER_MODIFICATION, GCPlacedFeatures.GALLIFREYAN_ARCADIAN_SHALE_BOULDER);
+        biomeBuilder.addFeature(
+                GenerationStep.Decoration.TOP_LAYER_MODIFICATION, GCPlacedFeatures.GALLIFREYAN_MUDSTONE_PATCH);
 
         return new Biome.BiomeBuilder()
                 .hasPrecipitation(false)
                 .temperature(3.5F)
                 .downfall(0.0F)
-                .specialEffects(new BiomeSpecialEffects.Builder()
-                        .waterColor(0xBDB133)
-                        .build())
+                .specialEffects(
+                        new BiomeSpecialEffects.Builder().waterColor(0xBDB133).build())
                 .setAttribute(EnvironmentAttributes.SKY_COLOR, rgb(0xFF6622))
                 .setAttribute(EnvironmentAttributes.AMBIENT_LIGHT_COLOR, rgb(0xFF7733))
                 .setAttribute(EnvironmentAttributes.FOG_COLOR, rgb(0xE0723A))

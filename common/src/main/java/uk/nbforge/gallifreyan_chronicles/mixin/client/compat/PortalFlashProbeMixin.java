@@ -1,20 +1,20 @@
 package uk.nbforge.gallifreyan_chronicles.mixin.client.compat;
 
-import uk.nbforge.gallifreyan_chronicles.compat.portal.PortalDiagnostics;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Pseudo;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
+import uk.nbforge.gallifreyan_chronicles.compat.portal.PortalDiagnostics;
 
 /**
-   Immersive Portals has a teleport flash debug probe.
-   Every frame all session it builds a row of text, a bunch of String.format calls plus fog and sky attribute lookups, for a 96 frame ring.
-   When you cross a portal it keeps recording for 40 more frames and then writes the whole ring, about 32 KB, to the log in one go on the render thread, and that write is the hitch you feel a moment after going through a portal.
-   It is only a log so skip it.
-   The per frame counters it resets in onFrameEnd are left alone.
-*/
+ * Immersive Portals has a teleport flash debug probe.
+ * Every frame all session it builds a row of text, a bunch of String.format calls plus fog and sky attribute lookups, for a 96 frame ring.
+ * When you cross a portal it keeps recording for 40 more frames and then writes the whole ring, about 32 KB, to the log in one go on the render thread, and that write is the hitch you feel a moment after going through a portal.
+ * It is only a log so skip it.
+ * The per frame counters it resets in onFrameEnd are left alone.
+ */
 @Pseudo
 @Mixin(targets = "qouteall.imm_ptl.core.render.TeleportFlashProbe", remap = false)
 public abstract class PortalFlashProbeMixin {

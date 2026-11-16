@@ -1,22 +1,23 @@
 package uk.nbforge.gallifreyan_chronicles.tardis.control.impl;
 
-import uk.nbforge.gallifreyan_chronicles.tardis.Tardis;
-import uk.nbforge.gallifreyan_chronicles.core.block_entities.TardisConsoleBlockEntity;
-import uk.nbforge.gallifreyan_chronicles.core.block_entities.TardisExteriorBlockEntity;
-import uk.nbforge.gallifreyan_chronicles.core.entity.TardisControlEntity;
-import uk.nbforge.gallifreyan_chronicles.core.GCSounds;
-import uk.nbforge.gallifreyan_chronicles.core.GCTardisControls;
-import uk.nbforge.gallifreyan_chronicles.tardis.control.BaseControl;
-import uk.nbforge.gallifreyan_chronicles.tardis.control.ControlAnimations;
-import net.minecraft.server.level.ServerLevel;
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
+import uk.nbforge.gallifreyan_chronicles.core.GCSounds;
+import uk.nbforge.gallifreyan_chronicles.core.GCTardisControls;
+import uk.nbforge.gallifreyan_chronicles.core.block_entities.TardisConsoleBlockEntity;
+import uk.nbforge.gallifreyan_chronicles.core.block_entities.TardisExteriorBlockEntity;
+import uk.nbforge.gallifreyan_chronicles.core.entity.TardisControlEntity;
+import uk.nbforge.gallifreyan_chronicles.tardis.Tardis;
+import uk.nbforge.gallifreyan_chronicles.tardis.control.BaseControl;
+import uk.nbforge.gallifreyan_chronicles.tardis.control.ControlAnimations;
 
 public class DoorLockControl extends BaseControl {
-    public static final ControlAnimations DEFAULT_ANIMATIONS = new ControlAnimations("door_lock_control_on", "door_lock_control_off", false);
+    public static final ControlAnimations DEFAULT_ANIMATIONS =
+            new ControlAnimations("door_lock_control_on", "door_lock_control_off", false);
 
     public DoorLockControl(ControlAnimations animations) {
         super(animations);
@@ -32,7 +33,8 @@ public class DoorLockControl extends BaseControl {
         var console = entity.getConsole();
         if (console == null || !(entity.level() instanceof ServerLevel level)) return InteractionResult.FAIL;
 
-        TardisExteriorBlockEntity exterior = linkedTardis(console).flatMap(Tardis::exterior).orElse(null);
+        TardisExteriorBlockEntity exterior =
+                linkedTardis(console).flatMap(Tardis::exterior).orElse(null);
         if (exterior == null) {
             tell(player, "message.gallifreyan_chronicles.lock_no_exterior");
             return InteractionResult.FAIL;
@@ -44,8 +46,11 @@ public class DoorLockControl extends BaseControl {
             tell(player, "message.gallifreyan_chronicles.close_doors_to_lock");
             return InteractionResult.FAIL;
         }
-        announce(player, exterior.isLocked()
-                ? "message.gallifreyan_chronicles.doors_unlocking" : "message.gallifreyan_chronicles.doors_locking");
+        announce(
+                player,
+                exterior.isLocked()
+                        ? "message.gallifreyan_chronicles.doors_unlocking"
+                        : "message.gallifreyan_chronicles.doors_locking");
         return InteractionResult.SUCCESS;
     }
 
@@ -58,6 +63,8 @@ public class DoorLockControl extends BaseControl {
 
     @Override
     public Component describeState(boolean activated) {
-        return activated ? state("door_lock", "locked", ChatFormatting.RED) : state("door_lock", "unlocked", ChatFormatting.GREEN);
+        return activated
+                ? state("door_lock", "locked", ChatFormatting.RED)
+                : state("door_lock", "unlocked", ChatFormatting.GREEN);
     }
 }

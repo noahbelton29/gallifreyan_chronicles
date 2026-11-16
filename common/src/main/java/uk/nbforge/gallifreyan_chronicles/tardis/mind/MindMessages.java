@@ -1,27 +1,30 @@
 package uk.nbforge.gallifreyan_chronicles.tardis.mind;
 
-import uk.nbforge.gallifreyan_chronicles.util.MessageUtil;
-import net.minecraft.ChatFormatting;
-import net.minecraft.world.entity.player.Player;
-
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
+import net.minecraft.ChatFormatting;
+import net.minecraft.world.entity.player.Player;
+import uk.nbforge.gallifreyan_chronicles.util.MessageUtil;
 
 /**
-   TARDIS mind messages above the hotbar.
-   One every few seconds per player so they do not talk over each other, the important ones can always cut in.
-*/
+ * TARDIS mind messages above the hotbar.
+ * One every few seconds per player so they do not talk over each other, the important ones can always cut in.
+ */
 public final class MindMessages {
     private static final long GAP_TICKS = 60L;
     private static final Set<String> IMPORTANT = Set.of(
-            "tardis_betrayed", "tardis_forgives_you", "tardis_terror_complies", "tardis_terror_savage",
-            "mallet_fights_back", "mallet_not_yours", "tardis_ptsd_easing");
+            "tardis_betrayed",
+            "tardis_forgives_you",
+            "tardis_terror_complies",
+            "tardis_terror_savage",
+            "mallet_fights_back",
+            "mallet_not_yours",
+            "tardis_ptsd_easing");
     private static final Map<UUID, Long> LAST = new HashMap<>();
 
-    private MindMessages() {
-    }
+    private MindMessages() {}
 
     public static void reset() {
         LAST.clear();

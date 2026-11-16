@@ -8,11 +8,10 @@ import uk.nbforge.gallifreyan_chronicles.tardis.flight.LandingTarget;
 
 public final class LandingTargetCodec {
     public static final Codec<LandingTarget> CODEC = RecordCodecBuilder.create(inst -> inst.group(
-            Level.RESOURCE_KEY_CODEC.fieldOf("dimension").forGetter(LandingTarget::dimension),
-            BlockPos.CODEC.fieldOf("pos").forGetter(LandingTarget::pos),
-            Codec.FLOAT.fieldOf("yaw").forGetter(LandingTarget::yaw)
-    ).apply(inst, LandingTarget::new));
+                    Level.RESOURCE_KEY_CODEC.fieldOf("dimension").forGetter(LandingTarget::dimension),
+                    BlockPos.CODEC.fieldOf("pos").forGetter(LandingTarget::pos),
+                    Codec.FLOAT.fieldOf("yaw").forGetter(LandingTarget::yaw))
+            .apply(inst, LandingTarget::new));
 
-    private LandingTargetCodec() {
-    }
+    private LandingTargetCodec() {}
 }

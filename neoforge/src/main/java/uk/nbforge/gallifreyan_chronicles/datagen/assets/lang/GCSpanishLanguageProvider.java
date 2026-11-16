@@ -1,8 +1,8 @@
 package uk.nbforge.gallifreyan_chronicles.datagen.assets.lang;
 
-import uk.nbforge.gallifreyan_chronicles.Constants;
 import net.minecraft.data.PackOutput;
 import net.neoforged.neoforge.common.data.LanguageProvider;
+import uk.nbforge.gallifreyan_chronicles.Constants;
 
 /**
  * Spanish translations for Spain, the keys must match GCLanguageProvider.
@@ -20,25 +20,39 @@ public class GCSpanishLanguageProvider extends LanguageProvider {
         add("addons.gallifreyan_chronicles.details.no_description", "Sin descripción.");
         add("addons.gallifreyan_chronicles.details.requires", "Necesita %s %s");
         add("addons.gallifreyan_chronicles.details.select", "Selecciona un addon para ver sus detalles.");
-        add("addons.gallifreyan_chronicles.drop_hint", "Arrastra archivos .zip o .jar de addons a esta ventana para instalarlos.");
+        add(
+                "addons.gallifreyan_chronicles.drop_hint",
+                "Arrastra archivos .zip o .jar de addons a esta ventana para instalarlos.");
         add("addons.gallifreyan_chronicles.empty", "Aún no hay addons instalados.");
         add("addons.gallifreyan_chronicles.hint.failed_to_start", "El registro del juego contiene el error completo.");
-        add("addons.gallifreyan_chronicles.hint.incompatible_api", "Actualiza Gallifreyan Chronicles o usa una versión anterior de este addon.");
-        add("addons.gallifreyan_chronicles.hint.incompatible_mod", "Consigue una versión de este addon hecha para tu versión del mod.");
+        add(
+                "addons.gallifreyan_chronicles.hint.incompatible_api",
+                "Actualiza Gallifreyan Chronicles o usa una versión anterior de este addon.");
+        add(
+                "addons.gallifreyan_chronicles.hint.incompatible_mod",
+                "Consigue una versión de este addon hecha para tu versión del mod.");
         add("addons.gallifreyan_chronicles.hint.invalid", "Revisa el archivo addon.json que hay dentro del archivo.");
         add("addons.gallifreyan_chronicles.hint.missing_requirement", "Instálalo y actívalo, y entonces se cargará.");
         add("addons.gallifreyan_chronicles.hint.wrong_requirement_version", "Actualiza o sustituye lo que necesita.");
-        add("addons.gallifreyan_chronicles.install_none", "No se ha instalado nada. Suelta archivos .zip o .jar, o carpetas con un addon.json.");
+        add(
+                "addons.gallifreyan_chronicles.install_none",
+                "No se ha instalado nada. Suelta archivos .zip o .jar, o carpetas con un addon.json.");
         add("addons.gallifreyan_chronicles.installed", "Se han instalado %s addon(s).");
         add("addons.gallifreyan_chronicles.open_folder", "Abrir carpeta de addons");
         add("addons.gallifreyan_chronicles.page", "%s / %s");
         add("addons.gallifreyan_chronicles.problem.failed_to_start", "Error al iniciar: %s");
-        add("addons.gallifreyan_chronicles.problem.incompatible_api", "Necesita una API de addons más reciente (%s, este mod tiene %s)");
-        add("addons.gallifreyan_chronicles.problem.incompatible_mod", "Funciona con la versión %s del mod, tienes la %s");
+        add(
+                "addons.gallifreyan_chronicles.problem.incompatible_api",
+                "Necesita una API de addons más reciente (%s, este mod tiene %s)");
+        add(
+                "addons.gallifreyan_chronicles.problem.incompatible_mod",
+                "Funciona con la versión %s del mod, tienes la %s");
         add("addons.gallifreyan_chronicles.problem.invalid", "No se puede leer: %s");
         add("addons.gallifreyan_chronicles.problem.missing_requirement", "Necesita %s (%s)");
         add("addons.gallifreyan_chronicles.problem.wrong_requirement_version", "Necesita %s %s, se ha encontrado %s");
-        add("addons.gallifreyan_chronicles.restart", "Reinicia el juego para aplicar los cambios en los addons de Java.");
+        add(
+                "addons.gallifreyan_chronicles.restart",
+                "Reinicia el juego para aplicar los cambios en los addons de Java.");
         add("addons.gallifreyan_chronicles.restart_tag", "Requiere reinicio");
         add("addons.gallifreyan_chronicles.state.active", "Activo");
         add("addons.gallifreyan_chronicles.state.off", "Desactivado");
@@ -55,9 +69,13 @@ public class GCSpanishLanguageProvider extends LanguageProvider {
         add("block.gallifreyan_chronicles.bamboo_roundel_block", "Bloque de roundel de bambú");
         add("block.gallifreyan_chronicles.birch_half_roundel_block", "Bloque de medio roundel de abedul");
         add("block.gallifreyan_chronicles.birch_roundel_block", "Bloque de roundel de abedul");
-        add("block.gallifreyan_chronicles.black_concrete_half_roundel_block", "Bloque de medio roundel de hormigón negro");
+        add(
+                "block.gallifreyan_chronicles.black_concrete_half_roundel_block",
+                "Bloque de medio roundel de hormigón negro");
         add("block.gallifreyan_chronicles.black_concrete_roundel_block", "Bloque de roundel de hormigón negro");
-        add("block.gallifreyan_chronicles.blue_concrete_half_roundel_block", "Bloque de medio roundel de hormigón azul");
+        add(
+                "block.gallifreyan_chronicles.blue_concrete_half_roundel_block",
+                "Bloque de medio roundel de hormigón azul");
         add("block.gallifreyan_chronicles.blue_concrete_roundel_block", "Bloque de roundel de hormigón azul");
         add("block.gallifreyan_chronicles.brachacki_fence", "Valla Brachacki");
         add("block.gallifreyan_chronicles.brachacki_fence_2", "Valla Brachacki 2");
@@ -68,7 +86,9 @@ public class GCSpanishLanguageProvider extends LanguageProvider {
         add("block.gallifreyan_chronicles.brachacki_fence_gate_3", "Puerta de valla Brachacki 3");
         add("block.gallifreyan_chronicles.brachacki_fence_gate_4", "Puerta de valla Brachacki 4");
         add("block.gallifreyan_chronicles.brachacki_floor_block", "Bloque de suelo Brachacki");
-        add("block.gallifreyan_chronicles.brachacki_half_roundel_alt_block", "Bloque de medio roundel (alt.) Brachacki");
+        add(
+                "block.gallifreyan_chronicles.brachacki_half_roundel_alt_block",
+                "Bloque de medio roundel (alt.) Brachacki");
         add("block.gallifreyan_chronicles.brachacki_half_roundel_block", "Bloque de medio roundel Brachacki");
         add("block.gallifreyan_chronicles.brachacki_half_roundel_block_2", "Bloque de medio roundel Brachacki 2");
         add("block.gallifreyan_chronicles.brachacki_half_roundel_block_3", "Bloque de medio roundel Brachacki 3");
@@ -94,9 +114,13 @@ public class GCSpanishLanguageProvider extends LanguageProvider {
         add("block.gallifreyan_chronicles.brachacki_tuat_fence", "Valla Brachacki TUAT");
         add("block.gallifreyan_chronicles.brachacki_tuat_fence_gate", "Puerta de valla Brachacki TUAT");
         add("block.gallifreyan_chronicles.brachacki_tuat_floor_block", "Bloque de suelo Brachacki TUAT");
-        add("block.gallifreyan_chronicles.brachacki_tuat_half_hexagonal_roundel_block", "Bloque de medio roundel hexagonal Brachacki TUAT");
+        add(
+                "block.gallifreyan_chronicles.brachacki_tuat_half_hexagonal_roundel_block",
+                "Bloque de medio roundel hexagonal Brachacki TUAT");
         add("block.gallifreyan_chronicles.brachacki_tuat_half_roundel_block", "Bloque de medio roundel Brachacki TUAT");
-        add("block.gallifreyan_chronicles.brachacki_tuat_hexagonal_roundel_block", "Bloque de roundel hexagonal Brachacki TUAT");
+        add(
+                "block.gallifreyan_chronicles.brachacki_tuat_hexagonal_roundel_block",
+                "Bloque de roundel hexagonal Brachacki TUAT");
         add("block.gallifreyan_chronicles.brachacki_tuat_pressure_plate", "Placa de presión Brachacki TUAT");
         add("block.gallifreyan_chronicles.brachacki_tuat_roundel_block", "Bloque de roundel Brachacki TUAT");
         add("block.gallifreyan_chronicles.brachacki_tuat_slab", "Losa Brachacki TUAT");
@@ -111,7 +135,9 @@ public class GCSpanishLanguageProvider extends LanguageProvider {
         add("block.gallifreyan_chronicles.brachacki_wall_block_2", "Bloque de muro Brachacki 2");
         add("block.gallifreyan_chronicles.brachacki_wall_block_3", "Bloque de muro Brachacki 3");
         add("block.gallifreyan_chronicles.brachacki_wall_block_4", "Bloque de muro Brachacki 4");
-        add("block.gallifreyan_chronicles.brown_concrete_half_roundel_block", "Bloque de medio roundel de hormigón marrón");
+        add(
+                "block.gallifreyan_chronicles.brown_concrete_half_roundel_block",
+                "Bloque de medio roundel de hormigón marrón");
         add("block.gallifreyan_chronicles.brown_concrete_roundel_block", "Bloque de roundel de hormigón marrón");
         add("block.gallifreyan_chronicles.cadonwood_button", "Botón de cadonwood");
         add("block.gallifreyan_chronicles.cadonwood_fence", "Valla de cadonwood");
@@ -132,7 +158,9 @@ public class GCSpanishLanguageProvider extends LanguageProvider {
         add("block.gallifreyan_chronicles.cobbled_limestone", "Caliza adoquinada");
         add("block.gallifreyan_chronicles.crimson_half_roundel_block", "Bloque de medio roundel carmesí");
         add("block.gallifreyan_chronicles.crimson_roundel_block", "Bloque de roundel carmesí");
-        add("block.gallifreyan_chronicles.cyan_concrete_half_roundel_block", "Bloque de medio roundel de hormigón cian");
+        add(
+                "block.gallifreyan_chronicles.cyan_concrete_half_roundel_block",
+                "Bloque de medio roundel de hormigón cian");
         add("block.gallifreyan_chronicles.cyan_concrete_roundel_block", "Bloque de roundel de hormigón cian");
         add("block.gallifreyan_chronicles.dark_oak_half_roundel_block", "Bloque de medio roundel de roble oscuro");
         add("block.gallifreyan_chronicles.dark_oak_roundel_block", "Bloque de roundel de roble oscuro");
@@ -148,22 +176,38 @@ public class GCSpanishLanguageProvider extends LanguageProvider {
         add("block.gallifreyan_chronicles.gallifreyan_stone_coal_ore", "Mineral de carbón en piedra gallifreyana");
         add("block.gallifreyan_chronicles.gallifreyan_stone_iron_ore", "Mineral de hierro en piedra gallifreyana");
         add("block.gallifreyan_chronicles.gallifreyan_vine", "Enredadera gallifreyana");
-        add("block.gallifreyan_chronicles.gray_concrete_half_roundel_block", "Bloque de medio roundel de hormigón gris");
+        add(
+                "block.gallifreyan_chronicles.gray_concrete_half_roundel_block",
+                "Bloque de medio roundel de hormigón gris");
         add("block.gallifreyan_chronicles.gray_concrete_roundel_block", "Bloque de roundel de hormigón gris");
-        add("block.gallifreyan_chronicles.green_concrete_half_roundel_block", "Bloque de medio roundel de hormigón verde");
+        add(
+                "block.gallifreyan_chronicles.green_concrete_half_roundel_block",
+                "Bloque de medio roundel de hormigón verde");
         add("block.gallifreyan_chronicles.green_concrete_roundel_block", "Bloque de roundel de hormigón verde");
         add("block.gallifreyan_chronicles.hellbent_door", "Puerta de Hell Bent");
         add("block.gallifreyan_chronicles.interior_door_barrier", "Barrera de la puerta interior");
         add("block.gallifreyan_chronicles.jungle_half_roundel_block", "Bloque de medio roundel de jungla");
         add("block.gallifreyan_chronicles.jungle_roundel_block", "Bloque de roundel de jungla");
-        add("block.gallifreyan_chronicles.light_blue_concrete_half_roundel_block", "Bloque de medio roundel de hormigón azul claro");
-        add("block.gallifreyan_chronicles.light_blue_concrete_roundel_block", "Bloque de roundel de hormigón azul claro");
-        add("block.gallifreyan_chronicles.light_gray_concrete_half_roundel_block", "Bloque de medio roundel de hormigón gris claro");
-        add("block.gallifreyan_chronicles.light_gray_concrete_roundel_block", "Bloque de roundel de hormigón gris claro");
-        add("block.gallifreyan_chronicles.lime_concrete_half_roundel_block", "Bloque de medio roundel de hormigón lima");
+        add(
+                "block.gallifreyan_chronicles.light_blue_concrete_half_roundel_block",
+                "Bloque de medio roundel de hormigón azul claro");
+        add(
+                "block.gallifreyan_chronicles.light_blue_concrete_roundel_block",
+                "Bloque de roundel de hormigón azul claro");
+        add(
+                "block.gallifreyan_chronicles.light_gray_concrete_half_roundel_block",
+                "Bloque de medio roundel de hormigón gris claro");
+        add(
+                "block.gallifreyan_chronicles.light_gray_concrete_roundel_block",
+                "Bloque de roundel de hormigón gris claro");
+        add(
+                "block.gallifreyan_chronicles.lime_concrete_half_roundel_block",
+                "Bloque de medio roundel de hormigón lima");
         add("block.gallifreyan_chronicles.lime_concrete_roundel_block", "Bloque de roundel de hormigón lima");
         add("block.gallifreyan_chronicles.lunar_regolith", "Regolito lunar");
-        add("block.gallifreyan_chronicles.magenta_concrete_half_roundel_block", "Bloque de medio roundel de hormigón magenta");
+        add(
+                "block.gallifreyan_chronicles.magenta_concrete_half_roundel_block",
+                "Bloque de medio roundel de hormigón magenta");
         add("block.gallifreyan_chronicles.magenta_concrete_roundel_block", "Bloque de roundel de hormigón magenta");
         add("block.gallifreyan_chronicles.mangrove_half_roundel_block", "Bloque de medio roundel de manglar");
         add("block.gallifreyan_chronicles.mangrove_roundel_block", "Bloque de roundel de manglar");
@@ -171,14 +215,20 @@ public class GCSpanishLanguageProvider extends LanguageProvider {
         add("block.gallifreyan_chronicles.moonslate", "Pizarra lunar");
         add("block.gallifreyan_chronicles.oak_half_roundel_block", "Bloque de medio roundel de roble");
         add("block.gallifreyan_chronicles.oak_roundel_block", "Bloque de roundel de roble");
-        add("block.gallifreyan_chronicles.orange_concrete_half_roundel_block", "Bloque de medio roundel de hormigón naranja");
+        add(
+                "block.gallifreyan_chronicles.orange_concrete_half_roundel_block",
+                "Bloque de medio roundel de hormigón naranja");
         add("block.gallifreyan_chronicles.orange_concrete_roundel_block", "Bloque de roundel de hormigón naranja");
         add("block.gallifreyan_chronicles.pale_oak_half_roundel_block", "Bloque de medio roundel de roble pálido");
         add("block.gallifreyan_chronicles.pale_oak_roundel_block", "Bloque de roundel de roble pálido");
-        add("block.gallifreyan_chronicles.pink_concrete_half_roundel_block", "Bloque de medio roundel de hormigón rosa");
+        add(
+                "block.gallifreyan_chronicles.pink_concrete_half_roundel_block",
+                "Bloque de medio roundel de hormigón rosa");
         add("block.gallifreyan_chronicles.pink_concrete_roundel_block", "Bloque de roundel de hormigón rosa");
         add("block.gallifreyan_chronicles.potted_cadonwood_sapling", "Brote de cadonwood en maceta");
-        add("block.gallifreyan_chronicles.purple_concrete_half_roundel_block", "Bloque de medio roundel de hormigón morado");
+        add(
+                "block.gallifreyan_chronicles.purple_concrete_half_roundel_block",
+                "Bloque de medio roundel de hormigón morado");
         add("block.gallifreyan_chronicles.purple_concrete_roundel_block", "Bloque de roundel de hormigón morado");
         add("block.gallifreyan_chronicles.red_concrete_half_roundel_block", "Bloque de medio roundel de hormigón rojo");
         add("block.gallifreyan_chronicles.red_concrete_roundel_block", "Bloque de roundel de hormigón rojo");
@@ -202,24 +252,36 @@ public class GCSpanishLanguageProvider extends LanguageProvider {
         add("block.gallifreyan_chronicles.void_block", "Bloque del vacío");
         add("block.gallifreyan_chronicles.warped_half_roundel_block", "Bloque de medio roundel distorsionado");
         add("block.gallifreyan_chronicles.warped_roundel_block", "Bloque de roundel distorsionado");
-        add("block.gallifreyan_chronicles.white_concrete_half_roundel_block", "Bloque de medio roundel de hormigón blanco");
+        add(
+                "block.gallifreyan_chronicles.white_concrete_half_roundel_block",
+                "Bloque de medio roundel de hormigón blanco");
         add("block.gallifreyan_chronicles.white_concrete_roundel_block", "Bloque de roundel de hormigón blanco");
-        add("block.gallifreyan_chronicles.yellow_concrete_half_roundel_block", "Bloque de medio roundel de hormigón amarillo");
+        add(
+                "block.gallifreyan_chronicles.yellow_concrete_half_roundel_block",
+                "Bloque de medio roundel de hormigón amarillo");
         add("block.gallifreyan_chronicles.yellow_concrete_roundel_block", "Bloque de roundel de hormigón amarillo");
         add("command.gallifreyan_chronicles.control_already", "El control %s ya está %s");
-        add("command.gallifreyan_chronicles.control_not_on_console", "El control %s no está en la consola de la TARDIS %s");
+        add(
+                "command.gallifreyan_chronicles.control_not_on_console",
+                "El control %s no está en la consola de la TARDIS %s");
         add("command.gallifreyan_chronicles.control_refused", "El control %s se negó a pasar a %s");
         add("command.gallifreyan_chronicles.data_line", "  %s: %s");
         add("command.gallifreyan_chronicles.debug", "=== Depuración de la TARDIS: %s ===");
         add("command.gallifreyan_chronicles.deletion_mode_off", "Modo de eliminación de TARDIS desactivado.");
-        add("command.gallifreyan_chronicles.deletion_mode_on", "Modo de eliminación de TARDIS activado. Ahora, romper una TARDIS la eliminará.");
+        add(
+                "command.gallifreyan_chronicles.deletion_mode_on",
+                "Modo de eliminación de TARDIS activado. Ahora, romper una TARDIS la eliminará.");
         add("command.gallifreyan_chronicles.destination_bad_facing", "Orientación desconocida: %s");
         add("command.gallifreyan_chronicles.destination_cleared", "Se ha borrado el destino de la TARDIS %s");
         add("command.gallifreyan_chronicles.destination_get", "Destino de la TARDIS %s: %s en %s orientada hacia %s");
-        add("command.gallifreyan_chronicles.destination_interior", "Un destino no puede estar dentro del interior de una TARDIS");
+        add(
+                "command.gallifreyan_chronicles.destination_interior",
+                "Un destino no puede estar dentro del interior de una TARDIS");
         add("command.gallifreyan_chronicles.destination_none", "La TARDIS %s no tiene ningún destino establecido");
         add("command.gallifreyan_chronicles.destination_out_of_world", "Esa posición está fuera del mundo");
-        add("command.gallifreyan_chronicles.destination_set", "Se ha establecido el destino de la TARDIS %s en %s en %s orientada hacia %s");
+        add(
+                "command.gallifreyan_chronicles.destination_set",
+                "Se ha establecido el destino de la TARDIS %s en %s en %s orientada hacia %s");
         add("command.gallifreyan_chronicles.exterior", "Exterior: %s");
         add("command.gallifreyan_chronicles.get_console", "Consola de la TARDIS %s: %s");
         add("command.gallifreyan_chronicles.get_exterior", "Exterior de la TARDIS %s: %s");
@@ -227,7 +289,9 @@ public class GCSpanishLanguageProvider extends LanguageProvider {
         add("command.gallifreyan_chronicles.get_interior", "Interior de la TARDIS %s: %s");
         add("command.gallifreyan_chronicles.get_mind", "%s de la TARDIS %s: %s");
         add("command.gallifreyan_chronicles.get_subsystem_health", "Salud del subsistema %s en la TARDIS %s: %s");
-        add("command.gallifreyan_chronicles.interior_unchanged", "El interior de la TARDIS %s ya está establecido en %s");
+        add(
+                "command.gallifreyan_chronicles.interior_unchanged",
+                "El interior de la TARDIS %s ya está establecido en %s");
         add("command.gallifreyan_chronicles.invalid_id", "ID de TARDIS no válido: %s");
         add("command.gallifreyan_chronicles.link_console", "Consola vinculada a la TARDIS con ID: %s");
         add("command.gallifreyan_chronicles.link_exterior", "Exterior vinculado a la TARDIS con ID: %s");
@@ -238,24 +302,36 @@ public class GCSpanishLanguageProvider extends LanguageProvider {
         add("command.gallifreyan_chronicles.get_control", "Control %s de la TARDIS %s: %s");
         add("command.gallifreyan_chronicles.get_locked", "Bloqueo de la TARDIS %s: %s");
         add("command.gallifreyan_chronicles.set_locked", "Se ha establecido el bloqueo de la TARDIS %s en %s");
-        add("command.gallifreyan_chronicles.set_locked_failed", "No se pudo establecer el bloqueo de la TARDIS %s en %s, las puertas no están completamente cerradas");
+        add(
+                "command.gallifreyan_chronicles.set_locked_failed",
+                "No se pudo establecer el bloqueo de la TARDIS %s en %s, las puertas no están completamente cerradas");
         add("command.gallifreyan_chronicles.get_cloaked", "Camuflaje de la TARDIS %s: %s");
         add("command.gallifreyan_chronicles.set_cloaked", "Se ha establecido el camuflaje de la TARDIS %s en %s");
         add("command.gallifreyan_chronicles.get_yaw", "Orientación de la TARDIS %s: %s grados");
         add("command.gallifreyan_chronicles.set_yaw", "Se ha establecido la orientación de la TARDIS %s en %s grados");
         add("command.gallifreyan_chronicles.get_crashed", "La TARDIS %s está estrellada: %s");
-        add("command.gallifreyan_chronicles.set_crashed", "Se ha establecido el estado de estrellada de la TARDIS %s en %s");
+        add(
+                "command.gallifreyan_chronicles.set_crashed",
+                "Se ha establecido el estado de estrellada de la TARDIS %s en %s");
         add("command.gallifreyan_chronicles.crashed_already", "La TARDIS %s ya está establecida como estrellada: %s");
         add("command.gallifreyan_chronicles.data_dump_header", "=== Datos de la TARDIS: %s ===");
         add("command.gallifreyan_chronicles.not_travelling", "La TARDIS %s no está viajando actualmente");
         add("command.gallifreyan_chronicles.get_flight_remaining", "A la TARDIS %s le quedan %s segundos de vuelo");
-        add("command.gallifreyan_chronicles.set_flight_remaining", "Se ha adelantado el tiempo, a la TARDIS %s le quedan ahora %s segundos de vuelo");
+        add(
+                "command.gallifreyan_chronicles.set_flight_remaining",
+                "Se ha adelantado el tiempo, a la TARDIS %s le quedan ahora %s segundos de vuelo");
         add("command.gallifreyan_chronicles.list_tardis", "%s | Exterior: %s | Posición: %s");
         add("command.gallifreyan_chronicles.missing_interior_template", "Falta la plantilla del interior: %s");
-        add("command.gallifreyan_chronicles.no_console", "No se ha encontrado ninguna consola para la TARDIS con ID: %s");
+        add(
+                "command.gallifreyan_chronicles.no_console",
+                "No se ha encontrado ninguna consola para la TARDIS con ID: %s");
         add("command.gallifreyan_chronicles.no_control_entities", "Esta consola no tiene entidades de control.");
-        add("command.gallifreyan_chronicles.no_exterior", "No se ha encontrado ningún exterior para la TARDIS con ID: %s");
-        add("command.gallifreyan_chronicles.no_interior_door", "No se han encontrado puertas interiores para la TARDIS con ID: %s");
+        add(
+                "command.gallifreyan_chronicles.no_exterior",
+                "No se ha encontrado ningún exterior para la TARDIS con ID: %s");
+        add(
+                "command.gallifreyan_chronicles.no_interior_door",
+                "No se han encontrado puertas interiores para la TARDIS con ID: %s");
         add("command.gallifreyan_chronicles.no_tardis_id", "No se ha encontrado ninguna TARDIS con ID: %s");
         add("command.gallifreyan_chronicles.no_tardises", "No se ha encontrado ninguna TARDIS.");
         add("command.gallifreyan_chronicles.not_crashed", "La TARDIS %s no está dañada");
@@ -264,20 +340,34 @@ public class GCSpanishLanguageProvider extends LanguageProvider {
         add("command.gallifreyan_chronicles.owner", "Propietario: %s");
         add("command.gallifreyan_chronicles.player_only", "Este comando debe ejecutarlo un jugador.");
         add("command.gallifreyan_chronicles.position", "Posición: %s");
-        add("command.gallifreyan_chronicles.remove_tardis", "Se han eliminado la TARDIS %s, su exterior y su dimensión interior");
+        add(
+                "command.gallifreyan_chronicles.remove_tardis",
+                "Se han eliminado la TARDIS %s, su exterior y su dimensión interior");
         add("command.gallifreyan_chronicles.repaired", "Se ha reparado la TARDIS %s");
         add("command.gallifreyan_chronicles.set_console", "Se ha establecido la consola de la TARDIS %s en %s");
-        add("command.gallifreyan_chronicles.set_console_variant", "Se ha establecido la variante de consola de la TARDIS %s en %s");
+        add(
+                "command.gallifreyan_chronicles.set_console_variant",
+                "Se ha establecido la variante de consola de la TARDIS %s en %s");
         add("command.gallifreyan_chronicles.set_control", "Se ha puesto el control %s de la TARDIS %s en %s");
-        add("command.gallifreyan_chronicles.set_door_variant", "Se ha establecido la variante de puerta de la TARDIS %s en %s (%s puertas actualizadas)");
+        add(
+                "command.gallifreyan_chronicles.set_door_variant",
+                "Se ha establecido la variante de puerta de la TARDIS %s en %s (%s puertas actualizadas)");
         add("command.gallifreyan_chronicles.set_exterior", "Se ha establecido el exterior de la TARDIS %s en %s");
-        add("command.gallifreyan_chronicles.set_fade_type", "Se ha establecido el tipo de desvanecimiento de la TARDIS %s en %s");
-        add("command.gallifreyan_chronicles.set_glow", "Se ha establecido el brillo del exterior de la TARDIS %s en %s");
+        add(
+                "command.gallifreyan_chronicles.set_fade_type",
+                "Se ha establecido el tipo de desvanecimiento de la TARDIS %s en %s");
+        add(
+                "command.gallifreyan_chronicles.set_glow",
+                "Se ha establecido el brillo del exterior de la TARDIS %s en %s");
         add("command.gallifreyan_chronicles.set_interior", "Se ha establecido el interior de la TARDIS %s en %s");
         add("command.gallifreyan_chronicles.set_mind", "Se ha establecido %s de la TARDIS %s en %s");
-        add("command.gallifreyan_chronicles.set_subsystem_health", "Se ha establecido la salud del subsistema %s en la TARDIS %s en %s");
+        add(
+                "command.gallifreyan_chronicles.set_subsystem_health",
+                "Se ha establecido la salud del subsistema %s en la TARDIS %s en %s");
         add("command.gallifreyan_chronicles.summon_blocked", "Hay algo en el camino, muévete e inténtalo de nuevo");
-        add("command.gallifreyan_chronicles.summon_inside_tardis", "No se puede invocar una TARDIS dentro del interior de otra TARDIS");
+        add(
+                "command.gallifreyan_chronicles.summon_inside_tardis",
+                "No se puede invocar una TARDIS dentro del interior de otra TARDIS");
         add("command.gallifreyan_chronicles.summon_tardis", "Se ha invocado la TARDIS %s en %s");
         add("command.gallifreyan_chronicles.trait_already", "Ya tiene el rasgo %s");
         add("command.gallifreyan_chronicles.trait_doesnt_fit", "El rasgo %s no encaja con una TARDIS %s");
@@ -285,11 +375,17 @@ public class GCSpanishLanguageProvider extends LanguageProvider {
         add("command.gallifreyan_chronicles.trait_missing", "No tiene el rasgo %s");
         add("command.gallifreyan_chronicles.traits_full", "Una TARDIS solo puede tener %s rasgos");
         add("command.gallifreyan_chronicles.unknown_console", "Consola desconocida: %s");
-        add("command.gallifreyan_chronicles.unknown_console_variant", "Variante de consola '%s' desconocida para la consola '%s'");
+        add(
+                "command.gallifreyan_chronicles.unknown_console_variant",
+                "Variante de consola '%s' desconocida para la consola '%s'");
         add("command.gallifreyan_chronicles.unknown_control", "Control de TARDIS desconocido: %s");
-        add("command.gallifreyan_chronicles.unknown_door_variant", "Variante de puerta '%s' desconocida para el tipo de puerta '%s'");
+        add(
+                "command.gallifreyan_chronicles.unknown_door_variant",
+                "Variante de puerta '%s' desconocida para el tipo de puerta '%s'");
         add("command.gallifreyan_chronicles.unknown_exterior", "Exterior desconocido: %s");
-        add("command.gallifreyan_chronicles.unknown_fade_type", "Tipo de desvanecimiento %s desconocido (disponibles: %s)");
+        add(
+                "command.gallifreyan_chronicles.unknown_fade_type",
+                "Tipo de desvanecimiento %s desconocido (disponibles: %s)");
         add("command.gallifreyan_chronicles.unknown_interior", "Interior desconocido: %s");
         add("command.gallifreyan_chronicles.unknown_personality", "Personalidad desconocida: %s");
         add("command.gallifreyan_chronicles.unknown_subsystem", "Subsistema de TARDIS desconocido: %s");
@@ -300,11 +396,17 @@ public class GCSpanishLanguageProvider extends LanguageProvider {
         add("command.gallifreyan_chronicles.unlink_console", "Consola desvinculada de la TARDIS con ID: %s");
         add("command.gallifreyan_chronicles.unlink_exterior", "Exterior desvinculado de la TARDIS con ID: %s");
         add("config.jade.plugin_gallifreyan_chronicles", "Gallifreyan Chronicles");
-        add("config.jade.plugin_gallifreyan_chronicles.tardis_block_icon", "Icono del exterior y la consola de la TARDIS");
-        add("config.jade.plugin_gallifreyan_chronicles.tardis_console_info", "Modelo y variante de la consola de la TARDIS");
+        add(
+                "config.jade.plugin_gallifreyan_chronicles.tardis_block_icon",
+                "Icono del exterior y la consola de la TARDIS");
+        add(
+                "config.jade.plugin_gallifreyan_chronicles.tardis_console_info",
+                "Modelo y variante de la consola de la TARDIS");
         add("config.jade.plugin_gallifreyan_chronicles.tardis_control", "Icono de los controles de la TARDIS");
         add("config.jade.plugin_gallifreyan_chronicles.tardis_exterior_info", "Exterior de la TARDIS");
-        add("config.jade.plugin_gallifreyan_chronicles.interior_door_lock", "Nombre y bloqueo de la puerta interior de la TARDIS");
+        add(
+                "config.jade.plugin_gallifreyan_chronicles.interior_door_lock",
+                "Nombre y bloqueo de la puerta interior de la TARDIS");
         add("config.jade.plugin_gallifreyan_chronicles.tardis_owner", "Propietario de la TARDIS");
         add("control.gallifreyan_chronicles.cloaking_device_control", "Control del dispositivo de camuflaje");
         add("control.gallifreyan_chronicles.cloister_bell_control", "Control de la campana del claustro");
@@ -351,7 +453,9 @@ public class GCSpanishLanguageProvider extends LanguageProvider {
         add("gallifreyan_chronicles.title.tile_screen", "Tema principal de Gallifreyan Chronicles");
         add("gamerule.category.gallifreyan_chronicles.gallifreyan_chronicles", "Gallifreyan Chronicles");
         add("gamerule.gallifreyan_chronicles.gc_tardis_griefing", "Las TARDIS que se estrellan abren cráteres");
-        add("gc.build.expired.message", "Esta versión de prueba de Gallifreyan Chronicles ha caducado. Pide una versión nueva para seguir probando.");
+        add(
+                "gc.build.expired.message",
+                "Esta versión de prueba de Gallifreyan Chronicles ha caducado. Pide una versión nueva para seguir probando.");
         add("gc.build.expired.title", "Versión de prueba caducada");
         add("gc.build.expires_in", "La versión caduca en %s");
         add("item.gallifreyan_chronicles.mallet", "Mazo");
@@ -380,9 +484,13 @@ public class GCSpanishLanguageProvider extends LanguageProvider {
         add("menu.gallifreyan_chronicles.credits", "Créditos");
         add("menu.gallifreyan_chronicles.credits.coding", "Programación");
         add("menu.gallifreyan_chronicles.credits.disclaimer", "Aviso legal");
-        add("menu.gallifreyan_chronicles.credits.disclaimer.credit", "Todo el mérito de los recursos de Doctor Who corresponde a la BBC.");
+        add(
+                "menu.gallifreyan_chronicles.credits.disclaimer.credit",
+                "Todo el mérito de los recursos de Doctor Who corresponde a la BBC.");
         add("menu.gallifreyan_chronicles.credits.disclaimer.ownership", "Doctor Who y la TARDIS pertenecen a la BBC.");
-        add("menu.gallifreyan_chronicles.credits.disclaimer.unofficial", "Este es un proyecto no oficial hecho por aficionados, sin afiliación ni respaldo de la BBC.");
+        add(
+                "menu.gallifreyan_chronicles.credits.disclaimer.unofficial",
+                "Este es un proyecto no oficial hecho por aficionados, sin afiliación ni respaldo de la BBC.");
         add("menu.gallifreyan_chronicles.credits.interiors", "Construcción de interiores");
         add("menu.gallifreyan_chronicles.credits.models", "Recursos y modelos");
         add("menu.gallifreyan_chronicles.credits.special_thanks", "Agradecimientos especiales");
@@ -404,11 +512,17 @@ public class GCSpanishLanguageProvider extends LanguageProvider {
         add("menu.gallifreyan_chronicles.replay_viewer", "Visor de repeticiones");
         add("menu.gallifreyan_chronicles.settings", "Ajustes del mod");
         add("menu.gallifreyan_chronicles.version", "Gallifreyan Chronicles v%s");
-        add("message.gallifreyan_chronicles.close_doors_to_insert_key", "¡Cierra ambas puertas antes de insertar la llave!");
+        add(
+                "message.gallifreyan_chronicles.close_doors_to_insert_key",
+                "¡Cierra ambas puertas antes de insertar la llave!");
         add("message.gallifreyan_chronicles.close_doors_to_lock", "¡Cierra ambas puertas antes de cerrar con llave!");
         add("message.gallifreyan_chronicles.close_doors_to_remove_key", "¡Cierra las puertas antes de sacar la llave!");
-        add("message.gallifreyan_chronicles.crash_landing", "¡Freno de mano puesto en el vórtice, la TARDIS se estrella!");
-        add("message.gallifreyan_chronicles.deletion_mode_required", "%s: activa el modo de eliminación con %s para romper esta TARDIS.");
+        add(
+                "message.gallifreyan_chronicles.crash_landing",
+                "¡Freno de mano puesto en el vórtice, la TARDIS se estrella!");
+        add(
+                "message.gallifreyan_chronicles.deletion_mode_required",
+                "%s: activa el modo de eliminación con %s para romper esta TARDIS.");
         add("message.gallifreyan_chronicles.doors_locked", "¡Las puertas están cerradas con llave!");
         add("message.gallifreyan_chronicles.doors_key_in_lock", "¡Hay una llave puesta en la cerradura exterior!");
         add("message.gallifreyan_chronicles.control_names_on", "Nombres de controles: activados");
@@ -449,86 +563,152 @@ public class GCSpanishLanguageProvider extends LanguageProvider {
         add("message.gallifreyan_chronicles.interior_door_opening", "Abriendo la puerta interior");
         add("message.gallifreyan_chronicles.interior_door_closing", "Cerrando la puerta interior");
         add("message.gallifreyan_chronicles.doors_sealed", "¡Las puertas están selladas mientras la TARDIS viaja!");
-        add("message.gallifreyan_chronicles.isomorphic_denied", "Seguridad isomórfica: solo el propietario puede usar estos controles.");
+        add(
+                "message.gallifreyan_chronicles.isomorphic_denied",
+                "Seguridad isomórfica: solo el propietario puede usar estos controles.");
         add("message.gallifreyan_chronicles.key_linked", "La llave ahora está vinculada a esta TARDIS.");
-        add("message.gallifreyan_chronicles.key_lockout", "Esa llave está atascada en esta cerradura. Inténtalo de nuevo en %s s.");
+        add(
+                "message.gallifreyan_chronicles.key_lockout",
+                "Esa llave está atascada en esta cerradura. Inténtalo de nuevo en %s s.");
         add("message.gallifreyan_chronicles.lock_jammed", "¡La cerradura está atascada!");
-        add("message.gallifreyan_chronicles.lock_no_exterior", "¡La cerradura de la puerta no tiene un exterior de TARDIS vinculado!");
-        add("message.gallifreyan_chronicles.lock_too_damaged", "¡La cerradura está demasiado dañada para aceptar la llave!");
+        add(
+                "message.gallifreyan_chronicles.lock_no_exterior",
+                "¡La cerradura de la puerta no tiene un exterior de TARDIS vinculado!");
+        add(
+                "message.gallifreyan_chronicles.lock_too_damaged",
+                "¡La cerradura está demasiado dañada para aceptar la llave!");
         add("message.gallifreyan_chronicles.locked", "Cerrada con llave, esta TARDIS");
         add("message.gallifreyan_chronicles.locked_owned", "Cerrada con llave, esta TARDIS pertenece a %s");
         add("message.gallifreyan_chronicles.mallet_cowers", "La TARDIS se encoge de miedo...");
         add("message.gallifreyan_chronicles.mallet_flinches", "La TARDIS se aparta de ti con un respingo...");
         add("message.gallifreyan_chronicles.mallet_shudders", "La TARDIS se estremece...");
-        add("message.gallifreyan_chronicles.no_destination_to_set", "¡Esta consola no tiene ningún destino de TARDIS que establecer!");
+        add(
+                "message.gallifreyan_chronicles.no_destination_to_set",
+                "¡Esta consola no tiene ningún destino de TARDIS que establecer!");
         add("message.gallifreyan_chronicles.not_your_key", "¡Esa no es tu llave!");
-        add("message.gallifreyan_chronicles.power_locked_crashing", "¡La TARDIS se está estrellando, la palanca de energía no cede!");
-        add("message.gallifreyan_chronicles.cloister_bell_locked_crashing", "¡La TARDIS se está estrellando, la campana del claustro no se detiene!");
-        add("message.gallifreyan_chronicles.still_travelling", "Aún en el vórtice, faltan %s segundos para poder aterrizar");
-        add("message.gallifreyan_chronicles.tardis_balks.distrust", "La TARDIS no confía lo suficiente en ti como para despegar... tira de nuevo para obligarla");
-        add("message.gallifreyan_chronicles.tardis_balks.stressed", "La TARDIS está estresada y no quiere despegar... tira de nuevo para obligarla");
-        add("message.gallifreyan_chronicles.tardis_cowed", "La TARDIS no quiere ir, pero te tiene demasiado miedo como para negarse...");
+        add(
+                "message.gallifreyan_chronicles.power_locked_crashing",
+                "¡La TARDIS se está estrellando, la palanca de energía no cede!");
+        add(
+                "message.gallifreyan_chronicles.cloister_bell_locked_crashing",
+                "¡La TARDIS se está estrellando, la campana del claustro no se detiene!");
+        add(
+                "message.gallifreyan_chronicles.still_travelling",
+                "Aún en el vórtice, faltan %s segundos para poder aterrizar");
+        add(
+                "message.gallifreyan_chronicles.tardis_balks.distrust",
+                "La TARDIS no confía lo suficiente en ti como para despegar... tira de nuevo para obligarla");
+        add(
+                "message.gallifreyan_chronicles.tardis_balks.stressed",
+                "La TARDIS está estresada y no quiere despegar... tira de nuevo para obligarla");
+        add(
+                "message.gallifreyan_chronicles.tardis_cowed",
+                "La TARDIS no quiere ir, pero te tiene demasiado miedo como para negarse...");
         add("message.gallifreyan_chronicles.tardis_muddled", "La TARDIS ha confundido sus números...");
         add("message.gallifreyan_chronicles.tardis_furious", "¡La TARDIS está furiosa e intenta hacerte daño!");
         add("message.gallifreyan_chronicles.tardis_lashes_out", "¡La TARDIS arremete contra ti!");
-        add("message.gallifreyan_chronicles.tardis_refuses.distrust", "La TARDIS no confía en ti, ¡se niega a despegar!");
-        add("message.gallifreyan_chronicles.tardis_refuses.stressed", "La TARDIS está demasiado estresada, ¡se niega a despegar!");
+        add(
+                "message.gallifreyan_chronicles.tardis_refuses.distrust",
+                "La TARDIS no confía en ti, ¡se niega a despegar!");
+        add(
+                "message.gallifreyan_chronicles.tardis_refuses.stressed",
+                "La TARDIS está demasiado estresada, ¡se niega a despegar!");
         add("message.gallifreyan_chronicles.tardis_warning", "La TARDIS se está enfadando... deja de presionarla");
-        add("message.gallifreyan_chronicles.tardis_worked_up", "Has tardado demasiado, la TARDIS se estresa aún más y ahora de verdad no quiere ir...");
+        add(
+                "message.gallifreyan_chronicles.tardis_worked_up",
+                "Has tardado demasiado, la TARDIS se estresa aún más y ahora de verdad no quiere ir...");
         add("message.gallifreyan_chronicles.trust_added", "%s ya puede usar los controles de tu TARDIS.");
         add("message.gallifreyan_chronicles.trust_already", "%s ya es de confianza.");
         add("message.gallifreyan_chronicles.trust_granted", "%s te ha confiado los controles de su TARDIS.");
         add("message.gallifreyan_chronicles.trust_not_trusted", "%s no es de confianza.");
-        add("message.gallifreyan_chronicles.trust_not_yours", "Solo el propietario de esta TARDIS puede dar su confianza a otros.");
+        add(
+                "message.gallifreyan_chronicles.trust_not_yours",
+                "Solo el propietario de esta TARDIS puede dar su confianza a otros.");
         add("message.gallifreyan_chronicles.trust_removed", "%s ya no puede usar los controles de tu TARDIS.");
-        add("message.gallifreyan_chronicles.trust_revoked", "%s te ha retirado el acceso a los controles de su TARDIS.");
+        add(
+                "message.gallifreyan_chronicles.trust_revoked",
+                "%s te ha retirado el acceso a los controles de su TARDIS.");
         add("message.gallifreyan_chronicles.unknown_player", "un jugador desconocido");
         add("message.gallifreyan_chronicles.wrong_key", "¡Esa es la llave equivocada!");
         add("options.gallifreyan_chronicles.camera_shake", "Sacudida de cámara de la TARDIS");
         add("options.gallifreyan_chronicles.flight_messages", "Mensajes de vuelo de la TARDIS");
-        add("options.gallifreyan_chronicles.flight_messages.tooltip", "Muestra un mensaje sobre la barra de objetos cuando la TARDIS en la que estás sale y cuando llega.");
+        add(
+                "options.gallifreyan_chronicles.flight_messages.tooltip",
+                "Muestra un mensaje sobre la barra de objetos cuando la TARDIS en la que estás sale y cuando llega.");
         add("overlay.gallifreyan_chronicles.flight_departing", "Desmaterializando...");
         add("overlay.gallifreyan_chronicles.door_style_set", "Puerta con el estilo de %s");
         add("overlay.gallifreyan_chronicles.door_style_cleared", "Estilo de la puerta eliminado");
-        add("overlay.gallifreyan_chronicles.door_style_no_match", "Esta puerta no se puede combinar con el estilo de %s");
-        add("overlay.gallifreyan_chronicles.door_style_primary", "Esta puerta la controla la consola y no se puede cambiar de estilo");
+        add(
+                "overlay.gallifreyan_chronicles.door_style_no_match",
+                "Esta puerta no se puede combinar con el estilo de %s");
+        add(
+                "overlay.gallifreyan_chronicles.door_style_primary",
+                "Esta puerta la controla la consola y no se puede cambiar de estilo");
         add("overlay.gallifreyan_chronicles.flight_arrived", "Llegada a %s en %s");
         add("options.gallifreyan_chronicles.overlay_messages", "Mensajes de la TARDIS en la barra de acción");
-        add("options.gallifreyan_chronicles.overlay_messages.tooltip", "Muestra los mensajes sobre la barra de objetos al usar los controles de la TARDIS, como bloquear las puertas o fijar un destino.");
-        add("options.gallifreyan_chronicles.camera_shake.tooltip", "La intensidad con la que se sacude la cámara durante el despegue, el vuelo y el aterrizaje de la TARDIS.");
+        add(
+                "options.gallifreyan_chronicles.overlay_messages.tooltip",
+                "Muestra los mensajes sobre la barra de objetos al usar los controles de la TARDIS, como bloquear las puertas o fijar un destino.");
+        add(
+                "options.gallifreyan_chronicles.camera_shake.tooltip",
+                "La intensidad con la que se sacude la cámara durante el despegue, el vuelo y el aterrizaje de la TARDIS.");
         add("options.gallifreyan_chronicles.header", "Gallifreyan Chronicles");
         add("options.gallifreyan_chronicles.header.audio_visual", "Audio y visual");
         add("options.gallifreyan_chronicles.header.messages", "Mensajes e interfaz");
         add("options.gallifreyan_chronicles.header.rendering", "Renderizado");
         add("options.gallifreyan_chronicles.version_hud", "Superposición de versión");
-        add("options.gallifreyan_chronicles.version_hud.tooltip", "Muestra la versión del mod en la esquina de la pantalla.");
+        add(
+                "options.gallifreyan_chronicles.version_hud.tooltip",
+                "Muestra la versión del mod en la esquina de la pantalla.");
         add("options.gallifreyan_chronicles.immersive_portals", "Immersive Portals");
-        add("options.gallifreyan_chronicles.immersive_portals.tooltip", "Usa Immersive Portals para las puertas de la TARDIS. Si está desactivado, las puertas usan el teletransporte normal. Se aplica a los mundos que alojes.");
+        add(
+                "options.gallifreyan_chronicles.immersive_portals.tooltip",
+                "Usa Immersive Portals para las puertas de la TARDIS. Si está desactivado, las puertas usan el teletransporte normal. Se aplica a los mundos que alojes.");
         add("options.gallifreyan_chronicles.max_rendered_portals", "Máximo de portales renderizados");
-        add("options.gallifreyan_chronicles.max_rendered_portals.tooltip", "La mayor cantidad de portales de puertas de TARDIS que se pueden renderizar a la vez.");
+        add(
+                "options.gallifreyan_chronicles.max_rendered_portals.tooltip",
+                "La mayor cantidad de portales de puertas de TARDIS que se pueden renderizar a la vez.");
         add("options.gallifreyan_chronicles.model_render_distance", "Distancia de renderizado de modelos");
-        add("options.gallifreyan_chronicles.model_render_distance.tooltip", "A qué distancia se renderizan los modelos de la TARDIS, en bloques.");
+        add(
+                "options.gallifreyan_chronicles.model_render_distance.tooltip",
+                "A qué distancia se renderizan los modelos de la TARDIS, en bloques.");
         add("options.gallifreyan_chronicles.model_render_distance.value", "%s bloques");
         add("options.gallifreyan_chronicles.portal_render_distance", "Distancia de renderizado de portales");
-        add("options.gallifreyan_chronicles.portal_render_distance.tooltip", "A qué distancia se renderizan los portales de las puertas de la TARDIS, en bloques.");
+        add(
+                "options.gallifreyan_chronicles.portal_render_distance.tooltip",
+                "A qué distancia se renderizan los portales de las puertas de la TARDIS, en bloques.");
         add("options.gallifreyan_chronicles.power_darkness", "Oscuridad al apagar la TARDIS");
-        add("options.gallifreyan_chronicles.power_darkness.tooltip", "Cuánto se oscurece el interior de una TARDIS cuando se apaga su energía.");
+        add(
+                "options.gallifreyan_chronicles.power_darkness.tooltip",
+                "Cuánto se oscurece el interior de una TARDIS cuando se apaga su energía.");
         add("options.gallifreyan_chronicles.star_density", "Densidad de estrellas");
         add("options.gallifreyan_chronicles.star_density.high", "Alta");
         add("options.gallifreyan_chronicles.star_density.low", "Baja");
         add("options.gallifreyan_chronicles.star_density.normal", "Normal");
         add("options.gallifreyan_chronicles.star_density.off", "Desactivada");
-        add("options.gallifreyan_chronicles.star_density.tooltip", "Cuántas estrellas aparecen en los cielos de otros planetas.");
+        add(
+                "options.gallifreyan_chronicles.star_density.tooltip",
+                "Cuántas estrellas aparecen en los cielos de otros planetas.");
         add("options.gallifreyan_chronicles.tardis_hum", "Zumbido de la TARDIS");
         add("overlay.gallifreyan_chronicles.coord_increment", "Incremento: %s");
         add("overlay.gallifreyan_chronicles.stattenheim_linked", "Control remoto vinculado a tu TARDIS");
         add("overlay.gallifreyan_chronicles.stattenheim_linked_other", "Control remoto vinculado a la TARDIS de %s");
-        add("overlay.gallifreyan_chronicles.stattenheim_already_linked", "El control remoto ya está vinculado a esta TARDIS");
-        add("overlay.gallifreyan_chronicles.stattenheim_not_linked", "Este control remoto no está vinculado. Mayús + clic derecho en una TARDIS para vincularlo");
-        add("overlay.gallifreyan_chronicles.stattenheim_not_yours", "Esa es la TARDIS de otra persona. No puedes usar el control remoto con ella");
-        add("overlay.gallifreyan_chronicles.stattenheim_lost", "No se encuentra la TARDIS a la que estaba vinculado este control remoto");
+        add(
+                "overlay.gallifreyan_chronicles.stattenheim_already_linked",
+                "El control remoto ya está vinculado a esta TARDIS");
+        add(
+                "overlay.gallifreyan_chronicles.stattenheim_not_linked",
+                "Este control remoto no está vinculado. Mayús + clic derecho en una TARDIS para vincularlo");
+        add(
+                "overlay.gallifreyan_chronicles.stattenheim_not_yours",
+                "Esa es la TARDIS de otra persona. No puedes usar el control remoto con ella");
+        add(
+                "overlay.gallifreyan_chronicles.stattenheim_lost",
+                "No se encuentra la TARDIS a la que estaba vinculado este control remoto");
         add("overlay.gallifreyan_chronicles.stattenheim_cannot_link", "Esa TARDIS no se puede vincular");
-        add("overlay.gallifreyan_chronicles.stattenheim_inside_tardis", "No puedes invocar una TARDIS dentro de otra TARDIS");
+        add(
+                "overlay.gallifreyan_chronicles.stattenheim_inside_tardis",
+                "No puedes invocar una TARDIS dentro de otra TARDIS");
         add("overlay.gallifreyan_chronicles.stattenheim_recharging", "El control remoto aún se está recargando");
         add("overlay.gallifreyan_chronicles.stattenheim_cannot_summon", "La TARDIS no se puede invocar ahora mismo");
         add("overlay.gallifreyan_chronicles.stattenheim_summoned", "La TARDIS responde a la llamada");
@@ -585,86 +765,154 @@ public class GCSpanishLanguageProvider extends LanguageProvider {
         add("advancement.gallifreyan_chronicles.tardis_mind.root.title", "Mentes de TARDIS");
         add("advancement.gallifreyan_chronicles.tardis_mind.root.description", "No hay dos TARDIS exactamente iguales");
         add("advancement.gallifreyan_chronicles.tardis_mind.personality.title", "Con mente propia");
-        add("advancement.gallifreyan_chronicles.tardis_mind.personality.description", "Descubre la personalidad de tu TARDIS");
+        add(
+                "advancement.gallifreyan_chronicles.tardis_mind.personality.description",
+                "Descubre la personalidad de tu TARDIS");
         add("advancement.gallifreyan_chronicles.tardis_mind.trait.title", "Conociéndote");
-        add("advancement.gallifreyan_chronicles.tardis_mind.trait.description", "Descubre uno de los rasgos de tu TARDIS");
+        add(
+                "advancement.gallifreyan_chronicles.tardis_mind.trait.description",
+                "Descubre uno de los rasgos de tu TARDIS");
         add("advancement.gallifreyan_chronicles.tardis_mind.dyslexic.title", "Espera, ¿dónde estamos?");
-        add("advancement.gallifreyan_chronicles.tardis_mind.dyslexic.description", "¡Tu TARDIS es disléxica! Confundió sus números y te llevó a un lugar completamente distinto");
-        add("discovery.gallifreyan_chronicles.personality.intro", "Toda TARDIS tiene mente propia, y la tuya empieza a mostrarla...");
+        add(
+                "advancement.gallifreyan_chronicles.tardis_mind.dyslexic.description",
+                "¡Tu TARDIS es disléxica! Confundió sus números y te llevó a un lugar completamente distinto");
+        add(
+                "discovery.gallifreyan_chronicles.personality.intro",
+                "Toda TARDIS tiene mente propia, y la tuya empieza a mostrarla...");
         add("discovery.gallifreyan_chronicles.personality.found", "¡Personalidad descubierta!");
         add("discovery.gallifreyan_chronicles.personality.obedient", "Obediente");
-        add("discovery.gallifreyan_chronicles.personality.obedient.desc", "Irá adonde le pidas, cuando se lo pidas. Sin discusiones ni enfurruñamientos. Cuídala.");
+        add(
+                "discovery.gallifreyan_chronicles.personality.obedient.desc",
+                "Irá adonde le pidas, cuando se lo pidas. Sin discusiones ni enfurruñamientos. Cuídala.");
         add("discovery.gallifreyan_chronicles.personality.submissive", "Sumisa");
-        add("discovery.gallifreyan_chronicles.personality.submissive.desc", "Cuando está descontenta, se resiste a la palanca, pero si vuelves a tirar, cederá. Eso sí, recordará que lo hiciste.");
+        add(
+                "discovery.gallifreyan_chronicles.personality.submissive.desc",
+                "Cuando está descontenta, se resiste a la palanca, pero si vuelves a tirar, cederá. Eso sí, recordará que lo hiciste.");
         add("discovery.gallifreyan_chronicles.personality.defensive", "Defensiva");
-        add("discovery.gallifreyan_chronicles.personality.defensive.desc", "Si está estresada o no confía en ti, sencillamente no volará. Mantenla tranquila y gánate su confianza.");
+        add(
+                "discovery.gallifreyan_chronicles.personality.defensive.desc",
+                "Si está estresada o no confía en ti, sencillamente no volará. Mantenla tranquila y gánate su confianza.");
         add("discovery.gallifreyan_chronicles.personality.aggressive", "Agresiva");
-        add("discovery.gallifreyan_chronicles.personality.aggressive.desc", "Si sigues forzándola cuando no quiere ir, te plantará cara. Puede hacerte daño, y lo hará.");
+        add(
+                "discovery.gallifreyan_chronicles.personality.aggressive.desc",
+                "Si sigues forzándola cuando no quiere ir, te plantará cara. Puede hacerte daño, y lo hará.");
         add("discovery.gallifreyan_chronicles.trait.found", "¡Rasgo descubierto!");
         add("discovery.gallifreyan_chronicles.trait.skittish", "Asustadiza");
-        add("discovery.gallifreyan_chronicles.trait.skittish.desc", "Se estresa enseguida, pero también se calma igual de rápido. Se aferra a quien la tranquiliza.");
+        add(
+                "discovery.gallifreyan_chronicles.trait.skittish.desc",
+                "Se estresa enseguida, pero también se calma igual de rápido. Se aferra a quien la tranquiliza.");
         add("discovery.gallifreyan_chronicles.trait.loyal", "Leal");
-        add("discovery.gallifreyan_chronicles.trait.loyal.desc", "Aprende a confiar en ti enseguida y no pierde la fe en ti con facilidad. Pero siente cada herida muy hondo, y una traición es casi imposible de reparar.");
+        add(
+                "discovery.gallifreyan_chronicles.trait.loyal.desc",
+                "Aprende a confiar en ti enseguida y no pierde la fe en ti con facilidad. Pero siente cada herida muy hondo, y una traición es casi imposible de reparar.");
         add("discovery.gallifreyan_chronicles.trait.stubborn", "Terca");
-        add("discovery.gallifreyan_chronicles.trait.stubborn.desc", "Se planta y dice que no antes que la mayoría de las TARDIS. También es mucho más difícil de quebrar.");
+        add(
+                "discovery.gallifreyan_chronicles.trait.stubborn.desc",
+                "Se planta y dice que no antes que la mayoría de las TARDIS. También es mucho más difícil de quebrar.");
         add("discovery.gallifreyan_chronicles.trait.forgiving", "Indulgente");
-        add("discovery.gallifreyan_chronicles.trait.forgiving.desc", "El miedo y el estrés se le pasan mucho más rápido de lo normal, aunque siente las cosas con algo más de intensidad.");
+        add(
+                "discovery.gallifreyan_chronicles.trait.forgiving.desc",
+                "El miedo y el estrés se le pasan mucho más rápido de lo normal, aunque siente las cosas con algo más de intensidad.");
         add("discovery.gallifreyan_chronicles.trait.grudge_holder", "Rencorosa");
-        add("discovery.gallifreyan_chronicles.trait.grudge_holder.desc", "No olvida, ni la bondad ni la crueldad. El miedo y el estrés se le pasan despacio, pero cada gesto amable cuenta más.");
+        add(
+                "discovery.gallifreyan_chronicles.trait.grudge_holder.desc",
+                "No olvida, ni la bondad ni la crueldad. El miedo y el estrés se le pasan despacio, pero cada gesto amable cuenta más.");
         add("discovery.gallifreyan_chronicles.trait.protective", "Protectora");
-        add("discovery.gallifreyan_chronicles.trait.protective.desc", "Se prepara para protegerte, así que los choques afectan mucho menos a quienes están dentro. Tanta preocupación la desgasta.");
+        add(
+                "discovery.gallifreyan_chronicles.trait.protective.desc",
+                "Se prepara para protegerte, así que los choques afectan mucho menos a quienes están dentro. Tanta preocupación la desgasta.");
         add("discovery.gallifreyan_chronicles.trait.possessive", "Posesiva");
-        add("discovery.gallifreyan_chronicles.trait.possessive.desc", "Es devota de su propietario y en realidad solo le hace caso a él. A cualquier otra persona le costará mucho más pilotarla.");
+        add(
+                "discovery.gallifreyan_chronicles.trait.possessive.desc",
+                "Es devota de su propietario y en realidad solo le hace caso a él. A cualquier otra persona le costará mucho más pilotarla.");
         add("discovery.gallifreyan_chronicles.trait.welcoming", "Acogedora");
-        add("discovery.gallifreyan_chronicles.trait.welcoming.desc", "Está encantada de volar para cualquiera, no solo para su propietario. Eso sí, se hiere con facilidad.");
+        add(
+                "discovery.gallifreyan_chronicles.trait.welcoming.desc",
+                "Está encantada de volar para cualquiera, no solo para su propietario. Eso sí, se hiere con facilidad.");
         add("discovery.gallifreyan_chronicles.disability.found", "¡Peculiaridad descubierta!");
         add("discovery.gallifreyan_chronicles.disability.dyslexic", "Disléxica");
-        add("discovery.gallifreyan_chronicles.disability.dyslexic.desc", "A veces confunde sus coordenadas, sobre todo cuando está estresada. Mejora con la práctica, pero nunca desaparece del todo.");
+        add(
+                "discovery.gallifreyan_chronicles.disability.dyslexic.desc",
+                "A veces confunde sus coordenadas, sobre todo cuando está estresada. Mejora con la práctica, pero nunca desaparece del todo.");
         add("message.gallifreyan_chronicles.mallet_fights_back", "¡La TARDIS te devuelve el golpe!");
-        add("message.gallifreyan_chronicles.tardis_controls_frozen", "Los controles no ceden. La TARDIS no confía en ti");
-        add("message.gallifreyan_chronicles.tardis_control_sticks", "El control se atasca... la TARDIS desconfía de ti");
+        add(
+                "message.gallifreyan_chronicles.tardis_controls_frozen",
+                "Los controles no ceden. La TARDIS no confía en ti");
+        add(
+                "message.gallifreyan_chronicles.tardis_control_sticks",
+                "El control se atasca... la TARDIS desconfía de ti");
         add("message.gallifreyan_chronicles.tardis_betrayed", "La TARDIS nunca olvidará esta traición");
         add("discovery.gallifreyan_chronicles.trait.distrusting", "Desconfiada");
-        add("discovery.gallifreyan_chronicles.trait.distrusting.desc", "Aún no confía en ti. Sus controles se atascarán hasta que te ganes su confianza, algo que llega despacio, pero que, una vez conseguida, conserva y es difícil de romper. No abuses de ella.");
+        add(
+                "discovery.gallifreyan_chronicles.trait.distrusting.desc",
+                "Aún no confía en ti. Sus controles se atascarán hasta que te ganes su confianza, algo que llega despacio, pero que, una vez conseguida, conserva y es difícil de romper. No abuses de ella.");
         add("message.gallifreyan_chronicles.mallet_seen_flinch", "La TARDIS se encoge al ver el mazo");
         add("message.gallifreyan_chronicles.mallet_seen_braces", "La TARDIS se prepara y se bloquea con fuerza");
-        add("message.gallifreyan_chronicles.mallet_seen_threatens", "La TARDIS chisporrotea con amenaza. Recuerda ese mazo");
+        add(
+                "message.gallifreyan_chronicles.mallet_seen_threatens",
+                "La TARDIS chisporrotea con amenaza. Recuerda ese mazo");
         add("discovery.gallifreyan_chronicles.disability.ptsd", "TEPT");
-        add("discovery.gallifreyan_chronicles.disability.ptsd.desc", "La has herido demasiadas veces. Ahora siempre te tiene un poco de miedo, se estresa con facilidad y se encoge cada vez que ve ese mazo. La amabilidad puede aliviarla, pero nunca lo olvidará del todo.");
+        add(
+                "discovery.gallifreyan_chronicles.disability.ptsd.desc",
+                "La has herido demasiadas veces. Ahora siempre te tiene un poco de miedo, se estresa con facilidad y se encoge cada vez que ve ese mazo. La amabilidad puede aliviarla, pero nunca lo olvidará del todo.");
         add("advancement.gallifreyan_chronicles.tardis_mind.ptsd.title", "¿Qué has hecho?");
-        add("advancement.gallifreyan_chronicles.tardis_mind.ptsd.description", "Maltrata a tu TARDIS hasta que desarrolle TEPT");
-        add("message.gallifreyan_chronicles.tardis_terrified", "La TARDIS está paralizada de terror. Los controles no ceden");
+        add(
+                "advancement.gallifreyan_chronicles.tardis_mind.ptsd.description",
+                "Maltrata a tu TARDIS hasta que desarrolle TEPT");
+        add(
+                "message.gallifreyan_chronicles.tardis_terrified",
+                "La TARDIS está paralizada de terror. Los controles no ceden");
         add("message.gallifreyan_chronicles.tardis_terror_resists", "Sigue paralizada... hace falta convencerla más");
         add("message.gallifreyan_chronicles.tardis_terror_complies", "La TARDIS cede, temblando");
         add("message.gallifreyan_chronicles.tardis_terror_savage", "¡La TARDIS lucha por su vida!");
-        add("message.gallifreyan_chronicles.tardis_offering_accepted", "La TARDIS zumba suavemente y acepta tu ofrenda");
-        add("message.gallifreyan_chronicles.tardis_offering_again", "La TARDIS la acepta, aunque ya se está dando cuenta de los sobornos");
-        add("message.gallifreyan_chronicles.tardis_offering_nervous", "La TARDIS la acepta con nerviosismo, aún encogiéndose");
+        add(
+                "message.gallifreyan_chronicles.tardis_offering_accepted",
+                "La TARDIS zumba suavemente y acepta tu ofrenda");
+        add(
+                "message.gallifreyan_chronicles.tardis_offering_again",
+                "La TARDIS la acepta, aunque ya se está dando cuenta de los sobornos");
+        add(
+                "message.gallifreyan_chronicles.tardis_offering_nervous",
+                "La TARDIS la acepta con nerviosismo, aún encogiéndose");
         add("message.gallifreyan_chronicles.tardis_offering_wait", "La TARDIS aún está pensando en la última");
-        add("message.gallifreyan_chronicles.tardis_offering_content", "La TARDIS ya te tiene cariño. No hace falta sobornarla");
+        add(
+                "message.gallifreyan_chronicles.tardis_offering_content",
+                "La TARDIS ya te tiene cariño. No hace falta sobornarla");
         add("message.gallifreyan_chronicles.tardis_offering_afraid", "La TARDIS la acepta, temblando");
         add("message.gallifreyan_chronicles.tardis_offering_betrayed", "La TARDIS la acepta, pero no lo ha olvidado");
         add("message.gallifreyan_chronicles.tardis_uneasy", "La TARDIS zumba con inquietud al entrar...");
-        add("message.gallifreyan_chronicles.tardis_afraid", "El zumbido vacila y las luces parpadean. La TARDIS te tiene miedo");
-        add("message.gallifreyan_chronicles.tardis_dreads_you", "La TARDIS se estremece. Su zumbido se retuerce y las luces se apagan de miedo");
+        add(
+                "message.gallifreyan_chronicles.tardis_afraid",
+                "El zumbido vacila y las luces parpadean. La TARDIS te tiene miedo");
+        add(
+                "message.gallifreyan_chronicles.tardis_dreads_you",
+                "La TARDIS se estremece. Su zumbido se retuerce y las luces se apagan de miedo");
         add("message.gallifreyan_chronicles.tardis_forgives_you", "La TARDIS te ha perdonado");
         add("message.gallifreyan_chronicles.tardis_ptsd_easing", "La TARDIS parece más en paz últimamente");
         add("message.gallifreyan_chronicles.mallet_not_yours", "Esta no es tu TARDIS para golpearla");
         add("command.gallifreyan_chronicles.mind_header", "Mente de la TARDIS %s:");
-        add("command.gallifreyan_chronicles.mind_bond", "  %s: confianza %s | miedo %s (%s) | trauma %s | golpes %s | traicionada %s");
+        add(
+                "command.gallifreyan_chronicles.mind_bond",
+                "  %s: confianza %s | miedo %s (%s) | trauma %s | golpes %s | traicionada %s");
         add("command.gallifreyan_chronicles.mind_no_bonds", "  Aún no conoce a nadie");
         add("command.gallifreyan_chronicles.tp_exterior", "Teletransportado al exterior de la TARDIS %s");
         add("command.gallifreyan_chronicles.tp_interior", "Teletransportado al interior de la TARDIS %s");
-        add("command.gallifreyan_chronicles.no_tardis_here", "Mira un exterior o una consola de TARDIS, o colócate dentro de una");
+        add(
+                "command.gallifreyan_chronicles.no_tardis_here",
+                "Mira un exterior o una consola de TARDIS, o colócate dentro de una");
         add("command.gallifreyan_chronicles.tardis_id", "ID de TARDIS: %s");
         add("command.gallifreyan_chronicles.click_to_copy", "Haz clic para copiar");
         add("sound.gallifreyan_chronicles.spark", "Crepitan chispas");
         add("sound.gallifreyan_chronicles.spark_explosion", "Estallan chispas");
         add("sound.gallifreyan_chronicles.explosion", "La TARDIS explota");
-        add("message.gallifreyan_chronicles.crash_landing_stress", "La TARDIS apenas aguantaba... ¡aterrizaje de emergencia!");
+        add(
+                "message.gallifreyan_chronicles.crash_landing_stress",
+                "La TARDIS apenas aguantaba... ¡aterrizaje de emergencia!");
         add("message.gallifreyan_chronicles.smoke_choking", "El humo se está espesando... ¡tienes que salir!");
         add("death.attack.gallifreyan_chronicles.smoke", "%1$s se asfixió con el humo de una TARDIS estrellada");
-        add("death.attack.gallifreyan_chronicles.smoke.player", "%1$s se asfixió con el humo de una TARDIS estrellada mientras luchaba contra %2$s");
+        add(
+                "death.attack.gallifreyan_chronicles.smoke.player",
+                "%1$s se asfixió con el humo de una TARDIS estrellada mientras luchaba contra %2$s");
         add("effect.gallifreyan_chronicles.choking", "Asfixia");
         add("tooltip.gallifreyan_chronicles.tardis.door", "Puertas");
         add("tooltip.gallifreyan_chronicles.interior_door.tardis_door", "Puerta de la TARDIS");

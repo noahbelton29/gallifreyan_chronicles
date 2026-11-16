@@ -1,12 +1,12 @@
 package uk.nbforge.gallifreyan_chronicles.tardis.key;
 
-import uk.nbforge.gallifreyan_chronicles.core.block_entities.TardisExteriorBlockEntity;
-import uk.nbforge.gallifreyan_chronicles.core.GCDataComponents;
-import uk.nbforge.gallifreyan_chronicles.core.item.MasterTardisKeyItem;
-import uk.nbforge.gallifreyan_chronicles.core.item.TardisKeyItem;
-import uk.nbforge.gallifreyan_chronicles.core.dynamic_registries.TardisInteriorRegistry;
-import uk.nbforge.gallifreyan_chronicles.tardis.TardisManager;
-import uk.nbforge.gallifreyan_chronicles.util.GCUtil;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
+import java.util.UUID;
+import java.util.WeakHashMap;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Vec3i;
 import net.minecraft.network.protocol.game.ClientboundTrackedWaypointPacket;
@@ -20,14 +20,13 @@ import net.minecraft.world.waypoints.Waypoint;
 import net.minecraft.world.waypoints.WaypointStyleAsset;
 import net.minecraft.world.waypoints.WaypointStyleAssets;
 import org.jspecify.annotations.Nullable;
-
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Set;
-import java.util.UUID;
-import java.util.WeakHashMap;
+import uk.nbforge.gallifreyan_chronicles.core.GCDataComponents;
+import uk.nbforge.gallifreyan_chronicles.core.block_entities.TardisExteriorBlockEntity;
+import uk.nbforge.gallifreyan_chronicles.core.dynamic_registries.TardisInteriorRegistry;
+import uk.nbforge.gallifreyan_chronicles.core.item.MasterTardisKeyItem;
+import uk.nbforge.gallifreyan_chronicles.core.item.TardisKeyItem;
+import uk.nbforge.gallifreyan_chronicles.tardis.TardisManager;
+import uk.nbforge.gallifreyan_chronicles.util.GCUtil;
 
 public final class TardisKeyLocator {
     private static final int MASTER_INTERVAL = 5;
@@ -37,12 +36,10 @@ public final class TardisKeyLocator {
     private static final ResourceKey<WaypointStyleAsset> TUAT_STYLE = style("tuat_tardis");
     private static final Map<ServerPlayer, Map<UUID, Tracked>> TRACKED = new WeakHashMap<>();
 
-    private record Tracked(UUID tardisId, BlockPos pos, ResourceKey<Level> dimension,
-                           ResourceKey<WaypointStyleAsset> style) {
-    }
+    private record Tracked(
+            UUID tardisId, BlockPos pos, ResourceKey<Level> dimension, ResourceKey<WaypointStyleAsset> style) {}
 
-    private TardisKeyLocator() {
-    }
+    private TardisKeyLocator() {}
 
     public static void tick(MinecraftServer server) {
         TardisManager manager = TardisManager.get(server);
@@ -96,13 +93,16 @@ public final class TardisKeyLocator {
         if (iconChanged) {
             player.connection.send(ClientboundTrackedWaypointPacket.removeWaypoint(tracked.tardisId()));
         }
-        player.connection.send(old == null || iconChanged
-                ? ClientboundTrackedWaypointPacket.addWaypointPosition(tracked.tardisId(), icon(tracked.style()), position)
-                : ClientboundTrackedWaypointPacket.updateWaypointPosition(tracked.tardisId(), icon(tracked.style()), position));
+        player.connection.send(
+                old == null || iconChanged
+                        ? ClientboundTrackedWaypointPacket.addWaypointPosition(
+                                tracked.tardisId(), icon(tracked.style()), position)
+                        : ClientboundTrackedWaypointPacket.updateWaypointPosition(
+                                tracked.tardisId(), icon(tracked.style()), position));
     }
 
-    private static Map<UUID, Tracked> resolve(MinecraftServer server, TardisManager manager, ServerPlayer player,
-                                              boolean master) {
+    private static Map<UUID, Tracked> resolve(
+            MinecraftServer server, TardisManager manager, ServerPlayer player, boolean master) {
         Set<UUID> ids = new HashSet<>();
         if (master) {
             ids.addAll(manager.getAllIds());
@@ -121,8 +121,8 @@ public final class TardisKeyLocator {
         return result;
     }
 
-    private static @Nullable Tracked resolveOne(MinecraftServer server, TardisManager manager, ServerPlayer player,
-                                                UUID tardisId) {
+    private static @Nullable Tracked resolveOne(
+            MinecraftServer server, TardisManager manager, ServerPlayer player, UUID tardisId) {
         BlockPos pos = manager.resolveExteriorBlockPos(tardisId);
         if (pos == null) return null;
 
@@ -142,17 +142,19 @@ public final class TardisKeyLocator {
         return stack.get(GCDataComponents.TARDIS_ID);
     }
 
-    private static ResourceKey<WaypointStyleAsset> styleFor(TardisManager manager, MinecraftServer server,
-                                                            UUID tardisId, ResourceKey<Level> dimension, BlockPos pos) {
+    private static ResourceKey<WaypointStyleAsset> styleFor(
+            TardisManager manager, MinecraftServer server, UUID tardisId, ResourceKey<Level> dimension, BlockPos pos) {
         String exteriorId = null;
         ServerLevel level = server.getLevel(dimension);
-        if (level != null && level.isLoaded(pos)
+        if (level != null
+                && level.isLoaded(pos)
                 && level.getBlockEntity(pos) instanceof TardisExteriorBlockEntity exterior
                 && exterior.getExterior() != null) {
             exteriorId = exterior.getExterior().id();
         }
         if (exteriorId == null) {
-            exteriorId = TardisInteriorRegistry.get(manager.getInteriorId(tardisId)).resolveExteriorId();
+            exteriorId =
+                    TardisInteriorRegistry.get(manager.getInteriorId(tardisId)).resolveExteriorId();
         }
         if (exteriorId != null && exteriorId.endsWith("second_doctors_exterior")) return SECOND_DOCTORS_STYLE;
         if (exteriorId != null && exteriorId.endsWith("tuat_exterior")) return TUAT_STYLE;

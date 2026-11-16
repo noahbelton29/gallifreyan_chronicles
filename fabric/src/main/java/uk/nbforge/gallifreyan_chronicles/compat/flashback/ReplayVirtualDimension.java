@@ -28,21 +28,21 @@ import qouteall.imm_ptl.core.network.ImmPtlNetworking;
 import qouteall.imm_ptl.core.teleportation.ClientTeleportationManager;
 
 /**
-   In a replay the camera really goes through doors, Immersive Portals moves it into the TARDIS world on the client like in the real game.
-   The replay server only has the overworld and cannot follow, so only the client moves.
-   The message that I went through a portal and the movement of the camera are not sent while it is in another world, so the server keeps it parked outside and does not pull it back.
-   Packets from the replay server are for its world, the overworld, so while the camera is somewhere else they are applied to that world and not the one we are in.
-   Flying back out through the door puts it back in the overworld.
-*/
+ * In a replay the camera really goes through doors, Immersive Portals moves it into the TARDIS world on the client like in the real game.
+ * The replay server only has the overworld and cannot follow, so only the client moves.
+ * The message that I went through a portal and the movement of the camera are not sent while it is in another world, so the server keeps it parked outside and does not pull it back.
+ * Packets from the replay server are for its world, the overworld, so while the camera is somewhere else they are applied to that world and not the one we are in.
+ * Flying back out through the door puts it back in the overworld.
+ */
 final class ReplayVirtualDimension {
-    private ReplayVirtualDimension() {
-    }
+    private ReplayVirtualDimension() {}
 
     /** The world the replay server has the camera in. */
     static @Nullable ResourceKey<Level> serverDim() {
         ReplayServer server = Flashback.getReplayServer();
         if (server == null) return null;
-        for (ReplayPlayer viewer : server.getReplayViewers()) return viewer.level().dimension();
+        for (ReplayPlayer viewer : server.getReplayViewers())
+            return viewer.level().dimension();
         return null;
     }
 
@@ -50,7 +50,9 @@ final class ReplayVirtualDimension {
     static boolean isAway() {
         Minecraft mc = Minecraft.getInstance();
         ResourceKey<Level> server = serverDim();
-        return server != null && mc.player != null && !mc.player.level().dimension().equals(server);
+        return server != null
+                && mc.player != null
+                && !mc.player.level().dimension().equals(server);
     }
 
     static boolean dropOutgoing(Packet<?> packet) {
@@ -65,9 +67,9 @@ final class ReplayVirtualDimension {
     private static int pendingTicks;
 
     /**
-       Going back on the timeline reloads the world and the camera lands in whatever world the replay has.
-       Put it back in the world it was in before so only doors ever change which world the camera is in.
-    */
+     * Going back on the timeline reloads the world and the camera lands in whatever world the replay has.
+     * Put it back in the world it was in before so only doors ever change which world the camera is in.
+     */
     static void register() {
         ClientTickEvents.END_CLIENT_TICK.register(client -> {
             if (Flashback.getReplayServer() == null) {
@@ -105,7 +107,8 @@ final class ReplayVirtualDimension {
             return false;
         }
         if (!isAway()) return false;
-        if (packet instanceof ClientboundLoginPacket || packet instanceof ClientboundRespawnPacket
+        if (packet instanceof ClientboundLoginPacket
+                || packet instanceof ClientboundRespawnPacket
                 || packet instanceof ClientboundStartConfigurationPacket
                 || packet instanceof ClientboundFinishConfigurationPacket) {
             return false;

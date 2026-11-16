@@ -1,34 +1,33 @@
 package uk.nbforge.gallifreyan_chronicles.tardis;
 
-import uk.nbforge.gallifreyan_chronicles.tardis.ecs.system.TardisInteriorSystem;
-import uk.nbforge.gallifreyan_chronicles.util.MessageUtil;
-import uk.nbforge.gallifreyan_chronicles.core.GCItems;
-import uk.nbforge.gallifreyan_chronicles.tardis.control.impl.SpaceTimeThrottleControl;
-import net.minecraft.world.item.ItemStack;
-import net.minecraft.util.Prediction;
-import uk.nbforge.gallifreyan_chronicles.core.GCDataComponents;
-import uk.nbforge.gallifreyan_chronicles.core.block_entities.InteriorDoorBlockEntity;
-import uk.nbforge.gallifreyan_chronicles.core.block_entities.TardisConsoleBlockEntity;
-import uk.nbforge.gallifreyan_chronicles.core.block_entities.TardisExteriorBlockEntity;
-import uk.nbforge.gallifreyan_chronicles.core.GCTardisControls;
-import uk.nbforge.gallifreyan_chronicles.tardis.ecs.component.DoorState;
-import uk.nbforge.gallifreyan_chronicles.tardis.ecs.component.TardisComponent;
-import uk.nbforge.gallifreyan_chronicles.tardis.ecs.system.ConsoleSyncSystem;
-import uk.nbforge.gallifreyan_chronicles.tardis.ecs.system.DoorSyncSystem;
-import uk.nbforge.gallifreyan_chronicles.tardis.flight.LandingTarget;
-import uk.nbforge.gallifreyan_chronicles.tardis.flight.TardisDestinations;
-import uk.nbforge.gallifreyan_chronicles.tardis.flight.TardisFlightState;
+import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
 import net.minecraft.core.BlockPos;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.util.Prediction;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
-
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
+import uk.nbforge.gallifreyan_chronicles.core.GCDataComponents;
+import uk.nbforge.gallifreyan_chronicles.core.GCItems;
+import uk.nbforge.gallifreyan_chronicles.core.GCTardisControls;
+import uk.nbforge.gallifreyan_chronicles.core.block_entities.InteriorDoorBlockEntity;
+import uk.nbforge.gallifreyan_chronicles.core.block_entities.TardisConsoleBlockEntity;
+import uk.nbforge.gallifreyan_chronicles.core.block_entities.TardisExteriorBlockEntity;
+import uk.nbforge.gallifreyan_chronicles.tardis.control.impl.SpaceTimeThrottleControl;
+import uk.nbforge.gallifreyan_chronicles.tardis.ecs.component.DoorState;
+import uk.nbforge.gallifreyan_chronicles.tardis.ecs.component.TardisComponent;
+import uk.nbforge.gallifreyan_chronicles.tardis.ecs.system.ConsoleSyncSystem;
+import uk.nbforge.gallifreyan_chronicles.tardis.ecs.system.DoorSyncSystem;
+import uk.nbforge.gallifreyan_chronicles.tardis.ecs.system.TardisInteriorSystem;
+import uk.nbforge.gallifreyan_chronicles.tardis.flight.LandingTarget;
+import uk.nbforge.gallifreyan_chronicles.tardis.flight.TardisDestinations;
+import uk.nbforge.gallifreyan_chronicles.tardis.flight.TardisFlightState;
+import uk.nbforge.gallifreyan_chronicles.util.MessageUtil;
 
 public final class Tardis {
     private final MinecraftServer server;
@@ -183,7 +182,9 @@ public final class Tardis {
     }
 
     public boolean areDoorsSealedForTravel() {
-        return exterior().map(TardisExteriorBlockEntity::areDoorsSealedForTravel).orElse(false);
+        return exterior()
+                .map(TardisExteriorBlockEntity::areDoorsSealedForTravel)
+                .orElse(false);
     }
 
     public Optional<LandingTarget> landingTarget() {
@@ -283,7 +284,9 @@ public final class Tardis {
     }
 
     public boolean isIsomorphicActive() {
-        return console().map(c -> c.getControlState(GCTardisControls.ISOMORPHIC_CONTROL)).orElse(false);
+        return console()
+                .map(c -> c.getControlState(GCTardisControls.ISOMORPHIC_CONTROL))
+                .orElse(false);
     }
 
     public boolean canUseControls(Player player) {

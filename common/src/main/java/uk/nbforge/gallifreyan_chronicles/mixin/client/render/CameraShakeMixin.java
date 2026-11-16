@@ -1,6 +1,5 @@
 package uk.nbforge.gallifreyan_chronicles.mixin.client.render;
 
-import uk.nbforge.gallifreyan_chronicles.client.camera.GCCameraShake;
 import net.minecraft.client.Camera;
 import net.minecraft.client.DeltaTracker;
 import org.spongepowered.asm.mixin.Mixin;
@@ -8,6 +7,7 @@ import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+import uk.nbforge.gallifreyan_chronicles.client.camera.GCCameraShake;
 
 @Mixin(Camera.class)
 public abstract class CameraShakeMixin {

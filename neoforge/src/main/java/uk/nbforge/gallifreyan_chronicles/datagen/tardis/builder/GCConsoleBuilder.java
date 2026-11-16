@@ -3,12 +3,10 @@ package uk.nbforge.gallifreyan_chronicles.datagen.tardis.builder;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
-import uk.nbforge.gallifreyan_chronicles.core.GCTardisControls;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Consumer;
-
+import uk.nbforge.gallifreyan_chronicles.core.GCTardisControls;
 import uk.nbforge.gallifreyan_chronicles.datagen.util.GCJson;
 
 /**
@@ -49,16 +47,13 @@ public final class GCConsoleBuilder {
      * The lights, buttons and rotor groups every console uses.
      */
     public GCConsoleBuilder standardGlowGroups() {
-        return glowGroup("lights", 4, 30, 8)
-                .glowGroup("buttons", 4, 60, 8)
-                .glowGroup("rotor", 4, 50, 8);
+        return glowGroup("lights", 4, 30, 8).glowGroup("buttons", 4, 60, 8).glowGroup("rotor", 4, 50, 8);
     }
 
     // Controls
 
     public GCConsoleBuilder control(String id, double cooldownSeconds) {
-        return control(id, cooldownSeconds, details -> {
-        });
+        return control(id, cooldownSeconds, details -> {});
     }
 
     /**
@@ -108,13 +103,12 @@ public final class GCConsoleBuilder {
      * Goes right after the door control, needs standardControls first.
      */
     public void interiorDoorControl() {
-        interiorDoorControl(details -> {
-        });
+        interiorDoorControl(details -> {});
     }
 
     public void interiorDoorControl(Consumer<Control> details) {
-        controlAfter(GCTardisControls.DOOR_CONTROL, GCTardisControls.INTERIOR_DOOR_CONTROL,
-                INTERIOR_DOOR_COOLDOWN, details);
+        controlAfter(
+                GCTardisControls.DOOR_CONTROL, GCTardisControls.INTERIOR_DOOR_CONTROL, INTERIOR_DOOR_COOLDOWN, details);
     }
 
     private GCConsoleBuilder insert(int index, String id, double cooldownSeconds, Consumer<Control> details) {
@@ -160,7 +154,7 @@ public final class GCConsoleBuilder {
          * Where it is, in blocks from the console.
          */
         public Control at(double x, double y, double z) {
-            this.position = new double[]{x, y, z};
+            this.position = new double[] {x, y, z};
             return this;
         }
 
@@ -168,7 +162,7 @@ public final class GCConsoleBuilder {
          * The size of the hitbox, width then height then depth.
          */
         public Control size(double width, double height, double depth) {
-            this.size = new double[]{width, height, depth};
+            this.size = new double[] {width, height, depth};
             return this;
         }
 

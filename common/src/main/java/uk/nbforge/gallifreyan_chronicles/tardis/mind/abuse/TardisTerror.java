@@ -1,33 +1,25 @@
 package uk.nbforge.gallifreyan_chronicles.tardis.mind.abuse;
 
-import uk.nbforge.gallifreyan_chronicles.tardis.Tardis;
-import uk.nbforge.gallifreyan_chronicles.tardis.mind.FearLevel;
-import uk.nbforge.gallifreyan_chronicles.tardis.mind.MindMessages;
-import org.jspecify.annotations.Nullable;
-import uk.nbforge.gallifreyan_chronicles.tardis.mind.action.MindActions;
-import uk.nbforge.gallifreyan_chronicles.tardis.mind.action.MindContext;
-import uk.nbforge.gallifreyan_chronicles.tardis.mind.TardisMind;
-import uk.nbforge.gallifreyan_chronicles.tardis.ecs.system.TardisMindSystem;
-import uk.nbforge.gallifreyan_chronicles.tardis.mind.TardisPersonality;
-import uk.nbforge.gallifreyan_chronicles.util.PlayerMotionUtil;
-import net.minecraft.ChatFormatting;
-import net.minecraft.core.particles.ParticleTypes;
-import net.minecraft.server.level.ServerLevel;
-import net.minecraft.sounds.SoundEvents;
-import net.minecraft.sounds.SoundSource;
-import net.minecraft.util.Mth;
-import net.minecraft.util.RandomSource;
-import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.phys.Vec3;
-
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
+import net.minecraft.ChatFormatting;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.phys.Vec3;
+import org.jspecify.annotations.Nullable;
+import uk.nbforge.gallifreyan_chronicles.tardis.Tardis;
+import uk.nbforge.gallifreyan_chronicles.tardis.ecs.system.TardisMindSystem;
+import uk.nbforge.gallifreyan_chronicles.tardis.mind.FearLevel;
+import uk.nbforge.gallifreyan_chronicles.tardis.mind.MindMessages;
+import uk.nbforge.gallifreyan_chronicles.tardis.mind.TardisPersonality;
+import uk.nbforge.gallifreyan_chronicles.tardis.mind.action.MindActions;
+import uk.nbforge.gallifreyan_chronicles.tardis.mind.action.MindContext;
 
 /**
-   So scared of a player it freezes up for them.
-   It wears off by itself as its fear fades, leave it alone a few minutes, or the mallet snaps it out of it for a while.
-*/
+ * So scared of a player it freezes up for them.
+ * It wears off by itself as its fear fades, leave it alone a few minutes, or the mallet snaps it out of it for a while.
+ */
 public final class TardisTerror {
     private static final long COMPLY_TICKS = 600L;
 
@@ -39,8 +31,7 @@ public final class TardisTerror {
         long compliantUntil = Long.MIN_VALUE;
     }
 
-    private TardisTerror() {
-    }
+    private TardisTerror() {}
 
     public static void reset() {
         EPISODES.clear();
@@ -69,7 +60,8 @@ public final class TardisTerror {
         if (!terrified(tardis, player.getUUID())) return false;
         TardisPersonality personality = TardisMindSystem.mind(tardis).personality();
         Episode episode = EPISODES.computeIfAbsent(key(tardis, player.getUUID()), id -> new Episode());
-        if (episode.required == 0) episode.required = Math.max(1, personality.terrorHits().pickInt(level.getRandom()));
+        if (episode.required == 0)
+            episode.required = Math.max(1, personality.terrorHits().pickInt(level.getRandom()));
         episode.hits++;
 
         MindContext context = new MindContext(tardis, level, player, hit);
@@ -86,5 +78,4 @@ public final class TardisTerror {
         }
         return true;
     }
-
 }

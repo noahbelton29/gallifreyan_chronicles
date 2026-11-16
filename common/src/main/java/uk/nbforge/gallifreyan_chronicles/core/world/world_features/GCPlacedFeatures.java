@@ -1,7 +1,6 @@
 package uk.nbforge.gallifreyan_chronicles.core.world.world_features;
 
-import uk.nbforge.gallifreyan_chronicles.core.GCBlocks;
-import uk.nbforge.gallifreyan_chronicles.util.GCUtil;
+import java.util.List;
 import net.minecraft.core.Holder;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.data.worldgen.BootstrapContext;
@@ -12,28 +11,39 @@ import net.minecraft.world.level.levelgen.VerticalAnchor;
 import net.minecraft.world.level.levelgen.blockpredicates.BlockPredicate;
 import net.minecraft.world.level.levelgen.feature.Feature;
 import net.minecraft.world.level.levelgen.placement.*;
-
-import java.util.List;
+import uk.nbforge.gallifreyan_chronicles.core.GCBlocks;
+import uk.nbforge.gallifreyan_chronicles.util.GCUtil;
 
 public class GCPlacedFeatures {
-    public static final ResourceKey<PlacedFeature> IRON_GALLIFREY_ORES_UPPER_KEY = registerKey("iron_gallifrey_ores_upper");
-    public static final ResourceKey<PlacedFeature> IRON_GALLIFREY_ORES_MIDDLE_KEY = registerKey("iron_gallifrey_ores_middle");
-    public static final ResourceKey<PlacedFeature> IRON_GALLIFREY_ORES_SMALL_KEY = registerKey("iron_gallifrey_ores_small");
-    public static final ResourceKey<PlacedFeature> COAL_GALLIFREY_ORES_UPPER_KEY = registerKey("coal_gallifrey_ores_upper");
-    public static final ResourceKey<PlacedFeature> COAL_GALLIFREY_ORES_LOWER_KEY = registerKey("coal_gallifrey_ores_lower");
+    public static final ResourceKey<PlacedFeature> IRON_GALLIFREY_ORES_UPPER_KEY =
+            registerKey("iron_gallifrey_ores_upper");
+    public static final ResourceKey<PlacedFeature> IRON_GALLIFREY_ORES_MIDDLE_KEY =
+            registerKey("iron_gallifrey_ores_middle");
+    public static final ResourceKey<PlacedFeature> IRON_GALLIFREY_ORES_SMALL_KEY =
+            registerKey("iron_gallifrey_ores_small");
+    public static final ResourceKey<PlacedFeature> COAL_GALLIFREY_ORES_UPPER_KEY =
+            registerKey("coal_gallifrey_ores_upper");
+    public static final ResourceKey<PlacedFeature> COAL_GALLIFREY_ORES_LOWER_KEY =
+            registerKey("coal_gallifrey_ores_lower");
     public static final ResourceKey<PlacedFeature> GRAVEL_GALLIFREY_ORES_KEY = registerKey("gravel_gallifrey_ores");
-    public static final ResourceKey<PlacedFeature> COBBLED_LIMESTONE_GALLIFREY_ORES_KEY = registerKey("cobbled_limestone_gallifrey_ores");
+    public static final ResourceKey<PlacedFeature> COBBLED_LIMESTONE_GALLIFREY_ORES_KEY =
+            registerKey("cobbled_limestone_gallifrey_ores");
     public static final ResourceKey<PlacedFeature> PATCH_GALLIFREY_DRY_GRASS = registerKey("patch_gallifrey_dry_grass");
-    public static final ResourceKey<PlacedFeature> PATCH_GALLIFREY_GRASS_PLAIN = registerKey("patch_gallifrey_grass_plain");
-    public static final ResourceKey<PlacedFeature> PATCH_GALLIFREY_TALL_GRASS_PLAIN = registerKey("patch_gallifrey_tall_grass_plain");
-    public static final ResourceKey<PlacedFeature> PATCH_GALLIFREY_TALL_GRASS_PLAIN_2 = registerKey("patch_gallifrey_tall_grass_plain_2");
+    public static final ResourceKey<PlacedFeature> PATCH_GALLIFREY_GRASS_PLAIN =
+            registerKey("patch_gallifrey_grass_plain");
+    public static final ResourceKey<PlacedFeature> PATCH_GALLIFREY_TALL_GRASS_PLAIN =
+            registerKey("patch_gallifrey_tall_grass_plain");
+    public static final ResourceKey<PlacedFeature> PATCH_GALLIFREY_TALL_GRASS_PLAIN_2 =
+            registerKey("patch_gallifrey_tall_grass_plain_2");
     public static final ResourceKey<PlacedFeature> CADONWOOD_TREE_PLACED = registerKey("cadonwood_tree_placed");
     public static final ResourceKey<PlacedFeature> CADONWOOD_FALLEN_LOG = registerKey("cadonwood_fallen_log");
     public static final ResourceKey<PlacedFeature> GALLIFREYAN_STONE_BOULDER = registerKey("gallifreyan_stone_boulder");
-    public static final ResourceKey<PlacedFeature> GALLIFREYAN_ARCADIAN_SHALE_BOULDER = registerKey("gallifreyan_arcadian_shale_boulder");
+    public static final ResourceKey<PlacedFeature> GALLIFREYAN_ARCADIAN_SHALE_BOULDER =
+            registerKey("gallifreyan_arcadian_shale_boulder");
     public static final ResourceKey<PlacedFeature> MOON_BOULDER = registerKey("moon_boulder");
     public static final ResourceKey<PlacedFeature> GALLIFREYAN_STONE_PATCH = registerKey("gallifreyan_stone_patch");
-    public static final ResourceKey<PlacedFeature> GALLIFREYAN_MUDSTONE_PATCH = registerKey("gallifreyan_mudstone_patch");
+    public static final ResourceKey<PlacedFeature> GALLIFREYAN_MUDSTONE_PATCH =
+            registerKey("gallifreyan_mudstone_patch");
     public static final ResourceKey<PlacedFeature> PATCH_THORIVINE = registerKey("patch_thorivine");
 
     public static void bootstrap(BootstrapContext<PlacedFeature> context) {
@@ -42,7 +52,8 @@ public class GCPlacedFeatures {
         var oreIronSmall = configuredFeatures.getOrThrow(GCConfiguredFeatures.IRON_GALLIFREY_ORES_SMALL_KEY);
         var oreCoal = configuredFeatures.getOrThrow(GCConfiguredFeatures.COAL_GALLIFREY_ORES_KEY);
         var oreGravel = configuredFeatures.getOrThrow(GCConfiguredFeatures.GRAVEL_GALLIFREY_ORES_KEY);
-        var oreCobbledLimestone = configuredFeatures.getOrThrow(GCConfiguredFeatures.COBBLED_LIMESTONE_GALLIFREY_ORES_KEY);
+        var oreCobbledLimestone =
+                configuredFeatures.getOrThrow(GCConfiguredFeatures.COBBLED_LIMESTONE_GALLIFREY_ORES_KEY);
         var patchDryGrass = configuredFeatures.getOrThrow(GCConfiguredFeatures.GALLIFREYAN_DRY_GRASS);
         var grass = configuredFeatures.getOrThrow(GCConfiguredFeatures.GALLIFREYAN_GRASS);
         var tallGrass = configuredFeatures.getOrThrow(GCConfiguredFeatures.GALLIFREYAN_TALL_GRASS);
@@ -51,10 +62,14 @@ public class GCPlacedFeatures {
         var moonBoulder = configuredFeatures.getOrThrow(GCConfiguredFeatures.MOON_BOULDER);
         var gallifreyanStonePatch = configuredFeatures.getOrThrow(GCConfiguredFeatures.GALLIFREYAN_STONE_PATCH);
         var gallifreyanMudstonePatch = configuredFeatures.getOrThrow(GCConfiguredFeatures.GALLIFREYAN_MUDSTONE_PATCH);
-        var gallifreyanArcadianShaleBoulder = configuredFeatures.getOrThrow(GCConfiguredFeatures.GALLIFREYAN_ARCADIAN_SHALE_BOULDER);
+        var gallifreyanArcadianShaleBoulder =
+                configuredFeatures.getOrThrow(GCConfiguredFeatures.GALLIFREYAN_ARCADIAN_SHALE_BOULDER);
         var thorivine = configuredFeatures.getOrThrow(GCConfiguredFeatures.THORIVINE);
 
-        register(context, PATCH_THORIVINE, thorivine,
+        register(
+                context,
+                PATCH_THORIVINE,
+                thorivine,
                 RarityFilter.onAverageOnceEvery(6),
                 InSquarePlacement.spread(),
                 PlacementUtils.HEIGHTMAP,
@@ -62,10 +77,7 @@ public class GCPlacedFeatures {
                 CountPlacement.of(10),
                 triangleOffset(7, 3),
                 BlockPredicateFilter.forPredicate(BlockPredicate.allOf(
-                        BlockPredicate.ONLY_IN_AIR_PREDICATE,
-                        BlockPredicate.wouldSurvive(GCBlocks.THORIVINE)
-                ))
-        );
+                        BlockPredicate.ONLY_IN_AIR_PREDICATE, BlockPredicate.wouldSurvive(GCBlocks.THORIVINE))));
 
         register(context, GALLIFREYAN_STONE_PATCH, gallifreyanStonePatch, rareOnSurface(8));
 
@@ -77,35 +89,68 @@ public class GCPlacedFeatures {
 
         register(context, GALLIFREYAN_ARCADIAN_SHALE_BOULDER, gallifreyanArcadianShaleBoulder, rareOnSurface(16));
 
-        register(context, PATCH_GALLIFREY_GRASS_PLAIN, grass,
+        register(
+                context,
+                PATCH_GALLIFREY_GRASS_PLAIN,
+                grass,
                 NoiseThresholdCountPlacement.of(-0.8, 5, 10),
                 InSquarePlacement.spread(),
                 PlacementUtils.HEIGHTMAP_WORLD_SURFACE,
                 BiomeFilter.biome(),
                 CountPlacement.of(32),
                 triangleOffset(7, 3),
-                BlockPredicateFilter.forPredicate(BlockPredicate.ONLY_IN_AIR_PREDICATE)
-        );
+                BlockPredicateFilter.forPredicate(BlockPredicate.ONLY_IN_AIR_PREDICATE));
 
-        register(context, IRON_GALLIFREY_ORES_UPPER_KEY, oreIron,
-                GCOrePlacements.commonOrePlacement(90, HeightRangePlacement.triangle(VerticalAnchor.absolute(80), VerticalAnchor.absolute(384))));
-        register(context, IRON_GALLIFREY_ORES_MIDDLE_KEY, oreIron,
-                GCOrePlacements.commonOrePlacement(10, HeightRangePlacement.triangle(VerticalAnchor.absolute(-24), VerticalAnchor.absolute(56))));
-        register(context, IRON_GALLIFREY_ORES_SMALL_KEY, oreIronSmall,
-                GCOrePlacements.commonOrePlacement(10, HeightRangePlacement.uniform(VerticalAnchor.bottom(), VerticalAnchor.absolute(72))));
+        register(
+                context,
+                IRON_GALLIFREY_ORES_UPPER_KEY,
+                oreIron,
+                GCOrePlacements.commonOrePlacement(
+                        90, HeightRangePlacement.triangle(VerticalAnchor.absolute(80), VerticalAnchor.absolute(384))));
+        register(
+                context,
+                IRON_GALLIFREY_ORES_MIDDLE_KEY,
+                oreIron,
+                GCOrePlacements.commonOrePlacement(
+                        10, HeightRangePlacement.triangle(VerticalAnchor.absolute(-24), VerticalAnchor.absolute(56))));
+        register(
+                context,
+                IRON_GALLIFREY_ORES_SMALL_KEY,
+                oreIronSmall,
+                GCOrePlacements.commonOrePlacement(
+                        10, HeightRangePlacement.uniform(VerticalAnchor.bottom(), VerticalAnchor.absolute(72))));
 
-        register(context, COAL_GALLIFREY_ORES_UPPER_KEY, oreCoal,
-                GCOrePlacements.commonOrePlacement(30, HeightRangePlacement.uniform(VerticalAnchor.absolute(136), VerticalAnchor.top())));
-        register(context, COAL_GALLIFREY_ORES_LOWER_KEY, oreCoal,
-                GCOrePlacements.commonOrePlacement(20, HeightRangePlacement.triangle(VerticalAnchor.absolute(0), VerticalAnchor.absolute(192))));
+        register(
+                context,
+                COAL_GALLIFREY_ORES_UPPER_KEY,
+                oreCoal,
+                GCOrePlacements.commonOrePlacement(
+                        30, HeightRangePlacement.uniform(VerticalAnchor.absolute(136), VerticalAnchor.top())));
+        register(
+                context,
+                COAL_GALLIFREY_ORES_LOWER_KEY,
+                oreCoal,
+                GCOrePlacements.commonOrePlacement(
+                        20, HeightRangePlacement.triangle(VerticalAnchor.absolute(0), VerticalAnchor.absolute(192))));
 
-        register(context, GRAVEL_GALLIFREY_ORES_KEY, oreGravel,
-                GCOrePlacements.commonOrePlacement(14, HeightRangePlacement.uniform(VerticalAnchor.bottom(), VerticalAnchor.top())));
+        register(
+                context,
+                GRAVEL_GALLIFREY_ORES_KEY,
+                oreGravel,
+                GCOrePlacements.commonOrePlacement(
+                        14, HeightRangePlacement.uniform(VerticalAnchor.bottom(), VerticalAnchor.top())));
 
-        register(context, COBBLED_LIMESTONE_GALLIFREY_ORES_KEY, oreCobbledLimestone,
-                GCOrePlacements.commonOrePlacement(12, HeightRangePlacement.uniform(VerticalAnchor.bottom(), VerticalAnchor.top())));
+        register(
+                context,
+                COBBLED_LIMESTONE_GALLIFREY_ORES_KEY,
+                oreCobbledLimestone,
+                GCOrePlacements.commonOrePlacement(
+                        12, HeightRangePlacement.uniform(VerticalAnchor.bottom(), VerticalAnchor.top())));
 
-        register(context, PATCH_GALLIFREY_DRY_GRASS, patchDryGrass,
+        register(
+                context,
+                PATCH_GALLIFREY_DRY_GRASS,
+                patchDryGrass,
                 RarityFilter.onAverageOnceEvery(10),
                 InSquarePlacement.spread(),
                 PlacementUtils.HEIGHTMAP,
@@ -114,7 +159,10 @@ public class GCPlacedFeatures {
                 triangleOffset(5, 2),
                 BlockPredicateFilter.forPredicate(BlockPredicate.ONLY_IN_AIR_PREDICATE));
 
-        register(context, PATCH_GALLIFREY_TALL_GRASS_PLAIN, tallGrass,
+        register(
+                context,
+                PATCH_GALLIFREY_TALL_GRASS_PLAIN,
+                tallGrass,
                 RarityFilter.onAverageOnceEvery(5),
                 InSquarePlacement.spread(),
                 PlacementUtils.HEIGHTMAP,
@@ -123,7 +171,10 @@ public class GCPlacedFeatures {
                 triangleOffset(7, 3),
                 BlockPredicateFilter.forPredicate(BlockPredicate.ONLY_IN_AIR_PREDICATE));
 
-        register(context, PATCH_GALLIFREY_TALL_GRASS_PLAIN_2, tallGrass,
+        register(
+                context,
+                PATCH_GALLIFREY_TALL_GRASS_PLAIN_2,
+                tallGrass,
                 NoiseThresholdCountPlacement.of(-0.8, 0, 7),
                 RarityFilter.onAverageOnceEvery(32),
                 InSquarePlacement.spread(),
@@ -133,17 +184,21 @@ public class GCPlacedFeatures {
                 triangleOffset(7, 3),
                 BlockPredicateFilter.forPredicate(BlockPredicate.ONLY_IN_AIR_PREDICATE));
 
-        register(context, CADONWOOD_TREE_PLACED, configuredFeatures.getOrThrow(GCConfiguredFeatures.CADONWOOD_TREE),
-                VegetationPlacements.treePlacement(
-                        PlacementUtils.countExtra(2, 0.1f, 2), GCBlocks.CADONWOOD_SAPLING));
+        register(
+                context,
+                CADONWOOD_TREE_PLACED,
+                configuredFeatures.getOrThrow(GCConfiguredFeatures.CADONWOOD_TREE),
+                VegetationPlacements.treePlacement(PlacementUtils.countExtra(2, 0.1f, 2), GCBlocks.CADONWOOD_SAPLING));
 
-        register(context, CADONWOOD_FALLEN_LOG, cadonwoodFallenLog,
+        register(
+                context,
+                CADONWOOD_FALLEN_LOG,
+                cadonwoodFallenLog,
                 RarityFilter.onAverageOnceEvery(4),
                 InSquarePlacement.spread(),
                 PlacementUtils.HEIGHTMAP_WORLD_SURFACE,
                 BiomeFilter.biome(),
-                CountPlacement.of(2)
-        );
+                CountPlacement.of(2));
     }
 
     public static ResourceKey<PlacedFeature> registerKey(String name) {
@@ -162,13 +217,19 @@ public class GCPlacedFeatures {
         return OffsetPlacement.ofTriangle(xzSpread, ySpread);
     }
 
-    private static void register(BootstrapContext<PlacedFeature> context, ResourceKey<PlacedFeature> key,
-                                 Holder<Feature> feature, PlacementModifier... modifiers) {
+    private static void register(
+            BootstrapContext<PlacedFeature> context,
+            ResourceKey<PlacedFeature> key,
+            Holder<Feature> feature,
+            PlacementModifier... modifiers) {
         register(context, key, feature, List.of(modifiers));
     }
 
-    private static void register(BootstrapContext<PlacedFeature> context, ResourceKey<PlacedFeature> key,
-                                 Holder<Feature> feature, List<PlacementModifier> modifiers) {
+    private static void register(
+            BootstrapContext<PlacedFeature> context,
+            ResourceKey<PlacedFeature> key,
+            Holder<Feature> feature,
+            List<PlacementModifier> modifiers) {
         context.register(key, new PlacedFeature(feature, List.copyOf(modifiers)));
     }
 }

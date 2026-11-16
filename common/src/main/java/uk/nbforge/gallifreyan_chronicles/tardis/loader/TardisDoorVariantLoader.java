@@ -1,11 +1,10 @@
 package uk.nbforge.gallifreyan_chronicles.tardis.loader;
 
+import net.minecraft.server.MinecraftServer;
+import uk.nbforge.gallifreyan_chronicles.core.dynamic_registries.TardisDoorRegistry;
 import uk.nbforge.gallifreyan_chronicles.loader.GCJsonReloadListener;
 import uk.nbforge.gallifreyan_chronicles.network.tardis.TardisConsoleSyncPayload;
 import uk.nbforge.gallifreyan_chronicles.platform.Services;
-import net.minecraft.server.MinecraftServer;
-
-import uk.nbforge.gallifreyan_chronicles.core.dynamic_registries.TardisDoorRegistry;
 import uk.nbforge.gallifreyan_chronicles.tardis.codec.door.TardisDoorVariantCodec;
 import uk.nbforge.gallifreyan_chronicles.tardis.door.TardisDoorVariant;
 

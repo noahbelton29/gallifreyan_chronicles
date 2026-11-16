@@ -28,6 +28,7 @@ public abstract class PortalRecordingMixin {
     @Shadow
     @Final
     private Minecraft mc;
+
     @Shadow
     @Final
     private PacketListener packetListener;
@@ -37,8 +38,10 @@ public abstract class PortalRecordingMixin {
 
     @Unique
     private ResourceKey<Level> gc$baseDim;
+
     @Unique
     private ResourceKey<Level> gc$lastDim;
+
     @Unique
     private boolean gc$switching;
 
@@ -70,9 +73,13 @@ public abstract class PortalRecordingMixin {
 
     @Redirect(
             method = {"onPacket", "spawnRecordingPlayer", "onClientEffect", "onPlayerTick", "onBlockBreakAnim"},
-            at = @At(value = "INVOKE",
-                    target = "Lcom/replaymod/recording/packet/PacketListener;save(Lnet/minecraft/network/protocol/Packet;)V"),
-            remap = false, require = 0)
+            at =
+                    @At(
+                            value = "INVOKE",
+                            target =
+                                    "Lcom/replaymod/recording/packet/PacketListener;save(Lnet/minecraft/network/protocol/Packet;)V"),
+            remap = false,
+            require = 0)
     private void gc$saveInPlayerLevel(PacketListener listener, Packet packet) {
         ResourceKey<Level> dim = gc$lastDim;
         if (dim == null) {

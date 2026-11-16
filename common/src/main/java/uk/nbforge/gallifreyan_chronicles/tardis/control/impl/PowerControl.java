@@ -1,20 +1,20 @@
 package uk.nbforge.gallifreyan_chronicles.tardis.control.impl;
 
-import uk.nbforge.gallifreyan_chronicles.tardis.flight.crash.TardisCrash;
-
-import uk.nbforge.gallifreyan_chronicles.core.entity.TardisControlEntity;
-import uk.nbforge.gallifreyan_chronicles.core.GCSounds;
-import uk.nbforge.gallifreyan_chronicles.core.GCTardisControls;
-import uk.nbforge.gallifreyan_chronicles.tardis.control.BaseControl;
-import uk.nbforge.gallifreyan_chronicles.tardis.control.ControlAnimations;
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
+import uk.nbforge.gallifreyan_chronicles.core.GCSounds;
+import uk.nbforge.gallifreyan_chronicles.core.GCTardisControls;
+import uk.nbforge.gallifreyan_chronicles.core.entity.TardisControlEntity;
+import uk.nbforge.gallifreyan_chronicles.tardis.control.BaseControl;
+import uk.nbforge.gallifreyan_chronicles.tardis.control.ControlAnimations;
+import uk.nbforge.gallifreyan_chronicles.tardis.flight.crash.TardisCrash;
 
 public class PowerControl extends BaseControl {
-    public static final ControlAnimations DEFAULT_ANIMATIONS = new ControlAnimations("power_control_on", "power_control_off", false);
+    public static final ControlAnimations DEFAULT_ANIMATIONS =
+            new ControlAnimations("power_control_on", "power_control_off", false);
 
     public PowerControl(ControlAnimations animations) {
         super(animations);
@@ -25,8 +25,12 @@ public class PowerControl extends BaseControl {
         super.playClickSound(entity);
         var console = entity.getConsole();
         if (console == null) return;
-        playSound(entity, console.getControlState(GCTardisControls.POWER_CONTROL)
-                ? GCSounds.TARDIS_POWER_OFF : GCSounds.TARDIS_POWER_ON, 1.0f);
+        playSound(
+                entity,
+                console.getControlState(GCTardisControls.POWER_CONTROL)
+                        ? GCSounds.TARDIS_POWER_OFF
+                        : GCSounds.TARDIS_POWER_ON,
+                1.0f);
     }
 
     @Override

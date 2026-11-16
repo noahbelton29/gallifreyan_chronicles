@@ -1,12 +1,12 @@
 package uk.nbforge.gallifreyan_chronicles.tardis.mind;
 
 /**
-   How a TARDIS feels about one player.
-   hits are unforgiven mallet hits and kindness takes them away again.
-   trauma is the scars from this player and they fade slowly on their own.
-*/
-public record TardisBond(float trust, float fear, long fearTick, int hits, boolean betrayed,
-                         float trauma, long traumaTick) {
+ * How a TARDIS feels about one player.
+ * hits are unforgiven mallet hits and kindness takes them away again.
+ * trauma is the scars from this player and they fade slowly on their own.
+ */
+public record TardisBond(
+        float trust, float fear, long fearTick, int hits, boolean betrayed, float trauma, long traumaTick) {
     public TardisBond {
         trust = Math.clamp(trust, 0f, TardisMind.MAX);
         fear = Math.clamp(fear, 0f, TardisMind.MAX);

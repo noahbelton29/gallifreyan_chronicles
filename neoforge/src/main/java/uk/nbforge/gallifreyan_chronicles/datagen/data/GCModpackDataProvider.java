@@ -1,10 +1,8 @@
 package uk.nbforge.gallifreyan_chronicles.datagen.data;
 
-import uk.nbforge.gallifreyan_chronicles.Constants;
-import uk.nbforge.gallifreyan_chronicles.core.GCBiomes;
-import uk.nbforge.gallifreyan_chronicles.core.GCDimensions;
-import uk.nbforge.gallifreyan_chronicles.core.world.world_features.GCConfiguredFeatures;
-import uk.nbforge.gallifreyan_chronicles.core.world.world_features.GCPlacedFeatures;
+import java.util.List;
+import java.util.Set;
+import java.util.concurrent.CompletableFuture;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.core.RegistrySetBuilder;
 import net.minecraft.core.registries.Registries;
@@ -12,10 +10,11 @@ import net.minecraft.data.PackOutput;
 import net.minecraft.data.loot.LootTableProvider;
 import net.minecraft.world.level.storage.loot.parameters.LootContextParamSets;
 import net.neoforged.neoforge.common.data.DatapackBuiltinEntriesProvider;
-
-import java.util.List;
-import java.util.Set;
-import java.util.concurrent.CompletableFuture;
+import uk.nbforge.gallifreyan_chronicles.Constants;
+import uk.nbforge.gallifreyan_chronicles.core.GCBiomes;
+import uk.nbforge.gallifreyan_chronicles.core.GCDimensions;
+import uk.nbforge.gallifreyan_chronicles.core.world.world_features.GCConfiguredFeatures;
+import uk.nbforge.gallifreyan_chronicles.core.world.world_features.GCPlacedFeatures;
 
 public class GCModpackDataProvider {
 
@@ -27,34 +26,20 @@ public class GCModpackDataProvider {
             .add(Registries.LEVEL_STEM, GCDimensions::bootstrapStem)
             .add(Registries.BIOME, GCBiomes::bootstrap);
 
-    public static final RegistrySetBuilder RELOADABLE_BUILDER =
-            new RegistrySetBuilder()
-                    .add(
-                            Registries.LOOT_TABLE,
-                            new LootTableProvider(
-                                    Set.of(),
-                                    List.of(
-                                            new LootTableProvider.SubProviderEntry(
-                                                    GCBlockLootTableProvider::new,
-                                                    LootContextParamSets.BLOCK
-                                            )
-                                    )
-                            )
-                    )
-                    .add(GCRecipeProvider.bootstrap());
+    public static final RegistrySetBuilder RELOADABLE_BUILDER = new RegistrySetBuilder()
+            .add(
+                    Registries.LOOT_TABLE,
+                    new LootTableProvider(
+                            Set.of(),
+                            List.of(new LootTableProvider.SubProviderEntry(
+                                    GCBlockLootTableProvider::new, LootContextParamSets.BLOCK))))
+            .add(GCRecipeProvider.bootstrap());
 
     public static DatapackBuiltinEntriesProvider create(
-            PackOutput output,
-            CompletableFuture<
-                    HolderLookup.Provider> registries) {
+            PackOutput output, CompletableFuture<HolderLookup.Provider> registries) {
 
         return DatapackBuiltinEntriesProvider.forWorldLayer(
-                output,
-                "Gallifreyan Chronicles worldgen",
-                registries,
-                BUILDER,
-                Set.of(Constants.MOD_ID)
-        );
+                output, "Gallifreyan Chronicles worldgen", registries, BUILDER, Set.of(Constants.MOD_ID));
     }
 
     public static DatapackBuiltinEntriesProvider createReloadable(
@@ -68,7 +53,6 @@ public class GCModpackDataProvider {
                 worldRegistries,
                 reloadableRegistries,
                 RELOADABLE_BUILDER,
-                Set.of(Constants.MOD_ID)
-        );
+                Set.of(Constants.MOD_ID));
     }
 }

@@ -1,16 +1,8 @@
-
 package uk.nbforge.gallifreyan_chronicles.tardis.control;
 
-import uk.nbforge.gallifreyan_chronicles.tardis.ecs.system.DoorSyncSystem;
-import uk.nbforge.gallifreyan_chronicles.core.sound.timed.TimedSounds;
 import com.mojang.serialization.MapCodec;
-import uk.nbforge.gallifreyan_chronicles.core.block_entities.TardisConsoleBlockEntity;
-import uk.nbforge.gallifreyan_chronicles.core.entity.TardisControlEntity;
-import uk.nbforge.gallifreyan_chronicles.core.GCSounds;
-import uk.nbforge.gallifreyan_chronicles.tardis.ecs.system.ConsoleSyncSystem;
-import uk.nbforge.gallifreyan_chronicles.tardis.Tardis;
-import uk.nbforge.gallifreyan_chronicles.tardis.TardisApi;
-import uk.nbforge.gallifreyan_chronicles.core.block_entities.TardisExteriorBlockEntity;
+import java.util.Optional;
+import java.util.function.Function;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
@@ -21,9 +13,15 @@ import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
 import org.jspecify.annotations.Nullable;
-
-import java.util.Optional;
-import java.util.function.Function;
+import uk.nbforge.gallifreyan_chronicles.core.GCSounds;
+import uk.nbforge.gallifreyan_chronicles.core.block_entities.TardisConsoleBlockEntity;
+import uk.nbforge.gallifreyan_chronicles.core.block_entities.TardisExteriorBlockEntity;
+import uk.nbforge.gallifreyan_chronicles.core.entity.TardisControlEntity;
+import uk.nbforge.gallifreyan_chronicles.core.sound.timed.TimedSounds;
+import uk.nbforge.gallifreyan_chronicles.tardis.Tardis;
+import uk.nbforge.gallifreyan_chronicles.tardis.TardisApi;
+import uk.nbforge.gallifreyan_chronicles.tardis.ecs.system.ConsoleSyncSystem;
+import uk.nbforge.gallifreyan_chronicles.tardis.ecs.system.DoorSyncSystem;
 
 /**
  * Base class for console controls with shared animations, sounds and door helpers.
@@ -36,7 +34,8 @@ public abstract class BaseControl implements TardisControl {
         this.animations = animations;
     }
 
-    public static <T extends BaseControl> MapCodec<T> codec(ControlAnimations defaults, Function<ControlAnimations, T> ctor) {
+    public static <T extends BaseControl> MapCodec<T> codec(
+            ControlAnimations defaults, Function<ControlAnimations, T> ctor) {
         return ControlAnimations.codec(defaults).xmap(ctor, BaseControl::animations);
     }
 
@@ -100,7 +99,11 @@ public abstract class BaseControl implements TardisControl {
 
     protected static void playAtAllConsoles(TardisConsoleBlockEntity console, ServerLevel level, SoundEvent sound) {
         for (TardisConsoleBlockEntity each : ConsoleSyncSystem.liveConsolesWith(console)) {
-            playAt(each.getLevel() instanceof ServerLevel eachLevel ? eachLevel : level, each.getBlockPos(), sound, 1.0F);
+            playAt(
+                    each.getLevel() instanceof ServerLevel eachLevel ? eachLevel : level,
+                    each.getBlockPos(),
+                    sound,
+                    1.0F);
         }
     }
 
@@ -130,7 +133,8 @@ public abstract class BaseControl implements TardisControl {
         return Component.translatable("tooltip.gallifreyan_chronicles.control_state.label." + label)
                 .withStyle(ChatFormatting.GRAY)
                 .append(Component.literal(": ").withStyle(ChatFormatting.GRAY))
-                .append(Component.translatable("tooltip.gallifreyan_chronicles.control_state.value." + value).withStyle(colour));
+                .append(Component.translatable("tooltip.gallifreyan_chronicles.control_state.value." + value)
+                        .withStyle(colour));
     }
 
     protected static void tell(@Nullable Player player, String translationKey) {

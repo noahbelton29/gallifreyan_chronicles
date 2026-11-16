@@ -1,13 +1,5 @@
 package uk.nbforge.gallifreyan_chronicles.compat.essential;
 
-import uk.nbforge.gallifreyan_chronicles.Constants;
-import uk.nbforge.gallifreyan_chronicles.client.gui.title.GCButton;
-import net.minecraft.client.gui.components.AbstractWidget;
-import net.minecraft.client.gui.components.events.GuiEventListener;
-import net.minecraft.client.gui.screens.Screen;
-import net.minecraft.client.gui.screens.TitleScreen;
-import net.minecraft.network.chat.Component;
-
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
@@ -19,21 +11,28 @@ import java.util.Map;
 import java.util.Set;
 import java.util.WeakHashMap;
 import java.util.function.Consumer;
+import net.minecraft.client.gui.components.AbstractWidget;
+import net.minecraft.client.gui.components.events.GuiEventListener;
+import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.client.gui.screens.TitleScreen;
+import net.minecraft.network.chat.Component;
+import uk.nbforge.gallifreyan_chronicles.Constants;
+import uk.nbforge.gallifreyan_chronicles.client.gui.title.GCButton;
 
 public final class EssentialMenuCompat {
     private static final String PROXY_CLASS = "gg.essential.gui.proxies.EssentialProxyElement";
     private static final String MENU_PROXY_CLASS = "gg.essential.gui.proxies.MenuButtonProxy";
     private static final String HANDLER_CLASS = "gg.essential.gui.proxies.ScreenWithProxiesHandler";
     private static final String MENU_DISPLAY_CLASS = "gg.essential.handlers.PauseMenuDisplay";
-    private static final List<String> ORDER = List.of("invite_host", "social", "wardrobe", "pictures", "settings", "account");
+    private static final List<String> ORDER =
+            List.of("invite_host", "social", "wardrobe", "pictures", "settings", "account");
     private static final Map<String, String> FALLBACK_LABELS = Map.of(
             "invite_host", "Host",
             "social", "Social",
             "wardrobe", "Wardrobe",
             "pictures", "Pictures",
             "settings", "Settings",
-            "account", "Account"
-    );
+            "account", "Account");
 
     private static final int BUTTON_WIDTH = 90;
     private static final int BUTTON_HEIGHT = 20;
@@ -50,8 +49,7 @@ public final class EssentialMenuCompat {
     private static boolean loggedFound;
     private static final int OFFSCREEN = -10000;
 
-    private EssentialMenuCompat() {
-    }
+    private EssentialMenuCompat() {}
 
     private static final class State {
         private GCButton toggle;
@@ -73,7 +71,9 @@ public final class EssentialMenuCompat {
         String id = baseId(essentialId);
         String fallback = FALLBACK_LABELS.get(id);
         if (fallback == null) {
-            fallback = id.isEmpty() ? id : Character.toUpperCase(id.charAt(0)) + id.substring(1).replace('_', ' ');
+            fallback = id.isEmpty()
+                    ? id
+                    : Character.toUpperCase(id.charAt(0)) + id.substring(1).replace('_', ' ');
         }
         return Component.translatableWithFallback("menu.gallifreyan_chronicles.essential." + id, fallback);
     }
@@ -103,7 +103,10 @@ public final class EssentialMenuCompat {
             handlerField.setAccessible(true);
             Object handler = handlerField.get(screen);
             if (handler == null) {
-                handler = handlerField.getType().getMethod("forMainMenu", Screen.class).invoke(null, screen);
+                handler = handlerField
+                        .getType()
+                        .getMethod("forMainMenu", Screen.class)
+                        .invoke(null, screen);
                 handlerField.set(screen, handler);
             }
             handler.getClass().getMethod("initGui").invoke(handler);
@@ -121,7 +124,9 @@ public final class EssentialMenuCompat {
 
         if (!proxies.isEmpty() && !loggedFound) {
             loggedFound = true;
-            Constants.LOG.info("[GC] Essential menu: tucking {} Essential buttons away on {}", proxies.size(),
+            Constants.LOG.info(
+                    "[GC] Essential menu: tucking {} Essential buttons away on {}",
+                    proxies.size(),
                     screen.getClass().getSimpleName());
         }
 
@@ -164,7 +169,11 @@ public final class EssentialMenuCompat {
 
         if (state.toggle == null && !state.entries.isEmpty()) {
             State owner = state;
-            state.toggle = new GCButton(0, 0, BUTTON_WIDTH, BUTTON_HEIGHT,
+            state.toggle = new GCButton(
+                    0,
+                    0,
+                    BUTTON_WIDTH,
+                    BUTTON_HEIGHT,
                     Component.translatableWithFallback("menu.gallifreyan_chronicles.essential", "Essential"),
                     button -> owner.open = !owner.open);
             add.accept(state.toggle);
@@ -249,10 +258,12 @@ public final class EssentialMenuCompat {
 
     private static boolean click(AbstractWidget proxy) {
         try {
-            Object component = proxy.getClass().getMethod("getEssentialComponent").invoke(proxy);
+            Object component =
+                    proxy.getClass().getMethod("getEssentialComponent").invoke(proxy);
             if (component == null) return false;
             for (Method method : proxy.getClass().getMethods()) {
-                if (method.getName().equals("click") && method.getParameterCount() == 1
+                if (method.getName().equals("click")
+                        && method.getParameterCount() == 1
                         && method.getParameterTypes()[0].isInstance(component)) {
                     method.invoke(proxy, component);
                     return true;

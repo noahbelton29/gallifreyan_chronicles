@@ -1,14 +1,13 @@
 package uk.nbforge.gallifreyan_chronicles.mixin.client.capture;
 
 import com.mojang.blaze3d.platform.NativeImage;
-import uk.nbforge.gallifreyan_chronicles.Constants;
-import uk.nbforge.gallifreyan_chronicles.client.protection.watermark.ScreenshotWatermark;
+import java.util.function.Consumer;
 import net.minecraft.client.Screenshot;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.ModifyVariable;
-
-import java.util.function.Consumer;
+import uk.nbforge.gallifreyan_chronicles.Constants;
+import uk.nbforge.gallifreyan_chronicles.client.protection.watermark.ScreenshotWatermark;
 
 @Mixin(Screenshot.class)
 public abstract class ScreenshotMixin {

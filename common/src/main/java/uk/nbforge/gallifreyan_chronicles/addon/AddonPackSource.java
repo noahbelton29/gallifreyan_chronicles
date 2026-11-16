@@ -1,6 +1,8 @@
 package uk.nbforge.gallifreyan_chronicles.addon;
 
-import uk.nbforge.gallifreyan_chronicles.Constants;
+import java.nio.file.Files;
+import java.util.Optional;
+import java.util.function.Consumer;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.packs.FilePackResources;
 import net.minecraft.server.packs.PackLocationInfo;
@@ -10,10 +12,7 @@ import net.minecraft.server.packs.PathPackResources;
 import net.minecraft.server.packs.repository.Pack;
 import net.minecraft.server.packs.repository.PackSource;
 import net.minecraft.server.packs.repository.RepositorySource;
-
-import java.nio.file.Files;
-import java.util.Optional;
-import java.util.function.Consumer;
+import uk.nbforge.gallifreyan_chronicles.Constants;
 
 /** Offers the enabled addons as required packs. */
 public final class AddonPackSource implements RepositorySource {
@@ -32,10 +31,10 @@ public final class AddonPackSource implements RepositorySource {
                 Pack.ResourcesSupplier resources = Files.isDirectory(info.path())
                         ? new PathPackResources.PathResourcesSupplier(info.path())
                         : new FilePackResources.FileResourcesSupplier(info.path());
-                PackLocationInfo location = new PackLocationInfo(ID_PREFIX + info.id(), Component.literal(info.name()),
-                        PackSource.BUILT_IN, Optional.empty());
-                Pack pack = Pack.readMetaAndCreate(location, resources, type,
-                        new PackSelectionConfig(true, Pack.Position.TOP, false));
+                PackLocationInfo location = new PackLocationInfo(
+                        ID_PREFIX + info.id(), Component.literal(info.name()), PackSource.BUILT_IN, Optional.empty());
+                Pack pack = Pack.readMetaAndCreate(
+                        location, resources, type, new PackSelectionConfig(true, Pack.Position.TOP, false));
                 if (pack != null) output.accept(pack);
             } catch (RuntimeException e) {
                 Constants.LOG.warn("Could not load the data of addon '{}'", info.id(), e);

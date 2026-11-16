@@ -1,21 +1,17 @@
 package uk.nbforge.gallifreyan_chronicles.tardis.mind.refusal;
 
-import org.jspecify.annotations.Nullable;
-
-import uk.nbforge.gallifreyan_chronicles.tardis.ecs.system.TardisMindSystem;
-import uk.nbforge.gallifreyan_chronicles.tardis.mind.TardisTrait;
-
-import uk.nbforge.gallifreyan_chronicles.tardis.Tardis;
-import uk.nbforge.gallifreyan_chronicles.tardis.ecs.system.TardisMindSystem.Refusal;
-
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
+import org.jspecify.annotations.Nullable;
+import uk.nbforge.gallifreyan_chronicles.tardis.Tardis;
+import uk.nbforge.gallifreyan_chronicles.tardis.ecs.system.TardisMindSystem;
+import uk.nbforge.gallifreyan_chronicles.tardis.ecs.system.TardisMindSystem.Refusal;
 
 /**
-   Handles pulling the controls to convince a TARDIS to fly after it refused.
-   Repeated tries make it give in, but it gets more stressed and trusts the pilot less.
-*/
+ * Handles pulling the controls to convince a TARDIS to fly after it refused.
+ * Repeated tries make it give in, but it gets more stressed and trusts the pilot less.
+ */
 public final class TardisConvincing {
     // Pulls inside this time count as quick pulls
     private static final long QUICK_PULL_TICKS = 200L;
@@ -36,16 +32,14 @@ public final class TardisConvincing {
     private static final float FORCED_TRUST_LOSS = 3f;
 
     /**
-       How close it is to giving in.
-       refusals is the pulls in this try, quickPullUntil is the time until another pull counts as quick, lastBalk is the last refusal and workedUp is how worked up it is.
-    */
-    private record State(int refusals, long quickPullUntil, long lastBalk, int workedUp) {
-    }
+     * How close it is to giving in.
+     * refusals is the pulls in this try, quickPullUntil is the time until another pull counts as quick, lastBalk is the last refusal and workedUp is how worked up it is.
+     */
+    private record State(int refusals, long quickPullUntil, long lastBalk, int workedUp) {}
 
     private static final Map<UUID, State> STATES = new HashMap<>();
 
-    private TardisConvincing() {
-    }
+    private TardisConvincing() {}
 
     public static void reset() {
         STATES.clear();
@@ -56,9 +50,9 @@ public final class TardisConvincing {
     }
 
     /**
-       The first pull is refused, more quick pulls raise the refusal count until it gives in.
-       Waiting too long makes it worked up instead.
-    */
+     * The first pull is refused, more quick pulls raise the refusal count until it gives in.
+     * Waiting too long makes it worked up instead.
+     */
     public static Refusal pull(Tardis tardis, @Nullable UUID pilot) {
         long now = TardisMindSystem.now(tardis.server());
         State state = current(tardis, now);

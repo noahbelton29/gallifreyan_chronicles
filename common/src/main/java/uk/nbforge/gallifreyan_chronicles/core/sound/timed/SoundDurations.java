@@ -3,20 +3,18 @@ package uk.nbforge.gallifreyan_chronicles.core.sound.timed;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
-import net.minecraft.resources.Identifier;
-
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
+import net.minecraft.resources.Identifier;
 
 public final class SoundDurations {
     private static final Map<Identifier, Double> SECONDS = new HashMap<>();
 
-    private SoundDurations() {
-    }
+    private SoundDurations() {}
 
     public static synchronized double seconds(Identifier event) {
         return SECONDS.computeIfAbsent(event, SoundDurations::compute);
@@ -27,13 +25,16 @@ public final class SoundDurations {
         String soundsJson = "/assets/" + event.getNamespace() + "/sounds.json";
         try (InputStream in = SoundDurations.class.getResourceAsStream(soundsJson)) {
             if (in == null) return 0.0;
-            JsonObject root = JsonParser.parseReader(new InputStreamReader(in, StandardCharsets.UTF_8)).getAsJsonObject();
+            JsonObject root = JsonParser.parseReader(new InputStreamReader(in, StandardCharsets.UTF_8))
+                    .getAsJsonObject();
             JsonObject entry = root.has(event.getPath()) ? root.getAsJsonObject(event.getPath()) : null;
             if (entry == null || !entry.has("sounds")) return 0.0;
 
             double longest = 0.0;
             for (JsonElement element : entry.getAsJsonArray("sounds")) {
-                String name = element.isJsonObject() ? element.getAsJsonObject().get("name").getAsString() : element.getAsString();
+                String name = element.isJsonObject()
+                        ? element.getAsJsonObject().get("name").getAsString()
+                        : element.getAsString();
                 Identifier file = Identifier.parse(name);
                 String path = "/assets/" + file.getNamespace() + "/sounds/" + file.getPath() + ".ogg";
                 try (InputStream ogg = SoundDurations.class.getResourceAsStream(path)) {
@@ -47,7 +48,7 @@ public final class SoundDurations {
     }
 
     private static double oggSeconds(byte[] data) {
-        int header = indexOf(data, new byte[]{1, 'v', 'o', 'r', 'b', 'i', 's'}, 0);
+        int header = indexOf(data, new byte[] {1, 'v', 'o', 'r', 'b', 'i', 's'}, 0);
         if (header < 0 || header + 16 > data.length) return 0.0;
         long rate = readLittleEndian(data, header + 12, 4);
         if (rate <= 0) return 0.0;

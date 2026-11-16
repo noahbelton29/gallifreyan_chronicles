@@ -1,7 +1,5 @@
 package uk.nbforge.gallifreyan_chronicles.mixin.client.render;
 
-import uk.nbforge.gallifreyan_chronicles.client.renderer.fade.FadeBoxRenderer;
-import uk.nbforge.gallifreyan_chronicles.client.sky.CustomSkyRenderer;
 import net.minecraft.client.renderer.GameRenderer;
 import net.minecraft.client.renderer.LevelRenderer;
 import net.minecraft.client.renderer.feature.FeatureRenderDispatcher;
@@ -11,6 +9,8 @@ import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+import uk.nbforge.gallifreyan_chronicles.client.renderer.fade.FadeBoxRenderer;
+import uk.nbforge.gallifreyan_chronicles.client.sky.CustomSkyRenderer;
 
 /** Draws fading TARDISes on top once the world, water and clouds are all done. */
 @Mixin(LevelRenderer.class)

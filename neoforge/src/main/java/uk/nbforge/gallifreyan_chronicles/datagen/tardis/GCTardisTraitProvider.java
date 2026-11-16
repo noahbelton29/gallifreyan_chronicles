@@ -1,16 +1,16 @@
 package uk.nbforge.gallifreyan_chronicles.datagen.tardis;
 
 import com.google.gson.JsonObject;
-import uk.nbforge.gallifreyan_chronicles.tardis.mind.data.MindEnums.Reveal;
 import net.minecraft.data.PackOutput;
-import uk.nbforge.gallifreyan_chronicles.datagen.util.GCJsonDataProvider;
 import uk.nbforge.gallifreyan_chronicles.datagen.tardis.builder.GCTraitBuilder;
+import uk.nbforge.gallifreyan_chronicles.datagen.util.GCJsonDataProvider;
+import uk.nbforge.gallifreyan_chronicles.tardis.mind.data.MindEnums.Reveal;
 
 /**
-   Generates the tardis_trait json files.
-   To add one copy a block below and change what you want, times values default to 1 and shifts to 0 so only list what the trait changes.
-   Reactions to events come from GCMind.
-*/
+ * Generates the tardis_trait json files.
+ * To add one copy a block below and change what you want, times values default to 1 and shifts to 0 so only list what the trait changes.
+ * Reactions to events come from GCMind.
+ */
 public class GCTardisTraitProvider extends GCJsonDataProvider {
     public GCTardisTraitProvider(PackOutput output) {
         super(output, "tardis_trait", "TARDIS Trait");
@@ -65,11 +65,7 @@ public class GCTardisTraitProvider extends GCJsonDataProvider {
                 .neverWithPersonalities("obedient")
                 .revealedWhen(Reveal.A_STRANGER_UPSETS_IT);
 
-        trait("protective")
-                .howCommon(10)
-                .stressBuildsUp(1.2)
-                .crashDamage(0.6)
-                .revealedWhen(Reveal.IT_CRASHES);
+        trait("protective").howCommon(10).stressBuildsUp(1.2).crashDamage(0.6).revealedWhen(Reveal.IT_CRASHES);
 
         trait("skittish")
                 .howCommon(10)

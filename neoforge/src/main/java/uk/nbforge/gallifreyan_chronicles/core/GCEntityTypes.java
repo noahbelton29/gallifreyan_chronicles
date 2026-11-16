@@ -1,14 +1,13 @@
 package uk.nbforge.gallifreyan_chronicles.core;
 
-import uk.nbforge.gallifreyan_chronicles.Constants;
-import uk.nbforge.gallifreyan_chronicles.core.entity.TardisControlEntity;
-import uk.nbforge.gallifreyan_chronicles.core.entity.TardisKeyEntity;
+import java.util.function.Supplier;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.world.entity.EntityType;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.neoforge.registries.DeferredRegister;
-
-import java.util.function.Supplier;
+import uk.nbforge.gallifreyan_chronicles.Constants;
+import uk.nbforge.gallifreyan_chronicles.core.entity.TardisControlEntity;
+import uk.nbforge.gallifreyan_chronicles.core.entity.TardisKeyEntity;
 
 public class GCEntityTypes {
     public static final DeferredRegister<EntityType<?>> ENTITY_TYPES =

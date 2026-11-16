@@ -6,6 +6,5 @@ public final class AddonApi {
     // Addons say theirs with api in addon.json
     public static final int VERSION = 1;
 
-    private AddonApi() {
-    }
+    private AddonApi() {}
 }

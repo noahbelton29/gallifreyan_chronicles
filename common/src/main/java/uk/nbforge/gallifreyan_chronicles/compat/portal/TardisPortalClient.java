@@ -1,44 +1,40 @@
 package uk.nbforge.gallifreyan_chronicles.compat.portal;
 
-import uk.nbforge.gallifreyan_chronicles.core.block.TardisBlock;
-import uk.nbforge.gallifreyan_chronicles.core.block.TardisTopBlock;
-import uk.nbforge.gallifreyan_chronicles.util.TardisDimensionUtil;
-import uk.nbforge.gallifreyan_chronicles.Constants;
-import uk.nbforge.gallifreyan_chronicles.core.block.InteriorDoorBarrierBlock;
-import uk.nbforge.gallifreyan_chronicles.core.block.InteriorDoorBlock;
-import uk.nbforge.gallifreyan_chronicles.config.GCConfig;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.HashSet;
+import java.util.IdentityHashMap;
+import java.util.List;
+import java.util.Set;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.core.BlockPos;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.entity.Entity;
-import qouteall.imm_ptl.core.CHelper;
-
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.IdentityHashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.phys.Vec3;
 import org.jspecify.annotations.Nullable;
-import uk.nbforge.gallifreyan_chronicles.client.gui.hud.GCPowerDarkness;
-import uk.nbforge.gallifreyan_chronicles.client.gui.hud.PowerDarknessTint;
+import qouteall.imm_ptl.core.CHelper;
 import qouteall.imm_ptl.core.ClientWorldLoader;
 import qouteall.imm_ptl.core.portal.Portal;
 import qouteall.imm_ptl.core.render.context_management.PortalRendering;
 import qouteall.imm_ptl.core.render.renderer.RendererUsingStencil;
+import uk.nbforge.gallifreyan_chronicles.client.gui.hud.GCPowerDarkness;
+import uk.nbforge.gallifreyan_chronicles.client.gui.hud.PowerDarknessTint;
+import uk.nbforge.gallifreyan_chronicles.config.GCConfig;
+import uk.nbforge.gallifreyan_chronicles.core.block.InteriorDoorBarrierBlock;
+import uk.nbforge.gallifreyan_chronicles.core.block.InteriorDoorBlock;
+import uk.nbforge.gallifreyan_chronicles.core.block.TardisBlock;
+import uk.nbforge.gallifreyan_chronicles.core.block.TardisTopBlock;
+import uk.nbforge.gallifreyan_chronicles.util.TardisDimensionUtil;
 
 final class TardisPortalClient {
     private static final double DOOR_FOOTPRINT_HORIZONTAL = 2.6;
     private static final double DOOR_FOOTPRINT_VERTICAL = 3.0;
 
-    private TardisPortalClient() {
-    }
+    private TardisPortalClient() {}
 
     static @Nullable Level clientLevel(ResourceKey<Level> dimension) {
         return ClientWorldLoader.peekWorld(dimension);
@@ -55,11 +51,11 @@ final class TardisPortalClient {
 
     static boolean isRenderingTardisPortal() {
         if (!PortalRendering.isRendering()) return false;
-        return TardisDimensionUtil.isInterior(PortalRendering.getRenderingPortal().getDestDim());
+        return TardisDimensionUtil.isInterior(
+                PortalRendering.getRenderingPortal().getDestDim());
     }
 
-    private record Scored(Portal portal, double distance) {
-    }
+    private record Scored(Portal portal, double distance) {}
 
     private static final class Ranking {
         private final Level level;
@@ -84,8 +80,11 @@ final class TardisPortalClient {
 
         Vec3 camera = CHelper.getCurrentCameraPos();
         Ranking current = ranking;
-        if (current == null || current.level != level || current.tick != level.getGameTime()
-                || !current.camera.equals(camera) || !current.scanned.contains(portal)) {
+        if (current == null
+                || current.level != level
+                || current.tick != level.getGameTime()
+                || !current.camera.equals(camera)
+                || !current.scanned.contains(portal)) {
             current = rank(level, camera);
             ranking = current;
         }
@@ -147,7 +146,8 @@ final class TardisPortalClient {
     }
 
     // Doorway centres seen so far per TARDIS interior dimension
-    // Immersive Portals draws the outline of the remote hit while the client level is swapped to the destination dimension where the entry portal is not listed, and the portal can disappear once the door is replaced
+    // Immersive Portals draws the outline of the remote hit while the client level is swapped to the destination
+    // dimension where the entry portal is not listed, and the portal can disappear once the door is replaced
     // So the centres are remembered and not looked up from the current level
     private static final java.util.Map<ResourceKey<Level>, Set<Vec3>> DOOR_CENTRES = new java.util.HashMap<>();
 
@@ -160,9 +160,9 @@ final class TardisPortalClient {
     }
 
     /**
-       True when the position is inside the doorway of a TARDIS interior seen through a portal, whatever block is there.
-       It keeps the outline hidden after the interior door or its barriers were replaced by another block.
-    */
+     * True when the position is inside the doorway of a TARDIS interior seen through a portal, whatever block is there.
+     * It keeps the outline hidden after the interior door or its barriers were replaced by another block.
+     */
     static boolean isInDoorFootprintOfAnyTardisPortal(BlockPos pos) {
         Minecraft mc = Minecraft.getInstance();
         if (mc.level == null || mc.player == null) {

@@ -13,12 +13,12 @@ import qouteall.imm_ptl.core.portal.Portal;
 import qouteall.imm_ptl.core.teleportation.ClientTeleportationManager;
 
 /**
-   Camera keyframes through a door.
-   Flashback keyframes are only positions with no world, so every keyframe is kept in the coordinates of the replay own world, the overworld, even ones placed inside the TARDIS, which are converted back through the door they came in by.
-   When keyframes play the path is followed in overworld coordinates, the moment it passes through a door the camera moves into the world behind it and each position is converted through that door.
-   Passing back out brings it back.
-   So a path flies smoothly in and out, in the editor and in exports.
-*/
+ * Camera keyframes through a door.
+ * Flashback keyframes are only positions with no world, so every keyframe is kept in the coordinates of the replay own world, the overworld, even ones placed inside the TARDIS, which are converted back through the door they came in by.
+ * When keyframes play the path is followed in overworld coordinates, the moment it passes through a door the camera moves into the world behind it and each position is converted through that door.
+ * Passing back out brings it back.
+ * So a path flies smoothly in and out, in the editor and in exports.
+ */
 final class ReplayKeyframePortal {
     // The door the camera went through to leave the replay world, null means not away
     private static @Nullable Portal entry;
@@ -27,8 +27,7 @@ final class ReplayKeyframePortal {
     private static long lastApplyNanos;
     private static final double MAX_STEP = 16.0;
 
-    private ReplayKeyframePortal() {
-    }
+    private ReplayKeyframePortal() {}
 
     /** Immersive Portals moved the camera through a door, free camera. */
     static void onTeleport(Portal portal) {
@@ -49,18 +48,20 @@ final class ReplayKeyframePortal {
     }
 
     /**
-       A keyframe position in overworld coordinates is about to be applied.
-       Returns x, y, z, yaw and pitch to really use.
-    */
+     * A keyframe position in overworld coordinates is about to be applied.
+     * Returns x, y, z, yaw and pitch to really use.
+     */
     static double[] apply(double x, double y, double z, float yaw, float pitch) {
         lastApplyNanos = System.nanoTime();
         Minecraft mc = Minecraft.getInstance();
         ResourceKey<Level> server = ReplayVirtualDimension.serverDim();
-        if (server == null || mc.player == null) return new double[]{x, y, z, yaw, pitch};
+        if (server == null || mc.player == null) return new double[] {x, y, z, yaw, pitch};
         double eyeHeight = mc.player.getEyeHeight();
         Vec3 path = new Vec3(x, y + eyeHeight, z);
 
-        if (entry != null && (entry.isRemoved() || !entry.getDestDim().equals(mc.player.level().dimension()))) {
+        if (entry != null
+                && (entry.isRemoved()
+                        || !entry.getDestDim().equals(mc.player.level().dimension()))) {
             entry = null;
         }
         // The camera is behind a door but we lost which one after a timeline jump, find it again
@@ -84,16 +85,16 @@ final class ReplayKeyframePortal {
         }
         lastPath = path;
 
-        if (entry == null) return new double[]{x, y, z, yaw, pitch};
+        if (entry == null) return new double[] {x, y, z, yaw, pitch};
         Vec3 eye = entry.transformPoint(path);
         Vec3 look = entry.transformLocalVecNonScale(Vec3.directionFromRotation(pitch, yaw));
-        return new double[]{eye.x, eye.y - eyeHeight, eye.z, yawOf(look), pitchOf(look)};
+        return new double[] {eye.x, eye.y - eyeHeight, eye.z, yawOf(look), pitchOf(look)};
     }
 
     /**
-       A keyframe was just made from the camera.
-       If the camera is inside, store it in overworld coordinates so the path stays one continuous line.
-    */
+     * A keyframe was just made from the camera.
+     * If the camera is inside, store it in overworld coordinates so the path stays one continuous line.
+     */
     static void onKeyframeCreated(Vector3d position, float[] yawPitch) {
         Minecraft mc = Minecraft.getInstance();
         if (entry == null || mc.player == null) return;
@@ -128,7 +129,9 @@ final class ReplayKeyframePortal {
         Portal best = null;
         double bestDist = Double.MAX_VALUE;
         for (Entity e : level.entitiesForRendering()) {
-            if (!(e instanceof Portal portal) || portal.getAxisW() == null || !portal.getDestDim().equals(dest)) continue;
+            if (!(e instanceof Portal portal)
+                    || portal.getAxisW() == null
+                    || !portal.getDestDim().equals(dest)) continue;
             double dist = portal.getOriginPos().distanceToSqr(near);
             if (dist < bestDist) {
                 bestDist = dist;

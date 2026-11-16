@@ -1,25 +1,27 @@
 package uk.nbforge.gallifreyan_chronicles.client.protection.watermark;
 
-import uk.nbforge.gallifreyan_chronicles.Constants;
-import net.minecraft.client.Minecraft;
-
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.BooleanSupplier;
+import net.minecraft.client.Minecraft;
+import uk.nbforge.gallifreyan_chronicles.Constants;
 
 public final class HudVisibility {
-    private static final String[] FIELD_NAMES = {"hideGui", "guiHidden", "hudHidden", "hideHud", "hidden", "hiddenByUser"};
-    private static final String[] METHOD_NAMES = {"isHidden", "isGuiHidden", "isHudHidden", "hideGui", "isHudVisible", "isVisible"};
+    private static final String[] FIELD_NAMES = {
+        "hideGui", "guiHidden", "hudHidden", "hideHud", "hidden", "hiddenByUser"
+    };
+    private static final String[] METHOD_NAMES = {
+        "isHidden", "isGuiHidden", "isHudHidden", "hideGui", "isHudVisible", "isVisible"
+    };
     private static final String[] INVERTED = {"isHudVisible", "isVisible"};
 
     private static boolean resolved;
     private static BooleanSupplier hidden;
 
-    private HudVisibility() {
-    }
+    private HudVisibility() {}
 
     public static boolean isHidden() {
         if (!resolved) {
@@ -52,7 +54,8 @@ public final class HudVisibility {
                 Field field = findField(root.getClass(), name);
                 if (field != null && field.getType() == boolean.class) {
                     field.setAccessible(true);
-                    Constants.LOG.debug("[GC] HUD hidden flag found: {}.{}", root.getClass().getName(), name);
+                    Constants.LOG.debug(
+                            "[GC] HUD hidden flag found: {}.{}", root.getClass().getName(), name);
                     return () -> {
                         try {
                             return field.getBoolean(Modifier.isStatic(field.getModifiers()) ? null : root);
@@ -69,7 +72,10 @@ public final class HudVisibility {
                     boolean invert = false;
                     for (String inverted : INVERTED) invert |= inverted.equals(name);
                     final boolean flip = invert;
-                    Constants.LOG.debug("[GC] HUD hidden flag found: {}.{}()", root.getClass().getName(), name);
+                    Constants.LOG.debug(
+                            "[GC] HUD hidden flag found: {}.{}()",
+                            root.getClass().getName(),
+                            name);
                     return () -> {
                         try {
                             return flip != (boolean) method.invoke(root);
@@ -93,7 +99,8 @@ public final class HudVisibility {
                     }
                 }
             }
-            Constants.LOG.debug("[GC] HUD flag candidates on {}:{}", root.getClass().getName(), sb);
+            Constants.LOG.debug(
+                    "[GC] HUD flag candidates on {}:{}", root.getClass().getName(), sb);
         }
         return null;
     }

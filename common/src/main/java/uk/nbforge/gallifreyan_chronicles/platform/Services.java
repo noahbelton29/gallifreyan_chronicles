@@ -1,10 +1,9 @@
 package uk.nbforge.gallifreyan_chronicles.platform;
 
+import java.util.ServiceLoader;
 import uk.nbforge.gallifreyan_chronicles.Constants;
 import uk.nbforge.gallifreyan_chronicles.platform.services.INetworkHelper;
 import uk.nbforge.gallifreyan_chronicles.platform.services.IPlatformHelper;
-
-import java.util.ServiceLoader;
 
 public class Services {
     public static final IPlatformHelper PLATFORM = load(IPlatformHelper.class);

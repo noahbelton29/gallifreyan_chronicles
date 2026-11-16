@@ -1,8 +1,6 @@
 package uk.nbforge.gallifreyan_chronicles.datagen.data.tag;
 
-import uk.nbforge.gallifreyan_chronicles.Constants;
-import uk.nbforge.gallifreyan_chronicles.core.GCItems;
-import uk.nbforge.gallifreyan_chronicles.core.GCTags;
+import java.util.concurrent.CompletableFuture;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.data.PackOutput;
@@ -12,8 +10,9 @@ import net.minecraft.tags.TagKey;
 import net.minecraft.world.item.Item;
 import net.neoforged.neoforge.common.data.ItemTagsProvider;
 import org.jspecify.annotations.NonNull;
-
-import java.util.concurrent.CompletableFuture;
+import uk.nbforge.gallifreyan_chronicles.Constants;
+import uk.nbforge.gallifreyan_chronicles.core.GCItems;
+import uk.nbforge.gallifreyan_chronicles.core.GCTags;
 
 public class GCItemTagProvider extends ItemTagsProvider {
     public GCItemTagProvider(PackOutput output, CompletableFuture<HolderLookup.Provider> lookupProvider) {
@@ -29,30 +28,21 @@ public class GCItemTagProvider extends ItemTagsProvider {
 
     @Override
     protected void addTags(HolderLookup.@NonNull Provider provider) {
-        tagAdd(GCTags.Items.TARANIUM_REPAIRABLE,
-                GCItems.TARANIUM_INGOT);
+        tagAdd(GCTags.Items.TARANIUM_REPAIRABLE, GCItems.TARANIUM_INGOT);
 
-        tagAdd(ItemTags.SWORDS,
-                GCItems.TARANIUM_SWORD);
-        tagAdd(ItemTags.PICKAXES,
-                GCItems.TARANIUM_PICKAXE);
-        tagAdd(ItemTags.AXES,
-                GCItems.TARANIUM_AXE);
-        tagAdd(ItemTags.SHOVELS,
-                GCItems.TARANIUM_SHOVEL);
-        tagAdd(ItemTags.HOES,
-                GCItems.TARANIUM_HOE);
+        tagAdd(ItemTags.SWORDS, GCItems.TARANIUM_SWORD);
+        tagAdd(ItemTags.PICKAXES, GCItems.TARANIUM_PICKAXE);
+        tagAdd(ItemTags.AXES, GCItems.TARANIUM_AXE);
+        tagAdd(ItemTags.SHOVELS, GCItems.TARANIUM_SHOVEL);
+        tagAdd(ItemTags.HOES, GCItems.TARANIUM_HOE);
 
-        tagAdd(ItemTags.HEAD_ARMOR,
-                GCItems.TARANIUM_HELMET);
-        tagAdd(ItemTags.CHEST_ARMOR,
-                GCItems.TARANIUM_CHESTPLATE);
-        tagAdd(ItemTags.LEG_ARMOR,
-                GCItems.TARANIUM_LEGGINGS);
-        tagAdd(ItemTags.FOOT_ARMOR,
-                GCItems.TARANIUM_BOOTS);
+        tagAdd(ItemTags.HEAD_ARMOR, GCItems.TARANIUM_HELMET);
+        tagAdd(ItemTags.CHEST_ARMOR, GCItems.TARANIUM_CHESTPLATE);
+        tagAdd(ItemTags.LEG_ARMOR, GCItems.TARANIUM_LEGGINGS);
+        tagAdd(ItemTags.FOOT_ARMOR, GCItems.TARANIUM_BOOTS);
 
-        tagAdd(ItemTags.TRIMMABLE_ARMOR,
+        tagAdd(
+                ItemTags.TRIMMABLE_ARMOR,
                 GCItems.TARANIUM_HELMET,
                 GCItems.TARANIUM_CHESTPLATE,
                 GCItems.TARANIUM_LEGGINGS,

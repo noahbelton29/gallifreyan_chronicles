@@ -1,11 +1,11 @@
 package uk.nbforge.gallifreyan_chronicles.mixin.client.compat.immersive_portals;
 
-import uk.nbforge.gallifreyan_chronicles.compat.flashback.FlashbackChunks;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Pseudo;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+import uk.nbforge.gallifreyan_chronicles.compat.flashback.FlashbackChunks;
 
 /** Before the client takes a dimension list, in a replay merge it with the ones from before, see FlashbackDimMerge. */
 @Pseudo

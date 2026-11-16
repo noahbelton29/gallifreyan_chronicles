@@ -1,13 +1,12 @@
 package uk.nbforge.gallifreyan_chronicles.loader.sky;
 
+import net.minecraft.server.MinecraftServer;
+import uk.nbforge.gallifreyan_chronicles.codec.sky.data.CelestialBodyCodec;
+import uk.nbforge.gallifreyan_chronicles.core.dynamic_registries.CelestialBodyRegistry;
 import uk.nbforge.gallifreyan_chronicles.loader.GCJsonReloadListener;
 import uk.nbforge.gallifreyan_chronicles.network.DimensionSkySyncPayload;
 import uk.nbforge.gallifreyan_chronicles.platform.Services;
-import net.minecraft.server.MinecraftServer;
-
-import uk.nbforge.gallifreyan_chronicles.core.dynamic_registries.CelestialBodyRegistry;
 import uk.nbforge.gallifreyan_chronicles.sky.data.CelestialBody;
-import uk.nbforge.gallifreyan_chronicles.codec.sky.data.CelestialBodyCodec;
 
 public class CelestialBodyLoader extends GCJsonReloadListener<CelestialBody> {
     public CelestialBodyLoader() {

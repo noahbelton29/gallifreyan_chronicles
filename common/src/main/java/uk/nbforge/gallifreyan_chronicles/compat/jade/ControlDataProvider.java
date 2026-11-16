@@ -1,5 +1,6 @@
 package uk.nbforge.gallifreyan_chronicles.compat.jade;
 
+import java.util.UUID;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.Identifier;
 import net.minecraft.server.MinecraftServer;
@@ -15,8 +16,6 @@ import uk.nbforge.gallifreyan_chronicles.tardis.TardisApi;
 import uk.nbforge.gallifreyan_chronicles.tardis.flight.LandingTarget;
 import uk.nbforge.gallifreyan_chronicles.tardis.flight.TardisDestinations;
 import uk.nbforge.gallifreyan_chronicles.util.GCUtil;
-
-import java.util.UUID;
 
 /** The destination data lives on the server so the destination controls send what their tooltip needs from here. */
 public class ControlDataProvider implements IServerDataProvider<EntityAccessor> {
@@ -40,17 +39,23 @@ public class ControlDataProvider implements IServerDataProvider<EntityAccessor> 
         MinecraftServer server = level.getServer();
         String id = control.getControlId();
         switch (id) {
-            case GCTardisControls.X_INCREMENT_CONTROL, GCTardisControls.Y_INCREMENT_CONTROL,
-                 GCTardisControls.Z_INCREMENT_CONTROL -> {
+            case GCTardisControls.X_INCREMENT_CONTROL,
+                    GCTardisControls.Y_INCREMENT_CONTROL,
+                    GCTardisControls.Z_INCREMENT_CONTROL -> {
                 LandingTarget target = TardisDestinations.current(server, tardisId);
                 if (target == null) return;
-                data.putInt(COORD, switch (id) {
-                    case GCTardisControls.X_INCREMENT_CONTROL -> target.pos().getX();
-                    case GCTardisControls.Y_INCREMENT_CONTROL -> target.pos().getY();
-                    default -> target.pos().getZ();
-                });
+                data.putInt(
+                        COORD,
+                        switch (id) {
+                            case GCTardisControls.X_INCREMENT_CONTROL ->
+                                target.pos().getX();
+                            case GCTardisControls.Y_INCREMENT_CONTROL ->
+                                target.pos().getY();
+                            default -> target.pos().getZ();
+                        });
             }
-            case GCTardisControls.COORDINATE_STEP_CONTROL -> data.putInt(STEP, TardisDestinations.increment(server, tardisId));
+            case GCTardisControls.COORDINATE_STEP_CONTROL ->
+                data.putInt(STEP, TardisDestinations.increment(server, tardisId));
             case GCTardisControls.DIRECTIONAL_CONTROL -> {
                 LandingTarget target = TardisDestinations.current(server, tardisId);
                 if (target != null) data.putFloat(YAW, target.yaw());
@@ -58,12 +63,15 @@ public class ControlDataProvider implements IServerDataProvider<EntityAccessor> 
             case GCTardisControls.DIMENSIONAL_CONTROL -> {
                 LandingTarget target = TardisDestinations.current(server, tardisId);
                 if (target == null) return;
-                data.putString(DIMENSION, TardisDestinations.dimensionName(target.dimension()).getString());
-                data.putString(DIMENSION_INDEX, TardisDestinations.landableIndex(server, target.dimension())
-                        + "/" + TardisDestinations.landableCount(server));
+                data.putString(
+                        DIMENSION,
+                        TardisDestinations.dimensionName(target.dimension()).getString());
+                data.putString(
+                        DIMENSION_INDEX,
+                        TardisDestinations.landableIndex(server, target.dimension()) + "/"
+                                + TardisDestinations.landableCount(server));
             }
-            default -> {
-            }
+            default -> {}
         }
     }
 

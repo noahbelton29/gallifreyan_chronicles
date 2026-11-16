@@ -1,23 +1,22 @@
 package uk.nbforge.gallifreyan_chronicles.tardis.mind.feedback;
 
-import uk.nbforge.gallifreyan_chronicles.tardis.Tardis;
-import uk.nbforge.gallifreyan_chronicles.tardis.ecs.system.TardisMindSystem;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.UUID;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.util.Mth;
-
-import java.util.HashMap;
-import java.util.Map;
-import java.util.UUID;
+import uk.nbforge.gallifreyan_chronicles.tardis.Tardis;
+import uk.nbforge.gallifreyan_chronicles.tardis.ecs.system.TardisMindSystem;
 
 /**
-   Shows how a TARDIS feels with particles around its console and exterior.
-   Gaining trust shows hearts and losing it shows frustration or distress.
-   A cooldown limits small changes so the room does not fill with particles.
-*/
+ * Shows how a TARDIS feels with particles around its console and exterior.
+ * Gaining trust shows hearts and losing it shows frustration or distress.
+ * A cooldown limits small changes so the room does not fill with particles.
+ */
 public final class TardisFeedback {
     /** What made the trust change. */
     public enum Cause {
@@ -47,17 +46,16 @@ public final class TardisFeedback {
     // When each TARDIS last showed a reaction
     private static final Map<UUID, Long> LAST = new HashMap<>();
 
-    private TardisFeedback() {
-    }
+    private TardisFeedback() {}
 
     public static void reset() {
         LAST.clear();
     }
 
     /**
-       The bigger the change the more particles.
-       Serious things like abuse and betrayal react straight away even if it showed one recently.
-    */
+     * The bigger the change the more particles.
+     * Serious things like abuse and betrayal react straight away even if it showed one recently.
+     */
     public static void trustChanged(Tardis tardis, float change, Cause cause) {
         float size = Math.abs(change);
         boolean serious = cause != Cause.NORMAL;
@@ -82,11 +80,11 @@ public final class TardisFeedback {
     }
 
     /**
-       Gains give hearts, losses give other particles depending on how bad it was.
-       Betrayal gets its own stronger reaction and small losses a gentler one.
-    */
-    private static void emit(ServerLevel level, BlockPos pos, double height, int count, boolean gained,
-                             float size, Cause cause) {
+     * Gains give hearts, losses give other particles depending on how bad it was.
+     * Betrayal gets its own stronger reaction and small losses a gentler one.
+     */
+    private static void emit(
+            ServerLevel level, BlockPos pos, double height, int count, boolean gained, float size, Cause cause) {
         double x = pos.getX() + 0.5;
         double y = pos.getY() + height;
         double z = pos.getZ() + 0.5;

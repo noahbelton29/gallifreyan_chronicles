@@ -1,13 +1,8 @@
 package uk.nbforge.gallifreyan_chronicles.tardis.door;
 
-import uk.nbforge.gallifreyan_chronicles.util.GCUtil;
-
 import com.google.gson.JsonElement;
 import com.google.gson.JsonParser;
 import com.mojang.serialization.JsonOps;
-import uk.nbforge.gallifreyan_chronicles.Constants;
-import org.jspecify.annotations.Nullable;
-
 import java.net.URI;
 import java.net.URL;
 import java.nio.file.FileSystem;
@@ -20,21 +15,22 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Stream;
+import org.jspecify.annotations.Nullable;
+import uk.nbforge.gallifreyan_chronicles.Constants;
 import uk.nbforge.gallifreyan_chronicles.tardis.codec.door.TardisDoorVariantCodec;
+import uk.nbforge.gallifreyan_chronicles.util.GCUtil;
 
 public final class DoorBlockJson {
     public static final String FOLDER = "/data/" + Constants.MOD_ID + "/tardis_door_variant";
     private static final String MARKER = "first_doctors_doors.json";
     private static final String DEFAULT_PARTICLE = Constants.MOD_ID + ":brachacki_wall_block";
 
-    public record Entry(String block, String variant, String model, int priority, String particle) {
-    }
+    public record Entry(String block, String variant, String model, int priority, String particle) {}
 
     private static @Nullable List<TardisDoorVariant> variants;
     private static @Nullable List<Entry> entries;
 
-    private DoorBlockJson() {
-    }
+    private DoorBlockJson() {}
 
     public static List<Entry> entries() {
         if (entries != null) return entries;
@@ -43,7 +39,8 @@ public final class DoorBlockJson {
             if (v.interior() || v.block().isEmpty()) continue;
             String block = v.block().contains(":") ? v.block() : Constants.MOD_ID + ":" + v.block();
             if (!block.startsWith(Constants.MOD_ID + ":")) {
-                Constants.LOG.warn("[GC] door variant {} has block {} outside {}, skipped", v.id(), block, Constants.MOD_ID);
+                Constants.LOG.warn(
+                        "[GC] door variant {} has block {} outside {}, skipped", v.id(), block, Constants.MOD_ID);
                 continue;
             }
             String particle = v.particle().isEmpty() ? DEFAULT_PARTICLE : v.particle();
@@ -114,7 +111,8 @@ public final class DoorBlockJson {
                 if (!name.endsWith(".json")) continue;
                 String id = Constants.MOD_ID + ":" + name.substring(0, name.length() - ".json".length());
                 JsonElement json = JsonParser.parseString(Files.readString(file));
-                TardisDoorVariantCodec.CODEC.parse(JsonOps.INSTANCE, json)
+                TardisDoorVariantCodec.CODEC
+                        .parse(JsonOps.INSTANCE, json)
                         .resultOrPartial(error -> Constants.LOG.error("[GC] bad door variant {}: {}", id, error))
                         .ifPresent(v -> out.add(v.withId(id)));
             }

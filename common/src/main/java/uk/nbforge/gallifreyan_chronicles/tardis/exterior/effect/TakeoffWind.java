@@ -16,11 +16,15 @@ public final class TakeoffWind {
     private static final float CLOUD_SPEED = 0.08f;
     private static final float END_PROGRESS = 0.92f;
 
-    private TakeoffWind() {
-    }
+    private TakeoffWind() {}
 
-    public static void tick(ServerLevel level, BlockPos pos, boolean inFlight, boolean fullyInvisible,
-                            long fadeStartTick, long fadeDuration) {
+    public static void tick(
+            ServerLevel level,
+            BlockPos pos,
+            boolean inFlight,
+            boolean fullyInvisible,
+            long fadeStartTick,
+            long fadeDuration) {
         long now = level.getGameTime();
         float progress = Math.clamp((now - fadeStartTick) / (float) fadeDuration, 0.0f, 1.0f);
 
@@ -54,9 +58,7 @@ public final class TakeoffWind {
             double angle = spin + (Math.PI * 2.0 * i) / dustPoints + (random.nextDouble() - 0.5) * 0.3;
             double dx = Math.cos(angle);
             double dz = Math.sin(angle);
-            level.sendParticles(dust,
-                    cx + dx * DUST_RADIUS, cy, cz + dz * DUST_RADIUS,
-                    0, dx, 0.0, dz, dustSpeed);
+            level.sendParticles(dust, cx + dx * DUST_RADIUS, cy, cz + dz * DUST_RADIUS, 0, dx, 0.0, dz, dustSpeed);
         }
 
         int clouds = strength > 0.5f ? 2 : 1;
@@ -64,9 +66,16 @@ public final class TakeoffWind {
             double angle = random.nextDouble() * Math.PI * 2.0;
             double dx = Math.cos(angle);
             double dz = Math.sin(angle);
-            level.sendParticles(ParticleTypes.CLOUD,
-                    cx + dx * CLOUD_RADIUS, cy, cz + dz * CLOUD_RADIUS,
-                    0, dx, 0.0, dz, CLOUD_SPEED * (0.6f + 0.4f * strength));
+            level.sendParticles(
+                    ParticleTypes.CLOUD,
+                    cx + dx * CLOUD_RADIUS,
+                    cy,
+                    cz + dz * CLOUD_RADIUS,
+                    0,
+                    dx,
+                    0.0,
+                    dz,
+                    CLOUD_SPEED * (0.6f + 0.4f * strength));
         }
     }
 }

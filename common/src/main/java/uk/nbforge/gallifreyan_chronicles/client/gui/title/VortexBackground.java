@@ -1,6 +1,5 @@
 package uk.nbforge.gallifreyan_chronicles.client.gui.title;
 
-import uk.nbforge.gallifreyan_chronicles.util.GCUtil;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.renderer.RenderPipelines;
@@ -8,6 +7,7 @@ import net.minecraft.resources.Identifier;
 import net.minecraft.util.ARGB;
 import net.minecraft.util.Mth;
 import net.minecraft.util.Util;
+import uk.nbforge.gallifreyan_chronicles.util.GCUtil;
 
 public final class VortexBackground {
     private static final int SHEET_COUNT = 8;
@@ -25,8 +25,7 @@ public final class VortexBackground {
         }
     }
 
-    private VortexBackground() {
-    }
+    private VortexBackground() {}
 
     public static void render(GuiGraphicsExtractor graphics, int width, int height, int centerX, int centerY) {
         graphics.fill(0, 0, width, height, BACKDROP_COLOR);
@@ -46,7 +45,19 @@ public final class VortexBackground {
         int x = centerX - size / 2;
         int y = centerY - size / 2;
 
-        graphics.blit(RenderPipelines.GUI_TEXTURED, sheet, x, y, 0.0F, (float) (row * FRAME_SIZE),
-                size, size, FRAME_SIZE, FRAME_SIZE, FRAME_SIZE, FRAME_SIZE * FRAMES_PER_SHEET, ARGB.white(1.0F));
+        graphics.blit(
+                RenderPipelines.GUI_TEXTURED,
+                sheet,
+                x,
+                y,
+                0.0F,
+                (float) (row * FRAME_SIZE),
+                size,
+                size,
+                FRAME_SIZE,
+                FRAME_SIZE,
+                FRAME_SIZE,
+                FRAME_SIZE * FRAMES_PER_SHEET,
+                ARGB.white(1.0F));
     }
 }

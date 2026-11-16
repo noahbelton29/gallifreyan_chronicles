@@ -1,15 +1,13 @@
 package uk.nbforge.gallifreyan_chronicles.tardis.console;
 
-import uk.nbforge.gallifreyan_chronicles.Constants;
-import uk.nbforge.gallifreyan_chronicles.core.dynamic_registries.TardisControlRegistry;
-
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
+import uk.nbforge.gallifreyan_chronicles.Constants;
+import uk.nbforge.gallifreyan_chronicles.core.dynamic_registries.TardisControlRegistry;
 
 public final class TardisConsoleValidator {
-    private TardisConsoleValidator() {
-    }
+    private TardisConsoleValidator() {}
 
     public static int validate(Collection<TardisConsole> consoles) {
         int problems = 0;
@@ -23,9 +21,9 @@ public final class TardisConsoleValidator {
     }
 
     /**
-       Checks a console file and logs what is wrong, returns how many problems it found.
-       Problems are unknown controls, repeated controls and sizes of zero or less.
-    */
+     * Checks a console file and logs what is wrong, returns how many problems it found.
+     * Problems are unknown controls, repeated controls and sizes of zero or less.
+     */
     private static int validate(TardisConsole console) {
         int problems = 0;
         Set<String> seen = new HashSet<>();
@@ -39,8 +37,13 @@ public final class TardisConsoleValidator {
                 problems++;
             }
             if (entry.width() <= 0.0F || entry.height() <= 0.0F || entry.depth() <= 0.0F) {
-                Constants.LOG.warn("Console '{}' control '{}' has a non-positive size ({} x {} x {})",
-                        console.id(), entry.id(), entry.width(), entry.height(), entry.depth());
+                Constants.LOG.warn(
+                        "Console '{}' control '{}' has a non-positive size ({} x {} x {})",
+                        console.id(),
+                        entry.id(),
+                        entry.width(),
+                        entry.height(),
+                        entry.depth());
                 problems++;
             }
         }

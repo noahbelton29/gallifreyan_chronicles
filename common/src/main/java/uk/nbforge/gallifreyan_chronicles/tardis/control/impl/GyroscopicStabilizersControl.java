@@ -2,7 +2,6 @@ package uk.nbforge.gallifreyan_chronicles.tardis.control.impl;
 
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
-
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
@@ -13,7 +12,8 @@ import uk.nbforge.gallifreyan_chronicles.tardis.control.BaseControl;
 import uk.nbforge.gallifreyan_chronicles.tardis.control.ControlAnimations;
 
 public class GyroscopicStabilizersControl extends BaseControl {
-    public static final ControlAnimations DEFAULT_ANIMATIONS = new ControlAnimations("gyroscopic_stabilizers_on", "gyroscopic_stabilizers_off", true);
+    public static final ControlAnimations DEFAULT_ANIMATIONS =
+            new ControlAnimations("gyroscopic_stabilizers_on", "gyroscopic_stabilizers_off", true);
 
     public GyroscopicStabilizersControl(ControlAnimations animations) {
         super(animations);
@@ -37,6 +37,8 @@ public class GyroscopicStabilizersControl extends BaseControl {
 
     @Override
     public Component describeState(boolean activated) {
-        return activated ? state("stabilizers", "engaged", ChatFormatting.GREEN) : state("stabilizers", "disengaged", ChatFormatting.RED);
+        return activated
+                ? state("stabilizers", "engaged", ChatFormatting.GREEN)
+                : state("stabilizers", "disengaged", ChatFormatting.RED);
     }
 }

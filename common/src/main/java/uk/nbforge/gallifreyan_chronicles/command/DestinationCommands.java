@@ -1,14 +1,17 @@
 package uk.nbforge.gallifreyan_chronicles.command;
 
+import static net.minecraft.commands.Commands.argument;
+import static net.minecraft.commands.Commands.literal;
+import static uk.nbforge.gallifreyan_chronicles.util.CommandUtil.*;
+
 import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.mojang.brigadier.suggestion.Suggestions;
 import com.mojang.brigadier.suggestion.SuggestionsBuilder;
-import uk.nbforge.gallifreyan_chronicles.tardis.Tardis;
-import uk.nbforge.gallifreyan_chronicles.tardis.TardisApi;
-import uk.nbforge.gallifreyan_chronicles.tardis.flight.LandingTarget;
+import java.util.Map;
+import java.util.concurrent.CompletableFuture;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.SharedSuggestionProvider;
 import net.minecraft.commands.arguments.DimensionArgument;
@@ -17,21 +20,30 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.util.Mth;
-
-import java.util.Map;
-import java.util.concurrent.CompletableFuture;
-
-import static uk.nbforge.gallifreyan_chronicles.util.CommandUtil.*;
-import static net.minecraft.commands.Commands.argument;
-import static net.minecraft.commands.Commands.literal;
+import uk.nbforge.gallifreyan_chronicles.tardis.Tardis;
+import uk.nbforge.gallifreyan_chronicles.tardis.TardisApi;
+import uk.nbforge.gallifreyan_chronicles.tardis.flight.LandingTarget;
 
 public final class DestinationCommands {
     private static final Map<String, Float> FACINGS = Map.of(
-            "south", 0f, "southwest", 45f, "west", 90f, "northwest", 135f,
-            "north", 180f, "northeast", 225f, "east", 270f, "southeast", 315f);
+            "south",
+            0f,
+            "southwest",
+            45f,
+            "west",
+            90f,
+            "northwest",
+            135f,
+            "north",
+            180f,
+            "northeast",
+            225f,
+            "east",
+            270f,
+            "southeast",
+            315f);
 
-    private DestinationCommands() {
-    }
+    private DestinationCommands() {}
 
     /** {@code data destination [here|clear|<dimension> <pos> <facing>]} */
     public static LiteralArgumentBuilder<CommandSourceStack> destinationData() {
@@ -46,8 +58,8 @@ public final class DestinationCommands {
                                         .executes(DestinationCommands::set))));
     }
 
-    private static CompletableFuture<Suggestions> suggestFacings(CommandContext<CommandSourceStack> ctx,
-                                                                 SuggestionsBuilder builder) {
+    private static CompletableFuture<Suggestions> suggestFacings(
+            CommandContext<CommandSourceStack> ctx, SuggestionsBuilder builder) {
         return SharedSuggestionProvider.suggest(FACINGS.keySet(), builder);
     }
 
@@ -78,16 +90,27 @@ public final class DestinationCommands {
         });
     }
 
-    private static int setTarget(CommandContext<CommandSourceStack> ctx, Tardis tardis, ServerLevel level,
-                                 BlockPos pos, float yaw, String facing) {
+    private static int setTarget(
+            CommandContext<CommandSourceStack> ctx,
+            Tardis tardis,
+            ServerLevel level,
+            BlockPos pos,
+            float yaw,
+            String facing) {
         if (TardisApi.idOfLevel(level).isPresent()) return fail(ctx, "destination_interior");
         if (level.isOutsideBuildHeight(pos) || level.isOutsideBuildHeight(pos.above())) {
             return fail(ctx, "destination_out_of_world");
         }
 
         manager(ctx).setLandingTarget(tardis.id(), new LandingTarget(level.dimension(), pos, yaw));
-        return success(ctx, true, "destination_set", tardis.id().toString(), pos.toShortString(),
-                level.dimension().identifier().toString(), facing);
+        return success(
+                ctx,
+                true,
+                "destination_set",
+                tardis.id().toString(),
+                pos.toShortString(),
+                level.dimension().identifier().toString(),
+                facing);
     }
 
     private static int get(CommandContext<CommandSourceStack> ctx) throws CommandSyntaxException {
@@ -96,8 +119,14 @@ public final class DestinationCommands {
             LandingTarget target = manager(ctx).getLandingTarget(tardis.id());
             if (target == null) return success(ctx, false, "destination_none", id);
 
-            return success(ctx, false, "destination_get", id, target.pos().toShortString(),
-                    target.dimension().identifier().toString(), facingName(target.yaw()));
+            return success(
+                    ctx,
+                    false,
+                    "destination_get",
+                    id,
+                    target.pos().toShortString(),
+                    target.dimension().identifier().toString(),
+                    facingName(target.yaw()));
         });
     }
 

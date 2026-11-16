@@ -1,17 +1,17 @@
 package uk.nbforge.gallifreyan_chronicles.tardis.mind.action.builtin;
 
+import net.minecraft.core.BlockPos;
+import net.minecraft.sounds.SoundSource;
 import uk.nbforge.gallifreyan_chronicles.Constants;
 import uk.nbforge.gallifreyan_chronicles.core.GCSounds;
 import uk.nbforge.gallifreyan_chronicles.network.tardis.TardisDrumShakePayload;
 import uk.nbforge.gallifreyan_chronicles.tardis.mind.action.MindAction;
 import uk.nbforge.gallifreyan_chronicles.tardis.mind.action.MindContext;
-import net.minecraft.core.BlockPos;
-import net.minecraft.sounds.SoundSource;
 
 /**
-   Slams its doors shut with a bang and the room shakes, lock locks them too.
-   The json fields are volume, shake and lock.
-*/
+ * Slams its doors shut with a bang and the room shakes, lock locks them too.
+ * The json fields are volume, shake and lock.
+ */
 public record SlamDoorsAction(float volume, float shake, boolean lock) implements MindAction {
     public static final String TYPE = Constants.MOD_ID + ":slam_doors";
 
@@ -25,7 +25,8 @@ public record SlamDoorsAction(float volume, float shake, boolean lock) implement
         if (lock) LockDoorsAction.closeAndLock(context.tardis);
         else context.tardis.closeDoors();
         context.everywhere((level, pos) -> {
-            level.playSound(null, BlockPos.containing(pos), GCSounds.TARDIS_DOOR_CLOSE, SoundSource.BLOCKS, volume, 0.6F);
+            level.playSound(
+                    null, BlockPos.containing(pos), GCSounds.TARDIS_DOOR_CLOSE, SoundSource.BLOCKS, volume, 0.6F);
             TardisDrumShakePayload.broadcast(level, pos, shake);
         });
     }

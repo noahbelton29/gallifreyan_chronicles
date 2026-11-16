@@ -1,18 +1,18 @@
 package uk.nbforge.gallifreyan_chronicles.mixin.client.compat;
 
-import uk.nbforge.gallifreyan_chronicles.compat.portal.PortalDiagnostics;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Pseudo;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+import uk.nbforge.gallifreyan_chronicles.compat.portal.PortalDiagnostics;
 
 /**
-   Another Immersive Portals debug probe.
-   After every crossing it is armed for 1200 frames and builds and logs a long status line on the render thread once a second.
-   It is log only so skip it.
-   why is a debug probe doing this every frame, makes no sense.
-*/
+ * Another Immersive Portals debug probe.
+ * After every crossing it is armed for 1200 frames and builds and logs a long status line on the render thread once a second.
+ * It is log only so skip it.
+ * why is a debug probe doing this every frame, makes no sense.
+ */
 @Pseudo
 @Mixin(targets = "qouteall.imm_ptl.core.render.RenderChainProbe", remap = false)
 public abstract class PortalChainProbeMixin {

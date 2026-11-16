@@ -1,10 +1,10 @@
 package uk.nbforge.gallifreyan_chronicles.tardis.control;
 
-import uk.nbforge.gallifreyan_chronicles.core.dynamic_registries.TardisControlRegistry;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.level.Level;
 import org.jspecify.annotations.Nullable;
+import uk.nbforge.gallifreyan_chronicles.core.dynamic_registries.TardisControlRegistry;
 
 public interface ConsoleControlHost {
     Level getHostLevel();

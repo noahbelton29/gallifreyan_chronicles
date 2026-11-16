@@ -1,6 +1,5 @@
 package uk.nbforge.gallifreyan_chronicles.mixin.client.compat.flashback;
 
-import uk.nbforge.gallifreyan_chronicles.compat.flashback.FlashbackChunks;
 import net.minecraft.network.protocol.game.ClientboundLevelChunkWithLightPacket;
 import net.minecraft.server.level.ServerLevel;
 import org.spongepowered.asm.mixin.Mixin;
@@ -9,11 +8,12 @@ import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+import uk.nbforge.gallifreyan_chronicles.compat.flashback.FlashbackChunks;
 
 /**
-   Flashback has just put a recorded chunk in the replay world.
-   With Immersive Portals nothing sends it to the viewer so we do, see FlashbackChunks.
-*/
+ * Flashback has just put a recorded chunk in the replay world.
+ * With Immersive Portals nothing sends it to the viewer so we do, see FlashbackChunks.
+ */
 @Pseudo
 @Mixin(targets = "com.moulberry.flashback.playback.ReplayGamePacketHandler", remap = false)
 public abstract class ChunkForwardMixin {

@@ -1,16 +1,15 @@
 package uk.nbforge.gallifreyan_chronicles.core;
 
-import uk.nbforge.gallifreyan_chronicles.core.entity.TardisControlEntity;
-import uk.nbforge.gallifreyan_chronicles.core.entity.TardisKeyEntity;
-import uk.nbforge.gallifreyan_chronicles.util.GCUtil;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.MobCategory;
+import uk.nbforge.gallifreyan_chronicles.core.entity.TardisControlEntity;
+import uk.nbforge.gallifreyan_chronicles.core.entity.TardisKeyEntity;
+import uk.nbforge.gallifreyan_chronicles.util.GCUtil;
 
 public final class GCEntityTypeBuilders {
-    private GCEntityTypeBuilders() {
-    }
+    private GCEntityTypeBuilders() {}
 
     public static EntityType<TardisControlEntity> tardisControl() {
         return EntityType.Builder.of(TardisControlEntity::new, MobCategory.MISC)

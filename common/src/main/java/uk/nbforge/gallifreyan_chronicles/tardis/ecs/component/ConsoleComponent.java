@@ -1,8 +1,8 @@
 package uk.nbforge.gallifreyan_chronicles.tardis.ecs.component;
 
+import uk.nbforge.gallifreyan_chronicles.core.dynamic_registries.TardisConsoleRegistry;
 import uk.nbforge.gallifreyan_chronicles.ecs.Component;
 import uk.nbforge.gallifreyan_chronicles.tardis.console.TardisConsole;
-import uk.nbforge.gallifreyan_chronicles.core.dynamic_registries.TardisConsoleRegistry;
 
 public record ConsoleComponent(String consoleId, String variantId) implements Component {
     public static ConsoleComponent ofDefault() {

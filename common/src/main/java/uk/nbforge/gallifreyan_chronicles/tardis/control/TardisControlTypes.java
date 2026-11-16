@@ -1,21 +1,19 @@
 package uk.nbforge.gallifreyan_chronicles.tardis.control;
 
 import com.mojang.serialization.MapCodec;
-import org.jspecify.annotations.Nullable;
-
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Set;
+import org.jspecify.annotations.Nullable;
 
 public final class TardisControlTypes {
     private static final Map<String, MapCodec<? extends TardisControl>> TYPES = new LinkedHashMap<>();
     private static final Map<MapCodec<? extends TardisControl>, String> IDS = new LinkedHashMap<>();
     private static final Map<Class<?>, MapCodec<? extends TardisControl>> BY_CLASS = new HashMap<>();
 
-    private TardisControlTypes() {
-    }
+    private TardisControlTypes() {}
 
     public static void register(String id, MapCodec<? extends TardisControl> codec) {
         if (TYPES.putIfAbsent(id, codec) != null) {
@@ -33,7 +31,8 @@ public final class TardisControlTypes {
     }
 
     /** Remembers the codec by class so a control can find it again from itself. */
-    public static void register(String id, Class<? extends TardisControl> type, MapCodec<? extends TardisControl> codec) {
+    public static void register(
+            String id, Class<? extends TardisControl> type, MapCodec<? extends TardisControl> codec) {
         register(id, codec);
         BY_CLASS.put(type, codec);
     }
@@ -44,7 +43,8 @@ public final class TardisControlTypes {
             MapCodec<? extends TardisControl> codec = BY_CLASS.get(type);
             if (codec != null) return codec;
         }
-        throw new IllegalStateException("TARDIS control type is not registered: " + control.getClass().getName());
+        throw new IllegalStateException(
+                "TARDIS control type is not registered: " + control.getClass().getName());
     }
 
     public static boolean contains(String id) {

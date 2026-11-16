@@ -1,16 +1,15 @@
 package uk.nbforge.gallifreyan_chronicles.tardis.ecs.system;
 
 import uk.nbforge.gallifreyan_chronicles.ecs.Entity;
+import uk.nbforge.gallifreyan_chronicles.tardis.ecs.TardisComponentTypes;
 import uk.nbforge.gallifreyan_chronicles.tardis.ecs.component.DoorComponent;
 import uk.nbforge.gallifreyan_chronicles.tardis.ecs.component.DoorState;
-import uk.nbforge.gallifreyan_chronicles.tardis.ecs.TardisComponentTypes;
 
 public final class DoorSystem {
     private static final long OPEN_DURATION_MS = 600;
     private static final long CLOSE_DURATION_MS = 400;
 
-    private DoorSystem() {
-    }
+    private DoorSystem() {}
 
     public record InteractionResult(String animationName, boolean opening, DoorState state) {
         public boolean hasNoAnimation() {
@@ -28,12 +27,14 @@ public final class DoorSystem {
 
     public static void applyRemoteDoorState(Entity entity, DoorState next, boolean opening, long now) {
         long duration = opening ? OPEN_DURATION_MS : CLOSE_DURATION_MS;
-        entity.set(TardisComponentTypes.DOOR, entity.get(TardisComponentTypes.DOOR).animatingUntil(next, now + duration));
+        entity.set(
+                TardisComponentTypes.DOOR, entity.get(TardisComponentTypes.DOOR).animatingUntil(next, now + duration));
     }
 
     /** Sets the state right away with no animation. */
     public static void snapToState(Entity entity, DoorState state) {
-        entity.set(TardisComponentTypes.DOOR, entity.get(TardisComponentTypes.DOOR).animatingUntil(state, 0L));
+        entity.set(
+                TardisComponentTypes.DOOR, entity.get(TardisComponentTypes.DOOR).animatingUntil(state, 0L));
     }
 
     public static InteractionResult interact(Entity entity, boolean sneaking, long now) {

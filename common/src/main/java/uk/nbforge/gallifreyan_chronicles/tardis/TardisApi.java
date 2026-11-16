@@ -1,9 +1,8 @@
 package uk.nbforge.gallifreyan_chronicles.tardis;
 
-import uk.nbforge.gallifreyan_chronicles.util.TardisDimensionUtil;
-
-import uk.nbforge.gallifreyan_chronicles.Constants;
-import uk.nbforge.gallifreyan_chronicles.tardis.ecs.TardisLinkable;
+import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
 import net.minecraft.resources.Identifier;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
@@ -11,17 +10,15 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import org.jspecify.annotations.Nullable;
-
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
+import uk.nbforge.gallifreyan_chronicles.Constants;
+import uk.nbforge.gallifreyan_chronicles.tardis.ecs.TardisLinkable;
+import uk.nbforge.gallifreyan_chronicles.util.TardisDimensionUtil;
 
 public final class TardisApi {
     // The start of the name of every interior world, what follows it is the TARDIS id
     private static final String INTERIOR_PREFIX = TardisDimensionUtil.INTERIOR_PREFIX;
 
-    public TardisApi() {
-    }
+    public TardisApi() {}
 
     /**
      * Finds a TARDIS by its id, empty if the id is null or no TARDIS has it.
@@ -45,7 +42,8 @@ public final class TardisApi {
      */
     public static <T extends BlockEntity & TardisLinkable> Optional<Tardis> of(T blockEntity) {
         if (!(blockEntity.getLevel() instanceof ServerLevel level)) return Optional.empty();
-        UUID id = blockEntity.getLinkedTardisId().orElseGet(() -> idOfLevel(level).orElse(null));
+        UUID id =
+                blockEntity.getLinkedTardisId().orElseGet(() -> idOfLevel(level).orElse(null));
         return get(level.getServer(), id);
     }
 

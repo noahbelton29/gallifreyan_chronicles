@@ -10,8 +10,7 @@ public final class RenderLevelGuard {
     public static final DataTicket<Integer> LEVEL_ID = DataTicket.create("gc_render_level_id", Integer.class);
     public static final DataTicket<Boolean> FOREIGN = DataTicket.create("gc_render_foreign", Boolean.class);
 
-    private RenderLevelGuard() {
-    }
+    private RenderLevelGuard() {}
 
     public static boolean isForeign(Level level) {
         ClientLevel current = Minecraft.getInstance().level;

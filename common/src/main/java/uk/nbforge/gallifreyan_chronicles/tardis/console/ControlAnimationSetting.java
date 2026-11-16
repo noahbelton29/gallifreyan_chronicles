@@ -1,11 +1,10 @@
 package uk.nbforge.gallifreyan_chronicles.tardis.console;
 
+import java.util.Optional;
 import org.jspecify.annotations.Nullable;
 
-import java.util.Optional;
-
-public record ControlAnimationSetting(boolean enabled, Optional<String> active, Optional<String> inactive,
-                                      Optional<Boolean> snapWhenInactive) {
+public record ControlAnimationSetting(
+        boolean enabled, Optional<String> active, Optional<String> inactive, Optional<Boolean> snapWhenInactive) {
     public static final ControlAnimationSetting DEFAULT =
             new ControlAnimationSetting(true, Optional.empty(), Optional.empty(), Optional.empty());
     public static final ControlAnimationSetting DISABLED =

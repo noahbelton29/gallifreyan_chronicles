@@ -1,6 +1,6 @@
 package uk.nbforge.gallifreyan_chronicles.mixin.addon;
 
-import uk.nbforge.gallifreyan_chronicles.addon.AddonPackSource;
+import java.util.Arrays;
 import net.minecraft.server.packs.PackType;
 import net.minecraft.server.packs.repository.FolderRepositorySource;
 import net.minecraft.server.packs.repository.PackRepository;
@@ -8,8 +8,7 @@ import net.minecraft.server.packs.repository.RepositorySource;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.ModifyVariable;
-
-import java.util.Arrays;
+import uk.nbforge.gallifreyan_chronicles.addon.AddonPackSource;
 
 @Mixin(PackRepository.class)
 public abstract class PackRepositoryMixin {

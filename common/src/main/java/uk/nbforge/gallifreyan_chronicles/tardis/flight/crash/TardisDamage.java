@@ -4,8 +4,7 @@ import uk.nbforge.gallifreyan_chronicles.tardis.Tardis;
 import uk.nbforge.gallifreyan_chronicles.tardis.mind.mood.TardisAlarm;
 
 public final class TardisDamage {
-    private TardisDamage() {
-    }
+    private TardisDamage() {}
 
     public static void markCrashed(Tardis tardis) {
         tardis.data().setCrashed(tardis.id(), true);

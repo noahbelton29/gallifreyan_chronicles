@@ -1,37 +1,36 @@
 package uk.nbforge.gallifreyan_chronicles.client;
 
-import uk.nbforge.gallifreyan_chronicles.core.GCTardisControls;
-import uk.nbforge.gallifreyan_chronicles.util.GameClockUtil;
-import uk.nbforge.gallifreyan_chronicles.client.tardis.RematCatchClient;
-import org.jspecify.annotations.Nullable;
-import net.minecraft.resources.ResourceKey;
-import net.minecraft.resources.Identifier;
-import net.minecraft.core.registries.Registries;
-import uk.nbforge.gallifreyan_chronicles.compat.portal.TardisPortalBridge;
-import uk.nbforge.gallifreyan_chronicles.config.GCConfig;
-import net.minecraft.sounds.SoundEvent;
+import net.minecraft.client.Minecraft;
+import net.minecraft.core.BlockPos;
 import net.minecraft.core.registries.BuiltInRegistries;
-import uk.nbforge.gallifreyan_chronicles.client.sound.OffsetSoundInstance;
-import uk.nbforge.gallifreyan_chronicles.client.sound.SoundResumeStatus;
-import uk.nbforge.gallifreyan_chronicles.network.ResumeSoundPayload;
-import uk.nbforge.gallifreyan_chronicles.client.sound.SoundListener;
-import uk.nbforge.gallifreyan_chronicles.core.block_entities.TardisConsoleBlockEntity;
+import net.minecraft.core.registries.Registries;
+import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.sounds.SoundEvent;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.phys.Vec3;
+import org.jspecify.annotations.Nullable;
 import uk.nbforge.gallifreyan_chronicles.client.camera.GCCameraShake;
-import uk.nbforge.gallifreyan_chronicles.client.input.GCKeyMappings;
 import uk.nbforge.gallifreyan_chronicles.client.gui.hud.GCPowerDarkness;
+import uk.nbforge.gallifreyan_chronicles.client.input.GCKeyMappings;
 import uk.nbforge.gallifreyan_chronicles.client.render.detail.TrialTimer;
-import uk.nbforge.gallifreyan_chronicles.core.block_entities.TardisExteriorBlockEntity;
 import uk.nbforge.gallifreyan_chronicles.client.sound.ConsoleHumSounds;
 import uk.nbforge.gallifreyan_chronicles.client.sound.ExteriorHumSounds;
 import uk.nbforge.gallifreyan_chronicles.client.sound.GCMusic;
-import net.minecraft.client.Minecraft;
-import net.minecraft.core.BlockPos;
-import net.minecraft.world.level.Level;
-import net.minecraft.world.phys.Vec3;
+import uk.nbforge.gallifreyan_chronicles.client.sound.OffsetSoundInstance;
+import uk.nbforge.gallifreyan_chronicles.client.sound.SoundListener;
+import uk.nbforge.gallifreyan_chronicles.client.sound.SoundResumeStatus;
+import uk.nbforge.gallifreyan_chronicles.client.tardis.RematCatchClient;
+import uk.nbforge.gallifreyan_chronicles.compat.portal.TardisPortalBridge;
+import uk.nbforge.gallifreyan_chronicles.config.GCConfig;
+import uk.nbforge.gallifreyan_chronicles.core.GCTardisControls;
+import uk.nbforge.gallifreyan_chronicles.core.block_entities.TardisConsoleBlockEntity;
+import uk.nbforge.gallifreyan_chronicles.core.block_entities.TardisExteriorBlockEntity;
+import uk.nbforge.gallifreyan_chronicles.network.ResumeSoundPayload;
+import uk.nbforge.gallifreyan_chronicles.util.GameClockUtil;
 
 public final class GCClientHooks {
-    private GCClientHooks() {
-    }
+    private GCClientHooks() {}
 
     static {
         // Fades use the time of the world you are standing in, the one the server keeps right
@@ -60,7 +59,8 @@ public final class GCClientHooks {
         }
     }
 
-    public static void applyConsoleAnimation(Identifier dimension, BlockPos pos, String animationName, String controllerName) {
+    public static void applyConsoleAnimation(
+            Identifier dimension, BlockPos pos, String animationName, String controllerName) {
         Level level = clientLevel(dimension);
         if (level == null) return;
         if (level.getBlockEntity(pos) instanceof TardisConsoleBlockEntity console) {
@@ -74,11 +74,20 @@ public final class GCClientHooks {
         // These restart flight loops for whoever just joined
         // A replay plays them again on every timeline jump and they do not say which world they are in
         if (SoundListener.inReplay()) return;
-        SoundEvent event = BuiltInRegistries.SOUND_EVENT.getOptional(payload.sound())
+        SoundEvent event = BuiltInRegistries.SOUND_EVENT
+                .getOptional(payload.sound())
                 .orElseGet(() -> SoundEvent.createVariableRangeEvent(payload.sound()));
         SoundResumeStatus.warnIfEngineUnhooked();
-        minecraft.getSoundManager().play(new OffsetSoundInstance(
-                event, payload.volume(), payload.pitch(), payload.x(), payload.y(), payload.z(), payload.offsetSeconds()));
+        minecraft
+                .getSoundManager()
+                .play(new OffsetSoundInstance(
+                        event,
+                        payload.volume(),
+                        payload.pitch(),
+                        payload.x(),
+                        payload.y(),
+                        payload.z(),
+                        payload.offsetSeconds()));
     }
 
     public static void triggerCameraShake(Vec3 origin, float strength) {
@@ -118,8 +127,10 @@ public final class GCClientHooks {
             @Override
             public boolean shouldPlayCameraShake() {
                 Minecraft minecraft = Minecraft.getInstance();
-                return be.isInFlight() && minecraft.player != null && be.getLevel() == minecraft.player.level() &&
-                        !be.getControlState(GCTardisControls.GYROSCOPIC_STABILIZERS);
+                return be.isInFlight()
+                        && minecraft.player != null
+                        && be.getLevel() == minecraft.player.level()
+                        && !be.getControlState(GCTardisControls.GYROSCOPIC_STABILIZERS);
             }
 
             @Override

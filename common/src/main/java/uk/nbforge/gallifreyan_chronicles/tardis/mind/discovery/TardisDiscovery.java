@@ -1,31 +1,28 @@
 package uk.nbforge.gallifreyan_chronicles.tardis.mind.discovery;
 
-import uk.nbforge.gallifreyan_chronicles.tardis.mind.data.MindEnums.Reveal;
-
-import uk.nbforge.gallifreyan_chronicles.tardis.mind.TardisMind;
-import uk.nbforge.gallifreyan_chronicles.tardis.ecs.system.TardisMindSystem;
-import uk.nbforge.gallifreyan_chronicles.tardis.mind.TardisTrait;
-import uk.nbforge.gallifreyan_chronicles.tardis.mind.disability.TardisDisability;
-
-import uk.nbforge.gallifreyan_chronicles.network.DiscoveryToastPayload;
-import uk.nbforge.gallifreyan_chronicles.tardis.Tardis;
-import uk.nbforge.gallifreyan_chronicles.tardis.TardisEvents;
-import uk.nbforge.gallifreyan_chronicles.util.GCUtil;
+import java.util.ArrayList;
+import java.util.List;
 import net.minecraft.advancements.AdvancementHolder;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.phys.Vec3;
-
-import java.util.ArrayList;
-import java.util.List;
+import uk.nbforge.gallifreyan_chronicles.network.DiscoveryToastPayload;
+import uk.nbforge.gallifreyan_chronicles.tardis.Tardis;
+import uk.nbforge.gallifreyan_chronicles.tardis.TardisEvents;
+import uk.nbforge.gallifreyan_chronicles.tardis.ecs.system.TardisMindSystem;
+import uk.nbforge.gallifreyan_chronicles.tardis.mind.TardisMind;
+import uk.nbforge.gallifreyan_chronicles.tardis.mind.TardisTrait;
+import uk.nbforge.gallifreyan_chronicles.tardis.mind.data.MindEnums.Reveal;
+import uk.nbforge.gallifreyan_chronicles.tardis.mind.disability.TardisDisability;
+import uk.nbforge.gallifreyan_chronicles.util.GCUtil;
 
 /**
-   Handles players finding out things about a TARDIS.
-   It does not reveal everything at once, players learn the personality, traits and disabilities through events.
-   Discoveries only count when the owner is around to see them.
-*/
+ * Handles players finding out things about a TARDIS.
+ * It does not reveal everything at once, players learn the personality, traits and disabilities through events.
+ * Discoveries only count when the owner is around to see them.
+ */
 public final class TardisDiscovery {
 
     // The advancement unlocked when the mind is first discovered
@@ -40,8 +37,7 @@ public final class TardisDiscovery {
     // How close the owner has to be to the exterior to see a discovery
     private static final double NEARBY_RANGE = 24.0;
 
-    private TardisDiscovery() {
-    }
+    private TardisDiscovery() {}
 
     public static void init() {
         TardisEvents.TAKE_OFF.register(TardisDiscovery::onTakeOff);
@@ -49,9 +45,9 @@ public final class TardisDiscovery {
     }
 
     /**
-       A TARDIS that normally refuses to fly does not reveal its personality just by taking off.
-       If it is obedient and stressed enough, taking off can reveal something.
-    */
+     * A TARDIS that normally refuses to fly does not reveal its personality just by taking off.
+     * If it is obedient and stressed enough, taking off can reveal something.
+     */
     private static void onTakeOff(Tardis tardis) {
         if (TardisMindSystem.mind(tardis).personality().refusesToFly()) return;
         if (TardisMindSystem.stress(tardis) >= OBEDIENT_REVEAL_STRESS) personality(tardis);
@@ -85,14 +81,19 @@ public final class TardisDiscovery {
 
     public static void disability(Tardis tardis, TardisDisability disability) {
         if (!TardisMindSystem.mind(tardis).has(disability)) return;
-        reveal(tardis, "disability:" + disability.id(), disability.id(), "disability", "tardis_mind/" + disability.id());
+        reveal(
+                tardis,
+                "disability:" + disability.id(),
+                disability.id(),
+                "disability",
+                "tardis_mind/" + disability.id());
     }
 
     /**
-       The owner has to be there to see it, inside the TARDIS or close to the exterior.
-       Disabilities are different and do not need the owner nearby.
-       Something that is already discovered is not revealed again.
-    */
+     * The owner has to be there to see it, inside the TARDIS or close to the exterior.
+     * Disabilities are different and do not need the owner nearby.
+     * Something that is already discovered is not revealed again.
+     */
     private static void reveal(Tardis tardis, String key, String id, String kind, String advancement) {
         TardisMind mind = TardisMindSystem.mind(tardis);
         if (mind.knows(key)) return;
@@ -123,7 +124,9 @@ public final class TardisDiscovery {
         if (owner.level() == tardis.interiorLevel().orElse(null)) return true;
         ServerLevel outside = tardis.exteriorLevel().orElse(null);
         BlockPos box = tardis.exteriorPos().orElse(null);
-        return outside != null && box != null && owner.level() == outside
+        return outside != null
+                && box != null
+                && owner.level() == outside
                 && owner.distanceToSqr(Vec3.atCenterOf(box)) <= NEARBY_RANGE * NEARBY_RANGE;
     }
 

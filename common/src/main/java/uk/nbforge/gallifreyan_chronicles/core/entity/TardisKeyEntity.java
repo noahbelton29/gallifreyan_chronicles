@@ -1,11 +1,7 @@
 package uk.nbforge.gallifreyan_chronicles.core.entity;
 
-import uk.nbforge.gallifreyan_chronicles.util.MessageUtil;
-import uk.nbforge.gallifreyan_chronicles.Constants;
-import uk.nbforge.gallifreyan_chronicles.core.block_entities.TardisExteriorBlockEntity;
-import uk.nbforge.gallifreyan_chronicles.core.GCDataComponents;
-import uk.nbforge.gallifreyan_chronicles.core.item.MasterTardisKeyItem;
-import uk.nbforge.gallifreyan_chronicles.core.item.TardisKeyItem;
+import java.util.UUID;
+import java.util.function.Supplier;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
@@ -28,9 +24,12 @@ import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
-
-import java.util.UUID;
-import java.util.function.Supplier;
+import uk.nbforge.gallifreyan_chronicles.Constants;
+import uk.nbforge.gallifreyan_chronicles.core.GCDataComponents;
+import uk.nbforge.gallifreyan_chronicles.core.block_entities.TardisExteriorBlockEntity;
+import uk.nbforge.gallifreyan_chronicles.core.item.MasterTardisKeyItem;
+import uk.nbforge.gallifreyan_chronicles.core.item.TardisKeyItem;
+import uk.nbforge.gallifreyan_chronicles.util.MessageUtil;
 
 public class TardisKeyEntity extends Entity {
     public static Supplier<EntityType<TardisKeyEntity>> TYPE;
@@ -108,9 +107,12 @@ public class TardisKeyEntity extends Entity {
         double halfDepth = this.getKeyDepth() / 2.0;
         double halfHeight = this.getKeyHeight() / 2.0;
         return new AABB(
-                pos.x - halfWidth, pos.y - halfHeight, pos.z - halfDepth,
-                pos.x + halfWidth, pos.y + halfHeight, pos.z + halfDepth
-        );
+                pos.x - halfWidth,
+                pos.y - halfHeight,
+                pos.z - halfDepth,
+                pos.x + halfWidth,
+                pos.y + halfHeight,
+                pos.z + halfDepth);
     }
 
     private void refreshKeyBoundingBox() {
@@ -173,8 +175,8 @@ public class TardisKeyEntity extends Entity {
     }
 
     @Override
-    public @NonNull InteractionResult interact(@NonNull Player player, @NonNull InteractionHand hand,
-                                               @NonNull Vec3 location) {
+    public @NonNull InteractionResult interact(
+            @NonNull Player player, @NonNull InteractionHand hand, @NonNull Vec3 location) {
         if (!player.isShiftKeyDown()) {
             return InteractionResult.PASS;
         }

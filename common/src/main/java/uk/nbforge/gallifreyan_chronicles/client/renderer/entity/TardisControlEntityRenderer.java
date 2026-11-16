@@ -34,7 +34,8 @@ public class TardisControlEntityRenderer extends EntityRenderer<TardisControlEnt
     }
 
     @Override
-    public void extractRenderState(@NonNull TardisControlEntity entity, @NonNull EntityRenderState state, float partialTick) {
+    public void extractRenderState(
+            @NonNull TardisControlEntity entity, @NonNull EntityRenderState state, float partialTick) {
         super.extractRenderState(entity, state, partialTick);
         if (state.nameTagAttachment != null) {
             state.nameTagAttachment = state.nameTagAttachment.subtract(0.0, TAG_OFFSET, 0.0);
@@ -42,8 +43,11 @@ public class TardisControlEntityRenderer extends EntityRenderer<TardisControlEnt
     }
 
     @Override
-    public void submit(@NonNull EntityRenderState state, @NonNull PoseStack poseStack,
-                       @NonNull SubmitNodeCollector collector, @NonNull CameraRenderState camera) {
+    public void submit(
+            @NonNull EntityRenderState state,
+            @NonNull PoseStack poseStack,
+            @NonNull SubmitNodeCollector collector,
+            @NonNull CameraRenderState camera) {
         Vec3 anchor = state.nameTagAttachment;
         if (anchor == null || state.nameTag == null) {
             super.submit(state, poseStack, collector, camera);

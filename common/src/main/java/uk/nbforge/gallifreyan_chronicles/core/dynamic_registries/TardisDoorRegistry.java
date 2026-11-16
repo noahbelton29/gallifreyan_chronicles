@@ -1,23 +1,19 @@
 package uk.nbforge.gallifreyan_chronicles.core.dynamic_registries;
 
-import uk.nbforge.gallifreyan_chronicles.util.GCUtil;
-
-import uk.nbforge.gallifreyan_chronicles.Constants;
-import org.jspecify.annotations.Nullable;
-
-import java.util.Comparator;
 import java.util.Collection;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentSkipListMap;
-
+import org.jspecify.annotations.Nullable;
+import uk.nbforge.gallifreyan_chronicles.Constants;
 import uk.nbforge.gallifreyan_chronicles.tardis.door.TardisDoorVariant;
+import uk.nbforge.gallifreyan_chronicles.util.GCUtil;
 
 public final class TardisDoorRegistry {
     private static final Map<String, TardisDoorVariant> VARIANTS = new ConcurrentSkipListMap<>();
 
-    private TardisDoorRegistry() {
-    }
+    private TardisDoorRegistry() {}
 
     public static String normalize(String modelId) {
         return modelId.contains(":") ? modelId : Constants.MOD_ID + ":" + modelId;
@@ -80,8 +76,7 @@ public final class TardisDoorRegistry {
     public static List<TardisDoorVariant> interiorVariants() {
         return VARIANTS.values().stream()
                 .filter(TardisDoorVariant::interior)
-                .sorted(Comparator.comparingInt(TardisDoorVariant::priority)
-                        .thenComparing(TardisDoorVariant::localId))
+                .sorted(Comparator.comparingInt(TardisDoorVariant::priority).thenComparing(TardisDoorVariant::localId))
                 .toList();
     }
 
@@ -125,10 +120,14 @@ public final class TardisDoorRegistry {
 
     public static void validate() {
         for (TardisDoorVariant variant : VARIANTS.values()) {
-            long defaults = variantsOf(variant.parent()).stream().filter(TardisDoorVariant::isDefault).count();
+            long defaults = variantsOf(variant.parent()).stream()
+                    .filter(TardisDoorVariant::isDefault)
+                    .count();
             if (defaults > 1) {
-                Constants.LOG.warn("Door model '{}' has {} variants flagged as default; using the first alphabetically",
-                        variant.parent(), defaults);
+                Constants.LOG.warn(
+                        "Door model '{}' has {} variants flagged as default; using the first alphabetically",
+                        variant.parent(),
+                        defaults);
             }
         }
     }

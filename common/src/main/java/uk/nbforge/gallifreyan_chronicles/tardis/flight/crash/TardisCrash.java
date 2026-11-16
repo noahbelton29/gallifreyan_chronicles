@@ -1,41 +1,32 @@
 package uk.nbforge.gallifreyan_chronicles.tardis.flight.crash;
 
-import uk.nbforge.gallifreyan_chronicles.core.GCSounds;
-import uk.nbforge.gallifreyan_chronicles.util.GCSparkUtil;
-import uk.nbforge.gallifreyan_chronicles.tardis.mind.data.MindEnums;
-
-import java.util.UUID;
-
-import java.util.Set;
-
 import java.util.HashSet;
-
-import net.minecraft.world.level.block.state.BlockState;
-
-import net.minecraft.world.level.block.Blocks;
-
-import net.minecraft.world.level.block.Block;
-
-import net.minecraft.core.Direction;
-
-import uk.nbforge.gallifreyan_chronicles.util.CrackedBlockUtil;
-
-import uk.nbforge.gallifreyan_chronicles.core.block_entities.TardisExteriorBlockEntity;
-import uk.nbforge.gallifreyan_chronicles.core.GCGameRules;
-import uk.nbforge.gallifreyan_chronicles.network.tardis.TardisCrashRumblePayload;
-import uk.nbforge.gallifreyan_chronicles.network.tardis.TardisDrumShakePayload;
-import uk.nbforge.gallifreyan_chronicles.tardis.Tardis;
-import uk.nbforge.gallifreyan_chronicles.tardis.mind.mood.TardisAlarm;
-import uk.nbforge.gallifreyan_chronicles.tardis.mind.discovery.TardisDiscovery;
-import uk.nbforge.gallifreyan_chronicles.tardis.ecs.system.TardisMindSystem;
-import uk.nbforge.gallifreyan_chronicles.util.GCSchedulerUtil;
+import java.util.Set;
+import java.util.UUID;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
+import uk.nbforge.gallifreyan_chronicles.core.GCGameRules;
+import uk.nbforge.gallifreyan_chronicles.core.GCSounds;
+import uk.nbforge.gallifreyan_chronicles.core.block_entities.TardisExteriorBlockEntity;
+import uk.nbforge.gallifreyan_chronicles.network.tardis.TardisCrashRumblePayload;
+import uk.nbforge.gallifreyan_chronicles.network.tardis.TardisDrumShakePayload;
+import uk.nbforge.gallifreyan_chronicles.tardis.Tardis;
+import uk.nbforge.gallifreyan_chronicles.tardis.ecs.system.TardisMindSystem;
+import uk.nbforge.gallifreyan_chronicles.tardis.mind.data.MindEnums;
+import uk.nbforge.gallifreyan_chronicles.tardis.mind.discovery.TardisDiscovery;
+import uk.nbforge.gallifreyan_chronicles.tardis.mind.mood.TardisAlarm;
+import uk.nbforge.gallifreyan_chronicles.util.CrackedBlockUtil;
+import uk.nbforge.gallifreyan_chronicles.util.GCSchedulerUtil;
+import uk.nbforge.gallifreyan_chronicles.util.GCSparkUtil;
 
 public final class TardisCrash {
     private static final int BUMP_TICKS = 8;
@@ -49,8 +40,7 @@ public final class TardisCrash {
 
     private static final Set<UUID> CRASHING = new HashSet<>();
 
-    private TardisCrash() {
-    }
+    private TardisCrash() {}
 
     public static boolean isCrashing(Tardis tardis) {
         return CRASHING.contains(tardis.id());
@@ -64,9 +54,9 @@ public final class TardisCrash {
     private static final float EMERGENCY_TRAUMA = 1f;
 
     /**
-       A stressed TARDIS losing its grip, very shaky with smoke and the odd spark and then one bump when it lands.
-       No fire, no damage and no repair needed.
-    */
+     * A stressed TARDIS losing its grip, very shaky with smoke and the odd spark and then one bump when it lands.
+     * No fire, no damage and no repair needed.
+     */
     public static void emergency(Tardis tardis, ServerLevel interior, BlockPos consolePos, int landingTicks) {
         CRASHING.add(tardis.id());
         TardisMindSystem.setTrauma(tardis, TardisMindSystem.trauma(tardis) + EMERGENCY_TRAUMA);
@@ -80,7 +70,8 @@ public final class TardisCrash {
             GCSchedulerUtil.runLater(interior.getServer(), tick, () -> struggle(tardis, interior, console));
         }
         GCSchedulerUtil.runLater(interior.getServer(), landingTicks, () -> emergencyImpact(tardis, interior, console));
-        GCSchedulerUtil.runLater(interior.getServer(), landingTicks + SETTLE_DELAY_TICKS, () -> HaywireControls.settle(tardis));
+        GCSchedulerUtil.runLater(
+                interior.getServer(), landingTicks + SETTLE_DELAY_TICKS, () -> HaywireControls.settle(tardis));
     }
 
     private static void struggle(Tardis tardis, ServerLevel level, Vec3 console) {
@@ -129,7 +120,8 @@ public final class TardisCrash {
             GCSchedulerUtil.runLater(interior.getServer(), tick, () -> bump(tardis, interior, console, progress));
         }
         GCSchedulerUtil.runLater(interior.getServer(), landingTicks, () -> impact(tardis, interior, console));
-        GCSchedulerUtil.runLater(interior.getServer(), landingTicks + SETTLE_DELAY_TICKS, () -> HaywireControls.settle(tardis));
+        GCSchedulerUtil.runLater(
+                interior.getServer(), landingTicks + SETTLE_DELAY_TICKS, () -> HaywireControls.settle(tardis));
     }
 
     /** One bump of the crash, scrambles the controls, damages the interior if griefing is on and throws out smoke and fire. */
@@ -141,12 +133,14 @@ public final class TardisCrash {
         }
 
         level.sendParticles(ParticleTypes.LARGE_SMOKE, console.x, console.y + 1, console.z, 12, 3.0, 1.5, 3.0, 0.02);
-        level.sendParticles(ParticleTypes.CAMPFIRE_COSY_SMOKE, console.x, console.y + 0.5, console.z, 4, 4.0, 0.5, 4.0, 0.01);
+        level.sendParticles(
+                ParticleTypes.CAMPFIRE_COSY_SMOKE, console.x, console.y + 0.5, console.z, 4, 4.0, 0.5, 4.0, 0.01);
         level.sendParticles(ParticleTypes.FLAME, console.x, console.y + 0.5, console.z, 30, 6.0, 1.0, 6.0, 0.02);
         level.sendParticles(ParticleTypes.LAVA, console.x, console.y + 0.5, console.z, 6, 5.0, 0.5, 5.0, 0.0);
 
         // The console keeps sparking as it goes down
-        Vec3 spot = console.add((random.nextDouble() - 0.5) * 6, 1 + random.nextDouble(), (random.nextDouble() - 0.5) * 6);
+        Vec3 spot =
+                console.add((random.nextDouble() - 0.5) * 6, 1 + random.nextDouble(), (random.nextDouble() - 0.5) * 6);
         if (random.nextInt(10) == 0) GCSparkUtil.big(level, spot);
         else if (random.nextInt(3) == 0) GCSparkUtil.small(level, spot, 10);
     }
@@ -185,13 +179,14 @@ public final class TardisCrash {
         Block cracked = CrackedBlockUtil.crackedOf(state.getBlock());
         if (cracked == null) return;
         level.setBlock(pos, cracked.defaultBlockState(), Block.UPDATE_ALL);
-        level.sendParticles(ParticleTypes.POOF, pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 0.5, 4, 0.3, 0.3, 0.3, 0.02);
+        level.sendParticles(
+                ParticleTypes.POOF, pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 0.5, 4, 0.3, 0.3, 0.3, 0.02);
     }
 
     private static void lightFire(ServerLevel level, BlockPos pos) {
         BlockPos below = pos.below();
-        boolean onFloor = level.getBlockState(pos).isAir()
-                && level.getBlockState(below).isFaceSturdy(level, below, Direction.UP);
+        boolean onFloor =
+                level.getBlockState(pos).isAir() && level.getBlockState(below).isFaceSturdy(level, below, Direction.UP);
         if (onFloor) {
             level.setBlock(pos, Blocks.FIRE.defaultBlockState(), Block.UPDATE_ALL);
         }
@@ -208,7 +203,8 @@ public final class TardisCrash {
     }
 
     private static void interiorImpact(ServerLevel interior, Vec3 console, float protection) {
-        interior.explode(null, console.x + 3, console.y + 1, console.z, 2.2F * protection, Level.ExplosionInteraction.NONE);
+        interior.explode(
+                null, console.x + 3, console.y + 1, console.z, 2.2F * protection, Level.ExplosionInteraction.NONE);
         interior.sendParticles(ParticleTypes.EXPLOSION_EMITTER, console.x, console.y + 1, console.z, 1, 0, 0, 0, 0);
         interior.sendParticles(ParticleTypes.LARGE_SMOKE, console.x, console.y + 1, console.z, 40, 4.0, 2.0, 4.0, 0.03);
         burst(interior, console);
@@ -229,5 +225,4 @@ public final class TardisCrash {
         GCSparkUtil.blast(outside, at.add(0, 1, 0));
         TardisDrumShakePayload.broadcast(outside, at, 2.0F);
     }
-
 }

@@ -1,8 +1,6 @@
 package uk.nbforge.gallifreyan_chronicles.tardis.ecs.component;
 
+import java.util.UUID;
 import uk.nbforge.gallifreyan_chronicles.ecs.Component;
 
-import java.util.UUID;
-
-public record TardisLinkComponent(UUID tardisId) implements Component {
-}
+public record TardisLinkComponent(UUID tardisId) implements Component {}

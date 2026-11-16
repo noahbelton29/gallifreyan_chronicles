@@ -7,15 +7,14 @@ import com.mojang.blaze3d.vertex.DefaultVertexFormat;
 import com.mojang.blaze3d.vertex.MeshData;
 import com.mojang.renderpearl.api.buffers.GpuBuffer;
 import com.mojang.renderpearl.api.pipeline.PrimitiveTopology;
-import uk.nbforge.gallifreyan_chronicles.sky.data.SkyStars;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Random;
 import net.minecraft.util.Mth;
 import org.joml.Matrix3f;
 import org.joml.Vector3f;
 import org.jspecify.annotations.Nullable;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Random;
+import uk.nbforge.gallifreyan_chronicles.sky.data.SkyStars;
 
 public final class SkyMeshes implements AutoCloseable {
     public static final int DISC_VERTICES = 10;
@@ -38,8 +37,16 @@ public final class SkyMeshes implements AutoCloseable {
     private final int[] groupFirstQuad;
     private final int[] groupQuadCount;
 
-    private SkyMeshes(GpuBuffer topDisc, GpuBuffer bottomDisc, GpuBuffer quad, GpuBuffer backdrop, GpuBuffer sphere,
-                      @Nullable GpuBuffer stars, int starIndexCount, int[] groupFirstQuad, int[] groupQuadCount) {
+    private SkyMeshes(
+            GpuBuffer topDisc,
+            GpuBuffer bottomDisc,
+            GpuBuffer quad,
+            GpuBuffer backdrop,
+            GpuBuffer sphere,
+            @Nullable GpuBuffer stars,
+            int starIndexCount,
+            int[] groupFirstQuad,
+            int[] groupQuadCount) {
         this.topDisc = topDisc;
         this.bottomDisc = bottomDisc;
         this.quad = quad;
@@ -56,10 +63,11 @@ public final class SkyMeshes implements AutoCloseable {
         int starIndexCount = 0;
         int[] groupFirstQuad = new int[STAR_GROUPS];
         int[] groupQuadCount = new int[STAR_GROUPS];
-        int starCount = starSettings == null ? 0 : Math.min(MAX_STARS, Math.round(starSettings.count() * densityMultiplier));
+        int starCount =
+                starSettings == null ? 0 : Math.min(MAX_STARS, Math.round(starSettings.count() * densityMultiplier));
         if (starCount > 0) {
-            try (ByteBufferBuilder bytes = ByteBufferBuilder.exactlySized(
-                    DefaultVertexFormat.POSITION.getVertexSize() * starCount * 4)) {
+            try (ByteBufferBuilder bytes =
+                    ByteBufferBuilder.exactlySized(DefaultVertexFormat.POSITION.getVertexSize() * starCount * 4)) {
                 BufferBuilder builder = new BufferBuilder(bytes, PrimitiveTopology.QUADS, DefaultVertexFormat.POSITION);
                 if (addStars(builder, starSettings, starCount, groupFirstQuad, groupQuadCount)) {
                     try (MeshData mesh = builder.buildOrThrow()) {
@@ -69,12 +77,20 @@ public final class SkyMeshes implements AutoCloseable {
                 }
             }
         }
-        return new SkyMeshes(buildDisc("GC sky top disc", 16.0F), buildDisc("GC sky bottom disc", -16.0F), buildQuad(),
-                buildBackdrop(), buildSphere(), stars, starIndexCount, groupFirstQuad, groupQuadCount);
+        return new SkyMeshes(
+                buildDisc("GC sky top disc", 16.0F),
+                buildDisc("GC sky bottom disc", -16.0F),
+                buildQuad(),
+                buildBackdrop(),
+                buildSphere(),
+                stars,
+                starIndexCount,
+                groupFirstQuad,
+                groupQuadCount);
     }
 
-    private static boolean addStars(BufferBuilder builder, SkyStars settings, int count,
-                                    int[] groupFirstQuad, int[] groupQuadCount) {
+    private static boolean addStars(
+            BufferBuilder builder, SkyStars settings, int count, int[] groupFirstQuad, int[] groupQuadCount) {
         Random random = new Random(settings.seed());
         float minSize = Math.min(settings.minSize(), settings.maxSize());
         float maxSize = Math.max(settings.minSize(), settings.maxSize());
@@ -97,11 +113,11 @@ public final class SkyMeshes implements AutoCloseable {
             Matrix3f rotation = new Matrix3f()
                     .rotateTowards(new Vector3f(center).negate(), new Vector3f(0.0F, 1.0F, 0.0F))
                     .rotateZ(-spin);
-            groups.get(random.nextInt(STAR_GROUPS)).add(new Vector3f[]{
-                    new Vector3f(size, -size, 0.0F).mul(rotation).add(center),
-                    new Vector3f(size, size, 0.0F).mul(rotation).add(center),
-                    new Vector3f(-size, size, 0.0F).mul(rotation).add(center),
-                    new Vector3f(-size, -size, 0.0F).mul(rotation).add(center)
+            groups.get(random.nextInt(STAR_GROUPS)).add(new Vector3f[] {
+                new Vector3f(size, -size, 0.0F).mul(rotation).add(center),
+                new Vector3f(size, size, 0.0F).mul(rotation).add(center),
+                new Vector3f(-size, size, 0.0F).mul(rotation).add(center),
+                new Vector3f(-size, -size, 0.0F).mul(rotation).add(center)
             });
             added++;
         }
@@ -119,8 +135,10 @@ public final class SkyMeshes implements AutoCloseable {
     }
 
     private static GpuBuffer buildDisc(String name, float y) {
-        try (ByteBufferBuilder bytes = ByteBufferBuilder.exactlySized(DISC_VERTICES * DefaultVertexFormat.POSITION.getVertexSize())) {
-            BufferBuilder builder = new BufferBuilder(bytes, PrimitiveTopology.TRIANGLE_FAN, DefaultVertexFormat.POSITION);
+        try (ByteBufferBuilder bytes =
+                ByteBufferBuilder.exactlySized(DISC_VERTICES * DefaultVertexFormat.POSITION.getVertexSize())) {
+            BufferBuilder builder =
+                    new BufferBuilder(bytes, PrimitiveTopology.TRIANGLE_FAN, DefaultVertexFormat.POSITION);
             float x = Math.signum(y) * DISC_RADIUS;
             builder.addVertex(0.0F, y, 0.0F);
             for (int degrees = -180; degrees <= 180; degrees += 45) {
@@ -134,7 +152,8 @@ public final class SkyMeshes implements AutoCloseable {
     }
 
     private static GpuBuffer buildQuad() {
-        try (ByteBufferBuilder bytes = ByteBufferBuilder.exactlySized(4 * DefaultVertexFormat.POSITION_TEX.getVertexSize())) {
+        try (ByteBufferBuilder bytes =
+                ByteBufferBuilder.exactlySized(4 * DefaultVertexFormat.POSITION_TEX.getVertexSize())) {
             BufferBuilder builder = new BufferBuilder(bytes, PrimitiveTopology.QUADS, DefaultVertexFormat.POSITION_TEX);
             builder.addVertex(-1.0F, 0.0F, -1.0F).setUv(0.0F, 1.0F);
             builder.addVertex(1.0F, 0.0F, -1.0F).setUv(1.0F, 1.0F);
@@ -148,14 +167,15 @@ public final class SkyMeshes implements AutoCloseable {
 
     private static GpuBuffer buildBackdrop() {
         float[][] faces = {
-                {-1, -1, -1, 1, -1, -1, 1, 1, -1, -1, 1, -1},
-                {-1, -1, 1, -1, 1, 1, 1, 1, 1, 1, -1, 1},
-                {-1, -1, -1, -1, 1, -1, -1, 1, 1, -1, -1, 1},
-                {1, -1, -1, 1, -1, 1, 1, 1, 1, 1, 1, -1},
-                {-1, 1, -1, 1, 1, -1, 1, 1, 1, -1, 1, 1},
-                {-1, -1, -1, -1, -1, 1, 1, -1, 1, 1, -1, -1}
+            {-1, -1, -1, 1, -1, -1, 1, 1, -1, -1, 1, -1},
+            {-1, -1, 1, -1, 1, 1, 1, 1, 1, 1, -1, 1},
+            {-1, -1, -1, -1, 1, -1, -1, 1, 1, -1, -1, 1},
+            {1, -1, -1, 1, -1, 1, 1, 1, 1, 1, 1, -1},
+            {-1, 1, -1, 1, 1, -1, 1, 1, 1, -1, 1, 1},
+            {-1, -1, -1, -1, -1, 1, 1, -1, 1, 1, -1, -1}
         };
-        try (ByteBufferBuilder bytes = ByteBufferBuilder.exactlySized(BACKDROP_INDEX_COUNT / 6 * 4 * DefaultVertexFormat.POSITION.getVertexSize())) {
+        try (ByteBufferBuilder bytes = ByteBufferBuilder.exactlySized(
+                BACKDROP_INDEX_COUNT / 6 * 4 * DefaultVertexFormat.POSITION.getVertexSize())) {
             BufferBuilder builder = new BufferBuilder(bytes, PrimitiveTopology.QUADS, DefaultVertexFormat.POSITION);
             for (float[] face : faces) {
                 for (int corner = 0; corner < 4; corner++) {
@@ -185,7 +205,8 @@ public final class SkyMeshes implements AutoCloseable {
                 }
             }
             try (MeshData mesh = builder.buildOrThrow()) {
-                return RenderSystem.getDevice().createBuffer(() -> "GC sky overlay fog sphere", 32, mesh.vertexBuffer());
+                return RenderSystem.getDevice()
+                        .createBuffer(() -> "GC sky overlay fog sphere", 32, mesh.vertexBuffer());
             }
         }
     }

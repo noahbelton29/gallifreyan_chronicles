@@ -1,8 +1,7 @@
 package uk.nbforge.gallifreyan_chronicles.client.sky;
 
-import net.minecraft.util.StringRepresentable;
-
 import java.util.Locale;
+import net.minecraft.util.StringRepresentable;
 
 public enum StarDensity implements StringRepresentable {
     OFF("off", 0.0F),

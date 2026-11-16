@@ -1,19 +1,17 @@
 package uk.nbforge.gallifreyan_chronicles.tardis.ecs.system;
 
-import uk.nbforge.gallifreyan_chronicles.tardis.TardisApi;
-import uk.nbforge.gallifreyan_chronicles.core.block_entities.TardisConsoleBlockEntity;
-import uk.nbforge.gallifreyan_chronicles.tardis.TardisManager;
+import java.util.*;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
 import org.jspecify.annotations.Nullable;
-
-import java.util.*;
+import uk.nbforge.gallifreyan_chronicles.core.block_entities.TardisConsoleBlockEntity;
+import uk.nbforge.gallifreyan_chronicles.tardis.TardisApi;
+import uk.nbforge.gallifreyan_chronicles.tardis.TardisManager;
 
 public final class ConsoleSyncSystem {
     private static final Map<UUID, Set<TardisConsoleBlockEntity>> CONSOLES = new HashMap<>();
 
-    private ConsoleSyncSystem() {
-    }
+    private ConsoleSyncSystem() {}
 
     private static @Nullable UUID keyOf(TardisConsoleBlockEntity console) {
         UUID id = console.getTardisId();
@@ -45,7 +43,8 @@ public final class ConsoleSyncSystem {
         }
         console.setSyncedTardisId(key);
         if (key != null) {
-            CONSOLES.computeIfAbsent(key, k -> Collections.newSetFromMap(new WeakHashMap<>())).add(console);
+            CONSOLES.computeIfAbsent(key, k -> Collections.newSetFromMap(new WeakHashMap<>()))
+                    .add(console);
         }
     }
 

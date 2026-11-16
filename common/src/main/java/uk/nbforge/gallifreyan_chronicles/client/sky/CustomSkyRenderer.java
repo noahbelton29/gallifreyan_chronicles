@@ -1,29 +1,24 @@
 package uk.nbforge.gallifreyan_chronicles.client.sky;
 
-import uk.nbforge.gallifreyan_chronicles.client.util.DetailLevelUtil;
-
 import com.mojang.blaze3d.pipeline.RenderTarget;
 import com.mojang.blaze3d.pipeline.TextureTarget;
 import com.mojang.blaze3d.systems.RenderSystem;
-import com.mojang.renderpearl.api.buffers.GpuBuffer;
 import com.mojang.renderpearl.api.GpuFormat;
+import com.mojang.renderpearl.api.buffers.GpuBuffer;
 import com.mojang.renderpearl.api.buffers.GpuBufferSlice;
 import com.mojang.renderpearl.api.commands.RenderPass;
 import com.mojang.renderpearl.api.commands.RenderPassDescriptor;
 import com.mojang.renderpearl.api.pipeline.PrimitiveTopology;
 import com.mojang.renderpearl.api.pipeline.RenderPipeline;
 import com.mojang.renderpearl.api.textures.FilterMode;
-import uk.nbforge.gallifreyan_chronicles.Constants;
-import uk.nbforge.gallifreyan_chronicles.compat.portal.TardisPortalBridge;
-import uk.nbforge.gallifreyan_chronicles.config.GCConfig;
-import uk.nbforge.gallifreyan_chronicles.sky.data.DimensionSky;
-import uk.nbforge.gallifreyan_chronicles.core.dynamic_registries.DimensionSkyRegistry;
-import uk.nbforge.gallifreyan_chronicles.codec.HexColorCodec;
-import uk.nbforge.gallifreyan_chronicles.sky.shader.ShaderSky;
-import uk.nbforge.gallifreyan_chronicles.sky.data.ResolvedSkyBody;
-import uk.nbforge.gallifreyan_chronicles.sky.data.SkyBody;
-import uk.nbforge.gallifreyan_chronicles.sky.data.SkyOrbit;
-import uk.nbforge.gallifreyan_chronicles.sky.data.SkyStars;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.IdentityHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.OptionalDouble;
+import java.util.Set;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.renderer.RenderPipelines;
@@ -38,15 +33,18 @@ import org.joml.Vector3f;
 import org.joml.Vector3fc;
 import org.joml.Vector4f;
 import org.jspecify.annotations.Nullable;
-
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.IdentityHashMap;
-import java.util.Map;
-import java.util.List;
-import java.util.Optional;
-import java.util.OptionalDouble;
-import java.util.Set;
+import uk.nbforge.gallifreyan_chronicles.Constants;
+import uk.nbforge.gallifreyan_chronicles.client.util.DetailLevelUtil;
+import uk.nbforge.gallifreyan_chronicles.codec.HexColorCodec;
+import uk.nbforge.gallifreyan_chronicles.compat.portal.TardisPortalBridge;
+import uk.nbforge.gallifreyan_chronicles.config.GCConfig;
+import uk.nbforge.gallifreyan_chronicles.core.dynamic_registries.DimensionSkyRegistry;
+import uk.nbforge.gallifreyan_chronicles.sky.data.DimensionSky;
+import uk.nbforge.gallifreyan_chronicles.sky.data.ResolvedSkyBody;
+import uk.nbforge.gallifreyan_chronicles.sky.data.SkyBody;
+import uk.nbforge.gallifreyan_chronicles.sky.data.SkyOrbit;
+import uk.nbforge.gallifreyan_chronicles.sky.data.SkyStars;
+import uk.nbforge.gallifreyan_chronicles.sky.shader.ShaderSky;
 
 public final class CustomSkyRenderer {
     private static final float BODY_DISTANCE = 100.0F;
@@ -66,23 +64,23 @@ public final class CustomSkyRenderer {
     private static @Nullable TextureTarget skyCanvas;
     private static final float OVERLAY_DISTANCE = 0.5F;
 
-    private record PreparedBody(ResolvedSkyBody body, AbstractTexture texture) {
-    }
+    private record PreparedBody(ResolvedSkyBody body, AbstractTexture texture) {}
 
-    private CustomSkyRenderer() {
-    }
+    private CustomSkyRenderer() {}
 
     public static boolean render(RenderTarget target, GpuBufferSlice skyFog, SkyRenderState state) {
         ClientLevel level = Minecraft.getInstance().level;
         if (level == null) return false;
 
-        DimensionSky sky = DimensionSkyRegistry.getForDimension(level.dimension().identifier());
+        DimensionSky sky =
+                DimensionSkyRegistry.getForDimension(level.dimension().identifier());
         if (sky == null || !DetailLevelUtil.highDetail()) return false;
 
         SkyShaderCompat.assignPipelines();
         // Pack skies, the pack paints over the sky so stars and bodies go on a canvas laid on after it
         // Overlay skies are drawn here as normal and a pack that supports them keeps them, the patched Solas
-        boolean onCanvas = sky.shaderSky() == ShaderSky.PACK && SkyShaderCompat.isShaderPackInUse()
+        boolean onCanvas = sky.shaderSky() == ShaderSky.PACK
+                && SkyShaderCompat.isShaderPackInUse()
                 && !TardisPortalBridge.isRenderingAnyPortal();
         if (onCanvas) {
             canvasState = state;
@@ -96,8 +94,12 @@ public final class CustomSkyRenderer {
         RenderSystem.setShaderFog(skyFog);
         try (RenderPass pass = RenderSystem.getDevice()
                 .createCommandEncoder()
-                .createRenderPass(() -> "GC custom sky", target.getColorTextureView(), Optional.empty(),
-                        target.getDepthTextureView(), OptionalDouble.empty())) {
+                .createRenderPass(
+                        () -> "GC custom sky",
+                        target.getColorTextureView(),
+                        Optional.empty(),
+                        target.getDepthTextureView(),
+                        OptionalDouble.empty())) {
             RenderSystem.bindDefaultUniforms(pass);
 
             SkyShaderCompat.setPhase(SkyShaderCompat.Phase.SKY);
@@ -140,7 +142,8 @@ public final class CustomSkyRenderer {
 
         ClientLevel level = Minecraft.getInstance().level;
         if (level == null || canvasFor != level) return;
-        DimensionSky sky = DimensionSkyRegistry.getForDimension(level.dimension().identifier());
+        DimensionSky sky =
+                DimensionSkyRegistry.getForDimension(level.dimension().identifier());
         if (sky == null) return;
 
         SkyMeshes skyMeshes = meshesFor(sky);
@@ -155,8 +158,12 @@ public final class CustomSkyRenderer {
         if (fog != null) RenderSystem.setShaderFog(fog);
         try (RenderPass pass = RenderSystem.getDevice()
                 .createCommandEncoder()
-                .createRenderPass(() -> "GC sky canvas", target.getColorTextureView(), Optional.of(new Vector4f(0.0F)),
-                        target.getDepthTextureView(), OptionalDouble.empty())) {
+                .createRenderPass(
+                        () -> "GC sky canvas",
+                        target.getColorTextureView(),
+                        Optional.of(new Vector4f(0.0F)),
+                        target.getDepthTextureView(),
+                        OptionalDouble.empty())) {
             RenderSystem.bindDefaultUniforms(pass);
             drawStars(pass, skyMeshes, sky, state.rainBrightness, SkyPipelines.CANVAS_STARS, scale);
             float daylight = daylight(state.sunAngle);
@@ -175,9 +182,14 @@ public final class CustomSkyRenderer {
         canvasWaiting = false;
         if (skyCanvas == null || main.getColorTextureView() == null) return;
         var nearest = RenderSystem.getSamplerCache().getClampToEdge(FilterMode.NEAREST);
-        try (RenderPass pass = RenderSystem.getDevice().createCommandEncoder().createRenderPass(
-                () -> "GC sky canvas composite", main.getColorTextureView(), Optional.empty(),
-                null, OptionalDouble.empty())) {
+        try (RenderPass pass = RenderSystem.getDevice()
+                .createCommandEncoder()
+                .createRenderPass(
+                        () -> "GC sky canvas composite",
+                        main.getColorTextureView(),
+                        Optional.empty(),
+                        null,
+                        OptionalDouble.empty())) {
             pass.setPipeline(RenderSystem.getCompiledPipeline(SkyPipelines.CANVAS_COMPOSITE));
             RenderSystem.bindDefaultUniforms(pass);
             pass.setUniform("InSampler", skyCanvas.getColorTextureView(), nearest);
@@ -201,7 +213,8 @@ public final class CustomSkyRenderer {
 
     private static TextureTarget skyCanvasFor(RenderTarget main) {
         if (skyCanvas == null) {
-            skyCanvas = new TextureTarget("GC sky canvas", main.width, main.height, GpuFormat.RGBA8_UNORM, GpuFormat.D32_FLOAT);
+            skyCanvas = new TextureTarget(
+                    "GC sky canvas", main.width, main.height, GpuFormat.RGBA8_UNORM, GpuFormat.D32_FLOAT);
         } else if (skyCanvas.width != main.width || skyCanvas.height != main.height) {
             skyCanvas.resize(main.width, main.height);
         }
@@ -268,7 +281,8 @@ public final class CustomSkyRenderer {
     }
 
     private static void drawDisc(RenderPass pass, GpuBuffer disc, Matrix4f modelView, Vector3fc color) {
-        GpuBufferSlice transforms = RenderSystem.getDynamicUniforms().writeTransform(modelView, new Vector4f(color, 1.0F));
+        GpuBufferSlice transforms =
+                RenderSystem.getDynamicUniforms().writeTransform(modelView, new Vector4f(color, 1.0F));
         pass.pushDebugGroup(() -> "GC sky disc");
         pass.setPipeline(RenderSystem.getCompiledPipeline(RenderPipelines.SKY));
         pass.setUniform("DynamicTransforms", transforms);
@@ -277,8 +291,13 @@ public final class CustomSkyRenderer {
         pass.popDebugGroup();
     }
 
-    private static void drawStars(RenderPass pass, SkyMeshes skyMeshes, DimensionSky sky, float rainBrightness,
-                                  RenderPipeline pipeline, float scale) {
+    private static void drawStars(
+            RenderPass pass,
+            SkyMeshes skyMeshes,
+            DimensionSky sky,
+            float rainBrightness,
+            RenderPipeline pipeline,
+            float scale) {
         GpuBuffer stars = skyMeshes.stars();
         if (stars == null || sky.stars().isEmpty()) return;
 
@@ -313,8 +332,14 @@ public final class CustomSkyRenderer {
     }
 
     private static GpuBufferSlice starTransform(Matrix4f modelView, int color, float brightness) {
-        return RenderSystem.getDynamicUniforms().writeTransform(modelView,
-                new Vector4f(HexColorCodec.red(color), HexColorCodec.green(color), HexColorCodec.blue(color), brightness));
+        return RenderSystem.getDynamicUniforms()
+                .writeTransform(
+                        modelView,
+                        new Vector4f(
+                                HexColorCodec.red(color),
+                                HexColorCodec.green(color),
+                                HexColorCodec.blue(color),
+                                brightness));
     }
 
     private static float twinkle(float time, int group) {
@@ -342,20 +367,28 @@ public final class CustomSkyRenderer {
         if (body.orbit().isPresent()) {
             SkyOrbit orbit = body.orbit().get();
             float angle = orbit.follows() == SkyOrbit.Follows.MOON ? state.moonAngle : state.sunAngle;
-            modelView.rotateY((float) Math.toRadians(-90.0F - body.yaw()))
+            modelView
+                    .rotateY((float) Math.toRadians(-90.0F - body.yaw()))
                     .rotateZ((float) Math.toRadians(orbit.tilt()))
                     .rotateX(angle + (float) Math.toRadians(orbit.offset()));
         } else {
-            modelView.rotateY((float) Math.toRadians(-body.yaw()))
-                    .rotateX((float) Math.toRadians(body.pitch() - 90.0F));
+            modelView.rotateY((float) Math.toRadians(-body.yaw())).rotateX((float)
+                    Math.toRadians(body.pitch() - 90.0F));
         }
-        return modelView.rotateY((float) Math.toRadians(body.roll()))
+        return modelView
+                .rotateY((float) Math.toRadians(body.roll()))
                 .translate(0.0F, BODY_DISTANCE, 0.0F)
                 .scale(body.size(), 1.0F, body.size());
     }
 
-    private static void drawBody(RenderPass pass, SkyMeshes skyMeshes, PreparedBody prepared, SkyRenderState state,
-                                 float daylight, RenderPipeline pipeline, float scale) {
+    private static void drawBody(
+            RenderPass pass,
+            SkyMeshes skyMeshes,
+            PreparedBody prepared,
+            SkyRenderState state,
+            float daylight,
+            RenderPipeline pipeline,
+            float scale) {
         ResolvedSkyBody body = prepared.body();
         float alpha = HexColorCodec.alpha(body.color())
                 * (body.fadesInRain() ? state.rainBrightness : 1.0F)
@@ -364,7 +397,11 @@ public final class CustomSkyRenderer {
 
         Matrix4f modelView = bodyTransform(body, state, scale);
 
-        Vector4f tint = new Vector4f(HexColorCodec.red(body.color()), HexColorCodec.green(body.color()), HexColorCodec.blue(body.color()), alpha);
+        Vector4f tint = new Vector4f(
+                HexColorCodec.red(body.color()),
+                HexColorCodec.green(body.color()),
+                HexColorCodec.blue(body.color()),
+                alpha);
         GpuBufferSlice transforms = RenderSystem.getDynamicUniforms().writeTransform(modelView, tint);
         RenderSystem.AutoStorageIndexBuffer indices = RenderSystem.getSequentialBuffer(PrimitiveTopology.QUADS);
 
@@ -372,7 +409,10 @@ public final class CustomSkyRenderer {
         pass.setPipeline(RenderSystem.getCompiledPipeline(pipeline));
         RenderSystem.bindDefaultUniforms(pass);
         pass.setUniform("DynamicTransforms", transforms);
-        pass.setUniform("Sampler0", prepared.texture().getTextureView(), prepared.texture().getSampler());
+        pass.setUniform(
+                "Sampler0",
+                prepared.texture().getTextureView(),
+                prepared.texture().getSampler());
         pass.setVertexBuffer(0, skyMeshes.quad().slice());
         pass.setIndexBuffer(indices.getBuffer(6), indices.type());
         pass.drawIndexed(6, 1, 0, 0, 0);

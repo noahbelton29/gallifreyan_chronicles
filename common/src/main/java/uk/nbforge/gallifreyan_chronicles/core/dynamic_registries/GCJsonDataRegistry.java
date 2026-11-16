@@ -4,7 +4,6 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
-
 import uk.nbforge.gallifreyan_chronicles.core.data.IdentifiableData;
 
 public class GCJsonDataRegistry<T extends IdentifiableData<T>> {

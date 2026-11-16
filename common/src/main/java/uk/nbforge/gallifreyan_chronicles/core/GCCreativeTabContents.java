@@ -1,14 +1,12 @@
 package uk.nbforge.gallifreyan_chronicles.core;
 
-import uk.nbforge.gallifreyan_chronicles.Constants;
+import java.util.function.Consumer;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.ItemLike;
-
-import java.util.function.Consumer;
+import uk.nbforge.gallifreyan_chronicles.Constants;
 
 public final class GCCreativeTabContents {
-    private GCCreativeTabContents() {
-    }
+    private GCCreativeTabContents() {}
 
     public static void tardis(Consumer<ItemStack> output) {
         add(output, GCBlocks.TARDIS);
@@ -75,7 +73,6 @@ public final class GCCreativeTabContents {
         add(output, GCBlocks.BRACHACKI_TUAT_WALL);
         add(output, GCBlocks.BRACHACKI_TUAT_FENCE);
         add(output, GCBlocks.BRACHACKI_TUAT_FENCE_GATE);
-
     }
 
     public static void naturalBlocks(Consumer<ItemStack> output) {
@@ -94,7 +91,6 @@ public final class GCCreativeTabContents {
         add(output, GCBlocks.GALLIFREYAN_STONE_COAL_ORE);
         add(output, GCBlocks.GALLIFREYAN_STONE_IRON_ORE);
         add(output, GCBlocks.ARCADIAN_SHALE_TARANIUM_ORE);
-
     }
 
     public static void buildingBlocks(Consumer<ItemStack> output) {
@@ -118,7 +114,6 @@ public final class GCCreativeTabContents {
             add(output, GCBlocks.CONCRETE_ROUNDELS.get(colour));
             add(output, GCBlocks.CONCRETE_HALF_ROUNDELS.get(colour));
         }
-
     }
 
     public static void flora(Consumer<ItemStack> output) {
@@ -131,7 +126,6 @@ public final class GCCreativeTabContents {
         add(output, GCBlocks.TALL_GALLIFREYAN_DRY_GRASS);
         add(output, GCBlocks.THORIVINE);
         add(output, GCBlocks.THORIVINE_FLOWER);
-
     }
 
     public static void toolsAndArmor(Consumer<ItemStack> output) {
@@ -152,7 +146,6 @@ public final class GCCreativeTabContents {
         add(output, GCItems.TARANIUM_CHESTPLATE);
         add(output, GCItems.TARANIUM_LEGGINGS);
         add(output, GCItems.TARANIUM_BOOTS);
-
     }
 
     private static void add(Consumer<ItemStack> output, ItemLike item) {

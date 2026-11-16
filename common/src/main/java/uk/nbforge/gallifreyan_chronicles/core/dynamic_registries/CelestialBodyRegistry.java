@@ -1,17 +1,14 @@
 package uk.nbforge.gallifreyan_chronicles.core.dynamic_registries;
 
+import java.util.Collection;
 import net.minecraft.resources.Identifier;
 import org.jspecify.annotations.Nullable;
-
-import java.util.Collection;
-
 import uk.nbforge.gallifreyan_chronicles.sky.data.CelestialBody;
 
 public final class CelestialBodyRegistry {
     private static final GCJsonDataRegistry<CelestialBody> BY_ID = new GCJsonDataRegistry<>();
 
-    private CelestialBodyRegistry() {
-    }
+    private CelestialBodyRegistry() {}
 
     public static void clear() {
         BY_ID.clear();

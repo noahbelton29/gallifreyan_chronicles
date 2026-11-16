@@ -1,7 +1,6 @@
 package uk.nbforge.gallifreyan_chronicles.client.renderer.entity;
 
-import uk.nbforge.gallifreyan_chronicles.core.entity.TardisControlEntity;
-import uk.nbforge.gallifreyan_chronicles.core.entity.TardisKeyEntity;
+import java.awt.*;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.components.debug.DebugScreenEntries;
 import net.minecraft.client.renderer.culling.Frustum;
@@ -12,8 +11,8 @@ import net.minecraft.util.debug.DebugValueAccess;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.phys.Vec3;
 import org.jspecify.annotations.NonNull;
-
-import java.awt.*;
+import uk.nbforge.gallifreyan_chronicles.core.entity.TardisControlEntity;
+import uk.nbforge.gallifreyan_chronicles.core.entity.TardisKeyEntity;
 
 public class TardisControlHitboxDebugRenderer implements DebugRenderer.SimpleDebugRenderer {
     private final Minecraft minecraft;
@@ -23,8 +22,13 @@ public class TardisControlHitboxDebugRenderer implements DebugRenderer.SimpleDeb
     }
 
     @Override
-    public void emitGizmos(double camX, double camY, double camZ, @NonNull DebugValueAccess debugValues,
-                           @NonNull Frustum frustum, float partialTicks) {
+    public void emitGizmos(
+            double camX,
+            double camY,
+            double camZ,
+            @NonNull DebugValueAccess debugValues,
+            @NonNull Frustum frustum,
+            float partialTicks) {
         if (this.minecraft.level == null) {
             return;
         }

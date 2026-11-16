@@ -1,11 +1,5 @@
 package uk.nbforge.gallifreyan_chronicles.client.renderer.geo_layer;
 
-import uk.nbforge.gallifreyan_chronicles.client.sky.SkyShaderCompat;
-import uk.nbforge.gallifreyan_chronicles.client.renderer.fade.FadeBoxRenderer;
-import uk.nbforge.gallifreyan_chronicles.client.util.DetailLevelUtil;
-import uk.nbforge.gallifreyan_chronicles.tardis.TardisExterior;
-import java.util.Map;
-import java.util.HashMap;
 import com.geckolib.animatable.GeoAnimatable;
 import com.geckolib.cache.model.GeoBone;
 import com.geckolib.renderer.base.GeoRenderState;
@@ -15,22 +9,27 @@ import com.geckolib.renderer.base.RenderPassInfo;
 import com.geckolib.renderer.layer.GeoRenderLayer;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
-import uk.nbforge.gallifreyan_chronicles.client.renderer.GCRenderTypes;
-import uk.nbforge.gallifreyan_chronicles.client.renderer.block.TardisExteriorBlockRenderer;
-import uk.nbforge.gallifreyan_chronicles.util.GCUtil;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.function.BiConsumer;
 import net.minecraft.client.renderer.SubmitNodeCollector;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.resources.Identifier;
 import org.joml.Quaternionf;
 import org.joml.Vector3f;
 import org.jspecify.annotations.NonNull;
-
-import java.util.function.BiConsumer;
+import uk.nbforge.gallifreyan_chronicles.client.renderer.GCRenderTypes;
+import uk.nbforge.gallifreyan_chronicles.client.renderer.block.TardisExteriorBlockRenderer;
+import uk.nbforge.gallifreyan_chronicles.client.renderer.fade.FadeBoxRenderer;
+import uk.nbforge.gallifreyan_chronicles.client.sky.SkyShaderCompat;
+import uk.nbforge.gallifreyan_chronicles.client.util.DetailLevelUtil;
+import uk.nbforge.gallifreyan_chronicles.tardis.TardisExterior;
+import uk.nbforge.gallifreyan_chronicles.util.GCUtil;
 
 /**
-   A glowing orb on the lamp bone of the exterior that always faces you.
-   Only used during a new who takeoff or landing where it pulses in and out.
-*/
+ * A glowing orb on the lamp bone of the exterior that always faces you.
+ * Only used during a new who takeoff or landing where it pulses in and out.
+ */
 public class TardisLampOrbLayer<T extends GeoAnimatable, O, R extends GeoRenderState> extends GeoRenderLayer<T, O, R> {
     public static final String LAMP_BONE = "lamp";
     private static final Identifier TEXTURE = GCUtil.modIdentifier("textures/effect/lamp_orb.png");
@@ -75,7 +74,9 @@ public class TardisLampOrbLayer<T extends GeoAnimatable, O, R extends GeoRenderS
     private static final Map<String, Vector3f> LAMP_SPOTS = new HashMap<>();
 
     private static void rememberLampSpot(GeoRenderState state, Vector3f centre) {
-        Vector3f local = new Vector3f(centre).sub(TardisExteriorBlockRenderer.blockOrigin).sub(0.5f, 0f, 0.5f);
+        Vector3f local = new Vector3f(centre)
+                .sub(TardisExteriorBlockRenderer.blockOrigin)
+                .sub(0.5f, 0f, 0.5f);
         local.rotate(yawRotation(state).conjugate());
         LAMP_SPOTS.put(state.getOrDefaultGeckolibData(TardisExteriorBlockRenderer.EXTERIOR_ID, ""), local);
     }
@@ -92,7 +93,8 @@ public class TardisLampOrbLayer<T extends GeoAnimatable, O, R extends GeoRenderS
         float pulse = Math.clamp(state.getOrDefaultGeckolibData(TardisExteriorBlockRenderer.LAMP_ORB, 0f), 0f, 1f);
         if (pulse <= 0.01f || !DetailLevelUtil.highDetail()) return;
 
-        // While fading on the canvas the box is not in the depth of the world and the orb draws after it so it is already in front and stays exactly on the lamp
+        // While fading on the canvas the box is not in the depth of the world and the orb draws after it so it is
+        // already in front and stays exactly on the lamp
         // Only a solid box needs it pulled forward
         boolean onCanvas = FadeBoxRenderer.active()
                 && state.getOrDefaultGeckolibData(TardisExteriorBlockRenderer.OPACITY, 1.0f) < 1.0f;
@@ -115,8 +117,8 @@ public class TardisLampOrbLayer<T extends GeoAnimatable, O, R extends GeoRenderS
         });
     }
 
-    private static void vertex(VertexConsumer buffer, PoseStack.Pose pose,
-                               float x, float y, float u, float v, int argb) {
+    private static void vertex(
+            VertexConsumer buffer, PoseStack.Pose pose, float x, float y, float u, float v, int argb) {
         buffer.addVertex(pose, x, y, 0f)
                 .setColor(argb)
                 .setUv(u, v)

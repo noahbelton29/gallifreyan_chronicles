@@ -1,10 +1,8 @@
 package uk.nbforge.gallifreyan_chronicles.command;
 
-import net.minecraft.server.level.ServerPlayer;
-
-import java.util.Map;
-import java.util.Locale;
-import java.util.LinkedHashMap;
+import static net.minecraft.commands.Commands.argument;
+import static net.minecraft.commands.Commands.literal;
+import static uk.nbforge.gallifreyan_chronicles.util.CommandUtil.*;
 
 import com.mojang.brigadier.arguments.BoolArgumentType;
 import com.mojang.brigadier.arguments.FloatArgumentType;
@@ -14,34 +12,30 @@ import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.mojang.brigadier.suggestion.Suggestions;
 import com.mojang.brigadier.suggestion.SuggestionsBuilder;
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import java.util.Optional;
+import java.util.UUID;
+import java.util.concurrent.CompletableFuture;
+import net.minecraft.commands.CommandSourceStack;
+import net.minecraft.commands.arguments.EntityArgument;
+import net.minecraft.server.level.ServerPlayer;
+import org.jspecify.annotations.Nullable;
 import uk.nbforge.gallifreyan_chronicles.Constants;
 import uk.nbforge.gallifreyan_chronicles.tardis.Tardis;
+import uk.nbforge.gallifreyan_chronicles.tardis.ecs.system.TardisMindSystem;
+import uk.nbforge.gallifreyan_chronicles.tardis.mind.TardisMind;
+import uk.nbforge.gallifreyan_chronicles.tardis.mind.TardisPersonality;
+import uk.nbforge.gallifreyan_chronicles.tardis.mind.TardisTrait;
 import uk.nbforge.gallifreyan_chronicles.tardis.mind.data.TardisPersonalities;
 import uk.nbforge.gallifreyan_chronicles.tardis.mind.data.TardisTraits;
 import uk.nbforge.gallifreyan_chronicles.tardis.mind.disability.TardisDisability;
-import uk.nbforge.gallifreyan_chronicles.tardis.mind.TardisMind;
-import uk.nbforge.gallifreyan_chronicles.tardis.ecs.system.TardisMindSystem;
-import uk.nbforge.gallifreyan_chronicles.tardis.mind.TardisPersonality;
-import uk.nbforge.gallifreyan_chronicles.tardis.mind.TardisTrait;
-import net.minecraft.commands.CommandSourceStack;
-
-import java.util.UUID;
-
-import org.jspecify.annotations.Nullable;
-import net.minecraft.commands.arguments.EntityArgument;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-import java.util.concurrent.CompletableFuture;
-
-import static uk.nbforge.gallifreyan_chronicles.util.CommandUtil.*;
-import static net.minecraft.commands.Commands.argument;
-import static net.minecraft.commands.Commands.literal;
 
 public final class MindCommands {
-    private MindCommands() {
-    }
+    private MindCommands() {}
 
     /**
      * Actions that don't fit the get/set shape of "data": rolling, forgetting and forgiving. Everything else about the mind lives under "data mind" now.
@@ -51,7 +45,8 @@ public final class MindCommands {
                 .then(literal("inspect").executes(MindCommands::inspect))
                 .then(literal("reroll").executes(MindCommands::reroll))
                 .then(literal("undiscover").executes(MindCommands::undiscover))
-                .then(literal("forgive").executes(MindCommands::forgive)
+                .then(literal("forgive")
+                        .executes(MindCommands::forgive)
                         .then(argument("player", EntityArgument.player()).executes(MindCommands::forgive)));
     }
 
@@ -65,7 +60,8 @@ public final class MindCommands {
                         .then(argument("betrayed", BoolArgumentType.bool()).executes(MindCommands::setBetrayed))
                         .then(argument("player", EntityArgument.player())
                                 .executes(MindCommands::getBetrayed)
-                                .then(argument("betrayed", BoolArgumentType.bool()).executes(MindCommands::setBetrayed))))
+                                .then(argument("betrayed", BoolArgumentType.bool())
+                                        .executes(MindCommands::setBetrayed))))
                 .then(literal("personality")
                         .executes(MindCommands::getPersonality)
                         .then(argument("personality", StringArgumentType.greedyString())
@@ -115,7 +111,11 @@ public final class MindCommands {
             sendLine(ctx, dataLine("personality", shortId(mind.personality().id())));
             sendLine(ctx, dataLine("traits", traitList(mind)));
             sendLine(ctx, dataLine("disabilities", disabilityList(mind)));
-            sendLine(ctx, dataLine("betrayed", String.valueOf(TardisMindSystem.bond(tardis, null).betrayed())));
+            sendLine(
+                    ctx,
+                    dataLine(
+                            "betrayed",
+                            String.valueOf(TardisMindSystem.bond(tardis, null).betrayed())));
             for (MindValue which : MindValue.values()) {
                 sendLine(ctx, dataLine(which.name, oneDecimal(which.get(tardis, null))));
             }
@@ -124,8 +124,13 @@ public final class MindCommands {
     }
 
     private enum MindValue {
-        STRESS("stress"), TRUST("trust"), FEAR("fear"), SKILL("skill"), TRAUMA("trauma"),
-        TOTAL_TRAUMA("total_trauma"), HITS("hits");
+        STRESS("stress"),
+        TRUST("trust"),
+        FEAR("fear"),
+        SKILL("skill"),
+        TRAUMA("trauma"),
+        TOTAL_TRAUMA("total_trauma"),
+        HITS("hits");
 
         private final String name;
 
@@ -182,21 +187,22 @@ public final class MindCommands {
         if (which.perPlayer()) {
             node.then(argument("player", EntityArgument.player())
                     .executes(ctx -> getValue(ctx, which))
-                    .then(argument("value", FloatArgumentType.floatArg(0f, 100f)).executes(ctx -> setValue(ctx, which))));
+                    .then(argument("value", FloatArgumentType.floatArg(0f, 100f))
+                            .executes(ctx -> setValue(ctx, which))));
         }
         return node;
     }
 
-    private static CompletableFuture<Suggestions> suggestPersonalities(CommandContext<CommandSourceStack> ctx,
-                                                                       SuggestionsBuilder builder) {
+    private static CompletableFuture<Suggestions> suggestPersonalities(
+            CommandContext<CommandSourceStack> ctx, SuggestionsBuilder builder) {
         for (TardisPersonality personality : TardisPersonalities.all()) {
             builder.suggest(shortId(personality.id()));
         }
         return builder.buildFuture();
     }
 
-    private static CompletableFuture<Suggestions> suggestTraits(CommandContext<CommandSourceStack> ctx,
-                                                                SuggestionsBuilder builder) {
+    private static CompletableFuture<Suggestions> suggestTraits(
+            CommandContext<CommandSourceStack> ctx, SuggestionsBuilder builder) {
         for (TardisTrait trait : TardisTraits.all()) {
             builder.suggest(shortId(trait.id()));
         }
@@ -218,7 +224,9 @@ public final class MindCommands {
             lines.put("skill", oneDecimal(mind.skill() * 100f));
             lines.put("stress", oneDecimal(TardisMindSystem.stress(tardis)));
             lines.put("trauma (total)", oneDecimal(TardisMindSystem.trauma(tardis)));
-            lines.put("ptsd recovery", mind.has(TardisDisability.PTSD) ? oneDecimal(mind.recovery() * 100f) + "%" : "no ptsd");
+            lines.put(
+                    "ptsd recovery",
+                    mind.has(TardisDisability.PTSD) ? oneDecimal(mind.recovery() * 100f) + "%" : "no ptsd");
             lines.put("willing to fly", String.valueOf(!TardisMindSystem.unwilling(tardis)));
             lines.put("discovered", mind.discovered().isEmpty() ? "nothing" : String.join(", ", mind.discovered()));
 
@@ -226,14 +234,18 @@ public final class MindCommands {
             lines.forEach((key, value) -> success(ctx, false, "data_line", key, value));
 
             if (mind.bonds().isEmpty()) return success(ctx, false, "mind_no_bonds");
-            mind.bonds().forEach((player, bond) -> success(ctx, false, "mind_bond",
-                    playerName(tardis, player) + (tardis.isOwner(player) ? " (owner)" : ""),
-                    oneDecimal(bond.trust()),
-                    oneDecimal(TardisMindSystem.fear(tardis, player)),
-                    TardisMindSystem.fearLevel(tardis, player).name().toLowerCase(Locale.ROOT),
-                    oneDecimal(bond.traumaAt(now)),
-                    bond.hits(),
-                    bond.betrayed()));
+            mind.bonds()
+                    .forEach((player, bond) -> success(
+                            ctx,
+                            false,
+                            "mind_bond",
+                            playerName(tardis, player) + (tardis.isOwner(player) ? " (owner)" : ""),
+                            oneDecimal(bond.trust()),
+                            oneDecimal(TardisMindSystem.fear(tardis, player)),
+                            TardisMindSystem.fearLevel(tardis, player).name().toLowerCase(Locale.ROOT),
+                            oneDecimal(bond.traumaAt(now)),
+                            bond.hits(),
+                            bond.betrayed()));
             return 1;
         });
     }
@@ -252,8 +264,14 @@ public final class MindCommands {
 
     private static int getBetrayed(CommandContext<CommandSourceStack> ctx) throws CommandSyntaxException {
         UUID player = playerArg(ctx);
-        return withTardis(ctx, (tardis, idText) ->
-                reply(ctx, tardis, "betrayed", String.valueOf(TardisMindSystem.bond(tardis, player).betrayed()), false));
+        return withTardis(
+                ctx,
+                (tardis, idText) -> reply(
+                        ctx,
+                        tardis,
+                        "betrayed",
+                        String.valueOf(TardisMindSystem.bond(tardis, player).betrayed()),
+                        false));
     }
 
     private static int setBetrayed(CommandContext<CommandSourceStack> ctx) throws CommandSyntaxException {
@@ -290,7 +308,8 @@ public final class MindCommands {
 
     private static int getValue(CommandContext<CommandSourceStack> ctx, MindValue which) throws CommandSyntaxException {
         UUID player = playerArg(ctx);
-        return withTardis(ctx, (tardis, idText) -> reply(ctx, tardis, which.name, oneDecimal(which.get(tardis, player)), false));
+        return withTardis(
+                ctx, (tardis, idText) -> reply(ctx, tardis, which.name, oneDecimal(which.get(tardis, player)), false));
     }
 
     private static int setValue(CommandContext<CommandSourceStack> ctx, MindValue which) throws CommandSyntaxException {
@@ -303,8 +322,14 @@ public final class MindCommands {
     }
 
     private static int getPersonality(CommandContext<CommandSourceStack> ctx) throws CommandSyntaxException {
-        return withTardis(ctx, (tardis, idText) ->
-                reply(ctx, tardis, "personality", shortId(TardisMindSystem.mind(tardis).personality().id()), false));
+        return withTardis(
+                ctx,
+                (tardis, idText) -> reply(
+                        ctx,
+                        tardis,
+                        "personality",
+                        shortId(TardisMindSystem.mind(tardis).personality().id()),
+                        false));
     }
 
     private static int setPersonality(CommandContext<CommandSourceStack> ctx) throws CommandSyntaxException {
@@ -319,8 +344,8 @@ public final class MindCommands {
     }
 
     private static int getTraits(CommandContext<CommandSourceStack> ctx) throws CommandSyntaxException {
-        return withTardis(ctx, (tardis, idText) ->
-                reply(ctx, tardis, "traits", traitList(TardisMindSystem.mind(tardis)), false));
+        return withTardis(
+                ctx, (tardis, idText) -> reply(ctx, tardis, "traits", traitList(TardisMindSystem.mind(tardis)), false));
     }
 
     private static int addTrait(CommandContext<CommandSourceStack> ctx) throws CommandSyntaxException {
@@ -329,13 +354,16 @@ public final class MindCommands {
             Optional<TardisTrait> trait = TardisTraits.byId(id);
             if (trait.isEmpty()) return fail(ctx, "unknown_trait", id);
 
-            List<TardisTrait> traits = new ArrayList<>(TardisMindSystem.mind(tardis).traits());
+            List<TardisTrait> traits =
+                    new ArrayList<>(TardisMindSystem.mind(tardis).traits());
             if (traits.contains(trait.get())) return fail(ctx, "trait_already", id);
             if (traits.size() >= TardisMind.MAX_TRAITS) return fail(ctx, "traits_full", TardisMind.MAX_TRAITS);
             TardisPersonality personality = TardisMindSystem.mind(tardis).personality();
             if (!trait.get().fits(personality)) return fail(ctx, "trait_doesnt_fit", id, shortId(personality.id()));
-            Optional<TardisTrait> clash = traits.stream().filter(trait.get()::clashesWith).findFirst();
-            if (clash.isPresent()) return fail(ctx, "trait_clashes", id, shortId(clash.get().id()));
+            Optional<TardisTrait> clash =
+                    traits.stream().filter(trait.get()::clashesWith).findFirst();
+            if (clash.isPresent())
+                return fail(ctx, "trait_clashes", id, shortId(clash.get().id()));
 
             traits.add(trait.get());
             return saveTraits(ctx, tardis, traits);
@@ -348,7 +376,8 @@ public final class MindCommands {
             Optional<TardisTrait> trait = TardisTraits.byId(id);
             if (trait.isEmpty()) return fail(ctx, "unknown_trait", id);
 
-            List<TardisTrait> traits = new ArrayList<>(TardisMindSystem.mind(tardis).traits());
+            List<TardisTrait> traits =
+                    new ArrayList<>(TardisMindSystem.mind(tardis).traits());
             if (!traits.remove(trait.get())) return fail(ctx, "trait_missing", id);
 
             return saveTraits(ctx, tardis, traits);
@@ -364,13 +393,19 @@ public final class MindCommands {
         return reply(ctx, tardis, "traits", traitList(TardisMindSystem.mind(tardis)), true);
     }
 
-    private static int reply(CommandContext<CommandSourceStack> ctx, Tardis tardis, String what, String value,
-                             boolean changed) {
-        return success(ctx, changed, changed ? "set_mind" : "get_mind", what, tardis.id().toString(), value);
+    private static int reply(
+            CommandContext<CommandSourceStack> ctx, Tardis tardis, String what, String value, boolean changed) {
+        return success(
+                ctx,
+                changed,
+                changed ? "set_mind" : "get_mind",
+                what,
+                tardis.id().toString(),
+                value);
     }
 
-    private static CompletableFuture<Suggestions> suggestDisabilities(CommandContext<CommandSourceStack> ctx,
-                                                                      SuggestionsBuilder builder) {
+    private static CompletableFuture<Suggestions> suggestDisabilities(
+            CommandContext<CommandSourceStack> ctx, SuggestionsBuilder builder) {
         for (TardisDisability disability : TardisDisability.values()) {
             builder.suggest(disability.id());
         }
@@ -378,17 +413,21 @@ public final class MindCommands {
     }
 
     private static int getDisabilities(CommandContext<CommandSourceStack> ctx) throws CommandSyntaxException {
-        return withTardis(ctx, (tardis, idText) ->
-                reply(ctx, tardis, "disabilities", disabilityList(TardisMindSystem.mind(tardis)), false));
+        return withTardis(
+                ctx,
+                (tardis, idText) ->
+                        reply(ctx, tardis, "disabilities", disabilityList(TardisMindSystem.mind(tardis)), false));
     }
 
-    private static int changeDisability(CommandContext<CommandSourceStack> ctx, boolean add) throws CommandSyntaxException {
+    private static int changeDisability(CommandContext<CommandSourceStack> ctx, boolean add)
+            throws CommandSyntaxException {
         String id = StringArgumentType.getString(ctx, "disability");
         return withTardis(ctx, (tardis, idText) -> {
             Optional<TardisDisability> disability = TardisDisability.byId(id);
             if (disability.isEmpty()) return fail(ctx, "unknown_disability", id);
 
-            List<TardisDisability> disabilities = new ArrayList<>(TardisMindSystem.mind(tardis).disabilities());
+            List<TardisDisability> disabilities =
+                    new ArrayList<>(TardisMindSystem.mind(tardis).disabilities());
             if (add && disabilities.contains(disability.get())) return fail(ctx, "disability_already", id);
             if (!add && !disabilities.contains(disability.get())) return fail(ctx, "disability_missing", id);
 
@@ -402,20 +441,22 @@ public final class MindCommands {
         return withTardis(ctx, (tardis, idText) -> saveDisabilities(ctx, tardis, List.of()));
     }
 
-    private static int saveDisabilities(CommandContext<CommandSourceStack> ctx, Tardis tardis,
-                                        List<TardisDisability> disabilities) {
+    private static int saveDisabilities(
+            CommandContext<CommandSourceStack> ctx, Tardis tardis, List<TardisDisability> disabilities) {
         TardisMindSystem.setDisabilities(tardis, disabilities);
         return reply(ctx, tardis, "disabilities", disabilityList(TardisMindSystem.mind(tardis)), true);
     }
 
     private static String disabilityList(TardisMind mind) {
         if (mind.disabilities().isEmpty()) return "none";
-        return String.join(", ", mind.disabilities().stream().map(TardisDisability::id).toList());
+        return String.join(
+                ", ", mind.disabilities().stream().map(TardisDisability::id).toList());
     }
 
     private static String traitList(TardisMind mind) {
         if (mind.traits().isEmpty()) return "none";
-        return String.join(", ", mind.traits().stream().map(trait -> shortId(trait.id())).toList());
+        return String.join(
+                ", ", mind.traits().stream().map(trait -> shortId(trait.id())).toList());
     }
 
     private static String shortId(String id) {

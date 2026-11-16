@@ -1,16 +1,8 @@
 package uk.nbforge.gallifreyan_chronicles.tardis.mind.flight;
 
-import uk.nbforge.gallifreyan_chronicles.util.GCSparkUtil;
-import uk.nbforge.gallifreyan_chronicles.core.block_entities.TardisConsoleBlockEntity;
-import uk.nbforge.gallifreyan_chronicles.network.tardis.TardisCrashRumblePayload;
-import uk.nbforge.gallifreyan_chronicles.tardis.Tardis;
-import uk.nbforge.gallifreyan_chronicles.tardis.TardisApi;
-import uk.nbforge.gallifreyan_chronicles.tardis.TardisEvents;
-import uk.nbforge.gallifreyan_chronicles.tardis.control.impl.SpaceTimeThrottleControl;
-import uk.nbforge.gallifreyan_chronicles.tardis.flight.crash.TardisCrash;
-import uk.nbforge.gallifreyan_chronicles.tardis.flight.TardisFlightState;
-import uk.nbforge.gallifreyan_chronicles.tardis.ecs.system.TardisMindSystem;
-import uk.nbforge.gallifreyan_chronicles.util.GCSchedulerUtil;
+import java.util.HashSet;
+import java.util.Set;
+import java.util.UUID;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
@@ -19,15 +11,22 @@ import net.minecraft.sounds.SoundSource;
 import net.minecraft.util.Mth;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.phys.Vec3;
-
-import java.util.HashSet;
-import java.util.Set;
-import java.util.UUID;
+import uk.nbforge.gallifreyan_chronicles.core.block_entities.TardisConsoleBlockEntity;
+import uk.nbforge.gallifreyan_chronicles.network.tardis.TardisCrashRumblePayload;
+import uk.nbforge.gallifreyan_chronicles.tardis.Tardis;
+import uk.nbforge.gallifreyan_chronicles.tardis.TardisApi;
+import uk.nbforge.gallifreyan_chronicles.tardis.TardisEvents;
+import uk.nbforge.gallifreyan_chronicles.tardis.control.impl.SpaceTimeThrottleControl;
+import uk.nbforge.gallifreyan_chronicles.tardis.ecs.system.TardisMindSystem;
+import uk.nbforge.gallifreyan_chronicles.tardis.flight.TardisFlightState;
+import uk.nbforge.gallifreyan_chronicles.tardis.flight.crash.TardisCrash;
+import uk.nbforge.gallifreyan_chronicles.util.GCSchedulerUtil;
+import uk.nbforge.gallifreyan_chronicles.util.GCSparkUtil;
 
 /**
-   A stressed TARDIS flies badly and shakes harder the more stressed it is.
-   Flying stressed wears it out more and if it reaches breaking point mid flight it crashes.
-*/
+ * A stressed TARDIS flies badly and shakes harder the more stressed it is.
+ * Flying stressed wears it out more and if it reaches breaking point mid flight it crashes.
+ */
 public final class TardisTurbulence {
     // No shaking below this
     private static final float CALM_BELOW = 30f;
@@ -46,8 +45,7 @@ public final class TardisTurbulence {
 
     private static final Set<UUID> FLYING = new HashSet<>();
 
-    private TardisTurbulence() {
-    }
+    private TardisTurbulence() {}
 
     public static void init() {
         TardisEvents.TAKE_OFF.register(TardisTurbulence::onTakeOff);
@@ -140,7 +138,9 @@ public final class TardisTurbulence {
     }
 
     private static boolean inVortex(Tardis tardis) {
-        return tardis.exterior().map(exterior -> exterior.getFlightState() == TardisFlightState.IN_VORTEX).orElse(false);
+        return tardis.exterior()
+                .map(exterior -> exterior.getFlightState() == TardisFlightState.IN_VORTEX)
+                .orElse(false);
     }
 
     private interface AtConsole {

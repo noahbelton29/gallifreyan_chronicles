@@ -4,11 +4,6 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
-import uk.nbforge.gallifreyan_chronicles.Constants;
-import net.minecraft.resources.Identifier;
-import net.minecraft.world.phys.Vec3;
-import org.jspecify.annotations.Nullable;
-
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -16,23 +11,25 @@ import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import net.minecraft.resources.Identifier;
+import net.minecraft.world.phys.Vec3;
+import org.jspecify.annotations.Nullable;
+import uk.nbforge.gallifreyan_chronicles.Constants;
 
 /**
-   Reads control positions from the hitbox bones of a console model, named after the control id, so the model is the one place that says where each control sits.
-   The first cube of a bone is the hitbox.
-   Its eight corners are moved through the own rotation of the cube and then through the rotation of its bone and every parent bone, exactly how GeckoLib draws the model with x mirrored, x and y angles negated and Z then Y then X order.
-   The centre of the moved cube is the control position, divided by 16 with y minus 0.5625 like the rest of the console space, and the size of the cube is the hitbox size since a control hitbox cannot be tilted.
-*/
+ * Reads control positions from the hitbox bones of a console model, named after the control id, so the model is the one place that says where each control sits.
+ * The first cube of a bone is the hitbox.
+ * Its eight corners are moved through the own rotation of the cube and then through the rotation of its bone and every parent bone, exactly how GeckoLib draws the model with x mirrored, x and y angles negated and Z then Y then X order.
+ * The centre of the moved cube is the control position, divided by 16 with y minus 0.5625 like the rest of the console space, and the size of the cube is the hitbox size since a control hitbox cannot be tilted.
+ */
 final class ConsoleHitboxBones {
     static final String SUFFIX = "_hitbox";
     private static final double Y_OFFSET = 0.5625;
     private static final Map<String, Map<String, Box>> CACHE = new ConcurrentHashMap<>();
 
-    record Box(Vec3 center, float width, float height, float depth) {
-    }
+    record Box(Vec3 center, float width, float height, float depth) {}
 
-    private ConsoleHitboxBones() {
-    }
+    private ConsoleHitboxBones() {}
 
     static Map<String, Box> read(String consoleId) {
         return CACHE.computeIfAbsent(consoleId, ConsoleHitboxBones::load);
@@ -41,7 +38,8 @@ final class ConsoleHitboxBones {
     /** Reads the model json of a console and finds every bone ending in the hitbox suffix, the result is keyed by control id. */
     private static Map<String, Box> load(String consoleId) {
         Map<String, Box> boxes = new HashMap<>();
-        Identifier parsed = Identifier.tryParse(consoleId.contains(":") ? consoleId : Constants.MOD_ID + ":" + consoleId);
+        Identifier parsed =
+                Identifier.tryParse(consoleId.contains(":") ? consoleId : Constants.MOD_ID + ":" + consoleId);
         if (parsed == null) return boxes;
         String resource = "/assets/" + parsed.getNamespace() + "/geckolib/models/" + parsed.getPath() + ".json";
         try (InputStream in = ConsoleHitboxBones.class.getResourceAsStream(resource)) {
@@ -49,7 +47,8 @@ final class ConsoleHitboxBones {
                 Constants.LOG.warn("No model {} found to read hitbox bones of console {}", resource, consoleId);
                 return boxes;
             }
-            JsonObject root = JsonParser.parseReader(new InputStreamReader(in, StandardCharsets.UTF_8)).getAsJsonObject();
+            JsonObject root = JsonParser.parseReader(new InputStreamReader(in, StandardCharsets.UTF_8))
+                    .getAsJsonObject();
             JsonArray geometries = root.getAsJsonArray("minecraft:geometry");
             if (geometries == null) return boxes;
 
@@ -89,22 +88,26 @@ final class ConsoleHitboxBones {
             // X is mirrored, as the model is drawn
             // forgetting this puts every control on the wrong side, ask me how I know
             double[] point = {
-                    -(origin[0] + ((corner & 1) != 0 ? size[0] : 0.0)),
-                    origin[1] + ((corner & 2) != 0 ? size[1] : 0.0),
-                    origin[2] + ((corner & 4) != 0 ? size[2] : 0.0)};
+                -(origin[0] + ((corner & 1) != 0 ? size[0] : 0.0)),
+                origin[1] + ((corner & 2) != 0 ? size[1] : 0.0),
+                origin[2] + ((corner & 4) != 0 ? size[2] : 0.0)
+            };
             spin(point, numbers(cube, "pivot"), numbers(cube, "rotation"));
             JsonObject current = bone;
             int guard = 0;
             while (current != null && guard++ < 64) {
                 spin(point, numbers(current, "pivot"), numbers(current, "rotation"));
-                current = current.has("parent") ? bones.get(current.get("parent").getAsString()) : null;
+                current =
+                        current.has("parent") ? bones.get(current.get("parent").getAsString()) : null;
             }
             for (int axis = 0; axis < 3; axis++) {
                 low[axis] = Math.min(low[axis], point[axis]);
                 high[axis] = Math.max(high[axis], point[axis]);
             }
         }
-        Vec3 centre = new Vec3((low[0] + high[0]) / 2.0 / 16.0, (low[1] + high[1]) / 2.0 / 16.0 - Y_OFFSET,
+        Vec3 centre = new Vec3(
+                (low[0] + high[0]) / 2.0 / 16.0,
+                (low[1] + high[1]) / 2.0 / 16.0 - Y_OFFSET,
                 (low[2] + high[2]) / 2.0 / 16.0);
         return new Box(centre, (float) (size[0] / 16.0), (float) (size[1] / 16.0), (float) (size[2] / 16.0));
     }
@@ -152,6 +155,8 @@ final class ConsoleHitboxBones {
         if (!object.has(key) || !object.get(key).isJsonArray()) return null;
         JsonArray array = object.getAsJsonArray(key);
         if (array.size() < 3) return null;
-        return new double[]{array.get(0).getAsDouble(), array.get(1).getAsDouble(), array.get(2).getAsDouble()};
+        return new double[] {
+            array.get(0).getAsDouble(), array.get(1).getAsDouble(), array.get(2).getAsDouble()
+        };
     }
 }

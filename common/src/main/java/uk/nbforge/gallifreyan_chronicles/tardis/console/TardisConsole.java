@@ -1,26 +1,27 @@
 package uk.nbforge.gallifreyan_chronicles.tardis.console;
 
-import uk.nbforge.gallifreyan_chronicles.Constants;
-
-import uk.nbforge.gallifreyan_chronicles.core.data.IdentifiableData;
-import net.minecraft.world.phys.Vec3;
-import org.jspecify.annotations.Nullable;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-
+import net.minecraft.world.phys.Vec3;
+import org.jspecify.annotations.Nullable;
+import uk.nbforge.gallifreyan_chronicles.Constants;
+import uk.nbforge.gallifreyan_chronicles.core.data.IdentifiableData;
 import uk.nbforge.gallifreyan_chronicles.core.dynamic_registries.TardisConsoleRegistry;
-import uk.nbforge.gallifreyan_chronicles.tardis.codec.console.TardisConsoleCodec;
 
-public record TardisConsole(String id, List<ControlEntry> controls, String defaultVariant,
-                            List<GlowGroup> glowGroups) implements IdentifiableData<TardisConsole> {
-    public record ControlEntry(String id, Vec3 offset, float width, float height, float depth, float cooldown,
-                               ControlAnimationSetting animation) {
+public record TardisConsole(String id, List<ControlEntry> controls, String defaultVariant, List<GlowGroup> glowGroups)
+        implements IdentifiableData<TardisConsole> {
+    public record ControlEntry(
+            String id,
+            Vec3 offset,
+            float width,
+            float height,
+            float depth,
+            float cooldown,
+            ControlAnimationSetting animation) {
         public static final float DEFAULT_COOLDOWN_SECONDS = 1.5F;
         // Position placeholder for controls placed by the hitbox bone of their model, resolved in withId
         public static final Vec3 FROM_HITBOX = new Vec3(Double.NaN, Double.NaN, Double.NaN);
-
     }
 
     public TardisConsole(String id) {
@@ -42,14 +43,23 @@ public record TardisConsole(String id, List<ControlEntry> controls, String defau
             }
             ConsoleHitboxBones.Box box = boxes.get(e.id());
             if (box == null) {
-                Constants.LOG.warn("Console {} control '{}' has no position and no '{}{}' bone",
-                        consoleId, e.id(), e.id(), ConsoleHitboxBones.SUFFIX);
+                Constants.LOG.warn(
+                        "Console {} control '{}' has no position and no '{}{}' bone",
+                        consoleId,
+                        e.id(),
+                        e.id(),
+                        ConsoleHitboxBones.SUFFIX);
                 continue;
             }
             boolean sized = !Float.isNaN(e.width());
-            out.add(new ControlEntry(e.id(), box.center(),
-                    sized ? e.width() : box.width(), sized ? e.height() : box.height(), sized ? e.depth() : box.depth(),
-                    e.cooldown(), e.animation()));
+            out.add(new ControlEntry(
+                    e.id(),
+                    box.center(),
+                    sized ? e.width() : box.width(),
+                    sized ? e.height() : box.height(),
+                    sized ? e.depth() : box.depth(),
+                    e.cooldown(),
+                    e.animation()));
         }
         return List.copyOf(out);
     }

@@ -1,13 +1,12 @@
 package uk.nbforge.gallifreyan_chronicles.loader.sky;
 
+import net.minecraft.server.MinecraftServer;
+import uk.nbforge.gallifreyan_chronicles.codec.sky.data.DimensionSkyCodec;
+import uk.nbforge.gallifreyan_chronicles.core.dynamic_registries.DimensionSkyRegistry;
 import uk.nbforge.gallifreyan_chronicles.loader.GCJsonReloadListener;
 import uk.nbforge.gallifreyan_chronicles.network.DimensionSkySyncPayload;
 import uk.nbforge.gallifreyan_chronicles.platform.Services;
-import net.minecraft.server.MinecraftServer;
-
-import uk.nbforge.gallifreyan_chronicles.core.dynamic_registries.DimensionSkyRegistry;
 import uk.nbforge.gallifreyan_chronicles.sky.data.DimensionSky;
-import uk.nbforge.gallifreyan_chronicles.codec.sky.data.DimensionSkyCodec;
 
 public class DimensionSkyLoader extends GCJsonReloadListener<DimensionSky> {
     public DimensionSkyLoader() {

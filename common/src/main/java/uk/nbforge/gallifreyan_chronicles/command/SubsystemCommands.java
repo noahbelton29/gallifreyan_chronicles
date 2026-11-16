@@ -1,5 +1,9 @@
 package uk.nbforge.gallifreyan_chronicles.command;
 
+import static net.minecraft.commands.Commands.argument;
+import static net.minecraft.commands.Commands.literal;
+import static uk.nbforge.gallifreyan_chronicles.util.CommandUtil.*;
+
 import com.mojang.brigadier.arguments.FloatArgumentType;
 import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
@@ -7,16 +11,11 @@ import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.mojang.brigadier.suggestion.Suggestions;
 import com.mojang.brigadier.suggestion.SuggestionsBuilder;
-import uk.nbforge.gallifreyan_chronicles.core.block_entities.TardisExteriorBlockEntity;
-import uk.nbforge.gallifreyan_chronicles.tardis.ecs.component.TardisSubsystem;
-import net.minecraft.commands.CommandSourceStack;
-
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
-
-import static uk.nbforge.gallifreyan_chronicles.util.CommandUtil.*;
-import static net.minecraft.commands.Commands.argument;
-import static net.minecraft.commands.Commands.literal;
+import net.minecraft.commands.CommandSourceStack;
+import uk.nbforge.gallifreyan_chronicles.core.block_entities.TardisExteriorBlockEntity;
+import uk.nbforge.gallifreyan_chronicles.tardis.ecs.component.TardisSubsystem;
 
 /**
  * Subsystem health lives entirely under "data" now.
@@ -26,8 +25,7 @@ public final class SubsystemCommands {
         int run(TardisExteriorBlockEntity exterior, TardisSubsystem subsystem, String idText);
     }
 
-    private SubsystemCommands() {
-    }
+    private SubsystemCommands() {}
 
     public static LiteralArgumentBuilder<CommandSourceStack> subsystemData() {
         return literal("subsystem")
@@ -39,8 +37,8 @@ public final class SubsystemCommands {
                                         .executes(SubsystemCommands::setHealth))));
     }
 
-    private static CompletableFuture<Suggestions> suggestSubsystems(CommandContext<CommandSourceStack> ctx,
-                                                                    SuggestionsBuilder builder) {
+    private static CompletableFuture<Suggestions> suggestSubsystems(
+            CommandContext<CommandSourceStack> ctx, SuggestionsBuilder builder) {
         for (TardisSubsystem subsystem : TardisSubsystem.values()) {
             builder.suggest(subsystem.id());
         }
@@ -70,9 +68,11 @@ public final class SubsystemCommands {
         if (subsystem.isEmpty()) return fail(ctx, "unknown_subsystem", subsystemId);
 
         return withTardis(ctx, (tardis, idText) -> {
-            Optional<TardisExteriorBlockEntity> exterior = findBlockEntity(ctx,
-                    manager(ctx).resolveExteriorBlockPos(tardis.id()), TardisExteriorBlockEntity.class);
-            return exterior.map(tardisExteriorBlockEntity -> action.run(tardisExteriorBlockEntity, subsystem.get(), idText)).orElseGet(() -> fail(ctx, "no_exterior", idText));
+            Optional<TardisExteriorBlockEntity> exterior = findBlockEntity(
+                    ctx, manager(ctx).resolveExteriorBlockPos(tardis.id()), TardisExteriorBlockEntity.class);
+            return exterior.map(
+                            tardisExteriorBlockEntity -> action.run(tardisExteriorBlockEntity, subsystem.get(), idText))
+                    .orElseGet(() -> fail(ctx, "no_exterior", idText));
         });
     }
 }

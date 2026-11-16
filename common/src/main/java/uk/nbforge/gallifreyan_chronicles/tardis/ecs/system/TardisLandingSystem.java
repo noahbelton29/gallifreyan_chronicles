@@ -1,27 +1,25 @@
 package uk.nbforge.gallifreyan_chronicles.tardis.ecs.system;
 
-import org.jspecify.annotations.Nullable;
-import uk.nbforge.gallifreyan_chronicles.tardis.TardisApi;
-import uk.nbforge.gallifreyan_chronicles.tardis.Tardis;
-import uk.nbforge.gallifreyan_chronicles.core.block.TardisBlock;
-import uk.nbforge.gallifreyan_chronicles.core.block_entities.TardisExteriorBlockEntity;
-import uk.nbforge.gallifreyan_chronicles.core.GCBlocks;
-import uk.nbforge.gallifreyan_chronicles.tardis.flight.LandingTarget;
-import uk.nbforge.gallifreyan_chronicles.tardis.flight.TardisLandingSite;
-import uk.nbforge.gallifreyan_chronicles.tardis.TardisManager;
+import java.util.UUID;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.block.Block;
-import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.Blocks;
-
-import java.util.UUID;
+import net.minecraft.world.level.block.state.BlockState;
+import org.jspecify.annotations.Nullable;
+import uk.nbforge.gallifreyan_chronicles.core.GCBlocks;
+import uk.nbforge.gallifreyan_chronicles.core.block.TardisBlock;
+import uk.nbforge.gallifreyan_chronicles.core.block_entities.TardisExteriorBlockEntity;
+import uk.nbforge.gallifreyan_chronicles.tardis.Tardis;
+import uk.nbforge.gallifreyan_chronicles.tardis.TardisApi;
+import uk.nbforge.gallifreyan_chronicles.tardis.TardisManager;
+import uk.nbforge.gallifreyan_chronicles.tardis.flight.LandingTarget;
+import uk.nbforge.gallifreyan_chronicles.tardis.flight.TardisLandingSite;
 
 public final class TardisLandingSystem {
-    private TardisLandingSystem() {
-    }
+    private TardisLandingSystem() {}
 
     public static BlockPos findLandingSpot(ServerLevel level, BlockPos pos) {
         if (isStandable(level, pos)) return pos;
@@ -41,13 +39,15 @@ public final class TardisLandingSystem {
         BlockPos above = pos.above();
         if (level.isOutsideBuildHeight(below) || level.isOutsideBuildHeight(above)) return false;
 
-        return isOpen(level, pos) && isOpen(level, above)
+        return isOpen(level, pos)
+                && isOpen(level, above)
                 && level.getBlockState(below).isFaceSturdy(level, below, Direction.UP);
     }
 
     private static boolean isOpen(ServerLevel level, BlockPos pos) {
         var state = level.getBlockState(pos);
-        return (state.canBeReplaced() || TardisLandingSite.isSoft(state)) && state.getFluidState().isEmpty();
+        return (state.canBeReplaced() || TardisLandingSite.isSoft(state))
+                && state.getFluidState().isEmpty();
     }
 
     public static void relocate(MinecraftServer server, UUID tardisId) {
@@ -76,7 +76,8 @@ public final class TardisLandingSystem {
 
         TardisLandingSite.clearSoft(newLevel, pos);
         TardisLandingSite.clearSoft(newLevel, pos.above());
-        if (!newLevel.getBlockState(pos).canBeReplaced() || !newLevel.getBlockState(pos.above()).canBeReplaced()) {
+        if (!newLevel.getBlockState(pos).canBeReplaced()
+                || !newLevel.getBlockState(pos.above()).canBeReplaced()) {
             return;
         }
 
@@ -99,19 +100,19 @@ public final class TardisLandingSystem {
 
         BlockPos oldTopPos = oldPos.above();
         if (oldLevel.getBlockState(oldTopPos).is(GCBlocks.TARDIS_TOP)) {
-            oldLevel.setBlock(oldTopPos, Blocks.AIR.defaultBlockState(),
-                    Block.UPDATE_CLIENTS | Block.UPDATE_SUPPRESS_DROPS);
+            oldLevel.setBlock(
+                    oldTopPos, Blocks.AIR.defaultBlockState(), Block.UPDATE_CLIENTS | Block.UPDATE_SUPPRESS_DROPS);
         }
         oldLevel.removeBlock(oldPos, false);
 
         newLevel.setBlock(
                 pos,
-                GCBlocks.TARDIS.defaultBlockState()
+                GCBlocks.TARDIS
+                        .defaultBlockState()
                         .setValue(TardisBlock.GLOWING, glowing)
                         .setValue(TardisBlock.IN_FLIGHT, inFlight)
                         .setValue(TardisBlock.LIGHT, light),
-                Block.UPDATE_ALL
-        );
+                Block.UPDATE_ALL);
         if (!(newLevel.getBlockEntity(pos) instanceof TardisExteriorBlockEntity fresh)) return null;
 
         fresh.copyStateFrom(old);

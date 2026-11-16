@@ -1,17 +1,16 @@
 package uk.nbforge.gallifreyan_chronicles.client.sound;
 
-import uk.nbforge.gallifreyan_chronicles.client.tardis.TardisFrightClient;
-import uk.nbforge.gallifreyan_chronicles.config.GCConfig;
-import uk.nbforge.gallifreyan_chronicles.core.GCSounds;
+import java.util.function.BooleanSupplier;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.player.LocalPlayer;
+import net.minecraft.client.resources.sounds.AbstractTickableSoundInstance;
 import net.minecraft.core.BlockPos;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.phys.Vec3;
-import net.minecraft.client.resources.sounds.AbstractTickableSoundInstance;
-
-import java.util.function.BooleanSupplier;
+import uk.nbforge.gallifreyan_chronicles.client.tardis.TardisFrightClient;
+import uk.nbforge.gallifreyan_chronicles.config.GCConfig;
+import uk.nbforge.gallifreyan_chronicles.core.GCSounds;
 
 public class TardisConsoleHumSoundInstance extends AbstractTickableSoundInstance {
     public static final double HEARING_RANGE = 30.0;
@@ -26,7 +25,8 @@ public class TardisConsoleHumSoundInstance extends AbstractTickableSoundInstance
     private float fade;
     private int tickCount = 0;
 
-    public TardisConsoleHumSoundInstance(BlockPos pos, BooleanSupplier stillValid, BooleanSupplier powered, BooleanSupplier known) {
+    public TardisConsoleHumSoundInstance(
+            BlockPos pos, BooleanSupplier stillValid, BooleanSupplier powered, BooleanSupplier known) {
         super(GCSounds.FIRST_DOCTORS_HUM, SoundSource.BLOCKS, RandomSource.create());
 
         this.stillValid = stillValid;
@@ -67,9 +67,7 @@ public class TardisConsoleHumSoundInstance extends AbstractTickableSoundInstance
         if (fade < target) fade = Math.min(target, fade + FADE_PER_TICK);
         else if (fade > target) fade = Math.max(target, fade - FADE_PER_TICK);
 
-        double distance = SoundListener.pos().distanceTo(
-                new Vec3(this.x, this.y, this.z)
-        );
+        double distance = SoundListener.pos().distanceTo(new Vec3(this.x, this.y, this.z));
 
         if (distance >= HEARING_RANGE) {
             this.volume = 0.0F;

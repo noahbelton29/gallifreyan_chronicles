@@ -1,9 +1,8 @@
 package uk.nbforge.gallifreyan_chronicles.core.sound.timed;
 
-import uk.nbforge.gallifreyan_chronicles.network.ResumeSoundPayload;
-import uk.nbforge.gallifreyan_chronicles.platform.Services;
-import uk.nbforge.gallifreyan_chronicles.core.sound.timed.TimedSoundData.Session;
-import uk.nbforge.gallifreyan_chronicles.util.GCSchedulerUtil;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.Identifier;
@@ -13,32 +12,47 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.phys.Vec3;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
+import uk.nbforge.gallifreyan_chronicles.core.sound.timed.TimedSoundData.Session;
+import uk.nbforge.gallifreyan_chronicles.network.ResumeSoundPayload;
+import uk.nbforge.gallifreyan_chronicles.platform.Services;
+import uk.nbforge.gallifreyan_chronicles.util.GCSchedulerUtil;
 
 public final class TimedSounds {
     private static final int MIN_TRACKED_TICKS = 40;
 
-    private TimedSounds() {
-    }
+    private TimedSounds() {}
 
     private static long now(MinecraftServer server) {
         return server.overworld().getGameTime();
     }
 
-    public static void play(ServerLevel level, BlockPos pos, SoundEvent sound, SoundSource source, float volume, float pitch) {
+    public static void play(
+            ServerLevel level, BlockPos pos, SoundEvent sound, SoundSource source, float volume, float pitch) {
         start(level, pos, sound, source, volume, pitch, false, Optional.empty(), 1.0F);
     }
 
-    public static void playThenLoop(ServerLevel level, BlockPos pos, SoundEvent first, SoundEvent then,
-                                    SoundSource source, float volume, float pitch, float thenVolume) {
+    public static void playThenLoop(
+            ServerLevel level,
+            BlockPos pos,
+            SoundEvent first,
+            SoundEvent then,
+            SoundSource source,
+            float volume,
+            float pitch,
+            float thenVolume) {
         start(level, pos, first, source, volume, pitch, false, Optional.of(then.location()), thenVolume);
     }
 
-    private static void start(ServerLevel level, BlockPos pos, SoundEvent sound, SoundSource source, float volume,
-                              float pitch, boolean loop, Optional<Identifier> next, float nextVolume) {
+    private static void start(
+            ServerLevel level,
+            BlockPos pos,
+            SoundEvent sound,
+            SoundSource source,
+            float volume,
+            float pitch,
+            boolean loop,
+            Optional<Identifier> next,
+            float nextVolume) {
         level.playSound(null, pos, sound, source, volume, pitch);
 
         double seconds = SoundDurations.seconds(sound.location());
@@ -47,10 +61,22 @@ public final class TimedSounds {
         if (durationTicks < (chained ? 1 : MIN_TRACKED_TICKS)) return;
 
         MinecraftServer server = level.getServer();
-        Session session = new Session(level.dimension(), sound.location(), Vec3.atCenterOf(pos), volume, pitch,
-                now(server), durationTicks, loop, next, nextVolume);
+        Session session = new Session(
+                level.dimension(),
+                sound.location(),
+                Vec3.atCenterOf(pos),
+                volume,
+                pitch,
+                now(server),
+                durationTicks,
+                loop,
+                next,
+                nextVolume);
         TimedSoundData data = TimedSoundData.get(server);
-        data.sessions().removeIf(old -> now(server) - old.startTick() >= old.durationTicks() && !old.loop() && old.next().isEmpty());
+        data.sessions()
+                .removeIf(old -> now(server) - old.startTick() >= old.durationTicks()
+                        && !old.loop()
+                        && old.next().isEmpty());
         data.add(session);
         scheduleEnd(server, session);
     }
@@ -72,11 +98,34 @@ public final class TimedSounds {
 
         BlockPos pos = BlockPos.containing(session.pos());
         if (session.next().isPresent()) {
-            SoundEvent next = BuiltInRegistries.SOUND_EVENT.getOptional(session.next().get()).orElse(null);
-            if (next != null) start(level, pos, next, SoundSource.BLOCKS, session.nextVolume(), session.pitch(), true, Optional.empty(), 1.0F);
+            SoundEvent next = BuiltInRegistries.SOUND_EVENT
+                    .getOptional(session.next().get())
+                    .orElse(null);
+            if (next != null)
+                start(
+                        level,
+                        pos,
+                        next,
+                        SoundSource.BLOCKS,
+                        session.nextVolume(),
+                        session.pitch(),
+                        true,
+                        Optional.empty(),
+                        1.0F);
         } else if (session.loop()) {
-            SoundEvent again = BuiltInRegistries.SOUND_EVENT.getOptional(session.sound()).orElse(null);
-            if (again != null) start(level, pos, again, SoundSource.BLOCKS, session.volume(), session.pitch(), true, Optional.empty(), 1.0F);
+            SoundEvent again =
+                    BuiltInRegistries.SOUND_EVENT.getOptional(session.sound()).orElse(null);
+            if (again != null)
+                start(
+                        level,
+                        pos,
+                        again,
+                        SoundSource.BLOCKS,
+                        session.volume(),
+                        session.pitch(),
+                        true,
+                        Optional.empty(),
+                        1.0F);
         }
     }
 
@@ -87,8 +136,19 @@ public final class TimedSounds {
             if (session.sound().equals(sound.location())) {
                 data.remove(session);
             } else if (session.next().isPresent() && session.next().get().equals(sound.location())) {
-                data.replace(session, new Session(session.dimension(), session.sound(), session.pos(), session.volume(),
-                        session.pitch(), session.startTick(), session.durationTicks(), session.loop(), Optional.empty(), session.nextVolume()));
+                data.replace(
+                        session,
+                        new Session(
+                                session.dimension(),
+                                session.sound(),
+                                session.pos(),
+                                session.volume(),
+                                session.pitch(),
+                                session.startTick(),
+                                session.durationTicks(),
+                                session.loop(),
+                                Optional.empty(),
+                                session.nextVolume()));
             }
         }
     }
@@ -113,14 +173,22 @@ public final class TimedSounds {
             if (session.loop()) elapsed %= session.durationTicks();
             else if (elapsed >= session.durationTicks()) continue;
 
-            SoundEvent event = BuiltInRegistries.SOUND_EVENT.getOptional(session.sound()).orElse(null);
+            SoundEvent event =
+                    BuiltInRegistries.SOUND_EVENT.getOptional(session.sound()).orElse(null);
             double range = event == null ? 16.0 : event.getRange(session.volume());
             if (player.distanceToSqr(session.pos()) > range * range) continue;
 
             float offsetSeconds = elapsed / 20.0F * session.pitch();
-            Services.NETWORK.sendResumeSound(player, new ResumeSoundPayload(
-                    session.sound(), session.pos().x, session.pos().y, session.pos().z,
-                    session.volume(), session.pitch(), offsetSeconds));
+            Services.NETWORK.sendResumeSound(
+                    player,
+                    new ResumeSoundPayload(
+                            session.sound(),
+                            session.pos().x,
+                            session.pos().y,
+                            session.pos().z,
+                            session.volume(),
+                            session.pitch(),
+                            offsetSeconds));
         }
     }
 }

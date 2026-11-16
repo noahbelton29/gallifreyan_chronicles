@@ -1,10 +1,11 @@
 package uk.nbforge.gallifreyan_chronicles.sky.data;
 
-import uk.nbforge.gallifreyan_chronicles.core.data.IdentifiableData;
 import net.minecraft.resources.Identifier;
+import uk.nbforge.gallifreyan_chronicles.core.data.IdentifiableData;
 
-public record CelestialBody(String id, Identifier texture, float size, int color, SkyBody.Blend blend,
-                            boolean fadesInRain) implements IdentifiableData<CelestialBody> {
+public record CelestialBody(
+        String id, Identifier texture, float size, int color, SkyBody.Blend blend, boolean fadesInRain)
+        implements IdentifiableData<CelestialBody> {
     public static final String UNSET_ID = "__unset__";
 
     @Override

@@ -1,13 +1,13 @@
 package uk.nbforge.gallifreyan_chronicles.client.sound;
 
-import uk.nbforge.gallifreyan_chronicles.core.block_entities.TardisExteriorBlockEntity;
 import net.minecraft.client.Minecraft;
 import net.minecraft.sounds.SoundEvent;
+import uk.nbforge.gallifreyan_chronicles.core.block_entities.TardisExteriorBlockEntity;
 
 /**
-   The power on and power off sound heard from outside the TARDIS.
-   Same distances and muffling as the outside hum, 3 blocks when shut and 6 when open.
-*/
+ * The power on and power off sound heard from outside the TARDIS.
+ * Same distances and muffling as the outside hum, 3 blocks when shut and 6 when open.
+ */
 public class ExteriorPowerSoundInstance extends ExteriorSoundInstance {
     private static final float OPEN_VOLUME = 1.0F;
 

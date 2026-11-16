@@ -4,10 +4,6 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
-import uk.nbforge.gallifreyan_chronicles.Constants;
-import net.minecraft.resources.Identifier;
-import org.jspecify.annotations.Nullable;
-
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -16,6 +12,9 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
+import net.minecraft.resources.Identifier;
+import org.jspecify.annotations.Nullable;
+import uk.nbforge.gallifreyan_chronicles.Constants;
 
 /** Where the portal goes, read from the portal bone of a geo model, in blocks and Blockbench space. */
 public record PortalBone(double x, double bottom, double width, double height, double front, double back) {
@@ -44,7 +43,8 @@ public record PortalBone(double x, double bottom, double width, double height, d
         String resource = "/assets/" + id.getNamespace() + "/geckolib/models/" + id.getPath() + ".json";
         try (InputStream in = PortalBone.class.getResourceAsStream(resource)) {
             if (in == null) return Optional.empty();
-            JsonObject root = JsonParser.parseReader(new InputStreamReader(in, StandardCharsets.UTF_8)).getAsJsonObject();
+            JsonObject root = JsonParser.parseReader(new InputStreamReader(in, StandardCharsets.UTF_8))
+                    .getAsJsonObject();
             JsonArray geometries = root.getAsJsonArray("minecraft:geometry");
             if (geometries == null) return Optional.empty();
             for (JsonElement geometry : geometries) {
@@ -77,8 +77,9 @@ public record PortalBone(double x, double bottom, double width, double height, d
             double[] o = vec(cube.getAsJsonArray("origin"));
             double[] s = vec(cube.getAsJsonArray("size"));
             for (int i = 0; i < 8; i++) {
-                double[] p = {o[0] + ((i & 1) != 0 ? s[0] : 0), o[1] + ((i & 2) != 0 ? s[1] : 0),
-                        o[2] + ((i & 4) != 0 ? s[2] : 0)};
+                double[] p = {
+                    o[0] + ((i & 1) != 0 ? s[0] : 0), o[1] + ((i & 2) != 0 ? s[1] : 0), o[2] + ((i & 4) != 0 ? s[2] : 0)
+                };
                 // The spin of the cube, then every bone up the chain
                 p = turn(p, cube);
                 JsonObject at = bone;
@@ -95,8 +96,13 @@ public record PortalBone(double x, double bottom, double width, double height, d
         // Geo json has x flipped compared to Blockbench
         // blockbench and geo json disagree on x and this bit me twice
         double x = -(min[0] + max[0]) / 2.0;
-        return new PortalBone(x / 16.0, min[1] / 16.0, (max[0] - min[0]) / 16.0, (max[1] - min[1]) / 16.0,
-                min[2] / 16.0, max[2] / 16.0);
+        return new PortalBone(
+                x / 16.0,
+                min[1] / 16.0,
+                (max[0] - min[0]) / 16.0,
+                (max[1] - min[1]) / 16.0,
+                min[2] / 16.0,
+                max[2] / 16.0);
     }
 
     /** Only the y spin counts, x and z spins on the portal are ignored. */
@@ -111,11 +117,13 @@ public record PortalBone(double x, double bottom, double width, double height, d
         double cos = Math.cos(r);
         double dx = p[0] - pivot[0];
         double dz = p[2] - pivot[2];
-        return new double[]{pivot[0] + dx * cos + dz * sin, p[1], pivot[2] - dx * sin + dz * cos};
+        return new double[] {pivot[0] + dx * cos + dz * sin, p[1], pivot[2] - dx * sin + dz * cos};
     }
 
     private static double[] vec(@Nullable JsonArray array) {
         if (array == null || array.size() < 3) return new double[3];
-        return new double[]{array.get(0).getAsDouble(), array.get(1).getAsDouble(), array.get(2).getAsDouble()};
+        return new double[] {
+            array.get(0).getAsDouble(), array.get(1).getAsDouble(), array.get(2).getAsDouble()
+        };
     }
 }

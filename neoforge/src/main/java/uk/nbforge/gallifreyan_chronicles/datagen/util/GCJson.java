@@ -7,8 +7,7 @@ import com.google.gson.JsonObject;
 
 /** A tiny json builder so datagen reads like the files it makes. */
 public final class GCJson {
-    private GCJson() {
-    }
+    private GCJson() {}
 
     /** Key and value pairs in a row. */
     public static JsonObject obj(Object... keyValues) {

@@ -1,22 +1,21 @@
 package uk.nbforge.gallifreyan_chronicles.network.tardis;
 
-import uk.nbforge.gallifreyan_chronicles.client.camera.GCCameraShake;
-import uk.nbforge.gallifreyan_chronicles.platform.Services;
-import uk.nbforge.gallifreyan_chronicles.util.GCUtil;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.phys.Vec3;
 import org.jspecify.annotations.NonNull;
+import uk.nbforge.gallifreyan_chronicles.client.camera.GCCameraShake;
+import uk.nbforge.gallifreyan_chronicles.platform.Services;
+import uk.nbforge.gallifreyan_chronicles.util.GCUtil;
 
 /**
-   A harsh rumble for the whole crash.
-   With stress set it is the ongoing stressed flight rumble instead, with a strength from 0 to 1 where 1 is as hard as a crash.
-*/
+ * A harsh rumble for the whole crash.
+ * With stress set it is the ongoing stressed flight rumble instead, with a strength from 0 to 1 where 1 is as hard as a crash.
+ */
 public record TardisCrashRumblePayload(double x, double y, double z, int ticks, boolean stress, float strength)
         implements CustomPacketPayload {
-    public static final Type<TardisCrashRumblePayload> TYPE =
-            new Type<>(GCUtil.modIdentifier("tardis_crash_rumble"));
+    public static final Type<TardisCrashRumblePayload> TYPE = new Type<>(GCUtil.modIdentifier("tardis_crash_rumble"));
 
     public static void broadcast(ServerLevel level, Vec3 origin, int ticks) {
         send(level, new TardisCrashRumblePayload(origin.x, origin.y, origin.z, ticks, false, 1f));

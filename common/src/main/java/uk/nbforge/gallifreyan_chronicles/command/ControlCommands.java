@@ -1,29 +1,27 @@
 package uk.nbforge.gallifreyan_chronicles.command;
 
+import static net.minecraft.commands.Commands.argument;
+import static net.minecraft.commands.Commands.literal;
+import static uk.nbforge.gallifreyan_chronicles.util.CommandUtil.*;
+
 import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.mojang.brigadier.suggestion.Suggestions;
 import com.mojang.brigadier.suggestion.SuggestionsBuilder;
-import uk.nbforge.gallifreyan_chronicles.core.block_entities.TardisConsoleBlockEntity;
-import uk.nbforge.gallifreyan_chronicles.core.entity.TardisControlEntity;
-import uk.nbforge.gallifreyan_chronicles.core.dynamic_registries.TardisControlRegistry;
+import java.util.Optional;
+import java.util.concurrent.CompletableFuture;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
-
-import java.util.Optional;
-import java.util.concurrent.CompletableFuture;
-
-import static uk.nbforge.gallifreyan_chronicles.util.CommandUtil.*;
-import static net.minecraft.commands.Commands.argument;
-import static net.minecraft.commands.Commands.literal;
+import uk.nbforge.gallifreyan_chronicles.core.block_entities.TardisConsoleBlockEntity;
+import uk.nbforge.gallifreyan_chronicles.core.dynamic_registries.TardisControlRegistry;
+import uk.nbforge.gallifreyan_chronicles.core.entity.TardisControlEntity;
 
 /** Whether a console control is on or off lives entirely under "data" now, since it goes through the control's real activate() logic. */
 public final class ControlCommands {
-    private ControlCommands() {
-    }
+    private ControlCommands() {}
 
     /** {@code data control <control_id> [on|off]} */
     public static LiteralArgumentBuilder<CommandSourceStack> controlData() {
@@ -35,8 +33,8 @@ public final class ControlCommands {
                         .then(literal("off").executes(ctx -> set(ctx, false))));
     }
 
-    private static CompletableFuture<Suggestions> suggestControls(CommandContext<CommandSourceStack> ctx,
-                                                                  SuggestionsBuilder builder) {
+    private static CompletableFuture<Suggestions> suggestControls(
+            CommandContext<CommandSourceStack> ctx, SuggestionsBuilder builder) {
         Optional<TardisConsoleBlockEntity> console = idArgument(ctx).flatMap(id -> ConsoleCommands.consoleOf(ctx, id));
         if (console.isPresent()) {
             console.get().getControlEntities().forEach(control -> builder.suggest(control.getControlId()));
@@ -53,7 +51,8 @@ public final class ControlCommands {
 
             Optional<TardisConsoleBlockEntity> console = tardis.console();
             if (console.isEmpty()) return fail(ctx, "no_console", idText);
-            if (findControl(console.get(), controlId) == null) return fail(ctx, "control_not_on_console", controlId, idText);
+            if (findControl(console.get(), controlId) == null)
+                return fail(ctx, "control_not_on_console", controlId, idText);
 
             boolean on = console.get().getControlState(controlId);
             return success(ctx, false, "get_control", controlId, idText, on ? "on" : "off");

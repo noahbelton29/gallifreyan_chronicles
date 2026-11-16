@@ -6,8 +6,7 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.world.phys.Vec3;
 
 public final class PlayerMotionUtil {
-    private PlayerMotionUtil() {
-    }
+    private PlayerMotionUtil() {}
 
     public static void set(Entity entity, Vec3 motion) {
         entity.setDeltaMovement(motion);

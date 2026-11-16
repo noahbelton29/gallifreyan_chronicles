@@ -5,8 +5,7 @@ import com.mojang.serialization.MapCodec;
 public final class NoopControl implements TardisControl {
     public static final NoopControl INSTANCE = new NoopControl();
 
-    private NoopControl() {
-    }
+    private NoopControl() {}
 
     @Override
     public MapCodec<? extends TardisControl> codec() {

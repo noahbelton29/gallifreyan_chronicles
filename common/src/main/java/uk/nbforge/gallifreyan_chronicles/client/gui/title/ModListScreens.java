@@ -1,21 +1,18 @@
 package uk.nbforge.gallifreyan_chronicles.client.gui.title;
 
+import java.lang.reflect.Constructor;
 import net.minecraft.client.gui.screens.Screen;
 import org.jspecify.annotations.Nullable;
 
-import java.lang.reflect.Constructor;
-
 public final class ModListScreens {
     private static final String[] CANDIDATES = {
-            "com.terraformersmc.modmenu.gui.ModsScreen",
-            "net.neoforged.neoforge.client.gui.ModListScreen"
+        "com.terraformersmc.modmenu.gui.ModsScreen", "net.neoforged.neoforge.client.gui.ModListScreen"
     };
 
     private static boolean resolved;
     private static @Nullable Constructor<?> constructor;
 
-    private ModListScreens() {
-    }
+    private ModListScreens() {}
 
     private static void resolve() {
         if (resolved) return;

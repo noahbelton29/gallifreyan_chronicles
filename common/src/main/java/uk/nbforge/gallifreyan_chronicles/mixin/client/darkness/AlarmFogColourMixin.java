@@ -1,6 +1,5 @@
 package uk.nbforge.gallifreyan_chronicles.mixin.client.darkness;
 
-import uk.nbforge.gallifreyan_chronicles.client.gui.hud.GCDangerAlarm;
 import net.minecraft.client.Camera;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.renderer.fog.FogRenderer;
@@ -10,6 +9,7 @@ import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+import uk.nbforge.gallifreyan_chronicles.client.gui.hud.GCDangerAlarm;
 
 @Mixin(FogRenderer.class)
 public abstract class AlarmFogColourMixin {
@@ -17,8 +17,14 @@ public abstract class AlarmFogColourMixin {
     private static final float RED = 1.0F, GREEN = 0.04F, BLUE = 0.04F;
 
     @Inject(method = "computeFogColor", at = @At("TAIL"))
-    private void gcAlarmFogColour(Camera camera, float partialTicks, ClientLevel level, int renderDistance,
-                                  float darkenWorldAmount, Vector4f dest, CallbackInfo ci) {
+    private void gcAlarmFogColour(
+            Camera camera,
+            float partialTicks,
+            ClientLevel level,
+            int renderDistance,
+            float darkenWorldAmount,
+            Vector4f dest,
+            CallbackInfo ci) {
         float alarm = GCDangerAlarm.amountFor(level);
         if (alarm <= 0.0F) return;
         alarm = (float) Math.pow(alarm, 0.3F);

@@ -1,10 +1,9 @@
 package uk.nbforge.gallifreyan_chronicles.tardis.ecs;
 
-import uk.nbforge.gallifreyan_chronicles.ecs.Entity;
-import uk.nbforge.gallifreyan_chronicles.tardis.ecs.system.TardisLinkSystem;
-
 import java.util.Optional;
 import java.util.UUID;
+import uk.nbforge.gallifreyan_chronicles.ecs.Entity;
+import uk.nbforge.gallifreyan_chronicles.tardis.ecs.system.TardisLinkSystem;
 
 public interface TardisLinkable {
     Entity asEntity();
@@ -24,5 +23,4 @@ public interface TardisLinkable {
     default boolean isLinked() {
         return getLinkedTardisId().isPresent();
     }
-
 }

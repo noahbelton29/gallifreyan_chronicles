@@ -1,40 +1,45 @@
 package uk.nbforge.gallifreyan_chronicles.tardis;
 
-import uk.nbforge.gallifreyan_chronicles.tardis.ecs.component.TardisComponent;
-import uk.nbforge.gallifreyan_chronicles.tardis.flight.LandingTarget;
-import uk.nbforge.gallifreyan_chronicles.tardis.mind.TardisMind;
-import uk.nbforge.gallifreyan_chronicles.util.GCUtil;
+import java.util.*;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.Identifier;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.world.level.Level;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.datafix.DataFixTypes;
+import net.minecraft.world.level.Level;
 import net.minecraft.world.level.saveddata.SavedData;
 import net.minecraft.world.level.saveddata.SavedDataType;
 import org.jspecify.annotations.Nullable;
-
 import uk.nbforge.gallifreyan_chronicles.tardis.codec.manager.TardisManagerCodec;
-import java.util.*;
+import uk.nbforge.gallifreyan_chronicles.tardis.ecs.component.TardisComponent;
+import uk.nbforge.gallifreyan_chronicles.tardis.flight.LandingTarget;
+import uk.nbforge.gallifreyan_chronicles.tardis.mind.TardisMind;
+import uk.nbforge.gallifreyan_chronicles.util.GCUtil;
 
 public class TardisManager extends SavedData {
-    public record Entry(TardisComponent component, Optional<BlockPos> blockPos,
-                        Optional<BlockPos> consoleBlockPos, Optional<BlockPos> exteriorBlockPos,
-                        Optional<BlockPos> interiorOrigin, Optional<Identifier> exteriorDimension,
-                        Optional<String> interiorId, Optional<LandingTarget> landingTarget,
-                        Optional<Integer> coordIncrement, Optional<Boolean> coordIncrementNegative,
-                        Optional<List<UUID>> trusted, Optional<TardisMind> mind,
-                        Optional<Long> flightStart, Optional<Boolean> crashed,
-                        Optional<Long> flightDurationOverride) {
-    }
+    public record Entry(
+            TardisComponent component,
+            Optional<BlockPos> blockPos,
+            Optional<BlockPos> consoleBlockPos,
+            Optional<BlockPos> exteriorBlockPos,
+            Optional<BlockPos> interiorOrigin,
+            Optional<Identifier> exteriorDimension,
+            Optional<String> interiorId,
+            Optional<LandingTarget> landingTarget,
+            Optional<Integer> coordIncrement,
+            Optional<Boolean> coordIncrementNegative,
+            Optional<List<UUID>> trusted,
+            Optional<TardisMind> mind,
+            Optional<Long> flightStart,
+            Optional<Boolean> crashed,
+            Optional<Long> flightDurationOverride) {}
 
     public static final SavedDataType<TardisManager> TYPE = new SavedDataType<>(
             GCUtil.modIdentifier("tardises"),
             TardisManager::new,
             TardisManagerCodec.CODEC,
-            DataFixTypes.SAVED_DATA_COMMAND_STORAGE
-    );
+            DataFixTypes.SAVED_DATA_COMMAND_STORAGE);
 
     private final Map<UUID, TardisComponent> byTardisId = new HashMap<>();
     private final Map<UUID, List<UUID>> byOwnerId = new HashMap<>();
@@ -68,14 +73,11 @@ public class TardisManager extends SavedData {
                     Optional.ofNullable(landingTargetById.get(id)),
                     Optional.ofNullable(coordIncrementById.get(id)),
                     negativeIncrements.contains(id) ? Optional.of(true) : Optional.empty(),
-                    trustedById.containsKey(id)
-                            ? Optional.of(List.copyOf(trustedById.get(id)))
-                            : Optional.empty(),
+                    trustedById.containsKey(id) ? Optional.of(List.copyOf(trustedById.get(id))) : Optional.empty(),
                     Optional.ofNullable(mindById.get(id)),
                     Optional.ofNullable(flightStartById.get(id)),
                     crashed.contains(id) ? Optional.of(true) : Optional.empty(),
-                    Optional.ofNullable(flightDurationOverrideById.get(id))
-            ));
+                    Optional.ofNullable(flightDurationOverrideById.get(id))));
         }
         return entries;
     }
@@ -119,8 +121,7 @@ public class TardisManager extends SavedData {
 
     /** Every TARDIS owned by this player, ids that have no record are skipped. */
     public List<TardisComponent> getByOwner(UUID ownerId) {
-        return byOwnerId.getOrDefault(ownerId, List.of())
-                .stream()
+        return byOwnerId.getOrDefault(ownerId, List.of()).stream()
                 .map(byTardisId::get)
                 .filter(Objects::nonNull)
                 .toList();

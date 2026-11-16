@@ -1,8 +1,5 @@
 package uk.nbforge.gallifreyan_chronicles.client.renderer.fade;
 
-import com.mojang.renderpearl.api.pipeline.CompareOp;
-import uk.nbforge.gallifreyan_chronicles.Constants;
-import com.mojang.renderpearl.api.vertex.VertexFormat;
 import com.mojang.blaze3d.pipeline.RenderTarget;
 import com.mojang.blaze3d.pipeline.TextureTarget;
 import com.mojang.blaze3d.systems.RenderSystem;
@@ -12,13 +9,18 @@ import com.mojang.renderpearl.api.commands.RenderPass;
 import com.mojang.renderpearl.api.commands.RenderPassDescriptor;
 import com.mojang.renderpearl.api.pipeline.BlendFunction;
 import com.mojang.renderpearl.api.pipeline.ColorTargetState;
+import com.mojang.renderpearl.api.pipeline.CompareOp;
 import com.mojang.renderpearl.api.pipeline.DepthStencilState;
 import com.mojang.renderpearl.api.pipeline.PrimitiveTopology;
 import com.mojang.renderpearl.api.pipeline.RenderPipeline;
 import com.mojang.renderpearl.api.textures.FilterMode;
-import uk.nbforge.gallifreyan_chronicles.client.sky.SkyShaderCompat;
-import uk.nbforge.gallifreyan_chronicles.compat.portal.TardisPortalBridge;
-import uk.nbforge.gallifreyan_chronicles.util.GCUtil;
+import com.mojang.renderpearl.api.vertex.VertexFormat;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.OptionalDouble;
 import net.minecraft.client.renderer.BindGroupLayouts;
 import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.client.renderer.StagedVertexBuffer;
@@ -28,23 +30,20 @@ import net.minecraft.client.renderer.rendertype.RenderType;
 import net.minecraft.resources.Identifier;
 import org.joml.Vector4f;
 import org.jspecify.annotations.Nullable;
-
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.OptionalDouble;
+import uk.nbforge.gallifreyan_chronicles.Constants;
+import uk.nbforge.gallifreyan_chronicles.client.sky.SkyShaderCompat;
+import uk.nbforge.gallifreyan_chronicles.compat.portal.TardisPortalBridge;
+import uk.nbforge.gallifreyan_chronicles.util.GCUtil;
 
 /**
-   Draws a fading TARDIS on its own canvas, then lays the canvas over the world.
-   The box only hides its own back faces, so water and clouds still draw.
-   Each frame goes like this.
-   One, the box is drawn with a special render type and we hold it instead of drawing it.
-   Two, after the world is drawn we copy the world depth into our canvas, so walls in front still hide the box.
-   Three, we draw the held boxes into the canvas, solid and keeping their faded alpha.
-   Four, we lay the canvas over the screen.
-*/
+ * Draws a fading TARDIS on its own canvas, then lays the canvas over the world.
+ * The box only hides its own back faces, so water and clouds still draw.
+ * Each frame goes like this.
+ * One, the box is drawn with a special render type and we hold it instead of drawing it.
+ * Two, after the world is drawn we copy the world depth into our canvas, so walls in front still hide the box.
+ * Three, we draw the held boxes into the canvas, solid and keeping their faded alpha.
+ * Four, we lay the canvas over the screen.
+ */
 public final class FadeBoxRenderer {
     private static final String NAME = "gc_fading_box";
     // The glowmask is held while it fades so it fades with the box
@@ -53,11 +52,11 @@ public final class FadeBoxRenderer {
     private static final String ORB_NAME = "gc_glow_orb";
 
     // The box, solid so only the nearest face wins, lit like any entity
-    private static final RenderPipeline BOX_PIPELINE = RenderPipelines.register(
-            boxPipeline(DefaultVertexFormat.ENTITY, "pipeline/fading_box"));
+    private static final RenderPipeline BOX_PIPELINE =
+            RenderPipelines.register(boxPipeline(DefaultVertexFormat.ENTITY, "pipeline/fading_box"));
 
-    private static final RenderPipeline GLOW_PIPELINE = RenderPipelines.register(
-            glowPipeline(DefaultVertexFormat.ENTITY, "pipeline/fading_glow"));
+    private static final RenderPipeline GLOW_PIPELINE =
+            RenderPipelines.register(glowPipeline(DefaultVertexFormat.ENTITY, "pipeline/fading_glow"));
 
     // Shader packs make entity vertices bigger so we read things with their real format
     // One pipeline per kind and format
@@ -67,22 +66,22 @@ public final class FadeBoxRenderer {
 
     private static RenderPipeline boxPipeline(VertexFormat format, String location) {
         return RenderPipeline.builder(RenderPipelines.GLOBALS_SNIPPET)
-                    .withBindGroupLayout(BindGroupLayouts.PROJECTION)
-                    .withBindGroupLayout(BindGroupLayouts.DYNAMIC_TRANSFORMS)
-                    .withBindGroupLayout(BindGroupLayouts.FOG)
-                    .withBindGroupLayout(BindGroupLayouts.LIGHTING)
-                    .withBindGroupLayout(BindGroupLayouts.SAMPLER0)
-                    .withBindGroupLayout(BindGroupLayouts.SAMPLER1)
-                    .withBindGroupLayout(BindGroupLayouts.SAMPLER2)
-                    .withVertexShader("core/entity")
-                    .withFragmentShader("core/entity")
-                    .withVertexBinding(0, format)
-                    .withPrimitiveTopology(PrimitiveTopology.QUADS)
-                    .withShaderDefine("ALPHA_CUTOUT", 0.01F)
-                    .withLocation(GCUtil.modIdentifier(location))
-                    .withColorTargetState(ColorTargetState.DEFAULT)
-                    .withDepthStencilState(DepthStencilState.DEFAULT)
-                    .build();
+                .withBindGroupLayout(BindGroupLayouts.PROJECTION)
+                .withBindGroupLayout(BindGroupLayouts.DYNAMIC_TRANSFORMS)
+                .withBindGroupLayout(BindGroupLayouts.FOG)
+                .withBindGroupLayout(BindGroupLayouts.LIGHTING)
+                .withBindGroupLayout(BindGroupLayouts.SAMPLER0)
+                .withBindGroupLayout(BindGroupLayouts.SAMPLER1)
+                .withBindGroupLayout(BindGroupLayouts.SAMPLER2)
+                .withVertexShader("core/entity")
+                .withFragmentShader("core/entity")
+                .withVertexBinding(0, format)
+                .withPrimitiveTopology(PrimitiveTopology.QUADS)
+                .withShaderDefine("ALPHA_CUTOUT", 0.01F)
+                .withLocation(GCUtil.modIdentifier(location))
+                .withColorTargetState(ColorTargetState.DEFAULT)
+                .withDepthStencilState(DepthStencilState.DEFAULT)
+                .build();
     }
 
     /** Glows like the eyes in vanilla, no lighting, see through and does not hide what is behind it. */
@@ -123,8 +122,10 @@ public final class FadeBoxRenderer {
     private static RenderPipeline pipelineNow(String kind, RenderPipeline vanilla, PipelineMaker maker) {
         VertexFormat format = writtenFormat();
         if (format.equals(DefaultVertexFormat.ENTITY)) return vanilla;
-        return FORMAT_PIPELINES.computeIfAbsent(kind + format.hashCode(), key -> RenderPipelines.register(
-                maker.make(format, "pipeline/fading_" + kind + "_shaders_" + Integer.toHexString(format.hashCode()))));
+        return FORMAT_PIPELINES.computeIfAbsent(
+                kind + format.hashCode(),
+                key -> RenderPipelines.register(maker.make(
+                        format, "pipeline/fading_" + kind + "_shaders_" + Integer.toHexString(format.hashCode()))));
     }
 
     private static RenderPipeline orbPipelineNow(RenderPipeline vanilla) {
@@ -148,18 +149,22 @@ public final class FadeBoxRenderer {
         if (!irisFormatLooked) {
             irisFormatLooked = true;
             try {
-                Object value = Class.forName("net.irisshaders.iris.vertices.IrisVertexFormats").getField("ENTITY").get(null);
+                Object value = Class.forName("net.irisshaders.iris.vertices.IrisVertexFormats")
+                        .getField("ENTITY")
+                        .get(null);
                 if (value instanceof VertexFormat format) irisFormat = format;
             } catch (ReflectiveOperationException | LinkageError e) {
-                Constants.LOG.warn("Could not find the Iris entity vertex format, the fading TARDIS may look wrong with shaders", e);
+                Constants.LOG.warn(
+                        "Could not find the Iris entity vertex format, the fading TARDIS may look wrong with shaders",
+                        e);
             }
         }
         return irisFormat;
     }
 
     // Lays the canvas over the screen using the alpha of each pixel
-    private static final RenderPipeline COMPOSITE_PIPELINE = RenderPipelines.register(
-            RenderPipeline.builder(RenderPipelines.GLOBALS_SNIPPET)
+    private static final RenderPipeline COMPOSITE_PIPELINE =
+            RenderPipelines.register(RenderPipeline.builder(RenderPipelines.GLOBALS_SNIPPET)
                     .withLocation(GCUtil.modIdentifier("pipeline/fading_box_composite"))
                     .withVertexShader("core/screenquad")
                     .withFragmentShader("core/blit_screen")
@@ -169,8 +174,8 @@ public final class FadeBoxRenderer {
                     .build());
 
     // The orb canvas is glow so it is added on top as light
-    private static final RenderPipeline ORB_COMPOSITE_PIPELINE = RenderPipelines.register(
-            RenderPipeline.builder(RenderPipelines.GLOBALS_SNIPPET)
+    private static final RenderPipeline ORB_COMPOSITE_PIPELINE =
+            RenderPipelines.register(RenderPipeline.builder(RenderPipelines.GLOBALS_SNIPPET)
                     .withLocation(GCUtil.modIdentifier("pipeline/lamp_orb_composite"))
                     .withVertexShader("core/screenquad")
                     .withFragmentShader("core/blit_screen")
@@ -189,19 +194,18 @@ public final class FadeBoxRenderer {
     // With a shader pack the canvas waits until the pack finishes the frame
     private static boolean canvasWaiting;
 
-    private record Held(PreparedRenderType type, StagedVertexBuffer.ExecuteInfo info) {
-    }
+    private record Held(PreparedRenderType type, StagedVertexBuffer.ExecuteInfo info) {}
 
-    private FadeBoxRenderer() {
-    }
+    private FadeBoxRenderer() {}
 
     /**
-       How the fading box is drawn.
-       CANVAS uses its own canvas over the world, same look with and without shaders.
-       MASK is the old depth mask way, only used for views through a portal.
-    */
+     * How the fading box is drawn.
+     * CANVAS uses its own canvas over the world, same look with and without shaders.
+     * MASK is the old depth mask way, only used for views through a portal.
+     */
     public enum Mode {
-        CANVAS, MASK
+        CANVAS,
+        MASK
     }
 
     public static Mode mode() {
@@ -214,19 +218,25 @@ public final class FadeBoxRenderer {
     }
 
     public static RenderType renderType(Identifier texture) {
-        return TYPES.computeIfAbsent(texture, t -> RenderType.create(NAME,
-                RenderSetup.builder(BOX_PIPELINE)
-                        .withTexture("Sampler0", t)
-                        .useLightmap()
-                        .useOverlay()
-                        .createRenderSetup()));
+        return TYPES.computeIfAbsent(
+                texture,
+                t -> RenderType.create(
+                        NAME,
+                        RenderSetup.builder(BOX_PIPELINE)
+                                .withTexture("Sampler0", t)
+                                .useLightmap()
+                                .useOverlay()
+                                .createRenderSetup()));
     }
 
     public static RenderType glowRenderType(Identifier texture) {
-        return GLOW_TYPES.computeIfAbsent(texture, t -> RenderType.create(GLOW_NAME,
-                RenderSetup.builder(GLOW_PIPELINE)
-                        .withTexture("Sampler0", t)
-                        .createRenderSetup()));
+        return GLOW_TYPES.computeIfAbsent(
+                texture,
+                t -> RenderType.create(
+                        GLOW_NAME,
+                        RenderSetup.builder(GLOW_PIPELINE)
+                                .withTexture("Sampler0", t)
+                                .createRenderSetup()));
     }
 
     /** Replaces the normal draw, true means we kept it for later. */
@@ -321,9 +331,14 @@ public final class FadeBoxRenderer {
     private static void drawOrbs(RenderTarget main, TextureTarget depthSource) {
         TextureTarget target = orbCanvasFor(main);
         drawingOurOwn = true;
-        try (RenderPass pass = RenderSystem.getDevice().createCommandEncoder().createRenderPass(
-                () -> "TARDIS lamp orbs", target.getColorTextureView(), Optional.of(new Vector4f(0f)),
-                depthSource.getDepthTextureView(), OptionalDouble.empty())) {
+        try (RenderPass pass = RenderSystem.getDevice()
+                .createCommandEncoder()
+                .createRenderPass(
+                        () -> "TARDIS lamp orbs",
+                        target.getColorTextureView(),
+                        Optional.of(new Vector4f(0f)),
+                        depthSource.getDepthTextureView(),
+                        OptionalDouble.empty())) {
             RenderSystem.bindDefaultUniforms(pass);
             for (Held held : HELD_ORBS) {
                 draw(held, pass, orbPipelineNow(held.type().pipeline()));
@@ -338,9 +353,14 @@ public final class FadeBoxRenderer {
     /** The boxes and their glowmask on a clear canvas. */
     private static void drawBoxes(TextureTarget target) {
         drawingOurOwn = true;
-        try (RenderPass pass = RenderSystem.getDevice().createCommandEncoder().createRenderPass(
-                () -> "Fading TARDIS", target.getColorTextureView(), Optional.of(new Vector4f(0f)),
-                target.getDepthTextureView(), OptionalDouble.empty())) {
+        try (RenderPass pass = RenderSystem.getDevice()
+                .createCommandEncoder()
+                .createRenderPass(
+                        () -> "Fading TARDIS",
+                        target.getColorTextureView(),
+                        Optional.of(new Vector4f(0f)),
+                        target.getDepthTextureView(),
+                        OptionalDouble.empty())) {
             RenderSystem.bindDefaultUniforms(pass);
             RenderPipeline pipeline = boxPipelineNow();
             for (Held held : HELD) {
@@ -383,9 +403,14 @@ public final class FadeBoxRenderer {
 
     private static void composite(RenderTarget main, TextureTarget source, RenderPipeline pipeline) {
         var nearest = RenderSystem.getSamplerCache().getClampToEdge(FilterMode.NEAREST);
-        try (RenderPass pass = RenderSystem.getDevice().createCommandEncoder().createRenderPass(
-                () -> "Fading TARDIS composite", main.getColorTextureView(), Optional.empty(),
-                null, OptionalDouble.empty())) {
+        try (RenderPass pass = RenderSystem.getDevice()
+                .createCommandEncoder()
+                .createRenderPass(
+                        () -> "Fading TARDIS composite",
+                        main.getColorTextureView(),
+                        Optional.empty(),
+                        null,
+                        OptionalDouble.empty())) {
             pass.setPipeline(RenderSystem.getCompiledPipeline(pipeline));
             RenderSystem.bindDefaultUniforms(pass);
             pass.setUniform("InSampler", source.getColorTextureView(), nearest);
@@ -406,7 +431,8 @@ public final class FadeBoxRenderer {
 
     private static TextureTarget canvasFor(RenderTarget main) {
         if (canvas == null) {
-            canvas = new TextureTarget("Fading TARDIS", main.width, main.height, GpuFormat.RGBA8_UNORM, GpuFormat.D32_FLOAT);
+            canvas = new TextureTarget(
+                    "Fading TARDIS", main.width, main.height, GpuFormat.RGBA8_UNORM, GpuFormat.D32_FLOAT);
         } else if (canvas.width != main.width || canvas.height != main.height) {
             canvas.resize(main.width, main.height);
         }

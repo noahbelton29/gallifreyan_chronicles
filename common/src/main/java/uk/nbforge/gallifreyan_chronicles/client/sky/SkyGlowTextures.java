@@ -1,26 +1,24 @@
 package uk.nbforge.gallifreyan_chronicles.client.sky;
 
 import com.mojang.blaze3d.platform.NativeImage;
-import uk.nbforge.gallifreyan_chronicles.Constants;
-import uk.nbforge.gallifreyan_chronicles.util.GCUtil;
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.texture.AbstractTexture;
-import net.minecraft.client.renderer.texture.DynamicTexture;
-import net.minecraft.client.renderer.texture.TextureManager;
-import net.minecraft.resources.Identifier;
-
 import java.io.InputStream;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.renderer.texture.AbstractTexture;
+import net.minecraft.client.renderer.texture.DynamicTexture;
+import net.minecraft.client.renderer.texture.TextureManager;
+import net.minecraft.resources.Identifier;
+import uk.nbforge.gallifreyan_chronicles.Constants;
+import uk.nbforge.gallifreyan_chronicles.util.GCUtil;
 
 public final class SkyGlowTextures {
     private static final Map<Identifier, Identifier> CONVERTED = new HashMap<>();
     private static final Set<Identifier> FAILED = new HashSet<>();
 
-    private SkyGlowTextures() {
-    }
+    private SkyGlowTextures() {}
 
     public static AbstractTexture get(Identifier source) {
         Minecraft minecraft = Minecraft.getInstance();

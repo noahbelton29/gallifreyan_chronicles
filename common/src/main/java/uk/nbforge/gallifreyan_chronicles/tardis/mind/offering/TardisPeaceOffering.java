@@ -1,27 +1,26 @@
 package uk.nbforge.gallifreyan_chronicles.tardis.mind.offering;
 
-import uk.nbforge.gallifreyan_chronicles.tardis.mind.MindMessages;
-import uk.nbforge.gallifreyan_chronicles.tardis.mind.FearLevel;
-import uk.nbforge.gallifreyan_chronicles.tardis.Tardis;
-import uk.nbforge.gallifreyan_chronicles.tardis.mind.TardisBond;
-import uk.nbforge.gallifreyan_chronicles.tardis.mind.TardisMind;
-import uk.nbforge.gallifreyan_chronicles.tardis.ecs.system.TardisMindSystem;
-import uk.nbforge.gallifreyan_chronicles.tardis.mind.disability.TardisDisability;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.UUID;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.entity.player.Player;
-
-import java.util.HashMap;
-import java.util.Map;
-import java.util.UUID;
+import uk.nbforge.gallifreyan_chronicles.tardis.Tardis;
+import uk.nbforge.gallifreyan_chronicles.tardis.ecs.system.TardisMindSystem;
+import uk.nbforge.gallifreyan_chronicles.tardis.mind.FearLevel;
+import uk.nbforge.gallifreyan_chronicles.tardis.mind.MindMessages;
+import uk.nbforge.gallifreyan_chronicles.tardis.mind.TardisBond;
+import uk.nbforge.gallifreyan_chronicles.tardis.mind.TardisMind;
+import uk.nbforge.gallifreyan_chronicles.tardis.mind.disability.TardisDisability;
 
 /**
-   Gifts to a TARDIS to repair the relationship.
-   They can raise trust and lower stress, fear and trauma but work less when repeated, and they cannot replace earning trust normally.
-*/
+ * Gifts to a TARDIS to repair the relationship.
+ * They can raise trust and lower stress, fear and trauma but work less when repeated, and they cannot replace earning trust normally.
+ */
 public final class TardisPeaceOffering {
     private static final float TRUST_GAIN = 6f;
     private static final float STRESS_RELIEF = 10f;
@@ -63,18 +62,17 @@ public final class TardisPeaceOffering {
         }
     }
 
-    private TardisPeaceOffering() {
-    }
+    private TardisPeaceOffering() {}
 
     public static void reset() {
         OFFERINGS.clear();
     }
 
     /**
-       A gift is rejected if it was betrayed, is too frightened, already trusts the player enough or got a gift from them recently.
-       Accepted gifts improve the relationship and lower the bad states, repeats work less and PTSD lowers it more.
-       Returns true if the gift was accepted and should be used up.
-    */
+     * A gift is rejected if it was betrayed, is too frightened, already trusts the player enough or got a gift from them recently.
+     * Accepted gifts improve the relationship and lower the bad states, repeats work less and PTSD lowers it more.
+     * Returns true if the gift was accepted and should be used up.
+     */
     public static boolean offer(Tardis tardis, ServerLevel level, BlockPos pos, Player player) {
         UUID who = player.getUUID();
         TardisMind mind = TardisMindSystem.mind(tardis);
@@ -116,8 +114,13 @@ public final class TardisPeaceOffering {
         OFFERINGS.put(key, new Offering(now, streak));
 
         level.playSound(null, pos, SoundEvents.ALLAY_ITEM_GIVEN, SoundSource.BLOCKS, 0.8F, 1.2F);
-        String message = betrayed ? "tardis_offering_betrayed" : afraid ? "tardis_offering_afraid"
-                : ptsd ? "tardis_offering_nervous" : streak > 0 ? "tardis_offering_again" : "tardis_offering_accepted";
+        String message = betrayed
+                ? "tardis_offering_betrayed"
+                : afraid
+                        ? "tardis_offering_afraid"
+                        : ptsd
+                                ? "tardis_offering_nervous"
+                                : streak > 0 ? "tardis_offering_again" : "tardis_offering_accepted";
         MindMessages.say(player, ChatFormatting.LIGHT_PURPLE, message);
         return true;
     }

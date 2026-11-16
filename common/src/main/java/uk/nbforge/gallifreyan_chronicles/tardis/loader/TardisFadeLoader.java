@@ -1,9 +1,9 @@
 package uk.nbforge.gallifreyan_chronicles.tardis.loader;
 
 import com.mojang.serialization.JsonOps;
+import net.minecraft.server.MinecraftServer;
 import uk.nbforge.gallifreyan_chronicles.Constants;
 import uk.nbforge.gallifreyan_chronicles.loader.GCJsonReloadListener;
-import net.minecraft.server.MinecraftServer;
 import uk.nbforge.gallifreyan_chronicles.tardis.codec.exterior.fade.FadeTypeKindCodec;
 import uk.nbforge.gallifreyan_chronicles.tardis.exterior.fade.FadeType;
 import uk.nbforge.gallifreyan_chronicles.tardis.exterior.fade.FadeTypes;
@@ -21,8 +21,14 @@ public class TardisFadeLoader extends GCJsonReloadListener<FadeType> {
     @Override
     protected void register(FadeType value) {
         FadeTypes.register(value);
-        Constants.LOG.info("Registered TARDIS fade {} ({})", value.id(), FadeTypeKindCodec.CODEC.encodeStart(
-                JsonOps.INSTANCE, value).result().map(Object::toString).orElse("?"));
+        Constants.LOG.info(
+                "Registered TARDIS fade {} ({})",
+                value.id(),
+                FadeTypeKindCodec.CODEC
+                        .encodeStart(JsonOps.INSTANCE, value)
+                        .result()
+                        .map(Object::toString)
+                        .orElse("?"));
     }
 
     @Override
@@ -36,6 +42,5 @@ public class TardisFadeLoader extends GCJsonReloadListener<FadeType> {
     }
 
     @Override
-    protected void broadcastSync(MinecraftServer server) {
-    }
+    protected void broadcastSync(MinecraftServer server) {}
 }

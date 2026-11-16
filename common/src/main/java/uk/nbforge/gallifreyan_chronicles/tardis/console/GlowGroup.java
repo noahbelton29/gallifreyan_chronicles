@@ -1,6 +1,5 @@
 package uk.nbforge.gallifreyan_chronicles.tardis.console;
 
-
 public record GlowGroup(String name, String prefix, int frames, int holdTicks, int fadeTicks) {
     public static final int DEFAULT_HOLD_TICKS = 30;
     public static final int DEFAULT_FADE_TICKS = 8;

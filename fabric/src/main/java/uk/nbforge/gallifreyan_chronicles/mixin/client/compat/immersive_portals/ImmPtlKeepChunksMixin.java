@@ -1,12 +1,12 @@
 package uk.nbforge.gallifreyan_chronicles.mixin.client.compat.immersive_portals;
 
-import uk.nbforge.gallifreyan_chronicles.compat.flashback.FlashbackChunks;
 import net.minecraft.world.level.ChunkPos;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Pseudo;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+import uk.nbforge.gallifreyan_chronicles.compat.flashback.FlashbackChunks;
 
 /** In a replay the client must never throw its chunks away because nothing sends them again, see FlashbackChunks keepChunk. */
 @Pseudo

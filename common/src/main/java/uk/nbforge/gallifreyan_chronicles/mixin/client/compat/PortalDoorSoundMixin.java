@@ -1,9 +1,5 @@
 package uk.nbforge.gallifreyan_chronicles.mixin.client.compat;
 
-import uk.nbforge.gallifreyan_chronicles.client.sound.SoundListener;
-import uk.nbforge.gallifreyan_chronicles.core.GCSounds;
-import uk.nbforge.gallifreyan_chronicles.core.dynamic_registries.TardisDoorRegistry;
-import uk.nbforge.gallifreyan_chronicles.tardis.door.TardisDoorVariant;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.resources.sounds.SimpleSoundInstance;
 import net.minecraft.resources.Identifier;
@@ -15,18 +11,29 @@ import org.spongepowered.asm.mixin.Pseudo;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
+import uk.nbforge.gallifreyan_chronicles.client.sound.SoundListener;
+import uk.nbforge.gallifreyan_chronicles.core.GCSounds;
+import uk.nbforge.gallifreyan_chronicles.core.dynamic_registries.TardisDoorRegistry;
+import uk.nbforge.gallifreyan_chronicles.tardis.door.TardisDoorVariant;
 
 /**
-   Immersive Portals also carries sounds through portals.
-   The interior door sounds reach 10 blocks so outside you heard them up to 10 blocks away.
-   The main door sound is already played outside by us within the range of the hum, see InteriorDoorBlockEntity playThroughExterior, so do not carry door sounds across.
-*/
+ * Immersive Portals also carries sounds through portals.
+ * The interior door sounds reach 10 blocks so outside you heard them up to 10 blocks away.
+ * The main door sound is already played outside by us within the range of the hum, see InteriorDoorBlockEntity playThroughExterior, so do not carry door sounds across.
+ */
 @Pseudo
 @Mixin(targets = "qouteall.imm_ptl.core.teleportation.CrossPortalSound", remap = false)
 public abstract class PortalDoorSoundMixin {
     @Inject(method = "createCrossPortalSound", at = @At("HEAD"), cancellable = true, remap = false, require = 0)
-    private static void gc$noDoorSoundAcross(ClientLevel level, SoundEvent sound, SoundSource source, Vec3 pos,
-                                             float volume, float pitch, long seed, CallbackInfoReturnable<SimpleSoundInstance> cir) {
+    private static void gc$noDoorSoundAcross(
+            ClientLevel level,
+            SoundEvent sound,
+            SoundSource source,
+            Vec3 pos,
+            float volume,
+            float pitch,
+            long seed,
+            CallbackInfoReturnable<SimpleSoundInstance> cir) {
         if (SoundListener.isTardisLevel(level) && isDoorSound(sound.location())) cir.setReturnValue(null);
     }
 

@@ -1,12 +1,12 @@
 package uk.nbforge.gallifreyan_chronicles.tardis.flight;
 
-import uk.nbforge.gallifreyan_chronicles.tardis.Tardis;
-import uk.nbforge.gallifreyan_chronicles.tardis.TardisEvents;
 import net.minecraft.core.BlockPos;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.world.level.Level;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.Mth;
+import net.minecraft.world.level.Level;
+import uk.nbforge.gallifreyan_chronicles.tardis.Tardis;
+import uk.nbforge.gallifreyan_chronicles.tardis.TardisEvents;
 
 public final class TardisTravel {
     private static final double SCALE = 0.385;
@@ -17,8 +17,7 @@ public final class TardisTravel {
     private static final long MIN_OVERRIDE_TICKS = 0L;
     private static final long MAX_OVERRIDE_TICKS = 20_000_000L;
 
-    private TardisTravel() {
-    }
+    private TardisTravel() {}
 
     public static void init() {
         TardisEvents.TAKE_OFF.register(tardis -> tardis.data().setFlightStart(tardis.id(), now(tardis.server())));

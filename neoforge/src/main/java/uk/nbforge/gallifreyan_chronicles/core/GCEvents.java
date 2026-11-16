@@ -1,11 +1,11 @@
 package uk.nbforge.gallifreyan_chronicles.core;
 
+import net.neoforged.neoforge.common.NeoForge;
 import uk.nbforge.gallifreyan_chronicles.Constants;
+import uk.nbforge.gallifreyan_chronicles.event_subscriber.DoorRoundelHandler;
 import uk.nbforge.gallifreyan_chronicles.event_subscriber.GCCraftingHandler;
 import uk.nbforge.gallifreyan_chronicles.event_subscriber.TaraniumLavaDamageHandler;
-import uk.nbforge.gallifreyan_chronicles.event_subscriber.DoorRoundelHandler;
 import uk.nbforge.gallifreyan_chronicles.event_subscriber.TardisTrustHandler;
-import net.neoforged.neoforge.common.NeoForge;
 
 public class GCEvents {
     public static void registerEvents() {

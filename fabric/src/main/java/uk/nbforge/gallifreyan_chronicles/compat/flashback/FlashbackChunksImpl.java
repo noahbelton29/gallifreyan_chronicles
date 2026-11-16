@@ -3,38 +3,34 @@ package uk.nbforge.gallifreyan_chronicles.compat.flashback;
 import com.moulberry.flashback.Flashback;
 import com.moulberry.flashback.playback.ReplayPlayer;
 import com.moulberry.flashback.playback.ReplayServer;
-import net.minecraft.network.protocol.common.ClientboundCustomPayloadPacket;
-import net.minecraft.network.protocol.game.ClientboundLevelChunkWithLightPacket;
-import net.minecraft.server.level.ServerLevel;
-import qouteall.imm_ptl.core.network.PacketRedirection;
-import qouteall.q_misc_util.dimension.DimIntIdMap;
-import qouteall.q_misc_util.dimension.DimensionIntId;
-
+import java.util.ArrayList;
 import java.util.function.Consumer;
-
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.protocol.Packet;
+import net.minecraft.network.protocol.common.ClientboundCustomPayloadPacket;
 import net.minecraft.network.protocol.game.ClientGamePacketListener;
+import net.minecraft.network.protocol.game.ClientboundLevelChunkWithLightPacket;
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.Entity;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.phys.Vec3;
+import org.joml.Vector3d;
+import org.jspecify.annotations.Nullable;
+import qouteall.imm_ptl.core.network.PacketRedirection;
 import qouteall.imm_ptl.core.network.PacketRedirectionClient;
 import qouteall.imm_ptl.core.portal.Portal;
-import org.joml.Vector3d;
-import uk.nbforge.gallifreyan_chronicles.client.sound.SoundListener;
-import net.minecraft.world.level.Level;
-import net.minecraft.resources.ResourceKey;
-import org.jspecify.annotations.Nullable;
-import net.minecraft.world.phys.Vec3;
-import java.util.ArrayList;
 import qouteall.imm_ptl.core.render.context_management.RenderStates;
+import qouteall.q_misc_util.dimension.DimIntIdMap;
+import qouteall.q_misc_util.dimension.DimensionIntId;
+import uk.nbforge.gallifreyan_chronicles.client.sound.SoundListener;
 
 final class FlashbackChunksImpl {
 
-    private FlashbackChunksImpl() {
-    }
+    private FlashbackChunksImpl() {}
 
     static boolean isShapelessPortal(Entity entity) {
-        return entity instanceof Portal portal
-                && (portal.getAxisW() == null || portal.getAxisH() == null);
+        return entity instanceof Portal portal && (portal.getAxisW() == null || portal.getAxisH() == null);
     }
 
     static boolean isRedirectedPacket() {
@@ -54,9 +50,9 @@ final class FlashbackChunksImpl {
     }
 
     /**
-       Only packets for other worlds.
-       The ones for the own world of the replay, the overworld chunks while the player was in the TARDIS, must go into the replay server or it never has them and the world is void.
-    */
+     * Only packets for other worlds.
+     * The ones for the own world of the replay, the overworld chunks while the player was in the TARDIS, must go into the replay server or it never has them and the world is void.
+     */
     static boolean passOn(int dimId, Packet<?> packet) {
         ReplayServer server = Flashback.getReplayServer();
         if (server == null) return false;
@@ -67,7 +63,8 @@ final class FlashbackChunksImpl {
     }
 
     private static @Nullable ResourceKey<Level> replayDim(ReplayServer server) {
-        for (ReplayPlayer viewer : server.getReplayViewers()) return viewer.level().dimension();
+        for (ReplayPlayer viewer : server.getReplayViewers())
+            return viewer.level().dimension();
         for (ServerLevel level : server.getAllLevels()) return level.dimension();
         return null;
     }
@@ -155,12 +152,14 @@ final class FlashbackChunksImpl {
         if (server == null) return;
         for (ReplayPlayer viewer : server.getReplayViewers()) {
             if (viewer.level() == level) {
-                // Tag the chunk with its world using the numbers of the client so a TARDIS chunk cannot end up in the overworld
+                // Tag the chunk with its world using the numbers of the client so a TARDIS chunk cannot end up in the
+                // overworld
                 int dimId = clientDimId(level);
-                // If the client does not know this world yet skip it, sending it plain put TARDIS chunks into the overworld and left holes in the ground
+                // If the client does not know this world yet skip it, sending it plain put TARDIS chunks into the
+                // overworld and left holes in the ground
                 if (dimId == Integer.MIN_VALUE) continue;
-                viewer.connection.send(new ClientboundCustomPayloadPacket(
-                        new PacketRedirection.Payload(dimId, packet)));
+                viewer.connection.send(
+                        new ClientboundCustomPayloadPacket(new PacketRedirection.Payload(dimId, packet)));
             }
         }
     }

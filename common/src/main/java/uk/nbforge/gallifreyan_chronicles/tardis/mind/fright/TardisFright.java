@@ -1,36 +1,33 @@
 package uk.nbforge.gallifreyan_chronicles.tardis.mind.fright;
 
-import uk.nbforge.gallifreyan_chronicles.tardis.mind.MindMessages;
-import uk.nbforge.gallifreyan_chronicles.network.tardis.TardisFrightPayload;
-import uk.nbforge.gallifreyan_chronicles.platform.Services;
-import uk.nbforge.gallifreyan_chronicles.tardis.Tardis;
-import uk.nbforge.gallifreyan_chronicles.tardis.TardisApi;
-import uk.nbforge.gallifreyan_chronicles.tardis.mind.TardisBond;
-import uk.nbforge.gallifreyan_chronicles.tardis.mind.TardisMind;
-import uk.nbforge.gallifreyan_chronicles.tardis.ecs.system.TardisMindSystem;
-import uk.nbforge.gallifreyan_chronicles.tardis.mind.action.MindActions;
-import uk.nbforge.gallifreyan_chronicles.tardis.mind.action.MindContext;
-import uk.nbforge.gallifreyan_chronicles.tardis.mind.disability.TardisDisability;
-import uk.nbforge.gallifreyan_chronicles.util.GCSchedulerUtil;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.UUID;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.util.Mth;
-import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
-
-import java.util.HashMap;
-import java.util.Map;
-import java.util.UUID;
+import uk.nbforge.gallifreyan_chronicles.network.tardis.TardisFrightPayload;
+import uk.nbforge.gallifreyan_chronicles.platform.Services;
+import uk.nbforge.gallifreyan_chronicles.tardis.Tardis;
+import uk.nbforge.gallifreyan_chronicles.tardis.TardisApi;
+import uk.nbforge.gallifreyan_chronicles.tardis.ecs.system.TardisMindSystem;
+import uk.nbforge.gallifreyan_chronicles.tardis.mind.MindMessages;
+import uk.nbforge.gallifreyan_chronicles.tardis.mind.TardisBond;
+import uk.nbforge.gallifreyan_chronicles.tardis.mind.TardisMind;
+import uk.nbforge.gallifreyan_chronicles.tardis.mind.action.MindActions;
+import uk.nbforge.gallifreyan_chronicles.tardis.mind.action.MindContext;
+import uk.nbforge.gallifreyan_chronicles.util.GCSchedulerUtil;
 
 /**
-   Makes a TARDIS react when a player it fears comes inside.
-   Lights and hum act strangely and the personality may react too.
-   How strong it is depends on what the player did to it, and the fear and trauma built up.
-   It cannot hurt the player and it has a cooldown.
-*/
+ * Makes a TARDIS react when a player it fears comes inside.
+ * Lights and hum act strangely and the personality may react too.
+ * How strong it is depends on what the player did to it, and the fear and trauma built up.
+ * It cannot hurt the player and it has a cooldown.
+ */
 public final class TardisFright {
 
     private static final long CHECK_TICKS = 10L;
@@ -78,8 +75,7 @@ public final class TardisFright {
     // When each player last triggered a reaction
     private static final Map<String, Long> LAST = new HashMap<>();
 
-    private TardisFright() {
-    }
+    private TardisFright() {}
 
     public static void reset() {
         INSIDE.clear();
@@ -87,9 +83,9 @@ public final class TardisFright {
     }
 
     /**
-       Fear of one player from 0 to 1.
-       Trauma, fear and hits all add to it, betrayal and PTSD make it worse.
-    */
+     * Fear of one player from 0 to 1.
+     * Trauma, fear and hits all add to it, betrayal and PTSD make it worse.
+     */
     public static float severity(Tardis tardis, UUID player) {
         TardisMind mind = TardisMindSystem.mind(tardis);
         TardisBond bond = TardisMindSystem.bond(tardis, player);
@@ -138,9 +134,9 @@ public final class TardisFright {
     }
 
     /**
-       Checks the player is still inside the same TARDIS first.
-       Then sends the effect to everyone inside, shows the fear to the player and runs the personality enter actions.
-    */
+     * Checks the player is still inside the same TARDIS first.
+     * Then sends the effect to everyone inside, shows the fear to the player and runs the personality enter actions.
+     */
     private static void react(Tardis tardis, ServerPlayer player) {
         if (player.isRemoved()) return;
         Tardis still = TardisApi.ofLevel(player.level()).orElse(null);
@@ -152,7 +148,8 @@ public final class TardisFright {
         if (severity < MIN_SEVERITY) return;
 
         int ticks = Math.round(Mth.lerp(severity, (float) MIN_EFFECT_TICKS, (float) MAX_EFFECT_TICKS));
-        TardisFrightPayload payload = new TardisFrightPayload(severity, ticks, level.dimension().identifier());
+        TardisFrightPayload payload =
+                new TardisFrightPayload(severity, ticks, level.dimension().identifier());
         for (ServerPlayer inside : level.players()) {
             Services.NETWORK.sendTardisFright(inside, payload);
         }

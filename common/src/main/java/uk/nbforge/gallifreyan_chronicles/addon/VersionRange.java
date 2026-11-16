@@ -9,7 +9,8 @@ public final class VersionRange {
     public static final VersionRange ANY = new VersionRange("*", new ArrayList<List<Bound>>());
 
     private static final Pattern TOKEN = Pattern.compile("(>=|<=|>|<|=|\\^|~)?\\s*([0-9A-Za-z.*+_-]+)");
-    private static final Pattern INTERVAL = Pattern.compile("^([\\[(])\\s*([^,\\]\\)]*?)\\s*,\\s*([^,\\]\\)]*?)\\s*([\\])])$");
+    private static final Pattern INTERVAL =
+            Pattern.compile("^([\\[(])\\s*([^,\\]\\)]*?)\\s*,\\s*([^,\\]\\)]*?)\\s*([\\])])$");
 
     private static final class Bound {
         private final Version version;
@@ -63,8 +64,10 @@ public final class VersionRange {
         String high = interval.group(3);
         if (low.isEmpty() && high.isEmpty())
             throw new IllegalArgumentException("'" + original + "' has no versions in it");
-        if (!low.isEmpty()) bounds.add(new Bound(Version.parse(low), true, interval.group(1).equals("[")));
-        if (!high.isEmpty()) bounds.add(new Bound(Version.parse(high), false, interval.group(4).equals("]")));
+        if (!low.isEmpty())
+            bounds.add(new Bound(Version.parse(low), true, interval.group(1).equals("[")));
+        if (!high.isEmpty())
+            bounds.add(new Bound(Version.parse(high), false, interval.group(4).equals("]")));
     }
 
     private static void addComparators(List<Bound> bounds, String part, String original) {
@@ -113,7 +116,7 @@ public final class VersionRange {
                     bounds.add(new Bound(version, true, true));
                     bounds.add(new Bound(Version.parse(version.part(0) + "." + (version.part(1) + 1)), false, false));
                     break;
-                default:  // Exactly this version
+                default: // Exactly this version
                     bounds.add(new Bound(version, true, true));
                     bounds.add(new Bound(version, false, true));
                     break;

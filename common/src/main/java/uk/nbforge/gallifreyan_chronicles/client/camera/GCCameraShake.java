@@ -1,14 +1,13 @@
 package uk.nbforge.gallifreyan_chronicles.client.camera;
 
-import uk.nbforge.gallifreyan_chronicles.config.GCConfig;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.ThreadLocalRandom;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.world.phys.Vec3;
 import org.jspecify.annotations.Nullable;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.concurrent.ThreadLocalRandom;
+import uk.nbforge.gallifreyan_chronicles.config.GCConfig;
 
 public final class GCCameraShake {
     public static final double MAX_DISTANCE = 25.0;
@@ -91,8 +90,7 @@ public final class GCCameraShake {
     private static final List<RumbleSource> RUMBLE_SOURCES = new ArrayList<>();
     private static long lastFrameNanos = 0L;
 
-    public record Sample(float pitch, float yaw, float roll) {
-    }
+    public record Sample(float pitch, float yaw, float roll) {}
 
     private record Wave(double slowHz, double slowPhase, double fastHz, double fastPhase) {
         static Wave random(ThreadLocalRandom r) {
@@ -107,8 +105,7 @@ public final class GCCameraShake {
         }
     }
 
-    private GCCameraShake() {
-    }
+    private GCCameraShake() {}
 
     public static void trigger(Vec3 origin, float strengthMultiplier) {
         LocalPlayer player = Minecraft.getInstance().player;
@@ -171,7 +168,8 @@ public final class GCCameraShake {
         boolean stale = (now - stressHeardNanos) / 1.0E9 > STRESS_TIMEOUT;
         double target = stale ? 0.0 : stressTarget;
         double step = (stale ? STRESS_FADE_OUT_PER_SECOND : STRESS_EASE_PER_SECOND) * dt;
-        stressLevel = stressLevel < target ? Math.min(target, stressLevel + step) : Math.max(target, stressLevel - step);
+        stressLevel =
+                stressLevel < target ? Math.min(target, stressLevel + step) : Math.max(target, stressLevel - step);
         if (stressLevel <= 0.0) {
             if (stale) stressOrigin = null;
             return null;
@@ -179,14 +177,14 @@ public final class GCCameraShake {
 
         LocalPlayer player = Minecraft.getInstance().player;
         if (player == null) return null;
-        double attenuation = Math.clamp(1.0 - player.getEyePosition().distanceTo(stressOrigin) / RUMBLE_RANGE, 0.0, 1.0);
+        double attenuation =
+                Math.clamp(1.0 - player.getEyePosition().distanceTo(stressOrigin) / RUMBLE_RANGE, 0.0, 1.0);
         double amount = stressLevel * attenuation;
         double clock = now / 1.0E9;
         return new Sample(
                 (float) (rumbleWave(CRASH_PITCH_HZ, clock + 1.3) * amount * CRASH_PITCH_DEGREES),
                 (float) (rumbleWave(CRASH_YAW_HZ, clock + 4.1) * amount * CRASH_YAW_DEGREES),
-                (float) (rumbleWave(CRASH_ROLL_HZ, clock + 7.7) * amount * CRASH_ROLL_DEGREES)
-        );
+                (float) (rumbleWave(CRASH_ROLL_HZ, clock + 7.7) * amount * CRASH_ROLL_DEGREES));
     }
 
     private static @Nullable Sample crashSample() {
@@ -206,8 +204,7 @@ public final class GCCameraShake {
         return new Sample(
                 (float) (rumbleWave(CRASH_PITCH_HZ, clock) * amount * CRASH_PITCH_DEGREES),
                 (float) (rumbleWave(CRASH_YAW_HZ, clock + 2.9) * amount * CRASH_YAW_DEGREES),
-                (float) (rumbleWave(CRASH_ROLL_HZ, clock + 6.1) * amount * CRASH_ROLL_DEGREES)
-        );
+                (float) (rumbleWave(CRASH_ROLL_HZ, clock + 6.1) * amount * CRASH_ROLL_DEGREES));
     }
 
     private static @Nullable Sample rumbleSample() {
@@ -263,8 +260,7 @@ public final class GCCameraShake {
         return new Sample(
                 (float) (rumbleWave(RUMBLE_PITCH_HZ, t) * amount * RUMBLE_PITCH_DEGREES),
                 (float) (rumbleWave(RUMBLE_YAW_HZ, t + 3.7) * amount * RUMBLE_YAW_DEGREES),
-                (float) (rumbleWave(RUMBLE_ROLL_HZ, t + 8.3) * amount * RUMBLE_ROLL_DEGREES)
-        );
+                (float) (rumbleWave(RUMBLE_ROLL_HZ, t + 8.3) * amount * RUMBLE_ROLL_DEGREES));
     }
 
     private static double rumbleWave(double[] frequencies, double t) {
@@ -288,8 +284,7 @@ public final class GCCameraShake {
         return new Sample(
                 (float) (pitchWave.at(t) * envelope * MAX_PITCH_DEGREES),
                 (float) (yawWave.at(t) * envelope * MAX_YAW_DEGREES),
-                (float) (rollWave.at(t) * envelope * MAX_ROLL_DEGREES)
-        );
+                (float) (rollWave.at(t) * envelope * MAX_ROLL_DEGREES));
     }
 
     private static double envelope(double t) {

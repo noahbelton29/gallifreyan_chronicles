@@ -1,15 +1,13 @@
 package uk.nbforge.gallifreyan_chronicles.platform;
 
-import uk.nbforge.gallifreyan_chronicles.platform.services.IPlatformHelper;
-import net.fabricmc.loader.api.FabricLoader;
-
-import uk.nbforge.gallifreyan_chronicles.addon.ModAddonEntry;
-import net.fabricmc.loader.api.ModContainer;
-import net.fabricmc.loader.api.metadata.ModMetadata;
-
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
+import net.fabricmc.loader.api.FabricLoader;
+import net.fabricmc.loader.api.ModContainer;
+import net.fabricmc.loader.api.metadata.ModMetadata;
+import uk.nbforge.gallifreyan_chronicles.addon.ModAddonEntry;
+import uk.nbforge.gallifreyan_chronicles.platform.services.IPlatformHelper;
 
 public class FabricPlatformHelper implements IPlatformHelper {
 
@@ -31,7 +29,8 @@ public class FabricPlatformHelper implements IPlatformHelper {
 
     @Override
     public String getModVersion(String modId) {
-        return FabricLoader.getInstance().getModContainer(modId)
+        return FabricLoader.getInstance()
+                .getModContainer(modId)
                 .map(container -> container.getMetadata().getVersion().getFriendlyString())
                 .orElse("unknown");
     }
@@ -48,7 +47,8 @@ public class FabricPlatformHelper implements IPlatformHelper {
         for (ModContainer container : FabricLoader.getInstance().getAllMods()) {
             ModMetadata metadata = container.getMetadata();
             if (!metadata.containsCustomValue(ModAddonEntry.KEY)) continue;
-            found.add(new ModAddonEntry(metadata.getId(), metadata.getCustomValue(ModAddonEntry.KEY).getAsString()));
+            found.add(new ModAddonEntry(
+                    metadata.getId(), metadata.getCustomValue(ModAddonEntry.KEY).getAsString()));
         }
         return found;
     }

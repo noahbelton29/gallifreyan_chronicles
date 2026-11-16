@@ -1,11 +1,11 @@
 package uk.nbforge.gallifreyan_chronicles.client.gui.hud;
 
-import uk.nbforge.gallifreyan_chronicles.client.render.detail.TrialTimerOverlay;
-import uk.nbforge.gallifreyan_chronicles.config.GCConfig;
-import uk.nbforge.gallifreyan_chronicles.platform.Services;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
+import uk.nbforge.gallifreyan_chronicles.client.render.detail.TrialTimerOverlay;
+import uk.nbforge.gallifreyan_chronicles.config.GCConfig;
+import uk.nbforge.gallifreyan_chronicles.platform.Services;
 
 public final class GCHudRenderer {
     private static final int ALPHA = 0x90;
@@ -30,8 +30,7 @@ public final class GCHudRenderer {
     private static String platformName = "";
     private static int platformRgb = FABRIC_RGB;
 
-    private GCHudRenderer() {
-    }
+    private GCHudRenderer() {}
 
     private static void resolve() {
         if (resolved) return;

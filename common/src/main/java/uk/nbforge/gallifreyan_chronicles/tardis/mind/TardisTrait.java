@@ -1,5 +1,6 @@
 package uk.nbforge.gallifreyan_chronicles.tardis.mind;
 
+import java.util.List;
 import uk.nbforge.gallifreyan_chronicles.core.data.IdentifiableData;
 import uk.nbforge.gallifreyan_chronicles.tardis.mind.action.MindAction;
 import uk.nbforge.gallifreyan_chronicles.tardis.mind.data.MindEnums.Reveal;
@@ -7,12 +8,10 @@ import uk.nbforge.gallifreyan_chronicles.tardis.mind.data.MindIds;
 import uk.nbforge.gallifreyan_chronicles.tardis.mind.data.TraitModifiers;
 import uk.nbforge.gallifreyan_chronicles.util.GCUtil;
 
-import java.util.List;
-
 /**
-   A trait is a quirk that changes how a TARDIS acts.
-   It can also block some personalities and some other traits.
-*/
+ * A trait is a quirk that changes how a TARDIS acts.
+ * It can also block some personalities and some other traits.
+ */
 public record TardisTrait(
         String id,
         int weight,
@@ -22,8 +21,8 @@ public record TardisTrait(
         Reveal reveal,
         List<MindAction> onUnwilling,
         List<MindAction> onTakeOff,
-        List<MindAction> onLand
-) implements IdentifiableData<TardisTrait> {
+        List<MindAction> onLand)
+        implements IdentifiableData<TardisTrait> {
 
     /** The id without the mod name at the front. */
     public String localId() {
@@ -53,6 +52,7 @@ public record TardisTrait(
 
     @Override
     public TardisTrait withId(String id) {
-        return new TardisTrait(id, weight, modifiers, clashesWith, bannedPersonalities, reveal, onUnwilling, onTakeOff, onLand);
+        return new TardisTrait(
+                id, weight, modifiers, clashesWith, bannedPersonalities, reveal, onUnwilling, onTakeOff, onLand);
     }
 }

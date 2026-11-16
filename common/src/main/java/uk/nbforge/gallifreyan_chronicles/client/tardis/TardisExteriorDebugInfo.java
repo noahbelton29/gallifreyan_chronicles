@@ -1,11 +1,11 @@
 package uk.nbforge.gallifreyan_chronicles.client.tardis;
 
-import uk.nbforge.gallifreyan_chronicles.core.block_entities.TardisExteriorBlockEntity;
 import net.minecraft.client.Minecraft;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.HitResult;
+import uk.nbforge.gallifreyan_chronicles.core.block_entities.TardisExteriorBlockEntity;
 import uk.nbforge.gallifreyan_chronicles.tardis.TardisExterior;
 
 public final class TardisExteriorDebugInfo {
@@ -27,9 +27,8 @@ public final class TardisExteriorDebugInfo {
 
         if (!(be instanceof TardisExteriorBlockEntity tardisBE)) return null;
 
-        String tardisId = tardisBE.getTardisId() != null
-                ? tardisBE.getTardisId().toString()
-                : "unlinked";
+        String tardisId =
+                tardisBE.getTardisId() != null ? tardisBE.getTardisId().toString() : "unlinked";
 
         TardisExterior exterior = tardisBE.getExterior();
         String exteriorId = exterior != null ? exterior.id() : "none";

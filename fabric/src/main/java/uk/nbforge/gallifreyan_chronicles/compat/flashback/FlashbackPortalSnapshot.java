@@ -1,6 +1,5 @@
 package uk.nbforge.gallifreyan_chronicles.compat.flashback;
 
-import uk.nbforge.gallifreyan_chronicles.Constants;
 import java.lang.reflect.Method;
 import java.util.function.Consumer;
 import net.minecraft.client.Minecraft;
@@ -9,29 +8,29 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.protocol.Packet;
 import net.minecraft.network.protocol.common.ClientboundCustomPayloadPacket;
 import net.minecraft.network.protocol.game.ClientGamePacketListener;
+import net.minecraft.network.protocol.game.ClientboundLevelChunkWithLightPacket;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.world.entity.Entity;
+import net.minecraft.world.level.chunk.LevelChunk;
+import qouteall.imm_ptl.core.ClientWorldLoader;
+import qouteall.imm_ptl.core.chunk_loading.ImmPtlClientChunkMap;
 import qouteall.imm_ptl.core.network.ImmPtlNetworking;
+import qouteall.imm_ptl.core.network.PacketRedirection;
 import qouteall.imm_ptl.core.portal.Portal;
 import qouteall.q_misc_util.MiscNetworking;
 import qouteall.q_misc_util.dimension.DimIntIdMap;
 import qouteall.q_misc_util.dimension.DimensionIntId;
-import net.minecraft.network.protocol.game.ClientboundLevelChunkWithLightPacket;
-import net.minecraft.world.level.chunk.LevelChunk;
-import qouteall.imm_ptl.core.ClientWorldLoader;
-import qouteall.imm_ptl.core.chunk_loading.ImmPtlClientChunkMap;
-import qouteall.imm_ptl.core.network.PacketRedirection;
+import uk.nbforge.gallifreyan_chronicles.Constants;
 
 /**
-   A Flashback snapshot saves portals as plain entities with no shape and it does not save the dimension list of Immersive Portals.
-   So a recording started after a TARDIS was placed had no working portal, we add both to the snapshot.
-*/
+ * A Flashback snapshot saves portals as plain entities with no shape and it does not save the dimension list of Immersive Portals.
+ * So a recording started after a TARDIS was placed had no working portal, we add both to the snapshot.
+ */
 final class FlashbackPortalSnapshot {
     private static Method saveMethod;
     private static int errors;
 
-    private FlashbackPortalSnapshot() {
-    }
+    private FlashbackPortalSnapshot() {}
 
     static void write(Consumer<Packet<? super ClientGamePacketListener>> out) {
         try {
@@ -52,16 +51,16 @@ final class FlashbackPortalSnapshot {
 
             // Every other loaded world, the TARDIS inside or the overworld when you stand inside the TARDIS
             // Flashback only saves the world you stand in
-            // It also takes a new snapshot when you walk through the door and an export plays those, so the outside portal has to be in it too
+            // It also takes a new snapshot when you walk through the door and an export plays those, so the outside
+            // portal has to be in it too
             for (ClientLevel other : ClientWorldLoader.getClientWorlds()) {
                 if (other == level || !map.containsDimId(other.dimension())) continue;
                 if (!(other.getChunkSource() instanceof ImmPtlClientChunkMap chunkMap)) continue;
                 int otherId = map.toIntegerId(other.dimension());
                 for (LevelChunk chunk : chunkMap.getCopiedChunkList()) {
-                    var chunkPacket = new ClientboundLevelChunkWithLightPacket(
-                            chunk, other.getLightEngine(), null, null);
-                    out.accept(new ClientboundCustomPayloadPacket(
-                            new PacketRedirection.Payload(otherId, chunkPacket)));
+                    var chunkPacket =
+                            new ClientboundLevelChunkWithLightPacket(chunk, other.getLightEngine(), null, null);
+                    out.accept(new ClientboundCustomPayloadPacket(new PacketRedirection.Payload(otherId, chunkPacket)));
                 }
             }
 
@@ -74,8 +73,14 @@ final class FlashbackPortalSnapshot {
                     CompoundTag tag = new CompoundTag();
                     save(portal, tag);
                     out.accept(new ClientboundCustomPayloadPacket(new ImmPtlNetworking.PortalSyncPacket(
-                            portal.getId(), portal.getUUID(), portal.getType(), worldId,
-                            portal.getX(), portal.getY(), portal.getZ(), tag)));
+                            portal.getId(),
+                            portal.getUUID(),
+                            portal.getType(),
+                            worldId,
+                            portal.getX(),
+                            portal.getY(),
+                            portal.getZ(),
+                            tag)));
                 }
             }
         } catch (Exception e) {

@@ -1,17 +1,5 @@
 package uk.nbforge.gallifreyan_chronicles.core.block_entities;
 
-import uk.nbforge.gallifreyan_chronicles.tardis.exterior.fade.PulseFadeType;
-import uk.nbforge.gallifreyan_chronicles.util.MessageUtil;
-import uk.nbforge.gallifreyan_chronicles.util.BlockEntitySyncUtil;
-
-import uk.nbforge.gallifreyan_chronicles.util.GameClockUtil;
-import uk.nbforge.gallifreyan_chronicles.tardis.flight.RematCatch;
-import uk.nbforge.gallifreyan_chronicles.client.GCClientHooks;
-import uk.nbforge.gallifreyan_chronicles.core.block.TardisTopBlock;
-import uk.nbforge.gallifreyan_chronicles.core.dynamic_registries.TardisDoorRegistry;
-import uk.nbforge.gallifreyan_chronicles.tardis.Tardis;
-import uk.nbforge.gallifreyan_chronicles.tardis.TardisApi;
-import uk.nbforge.gallifreyan_chronicles.tardis.mind.mood.TardisMoods;
 import com.geckolib.animatable.GeoBlockEntity;
 import com.geckolib.animatable.instance.AnimatableInstanceCache;
 import com.geckolib.animatable.manager.AnimatableManager;
@@ -19,26 +7,10 @@ import com.geckolib.animation.AnimationController;
 import com.geckolib.animation.RawAnimation;
 import com.geckolib.animation.object.PlayState;
 import com.geckolib.util.GeckoLibUtil;
-import uk.nbforge.gallifreyan_chronicles.core.block.TardisBlock;
-import uk.nbforge.gallifreyan_chronicles.client.renderer.geo_layer.TardisExteriorKeyLayer;
-import uk.nbforge.gallifreyan_chronicles.ecs.ComponentHolder;
-import uk.nbforge.gallifreyan_chronicles.ecs.ComponentType;
-import uk.nbforge.gallifreyan_chronicles.ecs.ComponentStore;
-import uk.nbforge.gallifreyan_chronicles.ecs.Entity;
-import uk.nbforge.gallifreyan_chronicles.core.entity.TardisKeyEntity;
-import uk.nbforge.gallifreyan_chronicles.core.GCDataComponents;
-import uk.nbforge.gallifreyan_chronicles.tardis.ecs.TardisLinkable;
-import uk.nbforge.gallifreyan_chronicles.tardis.ecs.component.DoorState;
-import uk.nbforge.gallifreyan_chronicles.tardis.flight.TardisFlightState;
-import uk.nbforge.gallifreyan_chronicles.tardis.ecs.TardisComponentTypes;
-import uk.nbforge.gallifreyan_chronicles.tardis.ecs.component.TardisSubsystem;
-import uk.nbforge.gallifreyan_chronicles.tardis.ecs.component.TransformComponent;
-import uk.nbforge.gallifreyan_chronicles.tardis.ecs.system.DoorSyncSystem;
-import uk.nbforge.gallifreyan_chronicles.tardis.ecs.system.DoorSystem;
-import uk.nbforge.gallifreyan_chronicles.tardis.ecs.system.ExteriorSystem;
-import uk.nbforge.gallifreyan_chronicles.tardis.ecs.system.GlowSystem;
-import uk.nbforge.gallifreyan_chronicles.tardis.ecs.system.SubsystemSystem;
-import uk.nbforge.gallifreyan_chronicles.tardis.ecs.system.TardisInteriorSystem;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.UUID;
+import java.util.function.Supplier;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.HolderLookup;
@@ -50,7 +22,6 @@ import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
-import uk.nbforge.gallifreyan_chronicles.util.GCSchedulerUtil;
 import net.minecraft.util.Prediction;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.player.Player;
@@ -65,27 +36,53 @@ import net.minecraft.world.level.storage.ValueOutput;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.NonNull;
+import uk.nbforge.gallifreyan_chronicles.client.GCClientHooks;
+import uk.nbforge.gallifreyan_chronicles.client.renderer.geo_layer.TardisExteriorKeyLayer;
 import uk.nbforge.gallifreyan_chronicles.client.renderer.util.CloakKeyReveal;
-import uk.nbforge.gallifreyan_chronicles.util.FadingValue;
+import uk.nbforge.gallifreyan_chronicles.core.GCDataComponents;
+import uk.nbforge.gallifreyan_chronicles.core.block.TardisBlock;
+import uk.nbforge.gallifreyan_chronicles.core.block.TardisTopBlock;
+import uk.nbforge.gallifreyan_chronicles.core.dynamic_registries.TardisDoorRegistry;
+import uk.nbforge.gallifreyan_chronicles.core.entity.TardisKeyEntity;
+import uk.nbforge.gallifreyan_chronicles.ecs.ComponentHolder;
+import uk.nbforge.gallifreyan_chronicles.ecs.ComponentStore;
+import uk.nbforge.gallifreyan_chronicles.ecs.ComponentType;
+import uk.nbforge.gallifreyan_chronicles.ecs.Entity;
+import uk.nbforge.gallifreyan_chronicles.tardis.Tardis;
+import uk.nbforge.gallifreyan_chronicles.tardis.TardisApi;
+import uk.nbforge.gallifreyan_chronicles.tardis.TardisExterior;
+import uk.nbforge.gallifreyan_chronicles.tardis.ecs.TardisComponentTypes;
+import uk.nbforge.gallifreyan_chronicles.tardis.ecs.TardisLinkable;
+import uk.nbforge.gallifreyan_chronicles.tardis.ecs.component.DoorState;
+import uk.nbforge.gallifreyan_chronicles.tardis.ecs.component.TardisSubsystem;
+import uk.nbforge.gallifreyan_chronicles.tardis.ecs.component.TransformComponent;
+import uk.nbforge.gallifreyan_chronicles.tardis.ecs.system.DoorSyncSystem;
+import uk.nbforge.gallifreyan_chronicles.tardis.ecs.system.DoorSystem;
+import uk.nbforge.gallifreyan_chronicles.tardis.ecs.system.ExteriorSystem;
+import uk.nbforge.gallifreyan_chronicles.tardis.ecs.system.GlowSystem;
+import uk.nbforge.gallifreyan_chronicles.tardis.ecs.system.SubsystemSystem;
+import uk.nbforge.gallifreyan_chronicles.tardis.ecs.system.TardisInteriorSystem;
+import uk.nbforge.gallifreyan_chronicles.tardis.exterior.effect.ExteriorSounds;
+import uk.nbforge.gallifreyan_chronicles.tardis.exterior.effect.LockDamageEffects;
+import uk.nbforge.gallifreyan_chronicles.tardis.exterior.effect.TakeoffWind;
 import uk.nbforge.gallifreyan_chronicles.tardis.exterior.fade.CloakFade;
 import uk.nbforge.gallifreyan_chronicles.tardis.exterior.fade.FadeType;
-import org.jspecify.annotations.NonNull;
-
-import java.util.HashMap;
-import java.util.Map;
-import java.util.UUID;
-import java.util.function.Supplier;
-
-import uk.nbforge.gallifreyan_chronicles.tardis.exterior.effect.ExteriorSounds;
-import uk.nbforge.gallifreyan_chronicles.tardis.exterior.effect.TakeoffWind;
-import uk.nbforge.gallifreyan_chronicles.tardis.exterior.effect.LockDamageEffects;
+import uk.nbforge.gallifreyan_chronicles.tardis.exterior.fade.PulseFadeType;
+import uk.nbforge.gallifreyan_chronicles.tardis.flight.ExteriorFlight;
+import uk.nbforge.gallifreyan_chronicles.tardis.flight.RematCatch;
+import uk.nbforge.gallifreyan_chronicles.tardis.flight.TardisFlightState;
 import uk.nbforge.gallifreyan_chronicles.tardis.key.HeldKey;
 import uk.nbforge.gallifreyan_chronicles.tardis.key.TardisKeyLocator;
-import uk.nbforge.gallifreyan_chronicles.tardis.flight.ExteriorFlight;
-import uk.nbforge.gallifreyan_chronicles.tardis.TardisExterior;
+import uk.nbforge.gallifreyan_chronicles.tardis.mind.mood.TardisMoods;
+import uk.nbforge.gallifreyan_chronicles.util.BlockEntitySyncUtil;
+import uk.nbforge.gallifreyan_chronicles.util.FadingValue;
+import uk.nbforge.gallifreyan_chronicles.util.GCSchedulerUtil;
+import uk.nbforge.gallifreyan_chronicles.util.GameClockUtil;
+import uk.nbforge.gallifreyan_chronicles.util.MessageUtil;
 
-public class TardisExteriorBlockEntity extends BlockEntity implements GeoBlockEntity, ComponentHolder, TardisLinkable,
-        TardisExteriorKeyLayer.TardisExteriorRenderable {
+public class TardisExteriorBlockEntity extends BlockEntity
+        implements GeoBlockEntity, ComponentHolder, TardisLinkable, TardisExteriorKeyLayer.TardisExteriorRenderable {
     public static Supplier<BlockEntityType<TardisExteriorBlockEntity>> TYPE;
     private static final long KEY_JAM_COOLDOWN_TICKS = 40L;
     private static final long KEY_TURN_COOLDOWN_TICKS = 20L;
@@ -142,8 +139,7 @@ public class TardisExteriorBlockEntity extends BlockEntity implements GeoBlockEn
         if (keyEntity != null && keyEntity.isAlive()) {
             keyEntity.discard();
         }
-        TardisKeyEntity entity =
-                TardisKeyEntity.create(serverLevel, getBlockPos(), getKeyWorldPos());
+        TardisKeyEntity entity = TardisKeyEntity.create(serverLevel, getBlockPos(), getKeyWorldPos());
         serverLevel.addFreshEntity(entity);
         this.keyEntity = entity;
     }
@@ -190,8 +186,7 @@ public class TardisExteriorBlockEntity extends BlockEntity implements GeoBlockEn
 
     /** True when the doors are shut and not in the middle of an animation. */
     public boolean areDoorsFullyClosed() {
-        return getDoorState().isClosed()
-                && !DoorSystem.isAnimating(asEntity(), System.currentTimeMillis());
+        return getDoorState().isClosed() && !DoorSystem.isAnimating(asEntity(), System.currentTimeMillis());
     }
 
     /** The flight state, it also moves a timed state on if its time is up. */
@@ -421,13 +416,8 @@ public class TardisExteriorBlockEntity extends BlockEntity implements GeoBlockEn
         if (level != null && !level.isClientSide()) {
             BlockState state = getBlockState();
 
-            if (state.hasProperty(TardisBlock.IN_FLIGHT)
-                    && state.getValue(TardisBlock.IN_FLIGHT) != inFlight) {
-                level.setBlock(
-                        worldPosition,
-                        state.setValue(TardisBlock.IN_FLIGHT, inFlight),
-                        Block.UPDATE_ALL
-                );
+            if (state.hasProperty(TardisBlock.IN_FLIGHT) && state.getValue(TardisBlock.IN_FLIGHT) != inFlight) {
+                level.setBlock(worldPosition, state.setValue(TardisBlock.IN_FLIGHT, inFlight), Block.UPDATE_ALL);
             }
         }
 
@@ -677,8 +667,10 @@ public class TardisExteriorBlockEntity extends BlockEntity implements GeoBlockEn
         if (level.isClientSide()) return;
         blockEntity.refreshFadeType();
         blockEntity.tickLanding(level);
-        // Players whose view of this chunk changed, like leaving the interior or coming back through a portal, may have missed an update so resend while it travels
-        if (blockEntity.isTravelling() && (GameClockUtil.now(level) + blockEntity.tickOffset) % TRAVEL_RESYNC_TICKS == 0) {
+        // Players whose view of this chunk changed, like leaving the interior or coming back through a portal, may have
+        // missed an update so resend while it travels
+        if (blockEntity.isTravelling()
+                && (GameClockUtil.now(level) + blockEntity.tickOffset) % TRAVEL_RESYNC_TICKS == 0) {
             blockEntity.sync();
         }
         blockEntity.updateLight(level);
@@ -698,9 +690,9 @@ public class TardisExteriorBlockEntity extends BlockEntity implements GeoBlockEn
     }
 
     /**
-       Scales the block light with the opacity of the exterior so it fades out as the TARDIS dematerialises and back in as it materialises.
-       It only touches the block state when the level really changes.
-    */
+     * Scales the block light with the opacity of the exterior so it fades out as the TARDIS dematerialises and back in as it materialises.
+     * It only touches the block state when the level really changes.
+     */
     private void updateLight(Level level) {
         BlockState current = getBlockState();
         if (!current.hasProperty(TardisBlock.LIGHT)) return;
@@ -734,7 +726,13 @@ public class TardisExteriorBlockEntity extends BlockEntity implements GeoBlockEn
 
     private void tickTakeoffWind(ServerLevel serverLevel) {
         if (cloak.isCloaked()) return;
-        TakeoffWind.tick(serverLevel, getBlockPos(), flight.inFlight(), isFullyInvisible(), flight.fadeStartTick(), flight.duration());
+        TakeoffWind.tick(
+                serverLevel,
+                getBlockPos(),
+                flight.inFlight(),
+                isFullyInvisible(),
+                flight.fadeStartTick(),
+                flight.duration());
     }
 
     private static UUID keyIdOf(ItemStack key) {
@@ -794,7 +792,10 @@ public class TardisExteriorBlockEntity extends BlockEntity implements GeoBlockEn
     /** True if this key is the one already inside the lock and belongs to this player. */
     private boolean isWrongKeyStillInside(UUID playerId, UUID keyId) {
         ItemStack inside = heldKey.stack();
-        return hasKeyRendered() && playerId.equals(heldKey.owner()) && inside != null && keyIdOf(inside).equals(keyId);
+        return hasKeyRendered()
+                && playerId.equals(heldKey.owner())
+                && inside != null
+                && keyIdOf(inside).equals(keyId);
     }
 
     public boolean rejectKeyIfLockBroken(@Nullable Player player) {
@@ -820,8 +821,7 @@ public class TardisExteriorBlockEntity extends BlockEntity implements GeoBlockEn
         if (!ignoreLock && isLocked()) {
             return;
         }
-        DoorSystem.InteractionResult result =
-                DoorSystem.interact(asEntity(), sneaking, System.currentTimeMillis());
+        DoorSystem.InteractionResult result = DoorSystem.interact(asEntity(), sneaking, System.currentTimeMillis());
         if (result.hasNoAnimation()) return;
         if (controller != null) {
             controller.setAnimationSpeed(1.0);
@@ -832,8 +832,8 @@ public class TardisExteriorBlockEntity extends BlockEntity implements GeoBlockEn
         if (level instanceof ServerLevel serverLevel) {
             UUID id = getTardisId();
             if (id != null) {
-                DoorSyncSystem.onExteriorDoorChanged(serverLevel.getServer(), id, result.state(),
-                        result.animationName(), result.opening());
+                DoorSyncSystem.onExteriorDoorChanged(
+                        serverLevel.getServer(), id, result.state(), result.animationName(), result.opening());
             }
         }
     }
@@ -892,10 +892,12 @@ public class TardisExteriorBlockEntity extends BlockEntity implements GeoBlockEn
         ExteriorSounds.locked(level, getBlockPos());
 
         Component overlay = TardisApi.of(this)
-                .map(tardis -> Component.translatable("message.gallifreyan_chronicles.locked_owned",
+                .map(tardis -> Component.translatable(
+                        "message.gallifreyan_chronicles.locked_owned",
                         tardis.ownerName()
                                 .map(name -> Component.literal(name).withStyle(ChatFormatting.AQUA))
-                                .orElseGet(() -> Component.translatable("message.gallifreyan_chronicles.unknown_player").withStyle(ChatFormatting.AQUA))))
+                                .orElseGet(() -> Component.translatable("message.gallifreyan_chronicles.unknown_player")
+                                        .withStyle(ChatFormatting.AQUA))))
                 .orElseGet(() -> Component.translatable("message.gallifreyan_chronicles.locked"));
         player.sendOverlayMessage(overlay.copy().withStyle(ChatFormatting.RED));
     }
@@ -939,8 +941,7 @@ public class TardisExteriorBlockEntity extends BlockEntity implements GeoBlockEn
         int animSeq = input.getIntOr("DoorAnimSeq", 0);
         String anim = input.getStringOr("DoorAnim", "");
         boolean instant = input.getBooleanOr("DoorAnimInstant", false);
-        if (doorAnimSeqKnown && animSeq != doorAnimSeq && !anim.isEmpty()
-                && level != null && level.isClientSide()) {
+        if (doorAnimSeqKnown && animSeq != doorAnimSeq && !anim.isEmpty() && level != null && level.isClientSide()) {
             if (instant) {
                 startSnapClient();
             } else if (controller != null) {
@@ -978,22 +979,19 @@ public class TardisExteriorBlockEntity extends BlockEntity implements GeoBlockEn
 
     @Override
     public void registerControllers(AnimatableManager.ControllerRegistrar registrar) {
-        controller = new AnimationController<>(
-                "anim_controller",
-                0,
-                state -> {
-                    if (needsStateSync && level != null && level.isClientSide()) {
-                        DoorState doorState = getDoorState();
-                        String animName = getAnimationForDoorState(doorState);
-                        snapAnimation(state.controller(), animName);
-                        needsStateSync = false;
-                    } else if (snapFramesLeft > 0 && --snapFramesLeft == 0) {
-                        state.controller().setAnimationSpeed(1.0);
-                    }
-                    return PlayState.CONTINUE;
-                }
-        );
-        controller.triggerableAnim("open_left", RawAnimation.begin().thenPlay("open_left"))
+        controller = new AnimationController<>("anim_controller", 0, state -> {
+            if (needsStateSync && level != null && level.isClientSide()) {
+                DoorState doorState = getDoorState();
+                String animName = getAnimationForDoorState(doorState);
+                snapAnimation(state.controller(), animName);
+                needsStateSync = false;
+            } else if (snapFramesLeft > 0 && --snapFramesLeft == 0) {
+                state.controller().setAnimationSpeed(1.0);
+            }
+            return PlayState.CONTINUE;
+        });
+        controller
+                .triggerableAnim("open_left", RawAnimation.begin().thenPlay("open_left"))
                 .triggerableAnim("open_right", RawAnimation.begin().thenPlay("open_right"))
                 .triggerableAnim("open_all", RawAnimation.begin().thenPlay("open_all"))
                 .triggerableAnim("close_left", RawAnimation.begin().thenPlay("close_left"))
@@ -1003,10 +1001,10 @@ public class TardisExteriorBlockEntity extends BlockEntity implements GeoBlockEn
                 .triggerableAnim("close_all", RawAnimation.begin().thenPlay("close_all"));
         registrar.add(controller);
 
-        AnimationController<TardisExteriorBlockEntity> keyController = new AnimationController<>("key_controller",
-                0,
-                _ -> PlayState.CONTINUE);
-        keyController.triggerableAnim("key_lock", RawAnimation.begin().thenPlay("key_lock"))
+        AnimationController<TardisExteriorBlockEntity> keyController =
+                new AnimationController<>("key_controller", 0, _ -> PlayState.CONTINUE);
+        keyController
+                .triggerableAnim("key_lock", RawAnimation.begin().thenPlay("key_lock"))
                 .triggerableAnim("key_unlock", RawAnimation.begin().thenPlay("key_unlock"))
                 .triggerableAnim("is_locked", RawAnimation.begin().thenPlay("is_locked"))
                 .triggerableAnim("key_jammed", RawAnimation.begin().thenPlay("key_jammed"));

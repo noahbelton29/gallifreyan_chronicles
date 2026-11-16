@@ -1,13 +1,13 @@
 package uk.nbforge.gallifreyan_chronicles.compat.sodium;
 
-import uk.nbforge.gallifreyan_chronicles.config.GCConfig;
-import uk.nbforge.gallifreyan_chronicles.util.GCUtil;
 import net.caffeinemc.mods.sodium.api.config.ConfigEntryPoint;
 import net.caffeinemc.mods.sodium.api.config.structure.ConfigBuilder;
 import net.caffeinemc.mods.sodium.api.config.structure.ModOptionsBuilder;
 import net.caffeinemc.mods.sodium.api.config.structure.OptionGroupBuilder;
 import net.caffeinemc.mods.sodium.api.config.structure.OptionPageBuilder;
 import net.minecraft.network.chat.Component;
+import uk.nbforge.gallifreyan_chronicles.config.GCConfig;
+import uk.nbforge.gallifreyan_chronicles.util.GCUtil;
 
 public final class GCSodiumConfig implements ConfigEntryPoint {
     @Override
@@ -15,7 +15,8 @@ public final class GCSodiumConfig implements ConfigEntryPoint {
         OptionGroupBuilder group = builder.createOptionGroup()
                 .addOption(builder.createIntegerOption(GCUtil.modIdentifier("model_render_distance"))
                         .setName(Component.translatable("options.gallifreyan_chronicles.model_render_distance"))
-                        .setTooltip(Component.translatable("options.gallifreyan_chronicles.model_render_distance.tooltip"))
+                        .setTooltip(
+                                Component.translatable("options.gallifreyan_chronicles.model_render_distance.tooltip"))
                         .setRange(GCConfig.MIN_MODEL_RENDER_DISTANCE, GCConfig.MAX_MODEL_RENDER_DISTANCE, 4)
                         .setDefaultValue(64)
                         .setValueFormatter(value -> Component.translatable(
@@ -30,7 +31,8 @@ public final class GCSodiumConfig implements ConfigEntryPoint {
                         .setBinding(GCConfig::setImmersivePortals, GCConfig::immersivePortals))
                 .addOption(builder.createIntegerOption(GCUtil.modIdentifier("portal_render_distance"))
                         .setName(Component.translatable("options.gallifreyan_chronicles.portal_render_distance"))
-                        .setTooltip(Component.translatable("options.gallifreyan_chronicles.portal_render_distance.tooltip"))
+                        .setTooltip(
+                                Component.translatable("options.gallifreyan_chronicles.portal_render_distance.tooltip"))
                         .setRange(GCConfig.MIN_PORTAL_RENDER_DISTANCE, GCConfig.MAX_PORTAL_RENDER_DISTANCE, 2)
                         .setDefaultValue(20)
                         .setValueFormatter(value -> Component.translatable(
@@ -39,7 +41,8 @@ public final class GCSodiumConfig implements ConfigEntryPoint {
                         .setBinding(GCConfig::setPortalRenderDistance, GCConfig::portalRenderDistance))
                 .addOption(builder.createIntegerOption(GCUtil.modIdentifier("max_rendered_portals"))
                         .setName(Component.translatable("options.gallifreyan_chronicles.max_rendered_portals"))
-                        .setTooltip(Component.translatable("options.gallifreyan_chronicles.max_rendered_portals.tooltip"))
+                        .setTooltip(
+                                Component.translatable("options.gallifreyan_chronicles.max_rendered_portals.tooltip"))
                         .setRange(GCConfig.MIN_RENDERED_PORTALS, GCConfig.MAX_RENDERED_PORTALS, 1)
                         .setDefaultValue(8)
                         .setValueFormatter(value -> Component.literal(Integer.toString(value)))

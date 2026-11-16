@@ -1,17 +1,23 @@
 package uk.nbforge.gallifreyan_chronicles.sky.data;
 
 import com.mojang.serialization.DataResult;
+import java.util.Optional;
 import net.minecraft.resources.Identifier;
 import net.minecraft.util.StringRepresentable;
-
-import java.util.Optional;
-
 import uk.nbforge.gallifreyan_chronicles.core.dynamic_registries.CelestialBodyRegistry;
-import uk.nbforge.gallifreyan_chronicles.codec.sky.data.SkyBodyCodec;
 
-public record SkyBody(Optional<Identifier> body, Optional<Identifier> texture, float yaw, float pitch, float roll,
-                      Optional<Float> size, Optional<Integer> color, Optional<Blend> blend,
-                      Optional<Boolean> fadesInRain, Optional<SkyOrbit> orbit, Visibility visibility) {
+public record SkyBody(
+        Optional<Identifier> body,
+        Optional<Identifier> texture,
+        float yaw,
+        float pitch,
+        float roll,
+        Optional<Float> size,
+        Optional<Integer> color,
+        Optional<Blend> blend,
+        Optional<Boolean> fadesInRain,
+        Optional<SkyOrbit> orbit,
+        Visibility visibility) {
     public static final float DEFAULT_SIZE = 20.0F;
 
     public static DataResult<SkyBody> validate(SkyBody body) {
@@ -21,8 +27,18 @@ public record SkyBody(Optional<Identifier> body, Optional<Identifier> texture, f
     }
 
     public static SkyBody of(Identifier body) {
-        return new SkyBody(Optional.of(body), Optional.empty(), 0.0F, 0.0F, 0.0F, Optional.empty(),
-                Optional.empty(), Optional.empty(), Optional.empty(), Optional.empty(), Visibility.ALWAYS);
+        return new SkyBody(
+                Optional.of(body),
+                Optional.empty(),
+                0.0F,
+                0.0F,
+                0.0F,
+                Optional.empty(),
+                Optional.empty(),
+                Optional.empty(),
+                Optional.empty(),
+                Optional.empty(),
+                Visibility.ALWAYS);
     }
 
     public SkyBody at(float yaw, float pitch) {
@@ -30,15 +46,18 @@ public record SkyBody(Optional<Identifier> body, Optional<Identifier> texture, f
     }
 
     public SkyBody orbiting(SkyOrbit orbit) {
-        return new SkyBody(body, texture, yaw, pitch, roll, size, color, blend, fadesInRain, Optional.of(orbit), visibility);
+        return new SkyBody(
+                body, texture, yaw, pitch, roll, size, color, blend, fadesInRain, Optional.of(orbit), visibility);
     }
 
     public SkyBody sized(float size) {
-        return new SkyBody(body, texture, yaw, pitch, roll, Optional.of(size), color, blend, fadesInRain, orbit, visibility);
+        return new SkyBody(
+                body, texture, yaw, pitch, roll, Optional.of(size), color, blend, fadesInRain, orbit, visibility);
     }
 
     public SkyBody colored(int color) {
-        return new SkyBody(body, texture, yaw, pitch, roll, size, Optional.of(color), blend, fadesInRain, orbit, visibility);
+        return new SkyBody(
+                body, texture, yaw, pitch, roll, size, Optional.of(color), blend, fadesInRain, orbit, visibility);
     }
 
     public SkyBody fadingInRain(boolean fades) {
@@ -58,8 +77,17 @@ public record SkyBody(Optional<Identifier> body, Optional<Identifier> texture, f
         int resolvedColor = color.orElse(base != null ? base.color() : 0xFFFFFFFF);
         Blend resolvedBlend = blend.orElse(base != null ? base.blend() : Blend.NORMAL);
         boolean resolvedFades = fadesInRain.orElse(base == null || base.fadesInRain());
-        return Optional.of(new ResolvedSkyBody(resolvedTexture, yaw, pitch, roll, resolvedSize, resolvedColor,
-                resolvedBlend, resolvedFades, orbit, visibility));
+        return Optional.of(new ResolvedSkyBody(
+                resolvedTexture,
+                yaw,
+                pitch,
+                roll,
+                resolvedSize,
+                resolvedColor,
+                resolvedBlend,
+                resolvedFades,
+                orbit,
+                visibility));
     }
 
     public enum Blend implements StringRepresentable {

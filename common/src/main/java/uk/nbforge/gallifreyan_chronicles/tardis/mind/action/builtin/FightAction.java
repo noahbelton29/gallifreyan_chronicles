@@ -7,9 +7,9 @@ import uk.nbforge.gallifreyan_chronicles.tardis.mind.action.MindContext;
 import uk.nbforge.gallifreyan_chronicles.tardis.mind.refusal.TardisAnger;
 
 /**
-   Refuses and gets angrier each time until it lashes out.
-   The json field is stress.
-*/
+ * Refuses and gets angrier each time until it lashes out.
+ * The json field is stress.
+ */
 public record FightAction(float stress) implements MindAction {
     public static final String TYPE = Constants.MOD_ID + ":fight";
 

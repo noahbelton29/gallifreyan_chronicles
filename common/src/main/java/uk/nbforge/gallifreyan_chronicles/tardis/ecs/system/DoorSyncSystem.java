@@ -1,15 +1,5 @@
 package uk.nbforge.gallifreyan_chronicles.tardis.ecs.system;
 
-import uk.nbforge.gallifreyan_chronicles.compat.portal.TardisPortalBridge;
-import uk.nbforge.gallifreyan_chronicles.core.block_entities.InteriorDoorBlockEntity;
-import uk.nbforge.gallifreyan_chronicles.core.block_entities.TardisExteriorBlockEntity;
-import uk.nbforge.gallifreyan_chronicles.core.GCTardisControls;
-import uk.nbforge.gallifreyan_chronicles.tardis.Tardis;
-import uk.nbforge.gallifreyan_chronicles.tardis.TardisApi;
-import uk.nbforge.gallifreyan_chronicles.tardis.ecs.component.DoorState;
-import net.minecraft.server.MinecraftServer;
-import org.jspecify.annotations.Nullable;
-
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -18,12 +8,20 @@ import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 import java.util.WeakHashMap;
+import net.minecraft.server.MinecraftServer;
+import org.jspecify.annotations.Nullable;
+import uk.nbforge.gallifreyan_chronicles.compat.portal.TardisPortalBridge;
+import uk.nbforge.gallifreyan_chronicles.core.GCTardisControls;
+import uk.nbforge.gallifreyan_chronicles.core.block_entities.InteriorDoorBlockEntity;
+import uk.nbforge.gallifreyan_chronicles.core.block_entities.TardisExteriorBlockEntity;
+import uk.nbforge.gallifreyan_chronicles.tardis.Tardis;
+import uk.nbforge.gallifreyan_chronicles.tardis.TardisApi;
+import uk.nbforge.gallifreyan_chronicles.tardis.ecs.component.DoorState;
 
 public final class DoorSyncSystem {
     private static final Map<UUID, Set<InteriorDoorBlockEntity>> INTERIOR_DOORS = new HashMap<>();
 
-    private DoorSyncSystem() {
-    }
+    private DoorSyncSystem() {}
 
     private static @Nullable TardisExteriorBlockEntity exteriorOf(MinecraftServer server, UUID tardisId) {
         return TardisApi.get(server, tardisId).flatMap(Tardis::exterior).orElse(null);
@@ -34,7 +32,9 @@ public final class DoorSyncSystem {
     }
 
     public static synchronized void register(UUID tardisId, InteriorDoorBlockEntity door) {
-        INTERIOR_DOORS.computeIfAbsent(tardisId, k -> Collections.newSetFromMap(new WeakHashMap<>())).add(door);
+        INTERIOR_DOORS
+                .computeIfAbsent(tardisId, k -> Collections.newSetFromMap(new WeakHashMap<>()))
+                .add(door);
     }
 
     public static synchronized void unregister(UUID tardisId, InteriorDoorBlockEntity door) {
@@ -70,8 +70,8 @@ public final class DoorSyncSystem {
         applyControl(server, tardisId, GCTardisControls.INTERIOR_DOOR_CONTROL, !state.isClosed(), true);
     }
 
-    public static void onExteriorDoorChanged(MinecraftServer server, UUID tardisId, DoorState state,
-                                             String animation, boolean opening) {
+    public static void onExteriorDoorChanged(
+            MinecraftServer server, UUID tardisId, DoorState state, String animation, boolean opening) {
         for (InteriorDoorBlockEntity door : doorsOf(tardisId)) {
             door.applySyncedDoor(state, animation, opening);
         }
@@ -79,8 +79,13 @@ public final class DoorSyncSystem {
         TardisPortalBridge.onDoorsChanged(server, tardisId);
     }
 
-    public static void onInteriorDoorChanged(MinecraftServer server, UUID tardisId, InteriorDoorBlockEntity source,
-                                             DoorState state, String animation, boolean opening) {
+    public static void onInteriorDoorChanged(
+            MinecraftServer server,
+            UUID tardisId,
+            InteriorDoorBlockEntity source,
+            DoorState state,
+            String animation,
+            boolean opening) {
         TardisExteriorBlockEntity exterior = exteriorOf(server, tardisId);
         if (exterior != null) {
             exterior.applySyncedDoor(state, animation, opening);
@@ -104,8 +109,8 @@ public final class DoorSyncSystem {
         applyControl(server, tardisId, GCTardisControls.DOOR_LOCK_CONTROL, locked, silent);
     }
 
-    private static void applyControl(MinecraftServer server, UUID tardisId, String controlId,
-                                     boolean activated, boolean silent) {
+    private static void applyControl(
+            MinecraftServer server, UUID tardisId, String controlId, boolean activated, boolean silent) {
         TardisApi.get(server, tardisId).flatMap(Tardis::console).ifPresent(console -> {
             if (silent) {
                 console.reconcileControl(controlId, activated);
@@ -150,7 +155,12 @@ public final class DoorSyncSystem {
         applyLockControl(server, tardisId, exterior.isLocked(), true);
         InteriorDoorBlockEntity primary = primaryDoor(tardisId);
         if (primary != null) {
-            applyControl(server, tardisId, GCTardisControls.INTERIOR_DOOR_CONTROL, !primary.getDoorState().isClosed(), true);
+            applyControl(
+                    server,
+                    tardisId,
+                    GCTardisControls.INTERIOR_DOOR_CONTROL,
+                    !primary.getDoorState().isClosed(),
+                    true);
         }
     }
 

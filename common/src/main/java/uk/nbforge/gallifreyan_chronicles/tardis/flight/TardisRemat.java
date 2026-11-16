@@ -1,17 +1,16 @@
 package uk.nbforge.gallifreyan_chronicles.tardis.flight;
 
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.sounds.SoundSource;
+import uk.nbforge.gallifreyan_chronicles.core.GCSounds;
 import uk.nbforge.gallifreyan_chronicles.core.block_entities.TardisConsoleBlockEntity;
 import uk.nbforge.gallifreyan_chronicles.core.block_entities.TardisExteriorBlockEntity;
-import uk.nbforge.gallifreyan_chronicles.core.GCSounds;
 import uk.nbforge.gallifreyan_chronicles.core.sound.timed.TimedSounds;
 import uk.nbforge.gallifreyan_chronicles.tardis.Tardis;
 import uk.nbforge.gallifreyan_chronicles.tardis.ecs.system.TardisLandingSystem;
-import net.minecraft.server.level.ServerLevel;
-import net.minecraft.sounds.SoundSource;
 
 public final class TardisRemat {
-    private TardisRemat() {
-    }
+    private TardisRemat() {}
 
     public static boolean vanish(Tardis tardis) {
         TardisExteriorBlockEntity exterior = tardis.exterior().orElse(null);

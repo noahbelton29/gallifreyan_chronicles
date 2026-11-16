@@ -1,16 +1,15 @@
 package uk.nbforge.gallifreyan_chronicles.client.sky;
 
 import com.mojang.renderpearl.api.pipeline.RenderPipeline;
-import uk.nbforge.gallifreyan_chronicles.Constants;
-import uk.nbforge.gallifreyan_chronicles.sky.data.DimensionSky;
-import uk.nbforge.gallifreyan_chronicles.core.dynamic_registries.DimensionSkyRegistry;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.Method;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.resources.Identifier;
 import org.jspecify.annotations.Nullable;
-
-import java.lang.reflect.Constructor;
-import java.lang.reflect.Method;
+import uk.nbforge.gallifreyan_chronicles.Constants;
+import uk.nbforge.gallifreyan_chronicles.core.dynamic_registries.DimensionSkyRegistry;
+import uk.nbforge.gallifreyan_chronicles.sky.data.DimensionSky;
 
 public final class SkyShaderCompat {
     public enum Phase {
@@ -35,8 +34,7 @@ public final class SkyShaderCompat {
     private static @Nullable Method isShaderPackInUse;
     private static @Nullable Method isRenderingShadowPass;
 
-    private SkyShaderCompat() {
-    }
+    private SkyShaderCompat() {}
 
     private static void resolve() {
         if (resolved) return;
@@ -87,9 +85,9 @@ public final class SkyShaderCompat {
     }
 
     /**
-       Iris draws the world a second time from the view of the sun to make shadows, true while it does that.
-       shadow pass was drawing our sky twice and it looked awful.
-    */
+     * Iris draws the world a second time from the view of the sun to make shadows, true while it does that.
+     * shadow pass was drawing our sky twice and it looked awful.
+     */
     public static boolean isRenderingShadowPass() {
         if (!isShaderPackInUse() || isRenderingShadowPass == null) return false;
         try {
@@ -146,9 +144,11 @@ public final class SkyShaderCompat {
             String namespace = (String) namespacedIdNamespace.invoke(current);
             assert namespacedIdName != null;
             String name = (String) namespacedIdName.invoke(current);
-            if (dimension.getNamespace().equals(namespace) && dimension.getPath().equals(name)) return null;
+            if (dimension.getNamespace().equals(namespace)
+                    && dimension.getPath().equals(name)) return null;
             assert namespacedId != null;
-            return namespacedId.newInstance("minecraft", sky.shaderDimension().get().getSerializedName());
+            return namespacedId.newInstance(
+                    "minecraft", sky.shaderDimension().get().getSerializedName());
         } catch (ReflectiveOperationException | RuntimeException e) {
             return null;
         }

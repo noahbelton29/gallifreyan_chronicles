@@ -1,17 +1,17 @@
 package uk.nbforge.gallifreyan_chronicles.util;
 
+import static net.minecraft.commands.Commands.argument;
+
 import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.builder.RequiredArgumentBuilder;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.mojang.brigadier.suggestion.Suggestions;
 import com.mojang.brigadier.suggestion.SuggestionsBuilder;
-import uk.nbforge.gallifreyan_chronicles.Constants;
-import uk.nbforge.gallifreyan_chronicles.network.tardis.TardisConsoleSyncPayload;
-import uk.nbforge.gallifreyan_chronicles.platform.Services;
-import uk.nbforge.gallifreyan_chronicles.tardis.Tardis;
-import uk.nbforge.gallifreyan_chronicles.tardis.TardisApi;
-import uk.nbforge.gallifreyan_chronicles.tardis.TardisManager;
+import java.util.Optional;
+import java.util.UUID;
+import java.util.concurrent.CompletableFuture;
+import java.util.regex.Pattern;
 import net.minecraft.ChatFormatting;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.core.BlockPos;
@@ -27,13 +27,12 @@ import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
 import org.jspecify.annotations.Nullable;
-
-import java.util.Optional;
-import java.util.UUID;
-import java.util.concurrent.CompletableFuture;
-import java.util.regex.Pattern;
-
-import static net.minecraft.commands.Commands.argument;
+import uk.nbforge.gallifreyan_chronicles.Constants;
+import uk.nbforge.gallifreyan_chronicles.network.tardis.TardisConsoleSyncPayload;
+import uk.nbforge.gallifreyan_chronicles.platform.Services;
+import uk.nbforge.gallifreyan_chronicles.tardis.Tardis;
+import uk.nbforge.gallifreyan_chronicles.tardis.TardisApi;
+import uk.nbforge.gallifreyan_chronicles.tardis.TardisManager;
 
 public final class CommandUtil {
     private static final String KEY = "command.gallifreyan_chronicles.";
@@ -49,10 +48,10 @@ public final class CommandUtil {
         int run(UUID id, String idText) throws CommandSyntaxException;
     }
 
-    private CommandUtil() {
-    }
+    private CommandUtil() {}
 
-    public static int withTardisId(CommandContext<CommandSourceStack> ctx, IdAction action) throws CommandSyntaxException {
+    public static int withTardisId(CommandContext<CommandSourceStack> ctx, IdAction action)
+            throws CommandSyntaxException {
         String idText = StringArgumentType.getString(ctx, ID_ARG);
         UUID id;
         try {
@@ -63,7 +62,8 @@ public final class CommandUtil {
         return action.run(id, idText);
     }
 
-    public static int withTardis(CommandContext<CommandSourceStack> ctx, TardisAction action) throws CommandSyntaxException {
+    public static int withTardis(CommandContext<CommandSourceStack> ctx, TardisAction action)
+            throws CommandSyntaxException {
         return withTardisId(ctx, (id, idText) -> {
             Optional<Tardis> tardis = TardisApi.get(ctx.getSource().getServer(), id);
             if (tardis.isEmpty()) return fail(ctx, "no_tardis_id", idText);
@@ -83,8 +83,8 @@ public final class CommandUtil {
         return argument(ID_ARG, StringArgumentType.string()).suggests(CommandUtil::suggestTardisIds);
     }
 
-    public static CompletableFuture<Suggestions> suggestTardisIds(CommandContext<CommandSourceStack> ctx,
-                                                                  SuggestionsBuilder builder) {
+    public static CompletableFuture<Suggestions> suggestTardisIds(
+            CommandContext<CommandSourceStack> ctx, SuggestionsBuilder builder) {
         TardisManager.get(ctx.getSource().getServer()).getAllIds().forEach(id -> builder.suggest(id.toString()));
         return builder.buildFuture();
     }
@@ -93,8 +93,8 @@ public final class CommandUtil {
         return TardisManager.get(ctx.getSource().getServer());
     }
 
-    private static final Pattern UUID_SHAPE = Pattern.compile(
-            "[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}");
+    private static final Pattern UUID_SHAPE =
+            Pattern.compile("[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}");
 
     /**
      * Every TARDIS id that reaches chat as a plain String argument to fail()/success()/text() is swapped for the
@@ -144,18 +144,19 @@ public final class CommandUtil {
      */
     public static MutableComponent idLink(UUID id) {
         String full = id.toString();
-        return Component.literal(shortId(id)).withStyle(style -> style
-                .withColor(ChatFormatting.AQUA)
-                .withUnderlined(true)
-                .withClickEvent(new ClickEvent.CopyToClipboard(full))
-                .withHoverEvent(new HoverEvent.ShowText(Component.literal("Click to copy: " + full))));
+        return Component.literal(shortId(id))
+                .withStyle(style -> style.withColor(ChatFormatting.AQUA)
+                        .withUnderlined(true)
+                        .withClickEvent(new ClickEvent.CopyToClipboard(full))
+                        .withHoverEvent(new HoverEvent.ShowText(Component.literal("Click to copy: " + full))));
     }
 
     /**
      * A {@code "=== <title>: <short id> ==="} header for a multi-line dump.
      */
     public static MutableComponent dataHeader(String title, UUID id) {
-        return Component.literal("=== " + title + ": ").withStyle(ChatFormatting.GOLD)
+        return Component.literal("=== " + title + ": ")
+                .withStyle(ChatFormatting.GOLD)
                 .append(idLink(id))
                 .append(Component.literal(" ===").withStyle(ChatFormatting.GOLD));
     }
@@ -217,8 +218,8 @@ public final class CommandUtil {
         return player;
     }
 
-    public static <T extends BlockEntity> Optional<T> findBlockEntity(CommandContext<CommandSourceStack> ctx,
-                                                                      @Nullable BlockPos pos, Class<T> type) {
+    public static <T extends BlockEntity> Optional<T> findBlockEntity(
+            CommandContext<CommandSourceStack> ctx, @Nullable BlockPos pos, Class<T> type) {
         if (pos == null) return Optional.empty();
 
         ServerLevel here = ctx.getSource().getLevel();

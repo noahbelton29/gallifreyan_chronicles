@@ -1,15 +1,14 @@
 package uk.nbforge.gallifreyan_chronicles.mixin.client.capture;
 
 import com.mojang.blaze3d.platform.NativeImage;
-import uk.nbforge.gallifreyan_chronicles.Constants;
-import uk.nbforge.gallifreyan_chronicles.client.protection.watermark.ScreenshotWatermark;
+import java.nio.file.Path;
+import java.util.Locale;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
-
-import java.nio.file.Path;
-import java.util.Locale;
+import uk.nbforge.gallifreyan_chronicles.Constants;
+import uk.nbforge.gallifreyan_chronicles.client.protection.watermark.ScreenshotWatermark;
 
 @Mixin(NativeImage.class)
 public abstract class NativeImageSaveMixin {

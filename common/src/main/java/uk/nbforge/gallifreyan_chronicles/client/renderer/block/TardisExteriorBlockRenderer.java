@@ -1,43 +1,42 @@
 package uk.nbforge.gallifreyan_chronicles.client.renderer.block;
 
-import uk.nbforge.gallifreyan_chronicles.client.renderer.fade.FadeBoxRenderer;
-import org.joml.Vector3f;
-import org.joml.Quaternionf;
-import uk.nbforge.gallifreyan_chronicles.client.renderer.geo_layer.TardisLampOrbLayer;
-import uk.nbforge.gallifreyan_chronicles.client.util.FadeTintUtil;
-
-import uk.nbforge.gallifreyan_chronicles.client.util.ModelRenderRangeUtil;
-
-import uk.nbforge.gallifreyan_chronicles.config.GCConfig;
 import com.geckolib.constant.dataticket.DataTicket;
 import com.geckolib.renderer.GeoBlockRenderer;
-import net.minecraft.client.renderer.state.level.CameraRenderState;
 import com.geckolib.renderer.base.BoneSnapshots;
-import uk.nbforge.gallifreyan_chronicles.compat.portal.PortalBone;
 import com.geckolib.renderer.base.RenderPassInfo;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.math.Axis;
-import uk.nbforge.gallifreyan_chronicles.client.model.TardisExteriorBlockModel;
-import uk.nbforge.gallifreyan_chronicles.core.block_entities.TardisExteriorBlockEntity;
-import uk.nbforge.gallifreyan_chronicles.client.renderer.geo_layer.TardisExteriorGlowLayer;
-import uk.nbforge.gallifreyan_chronicles.client.renderer.geo_layer.TardisExteriorKeyLayer;
-import uk.nbforge.gallifreyan_chronicles.client.sky.SkyShaderCompat;
-import uk.nbforge.gallifreyan_chronicles.compat.portal.TardisPortalBridge;
-import net.minecraft.world.phys.Vec3;
-import uk.nbforge.gallifreyan_chronicles.tardis.TardisExterior;
 import net.minecraft.client.renderer.OrderedSubmitNodeCollector;
 import net.minecraft.client.renderer.SubmitNodeCollector;
 import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
 import net.minecraft.client.renderer.rendertype.RenderType;
 import net.minecraft.client.renderer.rendertype.RenderTypes;
+import net.minecraft.client.renderer.state.level.CameraRenderState;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.resources.Identifier;
+import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.NotNull;
+import org.joml.Quaternionf;
+import org.joml.Vector3f;
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
+import uk.nbforge.gallifreyan_chronicles.client.model.TardisExteriorBlockModel;
+import uk.nbforge.gallifreyan_chronicles.client.renderer.fade.FadeBoxRenderer;
+import uk.nbforge.gallifreyan_chronicles.client.renderer.geo_layer.TardisExteriorGlowLayer;
+import uk.nbforge.gallifreyan_chronicles.client.renderer.geo_layer.TardisExteriorKeyLayer;
+import uk.nbforge.gallifreyan_chronicles.client.renderer.geo_layer.TardisLampOrbLayer;
 import uk.nbforge.gallifreyan_chronicles.client.renderer.util.RenderLevelGuard;
+import uk.nbforge.gallifreyan_chronicles.client.sky.SkyShaderCompat;
+import uk.nbforge.gallifreyan_chronicles.client.util.FadeTintUtil;
+import uk.nbforge.gallifreyan_chronicles.client.util.ModelRenderRangeUtil;
+import uk.nbforge.gallifreyan_chronicles.compat.portal.PortalBone;
+import uk.nbforge.gallifreyan_chronicles.compat.portal.TardisPortalBridge;
+import uk.nbforge.gallifreyan_chronicles.config.GCConfig;
+import uk.nbforge.gallifreyan_chronicles.core.block_entities.TardisExteriorBlockEntity;
+import uk.nbforge.gallifreyan_chronicles.tardis.TardisExterior;
 
-public class TardisExteriorBlockRenderer extends GeoBlockRenderer<@NotNull TardisExteriorBlockEntity, @NotNull TardisExteriorBlockRenderState> {
+public class TardisExteriorBlockRenderer
+        extends GeoBlockRenderer<@NotNull TardisExteriorBlockEntity, @NotNull TardisExteriorBlockRenderState> {
     public static final DataTicket<String> EXTERIOR_ID = DataTicket.create("exterior_id", String.class);
     public static final DataTicket<Float> YAW = DataTicket.create("tardis_yaw", Float.class);
     public static final DataTicket<Boolean> GLOWING = DataTicket.create("tardis_glowing", Boolean.class);
@@ -70,8 +69,11 @@ public class TardisExteriorBlockRenderer extends GeoBlockRenderer<@NotNull Tardi
     }
 
     @Override
-    public void addRenderData(TardisExteriorBlockEntity animatable, Void relatedObject,
-                              TardisExteriorBlockRenderState renderState, float partialTick) {
+    public void addRenderData(
+            TardisExteriorBlockEntity animatable,
+            Void relatedObject,
+            TardisExteriorBlockRenderState renderState,
+            float partialTick) {
         RenderLevelGuard.tag(renderState, animatable.getLevel());
         renderState.addGeckolibData(EXTERIOR_ID, animatable.getExterior().id());
         renderState.addGeckolibData(YAW, animatable.getYaw());
@@ -94,7 +96,8 @@ public class TardisExteriorBlockRenderer extends GeoBlockRenderer<@NotNull Tardi
     }
 
     @Override
-    public int getPackedOverlay(TardisExteriorBlockEntity animatable, @Nullable Void relatedObject, float u, float partialTick) {
+    public int getPackedOverlay(
+            TardisExteriorBlockEntity animatable, @Nullable Void relatedObject, float u, float partialTick) {
         float faded = 1.0f - Math.clamp(animatable.getOpacity(partialTick), 0.0f, 1.0f);
         float t = Math.clamp(faded * GLASS_SPEED, 0.0f, 1.0f);
         float glass = t * t * (3.0f - 2.0f * t) * GLASS_STRENGTH;
@@ -115,8 +118,10 @@ public class TardisExteriorBlockRenderer extends GeoBlockRenderer<@NotNull Tardi
     }
 
     @Override
-    public void submitRenderTasks(RenderPassInfo<TardisExteriorBlockRenderState> renderPassInfo,
-                                  OrderedSubmitNodeCollector renderTasks, @Nullable RenderType renderType) {
+    public void submitRenderTasks(
+            RenderPassInfo<TardisExteriorBlockRenderState> renderPassInfo,
+            OrderedSubmitNodeCollector renderTasks,
+            @Nullable RenderType renderType) {
         float opacity = renderPassInfo.renderState().getOrDefaultGeckolibData(OPACITY, 1.0f);
         // The depth mask is only needed for the old way with shaders and portals
         if (renderType != null && opacity < 1.0f && FadeBoxRenderer.mode() == FadeBoxRenderer.Mode.MASK) {
@@ -133,7 +138,8 @@ public class TardisExteriorBlockRenderer extends GeoBlockRenderer<@NotNull Tardi
     }
 
     @Override
-    public void adjustModelBonesForRender(@NonNull RenderPassInfo<TardisExteriorBlockRenderState> renderPassInfo, @NonNull BoneSnapshots snapshots) {
+    public void adjustModelBonesForRender(
+            @NonNull RenderPassInfo<TardisExteriorBlockRenderState> renderPassInfo, @NonNull BoneSnapshots snapshots) {
         super.adjustModelBonesForRender(renderPassInfo, snapshots);
         // The portal bone is only a marker
         snapshots.ifPresent(PortalBone.BONE_NAME, snapshot -> snapshot.skipRender(true));
@@ -149,15 +155,15 @@ public class TardisExteriorBlockRenderer extends GeoBlockRenderer<@NotNull Tardi
         super.adjustRenderPose(renderPassInfo);
 
         Float yaw = renderPassInfo.renderState().getGeckolibData(YAW);
-        renderPassInfo.poseStack().rotateDegrees(
-                Axis.YP,
-                TardisExterior.modelRotationDegrees(yaw != null ? yaw : 0f)
-        );
+        renderPassInfo.poseStack().rotateDegrees(Axis.YP, TardisExterior.modelRotationDegrees(yaw != null ? yaw : 0f));
     }
 
     @Override
-    public void submit(@NonNull TardisExteriorBlockRenderState renderState, @NonNull PoseStack poseStack,
-                       @NonNull SubmitNodeCollector submitNodeCollector, @NonNull CameraRenderState cameraState) {
+    public void submit(
+            @NonNull TardisExteriorBlockRenderState renderState,
+            @NonNull PoseStack poseStack,
+            @NonNull SubmitNodeCollector submitNodeCollector,
+            @NonNull CameraRenderState cameraState) {
         if (RenderLevelGuard.belongsToOtherLevel(renderState)) return;
         // The lamp orb needs these to face the camera
         // Skip the shadow pass of Iris, that is the view of the sun and not yours

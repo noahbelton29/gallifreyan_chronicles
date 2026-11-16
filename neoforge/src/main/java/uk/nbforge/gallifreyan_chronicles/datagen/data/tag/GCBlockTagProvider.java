@@ -1,8 +1,6 @@
 package uk.nbforge.gallifreyan_chronicles.datagen.data.tag;
 
-import uk.nbforge.gallifreyan_chronicles.Constants;
-import uk.nbforge.gallifreyan_chronicles.core.GCBlocks;
-import uk.nbforge.gallifreyan_chronicles.core.GCTags;
+import java.util.concurrent.CompletableFuture;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.data.PackOutput;
@@ -14,8 +12,9 @@ import net.minecraft.tags.TagKey;
 import net.minecraft.world.level.block.Block;
 import net.neoforged.neoforge.common.data.BlockTagsProvider;
 import org.jspecify.annotations.NonNull;
-
-import java.util.concurrent.CompletableFuture;
+import uk.nbforge.gallifreyan_chronicles.Constants;
+import uk.nbforge.gallifreyan_chronicles.core.GCBlocks;
+import uk.nbforge.gallifreyan_chronicles.core.GCTags;
 
 public class GCBlockTagProvider extends BlockTagsProvider {
     public GCBlockTagProvider(PackOutput output, CompletableFuture<HolderLookup.Provider> lookupProvider) {
@@ -43,19 +42,16 @@ public class GCBlockTagProvider extends BlockTagsProvider {
 
     @Override
     protected void addTags(HolderLookup.@NonNull Provider provider) {
-        tagAdd(BlockTags.CLIMBABLE,
-                GCBlocks.GALLIFREYAN_VINE);
+        tagAdd(BlockTags.CLIMBABLE, GCBlocks.GALLIFREYAN_VINE);
 
-        tagAdd(BlockTags.SAND,
-                GCBlocks.GALLIFREYAN_SAND);
+        tagAdd(BlockTags.SAND, GCBlocks.GALLIFREYAN_SAND);
 
-        tagAppend(GCTags.Blocks.NEEDS_NETHERITE_TOOL,
-                GCBlocks.ARCADIAN_SHALE_TARANIUM_ORE);
+        tagAppend(GCTags.Blocks.NEEDS_NETHERITE_TOOL, GCBlocks.ARCADIAN_SHALE_TARANIUM_ORE);
 
-        tagAppend(BlockTags.INCORRECT_FOR_DIAMOND_TOOL)
-                .addTag(GCTags.Blocks.NEEDS_NETHERITE_TOOL);
+        tagAppend(BlockTags.INCORRECT_FOR_DIAMOND_TOOL).addTag(GCTags.Blocks.NEEDS_NETHERITE_TOOL);
 
-        tagAdd(BlockTags.MINEABLE_WITH_PICKAXE,
+        tagAdd(
+                BlockTags.MINEABLE_WITH_PICKAXE,
                 GCBlocks.GALLIFREYAN_COBBLESTONE,
                 GCBlocks.GALLIFREYAN_STONE,
                 GCBlocks.GALLIFREYAN_STONE_IRON_ORE,
@@ -67,7 +63,8 @@ public class GCBlockTagProvider extends BlockTagsProvider {
                 GCBlocks.LUNAR_REGOLITH);
         tagAdd(BlockTags.MINEABLE_WITH_PICKAXE, GCBlocks.interiorDoorBlocks());
 
-        tagAdd(BlockTags.MINEABLE_WITH_SHOVEL,
+        tagAdd(
+                BlockTags.MINEABLE_WITH_SHOVEL,
                 GCBlocks.GALLIFREYAN_DIRT,
                 GCBlocks.GALLIFREYAN_GRASS_BLOCK,
                 GCBlocks.GALLIFREYAN_GRAVEL,
@@ -75,7 +72,8 @@ public class GCBlockTagProvider extends BlockTagsProvider {
                 GCBlocks.GALLIFREYAN_MUD,
                 GCBlocks.MOON_DUST);
 
-        tagAdd(BlockTags.MINEABLE_WITH_AXE,
+        tagAdd(
+                BlockTags.MINEABLE_WITH_AXE,
                 GCBlocks.CADONWOOD_PLANKS,
                 GCBlocks.CADONWOOD_LOG,
                 GCBlocks.STRIPPED_CADONWOOD_LOG,
@@ -89,51 +87,42 @@ public class GCBlockTagProvider extends BlockTagsProvider {
                 GCBlocks.CADONWOOD_PRESSURE_PLATE);
         tagAdd(BlockTags.MINEABLE_WITH_AXE, GCBlocks.WOOD_ROUNDELS.values().toArray(Block[]::new));
         tagAdd(BlockTags.MINEABLE_WITH_AXE, GCBlocks.WOOD_HALF_ROUNDELS.values().toArray(Block[]::new));
-        tagAdd(BlockTags.MINEABLE_WITH_PICKAXE, GCBlocks.CONCRETE_ROUNDELS.values().toArray(Block[]::new));
-        tagAdd(BlockTags.MINEABLE_WITH_PICKAXE, GCBlocks.CONCRETE_HALF_ROUNDELS.values().toArray(Block[]::new));
+        tagAdd(
+                BlockTags.MINEABLE_WITH_PICKAXE,
+                GCBlocks.CONCRETE_ROUNDELS.values().toArray(Block[]::new));
+        tagAdd(
+                BlockTags.MINEABLE_WITH_PICKAXE,
+                GCBlocks.CONCRETE_HALF_ROUNDELS.values().toArray(Block[]::new));
 
-        tagAdd(BlockTags.MINEABLE_WITH_HOE,
-                GCBlocks.CADONWOOD_LEAVES);
+        tagAdd(BlockTags.MINEABLE_WITH_HOE, GCBlocks.CADONWOOD_LEAVES);
 
-        tagAdd(BlockTags.NEEDS_STONE_TOOL,
-                GCBlocks.GALLIFREYAN_STONE_IRON_ORE,
-                GCBlocks.ARCADIAN_SHALE);
+        tagAdd(BlockTags.NEEDS_STONE_TOOL, GCBlocks.GALLIFREYAN_STONE_IRON_ORE, GCBlocks.ARCADIAN_SHALE);
 
-        tagAppend(BlockTags.ANIMALS_SPAWNABLE_ON,
-                GCBlocks.GALLIFREYAN_SAND).replace(false);
+        tagAppend(BlockTags.ANIMALS_SPAWNABLE_ON, GCBlocks.GALLIFREYAN_SAND).replace(false);
 
-        tagAppend(BlockTags.REPLACEABLE,
-                GCBlocks.SHORT_GALLIFREYAN_DRY_GRASS,
-                GCBlocks.TALL_GALLIFREYAN_DRY_GRASS);
+        tagAppend(BlockTags.REPLACEABLE, GCBlocks.SHORT_GALLIFREYAN_DRY_GRASS, GCBlocks.TALL_GALLIFREYAN_DRY_GRASS);
 
-        tagAppend(BlockTags.GRASS_BLOCKS,
-                GCBlocks.GALLIFREYAN_GRASS_BLOCK,
-                GCBlocks.GALLIFREYAN_SAND);
+        tagAppend(BlockTags.GRASS_BLOCKS, GCBlocks.GALLIFREYAN_GRASS_BLOCK, GCBlocks.GALLIFREYAN_SAND);
 
-        tagAppend(GCTags.Blocks.GALLIFREYAN_STONE_REPLACEABLES,
-                GCBlocks.GALLIFREYAN_STONE);
+        tagAppend(GCTags.Blocks.GALLIFREYAN_STONE_REPLACEABLES, GCBlocks.GALLIFREYAN_STONE);
 
-        tagAppend(GCTags.Blocks.BASE_STONE_GALLIFREY,
-                GCBlocks.GALLIFREYAN_STONE);
+        tagAppend(GCTags.Blocks.BASE_STONE_GALLIFREY, GCBlocks.GALLIFREYAN_STONE);
 
-        tagAddBlockItem(BlockItemTags.LOGS_THAT_BURN,
+        tagAddBlockItem(
+                BlockItemTags.LOGS_THAT_BURN,
                 GCBlocks.CADONWOOD_LOG,
                 GCBlocks.CADONWOOD_WOOD,
                 GCBlocks.STRIPPED_CADONWOOD_LOG,
                 GCBlocks.STRIPPED_CADONWOOD_WOOD);
 
-        tagAddBlockItem(BlockItemTags.SAPLINGS,
-                GCBlocks.CADONWOOD_SAPLING);
+        tagAddBlockItem(BlockItemTags.SAPLINGS, GCBlocks.CADONWOOD_SAPLING);
 
-        tagAdd(BlockTags.DIRT,
-                GCBlocks.GALLIFREYAN_GRASS_BLOCK,
-                GCBlocks.GALLIFREYAN_DIRT);
+        tagAdd(BlockTags.DIRT, GCBlocks.GALLIFREYAN_GRASS_BLOCK, GCBlocks.GALLIFREYAN_DIRT);
 
-        tagAddBlockItem(BlockItemTags.LOGS,
-                GCBlocks.CADONWOOD_LOG,
-                GCBlocks.STRIPPED_CADONWOOD_LOG);
+        tagAddBlockItem(BlockItemTags.LOGS, GCBlocks.CADONWOOD_LOG, GCBlocks.STRIPPED_CADONWOOD_LOG);
 
-        tagAdd(BlockTags.STAIRS,
+        tagAdd(
+                BlockTags.STAIRS,
                 GCBlocks.CADONWOOD_STAIRS,
                 GCBlocks.BRACHACKI_SLAB,
                 GCBlocks.BRACHACKI_STAIRS_2,
@@ -141,7 +130,8 @@ public class GCBlockTagProvider extends BlockTagsProvider {
                 GCBlocks.BRACHACKI_STAIRS_4,
                 GCBlocks.BRACHACKI_TUAT_STAIRS);
 
-        tagAdd(BlockTags.SLABS,
+        tagAdd(
+                BlockTags.SLABS,
                 GCBlocks.CADONWOOD_SLAB,
                 GCBlocks.BRACHACKI_SLAB,
                 GCBlocks.BRACHACKI_SLAB_2,
@@ -149,7 +139,8 @@ public class GCBlockTagProvider extends BlockTagsProvider {
                 GCBlocks.BRACHACKI_SLAB_4,
                 GCBlocks.BRACHACKI_TUAT_SLAB);
 
-        tagAdd(BlockTags.PRESSURE_PLATES,
+        tagAdd(
+                BlockTags.PRESSURE_PLATES,
                 GCBlocks.CADONWOOD_PRESSURE_PLATE,
                 GCBlocks.BRACHACKI_PRESSURE_PLATE,
                 GCBlocks.BRACHACKI_PRESSURE_PLATE_2,
@@ -157,10 +148,10 @@ public class GCBlockTagProvider extends BlockTagsProvider {
                 GCBlocks.BRACHACKI_PRESSURE_PLATE_4,
                 GCBlocks.BRACHACKI_TUAT_PRESSURE_PLATE);
 
-        tagAdd(BlockTags.BUTTONS,
-                GCBlocks.CADONWOOD_BUTTON);
+        tagAdd(BlockTags.BUTTONS, GCBlocks.CADONWOOD_BUTTON);
 
-        tagAdd(BlockTags.FENCES,
+        tagAdd(
+                BlockTags.FENCES,
                 GCBlocks.CADONWOOD_FENCE,
                 GCBlocks.BRACHACKI_FENCE,
                 GCBlocks.BRACHACKI_FENCE_2,
@@ -168,7 +159,8 @@ public class GCBlockTagProvider extends BlockTagsProvider {
                 GCBlocks.BRACHACKI_FENCE_4,
                 GCBlocks.BRACHACKI_TUAT_FENCE);
 
-        tagAdd(BlockTags.FENCE_GATES,
+        tagAdd(
+                BlockTags.FENCE_GATES,
                 GCBlocks.CADONWOOD_FENCE_GATE,
                 GCBlocks.BRACHACKI_FENCE_GATE,
                 GCBlocks.BRACHACKI_FENCE_GATE_2,
@@ -176,7 +168,8 @@ public class GCBlockTagProvider extends BlockTagsProvider {
                 GCBlocks.BRACHACKI_FENCE_GATE_4,
                 GCBlocks.BRACHACKI_TUAT_FENCE_GATE);
 
-        tagAdd(BlockTags.WALLS,
+        tagAdd(
+                BlockTags.WALLS,
                 GCBlocks.CADONWOOD_WALL,
                 GCBlocks.BRACHACKI_WALL,
                 GCBlocks.BRACHACKI_WALL_2,

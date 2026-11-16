@@ -1,35 +1,32 @@
 package uk.nbforge.gallifreyan_chronicles.tardis.flight.crash;
 
-import uk.nbforge.gallifreyan_chronicles.core.GCEffects;
-import net.minecraft.world.effect.MobEffectInstance;
-
-import java.util.Map;
 import java.util.HashMap;
-
-import uk.nbforge.gallifreyan_chronicles.util.MessageUtil;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
+import java.util.UUID;
 import net.minecraft.ChatFormatting;
-import net.minecraft.server.level.ServerPlayer;
-import uk.nbforge.gallifreyan_chronicles.core.block_entities.InteriorDoorBlockEntity;
-import uk.nbforge.gallifreyan_chronicles.core.block_entities.TardisExteriorBlockEntity;
-import uk.nbforge.gallifreyan_chronicles.tardis.Tardis;
-import uk.nbforge.gallifreyan_chronicles.util.GCSchedulerUtil;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.core.particles.SimpleParticleType;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.util.RandomSource;
+import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.phys.Vec3;
 import org.jspecify.annotations.Nullable;
-
-import java.util.HashSet;
-import java.util.Set;
-import java.util.UUID;
+import uk.nbforge.gallifreyan_chronicles.core.GCEffects;
+import uk.nbforge.gallifreyan_chronicles.core.block_entities.InteriorDoorBlockEntity;
+import uk.nbforge.gallifreyan_chronicles.core.block_entities.TardisExteriorBlockEntity;
+import uk.nbforge.gallifreyan_chronicles.tardis.Tardis;
+import uk.nbforge.gallifreyan_chronicles.util.GCSchedulerUtil;
+import uk.nbforge.gallifreyan_chronicles.util.MessageUtil;
 
 /**
-   A crashed TARDIS keeps pouring smoke out of its console until it is repaired.
-   Open the doors and the smoke is pulled through the room and out of the box.
-*/
+ * A crashed TARDIS keeps pouring smoke out of its console until it is repaired.
+ * Open the doors and the smoke is pulled through the room and out of the box.
+ */
 public final class CrashSmoke {
     private static final int PUFF_TICKS = 5;
 
@@ -63,8 +60,7 @@ public final class CrashSmoke {
     // How long each player has been breathing it, per TARDIS
     private static final Map<UUID, Map<UUID, Integer>> BREATHED = new HashMap<>();
 
-    private CrashSmoke() {
-    }
+    private CrashSmoke() {}
 
     public static void reset() {
         RUNNING.clear();
@@ -100,18 +96,42 @@ public final class CrashSmoke {
     }
 
     private static void pourFromConsole(ServerLevel level, Vec3 console) {
-        level.sendParticles(ParticleTypes.LARGE_SMOKE, console.x, console.y + 1.0, console.z, CONSOLE_PUFFS,
-                0.6, 0.3, 0.6, 0.06);
-        level.sendParticles(ParticleTypes.CAMPFIRE_SIGNAL_SMOKE, console.x, console.y + 1.0, console.z, CONSOLE_COLUMN,
-                0.4, 0.2, 0.4, 0.01);
+        level.sendParticles(
+                ParticleTypes.LARGE_SMOKE, console.x, console.y + 1.0, console.z, CONSOLE_PUFFS, 0.6, 0.3, 0.6, 0.06);
+        level.sendParticles(
+                ParticleTypes.CAMPFIRE_SIGNAL_SMOKE,
+                console.x,
+                console.y + 1.0,
+                console.z,
+                CONSOLE_COLUMN,
+                0.4,
+                0.2,
+                0.4,
+                0.01);
     }
 
     /** Doors shut so it just fills the room. */
     private static void hangInRoom(ServerLevel level, Vec3 console) {
-        level.sendParticles(ParticleTypes.CAMPFIRE_COSY_SMOKE, console.x, console.y + 1.5, console.z, ROOM_PUFFS,
-                ROOM_SPREAD, ROOM_HEIGHT, ROOM_SPREAD, 0.005);
-        level.sendParticles(ParticleTypes.LARGE_SMOKE, console.x, console.y + 1.5, console.z, ROOM_PUFFS / 3,
-                ROOM_SPREAD, ROOM_HEIGHT, ROOM_SPREAD, 0.01);
+        level.sendParticles(
+                ParticleTypes.CAMPFIRE_COSY_SMOKE,
+                console.x,
+                console.y + 1.5,
+                console.z,
+                ROOM_PUFFS,
+                ROOM_SPREAD,
+                ROOM_HEIGHT,
+                ROOM_SPREAD,
+                0.005);
+        level.sendParticles(
+                ParticleTypes.LARGE_SMOKE,
+                console.x,
+                console.y + 1.5,
+                console.z,
+                ROOM_PUFFS / 3,
+                ROOM_SPREAD,
+                ROOM_HEIGHT,
+                ROOM_SPREAD,
+                0.01);
     }
 
     /** Doors open so smoke all over the room drifts towards the doorway and out. */
@@ -120,7 +140,8 @@ public final class CrashSmoke {
         Vec3 doorway = Vec3.atCenterOf(door.getBlockPos()).add(0, 0.5, 0);
 
         for (int i = 0; i < DRAFT_PUFFS; i++) {
-            Vec3 from = console.add((random.nextDouble() - 0.5) * ROOM_SPREAD * 2,
+            Vec3 from = console.add(
+                    (random.nextDouble() - 0.5) * ROOM_SPREAD * 2,
                     1 + random.nextDouble() * ROOM_HEIGHT,
                     (random.nextDouble() - 0.5) * ROOM_SPREAD * 2);
             Vec3 towards = doorway.subtract(from).normalize();
@@ -132,7 +153,9 @@ public final class CrashSmoke {
         Vec3 through = new Vec3(-facing.getStepX(), 0.05, -facing.getStepZ());
         Vec3 inFront = doorway.add(facing.getStepX() * 1.2, 0, facing.getStepZ() * 1.2);
         for (int i = 0; i < DOORWAY_PUFFS; i++) {
-            Vec3 from = inFront.add((random.nextDouble() - 0.5) * 0.8, (random.nextDouble() - 0.5) * 1.6,
+            Vec3 from = inFront.add(
+                    (random.nextDouble() - 0.5) * 0.8,
+                    (random.nextDouble() - 0.5) * 1.6,
                     (random.nextDouble() - 0.5) * 0.8);
             send(level, random, from, through, DRAFT_SPEED);
         }
@@ -148,11 +171,14 @@ public final class CrashSmoke {
         Vec3 outwards = new Vec3(-Math.sin(yaw), 0.15, Math.cos(yaw));
         Vec3 doors = Vec3.atBottomCenterOf(exterior.getBlockPos()).add(outwards.x * 0.6, 1.2, outwards.z * 0.6);
         for (int i = 0; i < OUTSIDE_PUFFS; i++) {
-            Vec3 from = doors.add((random.nextDouble() - 0.5) * 0.9, (random.nextDouble() - 0.5) * 1.6,
+            Vec3 from = doors.add(
+                    (random.nextDouble() - 0.5) * 0.9,
+                    (random.nextDouble() - 0.5) * 1.6,
                     (random.nextDouble() - 0.5) * 0.9);
             send(outside, random, from, outwards, OUTSIDE_SPEED * (0.6 + random.nextDouble() * 0.6));
         }
-        outside.sendParticles(ParticleTypes.CAMPFIRE_SIGNAL_SMOKE, doors.x, doors.y + 1.5, doors.z, 2, 0.4, 0.3, 0.4, 0.01);
+        outside.sendParticles(
+                ParticleTypes.CAMPFIRE_SIGNAL_SMOKE, doors.x, doors.y + 1.5, doors.z, 2, 0.4, 0.3, 0.4, 0.01);
     }
 
     private static void choke(Tardis tardis, ServerLevel interior, boolean doorsOpen) {
@@ -189,7 +215,8 @@ public final class CrashSmoke {
 
     /** A count of 0 makes the particle move in the given direction. */
     private static void send(ServerLevel level, RandomSource random, Vec3 from, Vec3 direction, double speed) {
-        SimpleParticleType type = random.nextInt(3) == 0 ? ParticleTypes.LARGE_SMOKE : ParticleTypes.CAMPFIRE_COSY_SMOKE;
+        SimpleParticleType type =
+                random.nextInt(3) == 0 ? ParticleTypes.LARGE_SMOKE : ParticleTypes.CAMPFIRE_COSY_SMOKE;
         level.sendParticles(type, from.x, from.y, from.z, 0, direction.x, direction.y, direction.z, speed);
     }
 }

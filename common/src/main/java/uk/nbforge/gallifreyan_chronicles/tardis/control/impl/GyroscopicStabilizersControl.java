@@ -22,7 +22,7 @@ public class GyroscopicStabilizersControl extends BaseControl {
         if (console == null) return InteractionResult.FAIL;
         boolean stabilizersOn = console.getControlState(GCTardisControls.GYROSCOPIC_STABILIZERS);
         if (!stabilizersOn) {
-            playSound(entity, GCSounds.TARDIS_STABILIZERS_ON, 0.0f);
+            playSound(entity, GCSounds.TARDIS_STABILIZERS_ON, 1.0f);
         }
         return InteractionResult.SUCCESS;
     }

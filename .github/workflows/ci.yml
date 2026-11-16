@@ -19,7 +19,7 @@ env:
 jobs:
   build:
     name: Build
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 30
     outputs:
       artifact: gc-dev-${{ steps.meta.outputs.short_sha }}
@@ -43,7 +43,7 @@ jobs:
         run: echo "short_sha=${GITHUB_SHA::7}" >> "$GITHUB_OUTPUT"
 
       - name: Upload dev jars
-        uses: actions/upload-artifact@v5
+        uses: actions/upload-artifact@v7
         with:
           name: gc-dev-${{ steps.meta.outputs.short_sha }}
           path: |
@@ -56,7 +56,7 @@ jobs:
 
   datagen:
     name: Datagen is up to date
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 30
     steps:
       - uses: actions/checkout@v5
@@ -85,7 +85,7 @@ jobs:
 
   translations:
     name: Translations
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 5
     steps:
       - uses: actions/checkout@v5
@@ -95,7 +95,7 @@ jobs:
   boot-test:
     name: Server boots (${{ matrix.loader }})
     needs: build
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 20
     strategy:
       fail-fast: false
@@ -110,13 +110,13 @@ jobs:
           java-version: ${{ env.JAVA_VERSION }}
 
       - name: Download the built jars
-        uses: actions/download-artifact@v5
+        uses: actions/download-artifact@v8
         with:
           name: ${{ needs.build.outputs.artifact }}
           path: jars
 
       - name: Cache the server files
-        uses: actions/cache@v4
+        uses: actions/cache@v5
         with:
           path: |
             boot-server/${{ matrix.loader }}/libraries
@@ -138,7 +138,7 @@ jobs:
 
       - name: Upload logs on failure
         if: failure()
-        uses: actions/upload-artifact@v5
+        uses: actions/upload-artifact@v7
         with:
           name: boot-test-logs-${{ matrix.loader }}
           path: |
@@ -153,7 +153,7 @@ jobs:
     name: Discord
     needs: [build, datagen, translations, boot-test]
     if: always() && github.event_name == 'push'
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 5
     steps:
       - name: Post the result

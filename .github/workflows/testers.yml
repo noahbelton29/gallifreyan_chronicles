@@ -34,7 +34,7 @@ permissions:
 jobs:
   check:
     name: Anything new?
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 5
     outputs:
       run: ${{ steps.check.outputs.run }}
@@ -74,7 +74,7 @@ jobs:
     name: Build tester jars
     needs: check
     if: needs.check.outputs.run == 'true'
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 90
     permissions:
       contents: write
@@ -131,7 +131,7 @@ jobs:
 
       - name: Upload the build ledger
         if: success() && inputs.watermark != 'off'
-        uses: actions/upload-artifact@v5
+        uses: actions/upload-artifact@v7
         with:
           name: build-ledger-${{ github.run_number }}
           path: build-ledger.csv
@@ -140,7 +140,7 @@ jobs:
 
       - name: Upload the jars
         if: success() && inputs.upload_artifacts
-        uses: actions/upload-artifact@v5
+        uses: actions/upload-artifact@v7
         with:
           name: tester-jars-${{ github.run_number }}
           path: build/tester-jars/

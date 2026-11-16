@@ -263,6 +263,7 @@ public class GCSpanishLanguageProvider extends LanguageProvider {
         add("command.gallifreyan_chronicles.set_mind", "Se ha establecido %s de la TARDIS %s en %s");
         add("command.gallifreyan_chronicles.set_subsystem_health", "Se ha establecido la salud del subsistema %s en la TARDIS %s en %s");
         add("command.gallifreyan_chronicles.summon_blocked", "Hay algo en el camino, muévete e inténtalo de nuevo");
+        add("command.gallifreyan_chronicles.summon_inside_tardis", "No se puede invocar una TARDIS dentro del interior de otra TARDIS");
         add("command.gallifreyan_chronicles.summon_tardis", "Se ha invocado la TARDIS %s en %s");
         add("command.gallifreyan_chronicles.trait_already", "Ya tiene el rasgo %s");
         add("command.gallifreyan_chronicles.trait_doesnt_fit", "El rasgo %s no encaja con una TARDIS %s");
@@ -393,6 +394,7 @@ public class GCSpanishLanguageProvider extends LanguageProvider {
         add("message.gallifreyan_chronicles.crash_landing", "¡Freno de mano puesto en el vórtice, la TARDIS se estrella!");
         add("message.gallifreyan_chronicles.deletion_mode_required", "%s: activa el modo de eliminación con %s para romper esta TARDIS.");
         add("message.gallifreyan_chronicles.doors_locked", "¡Las puertas están cerradas con llave!");
+        add("message.gallifreyan_chronicles.doors_key_in_lock", "¡Hay una llave puesta en la cerradura exterior!");
         add("message.gallifreyan_chronicles.control_names_on", "Nombres de controles: activados");
         add("message.gallifreyan_chronicles.control_names_off", "Nombres de controles: desactivados");
         add("key.gallifreyan_chronicles.show_control_names", "Mostrar nombres de controles");

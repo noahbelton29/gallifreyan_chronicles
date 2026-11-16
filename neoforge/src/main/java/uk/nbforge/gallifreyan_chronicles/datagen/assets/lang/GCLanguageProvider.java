@@ -240,6 +240,8 @@ public class GCLanguageProvider extends LanguageProvider {
                 "Summoned TARDIS %s to %s");
         add("command.gallifreyan_chronicles.summon_blocked",
                 "Something is in the way, move and try again");
+        add("command.gallifreyan_chronicles.summon_inside_tardis",
+                "A TARDIS cannot be summoned inside a TARDIS interior");
 
         /** Commands, exterior glow. */
         add("command.gallifreyan_chronicles.set_glow",
@@ -554,6 +556,7 @@ public class GCLanguageProvider extends LanguageProvider {
         add("message.gallifreyan_chronicles.close_doors_to_lock", "Close both doors before locking!");
         add("message.gallifreyan_chronicles.no_destination_to_set", "This console has no TARDIS destination to set!");
         add("message.gallifreyan_chronicles.doors_locked", "The doors are locked!");
+        add("message.gallifreyan_chronicles.doors_key_in_lock", "There is a key in the outside lock!");
         add("message.gallifreyan_chronicles.control_names_on", "Control names: on");
         add("message.gallifreyan_chronicles.control_names_off", "Control names: off");
         add("key.gallifreyan_chronicles.show_control_names", "Show Control Names");

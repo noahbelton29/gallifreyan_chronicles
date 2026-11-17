@@ -18,6 +18,7 @@ import net.minecraft.world.phys.Vec3;
 import uk.nbforge.gallifreyan_chronicles.core.GCSounds;
 import uk.nbforge.gallifreyan_chronicles.core.GCTardisControls;
 import uk.nbforge.gallifreyan_chronicles.core.block_entities.TardisExteriorBlockEntity;
+import uk.nbforge.gallifreyan_chronicles.core.lifecycle.ServerState;
 import uk.nbforge.gallifreyan_chronicles.network.tardis.TardisAlarmPayload;
 import uk.nbforge.gallifreyan_chronicles.tardis.Tardis;
 import uk.nbforge.gallifreyan_chronicles.tardis.TardisApi;
@@ -96,10 +97,10 @@ public final class TardisAlarm {
     private record Request(Mode mode, int flashes, boolean loud) {}
 
     // Ringing alarms
-    private static final Map<UUID, Alarm> ACTIVE = new HashMap<>();
+    private static final Map<UUID, Alarm> ACTIVE = ServerState.track(new HashMap<>());
 
     // Why the control is about to be switched on, read when it is
-    private static final Map<UUID, Request> PENDING = new HashMap<>();
+    private static final Map<UUID, Request> PENDING = ServerState.track(new HashMap<>());
 
     private TardisAlarm() {}
 

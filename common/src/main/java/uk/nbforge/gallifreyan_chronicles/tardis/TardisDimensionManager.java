@@ -20,13 +20,14 @@ import uk.nbforge.gallifreyan_chronicles.Constants;
 import uk.nbforge.gallifreyan_chronicles.compat.portal.TardisPortalBridge;
 import uk.nbforge.gallifreyan_chronicles.core.GCDimensions;
 import uk.nbforge.gallifreyan_chronicles.core.block_entities.TardisConsoleBlockEntity;
+import uk.nbforge.gallifreyan_chronicles.core.lifecycle.ServerState;
 import uk.nbforge.gallifreyan_chronicles.mixin.server.MinecraftServerAccessor;
 import uk.nbforge.gallifreyan_chronicles.tardis.ecs.system.TardisInteriorSystem;
 import uk.nbforge.gallifreyan_chronicles.util.GCUtil;
 
 public final class TardisDimensionManager {
-    private static final Map<UUID, UUID> PENDING = new LinkedHashMap<>();
-    private static final Map<UUID, Integer> PLACE_CONTROLS = new LinkedHashMap<>();
+    private static final Map<UUID, UUID> PENDING = ServerState.track(new LinkedHashMap<>());
+    private static final Map<UUID, Integer> PLACE_CONTROLS = ServerState.track(new LinkedHashMap<>());
     private static final int CONTROL_PLACE_DELAY_TICKS = 5;
 
     private TardisDimensionManager() {}

@@ -9,6 +9,7 @@ import net.minecraft.ChatFormatting;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerPlayer;
 import org.jspecify.annotations.Nullable;
+import uk.nbforge.gallifreyan_chronicles.core.lifecycle.ServerState;
 import uk.nbforge.gallifreyan_chronicles.tardis.Tardis;
 import uk.nbforge.gallifreyan_chronicles.tardis.TardisEvents;
 import uk.nbforge.gallifreyan_chronicles.tardis.mind.FearLevel;
@@ -45,7 +46,7 @@ public final class TardisMindSystem {
     private static final float COWED_STRESS = 4f;
     private static final float GENTLE_USE_TRUST = 1f;
     private static final long GENTLE_USE_COOLDOWN_TICKS = 1200L;
-    private static final Map<String, Long> LAST_GENTLE_USE = new HashMap<>();
+    private static final Map<String, Long> LAST_GENTLE_USE = ServerState.track(new HashMap<>());
 
     // Forcing it with fear works but it costs, kindness should always be the better way
     private static final float COWED_TRUST_LOSS = 4f;

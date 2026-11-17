@@ -11,11 +11,12 @@ import net.minecraft.world.phys.Vec3;
 import org.jspecify.annotations.Nullable;
 import uk.nbforge.gallifreyan_chronicles.client.compat.portal.TardisPortalClient;
 import uk.nbforge.gallifreyan_chronicles.config.GCConfig;
+import uk.nbforge.gallifreyan_chronicles.core.lifecycle.ServerState;
 
 public final class TardisPortalBridge {
     public static final String PORTAL_TAG = "gallifreyan_chronicles.tardis_portal";
     private static final String PORTAL_CLASS = "qouteall.imm_ptl.core.portal.Portal";
-    private static final Set<UUID> ACTIVE = ConcurrentHashMap.newKeySet();
+    private static final Set<UUID> ACTIVE = ServerState.track(ConcurrentHashMap.newKeySet());
     private static @Nullable Boolean available;
 
     private TardisPortalBridge() {}

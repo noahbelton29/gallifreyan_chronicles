@@ -13,6 +13,7 @@ import net.minecraft.world.entity.player.Player;
 import org.joml.Math;
 import uk.nbforge.gallifreyan_chronicles.core.block.ConsoleBlock;
 import uk.nbforge.gallifreyan_chronicles.core.block_entities.TardisConsoleBlockEntity;
+import uk.nbforge.gallifreyan_chronicles.core.lifecycle.ServerState;
 import uk.nbforge.gallifreyan_chronicles.util.MessageUtil;
 
 public final class IsomorphicPunishment {
@@ -29,7 +30,7 @@ public final class IsomorphicPunishment {
 
     private record Record(int strikes, long lastGameTime, int deaths) {}
 
-    private static final Map<UUID, Record> RECORDS = new HashMap<>();
+    private static final Map<UUID, Record> RECORDS = ServerState.track(new HashMap<>());
 
     private IsomorphicPunishment() {}
 

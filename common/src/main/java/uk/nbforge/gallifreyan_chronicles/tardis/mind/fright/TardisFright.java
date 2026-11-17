@@ -10,6 +10,7 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.util.Mth;
 import net.minecraft.world.phys.Vec3;
+import uk.nbforge.gallifreyan_chronicles.core.lifecycle.ServerState;
 import uk.nbforge.gallifreyan_chronicles.network.tardis.TardisFrightPayload;
 import uk.nbforge.gallifreyan_chronicles.platform.Services;
 import uk.nbforge.gallifreyan_chronicles.tardis.Tardis;
@@ -70,10 +71,10 @@ public final class TardisFright {
     private static final int MIN_EFFECT_TICKS = 80;
     private static final int MAX_EFFECT_TICKS = 300;
 
-    private static final Map<UUID, UUID> INSIDE = new HashMap<>();
+    private static final Map<UUID, UUID> INSIDE = ServerState.track(new HashMap<>());
 
     // When each player last triggered a reaction
-    private static final Map<String, Long> LAST = new HashMap<>();
+    private static final Map<String, Long> LAST = ServerState.track(new HashMap<>());
 
     private TardisFright() {}
 

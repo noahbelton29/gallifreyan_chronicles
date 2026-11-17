@@ -1,12 +1,6 @@
 package uk.nbforge.gallifreyan_chronicles.client.compat.portal;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.HashSet;
-import java.util.IdentityHashMap;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.core.BlockPos;
@@ -23,6 +17,7 @@ import qouteall.imm_ptl.core.render.context_management.PortalRendering;
 import qouteall.imm_ptl.core.render.renderer.RendererUsingStencil;
 import uk.nbforge.gallifreyan_chronicles.client.gui.hud.GCPowerDarkness;
 import uk.nbforge.gallifreyan_chronicles.client.gui.hud.PowerDarknessTint;
+import uk.nbforge.gallifreyan_chronicles.client.lifecycle.ClientState;
 import uk.nbforge.gallifreyan_chronicles.compat.portal.TardisPortalBridge;
 import uk.nbforge.gallifreyan_chronicles.config.GCConfig;
 import uk.nbforge.gallifreyan_chronicles.core.block.InteriorDoorBarrierBlock;
@@ -34,6 +29,8 @@ import uk.nbforge.gallifreyan_chronicles.util.TardisDimensionUtil;
 public final class TardisPortalClient {
     private static final double DOOR_FOOTPRINT_HORIZONTAL = 2.6;
     private static final double DOOR_FOOTPRINT_VERTICAL = 3.0;
+
+    private static final Map<ResourceKey<Level>, Set<Vec3>> DOOR_CENTRES = ClientState.track(new HashMap<>());
 
     private TardisPortalClient() {}
 
@@ -146,12 +143,6 @@ public final class TardisPortalClient {
         return false;
     }
 
-    // Doorway centres seen so far per TARDIS interior dimension
-    // Immersive Portals draws the outline of the remote hit while the client level is swapped to the destination
-    // dimension where the entry portal is not listed, and the portal can disappear once the door is replaced
-    // So the centres are remembered and not looked up from the current level
-    private static final java.util.Map<ResourceKey<Level>, Set<Vec3>> DOOR_CENTRES = new java.util.HashMap<>();
-
     private static void rememberDoorCentres(Level playerLevel) {
         for (Portal portal : tardisPortals((ClientLevel) playerLevel)) {
             Set<Vec3> centres = DOOR_CENTRES.computeIfAbsent(portal.getDestDim(), k -> new HashSet<>());
@@ -192,7 +183,9 @@ public final class TardisPortalClient {
         return false;
     }
 
-    /** True when the interior door behind the portal has a block flush against its back, unknown counts as not blocked because the door or level is not loaded. */
+    /**
+     * True when the interior door behind the portal has a block flush against its back, unknown counts as not blocked because the door or level is not loaded.
+     */
     public static boolean isDoorBackBlocked(Object object) {
         if (!(object instanceof Portal portal)) return false;
         Level dest = ClientWorldLoader.peekWorld(portal.getDestDim());
@@ -207,7 +200,9 @@ public final class TardisPortalClient {
         return false;
     }
 
-    /** The base block of the exterior TARDIS this portal sits in, null when it cannot be found. */
+    /**
+     * The base block of the exterior TARDIS this portal sits in, null when it cannot be found.
+     */
     public static @Nullable BlockPos exteriorBaseOf(Object object) {
         if (!(object instanceof Portal portal)) return null;
         Level level = portal.level();

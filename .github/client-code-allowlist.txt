@@ -39,5 +39,6 @@ neoforge/src/main/java/uk/nbforge/gallifreyan_chronicles/datagen/assets/GCEquipm
 neoforge/src/main/java/uk/nbforge/gallifreyan_chronicles/datagen/assets/GCModelProvider.java
 neoforge/src/main/java/uk/nbforge/gallifreyan_chronicles/event_subscriber/NeoForgeClientHud.java
 neoforge/src/main/java/uk/nbforge/gallifreyan_chronicles/event_subscriber/NeoForgeClientRenderers.java
+neoforge/src/main/java/uk/nbforge/gallifreyan_chronicles/event_subscriber/NeoForgeClientState.java
 neoforge/src/main/java/uk/nbforge/gallifreyan_chronicles/event_subscriber/NeoForgeKeyMappings.java
 neoforge/src/main/java/uk/nbforge/gallifreyan_chronicles/event_subscriber/NeoForgeOutlineHider.java

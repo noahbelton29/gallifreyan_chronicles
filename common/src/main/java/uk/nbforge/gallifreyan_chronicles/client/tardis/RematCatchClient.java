@@ -25,6 +25,7 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
 import org.joml.Vector3fc;
 import org.jspecify.annotations.Nullable;
+import uk.nbforge.gallifreyan_chronicles.client.lifecycle.ClientState;
 import uk.nbforge.gallifreyan_chronicles.client.util.FadeTintUtil;
 import uk.nbforge.gallifreyan_chronicles.core.block.InteriorDoorBlock;
 import uk.nbforge.gallifreyan_chronicles.network.tardis.RematCatchPayload;
@@ -61,14 +62,14 @@ public final class RematCatchClient {
     /** One block face drawn see through, with the light and tint taken before the block was hidden. */
     private record GhostQuad(float x, float y, float z, BakedQuad quad, int[] colors, int[] lights) {}
 
-    private static final Map<UUID, Fade> PLAYERS = new ConcurrentHashMap<>();
+    private static final Map<UUID, Fade> PLAYERS = ClientState.track(new ConcurrentHashMap<>());
 
     private static @Nullable Fade self;
     private static @Nullable RematCatchPayload pending;
     private static int pendingTicks;
     private static @Nullable ResourceKey<Level> selfDim;
-    private static final List<GhostQuad> QUADS = new ArrayList<>();
-    private static final Map<BlockPos, BlockState> HIDDEN = new ConcurrentHashMap<>();
+    private static final List<GhostQuad> QUADS = ClientState.track(new ArrayList<>());
+    private static final Map<BlockPos, BlockState> HIDDEN = ClientState.track(new ConcurrentHashMap<>());
     private static final QuadInstance DRAW = new QuadInstance();
     private static final float SWEEP = 0.35f;
     private static final float MIN_ALPHA = 0.02f;

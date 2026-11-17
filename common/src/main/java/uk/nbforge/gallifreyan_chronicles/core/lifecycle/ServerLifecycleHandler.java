@@ -35,5 +35,6 @@ public final class ServerLifecycleHandler {
         IsomorphicPunishment.reset();
         ConsoleSyncSystem.clear();
         GCJsonReloadListener.setCurrentServer(null);
+        ServerState.clearAll();
     }
 }

@@ -4,10 +4,11 @@ import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
+import uk.nbforge.gallifreyan_chronicles.core.lifecycle.ServerState;
 
 public final class TardisDeletionMode {
-    private static final Set<UUID> ENABLED = ConcurrentHashMap.newKeySet();
-    private static final Map<UUID, Long> LAST_WARNING = new ConcurrentHashMap<>();
+    private static final Set<UUID> ENABLED = ServerState.track(ConcurrentHashMap.newKeySet());
+    private static final Map<UUID, Long> LAST_WARNING = ServerState.track(new ConcurrentHashMap<>());
     private static final long WARNING_COOLDOWN_TICKS = 200L;
 
     private TardisDeletionMode() {}

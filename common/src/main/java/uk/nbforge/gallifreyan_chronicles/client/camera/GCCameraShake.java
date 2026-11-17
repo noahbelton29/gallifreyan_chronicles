@@ -7,6 +7,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.world.phys.Vec3;
 import org.jspecify.annotations.Nullable;
+import uk.nbforge.gallifreyan_chronicles.client.lifecycle.ClientState;
 import uk.nbforge.gallifreyan_chronicles.config.GCConfig;
 
 public final class GCCameraShake {
@@ -87,7 +88,7 @@ public final class GCCameraShake {
         }
     }
 
-    private static final List<RumbleSource> RUMBLE_SOURCES = new ArrayList<>();
+    private static final List<RumbleSource> RUMBLE_SOURCES = ClientState.track(new ArrayList<>());
     private static long lastFrameNanos = 0L;
 
     public record Sample(float pitch, float yaw, float roll) {}

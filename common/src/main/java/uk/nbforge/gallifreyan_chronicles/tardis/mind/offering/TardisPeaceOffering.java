@@ -9,6 +9,7 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.entity.player.Player;
+import uk.nbforge.gallifreyan_chronicles.core.lifecycle.ServerState;
 import uk.nbforge.gallifreyan_chronicles.tardis.Tardis;
 import uk.nbforge.gallifreyan_chronicles.tardis.ecs.system.TardisMindSystem;
 import uk.nbforge.gallifreyan_chronicles.tardis.mind.FearLevel;
@@ -49,7 +50,7 @@ public final class TardisPeaceOffering {
     private static final long STREAK_WINDOW_TICKS = 24000L;
 
     // The last gift from each player to each TARDIS
-    private static final Map<String, Offering> OFFERINGS = new HashMap<>();
+    private static final Map<String, Offering> OFFERINGS = ServerState.track(new HashMap<>());
 
     /** When it was given and how many in a row. */
     private static final class Offering {

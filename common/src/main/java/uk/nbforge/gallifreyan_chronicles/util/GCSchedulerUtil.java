@@ -4,11 +4,12 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import net.minecraft.server.MinecraftServer;
+import uk.nbforge.gallifreyan_chronicles.core.lifecycle.ServerState;
 
 public final class GCSchedulerUtil {
     private record Task(MinecraftServer server, int[] ticksLeft, Runnable action) {}
 
-    private static final List<Task> TASKS = new ArrayList<>();
+    private static final List<Task> TASKS = ServerState.track(new ArrayList<>());
 
     private GCSchedulerUtil() {}
 

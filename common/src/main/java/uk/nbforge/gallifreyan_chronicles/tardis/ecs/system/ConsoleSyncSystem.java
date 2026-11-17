@@ -5,11 +5,12 @@ import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
 import org.jspecify.annotations.Nullable;
 import uk.nbforge.gallifreyan_chronicles.core.block_entities.TardisConsoleBlockEntity;
+import uk.nbforge.gallifreyan_chronicles.core.lifecycle.ServerState;
 import uk.nbforge.gallifreyan_chronicles.tardis.TardisApi;
 import uk.nbforge.gallifreyan_chronicles.tardis.TardisManager;
 
 public final class ConsoleSyncSystem {
-    private static final Map<UUID, Set<TardisConsoleBlockEntity>> CONSOLES = new HashMap<>();
+    private static final Map<UUID, Set<TardisConsoleBlockEntity>> CONSOLES = ServerState.track(new HashMap<>());
 
     private ConsoleSyncSystem() {}
 

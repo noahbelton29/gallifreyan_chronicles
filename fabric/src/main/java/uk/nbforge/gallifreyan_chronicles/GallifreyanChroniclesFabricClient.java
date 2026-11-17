@@ -2,6 +2,7 @@ package uk.nbforge.gallifreyan_chronicles;
 
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.keymapping.v1.KeyMappingHelper;
+import net.fabricmc.fabric.api.client.networking.v1.ClientPlayConnectionEvents;
 import net.fabricmc.fabric.api.client.rendering.v1.hud.HudElementRegistry;
 import net.fabricmc.fabric.api.client.rendering.v1.hud.VanillaHudElements;
 import net.fabricmc.fabric.api.client.rendering.v1.level.LevelRenderEvents;
@@ -12,6 +13,7 @@ import net.minecraft.client.renderer.blockentity.BlockEntityRenderers;
 import net.minecraft.client.renderer.entity.EntityRenderers;
 import uk.nbforge.gallifreyan_chronicles.client.gui.hud.GCHudRenderer;
 import uk.nbforge.gallifreyan_chronicles.client.input.GCKeyMappings;
+import uk.nbforge.gallifreyan_chronicles.client.lifecycle.ClientState;
 import uk.nbforge.gallifreyan_chronicles.client.protection.watermark.WatermarkIdentity;
 import uk.nbforge.gallifreyan_chronicles.client.protection.watermark.WatermarkOverlay;
 import uk.nbforge.gallifreyan_chronicles.client.renderer.block.InteriorDoorBlockRenderer;
@@ -31,12 +33,8 @@ import uk.nbforge.gallifreyan_chronicles.util.GCUtil;
 public class GallifreyanChroniclesFabricClient implements ClientModInitializer {
     @Override
     public void onInitializeClient() {
+        ClientPlayConnectionEvents.DISCONNECT.register((handler, client) -> client.execute(ClientState::clearAll));
         WatermarkIdentity.enabled();
-        //        BlockColorRegistry.register(
-        //                List.of(BlockTintSources.constant(0xFF590a0a, 0xFF590a0a)),
-        //                GCBlocks.SHORT_GALLIFREYAN_GRASS,
-        //                GCBlocks.TALL_GALLIFREYAN_GRASS
-        //        );
 
         BlockTransformerHelper.registerStripping(GCBlocks.CADONWOOD_LOG, GCBlocks.STRIPPED_CADONWOOD_LOG);
         BlockEntityRenderers.register(
@@ -71,50 +69,5 @@ public class GallifreyanChroniclesFabricClient implements ClientModInitializer {
 
         HudElementRegistry.addLast(
                 GCUtil.modIdentifier("watermark_overlay"), (graphics, _) -> WatermarkOverlay.render(graphics));
-
-        //        ImGuiMCEvents.INSTANCE.imGuiLoadPre(() -> {
-        //            ImGui.getIO().addConfigFlags(
-        //                    ImGuiConfigFlags.NavEnableKeyboard |
-        //                            ImGuiConfigFlags.NavEnableGamepad |
-        //                            ImGuiConfigFlags.NavEnableSetMousePos |
-        //                            ImGuiConfigFlags.DockingEnable |
-        //                            ImGuiConfigFlags.ViewportsEnable);
-        //        });
-        //        ImGuiMCEvents.INSTANCE.preRenderImGuiEvent(() -> {
-        //            TardisExteriorDebugInfo.Info info = TardisExteriorDebugInfo.getLookedAt();
-        //            Minecraft mc = Minecraft.getInstance();
-        //            if (mc.player == null || mc.level == null) return;
-        //
-        //            HitResult hit = mc.player.pick(20.0, 0.0f, false);
-        //            if (hit.getType() != HitResult.Type.BLOCK) return;
-        //
-        //            BlockHitResult blockHit = (BlockHitResult) hit;
-        //            if (!(mc.level.getBlockEntity(blockHit.getBlockPos()) instanceof TardisExteriorBlockEntity
-        // tardisBE)) return;
-        //            if (info != null) {
-        //                ImGui.setNextWindowBgAlpha(0.6f);
-        //                if (ImGui.begin("TARDIS Info",
-        //                                ImGuiWindowFlags.NoFocusOnAppearing)) {
-        //                    ImGui.text("TARDIS ID: " + (tardisBE.getTardisId() != null ? tardisBE.getTardisId() :
-        // "unlinked"));
-        //                    ImGui.text("Current Exterior: " + tardisBE.getExterior().id());
-        //
-        //                    ImGui.text("Change Exterior:");
-        //                    ArrayList<TardisExterior> exteriors = new ArrayList<>(TardisExteriorRegistry.getAll());
-        //                    String[] exteriorNames =
-        // exteriors.stream().map(TardisExterior::id).toArray(String[]::new);
-        //                    ImInt currentExteriorIndex = new ImInt(Math.max(0,
-        // exteriors.indexOf(tardisBE.getExterior())));
-        //
-        //                    if (ImGui.combo("##exterior", currentExteriorIndex, exteriorNames)) {
-        //                        TardisExterior selected = exteriors.get(currentExteriorIndex.get());
-        //                        tardisBE.setExterior(selected);
-        //                    }
-        //
-        //                    ImGui.separator();
-        //                }
-        //                ImGui.end();
-        //            }
-        //        });
     }
 }

@@ -4,12 +4,13 @@ import java.util.HashMap;
 import java.util.Map;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.level.Level;
+import uk.nbforge.gallifreyan_chronicles.client.lifecycle.ClientState;
 import uk.nbforge.gallifreyan_chronicles.network.tardis.TardisAlarmPayload;
 import uk.nbforge.gallifreyan_chronicles.tardis.mind.mood.TardisAlarm;
 
 public final class GCDangerAlarm {
     private static final long FLASH_NANOS = TardisAlarm.FLASH_TICKS * 50_000_000L;
-    private static final Map<ResourceKey<Level>, State> ALARMS = new HashMap<>();
+    private static final Map<ResourceKey<Level>, State> ALARMS = ClientState.track(new HashMap<>());
     private static final long FOREVER_TIMEOUT_NANOS = FLASH_NANOS * 3;
 
     private static final class State {

@@ -13,6 +13,7 @@ import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
+import uk.nbforge.gallifreyan_chronicles.core.lifecycle.ServerState;
 import uk.nbforge.gallifreyan_chronicles.network.tardis.TardisAlarmPayload;
 import uk.nbforge.gallifreyan_chronicles.network.tardis.TardisDrumShakePayload;
 import uk.nbforge.gallifreyan_chronicles.tardis.Tardis;
@@ -43,7 +44,7 @@ public final class TardisMallet {
     private static final int LONG_ALARM_FLASHES = 3;
     // Hits within this long of each other count as one beating
     private static final long BEATING_GAP_TICKS = 6000L;
-    private static final Map<String, Beating> BEATINGS = new HashMap<>();
+    private static final Map<String, Beating> BEATINGS = ServerState.track(new HashMap<>());
 
     /** trustBefore is how much it trusted them when the beating started. */
     private record Beating(int count, long lastTick, float trustBefore) {}

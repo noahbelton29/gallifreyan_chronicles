@@ -17,6 +17,7 @@ import net.minecraft.world.phys.Vec3;
 import uk.nbforge.gallifreyan_chronicles.core.GCGameRules;
 import uk.nbforge.gallifreyan_chronicles.core.GCSounds;
 import uk.nbforge.gallifreyan_chronicles.core.block_entities.TardisExteriorBlockEntity;
+import uk.nbforge.gallifreyan_chronicles.core.lifecycle.ServerState;
 import uk.nbforge.gallifreyan_chronicles.network.tardis.TardisCrashRumblePayload;
 import uk.nbforge.gallifreyan_chronicles.network.tardis.TardisDrumShakePayload;
 import uk.nbforge.gallifreyan_chronicles.tardis.Tardis;
@@ -38,7 +39,7 @@ public final class TardisCrash {
     private static final int FIRE_TRIES_PER_BUMP = 16;
     private static final float IMPACT_SHAKE = 5.0F;
 
-    private static final Set<UUID> CRASHING = new HashSet<>();
+    private static final Set<UUID> CRASHING = ServerState.track(new HashSet<>());
 
     private TardisCrash() {}
 

@@ -25,6 +25,7 @@ import uk.nbforge.gallifreyan_chronicles.core.block_entities.TardisExteriorBlock
 import uk.nbforge.gallifreyan_chronicles.core.dynamic_registries.TardisInteriorRegistry;
 import uk.nbforge.gallifreyan_chronicles.core.item.MasterTardisKeyItem;
 import uk.nbforge.gallifreyan_chronicles.core.item.TardisKeyItem;
+import uk.nbforge.gallifreyan_chronicles.core.lifecycle.ServerState;
 import uk.nbforge.gallifreyan_chronicles.tardis.TardisManager;
 import uk.nbforge.gallifreyan_chronicles.util.GCUtil;
 
@@ -34,7 +35,7 @@ public final class TardisKeyLocator {
     private static final ResourceKey<WaypointStyleAsset> FIRST_DOCTORS_STYLE = style("tardis");
     private static final ResourceKey<WaypointStyleAsset> SECOND_DOCTORS_STYLE = style("second_doctors_tardis");
     private static final ResourceKey<WaypointStyleAsset> TUAT_STYLE = style("tuat_tardis");
-    private static final Map<ServerPlayer, Map<UUID, Tracked>> TRACKED = new WeakHashMap<>();
+    private static final Map<ServerPlayer, Map<UUID, Tracked>> TRACKED = ServerState.track(new WeakHashMap<>());
 
     private record Tracked(
             UUID tardisId, BlockPos pos, ResourceKey<Level> dimension, ResourceKey<WaypointStyleAsset> style) {}

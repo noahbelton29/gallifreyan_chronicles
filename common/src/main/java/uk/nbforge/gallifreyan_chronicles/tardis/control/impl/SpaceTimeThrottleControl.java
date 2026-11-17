@@ -27,6 +27,7 @@ import uk.nbforge.gallifreyan_chronicles.core.GCTardisControls;
 import uk.nbforge.gallifreyan_chronicles.core.block_entities.TardisConsoleBlockEntity;
 import uk.nbforge.gallifreyan_chronicles.core.block_entities.TardisExteriorBlockEntity;
 import uk.nbforge.gallifreyan_chronicles.core.entity.TardisControlEntity;
+import uk.nbforge.gallifreyan_chronicles.core.lifecycle.ServerState;
 import uk.nbforge.gallifreyan_chronicles.core.sound.timed.TimedSounds;
 import uk.nbforge.gallifreyan_chronicles.network.tardis.TardisDrumShakePayload;
 import uk.nbforge.gallifreyan_chronicles.tardis.Tardis;
@@ -61,7 +62,7 @@ public class SpaceTimeThrottleControl extends BaseControl {
     private static final int TAKEOFF_SOUND_DELAY_TICKS = 0;
     private static final int TAKEOFF_SOUND_LENGTH_TICKS = FlightTimings.TAKEOFF_TICKS;
 
-    private static final Map<UUID, Integer> QUEUED_TAKEOFFS = new HashMap<>();
+    private static final Map<UUID, Integer> QUEUED_TAKEOFFS = ServerState.track(new HashMap<>());
     private static int queueGeneration = 0;
     private static final int QUEUED_TAKEOFF_POLL_TICKS = 2;
     private static final int LAND_FADE_DELAY_TICKS = 130;

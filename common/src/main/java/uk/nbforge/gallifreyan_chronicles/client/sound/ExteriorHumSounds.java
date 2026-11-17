@@ -6,27 +6,30 @@ import java.util.WeakHashMap;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.sounds.SoundManager;
 import net.minecraft.world.phys.Vec3;
+import uk.nbforge.gallifreyan_chronicles.client.lifecycle.ClientState;
 import uk.nbforge.gallifreyan_chronicles.core.GCSounds;
 import uk.nbforge.gallifreyan_chronicles.core.block_entities.TardisExteriorBlockEntity;
 
-/** Starts and stops the outside hum for each TARDIS exterior near the player. */
+/**
+ * Starts and stops the outside hum for each TARDIS exterior near the player.
+ */
 public final class ExteriorHumSounds {
-    // Checked every tick (was throttled to every 10 ticks): the interior hum stopping on
-    // one poll and the exterior hum starting on the next, independent, poll left a gap of
-    // up to half a second of true silence when walking out through the door, which stood
-    // out once the exterior hum stopped masking it with its own fade-in
     private static final int CHECK_INTERVAL_TICKS = 1;
     private static final double START_RANGE_SQR =
             (ExteriorHumSoundInstance.OPEN_RANGE + 2) * (ExteriorHumSoundInstance.OPEN_RANGE + 2);
 
-    private static final Map<TardisExteriorBlockEntity, ExteriorHumSoundInstance> HUMS = new WeakHashMap<>();
+    private static final Map<TardisExteriorBlockEntity, ExteriorHumSoundInstance> HUMS =
+            ClientState.track(new WeakHashMap<>());
+
     // The last power state seen for each exterior, to play the power sound when it flips
-    private static final Map<TardisExteriorBlockEntity, Boolean> LAST_POWER = new WeakHashMap<>();
+    private static final Map<TardisExteriorBlockEntity, Boolean> LAST_POWER = ClientState.track(new WeakHashMap<>());
     private static int ticks;
 
     private ExteriorHumSounds() {}
 
-    /** Every tick, did the power flip on an exterior near us, then play the power sound there. */
+    /**
+     * Every tick, did the power flip on an exterior near us, then play the power sound there.
+     */
     private static void checkPowerChanges(Minecraft minecraft) {
         double maxRangeSqr = ExteriorHumSoundInstance.OPEN_RANGE * ExteriorHumSoundInstance.OPEN_RANGE;
         for (TardisExteriorBlockEntity exterior : HUMS.keySet()) {
@@ -52,7 +55,9 @@ public final class ExteriorHumSounds {
         HUMS.putIfAbsent(exterior, null);
     }
 
-    /** Every few ticks, start the hum of exteriors that are powered and near you and fade out the ones that are gone or in another world. */
+    /**
+     * Every few ticks, start the hum of exteriors that are powered and near you and fade out the ones that are gone or in another world.
+     */
     public static void tick() {
         Minecraft minecraft = Minecraft.getInstance();
         if (minecraft.level == null || minecraft.player == null) return;

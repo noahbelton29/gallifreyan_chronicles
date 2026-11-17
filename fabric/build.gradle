@@ -46,15 +46,29 @@ repositories {
 }
 
 
+def essentialDevDir = layout.buildDirectory.dir('essential-dev')
+def essentialDevSetup = tasks.register('essentialDevSetup') {
+    def outDir = essentialDevDir
+    def remapClasspath = configurations.compileClasspath
+    inputs.files(remapClasspath)
+    outputs.dir(outDir)
+    doLast {
+        def dir = outDir.get().asFile
+        new File(dir, 'mappings').mkdirs()
+        new File(dir, 'mappings/mappings.tiny').text = "tiny\t2\t0\tofficial\tintermediary\tnamed\n"
+        new File(dir, 'remapClasspath.txt').text = remapClasspath.files.collect { it.absolutePath }.join(File.pathSeparator)
+    }
+}
+
 dependencies {
     compileOnly("maven.modrinth:simple-voice-chat:${voicechat_version}")
     runtimeOnly("maven.modrinth:simple-voice-chat:${voicechat_version}")
     minecraft("com.mojang:minecraft:${minecraft_version}")
     implementation("net.fabricmc:fabric-loader:${fabric_loader_version}")
     implementation("net.fabricmc.fabric-api:fabric-api:${fabric_version}")
+    implementation("com.geckolib:geckolib-fabric-${providers.gradleProperty("minecraft_version").get()}:${providers.gradleProperty("geckolib_version").get()}")
     compileOnly("maven.modrinth:modmenu:${modmenu_version}")
     runtimeOnly("maven.modrinth:modmenu:${modmenu_version}")
-//    implementation(include("foundry.imguimc:imguimc-fabric-${providers.gradleProperty("minecraft_version").get()}:${providers.gradleProperty("imguimc_version").get()}"))
 
     compileOnly("maven.modrinth:sodium:${providers.gradleProperty("sodium_version").get()}")
     runtimeOnly("maven.modrinth:sodium:${providers.gradleProperty("sodium_version").get()}")
@@ -69,6 +83,15 @@ dependencies {
     runtimeOnly("maven.modrinth:flashback:${flashback_version}")
     runtimeOnly("maven.modrinth:entityculling:${entityculling_fabric_version}")
     runtimeOnly("maven.modrinth:lithium:${lithium_version}")
+    compileOnly("maven.modrinth:jade:${jade_fabric_version}")
+    runtimeOnly("maven.modrinth:jade:${jade_fabric_version}")
+    compileOnly("maven.modrinth:essential:${essential_version}")
+//    runtimeOnly("maven.modrinth:essential:${essential_version}")
+    runtimeOnly(files(essentialDevDir).builtBy(essentialDevSetup))
+    compileOnly("maven.modrinth:sound-physics-remastered:fabric-${sound_physics_version}")
+    runtimeOnly("maven.modrinth:sound-physics-remastered:fabric-${sound_physics_version}")
+    compileOnly("curse.maven:immersive-portal-1511174:${immersive_portals_fabric_file}")
+    runtimeOnly("curse.maven:immersive-portal-1511174:${immersive_portals_fabric_file}")
 }
 
 loom {
@@ -104,35 +127,6 @@ loom {
     }
 }
 
-def essentialDevDir = layout.buildDirectory.dir('essential-dev')
-def essentialDevSetup = tasks.register('essentialDevSetup') {
-    def outDir = essentialDevDir
-    def remapClasspath = configurations.compileClasspath
-    inputs.files(remapClasspath)
-    outputs.dir(outDir)
-    doLast {
-        def dir = outDir.get().asFile
-        new File(dir, 'mappings').mkdirs()
-        new File(dir, 'mappings/mappings.tiny').text = "tiny\t2\t0\tofficial\tintermediary\tnamed\n"
-        new File(dir, 'remapClasspath.txt').text = remapClasspath.files.collect { it.absolutePath }.join(File.pathSeparator)
-    }
-}
-
-dependencies {
-    implementation("com.geckolib:geckolib-fabric-${providers.gradleProperty("minecraft_version").get()}:${providers.gradleProperty("geckolib_version").get()}")
-    compileOnly("maven.modrinth:jade:${jade_fabric_version}")
-    runtimeOnly("maven.modrinth:jade:${jade_fabric_version}")
-    compileOnly("maven.modrinth:essential:${essential_version}")
-//    runtimeOnly("maven.modrinth:essential:${essential_version}")
-    runtimeOnly(files(essentialDevDir).builtBy(essentialDevSetup))
-    compileOnly("maven.modrinth:sound-physics-remastered:fabric-${sound_physics_version}")
-    runtimeOnly("maven.modrinth:sound-physics-remastered:fabric-${sound_physics_version}")
-    compileOnly("curse.maven:immersive-portal-1511174:${immersive_portals_fabric_file}")
-    runtimeOnly("curse.maven:immersive-portal-1511174:${immersive_portals_fabric_file}")
-//    implementation("foundry.imguimc:imguimc-fabric-${project.minecraft_version}:${project.imguimc_version}")
-//    runtimeOnly("foundry.imguimc:imguimc-fabric-${project.minecraft_version}:${project.imguimc_version}")
-}
-
 // Implement mcgradleconventions loader attribute
 def loaderAttribute = Attribute.of('io.github.mcgradleconventions.loader', String)
 ['apiElements', 'runtimeElements', 'sourcesElements', 'javadocElements', 'includeInternal', 'modCompileClasspath'].each { variant ->
@@ -155,14 +149,14 @@ sourceSets.configureEach {
 def gcBuildIdDir = layout.buildDirectory.dir('generated/gc-build-id')
 def gcTesterLabel = providers.gradleProperty('testerLabel').orElse('-')
 def gcWatermarkOff = providers.gradleProperty('watermark')
-        .map { it.equalsIgnoreCase('off') || it.equalsIgnoreCase('false') }
-        .orElse(false)
+    .map { it.equalsIgnoreCase('off') || it.equalsIgnoreCase('false') }
+    .orElse(false)
 def gcLedgerFile = rootProject.layout.projectDirectory.file('build-ledger.csv')
 def gcLockUuids = providers.gradleProperty('lockUuid').orElse(providers.environmentVariable('GC_LOCK_UUID')).orElse('')
 def gcDevBypass = providers.gradleProperty('devBypass').orElse(providers.environmentVariable('GC_DEV_BYPASS')).map { it.equalsIgnoreCase('true') }.orElse(false)
 def gcLockOff = providers.gradleProperty('lock')
-        .map { it.equalsIgnoreCase('off') || it.equalsIgnoreCase('false') }
-        .orElse(false)
+    .map { it.equalsIgnoreCase('off') || it.equalsIgnoreCase('false') }
+    .orElse(false)
 def gcUnassignedLock = '00000000-0000-0000-0000-000000000000'
 def gcExpiresIn = providers.gradleProperty('expiresIn').orElse('')
 def gcLedgerHeader = 'timestamp,build_id,tester,jar,locked_to,expires_at'

@@ -1,4 +1,4 @@
-package uk.nbforge.gallifreyan_chronicles.compat.replay;
+package uk.nbforge.gallifreyan_chronicles.client.compat.replay;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.server.MinecraftServer;

@@ -5,7 +5,7 @@ import org.spongepowered.asm.mixin.Pseudo;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
-import uk.nbforge.gallifreyan_chronicles.compat.replay.PortalReplay;
+import uk.nbforge.gallifreyan_chronicles.client.compat.replay.PortalReplay;
 
 /**
  * Voxy learns far terrain from every chunk the game loads.

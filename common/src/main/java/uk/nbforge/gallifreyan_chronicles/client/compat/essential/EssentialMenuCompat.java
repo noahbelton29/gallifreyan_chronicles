@@ -1,4 +1,4 @@
-package uk.nbforge.gallifreyan_chronicles.compat.essential;
+package uk.nbforge.gallifreyan_chronicles.client.compat.essential;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;

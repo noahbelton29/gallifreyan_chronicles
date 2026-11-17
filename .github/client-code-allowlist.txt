@@ -1,0 +1,43 @@
+# Bridges that hand off to client code only when called from the client
+common/src/main/java/uk/nbforge/gallifreyan_chronicles/compat/jade/GCJadePlugin.java  # registerClient only runs on the client
+common/src/main/java/uk/nbforge/gallifreyan_chronicles/compat/portal/TardisPortalBridge.java  # client methods are only called by client renderers and mixins
+common/src/main/java/uk/nbforge/gallifreyan_chronicles/core/block/InteriorDoorBlock.java  # guarded by level.isClientSide()
+
+# Block entities: client hooks are only called from client-side methods
+common/src/main/java/uk/nbforge/gallifreyan_chronicles/core/block_entities/TardisConsoleBlockEntity.java
+common/src/main/java/uk/nbforge/gallifreyan_chronicles/core/block_entities/TardisExteriorBlockEntity.java
+
+# Network payloads: the client part only runs when a client receives the packet
+common/src/main/java/uk/nbforge/gallifreyan_chronicles/network/DiscoveryToastPayload.java
+common/src/main/java/uk/nbforge/gallifreyan_chronicles/network/GCSyncPayload.java
+common/src/main/java/uk/nbforge/gallifreyan_chronicles/network/ResumeSoundPayload.java
+common/src/main/java/uk/nbforge/gallifreyan_chronicles/network/tardis/RematCatchPayload.java
+common/src/main/java/uk/nbforge/gallifreyan_chronicles/network/tardis/TardisAlarmPayload.java
+common/src/main/java/uk/nbforge/gallifreyan_chronicles/network/tardis/TardisConsoleAnimationPayload.java
+common/src/main/java/uk/nbforge/gallifreyan_chronicles/network/tardis/TardisConsoleRotorStatePayload.java
+common/src/main/java/uk/nbforge/gallifreyan_chronicles/network/tardis/TardisCrashRumblePayload.java
+common/src/main/java/uk/nbforge/gallifreyan_chronicles/network/tardis/TardisDrumShakePayload.java
+common/src/main/java/uk/nbforge/gallifreyan_chronicles/network/tardis/TardisFrightPayload.java
+
+# Fabric: the client entrypoint, and compat for client-only mods
+fabric/src/main/java/uk/nbforge/gallifreyan_chronicles/GallifreyanChroniclesFabricClient.java
+fabric/src/main/java/uk/nbforge/gallifreyan_chronicles/compat/flashback/FlashbackChunks.java
+fabric/src/main/java/uk/nbforge/gallifreyan_chronicles/compat/flashback/FlashbackChunksImpl.java
+fabric/src/main/java/uk/nbforge/gallifreyan_chronicles/compat/flashback/FlashbackOptionsButton.java
+fabric/src/main/java/uk/nbforge/gallifreyan_chronicles/compat/flashback/FlashbackPortalSnapshot.java
+fabric/src/main/java/uk/nbforge/gallifreyan_chronicles/compat/flashback/FlashbackProbe.java
+fabric/src/main/java/uk/nbforge/gallifreyan_chronicles/compat/flashback/FlashbackPuppet.java
+fabric/src/main/java/uk/nbforge/gallifreyan_chronicles/compat/flashback/FlashbackSnapshotRoot.java
+fabric/src/main/java/uk/nbforge/gallifreyan_chronicles/compat/flashback/ReplayKeyframePortal.java
+fabric/src/main/java/uk/nbforge/gallifreyan_chronicles/compat/flashback/ReplayVirtualDimension.java
+fabric/src/main/java/uk/nbforge/gallifreyan_chronicles/compat/modmenu/GCModMenuIntegration.java
+fabric/src/main/java/uk/nbforge/gallifreyan_chronicles/compat/replaymod/ReplayModOptionsButton.java
+fabric/src/main/java/uk/nbforge/gallifreyan_chronicles/compat/replaymod/ReplayModSoundGate.java
+
+# NeoForge: datagen and Dist.CLIENT event subscribers
+neoforge/src/main/java/uk/nbforge/gallifreyan_chronicles/datagen/assets/GCEquipmentAssetProvider.java
+neoforge/src/main/java/uk/nbforge/gallifreyan_chronicles/datagen/assets/GCModelProvider.java
+neoforge/src/main/java/uk/nbforge/gallifreyan_chronicles/event_subscriber/NeoForgeClientHud.java
+neoforge/src/main/java/uk/nbforge/gallifreyan_chronicles/event_subscriber/NeoForgeClientRenderers.java
+neoforge/src/main/java/uk/nbforge/gallifreyan_chronicles/event_subscriber/NeoForgeKeyMappings.java
+neoforge/src/main/java/uk/nbforge/gallifreyan_chronicles/event_subscriber/NeoForgeOutlineHider.java

@@ -1,4 +1,4 @@
-package uk.nbforge.gallifreyan_chronicles.compat.soundphysics;
+package uk.nbforge.gallifreyan_chronicles.client.compat.soundphysics;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientLevel;

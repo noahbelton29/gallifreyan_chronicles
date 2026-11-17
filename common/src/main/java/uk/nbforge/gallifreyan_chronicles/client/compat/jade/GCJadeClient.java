@@ -1,4 +1,4 @@
-package uk.nbforge.gallifreyan_chronicles.compat.jade;
+package uk.nbforge.gallifreyan_chronicles.client.compat.jade;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.core.BlockPos;
@@ -13,18 +13,24 @@ import snownee.jade.api.Accessor;
 import snownee.jade.api.BlockAccessor;
 import snownee.jade.api.EntityAccessor;
 import snownee.jade.api.IWailaClientRegistration;
+import uk.nbforge.gallifreyan_chronicles.compat.jade.ControlIconProvider;
+import uk.nbforge.gallifreyan_chronicles.compat.jade.TardisBlockIconProvider;
+import uk.nbforge.gallifreyan_chronicles.compat.jade.TardisConsoleInfoProvider;
+import uk.nbforge.gallifreyan_chronicles.compat.jade.TardisExteriorInfoProvider;
+import uk.nbforge.gallifreyan_chronicles.compat.jade.TardisInteriorDoorInfoProvider;
+import uk.nbforge.gallifreyan_chronicles.compat.jade.TardisOwnerProvider;
 import uk.nbforge.gallifreyan_chronicles.core.GCBlocks;
 import uk.nbforge.gallifreyan_chronicles.core.block.ConsoleBlock;
 import uk.nbforge.gallifreyan_chronicles.core.block.InteriorDoorBlock;
 import uk.nbforge.gallifreyan_chronicles.core.block.TardisBlock;
 import uk.nbforge.gallifreyan_chronicles.core.entity.TardisControlEntity;
 
-final class GCJadeClient {
+public final class GCJadeClient {
     private static final String PORTAL_PACKAGE = "qouteall.imm_ptl.";
 
     private GCJadeClient() {}
 
-    static void register(IWailaClientRegistration registration) {
+    public static void register(IWailaClientRegistration registration) {
         registration.addRayTraceCallback((hitResult, accessor, originalAccessor) -> {
             // Looking at a portal, show the info of the TARDIS exterior or interior door it belongs to
             if (accessor instanceof EntityAccessor entityAccessor && isPortal(entityAccessor.getEntity())) {

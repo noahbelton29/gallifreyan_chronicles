@@ -32,6 +32,7 @@ import uk.nbforge.gallifreyan_chronicles.core.GCBlocks;
 import uk.nbforge.gallifreyan_chronicles.core.block.InteriorDoorBlock;
 import uk.nbforge.gallifreyan_chronicles.core.block_entities.InteriorDoorBlockEntity;
 import uk.nbforge.gallifreyan_chronicles.core.block_entities.TardisExteriorBlockEntity;
+import uk.nbforge.gallifreyan_chronicles.core.lifecycle.ServerState;
 import uk.nbforge.gallifreyan_chronicles.tardis.Tardis;
 import uk.nbforge.gallifreyan_chronicles.tardis.TardisApi;
 import uk.nbforge.gallifreyan_chronicles.tardis.TardisExterior;
@@ -64,12 +65,12 @@ public final class TardisPortals {
     private static final int MISSING_GRACE_TICKS = 100;
     private static final double EXTERIOR_PLAYER_RANGE = 64.0;
 
-    private static final Map<UUID, Link> LINKS = new HashMap<>();
-    private static final Map<UUID, DoorLocation> DOORS = new HashMap<>();
-    private static final Map<UUID, Long> LAST_TICKET = new HashMap<>();
-    private static final Map<UUID, Long> NEXT_SCAN = new HashMap<>();
+    private static final Map<UUID, Link> LINKS = ServerState.track(new HashMap<>());
+    private static final Map<UUID, DoorLocation> DOORS = ServerState.track(new HashMap<>());
+    private static final Map<UUID, Long> LAST_TICKET = ServerState.track(new HashMap<>());
+    private static final Map<UUID, Long> NEXT_SCAN = ServerState.track(new HashMap<>());
     private static final int FULL_TICK_INTERVAL_TICKS = 10;
-    private static final Set<UUID> HOT = new HashSet<>();
+    private static final Set<UUID> HOT = ServerState.track(new HashSet<>());
 
     private record DoorLocation(ResourceKey<Level> dimension, BlockPos pos) {}
 

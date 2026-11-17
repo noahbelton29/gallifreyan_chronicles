@@ -9,6 +9,7 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.util.Mth;
+import uk.nbforge.gallifreyan_chronicles.core.lifecycle.ServerState;
 import uk.nbforge.gallifreyan_chronicles.tardis.Tardis;
 import uk.nbforge.gallifreyan_chronicles.tardis.ecs.system.TardisMindSystem;
 
@@ -44,7 +45,7 @@ public final class TardisFeedback {
     private static final double CONSOLE_HEIGHT = 1.1;
 
     // When each TARDIS last showed a reaction
-    private static final Map<UUID, Long> LAST = new HashMap<>();
+    private static final Map<UUID, Long> LAST = ServerState.track(new HashMap<>());
 
     private TardisFeedback() {}
 

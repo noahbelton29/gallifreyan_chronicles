@@ -36,6 +36,7 @@ import uk.nbforge.gallifreyan_chronicles.core.block_entities.TardisConsoleBlockE
 import uk.nbforge.gallifreyan_chronicles.core.block_entities.TardisExteriorBlockEntity;
 import uk.nbforge.gallifreyan_chronicles.core.dynamic_registries.TardisConsoleRegistry;
 import uk.nbforge.gallifreyan_chronicles.core.dynamic_registries.TardisInteriorRegistry;
+import uk.nbforge.gallifreyan_chronicles.core.lifecycle.ServerState;
 import uk.nbforge.gallifreyan_chronicles.tardis.*;
 import uk.nbforge.gallifreyan_chronicles.tardis.console.TardisConsole;
 import uk.nbforge.gallifreyan_chronicles.tardis.ecs.component.DoorState;
@@ -56,10 +57,10 @@ public final class TardisInteriorSystem {
     private static final int CLEAR_FLAGS =
             Block.UPDATE_CLIENTS | Block.UPDATE_KNOWN_SHAPE | Block.UPDATE_SUPPRESS_DROPS;
 
-    private static final Map<Identifier, BlockPos> DOOR_OFFSET_CACHE = new ConcurrentHashMap<>();
+    private static final Map<Identifier, BlockPos> DOOR_OFFSET_CACHE = ServerState.track(new ConcurrentHashMap<>());
     // Same idea as DOOR_OFFSET_CACHE: a template always places its console at the same offset, so once
     // we have found it for a given template we never need to scan the whole volume for it again
-    private static final Map<Identifier, BlockPos> CONSOLE_OFFSET_CACHE = new ConcurrentHashMap<>();
+    private static final Map<Identifier, BlockPos> CONSOLE_OFFSET_CACHE = ServerState.track(new ConcurrentHashMap<>());
 
     private record ConsoleCarryover(
             TardisConsole console, @Nullable String variant, CompoundTag controlStates) {}
@@ -136,7 +137,7 @@ public final class TardisInteriorSystem {
 
     public record Arrival(Vec3 pos, float yaw) {}
 
-    private static final Set<UUID> ARRIVING = ConcurrentHashMap.newKeySet();
+    private static final Set<UUID> ARRIVING = ServerState.track(ConcurrentHashMap.newKeySet());
 
     public static void markArriving(ServerPlayer player) {
         ARRIVING.add(player.getUUID());

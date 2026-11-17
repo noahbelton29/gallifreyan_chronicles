@@ -7,6 +7,7 @@ import java.util.Set;
 import java.util.UUID;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
+import uk.nbforge.gallifreyan_chronicles.core.lifecycle.ServerState;
 import uk.nbforge.gallifreyan_chronicles.tardis.Tardis;
 import uk.nbforge.gallifreyan_chronicles.tardis.TardisApi;
 import uk.nbforge.gallifreyan_chronicles.tardis.TardisEvents;
@@ -22,8 +23,8 @@ public final class TardisAutopilot {
     private static final int CHECK_TICKS = 20;
     private static final int UNOCCUPIED_TICKS_BEFORE_LANDING = 20 * 60;
 
-    private static final Set<UUID> FLYING = new HashSet<>();
-    private static final Map<UUID, Integer> UNOCCUPIED_TICKS = new HashMap<>();
+    private static final Set<UUID> FLYING = ServerState.track(new HashSet<>());
+    private static final Map<UUID, Integer> UNOCCUPIED_TICKS = ServerState.track(new HashMap<>());
 
     private TardisAutopilot() {}
 

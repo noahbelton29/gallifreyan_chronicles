@@ -19,6 +19,7 @@ import org.jspecify.annotations.Nullable;
 import uk.nbforge.gallifreyan_chronicles.core.GCEffects;
 import uk.nbforge.gallifreyan_chronicles.core.block_entities.InteriorDoorBlockEntity;
 import uk.nbforge.gallifreyan_chronicles.core.block_entities.TardisExteriorBlockEntity;
+import uk.nbforge.gallifreyan_chronicles.core.lifecycle.ServerState;
 import uk.nbforge.gallifreyan_chronicles.tardis.Tardis;
 import uk.nbforge.gallifreyan_chronicles.util.GCSchedulerUtil;
 import uk.nbforge.gallifreyan_chronicles.util.MessageUtil;
@@ -56,9 +57,9 @@ public final class CrashSmoke {
     // How long choking lasts after you get out
     private static final int LINGER_TICKS = 100;
 
-    private static final Set<UUID> RUNNING = new HashSet<>();
+    private static final Set<UUID> RUNNING = ServerState.track(new HashSet<>());
     // How long each player has been breathing it, per TARDIS
-    private static final Map<UUID, Map<UUID, Integer>> BREATHED = new HashMap<>();
+    private static final Map<UUID, Map<UUID, Integer>> BREATHED = ServerState.track(new HashMap<>());
 
     private CrashSmoke() {}
 

@@ -4,6 +4,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 import org.jspecify.annotations.Nullable;
+import uk.nbforge.gallifreyan_chronicles.core.lifecycle.ServerState;
 import uk.nbforge.gallifreyan_chronicles.tardis.Tardis;
 import uk.nbforge.gallifreyan_chronicles.tardis.ecs.system.TardisMindSystem;
 import uk.nbforge.gallifreyan_chronicles.tardis.ecs.system.TardisMindSystem.Refusal;
@@ -37,7 +38,7 @@ public final class TardisConvincing {
      */
     private record State(int refusals, long quickPullUntil, long lastBalk, int workedUp) {}
 
-    private static final Map<UUID, State> STATES = new HashMap<>();
+    private static final Map<UUID, State> STATES = ServerState.track(new HashMap<>());
 
     private TardisConvincing() {}
 

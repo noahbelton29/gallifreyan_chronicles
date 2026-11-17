@@ -14,12 +14,13 @@ import uk.nbforge.gallifreyan_chronicles.compat.portal.TardisPortalBridge;
 import uk.nbforge.gallifreyan_chronicles.core.GCTardisControls;
 import uk.nbforge.gallifreyan_chronicles.core.block_entities.InteriorDoorBlockEntity;
 import uk.nbforge.gallifreyan_chronicles.core.block_entities.TardisExteriorBlockEntity;
+import uk.nbforge.gallifreyan_chronicles.core.lifecycle.ServerState;
 import uk.nbforge.gallifreyan_chronicles.tardis.Tardis;
 import uk.nbforge.gallifreyan_chronicles.tardis.TardisApi;
 import uk.nbforge.gallifreyan_chronicles.tardis.ecs.component.DoorState;
 
 public final class DoorSyncSystem {
-    private static final Map<UUID, Set<InteriorDoorBlockEntity>> INTERIOR_DOORS = new HashMap<>();
+    private static final Map<UUID, Set<InteriorDoorBlockEntity>> INTERIOR_DOORS = ServerState.track(new HashMap<>());
 
     private DoorSyncSystem() {}
 

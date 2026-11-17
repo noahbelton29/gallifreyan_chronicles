@@ -6,6 +6,7 @@ import java.util.Set;
 import java.util.UUID;
 import net.minecraft.ChatFormatting;
 import net.minecraft.world.entity.player.Player;
+import uk.nbforge.gallifreyan_chronicles.core.lifecycle.ServerState;
 import uk.nbforge.gallifreyan_chronicles.util.MessageUtil;
 
 /**
@@ -22,7 +23,7 @@ public final class MindMessages {
             "mallet_fights_back",
             "mallet_not_yours",
             "tardis_ptsd_easing");
-    private static final Map<UUID, Long> LAST = new HashMap<>();
+    private static final Map<UUID, Long> LAST = ServerState.track(new HashMap<>());
 
     private MindMessages() {}
 

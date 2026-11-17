@@ -26,6 +26,7 @@ import org.jspecify.annotations.NonNull;
 import uk.nbforge.gallifreyan_chronicles.Constants;
 import uk.nbforge.gallifreyan_chronicles.compat.portal.TardisPortalBridge;
 import uk.nbforge.gallifreyan_chronicles.core.GCBlocks;
+import uk.nbforge.gallifreyan_chronicles.core.lifecycle.ServerState;
 import uk.nbforge.gallifreyan_chronicles.mixin.server.MinecraftServerAccessor;
 import uk.nbforge.gallifreyan_chronicles.tardis.TardisDimensionManager;
 import uk.nbforge.gallifreyan_chronicles.tardis.TardisManager;
@@ -33,7 +34,7 @@ import uk.nbforge.gallifreyan_chronicles.tardis.TardisManager;
 public final class TardisDeletion {
     private record Request(ResourceKey<Level> exitDimension, Vec3 exitPos) {}
 
-    private static final Map<UUID, Request> PENDING = new LinkedHashMap<>();
+    private static final Map<UUID, Request> PENDING = ServerState.track(new LinkedHashMap<>());
     private static final int REMOVE_FLAGS = Block.UPDATE_ALL | Block.UPDATE_SUPPRESS_DROPS;
 
     // Deleting a dimension's save folder is pure disk I/O with nothing server-state related in it,

@@ -12,6 +12,7 @@ import net.minecraft.util.Mth;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.phys.Vec3;
+import uk.nbforge.gallifreyan_chronicles.core.lifecycle.ServerState;
 import uk.nbforge.gallifreyan_chronicles.tardis.Tardis;
 import uk.nbforge.gallifreyan_chronicles.tardis.TardisApi;
 import uk.nbforge.gallifreyan_chronicles.tardis.TardisEvents;
@@ -52,7 +53,7 @@ public final class TardisTrauma {
     private static final float SIGHT_FEAR = 2f;
     private static final float SIGHT_STRESS = 2f;
 
-    private static final Map<String, Long> LAST_REACTION = new HashMap<>();
+    private static final Map<String, Long> LAST_REACTION = ServerState.track(new HashMap<>());
 
     private TardisTrauma() {}
 

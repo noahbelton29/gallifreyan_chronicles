@@ -8,6 +8,7 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.phys.Vec3;
 import org.jspecify.annotations.Nullable;
+import uk.nbforge.gallifreyan_chronicles.core.lifecycle.ServerState;
 import uk.nbforge.gallifreyan_chronicles.tardis.Tardis;
 import uk.nbforge.gallifreyan_chronicles.tardis.ecs.system.TardisMindSystem;
 import uk.nbforge.gallifreyan_chronicles.tardis.mind.FearLevel;
@@ -23,7 +24,7 @@ import uk.nbforge.gallifreyan_chronicles.tardis.mind.action.MindContext;
 public final class TardisTerror {
     private static final long COMPLY_TICKS = 600L;
 
-    private static final Map<String, Episode> EPISODES = new HashMap<>();
+    private static final Map<String, Episode> EPISODES = ServerState.track(new HashMap<>());
 
     private static final class Episode {
         int required;

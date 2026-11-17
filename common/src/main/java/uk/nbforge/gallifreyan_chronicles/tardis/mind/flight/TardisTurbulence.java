@@ -12,6 +12,7 @@ import net.minecraft.util.Mth;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.phys.Vec3;
 import uk.nbforge.gallifreyan_chronicles.core.block_entities.TardisConsoleBlockEntity;
+import uk.nbforge.gallifreyan_chronicles.core.lifecycle.ServerState;
 import uk.nbforge.gallifreyan_chronicles.network.tardis.TardisCrashRumblePayload;
 import uk.nbforge.gallifreyan_chronicles.tardis.Tardis;
 import uk.nbforge.gallifreyan_chronicles.tardis.TardisApi;
@@ -43,7 +44,7 @@ public final class TardisTurbulence {
     private static final float SPARK_CHANCE = 0.35f;
     private static final int CHECK_TICKS = 20;
 
-    private static final Set<UUID> FLYING = new HashSet<>();
+    private static final Set<UUID> FLYING = ServerState.track(new HashSet<>());
 
     private TardisTurbulence() {}
 

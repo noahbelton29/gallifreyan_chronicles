@@ -9,13 +9,13 @@ import java.util.WeakHashMap;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.world.level.Level;
+import uk.nbforge.gallifreyan_chronicles.client.lifecycle.ClientState;
 import uk.nbforge.gallifreyan_chronicles.client.tardis.RematCatchClient;
 import uk.nbforge.gallifreyan_chronicles.client.tardis.TardisFrightClient;
 import uk.nbforge.gallifreyan_chronicles.config.GCConfig;
 import uk.nbforge.gallifreyan_chronicles.core.block.ConsoleBlock;
 import uk.nbforge.gallifreyan_chronicles.core.block_entities.TardisConsoleBlockEntity;
 import uk.nbforge.gallifreyan_chronicles.util.TardisDimensionUtil;
-import uk.nbforge.gallifreyan_chronicles.client.lifecycle.ClientState;
 
 public final class GCPowerDarkness {
     private static final float MAX_ALPHA = 0.88F;
@@ -31,7 +31,8 @@ public final class GCPowerDarkness {
     private static volatile float darkness = 0.0F;
     private static long snapUntilNanos = 0L;
     private static volatile long shaderBlindnessReadNanos = 0L;
-    private static final Set<Level> NO_CONSOLE_LEVELS = ClientState.track(Collections.newSetFromMap(new WeakHashMap<>()));
+    private static final Set<Level> NO_CONSOLE_LEVELS =
+            ClientState.track(Collections.newSetFromMap(new WeakHashMap<>()));
     private static final Map<Level, LevelDarkness> STATES = ClientState.track(new WeakHashMap<>());
 
     private static final class LevelDarkness {

@@ -4,9 +4,9 @@ import java.util.HashMap;
 import java.util.Map;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.level.Level;
+import uk.nbforge.gallifreyan_chronicles.client.lifecycle.ClientState;
 import uk.nbforge.gallifreyan_chronicles.network.tardis.TardisAlarmPayload;
 import uk.nbforge.gallifreyan_chronicles.tardis.mind.mood.TardisAlarm;
-import uk.nbforge.gallifreyan_chronicles.client.lifecycle.ClientState;
 
 public final class GCDangerAlarm {
     private static final long FLASH_NANOS = TardisAlarm.FLASH_TICKS * 50_000_000L;

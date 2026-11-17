@@ -3,25 +3,25 @@ package uk.nbforge.gallifreyan_chronicles.client.sound;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.WeakHashMap;
-
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.sounds.SoundManager;
 import net.minecraft.world.phys.Vec3;
+import uk.nbforge.gallifreyan_chronicles.client.lifecycle.ClientState;
 import uk.nbforge.gallifreyan_chronicles.client.util.DetailLevelUtil;
 import uk.nbforge.gallifreyan_chronicles.core.block_entities.TardisConsoleBlockEntity;
 import uk.nbforge.gallifreyan_chronicles.util.TardisDimensionUtil;
-import uk.nbforge.gallifreyan_chronicles.client.lifecycle.ClientState;
 
 public final class ConsoleHumSounds {
     private static final int CHECK_INTERVAL_TICKS = 1;
     private static final double START_RANGE_SQR =
-        TardisConsoleHumSoundInstance.HEARING_RANGE * TardisConsoleHumSoundInstance.HEARING_RANGE;
+            TardisConsoleHumSoundInstance.HEARING_RANGE * TardisConsoleHumSoundInstance.HEARING_RANGE;
 
-    private static final Map<TardisConsoleBlockEntity, TardisConsoleHumSoundInstance> HUMS = ClientState.track(new WeakHashMap<>());
+    private static final Map<TardisConsoleBlockEntity, TardisConsoleHumSoundInstance> HUMS =
+            ClientState.track(new WeakHashMap<>());
+
     private static int ticks;
 
-    private ConsoleHumSounds() {
-    }
+    private ConsoleHumSounds() {}
 
     private static boolean isTardisLevel(TardisConsoleBlockEntity console) {
         return TardisDimensionUtil.isInterior(console.getLevel());
@@ -42,7 +42,7 @@ public final class ConsoleHumSounds {
 
         SoundManager sounds = minecraft.getSoundManager();
         Iterator<Map.Entry<TardisConsoleBlockEntity, TardisConsoleHumSoundInstance>> iterator =
-            HUMS.entrySet().iterator();
+                HUMS.entrySet().iterator();
         while (iterator.hasNext()) {
             Map.Entry<TardisConsoleBlockEntity, TardisConsoleHumSoundInstance> entry = iterator.next();
             TardisConsoleBlockEntity console = entry.getKey();
@@ -76,12 +76,12 @@ public final class ConsoleHumSounds {
             if (SoundListener.pos().distanceToSqr(Vec3.atCenterOf(console.getBlockPos())) > START_RANGE_SQR) continue;
 
             TardisConsoleHumSoundInstance fresh = new TardisConsoleHumSoundInstance(
-                console.getBlockPos(),
-                () -> !console.isRemoved()
-                    && console.getLevel() != null
-                    && console.getLevel().isClientSide(),
-                console::hasPower,
-                console::isPowerKnown);
+                    console.getBlockPos(),
+                    () -> !console.isRemoved()
+                            && console.getLevel() != null
+                            && console.getLevel().isClientSide(),
+                    console::hasPower,
+                    console::isPowerKnown);
             sounds.play(fresh);
             entry.setValue(fresh);
         }

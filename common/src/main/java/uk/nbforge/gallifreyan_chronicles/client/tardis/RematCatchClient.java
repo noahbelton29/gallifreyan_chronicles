@@ -25,12 +25,12 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
 import org.joml.Vector3fc;
 import org.jspecify.annotations.Nullable;
+import uk.nbforge.gallifreyan_chronicles.client.lifecycle.ClientState;
 import uk.nbforge.gallifreyan_chronicles.client.util.FadeTintUtil;
 import uk.nbforge.gallifreyan_chronicles.core.block.InteriorDoorBlock;
 import uk.nbforge.gallifreyan_chronicles.network.tardis.RematCatchPayload;
 import uk.nbforge.gallifreyan_chronicles.tardis.exterior.fade.FadeType;
 import uk.nbforge.gallifreyan_chronicles.tardis.exterior.fade.FadeTypes;
-import uk.nbforge.gallifreyan_chronicles.client.lifecycle.ClientState;
 
 /**
  * Client side of a TARDIS materialising around a player.

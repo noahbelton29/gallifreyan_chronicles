@@ -9,6 +9,7 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
 import org.jspecify.annotations.Nullable;
+import uk.nbforge.gallifreyan_chronicles.client.compat.portal.TardisPortalClient;
 import uk.nbforge.gallifreyan_chronicles.config.GCConfig;
 
 public final class TardisPortalBridge {

@@ -1,4 +1,4 @@
-package uk.nbforge.gallifreyan_chronicles.compat.portal;
+package uk.nbforge.gallifreyan_chronicles.client.compat.portal;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -23,6 +23,7 @@ import qouteall.imm_ptl.core.render.context_management.PortalRendering;
 import qouteall.imm_ptl.core.render.renderer.RendererUsingStencil;
 import uk.nbforge.gallifreyan_chronicles.client.gui.hud.GCPowerDarkness;
 import uk.nbforge.gallifreyan_chronicles.client.gui.hud.PowerDarknessTint;
+import uk.nbforge.gallifreyan_chronicles.compat.portal.TardisPortalBridge;
 import uk.nbforge.gallifreyan_chronicles.config.GCConfig;
 import uk.nbforge.gallifreyan_chronicles.core.block.InteriorDoorBarrierBlock;
 import uk.nbforge.gallifreyan_chronicles.core.block.InteriorDoorBlock;
@@ -30,26 +31,26 @@ import uk.nbforge.gallifreyan_chronicles.core.block.TardisBlock;
 import uk.nbforge.gallifreyan_chronicles.core.block.TardisTopBlock;
 import uk.nbforge.gallifreyan_chronicles.util.TardisDimensionUtil;
 
-final class TardisPortalClient {
+public final class TardisPortalClient {
     private static final double DOOR_FOOTPRINT_HORIZONTAL = 2.6;
     private static final double DOOR_FOOTPRINT_VERTICAL = 3.0;
 
     private TardisPortalClient() {}
 
-    static @Nullable Level clientLevel(ResourceKey<Level> dimension) {
+    public static @Nullable Level clientLevel(ResourceKey<Level> dimension) {
         return ClientWorldLoader.peekWorld(dimension);
     }
 
-    static boolean isViewingThroughPortalNear(Vec3 pos, double range) {
+    public static boolean isViewingThroughPortalNear(Vec3 pos, double range) {
         if (!PortalRendering.isRendering()) return false;
         return PortalRendering.getRenderingPortal().getDestPos().distanceToSqr(pos) <= range * range;
     }
 
-    static boolean isRenderingAnyPortal() {
+    public static boolean isRenderingAnyPortal() {
         return PortalRendering.isRendering();
     }
 
-    static boolean isRenderingTardisPortal() {
+    public static boolean isRenderingTardisPortal() {
         if (!PortalRendering.isRendering()) return false;
         return TardisDimensionUtil.isInterior(
                 PortalRendering.getRenderingPortal().getDestDim());
@@ -73,7 +74,7 @@ final class TardisPortalClient {
 
     private static @Nullable Ranking ranking;
 
-    static boolean shouldSkipRendering(Object object) {
+    public static boolean shouldSkipRendering(Object object) {
         if (!(object instanceof Portal portal)) return false;
         if (!TardisPortalBridge.PORTAL_TAG.equals(portal.portalTag)) return false;
         if (!(portal.level() instanceof ClientLevel level)) return false;
@@ -108,7 +109,7 @@ final class TardisPortalClient {
         return result;
     }
 
-    static boolean isNearTardisPortal(double range) {
+    public static boolean isNearTardisPortal(double range) {
         Minecraft mc = Minecraft.getInstance();
         if (mc.level == null) return false;
         Vec3 camera = CHelper.getCurrentCameraPos();
@@ -130,7 +131,7 @@ final class TardisPortalClient {
         return portals;
     }
 
-    static boolean isInteriorDoorAtInAnyTardisLevel(BlockPos pos) {
+    public static boolean isInteriorDoorAtInAnyTardisLevel(BlockPos pos) {
         Minecraft mc = Minecraft.getInstance();
         if (mc.level == null) return false;
         Set<ResourceKey<Level>> checked = new HashSet<>();
@@ -163,7 +164,7 @@ final class TardisPortalClient {
      * True when the position is inside the doorway of a TARDIS interior seen through a portal, whatever block is there.
      * It keeps the outline hidden after the interior door or its barriers were replaced by another block.
      */
-    static boolean isInDoorFootprintOfAnyTardisPortal(BlockPos pos) {
+    public static boolean isInDoorFootprintOfAnyTardisPortal(BlockPos pos) {
         Minecraft mc = Minecraft.getInstance();
         if (mc.level == null || mc.player == null) {
             DOOR_CENTRES.clear();
@@ -192,7 +193,7 @@ final class TardisPortalClient {
     }
 
     /** True when the interior door behind the portal has a block flush against its back, unknown counts as not blocked because the door or level is not loaded. */
-    static boolean isDoorBackBlocked(Object object) {
+    public static boolean isDoorBackBlocked(Object object) {
         if (!(object instanceof Portal portal)) return false;
         Level dest = ClientWorldLoader.peekWorld(portal.getDestDim());
         if (dest == null) return false;
@@ -207,7 +208,7 @@ final class TardisPortalClient {
     }
 
     /** The base block of the exterior TARDIS this portal sits in, null when it cannot be found. */
-    static @Nullable BlockPos exteriorBaseOf(Object object) {
+    public static @Nullable BlockPos exteriorBaseOf(Object object) {
         if (!(object instanceof Portal portal)) return null;
         Level level = portal.level();
         Vec3 origin = portal.getOriginPos();
@@ -233,7 +234,7 @@ final class TardisPortalClient {
         return best;
     }
 
-    static void tintPortalForPowerDarkness(Object object) {
+    public static void tintPortalForPowerDarkness(Object object) {
         if (!(object instanceof Portal portal)) return;
         if (GCPowerDarkness.shaderPackHandlesDarkness()) return;
         Level destination = ClientWorldLoader.peekWorld(portal.getDestDim());

@@ -12,7 +12,7 @@ import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
-import uk.nbforge.gallifreyan_chronicles.compat.essential.EssentialMenuCompat;
+import uk.nbforge.gallifreyan_chronicles.client.compat.essential.EssentialMenuCompat;
 
 @Mixin(Screen.class)
 public abstract class EssentialMenuScreenMixin {

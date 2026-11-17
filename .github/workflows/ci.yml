@@ -27,14 +27,14 @@ jobs:
     outputs:
       artifact: gc-dev-${{ steps.meta.outputs.short_sha }}
     steps:
-      - uses: actions/checkout@v7
+      - uses: actions/checkout@v5
 
       - uses: actions/setup-java@v5
         with:
           distribution: temurin
           java-version: ${{ env.JAVA_VERSION }}
 
-      - uses: gradle/actions/setup-gradle@v6
+      - uses: gradle/actions/setup-gradle@v5
 
       - name: Build Fabric and NeoForge (with Javadoc)
         env:
@@ -111,14 +111,14 @@ jobs:
     runs-on: ubuntu-24.04
     timeout-minutes: 30
     steps:
-      - uses: actions/checkout@v7
+      - uses: actions/checkout@v5
 
       - uses: actions/setup-java@v5
         with:
           distribution: temurin
           java-version: ${{ env.JAVA_VERSION }}
 
-      - uses: gradle/actions/setup-gradle@v6
+      - uses: gradle/actions/setup-gradle@v5
 
       - name: Run datagen
         run: ./gradlew :neoforge:runData -Pwatermark=off --console=plain
@@ -140,9 +140,18 @@ jobs:
     runs-on: ubuntu-24.04
     timeout-minutes: 5
     steps:
-      - uses: actions/checkout@v7
+      - uses: actions/checkout@v5
       - name: Check translation keys
         run: python3 .github/scripts/check_translations.py
+
+  client-code:
+    name: Client code separation
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v5
+      - name: Check client-only code stays in client packages
+        run: python3 .github/scripts/check_client_code.py
 
   boot-test:
     name: Server boots (${{ matrix.loader }})
@@ -154,7 +163,7 @@ jobs:
       matrix:
         loader: [fabric, neoforge]
     steps:
-      - uses: actions/checkout@v7
+      - uses: actions/checkout@v5
 
       - uses: actions/setup-java@v5
         with:
@@ -168,7 +177,7 @@ jobs:
           path: jars
 
       - name: Cache the server files
-        uses: actions/cache@v6
+        uses: actions/cache@v5
         with:
           path: |
             boot-server/${{ matrix.loader }}/libraries
@@ -203,7 +212,7 @@ jobs:
 
   notify:
     name: Discord
-    needs: [build, formatting, datagen, translations, boot-test]
+    needs: [build, formatting, datagen, translations, client-code, boot-test]
     if: always() && github.event_name == 'push'
     runs-on: ubuntu-24.04
     timeout-minutes: 5

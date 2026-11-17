@@ -10,8 +10,8 @@ import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+import uk.nbforge.gallifreyan_chronicles.client.compat.essential.EssentialMenuCompat;
 import uk.nbforge.gallifreyan_chronicles.client.gui.title.GCTitleScreenLayout;
-import uk.nbforge.gallifreyan_chronicles.compat.essential.EssentialMenuCompat;
 
 @Mixin(TitleScreen.class)
 public abstract class TitleScreenMixin extends Screen {

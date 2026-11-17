@@ -8,7 +8,7 @@ import net.minecraft.client.gui.screens.options.AccessibilityOptionsScreen;
 import net.minecraft.client.gui.screens.options.LanguageSelectScreen;
 import net.minecraft.client.gui.screens.options.OptionsScreen;
 import net.minecraft.network.chat.Component;
-import uk.nbforge.gallifreyan_chronicles.compat.essential.EssentialMenuCompat;
+import uk.nbforge.gallifreyan_chronicles.client.compat.essential.EssentialMenuCompat;
 
 public class GCOptionsMenuScreen extends Screen {
     private static final int BUTTON_WIDTH = 200;

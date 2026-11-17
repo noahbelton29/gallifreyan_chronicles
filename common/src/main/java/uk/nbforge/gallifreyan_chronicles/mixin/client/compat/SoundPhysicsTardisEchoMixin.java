@@ -7,7 +7,7 @@ import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
-import uk.nbforge.gallifreyan_chronicles.compat.soundphysics.SoundPhysicsCompat;
+import uk.nbforge.gallifreyan_chronicles.client.compat.soundphysics.SoundPhysicsCompat;
 
 @Pseudo
 @Mixin(targets = "com.sonicether.soundphysics.SoundPhysics", remap = false)

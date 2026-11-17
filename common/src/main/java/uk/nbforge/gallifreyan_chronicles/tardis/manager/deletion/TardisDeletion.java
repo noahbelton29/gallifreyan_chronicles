@@ -1,21 +1,5 @@
 package uk.nbforge.gallifreyan_chronicles.tardis.manager.deletion;
 
-import org.jspecify.annotations.NonNull;
-import uk.nbforge.gallifreyan_chronicles.Constants;
-import uk.nbforge.gallifreyan_chronicles.compat.portal.TardisPortalBridge;
-import uk.nbforge.gallifreyan_chronicles.core.GCBlocks;
-import uk.nbforge.gallifreyan_chronicles.mixin.server.MinecraftServerAccessor;
-import uk.nbforge.gallifreyan_chronicles.tardis.TardisDimensionManager;
-import net.minecraft.core.BlockPos;
-import net.minecraft.resources.ResourceKey;
-import net.minecraft.server.MinecraftServer;
-import net.minecraft.server.level.ServerLevel;
-import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.world.level.Level;
-import net.minecraft.world.level.block.Block;
-import net.minecraft.world.level.block.Blocks;
-import net.minecraft.world.phys.Vec3;
-
 import java.io.IOException;
 import java.nio.file.FileVisitResult;
 import java.nio.file.Files;
@@ -29,12 +13,25 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-
+import net.minecraft.core.BlockPos;
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.server.MinecraftServer;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.phys.Vec3;
+import org.jspecify.annotations.NonNull;
+import uk.nbforge.gallifreyan_chronicles.Constants;
+import uk.nbforge.gallifreyan_chronicles.compat.portal.TardisPortalBridge;
+import uk.nbforge.gallifreyan_chronicles.core.GCBlocks;
+import uk.nbforge.gallifreyan_chronicles.mixin.server.MinecraftServerAccessor;
+import uk.nbforge.gallifreyan_chronicles.tardis.TardisDimensionManager;
 import uk.nbforge.gallifreyan_chronicles.tardis.TardisManager;
 
 public final class TardisDeletion {
-    private record Request(ResourceKey<Level> exitDimension, Vec3 exitPos) {
-    }
+    private record Request(ResourceKey<Level> exitDimension, Vec3 exitPos) {}
 
     private static final Map<UUID, Request> PENDING = new LinkedHashMap<>();
     private static final int REMOVE_FLAGS = Block.UPDATE_ALL | Block.UPDATE_SUPPRESS_DROPS;
@@ -47,8 +44,7 @@ public final class TardisDeletion {
         return thread;
     });
 
-    private TardisDeletion() {
-    }
+    private TardisDeletion() {}
 
     public static void request(MinecraftServer server, UUID tardisId, ServerLevel exitLevel, BlockPos exitPos) {
         PENDING.put(tardisId, new Request(exitLevel.dimension(), Vec3.atBottomCenterOf(exitPos)));
@@ -60,7 +56,9 @@ public final class TardisDeletion {
         ServerLevel exteriorLevel = server.getLevel(manager.getExteriorDimension(tardisId));
         if (exteriorLevel == null) exteriorLevel = server.overworld();
         BlockPos exteriorPos = manager.resolveExteriorBlockPos(tardisId);
-        BlockPos exitPos = exteriorPos != null ? exteriorPos : exteriorLevel.getRespawnData().pos();
+        BlockPos exitPos = exteriorPos != null
+                ? exteriorPos
+                : exteriorLevel.getRespawnData().pos();
         if (exteriorPos != null) {
             exteriorLevel.getChunkAt(exteriorPos);
             BlockPos top = exteriorPos.above();
@@ -93,14 +91,23 @@ public final class TardisDeletion {
 
         ResourceKey<Level> key = TardisDimensionManager.levelKey(tardisId);
         ServerLevel interior = server.getLevel(key);
-        Path dimensionPath = ((MinecraftServerAccessor) server).gallifreyan_chronicles$getStorageSource().getDimensionPath(key);
+        Path dimensionPath = ((MinecraftServerAccessor) server)
+                .gallifreyan_chronicles$getStorageSource()
+                .getDimensionPath(key);
 
         if (interior != null) {
             ServerLevel exit = server.getLevel(request.exitDimension());
             if (exit == null) exit = server.overworld();
             for (ServerPlayer player : List.copyOf(interior.players())) {
-                player.teleportTo(exit, request.exitPos().x, request.exitPos().y, request.exitPos().z,
-                        Set.of(), player.getYRot(), player.getXRot(), true);
+                player.teleportTo(
+                        exit,
+                        request.exitPos().x,
+                        request.exitPos().y,
+                        request.exitPos().z,
+                        Set.of(),
+                        player.getYRot(),
+                        player.getXRot(),
+                        true);
             }
             TardisPortalBridge.beforeDimensionRemoved(interior);
             MinecraftServerAccessor accessor = (MinecraftServerAccessor) server;

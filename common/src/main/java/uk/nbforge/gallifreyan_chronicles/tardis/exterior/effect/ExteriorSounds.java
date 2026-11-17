@@ -1,14 +1,13 @@
 package uk.nbforge.gallifreyan_chronicles.tardis.exterior.effect;
 
-import uk.nbforge.gallifreyan_chronicles.core.GCSounds;
 import net.minecraft.core.BlockPos;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.level.Level;
+import uk.nbforge.gallifreyan_chronicles.core.GCSounds;
 
 public final class ExteriorSounds {
-    private ExteriorSounds() {
-    }
+    private ExteriorSounds() {}
 
     public static void locked(Level level, BlockPos pos) {
         play(level, pos, GCSounds.TARDIS_IS_LOCKED);

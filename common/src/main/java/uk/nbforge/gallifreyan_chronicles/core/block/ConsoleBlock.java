@@ -1,19 +1,5 @@
 package uk.nbforge.gallifreyan_chronicles.core.block;
 
-import uk.nbforge.gallifreyan_chronicles.util.PlayerMotionUtil;
-
-import uk.nbforge.gallifreyan_chronicles.util.ConsoleStackUtil;
-
-import uk.nbforge.gallifreyan_chronicles.core.block_entities.TardisConsoleBlockEntity;
-import uk.nbforge.gallifreyan_chronicles.core.GCDataComponents;
-import uk.nbforge.gallifreyan_chronicles.core.GCSounds;
-import uk.nbforge.gallifreyan_chronicles.tardis.console.TardisConsole;
-import uk.nbforge.gallifreyan_chronicles.core.dynamic_registries.TardisConsoleRegistry;
-import uk.nbforge.gallifreyan_chronicles.core.block_entities.TardisExteriorBlockEntity;
-import uk.nbforge.gallifreyan_chronicles.tardis.Tardis;
-import uk.nbforge.gallifreyan_chronicles.tardis.TardisApi;
-import uk.nbforge.gallifreyan_chronicles.tardis.ecs.system.ConsoleLinkSystem;
-import uk.nbforge.gallifreyan_chronicles.tardis.ecs.system.ConsoleSyncSystem;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.server.level.ServerLevel;
@@ -38,6 +24,18 @@ import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.NotNull;
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
+import uk.nbforge.gallifreyan_chronicles.core.GCDataComponents;
+import uk.nbforge.gallifreyan_chronicles.core.GCSounds;
+import uk.nbforge.gallifreyan_chronicles.core.block_entities.TardisConsoleBlockEntity;
+import uk.nbforge.gallifreyan_chronicles.core.block_entities.TardisExteriorBlockEntity;
+import uk.nbforge.gallifreyan_chronicles.core.dynamic_registries.TardisConsoleRegistry;
+import uk.nbforge.gallifreyan_chronicles.tardis.Tardis;
+import uk.nbforge.gallifreyan_chronicles.tardis.TardisApi;
+import uk.nbforge.gallifreyan_chronicles.tardis.console.TardisConsole;
+import uk.nbforge.gallifreyan_chronicles.tardis.ecs.system.ConsoleLinkSystem;
+import uk.nbforge.gallifreyan_chronicles.tardis.ecs.system.ConsoleSyncSystem;
+import uk.nbforge.gallifreyan_chronicles.util.ConsoleStackUtil;
+import uk.nbforge.gallifreyan_chronicles.util.PlayerMotionUtil;
 
 public class ConsoleBlock extends BaseEntityBlock {
 
@@ -47,10 +45,7 @@ public class ConsoleBlock extends BaseEntityBlock {
     public ConsoleBlock(Properties properties) {
         super(properties);
         this.registerDefaultState(
-                this.stateDefinition.any()
-                        .setValue(FACING, Direction.NORTH)
-                        .setValue(HALF, Half.BOTTOM)
-        );
+                this.stateDefinition.any().setValue(FACING, Direction.NORTH).setValue(HALF, Half.BOTTOM));
     }
 
     @Override
@@ -110,8 +105,12 @@ public class ConsoleBlock extends BaseEntityBlock {
     }
 
     @Override
-    public void setPlacedBy(@NonNull Level level, @NonNull BlockPos pos, @NonNull BlockState state,
-                            @Nullable LivingEntity placer, @NonNull ItemStack stack) {
+    public void setPlacedBy(
+            @NonNull Level level,
+            @NonNull BlockPos pos,
+            @NonNull BlockState state,
+            @Nullable LivingEntity placer,
+            @NonNull ItemStack stack) {
         super.setPlacedBy(level, pos, state, placer, stack);
 
         if (level.isClientSide()) return;
@@ -133,8 +132,8 @@ public class ConsoleBlock extends BaseEntityBlock {
     }
 
     @Override
-    protected void affectNeighborsAfterRemoval(@NonNull BlockState state, @NonNull ServerLevel level,
-                                               @NonNull BlockPos pos, boolean movedByPiston) {
+    protected void affectNeighborsAfterRemoval(
+            @NonNull BlockState state, @NonNull ServerLevel level, @NonNull BlockPos pos, boolean movedByPiston) {
         super.affectNeighborsAfterRemoval(state, level, pos, movedByPiston);
 
         Tardis tardis = TardisApi.ofLevel(level).orElse(null);
@@ -147,8 +146,8 @@ public class ConsoleBlock extends BaseEntityBlock {
     }
 
     @Override
-    protected @NonNull ItemStack getCloneItemStack(@NonNull LevelReader level, @NonNull BlockPos pos,
-                                                   @NonNull BlockState state, boolean includeData) {
+    protected @NonNull ItemStack getCloneItemStack(
+            @NonNull LevelReader level, @NonNull BlockPos pos, @NonNull BlockState state, boolean includeData) {
         ItemStack stack = super.getCloneItemStack(level, pos, state, includeData);
         if (!(level.getBlockEntity(pos) instanceof TardisConsoleBlockEntity console)) return stack;
         return ConsoleStackUtil.withConsoleData(stack, console);

@@ -1,25 +1,25 @@
 package uk.nbforge.gallifreyan_chronicles.compat.flashback;
 
-import net.fabricmc.loader.api.FabricLoader;
-import org.joml.Vector3d;
-import net.minecraft.network.protocol.game.ClientboundLevelChunkWithLightPacket;
-import net.minecraft.server.level.ServerLevel;
-import net.minecraft.world.entity.Entity;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Consumer;
-import uk.nbforge.gallifreyan_chronicles.Constants;
+import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.protocol.Packet;
 import net.minecraft.network.protocol.game.ClientGamePacketListener;
+import net.minecraft.network.protocol.game.ClientboundLevelChunkWithLightPacket;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Player;
+import org.joml.Vector3d;
+import uk.nbforge.gallifreyan_chronicles.Constants;
 
 /**
-   Immersive Portals turns off vanilla chunk tracking and sending, and Flashback needs both to show the recorded world.
-   With both installed we hand each replay chunk to the viewer ourselves.
-   This class never touches Flashback classes so it is safe without Flashback.
-*/
+ * Immersive Portals turns off vanilla chunk tracking and sending, and Flashback needs both to show the recorded world.
+ * With both installed we hand each replay chunk to the viewer ourselves.
+ * This class never touches Flashback classes so it is safe without Flashback.
+ */
 public final class FlashbackChunks {
     private static final boolean ACTIVE = FabricLoader.getInstance().isModLoaded("flashback")
             && FabricLoader.getInstance().isModLoaded("seamlessportals");
@@ -27,8 +27,7 @@ public final class FlashbackChunks {
     // A broken replay feature should never kick you out of the replay
     private static final Set<String> FAILED = ConcurrentHashMap.newKeySet();
 
-    private FlashbackChunks() {
-    }
+    private FlashbackChunks() {}
 
     private static void failed(String what, Throwable t) {
         if (FAILED.add(what)) Constants.LOG.warn("[replay] {} failed, skipping it from now on: {}", what, t.toString());
@@ -60,9 +59,9 @@ public final class FlashbackChunks {
     }
 
     /**
-       The replay server is about to unwrap a packet meant for another world.
-       True means we passed it to the camera instead, see RedirectedPacketForwardMixin.
-    */
+     * The replay server is about to unwrap a packet meant for another world.
+     * True means we passed it to the camera instead, see RedirectedPacketForwardMixin.
+     */
     public static boolean passOnFromReplayServer(Object listener, int dimId, Packet<?> packet) {
         if (!ACTIVE || !listener.getClass().getName().startsWith("com.moulberry.flashback.")) return false;
         try {
@@ -119,12 +118,12 @@ public final class FlashbackChunks {
 
     /** A keyframe camera position is about to be applied, returns x, y, z, yaw and pitch. */
     public static double[] keyframeCamera(double x, double y, double z, float yaw, float pitch) {
-        if (!inReplay() || FAILED.contains("keyframes through doors")) return new double[]{x, y, z, yaw, pitch};
+        if (!inReplay() || FAILED.contains("keyframes through doors")) return new double[] {x, y, z, yaw, pitch};
         try {
             return FlashbackChunksImpl.keyframeCamera(x, y, z, yaw, pitch);
         } catch (Throwable t) {
             failed("keyframes through doors", t);
-            return new double[]{x, y, z, yaw, pitch};
+            return new double[] {x, y, z, yaw, pitch};
         }
     }
 

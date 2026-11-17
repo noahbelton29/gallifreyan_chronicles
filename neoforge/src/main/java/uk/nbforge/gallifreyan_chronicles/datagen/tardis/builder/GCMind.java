@@ -1,19 +1,17 @@
 package uk.nbforge.gallifreyan_chronicles.datagen.tardis.builder;
 
 import com.google.gson.JsonObject;
-import uk.nbforge.gallifreyan_chronicles.tardis.mind.action.builtin.SparksAction;
-import net.minecraft.ChatFormatting;
-
 import java.util.Locale;
+import net.minecraft.ChatFormatting;
 import uk.nbforge.gallifreyan_chronicles.datagen.util.GCJson;
+import uk.nbforge.gallifreyan_chronicles.tardis.mind.action.builtin.SparksAction;
 
 /**
-   Things a TARDIS can do in reaction to events.
-   Statically import this class and pass them to whenUnwilling, whenHit and the others on a personality or trait.
-*/
+ * Things a TARDIS can do in reaction to events.
+ * Statically import this class and pass them to whenUnwilling, whenHit and the others on a personality or trait.
+ */
 public final class GCMind {
-    private GCMind() {
-    }
+    private GCMind() {}
 
     private static JsonObject action(String type, Object... fields) {
         JsonObject out = GCJson.obj(fields);
@@ -66,9 +64,20 @@ public final class GCMind {
         return action("savage", "min_damage", minDamage, "max_damage", maxDamage, "burn_seconds", burnSeconds);
     }
 
-    public static JsonObject lashOut(double fromSeverity, double minDamage, double maxDamage, double push, double lift) {
-        return action("lash_out", "from_severity", fromSeverity, "min_damage", minDamage, "max_damage", maxDamage,
-                "push", push, "lift", lift);
+    public static JsonObject lashOut(
+            double fromSeverity, double minDamage, double maxDamage, double push, double lift) {
+        return action(
+                "lash_out",
+                "from_severity",
+                fromSeverity,
+                "min_damage",
+                minDamage,
+                "max_damage",
+                maxDamage,
+                "push",
+                push,
+                "lift",
+                lift);
     }
 
     public static JsonObject addStress(double amount) {

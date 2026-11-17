@@ -1,9 +1,9 @@
 package uk.nbforge.gallifreyan_chronicles.core.block;
 
-import uk.nbforge.gallifreyan_chronicles.core.block_entities.InteriorDoorBlockEntity;
-import uk.nbforge.gallifreyan_chronicles.core.GCBlocks;
-import uk.nbforge.gallifreyan_chronicles.core.item.InteriorDoorBlockItem;
-import uk.nbforge.gallifreyan_chronicles.core.GCDataComponents;
+import java.util.ArrayList;
+import java.util.EnumMap;
+import java.util.List;
+import java.util.Map;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.InteractionResult;
@@ -32,15 +32,13 @@ import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
-
-import java.util.ArrayList;
-import java.util.EnumMap;
-import java.util.List;
-import java.util.Map;
-
 import org.jetbrains.annotations.NotNull;
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
+import uk.nbforge.gallifreyan_chronicles.core.GCBlocks;
+import uk.nbforge.gallifreyan_chronicles.core.GCDataComponents;
+import uk.nbforge.gallifreyan_chronicles.core.block_entities.InteriorDoorBlockEntity;
+import uk.nbforge.gallifreyan_chronicles.core.item.InteriorDoorBlockItem;
 
 public class InteriorDoorBlock extends BaseEntityBlock {
     public static final EnumProperty<Direction> FACING =
@@ -56,10 +54,9 @@ public class InteriorDoorBlock extends BaseEntityBlock {
     private static final VoxelShape SHAPE_FLUSH = Block.box(0, 8, 0, 16, 16, 16);
 
     private static final int[] DEFAULT_DEPTH = {4, 12};
-    private static final Map<String, int[]> MODEL_DEPTH = Map.of(
-            "first_doctors_interior_doors", new int[]{12, 16}
-    );
-    private static final Map<Integer, EnumMap<Direction, VoxelShape>> SLABS = new java.util.concurrent.ConcurrentHashMap<>();
+    private static final Map<String, int[]> MODEL_DEPTH = Map.of("first_doctors_interior_doors", new int[] {12, 16});
+    private static final Map<Integer, EnumMap<Direction, VoxelShape>> SLABS =
+            new java.util.concurrent.ConcurrentHashMap<>();
 
     private static VoxelShape slab(Direction facing, int[] depth) {
         EnumMap<Direction, VoxelShape> shapes = SLABS.computeIfAbsent(depth[0] * 100 + depth[1], k -> {
@@ -100,7 +97,8 @@ public class InteriorDoorBlock extends BaseEntityBlock {
         this.variant = variant;
         this.linked = linked;
         this.fixedVariantId = fixedVariantId;
-        this.registerDefaultState(this.stateDefinition.any()
+        this.registerDefaultState(this.stateDefinition
+                .any()
                 .setValue(FACING, Direction.NORTH)
                 .setValue(FLIPPED, false)
                 .setValue(FLUSH, false)
@@ -170,7 +168,10 @@ public class InteriorDoorBlock extends BaseEntityBlock {
         Level level = context.getLevel();
         BlockPos origin = context.getClickedPos();
 
-        BlockState placed = this.defaultBlockState().setValue(FACING, facing).setValue(FLIPPED, flipped).setValue(FLUSH, flush);
+        BlockState placed = this.defaultBlockState()
+                .setValue(FACING, facing)
+                .setValue(FLIPPED, flipped)
+                .setValue(FLUSH, flush);
         for (int x = 0; x < WIDTH; x++) {
             for (int y = 0; y < HEIGHT; y++) {
                 BlockPos p = origin.relative(right, x).relative(up, y);
@@ -187,7 +188,8 @@ public class InteriorDoorBlock extends BaseEntityBlock {
     }
 
     private static BlockPos barrierPos(BlockPos master, Direction facing, boolean flipped, int x, int y) {
-        return master.relative(rightDirectionOf(facing, flipped), x).relative(upDirectionOf(facing, flipped, false), y)
+        return master.relative(rightDirectionOf(facing, flipped), x)
+                .relative(upDirectionOf(facing, flipped, false), y)
                 .relative(facing.getOpposite());
     }
 
@@ -230,15 +232,20 @@ public class InteriorDoorBlock extends BaseEntityBlock {
     }
 
     @Override
-    public void setPlacedBy(@NonNull Level level, @NonNull BlockPos pos, @NonNull BlockState state,
-                            @Nullable LivingEntity placer, @NonNull ItemStack stack) {
+    public void setPlacedBy(
+            @NonNull Level level,
+            @NonNull BlockPos pos,
+            @NonNull BlockState state,
+            @Nullable LivingEntity placer,
+            @NonNull ItemStack stack) {
         super.setPlacedBy(level, pos, state, placer, stack);
         if (level.isClientSide()) return;
         if (stack.getOrDefault(GCDataComponents.PRIMARY_DOOR, false)
                 && level.getBlockEntity(pos) instanceof InteriorDoorBlockEntity primaryDoor) {
             primaryDoor.setPrimary(true);
         }
-        if (linked && stack.get(GCDataComponents.DOOR_TYPE) != null
+        if (linked
+                && stack.get(GCDataComponents.DOOR_TYPE) != null
                 && level.getBlockEntity(pos) instanceof InteriorDoorBlockEntity door) {
             door.setDoorVariant(InteriorDoorBlockItem.selectedVariant(stack));
         }
@@ -248,16 +255,18 @@ public class InteriorDoorBlock extends BaseEntityBlock {
         for (int x = 0; x < WIDTH; x++) {
             for (int y = 0; y < HEIGHT; y++) {
                 if (x == 0 && y == 0) continue;
-                level.setBlock(pos.relative(right, x).relative(up, y),
-                        state.setValue(PART_X, x).setValue(PART_Y, y), Block.UPDATE_ALL);
+                level.setBlock(
+                        pos.relative(right, x).relative(up, y),
+                        state.setValue(PART_X, x).setValue(PART_Y, y),
+                        Block.UPDATE_ALL);
             }
         }
         placeBarriers(level, pos, state);
     }
 
     @Override
-    public @NotNull BlockState playerWillDestroy(@NotNull Level level, @NotNull BlockPos pos,
-                                                 @NotNull BlockState state, @NotNull Player player) {
+    public @NotNull BlockState playerWillDestroy(
+            @NotNull Level level, @NotNull BlockPos pos, @NotNull BlockState state, @NotNull Player player) {
         if (!level.isClientSide()) {
             BlockPos master = masterBlockPos(state, pos);
             // Read this first, breaking a part that is not the master removes the master and its block entity below
@@ -270,8 +279,8 @@ public class InteriorDoorBlock extends BaseEntityBlock {
                     BlockPos p = master.relative(right, x).relative(up, y);
                     if (p.equals(pos)) continue;
                     if (level.getBlockState(p).is(this)) {
-                        level.setBlock(p, Blocks.AIR.defaultBlockState(),
-                                Block.UPDATE_ALL | Block.UPDATE_SUPPRESS_DROPS);
+                        level.setBlock(
+                                p, Blocks.AIR.defaultBlockState(), Block.UPDATE_ALL | Block.UPDATE_SUPPRESS_DROPS);
                     }
                 }
             }
@@ -286,8 +295,8 @@ public class InteriorDoorBlock extends BaseEntityBlock {
     }
 
     @Override
-    protected @NonNull ItemStack getCloneItemStack(@NonNull LevelReader level, @NonNull BlockPos pos,
-                                                   @NonNull BlockState state, boolean includeData) {
+    protected @NonNull ItemStack getCloneItemStack(
+            @NonNull LevelReader level, @NonNull BlockPos pos, @NonNull BlockState state, boolean includeData) {
         ItemStack stack = super.getCloneItemStack(level, pos, state, includeData);
         if (level.getBlockEntity(masterBlockPos(state, pos)) instanceof InteriorDoorBlockEntity door
                 && door.isPrimary()) {
@@ -297,8 +306,12 @@ public class InteriorDoorBlock extends BaseEntityBlock {
     }
 
     @Override
-    protected @NonNull InteractionResult useWithoutItem(@NonNull BlockState state, Level level, @NonNull BlockPos pos,
-                                                        @NonNull Player player, @NonNull BlockHitResult hitResult) {
+    protected @NonNull InteractionResult useWithoutItem(
+            @NonNull BlockState state,
+            Level level,
+            @NonNull BlockPos pos,
+            @NonNull Player player,
+            @NonNull BlockHitResult hitResult) {
         if (level.isClientSide()) return InteractionResult.SUCCESS;
         if (level.getBlockEntity(masterBlockPos(state, pos)) instanceof InteriorDoorBlockEntity door) {
             door.interact(player.isShiftKeyDown());
@@ -307,10 +320,15 @@ public class InteriorDoorBlock extends BaseEntityBlock {
     }
 
     @Override
-    protected @NonNull VoxelShape getShape(@NonNull BlockState state, @NonNull BlockGetter level,
-                                           @NonNull BlockPos pos, @NonNull CollisionContext context) {
-        // Seen from outside through the portal of the exterior there is no selection shape so no outline, and the targeting ray passes through the door instead of selecting it
-        if (level instanceof Level l && l.isClientSide()
+    protected @NonNull VoxelShape getShape(
+            @NonNull BlockState state,
+            @NonNull BlockGetter level,
+            @NonNull BlockPos pos,
+            @NonNull CollisionContext context) {
+        // Seen from outside through the portal of the exterior there is no selection shape so no outline, and the
+        // targeting ray passes through the door instead of selecting it
+        if (level instanceof Level l
+                && l.isClientSide()
                 && uk.nbforge.gallifreyan_chronicles.client.renderer.util.RemoteDoorView.isSeenThroughPortal(l)) {
             return Shapes.empty();
         }
@@ -319,8 +337,11 @@ public class InteriorDoorBlock extends BaseEntityBlock {
     }
 
     @Override
-    protected @NonNull VoxelShape getCollisionShape(@NonNull BlockState state, @NonNull BlockGetter level,
-                                                    @NonNull BlockPos pos, @NonNull CollisionContext context) {
+    protected @NonNull VoxelShape getCollisionShape(
+            @NonNull BlockState state,
+            @NonNull BlockGetter level,
+            @NonNull BlockPos pos,
+            @NonNull CollisionContext context) {
         if (level.getBlockEntity(masterBlockPos(state, pos)) instanceof InteriorDoorBlockEntity door
                 && !door.getDoorState().isClosed()) {
             return Shapes.empty();

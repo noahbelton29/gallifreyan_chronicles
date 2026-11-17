@@ -1,23 +1,23 @@
 package uk.nbforge.gallifreyan_chronicles.tardis.control.impl;
 
 import java.util.Optional;
-
-import uk.nbforge.gallifreyan_chronicles.tardis.Tardis;
-import uk.nbforge.gallifreyan_chronicles.core.block_entities.TardisConsoleBlockEntity;
-import uk.nbforge.gallifreyan_chronicles.core.entity.TardisControlEntity;
-import uk.nbforge.gallifreyan_chronicles.core.GCSounds;
-import uk.nbforge.gallifreyan_chronicles.tardis.control.BaseControl;
-import uk.nbforge.gallifreyan_chronicles.tardis.control.ControlAnimations;
-import uk.nbforge.gallifreyan_chronicles.tardis.ecs.system.DoorSyncSystem;
-import net.minecraft.server.level.ServerLevel;
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
+import uk.nbforge.gallifreyan_chronicles.core.GCSounds;
+import uk.nbforge.gallifreyan_chronicles.core.block_entities.TardisConsoleBlockEntity;
+import uk.nbforge.gallifreyan_chronicles.core.entity.TardisControlEntity;
+import uk.nbforge.gallifreyan_chronicles.tardis.Tardis;
+import uk.nbforge.gallifreyan_chronicles.tardis.control.BaseControl;
+import uk.nbforge.gallifreyan_chronicles.tardis.control.ControlAnimations;
+import uk.nbforge.gallifreyan_chronicles.tardis.ecs.system.DoorSyncSystem;
 
 public class DoorControl extends BaseControl {
-    public static final ControlAnimations DEFAULT_ANIMATIONS = new ControlAnimations("door_control_off", "door_control_on", true);
+    public static final ControlAnimations DEFAULT_ANIMATIONS =
+            new ControlAnimations("door_control_off", "door_control_on", true);
 
     public DoorControl(ControlAnimations animations) {
         super(animations);
@@ -36,8 +36,11 @@ public class DoorControl extends BaseControl {
         if (entity.level() instanceof ServerLevel level) {
             Optional<Tardis> tardis = linkedTardis(console);
             if (tardis.isPresent() && doorsBlocked(tardis.get(), player)) return InteractionResult.FAIL;
-            announce(player, console.getControlState(entity.getControlId())
-                    ? "message.gallifreyan_chronicles.doors_closing" : "message.gallifreyan_chronicles.doors_opening");
+            announce(
+                    player,
+                    console.getControlState(entity.getControlId())
+                            ? "message.gallifreyan_chronicles.doors_closing"
+                            : "message.gallifreyan_chronicles.doors_opening");
         }
         return InteractionResult.SUCCESS;
     }

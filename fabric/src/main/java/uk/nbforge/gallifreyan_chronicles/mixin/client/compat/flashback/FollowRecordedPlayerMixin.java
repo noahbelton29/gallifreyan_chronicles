@@ -2,10 +2,10 @@ package uk.nbforge.gallifreyan_chronicles.mixin.client.compat.flashback;
 
 import com.llamalad7.mixinextras.injector.wrapmethod.WrapMethod;
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
-import uk.nbforge.gallifreyan_chronicles.compat.flashback.FlashbackChunks;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Pseudo;
+import uk.nbforge.gallifreyan_chronicles.compat.flashback.FlashbackChunks;
 
 /** Before Flashback moves the recorded entities we look at the data to follow the recorded player into a TARDIS, see FlashbackPuppet. */
 @Pseudo

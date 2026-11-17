@@ -1,5 +1,7 @@
 package uk.nbforge.gallifreyan_chronicles.core.block;
 
+import java.util.ArrayList;
+import java.util.List;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.registries.BuiltInRegistries;
@@ -18,9 +20,6 @@ import org.jspecify.annotations.Nullable;
 import uk.nbforge.gallifreyan_chronicles.Constants;
 import uk.nbforge.gallifreyan_chronicles.core.block_entities.InteriorDoorBlockEntity;
 
-import java.util.ArrayList;
-import java.util.List;
-
 /**
  * Shift + right click on an interior door with one of this mod's roundel blocks gives the door that block's look.
  * Shift + right click with a brush takes it off again.
@@ -29,8 +28,7 @@ import java.util.List;
  * so this can't live on the block. Each loader calls it from its right-click-block event.</p>
  */
 public final class DoorRoundelInteraction {
-    private DoorRoundelInteraction() {
-    }
+    private DoorRoundelInteraction() {}
 
     public static InteractionResult interact(Player player, Level level, InteractionHand hand, BlockHitResult hit) {
         if (!player.isShiftKeyDown()) return InteractionResult.PASS;
@@ -44,7 +42,8 @@ public final class DoorRoundelInteraction {
         Identifier roundel = roundelIdOf(stack);
         if (!brush && roundel == null) return InteractionResult.PASS;
 
-        if (!(level.getBlockEntity(InteriorDoorBlock.masterBlockPos(state, pos)) instanceof InteriorDoorBlockEntity door)) {
+        if (!(level.getBlockEntity(InteriorDoorBlock.masterBlockPos(state, pos))
+                instanceof InteriorDoorBlockEntity door)) {
             return InteractionResult.PASS;
         }
         if (level.isClientSide()) return InteractionResult.SUCCESS;
@@ -56,11 +55,13 @@ public final class DoorRoundelInteraction {
             door.setRoundelBlock("");
             player.sendOverlayMessage(Component.translatable("overlay.gallifreyan_chronicles.door_style_cleared"));
         } else if (!hasWallBlock(roundel)) {
-            player.sendOverlayMessage(Component.translatable("overlay.gallifreyan_chronicles.door_style_no_match", stack.getHoverName())
-                    .withStyle(ChatFormatting.RED));
+            player.sendOverlayMessage(
+                    Component.translatable("overlay.gallifreyan_chronicles.door_style_no_match", stack.getHoverName())
+                            .withStyle(ChatFormatting.RED));
         } else {
             door.setRoundelBlock(roundel.toString());
-            player.sendOverlayMessage(Component.translatable("overlay.gallifreyan_chronicles.door_style_set", stack.getHoverName()));
+            player.sendOverlayMessage(
+                    Component.translatable("overlay.gallifreyan_chronicles.door_style_set", stack.getHoverName()));
         }
         return InteractionResult.SUCCESS;
     }
@@ -74,7 +75,7 @@ public final class DoorRoundelInteraction {
     }
 
     /** the ids of the plain blocks a roundel block could be the roundel version of, best match first. the block and
-        its texture share a name, so the client uses these for the texture too */
+     * its texture share a name, so the client uses these for the texture too */
     public static List<Identifier> wallBlockCandidates(Identifier roundelBlock) {
         String path = roundelBlock.getPath();
         String namespace = roundelBlock.getNamespace();
@@ -84,7 +85,8 @@ public final class DoorRoundelInteraction {
         if (plain.contains("_roundel")) {
             candidates.add(Identifier.fromNamespaceAndPath(namespace, plain.replace("_roundel", "_wall")));
             candidates.add(Identifier.fromNamespaceAndPath(namespace, plain.replaceAll("_roundel(_alt)?", "_wall")));
-            candidates.add(Identifier.fromNamespaceAndPath(namespace,
+            candidates.add(Identifier.fromNamespaceAndPath(
+                    namespace,
                     plain.replaceAll("_roundel(_alt)?", "_wall").replaceAll("_wall_block_\\d+", "_wall_block")));
         }
 

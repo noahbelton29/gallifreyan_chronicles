@@ -4,8 +4,7 @@ import java.lang.invoke.MethodHandle;
 import java.lang.invoke.MethodHandles;
 
 public final class IrisCompat {
-    private IrisCompat() {
-    }
+    private IrisCompat() {}
 
     private static final class Holder {
         static final MethodHandle SHADER_PACK_IN_USE = lookup();

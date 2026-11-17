@@ -1,26 +1,23 @@
 package uk.nbforge.gallifreyan_chronicles.core.item.tooltip;
 
 import java.util.List;
-
-import uk.nbforge.gallifreyan_chronicles.Constants;
-import uk.nbforge.gallifreyan_chronicles.core.GCDataComponents;
-import uk.nbforge.gallifreyan_chronicles.core.dynamic_registries.TardisConsoleRegistry;
-import uk.nbforge.gallifreyan_chronicles.core.dynamic_registries.TardisDoorRegistry;
-import uk.nbforge.gallifreyan_chronicles.tardis.console.TardisConsoleVariant;
-import uk.nbforge.gallifreyan_chronicles.tardis.TardisInteriorOptions;
+import java.util.UUID;
+import java.util.function.Consumer;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.component.DataComponentGetter;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.item.component.TooltipProvider;
-
-import java.util.UUID;
-import java.util.function.Consumer;
-
+import uk.nbforge.gallifreyan_chronicles.Constants;
+import uk.nbforge.gallifreyan_chronicles.core.GCDataComponents;
+import uk.nbforge.gallifreyan_chronicles.core.dynamic_registries.TardisConsoleRegistry;
+import uk.nbforge.gallifreyan_chronicles.core.dynamic_registries.TardisDoorRegistry;
 import uk.nbforge.gallifreyan_chronicles.core.item.ConsoleBlockItem;
 import uk.nbforge.gallifreyan_chronicles.core.item.DoorBlockItem;
 import uk.nbforge.gallifreyan_chronicles.core.item.TardisKeyItem;
+import uk.nbforge.gallifreyan_chronicles.tardis.TardisInteriorOptions;
+import uk.nbforge.gallifreyan_chronicles.tardis.console.TardisConsoleVariant;
 
 public enum ItemInfoTooltip implements TooltipProvider {
     TARDIS,
@@ -32,8 +29,11 @@ public enum ItemInfoTooltip implements TooltipProvider {
     STATTENHEIM_REMOTE;
 
     @Override
-    public void addToTooltip(Item.TooltipContext context, Consumer<Component> tooltip, TooltipFlag flag,
-                             DataComponentGetter components) {
+    public void addToTooltip(
+            Item.TooltipContext context,
+            Consumer<Component> tooltip,
+            TooltipFlag flag,
+            DataComponentGetter components) {
         switch (this) {
             case TARDIS -> addTardis(tooltip, flag, components);
             case CONSOLE -> addConsole(tooltip, flag, components);
@@ -48,7 +48,8 @@ public enum ItemInfoTooltip implements TooltipProvider {
     private static void addTardis(Consumer<Component> tooltip, TooltipFlag flag, DataComponentGetter components) {
         String interiorId = TardisInteriorOptions.effectiveInteriorId(components.get(GCDataComponents.TARDIS_INTERIOR));
         if (!interiorId.isEmpty()) {
-            tooltip.accept(SelectionTooltip.line("tooltip.gallifreyan_chronicles.tardis.schema",
+            tooltip.accept(SelectionTooltip.line(
+                    "tooltip.gallifreyan_chronicles.tardis.schema",
                     SelectionTooltip.highlight(SelectionTooltip.displayName("tardis_interior", interiorId))));
         }
 
@@ -64,7 +65,8 @@ public enum ItemInfoTooltip implements TooltipProvider {
 
         if (consoleId != null && !consoleId.isEmpty()) {
             variantId = ConsoleBlockItem.effectiveVariantId(consoleId, variantId);
-            tooltip.accept(SelectionTooltip.line("tooltip.gallifreyan_chronicles.console.model",
+            tooltip.accept(SelectionTooltip.line(
+                    "tooltip.gallifreyan_chronicles.console.model",
                     SelectionTooltip.highlight(SelectionTooltip.displayName("tardis_console", consoleId))));
 
             boolean choice = TardisConsoleRegistry.contains(consoleId)
@@ -91,7 +93,8 @@ public enum ItemInfoTooltip implements TooltipProvider {
         List<String> ids = DoorBlockItem.doorIds();
         if ((type == null || !ids.contains(type)) && !ids.isEmpty()) type = ids.getFirst();
         if (type == null) return;
-        tooltip.accept(SelectionTooltip.line("tooltip.gallifreyan_chronicles.door.type",
+        tooltip.accept(SelectionTooltip.line(
+                "tooltip.gallifreyan_chronicles.door.type",
                 SelectionTooltip.highlight(SelectionTooltip.displayName("door_type", Constants.MOD_ID + ":" + type))));
 
         if (components.getOrDefault(GCDataComponents.PRIMARY_DOOR, false)) {
@@ -109,9 +112,10 @@ public enum ItemInfoTooltip implements TooltipProvider {
         if (type == null || !TardisDoorRegistry.isInteriorVariant(type))
             type = TardisDoorRegistry.defaultInteriorVariantId();
         if (!type.isEmpty()) {
-            tooltip.accept(SelectionTooltip.line("tooltip.gallifreyan_chronicles.door.type",
-                    SelectionTooltip.highlight(SelectionTooltip.displayName("door_type",
-                            Constants.MOD_ID + ":" + TardisDoorRegistry.localId(type)))));
+            tooltip.accept(SelectionTooltip.line(
+                    "tooltip.gallifreyan_chronicles.door.type",
+                    SelectionTooltip.highlight(SelectionTooltip.displayName(
+                            "door_type", Constants.MOD_ID + ":" + TardisDoorRegistry.localId(type)))));
         }
 
         if (flag.isCreative() && TardisDoorRegistry.interiorVariantIds().size() > 1) {
@@ -121,7 +125,8 @@ public enum ItemInfoTooltip implements TooltipProvider {
 
     private static void addKeyStyle(Consumer<Component> tooltip, TooltipFlag flag, DataComponentGetter components) {
         String style = TardisKeyItem.styleOf(components.get(GCDataComponents.KEY_STYLE));
-        tooltip.accept(SelectionTooltip.line("tooltip.gallifreyan_chronicles.key.style",
+        tooltip.accept(SelectionTooltip.line(
+                "tooltip.gallifreyan_chronicles.key.style",
                 SelectionTooltip.highlight(SelectionTooltip.displayName("key_style", Constants.MOD_ID + ":" + style))));
         if (flag.isCreative()) {
             tooltip.accept(SelectionTooltip.scrollHint());
@@ -136,14 +141,16 @@ public enum ItemInfoTooltip implements TooltipProvider {
             tooltip.accept(Component.translatable("tooltip.gallifreyan_chronicles.key.unlinked")
                     .withStyle(ChatFormatting.DARK_GRAY));
         } else {
-            tooltip.accept(SelectionTooltip.line("tooltip.gallifreyan_chronicles.key.linked",
+            tooltip.accept(SelectionTooltip.line(
+                    "tooltip.gallifreyan_chronicles.key.linked",
                     SelectionTooltip.highlight(Component.literal(tardisId.toString()))));
             List<String> trusted = components.get(GCDataComponents.KEY_TRUSTED);
             if (trusted == null || trusted.isEmpty()) {
                 tooltip.accept(Component.translatable("tooltip.gallifreyan_chronicles.key.no_trusted")
                         .withStyle(ChatFormatting.DARK_GRAY));
             } else {
-                tooltip.accept(SelectionTooltip.line("tooltip.gallifreyan_chronicles.key.trusted",
+                tooltip.accept(SelectionTooltip.line(
+                        "tooltip.gallifreyan_chronicles.key.trusted",
                         SelectionTooltip.highlight(Component.literal(TardisKeyItem.trustedLine(trusted)))));
             }
         }
@@ -155,13 +162,15 @@ public enum ItemInfoTooltip implements TooltipProvider {
                 .withStyle(ChatFormatting.GOLD));
     }
 
-    private static void addStattenheimRemote(Consumer<Component> tooltip, TooltipFlag flag, DataComponentGetter components) {
+    private static void addStattenheimRemote(
+            Consumer<Component> tooltip, TooltipFlag flag, DataComponentGetter components) {
         UUID tardisId = components.get(GCDataComponents.TARDIS_ID);
         if (tardisId == null) {
             tooltip.accept(Component.translatable("tooltip.gallifreyan_chronicles.key.unlinked")
                     .withStyle(ChatFormatting.DARK_GRAY));
         } else {
-            tooltip.accept(SelectionTooltip.line("tooltip.gallifreyan_chronicles.key.linked",
+            tooltip.accept(SelectionTooltip.line(
+                    "tooltip.gallifreyan_chronicles.key.linked",
                     SelectionTooltip.highlight(Component.literal(tardisId.toString()))));
         }
     }

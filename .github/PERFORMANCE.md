@@ -1,6 +1,6 @@
 # Checking performance with spark
 
-Spark is a mod that shows what the game is spending its time on. It's already on the test server.
+spark is a mod that shows what the game is spending its time on. It's already on the test server.
 You use it to compare the game before your change and after it.
 
 ## The main rule: test the same thing both times

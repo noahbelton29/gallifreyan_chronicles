@@ -24,6 +24,7 @@ public final class Entity {
     public <T extends Component> T getOrNull(ComponentType<T> type) {
         return store.getOrNull(type);
     }
+
     public <T extends Component> void set(ComponentType<T> type, T value) {
         store.set(type, value);
         onDirty.run();

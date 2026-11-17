@@ -7,6 +7,5 @@ import uk.nbforge.gallifreyan_chronicles.client.sky.StarDensity;
 public final class StarDensityCodec {
     public static final Codec<StarDensity> CODEC = StringRepresentable.fromEnum(StarDensity::values);
 
-    private StarDensityCodec() {
-    }
+    private StarDensityCodec() {}
 }

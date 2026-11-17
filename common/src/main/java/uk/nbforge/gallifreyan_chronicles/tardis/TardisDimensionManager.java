@@ -1,12 +1,10 @@
 package uk.nbforge.gallifreyan_chronicles.tardis;
 
-import uk.nbforge.gallifreyan_chronicles.compat.portal.TardisPortalBridge;
-import uk.nbforge.gallifreyan_chronicles.Constants;
-import uk.nbforge.gallifreyan_chronicles.core.block_entities.TardisConsoleBlockEntity;
-import uk.nbforge.gallifreyan_chronicles.core.GCDimensions;
-import uk.nbforge.gallifreyan_chronicles.mixin.server.MinecraftServerAccessor;
-import uk.nbforge.gallifreyan_chronicles.tardis.ecs.system.TardisInteriorSystem;
-import uk.nbforge.gallifreyan_chronicles.util.GCUtil;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.UUID;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.MinecraftServer;
@@ -18,20 +16,20 @@ import net.minecraft.world.level.biome.BiomeManager;
 import net.minecraft.world.level.dimension.LevelStem;
 import net.minecraft.world.level.storage.DerivedLevelData;
 import org.jspecify.annotations.Nullable;
-
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.UUID;
+import uk.nbforge.gallifreyan_chronicles.Constants;
+import uk.nbforge.gallifreyan_chronicles.compat.portal.TardisPortalBridge;
+import uk.nbforge.gallifreyan_chronicles.core.GCDimensions;
+import uk.nbforge.gallifreyan_chronicles.core.block_entities.TardisConsoleBlockEntity;
+import uk.nbforge.gallifreyan_chronicles.mixin.server.MinecraftServerAccessor;
+import uk.nbforge.gallifreyan_chronicles.tardis.ecs.system.TardisInteriorSystem;
+import uk.nbforge.gallifreyan_chronicles.util.GCUtil;
 
 public final class TardisDimensionManager {
     private static final Map<UUID, UUID> PENDING = new LinkedHashMap<>();
     private static final Map<UUID, Integer> PLACE_CONTROLS = new LinkedHashMap<>();
     private static final int CONTROL_PLACE_DELAY_TICKS = 5;
 
-    private TardisDimensionManager() {
-    }
+    private TardisDimensionManager() {}
 
     public static ResourceKey<Level> levelKey(UUID tardisId) {
         return ResourceKey.create(Registries.DIMENSION, GCUtil.modIdentifier("tardis/" + tardisId));
@@ -46,8 +44,8 @@ public final class TardisDimensionManager {
         ServerLevel existing = server.getLevel(key);
         if (existing != null) return existing;
 
-        LevelStem template = server.registryAccess().lookupOrThrow(Registries.LEVEL_STEM)
-                .getValue(GCDimensions.TARDIS_INTERIOR_KEY);
+        LevelStem template =
+                server.registryAccess().lookupOrThrow(Registries.LEVEL_STEM).getValue(GCDimensions.TARDIS_INTERIOR_KEY);
         if (template == null) {
             throw new IllegalStateException("missing level stem " + GCDimensions.TARDIS_INTERIOR_KEY);
         }
@@ -55,11 +53,20 @@ public final class TardisDimensionManager {
         MinecraftServerAccessor accessor = (MinecraftServerAccessor) server;
         var worldData = server.getWorldData();
         DerivedLevelData levelData = new DerivedLevelData(worldData, worldData.overworldData());
-        long biomeZoomSeed = BiomeManager.obfuscateSeed(server.getWorldGenSettings().options().seed());
+        long biomeZoomSeed = BiomeManager.obfuscateSeed(
+                server.getWorldGenSettings().options().seed());
 
-        ServerLevel level = new ServerLevel(server, Util.backgroundExecutor(),
-                accessor.gallifreyan_chronicles$getStorageSource(), levelData, key, template,
-                worldData.isDebugWorld(), biomeZoomSeed, List.of(), false);
+        ServerLevel level = new ServerLevel(
+                server,
+                Util.backgroundExecutor(),
+                accessor.gallifreyan_chronicles$getStorageSource(),
+                levelData,
+                key,
+                template,
+                worldData.isDebugWorld(),
+                biomeZoomSeed,
+                List.of(),
+                false);
 
         accessor.gallifreyan_chronicles$getLevels().put(key, level);
         level.getWorldBorder().setAbsoluteMaxSize(server.getAbsoluteMaxWorldSize());
@@ -119,8 +126,8 @@ public final class TardisDimensionManager {
         boolean firstEntry = TardisInteriorSystem.buildInteriorIfMissing(interior, tardisId);
         TardisInteriorSystem.Arrival arrival = TardisInteriorSystem.arrival(interior, tardisId);
         TardisInteriorSystem.markArriving(player);
-        player.teleportTo(interior, arrival.pos().x, arrival.pos().y, arrival.pos().z, Set.of(),
-                arrival.yaw(), 0.0f, true);
+        player.teleportTo(
+                interior, arrival.pos().x, arrival.pos().y, arrival.pos().z, Set.of(), arrival.yaw(), 0.0f, true);
 
         if (firstEntry) {
             PLACE_CONTROLS.put(tardisId, CONTROL_PLACE_DELAY_TICKS);
@@ -140,9 +147,11 @@ public final class TardisDimensionManager {
             iterator.remove();
 
             UUID tardisId = entry.getKey();
-            TardisApi.get(server, tardisId).flatMap(Tardis::console).ifPresentOrElse(
-                    TardisConsoleBlockEntity::respawnControls,
-                    () -> Constants.LOG.warn("no console to place controls on for tardis {}", tardisId));
+            TardisApi.get(server, tardisId)
+                    .flatMap(Tardis::console)
+                    .ifPresentOrElse(
+                            TardisConsoleBlockEntity::respawnControls,
+                            () -> Constants.LOG.warn("no console to place controls on for tardis {}", tardisId));
         }
     }
 }

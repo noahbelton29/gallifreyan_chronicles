@@ -6,8 +6,7 @@ import uk.nbforge.gallifreyan_chronicles.tardis.ecs.TardisComponentTypes;
 import uk.nbforge.gallifreyan_chronicles.tardis.ecs.component.ConsoleComponent;
 
 public final class ConsoleSystem {
-    private ConsoleSystem() {
-    }
+    private ConsoleSystem() {}
 
     public static TardisConsole consoleOf(Entity entity) {
         return entity.get(TardisComponentTypes.CONSOLE).console();

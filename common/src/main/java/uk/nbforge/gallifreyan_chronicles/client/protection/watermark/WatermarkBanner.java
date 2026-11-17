@@ -1,10 +1,10 @@
 package uk.nbforge.gallifreyan_chronicles.client.protection.watermark;
 
-import uk.nbforge.gallifreyan_chronicles.Constants;
-import uk.nbforge.gallifreyan_chronicles.platform.Services;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
+import uk.nbforge.gallifreyan_chronicles.Constants;
+import uk.nbforge.gallifreyan_chronicles.platform.Services;
 
 public final class WatermarkBanner {
     private static final int RED = 0xFFFF3030;
@@ -15,16 +15,15 @@ public final class WatermarkBanner {
     private static String text;
     private static boolean logged;
 
-    private WatermarkBanner() {
-    }
+    private WatermarkBanner() {}
 
     private static String text() {
         if (text == null) {
             String version = Services.PLATFORM.getModVersion(MOD_ID);
             int devIndex = version.indexOf(DEV_MARKER);
             String baseVersion = devIndex < 0 ? version : version.substring(0, devIndex);
-            text = "BUILD " + WatermarkIdentity.buildId()
-                    + " | Prototype Build v" + baseVersion + ", Everything subject to change";
+            text = "BUILD " + WatermarkIdentity.buildId() + " | Prototype Build v" + baseVersion
+                    + ", Everything subject to change";
         }
         return text;
     }

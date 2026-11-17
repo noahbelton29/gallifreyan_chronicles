@@ -1,20 +1,19 @@
 package uk.nbforge.gallifreyan_chronicles.tardis.mind.action;
 
-import net.minecraft.core.BlockPos;
+import java.util.UUID;
 import java.util.function.BiConsumer;
-import uk.nbforge.gallifreyan_chronicles.tardis.Tardis;
-import uk.nbforge.gallifreyan_chronicles.tardis.ecs.system.TardisMindSystem.Refusal;
+import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.phys.Vec3;
 import org.jspecify.annotations.Nullable;
-
-import java.util.UUID;
+import uk.nbforge.gallifreyan_chronicles.tardis.Tardis;
+import uk.nbforge.gallifreyan_chronicles.tardis.ecs.system.TardisMindSystem.Refusal;
 
 /**
-   What is going on when a hook runs.
-   Level, player and pos are only there when the hook has them.
-*/
+ * What is going on when a hook runs.
+ * Level, player and pos are only there when the hook has them.
+ */
 public final class MindContext {
     public final Tardis tardis;
     public final @Nullable ServerLevel level;

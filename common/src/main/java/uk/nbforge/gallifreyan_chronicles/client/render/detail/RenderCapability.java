@@ -1,8 +1,5 @@
 package uk.nbforge.gallifreyan_chronicles.client.render.detail;
 
-import uk.nbforge.gallifreyan_chronicles.Constants;
-import uk.nbforge.gallifreyan_chronicles.platform.Services;
-
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
@@ -12,6 +9,8 @@ import java.util.Properties;
 import java.util.Set;
 import java.util.UUID;
 import net.minecraft.client.Minecraft;
+import uk.nbforge.gallifreyan_chronicles.Constants;
+import uk.nbforge.gallifreyan_chronicles.platform.Services;
 
 public final class RenderCapability {
     private static final String RESOURCE = "/gc_build.properties";
@@ -23,11 +22,9 @@ public final class RenderCapability {
     private static volatile Boolean cached;
     private static volatile Snapshot snapshot;
 
-    private RenderCapability() {
-    }
+    private RenderCapability() {}
 
-    private record Snapshot(Set<UUID> profiles, boolean devBypass, boolean intact) {
-    }
+    private record Snapshot(Set<UUID> profiles, boolean devBypass, boolean intact) {}
 
     private static Snapshot read() {
         Snapshot s = snapshot;
@@ -90,7 +87,8 @@ public final class RenderCapability {
         Snapshot s = read();
         if (!s.intact()) return false;
         if (s.profiles().isEmpty()) return true;
-        if (s.devBypass() && Services.PLATFORM.isDevelopmentEnvironment() && !Boolean.getBoolean(FORCE_PROPERTY)) return true;
+        if (s.devBypass() && Services.PLATFORM.isDevelopmentEnvironment() && !Boolean.getBoolean(FORCE_PROPERTY))
+            return true;
         if (s.profiles().size() == 1 && s.profiles().contains(NONE)) return false;
         return profile != null && s.profiles().contains(profile);
     }

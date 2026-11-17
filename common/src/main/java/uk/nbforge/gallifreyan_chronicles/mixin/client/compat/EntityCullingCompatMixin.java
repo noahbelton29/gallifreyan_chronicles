@@ -1,7 +1,6 @@
 package uk.nbforge.gallifreyan_chronicles.mixin.client.compat;
 
-import uk.nbforge.gallifreyan_chronicles.util.TardisDimensionUtil;
-import uk.nbforge.gallifreyan_chronicles.Constants;
+import java.util.function.Function;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.core.registries.BuiltInRegistries;
@@ -16,8 +15,8 @@ import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
-
-import java.util.function.Function;
+import uk.nbforge.gallifreyan_chronicles.Constants;
+import uk.nbforge.gallifreyan_chronicles.util.TardisDimensionUtil;
 
 @Pseudo
 @Mixin(targets = "dev.tr7zw.entityculling.EntityCullingModBase", remap = false)

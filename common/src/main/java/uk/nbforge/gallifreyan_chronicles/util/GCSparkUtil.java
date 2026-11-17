@@ -1,7 +1,5 @@
 package uk.nbforge.gallifreyan_chronicles.util;
 
-import uk.nbforge.gallifreyan_chronicles.core.GCSounds;
-import uk.nbforge.gallifreyan_chronicles.network.tardis.TardisDrumShakePayload;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.server.level.ServerLevel;
@@ -9,18 +7,19 @@ import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.phys.Vec3;
+import uk.nbforge.gallifreyan_chronicles.core.GCSounds;
+import uk.nbforge.gallifreyan_chronicles.network.tardis.TardisDrumShakePayload;
 
 /**
-   Sparks made of fire with a bit of smoke and their sounds, small crackles, big bursts and full blasts.
-   Every spark jolts the screen and bigger sparks jolt harder.
-*/
+ * Sparks made of fire with a bit of smoke and their sounds, small crackles, big bursts and full blasts.
+ * Every spark jolts the screen and bigger sparks jolt harder.
+ */
 public final class GCSparkUtil {
     private static final float SMALL_SHAKE = 2.0f;
     private static final float BIG_SHAKE = 3.0f;
     private static final float BLAST_SHAKE = 4.5f;
 
-    private GCSparkUtil() {
-    }
+    private GCSparkUtil() {}
 
     /** A little crackle. */
     public static void small(ServerLevel level, Vec3 at, int amount) {
@@ -65,7 +64,12 @@ public final class GCSparkUtil {
             float volume = 0.5f - i * 0.08f;
             GCSchedulerUtil.runLater(level.getServer(), delay, () -> {
                 level.sendParticles(ParticleTypes.FLAME, at.x, at.y, at.z, 5, 0.25, 0.15, 0.25, 0.06);
-                play(level, at, GCSounds.SPARK, Math.max(0.15f, volume), 1.0f + level.getRandom().nextFloat() * 0.4f);
+                play(
+                        level,
+                        at,
+                        GCSounds.SPARK,
+                        Math.max(0.15f, volume),
+                        1.0f + level.getRandom().nextFloat() * 0.4f);
                 TardisDrumShakePayload.broadcast(level, at, SMALL_SHAKE * 0.5f);
             });
         }

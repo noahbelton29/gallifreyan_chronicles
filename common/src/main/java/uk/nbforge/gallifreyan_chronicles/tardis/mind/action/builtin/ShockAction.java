@@ -1,16 +1,16 @@
 package uk.nbforge.gallifreyan_chronicles.tardis.mind.action.builtin;
 
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.phys.Vec3;
 import uk.nbforge.gallifreyan_chronicles.Constants;
 import uk.nbforge.gallifreyan_chronicles.tardis.mind.action.MindAction;
 import uk.nbforge.gallifreyan_chronicles.tardis.mind.action.MindContext;
 import uk.nbforge.gallifreyan_chronicles.util.PlayerMotionUtil;
-import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.phys.Vec3;
 
 /**
-   Zaps the player if they are close enough and throws them back.
-   The json fields are range, damage, push and lift.
-*/
+ * Zaps the player if they are close enough and throws them back.
+ * The json fields are range, damage, push and lift.
+ */
 public record ShockAction(float range, float damage, float push, float lift) implements MindAction {
     public static final String TYPE = Constants.MOD_ID + ":shock";
 

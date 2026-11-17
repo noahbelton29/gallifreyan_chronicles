@@ -1,12 +1,12 @@
 package uk.nbforge.gallifreyan_chronicles.event_subscriber;
 
-import uk.nbforge.gallifreyan_chronicles.Constants;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.neoforge.event.entity.player.PlayerEvent;
-import uk.nbforge.gallifreyan_chronicles.core.GCDataComponents;
+import uk.nbforge.gallifreyan_chronicles.Constants;
 import uk.nbforge.gallifreyan_chronicles.core.GCBlocks;
+import uk.nbforge.gallifreyan_chronicles.core.GCDataComponents;
 
 public class GCCraftingHandler {
     @SubscribeEvent

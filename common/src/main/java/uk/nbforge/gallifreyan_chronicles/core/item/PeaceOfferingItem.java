@@ -1,7 +1,6 @@
 package uk.nbforge.gallifreyan_chronicles.core.item;
 
-import uk.nbforge.gallifreyan_chronicles.tardis.Tardis;
-import uk.nbforge.gallifreyan_chronicles.tardis.mind.offering.TardisPeaceOffering;
+import java.util.Optional;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
@@ -9,8 +8,8 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.level.Level;
 import org.jspecify.annotations.NonNull;
-
-import java.util.Optional;
+import uk.nbforge.gallifreyan_chronicles.tardis.Tardis;
+import uk.nbforge.gallifreyan_chronicles.tardis.mind.offering.TardisPeaceOffering;
 
 /** A treat to make peace with a TARDIS, use it on the console or the box. */
 public class PeaceOfferingItem extends Item {

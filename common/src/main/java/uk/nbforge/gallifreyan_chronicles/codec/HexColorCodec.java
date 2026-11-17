@@ -2,14 +2,12 @@ package uk.nbforge.gallifreyan_chronicles.codec;
 
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.DataResult;
-
 import java.util.Locale;
 
 public final class HexColorCodec {
     public static final Codec<Integer> CODEC = Codec.STRING.comapFlatMap(HexColorCodec::parse, HexColorCodec::format);
 
-    private HexColorCodec() {
-    }
+    private HexColorCodec() {}
 
     public static DataResult<Integer> parse(String text) {
         String hex = text.startsWith("#") ? text.substring(1) : text;

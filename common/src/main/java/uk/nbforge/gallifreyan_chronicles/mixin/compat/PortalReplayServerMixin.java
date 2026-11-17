@@ -30,8 +30,8 @@ public abstract class PortalReplayServerMixin {
 
     // Backup, if it still gets here send a harmless remove packet and not a broken portal
     @WrapMethod(method = "getAddEntityPacket", remap = false, require = 0)
-    private Packet<ClientGamePacketListener> gc$safePacket(ServerEntity serverEntity,
-                                                           Operation<Packet<ClientGamePacketListener>> original) {
+    private Packet<ClientGamePacketListener> gc$safePacket(
+            ServerEntity serverEntity, Operation<Packet<ClientGamePacketListener>> original) {
         if (((Portal) (Object) this).getAxisW() != null) {
             return original.call(serverEntity);
         }

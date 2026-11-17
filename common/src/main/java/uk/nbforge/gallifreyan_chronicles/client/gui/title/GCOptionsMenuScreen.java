@@ -1,6 +1,6 @@
 package uk.nbforge.gallifreyan_chronicles.client.gui.title;
 
-import uk.nbforge.gallifreyan_chronicles.compat.essential.EssentialMenuCompat;
+import java.util.List;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.TitleScreen;
@@ -8,8 +8,7 @@ import net.minecraft.client.gui.screens.options.AccessibilityOptionsScreen;
 import net.minecraft.client.gui.screens.options.LanguageSelectScreen;
 import net.minecraft.client.gui.screens.options.OptionsScreen;
 import net.minecraft.network.chat.Component;
-
-import java.util.List;
+import uk.nbforge.gallifreyan_chronicles.compat.essential.EssentialMenuCompat;
 
 public class GCOptionsMenuScreen extends Screen {
     private static final int BUTTON_WIDTH = 200;
@@ -59,23 +58,40 @@ public class GCOptionsMenuScreen extends Screen {
         int x = (this.width - BUTTON_WIDTH) / 2;
         int y = this.top();
 
-        this.addRenderableWidget(new GCButton(x, y, BUTTON_WIDTH, BUTTON_HEIGHT,
+        this.addRenderableWidget(new GCButton(
+                x,
+                y,
+                BUTTON_WIDTH,
+                BUTTON_HEIGHT,
                 Component.translatable("menu.gallifreyan_chronicles.game_options"),
                 button -> this.minecraft.gui.setScreen(new OptionsScreen(this, this.minecraft.options))));
         y += BUTTON_STEP;
 
-        this.addRenderableWidget(new GCButton(x, y, BUTTON_WIDTH, BUTTON_HEIGHT,
+        this.addRenderableWidget(new GCButton(
+                x,
+                y,
+                BUTTON_WIDTH,
+                BUTTON_HEIGHT,
                 Component.translatable("options.language"),
-                button -> this.minecraft.gui.setScreen(new LanguageSelectScreen(this, this.minecraft.options, this.minecraft.getLanguageManager()))));
+                button -> this.minecraft.gui.setScreen(
+                        new LanguageSelectScreen(this, this.minecraft.options, this.minecraft.getLanguageManager()))));
         y += BUTTON_STEP;
 
-        this.addRenderableWidget(new GCButton(x, y, BUTTON_WIDTH, BUTTON_HEIGHT,
+        this.addRenderableWidget(new GCButton(
+                x,
+                y,
+                BUTTON_WIDTH,
+                BUTTON_HEIGHT,
                 Component.translatable("options.accessibility"),
                 button -> this.minecraft.gui.setScreen(new AccessibilityOptionsScreen(this, this.minecraft.options))));
         y += BUTTON_STEP;
 
         if (ReplayViewerHook.available()) {
-            this.addRenderableWidget(new GCButton(x, y, BUTTON_WIDTH, BUTTON_HEIGHT,
+            this.addRenderableWidget(new GCButton(
+                    x,
+                    y,
+                    BUTTON_WIDTH,
+                    BUTTON_HEIGHT,
                     Component.translatableWithFallback("menu.gallifreyan_chronicles.replay_viewer", "Replay Viewer"),
                     button -> {
                         Runnable opener = ReplayViewerHook.opener;
@@ -93,8 +109,8 @@ public class GCOptionsMenuScreen extends Screen {
                 int column = i % 2;
                 int bx = column == 0 ? x : x + BUTTON_WIDTH - half;
                 int width = column == 0 && i == ids.size() - 1 ? BUTTON_WIDTH : half;
-                this.addRenderableWidget(new GCButton(bx, y, width, BUTTON_HEIGHT, EssentialMenuCompat.label(id),
-                        button -> {
+                this.addRenderableWidget(
+                        new GCButton(bx, y, width, BUTTON_HEIGHT, EssentialMenuCompat.label(id), button -> {
                             EssentialMenuCompat.requestOnTitleScreen(id);
                             this.minecraft.gui.setScreen(this.parent);
                         }));
@@ -103,8 +119,8 @@ public class GCOptionsMenuScreen extends Screen {
         }
         y += DONE_GAP;
 
-        this.addRenderableWidget(new GCButton(x, y, BUTTON_WIDTH, BUTTON_HEIGHT,
-                Component.translatable("gui.done"), button -> this.onClose()));
+        this.addRenderableWidget(new GCButton(
+                x, y, BUTTON_WIDTH, BUTTON_HEIGHT, Component.translatable("gui.done"), button -> this.onClose()));
     }
 
     @Override
@@ -112,8 +128,12 @@ public class GCOptionsMenuScreen extends Screen {
         super.extractRenderState(graphics, mouseX, mouseY, partialTick);
         graphics.centeredText(this.font, this.title, this.width / 2, this.top() - TITLE_GAP, TITLE_COLOR);
         if (this.essentialRows() > 0) {
-            graphics.centeredText(this.font, Component.translatableWithFallback("menu.gallifreyan_chronicles.essential", "Essential"),
-                    this.width / 2, this.essentialHeadingY(), SECTION_COLOR);
+            graphics.centeredText(
+                    this.font,
+                    Component.translatableWithFallback("menu.gallifreyan_chronicles.essential", "Essential"),
+                    this.width / 2,
+                    this.essentialHeadingY(),
+                    SECTION_COLOR);
         }
     }
 

@@ -1,13 +1,6 @@
 package uk.nbforge.gallifreyan_chronicles.core.item;
 
-import uk.nbforge.gallifreyan_chronicles.core.block.TardisTopBlock;
-import uk.nbforge.gallifreyan_chronicles.core.block_entities.TardisConsoleBlockEntity;
-import uk.nbforge.gallifreyan_chronicles.core.block_entities.TardisExteriorBlockEntity;
-import uk.nbforge.gallifreyan_chronicles.tardis.Tardis;
-import uk.nbforge.gallifreyan_chronicles.tardis.TardisApi;
-import uk.nbforge.gallifreyan_chronicles.tardis.mind.abuse.TardisMallet;
-import uk.nbforge.gallifreyan_chronicles.tardis.mind.abuse.TardisTrauma;
-import uk.nbforge.gallifreyan_chronicles.tardis.mind.MindMessages;
+import java.util.Optional;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
@@ -21,8 +14,14 @@ import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.level.Level;
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
-
-import java.util.Optional;
+import uk.nbforge.gallifreyan_chronicles.core.block.TardisTopBlock;
+import uk.nbforge.gallifreyan_chronicles.core.block_entities.TardisConsoleBlockEntity;
+import uk.nbforge.gallifreyan_chronicles.core.block_entities.TardisExteriorBlockEntity;
+import uk.nbforge.gallifreyan_chronicles.tardis.Tardis;
+import uk.nbforge.gallifreyan_chronicles.tardis.TardisApi;
+import uk.nbforge.gallifreyan_chronicles.tardis.mind.MindMessages;
+import uk.nbforge.gallifreyan_chronicles.tardis.mind.abuse.TardisMallet;
+import uk.nbforge.gallifreyan_chronicles.tardis.mind.abuse.TardisTrauma;
 
 public class MalletItem extends Item {
     private static final int STRIKE_COOLDOWN_TICKS = 60;

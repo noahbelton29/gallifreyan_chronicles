@@ -1,22 +1,16 @@
 package uk.nbforge.gallifreyan_chronicles.core.item;
 
-import uk.nbforge.gallifreyan_chronicles.util.MessageUtil;
-import uk.nbforge.gallifreyan_chronicles.tardis.TardisManager;
-import net.minecraft.world.entity.EquipmentSlot;
-import net.minecraft.world.entity.Entity;
-import net.minecraft.server.players.NameAndId;
-import net.minecraft.server.level.ServerLevel;
-import net.minecraft.server.MinecraftServer;
-
 import java.util.ArrayList;
-
-import uk.nbforge.gallifreyan_chronicles.tardis.TardisApi;
-import uk.nbforge.gallifreyan_chronicles.core.block_entities.TardisConsoleBlockEntity;
-import uk.nbforge.gallifreyan_chronicles.core.block_entities.TardisExteriorBlockEntity;
-import uk.nbforge.gallifreyan_chronicles.core.GCDataComponents;
+import java.util.List;
+import java.util.UUID;
+import net.minecraft.server.MinecraftServer;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.players.NameAndId;
 import net.minecraft.util.Prediction;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
@@ -24,11 +18,13 @@ import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.level.Level;
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
-
-import java.util.List;
-import java.util.UUID;
-
+import uk.nbforge.gallifreyan_chronicles.core.GCDataComponents;
+import uk.nbforge.gallifreyan_chronicles.core.block_entities.TardisConsoleBlockEntity;
+import uk.nbforge.gallifreyan_chronicles.core.block_entities.TardisExteriorBlockEntity;
 import uk.nbforge.gallifreyan_chronicles.core.item.tooltip.ItemInfoTooltip;
+import uk.nbforge.gallifreyan_chronicles.tardis.TardisApi;
+import uk.nbforge.gallifreyan_chronicles.tardis.TardisManager;
+import uk.nbforge.gallifreyan_chronicles.util.MessageUtil;
 
 public class TardisKeyItem extends Item implements ScrollSelectable {
     public static final List<String> STYLES = List.of("tardis", "gallifreyan", "yale");
@@ -51,8 +47,8 @@ public class TardisKeyItem extends Item implements ScrollSelectable {
         return true;
     }
 
-    private static InteractionResult linkToConsole(Player player, InteractionHand hand, ItemStack stack,
-                                                   TardisConsoleBlockEntity console, Level level) {
+    private static InteractionResult linkToConsole(
+            Player player, InteractionHand hand, ItemStack stack, TardisConsoleBlockEntity console, Level level) {
         UUID tardisId = console.getTardisId();
         if (stack.get(GCDataComponents.TARDIS_ID) != null || tardisId == null) {
             return InteractionResult.PASS;
@@ -86,7 +82,9 @@ public class TardisKeyItem extends Item implements ScrollSelectable {
         MinecraftServer server = level.getServer();
         List<String> names = new ArrayList<>();
         for (UUID player : TardisManager.get(server).trustedOf(tardisId)) {
-            names.add(server.services().nameToIdCache().get(player)
+            names.add(server.services()
+                    .nameToIdCache()
+                    .get(player)
                     .map(NameAndId::name)
                     .orElse(player.toString().substring(0, 8)));
         }
@@ -155,7 +153,9 @@ public class TardisKeyItem extends Item implements ScrollSelectable {
 
             exterior.insertKey(player, context.getHand(), stack);
         } else {
-            if (!TardisApi.of(exterior).map(tardis -> tardis.returnKeyTo(player)).orElse(false)) {
+            if (!TardisApi.of(exterior)
+                    .map(tardis -> tardis.returnKeyTo(player))
+                    .orElse(false)) {
                 return InteractionResult.FAIL;
             }
         }

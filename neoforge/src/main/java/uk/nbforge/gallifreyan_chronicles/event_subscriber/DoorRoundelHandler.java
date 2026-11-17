@@ -8,7 +8,8 @@ import uk.nbforge.gallifreyan_chronicles.core.block.DoorRoundelInteraction;
 public class DoorRoundelHandler {
     @SubscribeEvent
     public void onRightClickBlock(PlayerInteractEvent.RightClickBlock event) {
-        InteractionResult result = DoorRoundelInteraction.interact(event.getEntity(), event.getLevel(), event.getHand(), event.getHitVec());
+        InteractionResult result = DoorRoundelInteraction.interact(
+                event.getEntity(), event.getLevel(), event.getHand(), event.getHitVec());
         if (result != InteractionResult.PASS) {
             event.setCancellationResult(result);
             event.setCanceled(true);

@@ -1,13 +1,22 @@
 package uk.nbforge.gallifreyan_chronicles.tardis.door;
 
+import uk.nbforge.gallifreyan_chronicles.core.data.IdentifiableData;
 import uk.nbforge.gallifreyan_chronicles.util.GCUtil;
 
-import uk.nbforge.gallifreyan_chronicles.core.data.IdentifiableData;
-
-public record TardisDoorVariant(String id, String parent, String texture, boolean isDefault, boolean interior,
-                                String exterior,
-                                String openSound, String closeSound, boolean openAllOnly, int priority,
-                                String block, String particle, float cooldownSeconds)
+public record TardisDoorVariant(
+        String id,
+        String parent,
+        String texture,
+        boolean isDefault,
+        boolean interior,
+        String exterior,
+        String openSound,
+        String closeSound,
+        boolean openAllOnly,
+        int priority,
+        String block,
+        String particle,
+        float cooldownSeconds)
         implements IdentifiableData<TardisDoorVariant> {
 
     public static final int NO_PRIORITY = Integer.MAX_VALUE;
@@ -20,6 +29,19 @@ public record TardisDoorVariant(String id, String parent, String texture, boolea
 
     @Override
     public TardisDoorVariant withId(String id) {
-        return new TardisDoorVariant(id, parent, texture, isDefault, interior, exterior, openSound, closeSound, openAllOnly, priority, block, particle, cooldownSeconds);
+        return new TardisDoorVariant(
+                id,
+                parent,
+                texture,
+                isDefault,
+                interior,
+                exterior,
+                openSound,
+                closeSound,
+                openAllOnly,
+                priority,
+                block,
+                particle,
+                cooldownSeconds);
     }
 }

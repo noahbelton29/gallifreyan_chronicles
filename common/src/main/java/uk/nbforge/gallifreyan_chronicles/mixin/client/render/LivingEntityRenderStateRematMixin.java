@@ -1,9 +1,9 @@
 package uk.nbforge.gallifreyan_chronicles.mixin.client.render;
 
-import uk.nbforge.gallifreyan_chronicles.client.tardis.RematAlpha;
 import net.minecraft.client.renderer.entity.state.LivingEntityRenderState;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
+import uk.nbforge.gallifreyan_chronicles.client.tardis.RematAlpha;
 
 /** How faded a player is while a TARDIS materialises around them. */
 @Mixin(LivingEntityRenderState.class)

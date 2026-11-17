@@ -1,9 +1,8 @@
 package uk.nbforge.gallifreyan_chronicles.ecs;
 
 import com.mojang.serialization.Codec;
-import uk.nbforge.gallifreyan_chronicles.util.GCUtil;
-
 import java.util.function.Supplier;
+import uk.nbforge.gallifreyan_chronicles.util.GCUtil;
 
 public final class ComponentType<T extends Component> {
     private final String id;
@@ -32,12 +31,15 @@ public final class ComponentType<T extends Component> {
     public String id() {
         return id;
     }
+
     public boolean isPersistent() {
         return codec != null;
     }
+
     public Codec<T> codec() {
         return codec;
     }
+
     public T createDefault() {
         return initializer != null ? initializer.get() : null;
     }

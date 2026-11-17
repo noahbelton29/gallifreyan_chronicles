@@ -382,8 +382,7 @@ public final class WatermarkFont {
     private static final Map<Character, int[]> GLYPHS = parse();
     private static final int[] BLANK = new int[GLYPH_HEIGHT];
 
-    private WatermarkFont() {
-    }
+    private WatermarkFont() {}
 
     private static Map<Character, int[]> parse() {
         Map<Character, int[]> glyphs = new HashMap<>();

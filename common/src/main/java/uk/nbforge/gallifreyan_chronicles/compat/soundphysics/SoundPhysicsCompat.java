@@ -1,17 +1,16 @@
 package uk.nbforge.gallifreyan_chronicles.compat.soundphysics;
 
-import uk.nbforge.gallifreyan_chronicles.util.TardisDimensionUtil;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.multiplayer.ClientLevel;
 import uk.nbforge.gallifreyan_chronicles.Constants;
 import uk.nbforge.gallifreyan_chronicles.client.gui.hud.GCPowerDarkness;
 import uk.nbforge.gallifreyan_chronicles.core.GCDimensions;
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.multiplayer.ClientLevel;
+import uk.nbforge.gallifreyan_chronicles.util.TardisDimensionUtil;
 
 public final class SoundPhysicsCompat {
     private static volatile boolean loggedActive;
 
-    private SoundPhysicsCompat() {
-    }
+    private SoundPhysicsCompat() {}
 
     public static void markActive() {
         if (loggedActive) return;

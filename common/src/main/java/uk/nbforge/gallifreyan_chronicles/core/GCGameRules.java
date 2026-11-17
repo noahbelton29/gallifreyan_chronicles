@@ -2,8 +2,6 @@ package uk.nbforge.gallifreyan_chronicles.core;
 
 import com.mojang.brigadier.arguments.BoolArgumentType;
 import com.mojang.serialization.Codec;
-import uk.nbforge.gallifreyan_chronicles.Constants;
-import uk.nbforge.gallifreyan_chronicles.util.GCUtil;
 import net.minecraft.core.Registry;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.Identifier;
@@ -12,13 +10,12 @@ import net.minecraft.world.level.gamerules.GameRule;
 import net.minecraft.world.level.gamerules.GameRuleCategory;
 import net.minecraft.world.level.gamerules.GameRuleType;
 import net.minecraft.world.level.gamerules.GameRuleTypeVisitor;
+import uk.nbforge.gallifreyan_chronicles.Constants;
+import uk.nbforge.gallifreyan_chronicles.util.GCUtil;
 
 public class GCGameRules {
-    public static final GameRule<Boolean> TARDIS_GRIEFING = register(
-            "gc_tardis_griefing",
-            GCGameRuleCategories.GALLIFREYAN_CHRONICLES,
-            true
-    );
+    public static final GameRule<Boolean> TARDIS_GRIEFING =
+            register("gc_tardis_griefing", GCGameRuleCategories.GALLIFREYAN_CHRONICLES, true);
 
     private static GameRule<Boolean> register(String id, GameRuleCategory category, boolean defaultValue) {
         Identifier identifier = GCUtil.modIdentifier(id);
@@ -31,8 +28,7 @@ public class GCGameRules {
                 Codec.BOOL,
                 (b) -> b ? 1 : 0,
                 defaultValue,
-                FeatureFlagSet.of()
-        );
+                FeatureFlagSet.of());
 
         return Registry.register(BuiltInRegistries.GAME_RULE, identifier, rule);
     }

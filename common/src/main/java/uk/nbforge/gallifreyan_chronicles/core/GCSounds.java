@@ -1,12 +1,11 @@
 package uk.nbforge.gallifreyan_chronicles.core;
 
 import java.util.function.Function;
-
-import uk.nbforge.gallifreyan_chronicles.util.GCUtil;
 import net.minecraft.core.Registry;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.Identifier;
 import net.minecraft.sounds.SoundEvent;
+import uk.nbforge.gallifreyan_chronicles.util.GCUtil;
 
 public class GCSounds {
     public static final float HEARING_RANGE = 10.0F;
@@ -27,7 +26,8 @@ public class GCSounds {
     public static final SoundEvent TARDIS_UNCLOAK = registerFixedRange("uncloak", HEARING_RANGE);
     public static final SoundEvent HARTNELL_DOOR = registerFixedRange("hartnell_door", HEARING_RANGE);
     public static final SoundEvent TARDIS_STOP_DEMAT = registerFixedRange("stop_demat", HEARING_RANGE);
-    public static final SoundEvent TARDIS_LANDING_NOTIFICATION = registerFixedRange("landing_notification", HEARING_RANGE);
+    public static final SoundEvent TARDIS_LANDING_NOTIFICATION =
+            registerFixedRange("landing_notification", HEARING_RANGE);
     public static final SoundEvent TARDIS_STABILIZERS_ON = registerFixedRange("stabilizers_on", HEARING_RANGE);
     public static final float FX_HEARING_RANGE = 24.0F;
     public static final SoundEvent SPARK = registerFixedRange("spark", HEARING_RANGE);
@@ -38,16 +38,11 @@ public class GCSounds {
 
     public static final float TAKEOFF_HEARING_RANGE = 25.0F;
 
-    public static final SoundEvent TARDIS_DRUM =
-            registerFixedRange("tardis_drum", TAKEOFF_HEARING_RANGE);
-    public static final SoundEvent TARDIS_LAND =
-            registerFixedRange("tardis_land", TAKEOFF_HEARING_RANGE);
-    public static final SoundEvent TARDIS_LAND_DRUM =
-            registerFixedRange("tardis_land_drum", TAKEOFF_HEARING_RANGE);
-    public static final SoundEvent TARDIS_TAKEOFF =
-            registerFixedRange("tardis_takeoff", TAKEOFF_HEARING_RANGE);
-    public static final SoundEvent TARDIS_VWORP =
-            registerFixedRange("tardis_vworp", TAKEOFF_HEARING_RANGE);
+    public static final SoundEvent TARDIS_DRUM = registerFixedRange("tardis_drum", TAKEOFF_HEARING_RANGE);
+    public static final SoundEvent TARDIS_LAND = registerFixedRange("tardis_land", TAKEOFF_HEARING_RANGE);
+    public static final SoundEvent TARDIS_LAND_DRUM = registerFixedRange("tardis_land_drum", TAKEOFF_HEARING_RANGE);
+    public static final SoundEvent TARDIS_TAKEOFF = registerFixedRange("tardis_takeoff", TAKEOFF_HEARING_RANGE);
+    public static final SoundEvent TARDIS_VWORP = registerFixedRange("tardis_vworp", TAKEOFF_HEARING_RANGE);
 
     private static SoundEvent register(String name) {
         return register(name, SoundEvent::createVariableRangeEvent);
@@ -62,8 +57,5 @@ public class GCSounds {
         return Registry.register(BuiltInRegistries.SOUND_EVENT, id, factory.apply(id));
     }
 
-    public static void registerSounds() {
-    }
-
-
+    public static void registerSounds() {}
 }

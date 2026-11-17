@@ -1,10 +1,9 @@
 package uk.nbforge.gallifreyan_chronicles.ecs;
 
-import net.minecraft.world.level.storage.ValueInput;
-import net.minecraft.world.level.storage.ValueOutput;
-
 import java.util.HashMap;
 import java.util.Map;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
 
 public final class ComponentStore {
     private final Map<ComponentType<?>, Object> data = new HashMap<>();
@@ -17,8 +16,8 @@ public final class ComponentStore {
     public <T extends Component> T getOrCreate(ComponentType<T> type) {
         return (T) data.computeIfAbsent(type, k -> {
             T def = type.createDefault();
-            if (def == null) throw new IllegalStateException(
-                    "Component " + type.id() + " has no default and has not been set");
+            if (def == null)
+                throw new IllegalStateException("Component " + type.id() + " has no default and has not been set");
             return def;
         });
     }

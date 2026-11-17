@@ -1,19 +1,19 @@
 package uk.nbforge.gallifreyan_chronicles.mixin.client.compat.immersive_portals;
 
-import uk.nbforge.gallifreyan_chronicles.compat.flashback.FlashbackChunks;
 import net.minecraft.world.level.ChunkPos;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Pseudo;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+import uk.nbforge.gallifreyan_chronicles.compat.flashback.FlashbackChunks;
 
 /**
-   Seamless Portals has its own client chunk store next to the one of Immersive Portals and it throws away chunks far from where it thinks the portal view is.
-   Once the recorded player walked into the TARDIS that moved, the interior chunks got thrown away and the door showed empty sky.
-   In a replay nothing sends them again so keep them.
-   the door was just empty sky for ages before this, so annoying.
-*/
+ * Seamless Portals has its own client chunk store next to the one of Immersive Portals and it throws away chunks far from where it thinks the portal view is.
+ * Once the recorded player walked into the TARDIS that moved, the interior chunks got thrown away and the door showed empty sky.
+ * In a replay nothing sends them again so keep them.
+ * the door was just empty sky for ages before this, so annoying.
+ */
 @Pseudo
 @Mixin(targets = "com.warwa.seamlessportals.client.SeamlessClientChunkMap", remap = false)
 public abstract class SeamlessKeepChunksMixin {

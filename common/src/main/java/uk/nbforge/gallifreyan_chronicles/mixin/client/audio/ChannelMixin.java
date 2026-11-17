@@ -1,7 +1,6 @@
 package uk.nbforge.gallifreyan_chronicles.mixin.client.audio;
 
 import com.mojang.blaze3d.audio.Channel;
-import uk.nbforge.gallifreyan_chronicles.client.sound.OffsetChannel;
 import net.minecraft.client.sounds.AudioStream;
 import org.lwjgl.openal.AL10;
 import org.lwjgl.openal.AL11;
@@ -13,6 +12,7 @@ import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+import uk.nbforge.gallifreyan_chronicles.client.sound.OffsetChannel;
 
 @Mixin(Channel.class)
 public abstract class ChannelMixin implements OffsetChannel {

@@ -1,29 +1,27 @@
 package uk.nbforge.gallifreyan_chronicles.command;
 
+import static net.minecraft.commands.Commands.argument;
+import static net.minecraft.commands.Commands.literal;
+import static uk.nbforge.gallifreyan_chronicles.util.CommandUtil.*;
+
 import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.mojang.brigadier.suggestion.Suggestions;
 import com.mojang.brigadier.suggestion.SuggestionsBuilder;
-import uk.nbforge.gallifreyan_chronicles.core.block_entities.InteriorDoorBlockEntity;
-import uk.nbforge.gallifreyan_chronicles.core.dynamic_registries.TardisDoorRegistry;
-import uk.nbforge.gallifreyan_chronicles.tardis.ecs.system.DoorSyncSystem;
-import uk.nbforge.gallifreyan_chronicles.core.dynamic_registries.TardisInteriorRegistry;
-import uk.nbforge.gallifreyan_chronicles.tardis.ecs.system.TardisInteriorSystem;
-import net.minecraft.commands.CommandSourceStack;
-
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
-
-import static uk.nbforge.gallifreyan_chronicles.util.CommandUtil.*;
-import static net.minecraft.commands.Commands.argument;
-import static net.minecraft.commands.Commands.literal;
+import net.minecraft.commands.CommandSourceStack;
+import uk.nbforge.gallifreyan_chronicles.core.block_entities.InteriorDoorBlockEntity;
+import uk.nbforge.gallifreyan_chronicles.core.dynamic_registries.TardisDoorRegistry;
+import uk.nbforge.gallifreyan_chronicles.core.dynamic_registries.TardisInteriorRegistry;
+import uk.nbforge.gallifreyan_chronicles.tardis.ecs.system.DoorSyncSystem;
+import uk.nbforge.gallifreyan_chronicles.tardis.ecs.system.TardisInteriorSystem;
 
 /** The interior template and the door model/variant of a TARDIS are entirely gotten/set under "data" now; see interiorData() and doorVariantData(). */
 public final class InteriorCommands {
-    private InteriorCommands() {
-    }
+    private InteriorCommands() {}
 
     /** {@code data interior [<interior_id>]} */
     public static LiteralArgumentBuilder<CommandSourceStack> interiorData() {
@@ -44,33 +42,37 @@ public final class InteriorCommands {
                                 .executes(InteriorCommands::setDoorVariant)));
     }
 
-    private static CompletableFuture<Suggestions> suggestInteriors(CommandContext<CommandSourceStack> ctx,
-                                                                    SuggestionsBuilder builder) {
+    private static CompletableFuture<Suggestions> suggestInteriors(
+            CommandContext<CommandSourceStack> ctx, SuggestionsBuilder builder) {
         TardisInteriorRegistry.getAll().forEach(interior -> builder.suggest(interior.id()));
         return builder.buildFuture();
     }
 
-    private static CompletableFuture<Suggestions> suggestDoorVariants(CommandContext<CommandSourceStack> ctx,
-                                                                       SuggestionsBuilder builder) {
-        idArgument(ctx).flatMap(id -> DoorSyncSystem.doorsOf(id).stream().findFirst()).ifPresent(door -> {
-            List<String> ids = door.isLinked()
-                    ? TardisDoorRegistry.interiorVariantIds()
-                    : TardisDoorRegistry.variantIds(door.getVariant());
-            ids.forEach(builder::suggest);
-        });
+    private static CompletableFuture<Suggestions> suggestDoorVariants(
+            CommandContext<CommandSourceStack> ctx, SuggestionsBuilder builder) {
+        idArgument(ctx)
+                .flatMap(id -> DoorSyncSystem.doorsOf(id).stream().findFirst())
+                .ifPresent(door -> {
+                    List<String> ids = door.isLinked()
+                            ? TardisDoorRegistry.interiorVariantIds()
+                            : TardisDoorRegistry.variantIds(door.getVariant());
+                    ids.forEach(builder::suggest);
+                });
         return builder.buildFuture();
     }
 
     static int get(CommandContext<CommandSourceStack> ctx) throws CommandSyntaxException {
         return withTardis(ctx, (tardis, idText) -> {
-            String interiorId = TardisInteriorSystem.getInteriorDefinition(tardis.server(), tardis.id()).id();
+            String interiorId = TardisInteriorSystem.getInteriorDefinition(tardis.server(), tardis.id())
+                    .id();
             return success(ctx, false, "get_interior", idText, interiorId);
         });
     }
 
     private static int set(CommandContext<CommandSourceStack> ctx) throws CommandSyntaxException {
         String interiorId = StringArgumentType.getString(ctx, "interior_id");
-        return withTardis(ctx, (tardis, idText) -> switch (TardisInteriorSystem.changeInterior(tardis.server(), tardis.id(), interiorId)) {
+        return withTardis(ctx, (tardis, idText) -> switch (TardisInteriorSystem.changeInterior(
+                tardis.server(), tardis.id(), interiorId)) {
             case UNKNOWN_INTERIOR -> fail(ctx, "unknown_interior", interiorId);
             case MISSING_TEMPLATE -> fail(ctx, "missing_interior_template", interiorId);
             case UNCHANGED -> fail(ctx, "interior_unchanged", idText, interiorId);

@@ -1,11 +1,10 @@
 package uk.nbforge.gallifreyan_chronicles.client.render.detail;
 
+import java.util.Locale;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.network.chat.Component;
-
-import java.util.Locale;
 
 public final class TrialTimerOverlay {
     private static final int MARGIN_X = 4;
@@ -16,8 +15,7 @@ public final class TrialTimerOverlay {
     private static final long WARNING_MILLIS = 10L * 60L * 1000L;
     private static final long CRITICAL_MILLIS = 60L * 1000L;
 
-    private TrialTimerOverlay() {
-    }
+    private TrialTimerOverlay() {}
 
     public static void render(GuiGraphicsExtractor graphics) {
         long remaining = TrialTimer.remainingMillis();

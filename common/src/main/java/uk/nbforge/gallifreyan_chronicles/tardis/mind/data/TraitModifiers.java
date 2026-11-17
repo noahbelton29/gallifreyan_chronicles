@@ -1,17 +1,29 @@
 package uk.nbforge.gallifreyan_chronicles.tardis.mind.data;
 
-import uk.nbforge.gallifreyan_chronicles.tardis.mind.TardisTrait;
-
 import java.util.List;
 import java.util.Optional;
+import uk.nbforge.gallifreyan_chronicles.tardis.mind.TardisTrait;
 
 /** The numbers a trait changes, times values default to 1 and by values to 0. */
-public record TraitModifiers(float stressGain, float stressFade, float fearFade, float trustGain, float trustLoss,
-                             float refusalShift, float strangerShift, float crashSoftening, Optional<Float> startTrust,
-                             Optional<Float> strangerStartTrust, float abuseTrustLoss, float traumaGain, boolean betrayable,
-                             float betrayedTrustGain, float betrayedTrustLoss, float betrayedTraumaGain) {
-    public static final TraitModifiers NONE = new TraitModifiers(1f, 1f, 1f, 1f, 1f, 0f, 0f, 1f, Optional.empty(),
-            Optional.empty(), 1f, 1f, false, 1f, 1f, 1f);
+public record TraitModifiers(
+        float stressGain,
+        float stressFade,
+        float fearFade,
+        float trustGain,
+        float trustLoss,
+        float refusalShift,
+        float strangerShift,
+        float crashSoftening,
+        Optional<Float> startTrust,
+        Optional<Float> strangerStartTrust,
+        float abuseTrustLoss,
+        float traumaGain,
+        boolean betrayable,
+        float betrayedTrustGain,
+        float betrayedTrustLoss,
+        float betrayedTraumaGain) {
+    public static final TraitModifiers NONE = new TraitModifiers(
+            1f, 1f, 1f, 1f, 1f, 0f, 0f, 1f, Optional.empty(), Optional.empty(), 1f, 1f, false, 1f, 1f, 1f);
 
     /** Everything the traits of a TARDIS add up to. */
     public static TraitModifiers combine(List<TardisTrait> traits, boolean betrayed) {
@@ -38,8 +50,23 @@ public record TraitModifiers(float stressGain, float stressFade, float fearFade,
             startTrust = lowest(startTrust, m.startTrust);
             strangerStartTrust = lowest(strangerStartTrust, m.strangerStartTrust);
         }
-        return new TraitModifiers(stressGain, stressFade, fearFade, trustGain, trustLoss, refusalShift, strangerShift,
-                crashSoftening, startTrust, strangerStartTrust, abuse, trauma, betrayable, 1f, 1f, 1f);
+        return new TraitModifiers(
+                stressGain,
+                stressFade,
+                fearFade,
+                trustGain,
+                trustLoss,
+                refusalShift,
+                strangerShift,
+                crashSoftening,
+                startTrust,
+                strangerStartTrust,
+                abuse,
+                trauma,
+                betrayable,
+                1f,
+                1f,
+                1f);
     }
 
     private static Optional<Float> lowest(Optional<Float> a, Optional<Float> b) {

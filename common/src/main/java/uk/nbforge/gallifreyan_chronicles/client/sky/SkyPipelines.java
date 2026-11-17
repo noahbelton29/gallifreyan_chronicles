@@ -8,18 +8,16 @@ import com.mojang.renderpearl.api.pipeline.CompareOp;
 import com.mojang.renderpearl.api.pipeline.DepthStencilState;
 import com.mojang.renderpearl.api.pipeline.PrimitiveTopology;
 import com.mojang.renderpearl.api.pipeline.RenderPipeline;
-import uk.nbforge.gallifreyan_chronicles.util.GCUtil;
+import java.util.Optional;
 import net.minecraft.client.renderer.BindGroupLayouts;
 import net.minecraft.client.renderer.RenderPipelines;
-
-import java.util.Optional;
+import uk.nbforge.gallifreyan_chronicles.util.GCUtil;
 
 public final class SkyPipelines {
     private static final DepthStencilState BEHIND_SCENE = new DepthStencilState(CompareOp.GREATER_THAN_OR_EQUAL, false);
 
-    public static final RenderPipeline BODY = texturedBody("sky_body")
-            .withDepthStencilState(Optional.empty())
-            .build();
+    public static final RenderPipeline BODY =
+            texturedBody("sky_body").withDepthStencilState(Optional.empty()).build();
 
     public static final RenderPipeline OVERLAY_BACKDROP = stars("sky_overlay_backdrop")
             .withColorTargetState(ColorTargetState.DEFAULT)
@@ -38,12 +36,12 @@ public final class SkyPipelines {
             .withDepthStencilState(BEHIND_SCENE)
             .build();
 
-    public static final RenderPipeline OVERLAY_BODY = texturedBody("sky_overlay_body")
-            .withDepthStencilState(BEHIND_SCENE)
-            .build();
+    public static final RenderPipeline OVERLAY_BODY =
+            texturedBody("sky_overlay_body").withDepthStencilState(BEHIND_SCENE).build();
 
     // Stars add light but leave the canvas see through
-    private static final BlendFunction ADD_KEEP_ALPHA = new BlendFunction(BlendFactor.SRC_ALPHA, BlendFactor.ONE, BlendFactor.ZERO, BlendFactor.ONE);
+    private static final BlendFunction ADD_KEEP_ALPHA =
+            new BlendFunction(BlendFactor.SRC_ALPHA, BlendFactor.ONE, BlendFactor.ZERO, BlendFactor.ONE);
 
     public static final RenderPipeline CANVAS_STARS = stars("sky_canvas_stars")
             .withColorTargetState(new ColorTargetState(ADD_KEEP_ALPHA))
@@ -85,6 +83,5 @@ public final class SkyPipelines {
                 .withVertexBinding(0, DefaultVertexFormat.POSITION);
     }
 
-    private SkyPipelines() {
-    }
+    private SkyPipelines() {}
 }

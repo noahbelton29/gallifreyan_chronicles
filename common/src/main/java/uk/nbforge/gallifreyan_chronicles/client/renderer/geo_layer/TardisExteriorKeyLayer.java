@@ -5,15 +5,15 @@ import com.geckolib.animatable.GeoAnimatable;
 import com.geckolib.cache.model.BakedGeoModel;
 import com.geckolib.cache.model.GeoBone;
 import com.geckolib.constant.dataticket.DataTicket;
-import com.geckolib.renderer.base.GeoRenderer;
 import com.geckolib.renderer.base.GeoRenderState;
+import com.geckolib.renderer.base.GeoRenderer;
 import com.geckolib.renderer.base.PerBoneRender;
 import com.geckolib.renderer.base.RenderPassInfo;
 import com.geckolib.renderer.layer.GeoRenderLayer;
 import com.geckolib.util.RenderUtil;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.math.Axis;
-import uk.nbforge.gallifreyan_chronicles.core.block_entities.TardisExteriorBlockEntity;
+import java.util.function.BiConsumer;
 import net.minecraft.client.renderer.SubmitNodeCollector;
 import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
 import net.minecraft.client.renderer.item.ItemModelResolver;
@@ -26,10 +26,10 @@ import net.minecraft.world.phys.Vec3;
 import org.joml.Vector4f;
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
+import uk.nbforge.gallifreyan_chronicles.core.block_entities.TardisExteriorBlockEntity;
 
-import java.util.function.BiConsumer;
-
-public class TardisExteriorKeyLayer<T extends GeoAnimatable & TardisExteriorKeyLayer.TardisExteriorRenderable, O, R extends GeoRenderState>
+public class TardisExteriorKeyLayer<
+                T extends GeoAnimatable & TardisExteriorKeyLayer.TardisExteriorRenderable, O, R extends GeoRenderState>
         extends GeoRenderLayer<@NonNull T, O, R> {
 
     public static final String KEY_BONE_NAME = "key_to_render";
@@ -54,11 +54,8 @@ public class TardisExteriorKeyLayer<T extends GeoAnimatable & TardisExteriorKeyL
 
         if (heldKey == null || heldKey.isEmpty()) return;
 
-        ItemStackRenderState itemRenderState = RenderUtil.createRenderStateForItem(
-                heldKey,
-                itemModelResolver,
-                ItemDisplayContext.FIXED
-        );
+        ItemStackRenderState itemRenderState =
+                RenderUtil.createRenderStateForItem(heldKey, itemModelResolver, ItemDisplayContext.FIXED);
 
         renderState.addGeckolibData(KEY_RENDER_STATE, itemRenderState);
     }
@@ -71,7 +68,8 @@ public class TardisExteriorKeyLayer<T extends GeoAnimatable & TardisExteriorKeyL
     }
 
     @Override
-    public void addPerBoneRender(RenderPassInfo<R> renderPassInfo, @NonNull BiConsumer<GeoBone, PerBoneRender<R>> consumer) {
+    public void addPerBoneRender(
+            RenderPassInfo<R> renderPassInfo, @NonNull BiConsumer<GeoBone, PerBoneRender<R>> consumer) {
         if (!renderPassInfo.willRender()) return;
 
         ItemStackRenderState itemRenderState = keyRenderState(renderPassInfo.renderState());
@@ -79,11 +77,12 @@ public class TardisExteriorKeyLayer<T extends GeoAnimatable & TardisExteriorKeyL
 
         BakedGeoModel model = renderPassInfo.model();
 
-        model.getBone(KEY_BONE_NAME).ifPresentOrElse(
-                bone -> consumer.accept(bone, this::submitKeyRender),
-                () -> GeckoLibConstants.LOGGER.error(
-                        "TardisExteriorKeyLayer: unable to find bone '{}', skipping key render", KEY_BONE_NAME)
-        );
+        model.getBone(KEY_BONE_NAME)
+                .ifPresentOrElse(
+                        bone -> consumer.accept(bone, this::submitKeyRender),
+                        () -> GeckoLibConstants.LOGGER.error(
+                                "TardisExteriorKeyLayer: unable to find bone '{}', skipping key render",
+                                KEY_BONE_NAME));
     }
 
     private void submitKeyRender(RenderPassInfo<R> renderPassInfo, GeoBone bone, SubmitNodeCollector renderTasks) {
@@ -100,13 +99,7 @@ public class TardisExteriorKeyLayer<T extends GeoAnimatable & TardisExteriorKeyL
         poseStack.rotate(Axis.ZP.rotationDegrees(90f));
         poseStack.rotate(Axis.XP.rotationDegrees(90f));
 
-        itemRenderState.submit(
-                poseStack,
-                renderTasks,
-                renderPassInfo.packedLight(),
-                OverlayTexture.NO_OVERLAY,
-                0
-        );
+        itemRenderState.submit(poseStack, renderTasks, renderPassInfo.packedLight(), OverlayTexture.NO_OVERLAY, 0);
 
         poseStack.popPose();
     }
@@ -122,16 +115,13 @@ public class TardisExteriorKeyLayer<T extends GeoAnimatable & TardisExteriorKeyL
         origin.mul(poseStack.last().pose());
 
         BlockPos pos = exterior.getBlockPos();
-        Vec3 worldPos = new Vec3(
-                pos.getX() + origin.x(),
-                pos.getY() + origin.y(),
-                pos.getZ() + origin.z()
-        );
+        Vec3 worldPos = new Vec3(pos.getX() + origin.x(), pos.getY() + origin.y(), pos.getZ() + origin.z());
 
         exterior.setCachedKeyBoneWorldPos(worldPos);
     }
 
     public interface TardisExteriorRenderable {
-        @Nullable ItemStack gc$getHeldKeyStack();
+        @Nullable
+        ItemStack gc$getHeldKeyStack();
     }
 }

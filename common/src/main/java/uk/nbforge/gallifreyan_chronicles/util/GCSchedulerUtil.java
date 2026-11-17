@@ -1,22 +1,19 @@
 package uk.nbforge.gallifreyan_chronicles.util;
 
-import net.minecraft.server.MinecraftServer;
-
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import net.minecraft.server.MinecraftServer;
 
 public final class GCSchedulerUtil {
-    private record Task(MinecraftServer server, int[] ticksLeft, Runnable action) {
-    }
+    private record Task(MinecraftServer server, int[] ticksLeft, Runnable action) {}
 
     private static final List<Task> TASKS = new ArrayList<>();
 
-    private GCSchedulerUtil() {
-    }
+    private GCSchedulerUtil() {}
 
     public static void runLater(MinecraftServer server, int delayTicks, Runnable action) {
-        TASKS.add(new Task(server, new int[]{Math.max(0, delayTicks)}, action));
+        TASKS.add(new Task(server, new int[] {Math.max(0, delayTicks)}, action));
     }
 
     public static void tick(MinecraftServer server) {

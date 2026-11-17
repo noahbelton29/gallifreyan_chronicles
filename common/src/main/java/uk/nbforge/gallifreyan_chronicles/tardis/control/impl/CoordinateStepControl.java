@@ -1,18 +1,18 @@
 package uk.nbforge.gallifreyan_chronicles.tardis.control.impl;
 
-import uk.nbforge.gallifreyan_chronicles.tardis.control.ControlAnimations;
-import uk.nbforge.gallifreyan_chronicles.tardis.flight.TardisDestinations;
-import uk.nbforge.gallifreyan_chronicles.core.block_entities.TardisConsoleBlockEntity;
-import uk.nbforge.gallifreyan_chronicles.core.entity.TardisControlEntity;
-import uk.nbforge.gallifreyan_chronicles.tardis.Tardis;
+import java.util.UUID;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.player.Player;
-
-import java.util.UUID;
+import uk.nbforge.gallifreyan_chronicles.core.block_entities.TardisConsoleBlockEntity;
+import uk.nbforge.gallifreyan_chronicles.core.entity.TardisControlEntity;
+import uk.nbforge.gallifreyan_chronicles.tardis.Tardis;
+import uk.nbforge.gallifreyan_chronicles.tardis.control.ControlAnimations;
+import uk.nbforge.gallifreyan_chronicles.tardis.flight.TardisDestinations;
 
 public class CoordinateStepControl extends DestinationControl {
-    public static final ControlAnimations DEFAULT_ANIMATIONS = new ControlAnimations("coordinate_step_control", "coordinate_step_control", false);
+    public static final ControlAnimations DEFAULT_ANIMATIONS =
+            new ControlAnimations("coordinate_step_control", "coordinate_step_control", false);
 
     public CoordinateStepControl(ControlAnimations animations) {
         super(animations);

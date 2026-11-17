@@ -1,21 +1,19 @@
 package uk.nbforge.gallifreyan_chronicles.tardis.mind.mood;
 
-import java.util.UUID;
 import java.util.List;
-
-import uk.nbforge.gallifreyan_chronicles.tardis.mind.TardisMind;
-import uk.nbforge.gallifreyan_chronicles.tardis.ecs.system.TardisMindSystem;
-
+import java.util.UUID;
 import uk.nbforge.gallifreyan_chronicles.core.block_entities.TardisExteriorBlockEntity;
 import uk.nbforge.gallifreyan_chronicles.tardis.Tardis;
 import uk.nbforge.gallifreyan_chronicles.tardis.TardisEvents;
 import uk.nbforge.gallifreyan_chronicles.tardis.ecs.component.TardisSubsystem;
 import uk.nbforge.gallifreyan_chronicles.tardis.ecs.system.SubsystemSystem;
+import uk.nbforge.gallifreyan_chronicles.tardis.ecs.system.TardisMindSystem;
+import uk.nbforge.gallifreyan_chronicles.tardis.mind.TardisMind;
 
 /**
-   Changes the mood of a TARDIS from flight events.
-   Taking off too soon, flying with damaged systems and using the wrong key can raise stress, a calm landing can improve trust with the crew.
-*/
+ * Changes the mood of a TARDIS from flight events.
+ * Taking off too soon, flying with damaged systems and using the wrong key can raise stress, a calm landing can improve trust with the crew.
+ */
 public final class TardisMoods {
     // Minimum time between landing and takeoff before overuse causes stress
     private static final long OVERUSE_TICKS = 600L;
@@ -30,8 +28,7 @@ public final class TardisMoods {
 
     private static final float CALM_LANDING_TRUST = 2f;
 
-    private TardisMoods() {
-    }
+    private TardisMoods() {}
 
     public static void init() {
         TardisEvents.TAKE_OFF.register(TardisMoods::onTakeOff);
@@ -69,7 +66,8 @@ public final class TardisMoods {
     /** Everyone aboard, or the owner if nobody is in the interior. */
     public static List<UUID> crew(Tardis tardis) {
         List<UUID> aboard = tardis.interiorLevel()
-                .map(level -> level.players().stream().map(player -> player.getUUID()).toList())
+                .map(level ->
+                        level.players().stream().map(player -> player.getUUID()).toList())
                 .orElse(List.of());
         return aboard.isEmpty() ? List.of(tardis.ownerId()) : aboard;
     }

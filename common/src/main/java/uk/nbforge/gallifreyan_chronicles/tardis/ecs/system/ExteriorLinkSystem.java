@@ -1,14 +1,13 @@
 package uk.nbforge.gallifreyan_chronicles.tardis.ecs.system;
 
-import uk.nbforge.gallifreyan_chronicles.tardis.TardisApi;
-import uk.nbforge.gallifreyan_chronicles.tardis.Tardis;
-import uk.nbforge.gallifreyan_chronicles.core.block_entities.TardisExteriorBlockEntity;
-import uk.nbforge.gallifreyan_chronicles.tardis.TardisManager;
-import net.minecraft.core.BlockPos;
-import net.minecraft.server.level.ServerLevel;
-
 import java.util.Optional;
 import java.util.UUID;
+import net.minecraft.core.BlockPos;
+import net.minecraft.server.level.ServerLevel;
+import uk.nbforge.gallifreyan_chronicles.core.block_entities.TardisExteriorBlockEntity;
+import uk.nbforge.gallifreyan_chronicles.tardis.Tardis;
+import uk.nbforge.gallifreyan_chronicles.tardis.TardisApi;
+import uk.nbforge.gallifreyan_chronicles.tardis.TardisManager;
 
 public final class ExteriorLinkSystem {
     private ExteriorLinkSystem() {}
@@ -28,7 +27,8 @@ public final class ExteriorLinkSystem {
     }
 
     public static void unlink(ServerLevel level, UUID tardisId) {
-        TardisApi.get(level.getServer(), tardisId).flatMap(Tardis::exterior)
+        TardisApi.get(level.getServer(), tardisId)
+                .flatMap(Tardis::exterior)
                 .ifPresent(TardisExteriorBlockEntity::unlinkFromTardis);
         TardisManager.get(level.getServer()).unlinkExterior(tardisId);
     }

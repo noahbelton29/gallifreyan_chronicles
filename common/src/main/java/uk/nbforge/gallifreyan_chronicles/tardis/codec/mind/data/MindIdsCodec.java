@@ -6,6 +6,5 @@ import uk.nbforge.gallifreyan_chronicles.tardis.mind.data.MindIds;
 public final class MindIdsCodec {
     public static final Codec<String> CODEC = Codec.STRING.xmap(MindIds::normalize, id -> id);
 
-    private MindIdsCodec() {
-    }
+    private MindIdsCodec() {}
 }

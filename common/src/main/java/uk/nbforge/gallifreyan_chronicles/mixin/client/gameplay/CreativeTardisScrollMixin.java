@@ -1,8 +1,5 @@
 package uk.nbforge.gallifreyan_chronicles.mixin.client.gameplay;
 
-import uk.nbforge.gallifreyan_chronicles.mixin.client.screen.AbstractContainerScreenAccessor;
-
-import uk.nbforge.gallifreyan_chronicles.core.item.ScrollSelectable;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.inventory.CreativeModeInventoryScreen;
 import net.minecraft.client.resources.sounds.SimpleSoundInstance;
@@ -14,12 +11,14 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
+import uk.nbforge.gallifreyan_chronicles.core.item.ScrollSelectable;
+import uk.nbforge.gallifreyan_chronicles.mixin.client.screen.AbstractContainerScreenAccessor;
 
 @Mixin(CreativeModeInventoryScreen.class)
 public abstract class CreativeTardisScrollMixin {
     @Inject(method = "mouseScrolled", at = @At("HEAD"), cancellable = true)
-    private void gallifreyan_chronicles$cycleTardis(double mouseX, double mouseY, double scrollX, double scrollY,
-                                                    CallbackInfoReturnable<Boolean> cir) {
+    private void gallifreyan_chronicles$cycleTardis(
+            double mouseX, double mouseY, double scrollX, double scrollY, CallbackInfoReturnable<Boolean> cir) {
         if (scrollY == 0.0) return;
 
         Slot slot = ((AbstractContainerScreenAccessor) (Object) this).gallifreyan_chronicles$getHoveredSlot();
@@ -29,7 +28,9 @@ public abstract class CreativeTardisScrollMixin {
         if (!(stack.getItem() instanceof ScrollSelectable selectable)) return;
 
         if (selectable.cycleSelection(stack, scrollY > 0.0 ? 1 : -1)) {
-            Minecraft.getInstance().getSoundManager().play(SimpleSoundInstance.forUI(SoundEvents.UI_BUTTON_CLICK, 1.0F));
+            Minecraft.getInstance()
+                    .getSoundManager()
+                    .play(SimpleSoundInstance.forUI(SoundEvents.UI_BUTTON_CLICK, 1.0F));
             cir.setReturnValue(true);
         }
     }

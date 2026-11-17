@@ -1,29 +1,27 @@
 package uk.nbforge.gallifreyan_chronicles.command;
 
+import static net.minecraft.commands.Commands.argument;
+import static net.minecraft.commands.Commands.literal;
+import static uk.nbforge.gallifreyan_chronicles.util.CommandUtil.*;
+
 import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.mojang.brigadier.suggestion.Suggestions;
 import com.mojang.brigadier.suggestion.SuggestionsBuilder;
-import uk.nbforge.gallifreyan_chronicles.core.block_entities.TardisConsoleBlockEntity;
-import uk.nbforge.gallifreyan_chronicles.tardis.console.TardisConsole;
-import uk.nbforge.gallifreyan_chronicles.core.dynamic_registries.TardisConsoleRegistry;
-import uk.nbforge.gallifreyan_chronicles.tardis.ecs.system.ConsoleLinkSystem;
-import net.minecraft.commands.CommandSourceStack;
-import net.minecraft.core.BlockPos;
-
 import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
-
-import static uk.nbforge.gallifreyan_chronicles.util.CommandUtil.*;
-import static net.minecraft.commands.Commands.argument;
-import static net.minecraft.commands.Commands.literal;
+import net.minecraft.commands.CommandSourceStack;
+import net.minecraft.core.BlockPos;
+import uk.nbforge.gallifreyan_chronicles.core.block_entities.TardisConsoleBlockEntity;
+import uk.nbforge.gallifreyan_chronicles.core.dynamic_registries.TardisConsoleRegistry;
+import uk.nbforge.gallifreyan_chronicles.tardis.console.TardisConsole;
+import uk.nbforge.gallifreyan_chronicles.tardis.ecs.system.ConsoleLinkSystem;
 
 public final class ConsoleCommands {
-    private ConsoleCommands() {
-    }
+    private ConsoleCommands() {}
 
     /**
      * Linking and unlinking a console block to a TARDIS. Getting/setting which console and its variant live under "data" now.
@@ -50,15 +48,16 @@ public final class ConsoleCommands {
                                 .executes(ConsoleCommands::setVariant)));
     }
 
-    private static CompletableFuture<Suggestions> suggestConsoles(CommandContext<CommandSourceStack> ctx,
-                                                                  SuggestionsBuilder builder) {
+    private static CompletableFuture<Suggestions> suggestConsoles(
+            CommandContext<CommandSourceStack> ctx, SuggestionsBuilder builder) {
         TardisConsoleRegistry.getAll().forEach(console -> builder.suggest(console.id()));
         return builder.buildFuture();
     }
 
-    private static CompletableFuture<Suggestions> suggestVariants(CommandContext<CommandSourceStack> ctx,
-                                                                  SuggestionsBuilder builder) {
-        idArgument(ctx).flatMap(id -> consoleOf(ctx, id))
+    private static CompletableFuture<Suggestions> suggestVariants(
+            CommandContext<CommandSourceStack> ctx, SuggestionsBuilder builder) {
+        idArgument(ctx)
+                .flatMap(id -> consoleOf(ctx, id))
                 .map(TardisConsoleBlockEntity::getConsole)
                 .ifPresent(console -> console.variantIds().forEach(builder::suggest));
         return builder.buildFuture();
@@ -71,7 +70,8 @@ public final class ConsoleCommands {
 
     static int get(CommandContext<CommandSourceStack> ctx) throws CommandSyntaxException {
         return withTardis(ctx, (tardis, idText) -> {
-            String consoleId = consoleOf(ctx, tardis.id()).map(be -> be.getConsole().id()).orElse("unknown");
+            String consoleId =
+                    consoleOf(ctx, tardis.id()).map(be -> be.getConsole().id()).orElse("unknown");
             return success(ctx, false, "get_console", idText, consoleId);
         });
     }
@@ -94,7 +94,9 @@ public final class ConsoleCommands {
     static int getVariant(CommandContext<CommandSourceStack> ctx) throws CommandSyntaxException {
         return withTardis(ctx, (tardis, idText) -> {
             Optional<TardisConsoleBlockEntity> be = consoleOf(ctx, tardis.id());
-            return be.map(tardisConsoleBlockEntity -> success(ctx, false, "get_console_variant", idText, tardisConsoleBlockEntity.getVariant())).orElseGet(() -> fail(ctx, "no_console", idText));
+            return be.map(tardisConsoleBlockEntity ->
+                            success(ctx, false, "get_console_variant", idText, tardisConsoleBlockEntity.getVariant()))
+                    .orElseGet(() -> fail(ctx, "no_console", idText));
         });
     }
 
@@ -116,7 +118,9 @@ public final class ConsoleCommands {
     private static int link(CommandContext<CommandSourceStack> ctx) throws CommandSyntaxException {
         return withTardis(ctx, (tardis, idText) -> {
             Optional<BlockPos> pos = lookedAtBlock(ctx);
-            if (pos.isEmpty() || findBlockEntity(ctx, pos.get(), TardisConsoleBlockEntity.class).isEmpty()) {
+            if (pos.isEmpty()
+                    || findBlockEntity(ctx, pos.get(), TardisConsoleBlockEntity.class)
+                            .isEmpty()) {
                 return fail(ctx, "not_looking_at_console");
             }
             ConsoleLinkSystem.link(ctx.getSource().getLevel(), tardis.id(), pos.get());

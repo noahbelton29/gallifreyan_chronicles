@@ -1,18 +1,16 @@
 package uk.nbforge.gallifreyan_chronicles.tardis.flight.crash;
 
+import java.util.List;
+import net.minecraft.util.RandomSource;
+import uk.nbforge.gallifreyan_chronicles.core.GCTardisControls;
 import uk.nbforge.gallifreyan_chronicles.core.block_entities.TardisConsoleBlockEntity;
 import uk.nbforge.gallifreyan_chronicles.core.entity.TardisControlEntity;
-import uk.nbforge.gallifreyan_chronicles.core.GCTardisControls;
 import uk.nbforge.gallifreyan_chronicles.tardis.Tardis;
-import net.minecraft.util.RandomSource;
-
-import java.util.List;
 
 public final class HaywireControls {
     private static final int MAX_FLICKS_PER_CONSOLE = 3;
 
-    private HaywireControls() {
-    }
+    private HaywireControls() {}
 
     public static void flick(Tardis tardis, RandomSource random) {
         for (TardisConsoleBlockEntity console : tardis.consoles()) {

@@ -2,8 +2,10 @@ package uk.nbforge.gallifreyan_chronicles.addon.api;
 
 import com.google.gson.JsonObject;
 import com.mojang.serialization.MapCodec;
-import uk.nbforge.gallifreyan_chronicles.tardis.Tardis;
-import uk.nbforge.gallifreyan_chronicles.tardis.control.TardisControl;
+import java.nio.file.Path;
+import java.util.function.BiFunction;
+import java.util.function.Consumer;
+import java.util.function.Function;
 import net.minecraft.resources.Identifier;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.sounds.SoundEvent;
@@ -11,17 +13,14 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockBehaviour;
 import org.slf4j.Logger;
-
-import java.nio.file.Path;
-import java.util.function.BiFunction;
-import java.util.function.Consumer;
-import java.util.function.Function;
+import uk.nbforge.gallifreyan_chronicles.tardis.Tardis;
+import uk.nbforge.gallifreyan_chronicles.tardis.control.TardisControl;
 
 /**
-   What a java addon gets to work with.
-   It is a normal mod so mixins work too.
-   We call onInitialize while the game registers things, so the register methods work there.
-*/
+ * What a java addon gets to work with.
+ * It is a normal mod so mixins work too.
+ * We call onInitialize while the game registers things, so the register methods work there.
+ */
 public interface AddonContext {
     String addonId();
 
@@ -42,17 +41,19 @@ public interface AddonContext {
     Identifier id(String path);
 
     /**
-       Added items show in the addons tab.
-       You still need the model, texture and lang.
-    */
+     * Added items show in the addons tab.
+     * You still need the model, texture and lang.
+     */
     <T extends Item> T registerItem(String name, Function<Item.Properties, T> factory);
 
     /** Adds a block and its item. */
     Block registerBlock(String name, Function<BlockBehaviour.Properties, Block> factory);
 
     /** Same but you build the item. */
-    Block registerBlock(String name, Function<BlockBehaviour.Properties, Block> factory,
-                        BiFunction<Block, Item.Properties, Item> itemFactory);
+    Block registerBlock(
+            String name,
+            Function<BlockBehaviour.Properties, Block> factory,
+            BiFunction<Block, Item.Properties, Item> itemFactory);
 
     Block registerBlockWithoutItem(String name, Function<BlockBehaviour.Properties, Block> factory);
 

@@ -1,33 +1,29 @@
 package uk.nbforge.gallifreyan_chronicles.tardis.mind.mood;
 
-import uk.nbforge.gallifreyan_chronicles.core.GCTardisControls;
-import uk.nbforge.gallifreyan_chronicles.tardis.flight.crash.CrashSmoke;
-import uk.nbforge.gallifreyan_chronicles.tardis.ecs.system.TardisMindSystem;
-
-import net.minecraft.server.MinecraftServer;
-
-import uk.nbforge.gallifreyan_chronicles.tardis.TardisApi;
-
-import uk.nbforge.gallifreyan_chronicles.core.GCSounds;
-import uk.nbforge.gallifreyan_chronicles.network.tardis.TardisAlarmPayload;
-import uk.nbforge.gallifreyan_chronicles.core.block_entities.TardisExteriorBlockEntity;
-import uk.nbforge.gallifreyan_chronicles.tardis.Tardis;
-import uk.nbforge.gallifreyan_chronicles.util.GCSchedulerUtil;
-import net.minecraft.core.BlockPos;
-import net.minecraft.core.Holder;
-import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.network.protocol.game.ClientboundSoundPacket;
-import net.minecraft.sounds.SoundEvent;
-import net.minecraft.world.phys.Vec3;
-import net.minecraft.server.level.ServerLevel;
-import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.sounds.SoundSource;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Holder;
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.network.protocol.game.ClientboundSoundPacket;
+import net.minecraft.server.MinecraftServer;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.sounds.SoundEvent;
+import net.minecraft.sounds.SoundSource;
+import net.minecraft.world.phys.Vec3;
+import uk.nbforge.gallifreyan_chronicles.core.GCSounds;
+import uk.nbforge.gallifreyan_chronicles.core.GCTardisControls;
+import uk.nbforge.gallifreyan_chronicles.core.block_entities.TardisExteriorBlockEntity;
+import uk.nbforge.gallifreyan_chronicles.network.tardis.TardisAlarmPayload;
+import uk.nbforge.gallifreyan_chronicles.tardis.Tardis;
+import uk.nbforge.gallifreyan_chronicles.tardis.TardisApi;
+import uk.nbforge.gallifreyan_chronicles.tardis.ecs.system.TardisMindSystem;
+import uk.nbforge.gallifreyan_chronicles.tardis.flight.crash.CrashSmoke;
+import uk.nbforge.gallifreyan_chronicles.util.GCSchedulerUtil;
 
 /**
  * Alarms with flashing lights and cloister bell sounds.
@@ -97,8 +93,7 @@ public final class TardisAlarm {
         }
     }
 
-    private record Request(Mode mode, int flashes, boolean loud) {
-    }
+    private record Request(Mode mode, int flashes, boolean loud) {}
 
     // Ringing alarms
     private static final Map<UUID, Alarm> ACTIVE = new HashMap<>();
@@ -106,8 +101,7 @@ public final class TardisAlarm {
     // Why the control is about to be switched on, read when it is
     private static final Map<UUID, Request> PENDING = new HashMap<>();
 
-    private TardisAlarm() {
-    }
+    private TardisAlarm() {}
 
     public static void reset() {
         ACTIVE.clear();
@@ -264,8 +258,15 @@ public final class TardisAlarm {
 
     private static void ringAt(ServerPlayer player, float volume) {
         Holder<SoundEvent> sound = BuiltInRegistries.SOUND_EVENT.wrapAsHolder(GCSounds.TARDIS_CLOISTER_BELL);
-        player.connection.send(new ClientboundSoundPacket(sound, SoundSource.BLOCKS,
-                player.getX(), player.getEyeY(), player.getZ(), volume, 1.0F, player.getRandom().nextLong()));
+        player.connection.send(new ClientboundSoundPacket(
+                sound,
+                SoundSource.BLOCKS,
+                player.getX(),
+                player.getEyeY(),
+                player.getZ(),
+                volume,
+                1.0F,
+                player.getRandom().nextLong()));
     }
 
     /**

@@ -1,13 +1,13 @@
 package uk.nbforge.gallifreyan_chronicles;
 
-import uk.nbforge.gallifreyan_chronicles.core.GCBlockEntities;
-import uk.nbforge.gallifreyan_chronicles.core.GCCreativeModeTabs;
-import uk.nbforge.gallifreyan_chronicles.core.GCEntityTypes;
-import uk.nbforge.gallifreyan_chronicles.core.GCEvents;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.fml.common.Mod;
 import net.neoforged.fml.event.lifecycle.FMLClientSetupEvent;
 import net.neoforged.neoforge.registries.RegisterEvent;
+import uk.nbforge.gallifreyan_chronicles.core.GCBlockEntities;
+import uk.nbforge.gallifreyan_chronicles.core.GCCreativeModeTabs;
+import uk.nbforge.gallifreyan_chronicles.core.GCEntityTypes;
+import uk.nbforge.gallifreyan_chronicles.core.GCEvents;
 import uk.nbforge.gallifreyan_chronicles.loaders.GCNeoForgeResourceLoaders;
 
 @Mod(Constants.MOD_ID)
@@ -26,6 +26,5 @@ public class GallifreyanChroniclesNeoForge {
         CommonClass.init();
     }
 
-    public void onClientSetup(FMLClientSetupEvent event) {
-    }
+    public void onClientSetup(FMLClientSetupEvent event) {}
 }

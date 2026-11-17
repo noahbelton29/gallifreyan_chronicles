@@ -15,8 +15,7 @@ public final class WatermarkOverlay {
     private static String label = "";
     private static long seed;
 
-    private WatermarkOverlay() {
-    }
+    private WatermarkOverlay() {}
 
     public static void render(GuiGraphicsExtractor graphics) {
         if (!WatermarkIdentity.enabled()) return;

@@ -5,15 +5,15 @@ import com.google.gson.GsonBuilder;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.mojang.serialization.MapCodec;
-import uk.nbforge.gallifreyan_chronicles.Constants;
-import uk.nbforge.gallifreyan_chronicles.addon.api.AddonContext;
-import uk.nbforge.gallifreyan_chronicles.platform.Services;
-import uk.nbforge.gallifreyan_chronicles.tardis.Tardis;
-import uk.nbforge.gallifreyan_chronicles.tardis.TardisEvents;
-import uk.nbforge.gallifreyan_chronicles.tardis.control.TardisControl;
-import uk.nbforge.gallifreyan_chronicles.core.dynamic_registries.TardisControlRegistry;
-import uk.nbforge.gallifreyan_chronicles.tardis.control.TardisControlTypes;
-import uk.nbforge.gallifreyan_chronicles.util.GCSchedulerUtil;
+import java.io.IOException;
+import java.io.Reader;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.function.BiFunction;
+import java.util.function.Consumer;
+import java.util.function.Function;
+import java.util.regex.Pattern;
 import net.minecraft.core.Registry;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
@@ -27,16 +27,15 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockBehaviour;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.io.IOException;
-import java.io.Reader;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.util.function.BiFunction;
-import java.util.function.Consumer;
-import java.util.function.Function;
-import java.util.regex.Pattern;
+import uk.nbforge.gallifreyan_chronicles.Constants;
+import uk.nbforge.gallifreyan_chronicles.addon.api.AddonContext;
+import uk.nbforge.gallifreyan_chronicles.core.dynamic_registries.TardisControlRegistry;
+import uk.nbforge.gallifreyan_chronicles.platform.Services;
+import uk.nbforge.gallifreyan_chronicles.tardis.Tardis;
+import uk.nbforge.gallifreyan_chronicles.tardis.TardisEvents;
+import uk.nbforge.gallifreyan_chronicles.tardis.control.TardisControl;
+import uk.nbforge.gallifreyan_chronicles.tardis.control.TardisControlTypes;
+import uk.nbforge.gallifreyan_chronicles.util.GCSchedulerUtil;
 
 /** What one addon gets, everything it adds is tagged with its id. */
 final class ModAddonContext implements AddonContext {
@@ -78,7 +77,11 @@ final class ModAddonContext implements AddonContext {
     /** The folder of this addon inside the config folder, made if it is missing. */
     @Override
     public Path dataFolder() {
-        Path path = Services.PLATFORM.getConfigDir().resolve(Constants.MOD_ID).resolve("addons").resolve(addonId);
+        Path path = Services.PLATFORM
+                .getConfigDir()
+                .resolve(Constants.MOD_ID)
+                .resolve("addons")
+                .resolve(addonId);
         try {
             Files.createDirectories(path);
         } catch (IOException e) {
@@ -123,7 +126,9 @@ final class ModAddonContext implements AddonContext {
     @Override
     public <T extends Item> T registerItem(String name, Function<Item.Properties, T> factory) {
         Identifier id = id(name);
-        T item = Registry.register(BuiltInRegistries.ITEM, id,
+        T item = Registry.register(
+                BuiltInRegistries.ITEM,
+                id,
                 factory.apply(new Item.Properties().setId(ResourceKey.create(Registries.ITEM, id))));
         AddonContent.addToTab(item);
         return item;
@@ -135,13 +140,20 @@ final class ModAddonContext implements AddonContext {
     }
 
     @Override
-    public Block registerBlock(String name, Function<BlockBehaviour.Properties, Block> factory,
-                               BiFunction<Block, Item.Properties, Item> itemFactory) {
+    public Block registerBlock(
+            String name,
+            Function<BlockBehaviour.Properties, Block> factory,
+            BiFunction<Block, Item.Properties, Item> itemFactory) {
         Identifier id = id(name);
         Block block = registerBlockWithoutItem(name, factory);
-        Item item = Registry.register(BuiltInRegistries.ITEM, id,
-                itemFactory.apply(block, new Item.Properties().useBlockDescriptionPrefix()
-                        .setId(ResourceKey.create(Registries.ITEM, id))));
+        Item item = Registry.register(
+                BuiltInRegistries.ITEM,
+                id,
+                itemFactory.apply(
+                        block,
+                        new Item.Properties()
+                                .useBlockDescriptionPrefix()
+                                .setId(ResourceKey.create(Registries.ITEM, id))));
         AddonContent.addToTab(item);
         return block;
     }
@@ -150,7 +162,9 @@ final class ModAddonContext implements AddonContext {
     @Override
     public Block registerBlockWithoutItem(String name, Function<BlockBehaviour.Properties, Block> factory) {
         Identifier id = id(name);
-        return Registry.register(BuiltInRegistries.BLOCK, id,
+        return Registry.register(
+                BuiltInRegistries.BLOCK,
+                id,
                 factory.apply(BlockBehaviour.Properties.of().setId(ResourceKey.create(Registries.BLOCK, id))));
     }
 
@@ -171,9 +185,12 @@ final class ModAddonContext implements AddonContext {
     /** Registers a control, the id must be lower case letters, digits and underscores, start with the prefix of the addon and not be taken already. */
     @Override
     public <T extends TardisControl> void registerControl(String id, MapCodec<T> codec, T control) {
-        if (!CONTROL_ID.matcher(id).matches() || !id.startsWith(controlPrefix) || id.length() == controlPrefix.length()) {
-            throw new IllegalArgumentException("Control id '" + id + "' must be lower case letters, digits and underscores, "
-                    + "and start with '" + controlPrefix + "'");
+        if (!CONTROL_ID.matcher(id).matches()
+                || !id.startsWith(controlPrefix)
+                || id.length() == controlPrefix.length()) {
+            throw new IllegalArgumentException(
+                    "Control id '" + id + "' must be lower case letters, digits and underscores, " + "and start with '"
+                            + controlPrefix + "'");
         }
         if (TardisControlRegistry.isRegistered(id)) {
             throw new IllegalStateException("A control called '" + id + "' is already registered");

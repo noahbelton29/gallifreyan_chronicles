@@ -1,14 +1,14 @@
 package uk.nbforge.gallifreyan_chronicles.compat.jade;
 
-import uk.nbforge.gallifreyan_chronicles.tardis.Tardis;
-import uk.nbforge.gallifreyan_chronicles.tardis.TardisApi;
-import uk.nbforge.gallifreyan_chronicles.core.block_entities.TardisExteriorBlockEntity;
-import uk.nbforge.gallifreyan_chronicles.util.GCUtil;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.Identifier;
 import org.jspecify.annotations.NonNull;
 import snownee.jade.api.BlockAccessor;
 import snownee.jade.api.IServerDataProvider;
+import uk.nbforge.gallifreyan_chronicles.core.block_entities.TardisExteriorBlockEntity;
+import uk.nbforge.gallifreyan_chronicles.tardis.Tardis;
+import uk.nbforge.gallifreyan_chronicles.tardis.TardisApi;
+import uk.nbforge.gallifreyan_chronicles.util.GCUtil;
 
 public class TardisOwnerDataProvider implements IServerDataProvider<BlockAccessor> {
     public static final TardisOwnerDataProvider INSTANCE = new TardisOwnerDataProvider();

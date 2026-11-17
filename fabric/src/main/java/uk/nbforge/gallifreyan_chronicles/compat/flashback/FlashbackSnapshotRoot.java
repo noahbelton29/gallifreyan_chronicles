@@ -1,6 +1,5 @@
 package uk.nbforge.gallifreyan_chronicles.compat.flashback;
 
-import uk.nbforge.gallifreyan_chronicles.client.sound.SoundListener;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientLevel;
@@ -8,16 +7,16 @@ import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.level.Level;
 import org.jspecify.annotations.Nullable;
 import qouteall.imm_ptl.core.ClientWorldLoader;
+import uk.nbforge.gallifreyan_chronicles.client.sound.SoundListener;
 
 /**
-   See SnapshotOutsideWorldMixin.
-   Remembers the last world that is not a TARDIS and takes snapshots from there while you are inside one.
-*/
+ * See SnapshotOutsideWorldMixin.
+ * Remembers the last world that is not a TARDIS and takes snapshots from there while you are inside one.
+ */
 final class FlashbackSnapshotRoot {
     private static @Nullable ResourceKey<Level> lastOutside;
 
-    private FlashbackSnapshotRoot() {
-    }
+    private FlashbackSnapshotRoot() {}
 
     static void register() {
         ClientTickEvents.END_CLIENT_TICK.register(client -> {
@@ -25,7 +24,8 @@ final class FlashbackSnapshotRoot {
                 lastOutside = null;
                 return;
             }
-            if (!SoundListener.isTardisLevel(client.player.level())) lastOutside = client.player.level().dimension();
+            if (!SoundListener.isTardisLevel(client.player.level()))
+                lastOutside = client.player.level().dimension();
         });
     }
 

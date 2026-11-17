@@ -1,8 +1,8 @@
 package uk.nbforge.gallifreyan_chronicles.tardis.ecs.component;
 
+import uk.nbforge.gallifreyan_chronicles.core.dynamic_registries.TardisExteriorRegistry;
 import uk.nbforge.gallifreyan_chronicles.ecs.Component;
 import uk.nbforge.gallifreyan_chronicles.tardis.TardisExterior;
-import uk.nbforge.gallifreyan_chronicles.core.dynamic_registries.TardisExteriorRegistry;
 
 public record ExteriorComponent(String exteriorId) implements Component {
     public static ExteriorComponent ofDefault() {

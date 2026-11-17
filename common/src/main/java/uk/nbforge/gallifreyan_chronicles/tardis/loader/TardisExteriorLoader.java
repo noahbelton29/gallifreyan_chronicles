@@ -1,14 +1,13 @@
 package uk.nbforge.gallifreyan_chronicles.tardis.loader;
 
+import net.minecraft.server.MinecraftServer;
 import uk.nbforge.gallifreyan_chronicles.Constants;
+import uk.nbforge.gallifreyan_chronicles.core.dynamic_registries.TardisExteriorRegistry;
 import uk.nbforge.gallifreyan_chronicles.loader.GCJsonReloadListener;
 import uk.nbforge.gallifreyan_chronicles.network.tardis.TardisExteriorSyncPayload;
 import uk.nbforge.gallifreyan_chronicles.platform.Services;
-import net.minecraft.server.MinecraftServer;
-
-import uk.nbforge.gallifreyan_chronicles.core.dynamic_registries.TardisExteriorRegistry;
-import uk.nbforge.gallifreyan_chronicles.tardis.codec.exterior.TardisExteriorCodec;
 import uk.nbforge.gallifreyan_chronicles.tardis.TardisExterior;
+import uk.nbforge.gallifreyan_chronicles.tardis.codec.exterior.TardisExteriorCodec;
 
 public class TardisExteriorLoader extends GCJsonReloadListener<TardisExterior> {
     public TardisExteriorLoader() {
@@ -34,7 +33,9 @@ public class TardisExteriorLoader extends GCJsonReloadListener<TardisExterior> {
     protected void onReloadComplete() {
         TardisExterior def = TardisExteriorRegistry.get(TardisExteriorRegistry.defaultId());
         if (def == null) {
-            Constants.LOG.warn("No TARDIS exteriors loaded! Expected e.g. data/{}/tardis_exterior/first_doctors_exterior.json", Constants.MOD_ID);
+            Constants.LOG.warn(
+                    "No TARDIS exteriors loaded! Expected e.g. data/{}/tardis_exterior/first_doctors_exterior.json",
+                    Constants.MOD_ID);
             return;
         }
         TardisExteriorRegistry.setDefault(def);

@@ -1,13 +1,12 @@
 package uk.nbforge.gallifreyan_chronicles.client.model;
 
-import uk.nbforge.gallifreyan_chronicles.client.model.GeoAssets;
 import com.geckolib.model.GeoModel;
 import com.geckolib.renderer.base.GeoRenderState;
-import uk.nbforge.gallifreyan_chronicles.core.block_entities.TardisExteriorBlockEntity;
-import uk.nbforge.gallifreyan_chronicles.client.renderer.block.TardisExteriorBlockRenderer;
-import uk.nbforge.gallifreyan_chronicles.core.dynamic_registries.TardisExteriorRegistry;
 import net.minecraft.resources.Identifier;
 import org.jspecify.annotations.NonNull;
+import uk.nbforge.gallifreyan_chronicles.client.renderer.block.TardisExteriorBlockRenderer;
+import uk.nbforge.gallifreyan_chronicles.core.block_entities.TardisExteriorBlockEntity;
+import uk.nbforge.gallifreyan_chronicles.core.dynamic_registries.TardisExteriorRegistry;
 
 public class TardisExteriorBlockModel extends GeoModel<TardisExteriorBlockEntity> {
     @Override

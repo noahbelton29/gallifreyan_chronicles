@@ -1,24 +1,6 @@
 package uk.nbforge.gallifreyan_chronicles.core.block;
 
-import uk.nbforge.gallifreyan_chronicles.util.MessageUtil;
-import uk.nbforge.gallifreyan_chronicles.util.TardisDimensionUtil;
-import uk.nbforge.gallifreyan_chronicles.util.ExteriorCollisionUtil;
-
-import uk.nbforge.gallifreyan_chronicles.compat.portal.TardisPortalBridge;
-import uk.nbforge.gallifreyan_chronicles.tardis.TardisApi;
-import uk.nbforge.gallifreyan_chronicles.Constants;
-import uk.nbforge.gallifreyan_chronicles.core.block_entities.TardisExteriorBlockEntity;
-import uk.nbforge.gallifreyan_chronicles.ecs.Entity;
-import uk.nbforge.gallifreyan_chronicles.core.GCDataComponents;
-import uk.nbforge.gallifreyan_chronicles.tardis.ecs.system.ExteriorSystem;
-import uk.nbforge.gallifreyan_chronicles.tardis.ecs.system.TardisLinkSystem;
-import uk.nbforge.gallifreyan_chronicles.core.dynamic_registries.TardisExteriorRegistry;
-import uk.nbforge.gallifreyan_chronicles.tardis.TardisInterior;
-import uk.nbforge.gallifreyan_chronicles.core.dynamic_registries.TardisInteriorRegistry;
-import uk.nbforge.gallifreyan_chronicles.tardis.manager.deletion.TardisDeletion;
-import uk.nbforge.gallifreyan_chronicles.tardis.TardisManager;
-import uk.nbforge.gallifreyan_chronicles.tardis.ecs.component.TardisComponent;
-import uk.nbforge.gallifreyan_chronicles.util.GCSchedulerUtil;
+import java.util.UUID;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
@@ -46,8 +28,24 @@ import net.minecraft.world.phys.shapes.VoxelShape;
 import org.jetbrains.annotations.NotNull;
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
-
-import java.util.UUID;
+import uk.nbforge.gallifreyan_chronicles.Constants;
+import uk.nbforge.gallifreyan_chronicles.compat.portal.TardisPortalBridge;
+import uk.nbforge.gallifreyan_chronicles.core.GCDataComponents;
+import uk.nbforge.gallifreyan_chronicles.core.block_entities.TardisExteriorBlockEntity;
+import uk.nbforge.gallifreyan_chronicles.core.dynamic_registries.TardisExteriorRegistry;
+import uk.nbforge.gallifreyan_chronicles.core.dynamic_registries.TardisInteriorRegistry;
+import uk.nbforge.gallifreyan_chronicles.ecs.Entity;
+import uk.nbforge.gallifreyan_chronicles.tardis.TardisApi;
+import uk.nbforge.gallifreyan_chronicles.tardis.TardisInterior;
+import uk.nbforge.gallifreyan_chronicles.tardis.TardisManager;
+import uk.nbforge.gallifreyan_chronicles.tardis.ecs.component.TardisComponent;
+import uk.nbforge.gallifreyan_chronicles.tardis.ecs.system.ExteriorSystem;
+import uk.nbforge.gallifreyan_chronicles.tardis.ecs.system.TardisLinkSystem;
+import uk.nbforge.gallifreyan_chronicles.tardis.manager.deletion.TardisDeletion;
+import uk.nbforge.gallifreyan_chronicles.util.ExteriorCollisionUtil;
+import uk.nbforge.gallifreyan_chronicles.util.GCSchedulerUtil;
+import uk.nbforge.gallifreyan_chronicles.util.MessageUtil;
+import uk.nbforge.gallifreyan_chronicles.util.TardisDimensionUtil;
 
 public class TardisBlock extends BaseEntityBlock {
     private static final VoxelShape TALL_SHAPE = Block.box(0, 0, 0, 16, 32, 16);
@@ -60,9 +58,9 @@ public class TardisBlock extends BaseEntityBlock {
 
     public TardisBlock(Properties properties) {
         super(properties);
-        this.registerDefaultState(this.stateDefinition.any().setValue(GLOWING, false).setValue(LIGHT, 0));
-        this.registerDefaultState(this.stateDefinition.any()
-                .setValue(IN_FLIGHT, false));
+        this.registerDefaultState(
+                this.stateDefinition.any().setValue(GLOWING, false).setValue(LIGHT, 0));
+        this.registerDefaultState(this.stateDefinition.any().setValue(IN_FLIGHT, false));
     }
 
     @Override
@@ -77,8 +75,12 @@ public class TardisBlock extends BaseEntityBlock {
     }
 
     @Override
-    public void setPlacedBy(@NonNull Level level, @NonNull BlockPos pos, @NonNull BlockState state, LivingEntity placer,
-                            @NonNull ItemStack stack) {
+    public void setPlacedBy(
+            @NonNull Level level,
+            @NonNull BlockPos pos,
+            @NonNull BlockState state,
+            LivingEntity placer,
+            @NonNull ItemStack stack) {
         super.setPlacedBy(level, pos, state, placer, stack);
         if (!(level.getBlockEntity(pos) instanceof TardisExteriorBlockEntity blockEntity)) return;
         String chosenInterior = stack.get(GCDataComponents.TARDIS_INTERIOR);
@@ -95,8 +97,12 @@ public class TardisBlock extends BaseEntityBlock {
             if (!(placer instanceof Player player)) return;
 
             Entity entity = blockEntity.asEntity();
-            TardisComponent record = TardisLinkSystem.registerNewTardis(entity, serverLevel, player.getUUID(),
-                    player.getGameProfile().name(), pos);
+            TardisComponent record = TardisLinkSystem.registerNewTardis(
+                    entity,
+                    serverLevel,
+                    player.getUUID(),
+                    player.getGameProfile().name(),
+                    pos);
             applyChosenInterior(serverLevel, entity, record, chosenInterior);
             blockEntity.snapDoorsShut();
 
@@ -104,7 +110,8 @@ public class TardisBlock extends BaseEntityBlock {
 
             TardisApi.get(serverLevel.getServer(), record.tardisId()).ifPresent(tardis -> tardis.giveKeyTo(player));
 
-            // Building the interior is heavy enough to stall the server for a noticeable moment, so it runs a tick later instead of inline here, keeping
+            // Building the interior is heavy enough to stall the server for a noticeable moment, so it runs a tick
+            // later instead of inline here, keeping
             // the block placement itself fast for the player and for any other code reacting to this event
             MinecraftServer server = serverLevel.getServer();
             UUID tardisId = record.tardisId();
@@ -113,8 +120,7 @@ public class TardisBlock extends BaseEntityBlock {
             Constants.LOG.debug(
                     "Registered TARDIS {} for player {}",
                     record.tardisId(),
-                    player.getName().getString()
-            );
+                    player.getName().getString());
         }
     }
 
@@ -140,8 +146,8 @@ public class TardisBlock extends BaseEntityBlock {
     }
 
     @Override
-    protected @NonNull ItemStack getCloneItemStack(@NonNull LevelReader level, @NonNull BlockPos pos,
-                                                   @NonNull BlockState state, boolean includeData) {
+    protected @NonNull ItemStack getCloneItemStack(
+            @NonNull LevelReader level, @NonNull BlockPos pos, @NonNull BlockState state, boolean includeData) {
         ItemStack stack = super.getCloneItemStack(level, pos, state, includeData);
         if (level instanceof ServerLevel serverLevel
                 && level.getBlockEntity(pos) instanceof TardisExteriorBlockEntity tardis) {
@@ -161,8 +167,12 @@ public class TardisBlock extends BaseEntityBlock {
     }
 
     @Override
-    protected @NonNull InteractionResult useWithoutItem(@NonNull BlockState state, Level level, @NonNull BlockPos pos,
-                                                        @NonNull Player player, @NonNull BlockHitResult hitResult) {
+    protected @NonNull InteractionResult useWithoutItem(
+            @NonNull BlockState state,
+            Level level,
+            @NonNull BlockPos pos,
+            @NonNull Player player,
+            @NonNull BlockHitResult hitResult) {
         if (!(level.getBlockEntity(pos) instanceof TardisExteriorBlockEntity tardis)) {
             return InteractionResult.CONSUME;
         }
@@ -206,8 +216,11 @@ public class TardisBlock extends BaseEntityBlock {
     }
 
     @Override
-    protected @NonNull VoxelShape getShape(@NonNull BlockState state, @NonNull BlockGetter level,
-                                           @NonNull BlockPos pos, @NonNull CollisionContext context) {
+    protected @NonNull VoxelShape getShape(
+            @NonNull BlockState state,
+            @NonNull BlockGetter level,
+            @NonNull BlockPos pos,
+            @NonNull CollisionContext context) {
         if (level.getBlockEntity(pos) instanceof TardisExteriorBlockEntity tardis && tardis.isFullyInvisible()) {
             return Shapes.empty();
         }
@@ -215,8 +228,12 @@ public class TardisBlock extends BaseEntityBlock {
     }
 
     @Override
-    protected void onPlace(@NonNull BlockState state, @NonNull Level level, @NonNull BlockPos pos,
-                           @NonNull BlockState oldState, boolean movedByPiston) {
+    protected void onPlace(
+            @NonNull BlockState state,
+            @NonNull Level level,
+            @NonNull BlockPos pos,
+            @NonNull BlockState oldState,
+            boolean movedByPiston) {
         super.onPlace(state, level, pos, oldState, movedByPiston);
         if (!level.isClientSide() && !oldState.is(this)) {
             TardisTopBlock.placeAbove(level, pos);
@@ -224,14 +241,17 @@ public class TardisBlock extends BaseEntityBlock {
     }
 
     @Override
-    protected @NonNull VoxelShape getCollisionShape(@NonNull BlockState state, @NonNull BlockGetter level,
-                                                    @NonNull BlockPos pos, @NonNull CollisionContext context) {
+    protected @NonNull VoxelShape getCollisionShape(
+            @NonNull BlockState state,
+            @NonNull BlockGetter level,
+            @NonNull BlockPos pos,
+            @NonNull CollisionContext context) {
         return ExteriorCollisionUtil.shape(level, pos);
     }
 
     @Override
-    public @NotNull BlockState playerWillDestroy(@NotNull Level level, @NotNull BlockPos pos,
-                                                 @NotNull BlockState state, @NotNull Player player) {
+    public @NotNull BlockState playerWillDestroy(
+            @NotNull Level level, @NotNull BlockPos pos, @NotNull BlockState state, @NotNull Player player) {
         deleteIfCreative(level, pos, player);
         return super.playerWillDestroy(level, pos, state, player);
     }

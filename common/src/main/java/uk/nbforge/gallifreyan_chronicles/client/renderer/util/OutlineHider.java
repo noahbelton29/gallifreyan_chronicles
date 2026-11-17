@@ -1,23 +1,24 @@
 package uk.nbforge.gallifreyan_chronicles.client.renderer.util;
 
-import uk.nbforge.gallifreyan_chronicles.core.block.TardisTopBlock;
-import uk.nbforge.gallifreyan_chronicles.core.block.TardisBlock;
-import uk.nbforge.gallifreyan_chronicles.core.block.InteriorDoorBarrierBlock;
-import uk.nbforge.gallifreyan_chronicles.core.block.InteriorDoorBlock;
-import uk.nbforge.gallifreyan_chronicles.compat.portal.TardisPortalBridge;
 import net.minecraft.client.Minecraft;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
+import uk.nbforge.gallifreyan_chronicles.compat.portal.TardisPortalBridge;
+import uk.nbforge.gallifreyan_chronicles.core.block.InteriorDoorBarrierBlock;
+import uk.nbforge.gallifreyan_chronicles.core.block.InteriorDoorBlock;
+import uk.nbforge.gallifreyan_chronicles.core.block.TardisBlock;
+import uk.nbforge.gallifreyan_chronicles.core.block.TardisTopBlock;
 
 public final class OutlineHider {
-    private OutlineHider() {
-    }
+    private OutlineHider() {}
 
     /** Interior doors and the whole TARDIS exterior never show a block outline. */
     private static boolean isDoorBlock(Block block) {
-        return block instanceof InteriorDoorBlock || block instanceof InteriorDoorBarrierBlock
-                || block instanceof TardisBlock || block instanceof TardisTopBlock;
+        return block instanceof InteriorDoorBlock
+                || block instanceof InteriorDoorBarrierBlock
+                || block instanceof TardisBlock
+                || block instanceof TardisTopBlock;
     }
 
     public static boolean shouldHide(Level level, BlockPos pos) {

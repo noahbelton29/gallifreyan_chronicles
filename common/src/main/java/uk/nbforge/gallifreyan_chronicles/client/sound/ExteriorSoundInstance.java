@@ -1,11 +1,11 @@
 package uk.nbforge.gallifreyan_chronicles.client.sound;
 
-import uk.nbforge.gallifreyan_chronicles.core.block_entities.TardisExteriorBlockEntity;
 import net.minecraft.client.resources.sounds.AbstractTickableSoundInstance;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.phys.Vec3;
+import uk.nbforge.gallifreyan_chronicles.core.block_entities.TardisExteriorBlockEntity;
 
 /** A sound played at the exterior that gets louder, reaches further and gets clearer as the doors open. */
 public abstract class ExteriorSoundInstance extends AbstractTickableSoundInstance {

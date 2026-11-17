@@ -1,28 +1,27 @@
 package uk.nbforge.gallifreyan_chronicles.client.sound;
 
-import uk.nbforge.gallifreyan_chronicles.util.TardisDimensionUtil;
-import uk.nbforge.gallifreyan_chronicles.Constants;
 import net.minecraft.client.Minecraft;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
 import org.jspecify.annotations.Nullable;
+import uk.nbforge.gallifreyan_chronicles.util.TardisDimensionUtil;
 
 /**
-   Where our sounds are heard from, normally the player.
-   In a Flashback replay the camera is the listener and once it flies through a door it hears the TARDIS world instead of the overworld, the replay side sets the override.
-*/
+ * Where our sounds are heard from, normally the player.
+ * In a Flashback replay the camera is the listener and once it flies through a door it hears the TARDIS world instead of the overworld, the replay side sets the override.
+ */
 public final class SoundListener {
     public interface Override {
         // Null when not in a replay
-        @Nullable Level level();
+        @Nullable
+        Level level();
 
         Vec3 pos();
     }
 
     private static @Nullable Override override;
 
-    private SoundListener() {
-    }
+    private SoundListener() {}
 
     public static void setOverride(Override value) {
         override = value;

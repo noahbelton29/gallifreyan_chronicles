@@ -1,36 +1,35 @@
 package uk.nbforge.gallifreyan_chronicles.client.renderer;
 
-import com.mojang.renderpearl.api.pipeline.PrimitiveTopology;
 import com.mojang.blaze3d.vertex.DefaultVertexFormat;
-import net.minecraft.client.renderer.BindGroupLayouts;
-import uk.nbforge.gallifreyan_chronicles.util.GCUtil;
-import com.mojang.renderpearl.api.pipeline.CompareOp;
-import com.mojang.renderpearl.api.pipeline.DepthStencilState;
 import com.mojang.renderpearl.api.pipeline.BlendFunction;
 import com.mojang.renderpearl.api.pipeline.ColorTargetState;
+import com.mojang.renderpearl.api.pipeline.CompareOp;
+import com.mojang.renderpearl.api.pipeline.DepthStencilState;
+import com.mojang.renderpearl.api.pipeline.PrimitiveTopology;
 import com.mojang.renderpearl.api.pipeline.RenderPipeline;
+import java.util.HashMap;
+import java.util.Map;
+import net.minecraft.client.renderer.BindGroupLayouts;
 import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.client.renderer.rendertype.LayeringTransform;
 import net.minecraft.client.renderer.rendertype.RenderSetup;
 import net.minecraft.client.renderer.rendertype.RenderType;
 import net.minecraft.resources.Identifier;
-
-import java.util.HashMap;
-import java.util.Map;
+import uk.nbforge.gallifreyan_chronicles.util.GCUtil;
 
 public final class GCRenderTypes {
     private static final Map<Identifier, RenderType> LAYERED_EYES = new HashMap<>();
 
-    private GCRenderTypes() {
-    }
+    private GCRenderTypes() {}
 
     private static final Map<Identifier, RenderType> GLOW_ORB = new HashMap<>();
 
-    // The lamp orb adds light so it glows with no dark edges and it does not write depth so it never hides the sky or the box behind it
+    // The lamp orb adds light so it glows with no dark edges and it does not write depth so it never hides the sky or
+    // the box behind it
     // Same setup as the eyes pipeline of vanilla, those snippets are private so it is copied here
     // annoying but there is no other way to get at them
-    private static final RenderPipeline GLOW_ORB_PIPELINE = RenderPipelines.register(
-            RenderPipeline.builder(RenderPipelines.GLOBALS_SNIPPET)
+    private static final RenderPipeline GLOW_ORB_PIPELINE =
+            RenderPipelines.register(RenderPipeline.builder(RenderPipelines.GLOBALS_SNIPPET)
                     .withBindGroupLayout(BindGroupLayouts.PROJECTION)
                     .withBindGroupLayout(BindGroupLayouts.DYNAMIC_TRANSFORMS)
                     .withBindGroupLayout(BindGroupLayouts.FOG)
@@ -49,21 +48,25 @@ public final class GCRenderTypes {
                     .build());
 
     public static RenderType glowOrb(Identifier texture) {
-        return GLOW_ORB.computeIfAbsent(texture, t -> RenderType.create(
-                "gc_glow_orb",
-                RenderSetup.builder(GLOW_ORB_PIPELINE)
-                        .withTexture("Sampler0", t)
-                        .sortOnUpload()
-                        .createRenderSetup()));
+        return GLOW_ORB.computeIfAbsent(
+                texture,
+                t -> RenderType.create(
+                        "gc_glow_orb",
+                        RenderSetup.builder(GLOW_ORB_PIPELINE)
+                                .withTexture("Sampler0", t)
+                                .sortOnUpload()
+                                .createRenderSetup()));
     }
 
     public static RenderType layeredEyes(Identifier texture) {
-        return LAYERED_EYES.computeIfAbsent(texture, t -> RenderType.create(
-                "gc_layered_eyes",
-                RenderSetup.builder(RenderPipelines.EYES)
-                        .withTexture("Sampler0", t)
-                        .setLayeringTransform(LayeringTransform.VIEW_OFFSET_Z_LAYERING)
-                        .sortOnUpload()
-                        .createRenderSetup()));
+        return LAYERED_EYES.computeIfAbsent(
+                texture,
+                t -> RenderType.create(
+                        "gc_layered_eyes",
+                        RenderSetup.builder(RenderPipelines.EYES)
+                                .withTexture("Sampler0", t)
+                                .setLayeringTransform(LayeringTransform.VIEW_OFFSET_Z_LAYERING)
+                                .sortOnUpload()
+                                .createRenderSetup()));
     }
 }

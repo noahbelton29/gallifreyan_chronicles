@@ -1,6 +1,5 @@
 package uk.nbforge.gallifreyan_chronicles.mixin.client.audio;
 
-import uk.nbforge.gallifreyan_chronicles.client.sound.GCMusic;
 import net.minecraft.client.Minecraft;
 import net.minecraft.sounds.Music;
 import net.minecraft.sounds.Musics;
@@ -8,6 +7,7 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
+import uk.nbforge.gallifreyan_chronicles.client.sound.GCMusic;
 
 @Mixin(Minecraft.class)
 public abstract class TitleMusicMixin {

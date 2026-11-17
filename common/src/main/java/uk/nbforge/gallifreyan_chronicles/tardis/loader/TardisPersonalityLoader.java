@@ -1,9 +1,9 @@
 package uk.nbforge.gallifreyan_chronicles.tardis.loader;
 
-import uk.nbforge.gallifreyan_chronicles.loader.GCJsonReloadListener;
-import uk.nbforge.gallifreyan_chronicles.tardis.mind.TardisPersonality;
 import net.minecraft.server.MinecraftServer;
+import uk.nbforge.gallifreyan_chronicles.loader.GCJsonReloadListener;
 import uk.nbforge.gallifreyan_chronicles.tardis.codec.mind.TardisPersonalityCodec;
+import uk.nbforge.gallifreyan_chronicles.tardis.mind.TardisPersonality;
 import uk.nbforge.gallifreyan_chronicles.tardis.mind.data.TardisPersonalities;
 
 public class TardisPersonalityLoader extends GCJsonReloadListener<TardisPersonality> {
@@ -27,6 +27,5 @@ public class TardisPersonalityLoader extends GCJsonReloadListener<TardisPersonal
     }
 
     @Override
-    protected void broadcastSync(MinecraftServer server) {
-    }
+    protected void broadcastSync(MinecraftServer server) {}
 }

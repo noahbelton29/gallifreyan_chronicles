@@ -1,7 +1,5 @@
 package uk.nbforge.gallifreyan_chronicles.mixin.client.screen;
 
-import uk.nbforge.gallifreyan_chronicles.client.gui.title.GCTitleScreenLayout;
-import uk.nbforge.gallifreyan_chronicles.compat.essential.EssentialMenuCompat;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.screens.Screen;
@@ -12,6 +10,8 @@ import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+import uk.nbforge.gallifreyan_chronicles.client.gui.title.GCTitleScreenLayout;
+import uk.nbforge.gallifreyan_chronicles.compat.essential.EssentialMenuCompat;
 
 @Mixin(TitleScreen.class)
 public abstract class TitleScreenMixin extends Screen {
@@ -28,7 +28,8 @@ public abstract class TitleScreenMixin extends Screen {
     }
 
     @Inject(method = "extractRenderState", at = @At("HEAD"), cancellable = true)
-    private void gc$renderTitleScreen(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float partialTick, CallbackInfo ci) {
+    private void gc$renderTitleScreen(
+            GuiGraphicsExtractor graphics, int mouseX, int mouseY, float partialTick, CallbackInfo ci) {
         if (this.minecraft.isDemo()) return;
         GCTitleScreenLayout.renderBackdrop(graphics, this.width, this.height);
         super.extractRenderState(graphics, mouseX, mouseY, partialTick);

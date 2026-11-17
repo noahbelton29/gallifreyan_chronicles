@@ -1,29 +1,27 @@
 package uk.nbforge.gallifreyan_chronicles.tardis.mind.refusal;
 
-import uk.nbforge.gallifreyan_chronicles.tardis.mind.MindMessages;
-import uk.nbforge.gallifreyan_chronicles.tardis.mind.FearLevel;
-import uk.nbforge.gallifreyan_chronicles.tardis.mind.data.MindEnums;
-
-import uk.nbforge.gallifreyan_chronicles.tardis.ecs.system.TardisMindSystem;
-import uk.nbforge.gallifreyan_chronicles.tardis.mind.discovery.TardisDiscovery;
-
-import uk.nbforge.gallifreyan_chronicles.core.block_entities.TardisConsoleBlockEntity;
-import uk.nbforge.gallifreyan_chronicles.core.entity.TardisControlEntity;
-import uk.nbforge.gallifreyan_chronicles.core.GCSounds;
-import uk.nbforge.gallifreyan_chronicles.tardis.Tardis;
-import uk.nbforge.gallifreyan_chronicles.tardis.TardisApi;
-import uk.nbforge.gallifreyan_chronicles.tardis.mind.abuse.TardisTerror;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.player.Player;
+import uk.nbforge.gallifreyan_chronicles.core.GCSounds;
+import uk.nbforge.gallifreyan_chronicles.core.block_entities.TardisConsoleBlockEntity;
+import uk.nbforge.gallifreyan_chronicles.core.entity.TardisControlEntity;
+import uk.nbforge.gallifreyan_chronicles.tardis.Tardis;
+import uk.nbforge.gallifreyan_chronicles.tardis.TardisApi;
+import uk.nbforge.gallifreyan_chronicles.tardis.ecs.system.TardisMindSystem;
+import uk.nbforge.gallifreyan_chronicles.tardis.mind.FearLevel;
+import uk.nbforge.gallifreyan_chronicles.tardis.mind.MindMessages;
+import uk.nbforge.gallifreyan_chronicles.tardis.mind.abuse.TardisTerror;
+import uk.nbforge.gallifreyan_chronicles.tardis.mind.data.MindEnums;
+import uk.nbforge.gallifreyan_chronicles.tardis.mind.discovery.TardisDiscovery;
 
 /**
-   Controls refuse or stick depending on how much the TARDIS trusts the player.
-   Low trust makes controls stick more, and repeated tries slowly build trust and lower the chance.
-*/
+ * Controls refuse or stick depending on how much the TARDIS trusts the player.
+ * Low trust makes controls stick more, and repeated tries slowly build trust and lower the chance.
+ */
 public final class TardisWariness {
 
     // Below this trust controls always refuse
@@ -47,8 +45,7 @@ public final class TardisWariness {
     // Trust gained when a control sticks, if it is not afraid
     private static final float TRUST_PER_JAM = 2f;
 
-    private TardisWariness() {
-    }
+    private TardisWariness() {}
 
     /** Refusal depends on the trust and on whether the TARDIS is terrified of the player. */
     public static boolean jams(TardisControlEntity control, TardisConsoleBlockEntity console, Player player) {
@@ -76,8 +73,10 @@ public final class TardisWariness {
         if (level.getRandom().nextFloat() >= chance) return false;
 
         level.playSound(null, control.blockPosition(), GCSounds.LEVER, SoundSource.BLOCKS, 0.7F, 0.5F);
-        level.sendParticles(ParticleTypes.SMOKE, control.getX(), control.getY() + 0.1, control.getZ(), 4, 0.05, 0.05, 0.05, 0.01);
-        MindMessages.say(player, ChatFormatting.GRAY, trust < HOSTILE ? "tardis_controls_frozen" : "tardis_control_sticks");
+        level.sendParticles(
+                ParticleTypes.SMOKE, control.getX(), control.getY() + 0.1, control.getZ(), 4, 0.05, 0.05, 0.05, 0.01);
+        MindMessages.say(
+                player, ChatFormatting.GRAY, trust < HOSTILE ? "tardis_controls_frozen" : "tardis_control_sticks");
 
         TardisDiscovery.reveal(tardis, MindEnums.Reveal.ITS_CONTROLS_STICK);
 

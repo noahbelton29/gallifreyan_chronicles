@@ -19,8 +19,13 @@ public class ThorivineBlock extends CactusBlock {
     }
 
     @Override
-    protected void entityInside(@NonNull BlockState state, Level level, @NonNull BlockPos pos, Entity entity,
-                                @NonNull InsideBlockEffectApplier effectApplier, boolean isPrecise) {
+    protected void entityInside(
+            @NonNull BlockState state,
+            Level level,
+            @NonNull BlockPos pos,
+            Entity entity,
+            @NonNull InsideBlockEffectApplier effectApplier,
+            boolean isPrecise) {
         entity.hurt(level.damageSources().cactus(), 3.0F);
         if (entity instanceof LivingEntity livingEntity) {
             livingEntity.addEffect(new MobEffectInstance(MobEffects.POISON, 100, 0));
@@ -29,7 +34,8 @@ public class ThorivineBlock extends CactusBlock {
     }
 
     @Override
-    protected void randomTick(@NonNull BlockState state, ServerLevel level, BlockPos pos, @NonNull RandomSource random) {
+    protected void randomTick(
+            @NonNull BlockState state, ServerLevel level, BlockPos pos, @NonNull RandomSource random) {
         BlockPos above = pos.above();
         if (level.isEmptyBlock(above)) {
             int height = 1;

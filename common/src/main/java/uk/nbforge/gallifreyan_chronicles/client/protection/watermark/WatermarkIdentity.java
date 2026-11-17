@@ -1,14 +1,13 @@
 package uk.nbforge.gallifreyan_chronicles.client.protection.watermark;
 
-import uk.nbforge.gallifreyan_chronicles.Constants;
-import uk.nbforge.gallifreyan_chronicles.platform.Services;
-
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.util.Locale;
 import java.util.Properties;
 import java.util.UUID;
+import uk.nbforge.gallifreyan_chronicles.Constants;
+import uk.nbforge.gallifreyan_chronicles.platform.Services;
 
 public final class WatermarkIdentity {
     private static final String RESOURCE = "/gc_build.properties";
@@ -20,8 +19,7 @@ public final class WatermarkIdentity {
     private static boolean fileEnabled = true;
     private static String buildId = "NOBUILD";
 
-    private WatermarkIdentity() {
-    }
+    private WatermarkIdentity() {}
 
     private static synchronized void load() {
         if (loaded) return;
@@ -31,7 +29,8 @@ public final class WatermarkIdentity {
             if (in != null) {
                 Properties props = new Properties();
                 props.load(in);
-                enabled = !"false".equalsIgnoreCase(props.getProperty("watermark", "true").trim());
+                enabled = !"false"
+                        .equalsIgnoreCase(props.getProperty("watermark", "true").trim());
                 String id = props.getProperty("build_id", "").trim();
                 if (!id.isEmpty()) buildId = id.toUpperCase(Locale.ROOT);
             }

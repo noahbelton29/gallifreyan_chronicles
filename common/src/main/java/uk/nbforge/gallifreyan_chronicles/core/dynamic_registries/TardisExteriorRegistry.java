@@ -1,9 +1,7 @@
 package uk.nbforge.gallifreyan_chronicles.core.dynamic_registries;
 
-import uk.nbforge.gallifreyan_chronicles.Constants;
-
 import java.util.Collection;
-
+import uk.nbforge.gallifreyan_chronicles.Constants;
 import uk.nbforge.gallifreyan_chronicles.tardis.TardisExterior;
 
 public class TardisExteriorRegistry {
@@ -14,8 +12,7 @@ public class TardisExteriorRegistry {
     private static final GCJsonDataRegistry<TardisExterior> REGISTRY = new GCJsonDataRegistry<>();
     private static TardisExterior defaultExterior;
 
-    private TardisExteriorRegistry() {
-    }
+    private TardisExteriorRegistry() {}
 
     public static void clear() {
         REGISTRY.clear();

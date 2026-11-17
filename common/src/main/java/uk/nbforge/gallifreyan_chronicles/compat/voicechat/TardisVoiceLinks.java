@@ -1,40 +1,43 @@
 package uk.nbforge.gallifreyan_chronicles.compat.voicechat;
 
-import uk.nbforge.gallifreyan_chronicles.core.block_entities.InteriorDoorBlockEntity;
-import uk.nbforge.gallifreyan_chronicles.core.block_entities.TardisExteriorBlockEntity;
-import uk.nbforge.gallifreyan_chronicles.tardis.Tardis;
-import uk.nbforge.gallifreyan_chronicles.tardis.TardisApi;
-import uk.nbforge.gallifreyan_chronicles.tardis.ecs.component.DoorState;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
 import net.minecraft.core.BlockPos;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.level.Level;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
+import uk.nbforge.gallifreyan_chronicles.core.block_entities.InteriorDoorBlockEntity;
+import uk.nbforge.gallifreyan_chronicles.core.block_entities.TardisExteriorBlockEntity;
+import uk.nbforge.gallifreyan_chronicles.tardis.Tardis;
+import uk.nbforge.gallifreyan_chronicles.tardis.TardisApi;
+import uk.nbforge.gallifreyan_chronicles.tardis.ecs.component.DoorState;
 
 public final class TardisVoiceLinks {
     private static final int REFRESH_TICKS = 5;
 
-    public record Link(UUID tardisId,
-                       ResourceKey<Level> exteriorDimension, double exteriorX, double exteriorY, double exteriorZ,
-                       ResourceKey<Level> interiorDimension, double doorX, double doorY, double doorZ,
-                       DoorState doorState) {
-    }
+    public record Link(
+            UUID tardisId,
+            ResourceKey<Level> exteriorDimension,
+            double exteriorX,
+            double exteriorY,
+            double exteriorZ,
+            ResourceKey<Level> interiorDimension,
+            double doorX,
+            double doorY,
+            double doorZ,
+            DoorState doorState) {}
 
-    public record PlayerPos(UUID id, ResourceKey<Level> dimension, double x, double y, double z) {
-    }
+    public record PlayerPos(UUID id, ResourceKey<Level> dimension, double x, double y, double z) {}
 
     private static volatile boolean active;
     private static volatile List<Link> links = List.of();
     private static volatile List<PlayerPos> players = List.of();
 
-    private TardisVoiceLinks() {
-    }
+    private TardisVoiceLinks() {}
 
     public static void setActive(boolean value) {
         active = value;
@@ -57,8 +60,8 @@ public final class TardisVoiceLinks {
 
         List<PlayerPos> playerSnapshot = new ArrayList<>();
         for (ServerPlayer player : server.getPlayerList().getPlayers()) {
-            playerSnapshot.add(new PlayerPos(player.getUUID(), player.level().dimension(),
-                    player.getX(), player.getY(), player.getZ()));
+            playerSnapshot.add(new PlayerPos(
+                    player.getUUID(), player.level().dimension(), player.getX(), player.getY(), player.getZ()));
         }
         players = List.copyOf(playerSnapshot);
 
@@ -73,9 +76,16 @@ public final class TardisVoiceLinks {
             BlockPos exteriorPos = ext.getBlockPos();
             BlockPos doorPos = door.getBlockPos();
             assert ext.getLevel() != null;
-            linkSnapshot.add(new Link(tardis.id(),
-                    ext.getLevel().dimension(), exteriorPos.getX() + 0.5, exteriorPos.getY() + 1.0, exteriorPos.getZ() + 0.5,
-                    interiorLevel.dimension(), doorPos.getX() + 0.5, doorPos.getY() + 1.0, doorPos.getZ() + 0.5,
+            linkSnapshot.add(new Link(
+                    tardis.id(),
+                    ext.getLevel().dimension(),
+                    exteriorPos.getX() + 0.5,
+                    exteriorPos.getY() + 1.0,
+                    exteriorPos.getZ() + 0.5,
+                    interiorLevel.dimension(),
+                    doorPos.getX() + 0.5,
+                    doorPos.getY() + 1.0,
+                    doorPos.getZ() + 0.5,
                     ext.getDoorState()));
         }
         links = List.copyOf(linkSnapshot);

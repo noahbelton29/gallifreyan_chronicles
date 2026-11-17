@@ -1,13 +1,12 @@
 package uk.nbforge.gallifreyan_chronicles.platform;
 
-import uk.nbforge.gallifreyan_chronicles.platform.services.IPlatformHelper;
-import uk.nbforge.gallifreyan_chronicles.addon.ModAddonEntry;
-import net.neoforged.fml.ModList;
-import net.neoforged.neoforgespi.language.IModInfo;
-
 import java.util.ArrayList;
 import java.util.List;
+import net.neoforged.fml.ModList;
 import net.neoforged.fml.loading.FMLLoader;
+import net.neoforged.neoforgespi.language.IModInfo;
+import uk.nbforge.gallifreyan_chronicles.addon.ModAddonEntry;
+import uk.nbforge.gallifreyan_chronicles.platform.services.IPlatformHelper;
 
 public class NeoForgePlatformHelper implements IPlatformHelper {
 
@@ -30,7 +29,8 @@ public class NeoForgePlatformHelper implements IPlatformHelper {
 
     @Override
     public String getModVersion(String modId) {
-        return ModList.get().getModContainerById(modId)
+        return ModList.get()
+                .getModContainerById(modId)
                 .map(container -> container.getModInfo().getVersion().toString())
                 .orElse("unknown");
     }

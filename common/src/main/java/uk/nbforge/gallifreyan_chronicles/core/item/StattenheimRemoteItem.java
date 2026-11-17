@@ -1,16 +1,6 @@
 package uk.nbforge.gallifreyan_chronicles.core.item;
 
-import uk.nbforge.gallifreyan_chronicles.core.block_entities.TardisExteriorBlockEntity;
-import uk.nbforge.gallifreyan_chronicles.core.GCDataComponents;
-import uk.nbforge.gallifreyan_chronicles.core.item.tooltip.ItemInfoTooltip;
-import uk.nbforge.gallifreyan_chronicles.core.GCTardisControls;
-import uk.nbforge.gallifreyan_chronicles.tardis.Tardis;
-import uk.nbforge.gallifreyan_chronicles.tardis.TardisApi;
-import uk.nbforge.gallifreyan_chronicles.tardis.flight.FlightTimings;
-import uk.nbforge.gallifreyan_chronicles.tardis.flight.LandingTarget;
-import uk.nbforge.gallifreyan_chronicles.tardis.flight.TardisTravel;
-import uk.nbforge.gallifreyan_chronicles.util.GCSchedulerUtil;
-import uk.nbforge.gallifreyan_chronicles.util.TardisDimensionUtil;
+import java.util.UUID;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
@@ -22,8 +12,17 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.context.UseOnContext;
 import org.jspecify.annotations.NonNull;
-
-import java.util.UUID;
+import uk.nbforge.gallifreyan_chronicles.core.GCDataComponents;
+import uk.nbforge.gallifreyan_chronicles.core.GCTardisControls;
+import uk.nbforge.gallifreyan_chronicles.core.block_entities.TardisExteriorBlockEntity;
+import uk.nbforge.gallifreyan_chronicles.core.item.tooltip.ItemInfoTooltip;
+import uk.nbforge.gallifreyan_chronicles.tardis.Tardis;
+import uk.nbforge.gallifreyan_chronicles.tardis.TardisApi;
+import uk.nbforge.gallifreyan_chronicles.tardis.flight.FlightTimings;
+import uk.nbforge.gallifreyan_chronicles.tardis.flight.LandingTarget;
+import uk.nbforge.gallifreyan_chronicles.tardis.flight.TardisTravel;
+import uk.nbforge.gallifreyan_chronicles.util.GCSchedulerUtil;
+import uk.nbforge.gallifreyan_chronicles.util.TardisDimensionUtil;
 
 public class StattenheimRemoteItem extends Item {
     private static final int SUMMON_COOLDOWN_TICKS = 400;
@@ -126,8 +125,9 @@ public class StattenheimRemoteItem extends Item {
             say(player, "stattenheim_linked", ChatFormatting.GREEN);
         } else {
             String owner = tardis.ownerName().orElse("?");
-            player.sendOverlayMessage(Component.translatable("overlay.gallifreyan_chronicles.stattenheim_linked_other", owner)
-                    .withStyle(ChatFormatting.GREEN));
+            player.sendOverlayMessage(
+                    Component.translatable("overlay.gallifreyan_chronicles.stattenheim_linked_other", owner)
+                            .withStyle(ChatFormatting.GREEN));
         }
         return InteractionResult.SUCCESS;
     }
@@ -147,6 +147,7 @@ public class StattenheimRemoteItem extends Item {
     }
 
     private static void say(Player player, String key, ChatFormatting colour) {
-        player.sendOverlayMessage(Component.translatable("overlay.gallifreyan_chronicles." + key).withStyle(colour));
+        player.sendOverlayMessage(
+                Component.translatable("overlay.gallifreyan_chronicles." + key).withStyle(colour));
     }
 }

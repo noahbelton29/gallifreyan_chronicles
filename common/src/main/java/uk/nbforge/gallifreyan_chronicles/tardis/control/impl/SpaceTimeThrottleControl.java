@@ -1,59 +1,57 @@
 package uk.nbforge.gallifreyan_chronicles.tardis.control.impl;
 
-import uk.nbforge.gallifreyan_chronicles.tardis.ecs.system.TardisMindSystem;
-import uk.nbforge.gallifreyan_chronicles.tardis.flight.TardisDestinations;
-import uk.nbforge.gallifreyan_chronicles.tardis.mind.flight.TardisTurbulence;
-import uk.nbforge.gallifreyan_chronicles.tardis.mind.mood.TardisMoods;
-import uk.nbforge.gallifreyan_chronicles.util.MessageUtil;
-import uk.nbforge.gallifreyan_chronicles.core.sound.timed.TimedSounds;
-
+import java.util.HashMap;
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Map;
 import java.util.Optional;
-
-import net.minecraft.core.BlockPos;
-import uk.nbforge.gallifreyan_chronicles.tardis.TardisEvents;
-import uk.nbforge.gallifreyan_chronicles.tardis.TardisApi;
-import uk.nbforge.gallifreyan_chronicles.tardis.Tardis;
-import uk.nbforge.gallifreyan_chronicles.Constants;
-import uk.nbforge.gallifreyan_chronicles.core.block_entities.TardisConsoleBlockEntity;
-import uk.nbforge.gallifreyan_chronicles.core.entity.TardisControlEntity;
-import uk.nbforge.gallifreyan_chronicles.core.GCSounds;
-import uk.nbforge.gallifreyan_chronicles.core.GCTardisControls;
-import uk.nbforge.gallifreyan_chronicles.network.tardis.TardisDrumShakePayload;
-import uk.nbforge.gallifreyan_chronicles.core.block_entities.TardisExteriorBlockEntity;
-import uk.nbforge.gallifreyan_chronicles.tardis.control.ControlAnimations;
-import uk.nbforge.gallifreyan_chronicles.tardis.control.BaseControl;
-import uk.nbforge.gallifreyan_chronicles.tardis.ecs.system.ConsoleSyncSystem;
-import uk.nbforge.gallifreyan_chronicles.tardis.ecs.system.TardisLandingSystem;
-import uk.nbforge.gallifreyan_chronicles.tardis.exterior.fade.FadeTiming;
-import uk.nbforge.gallifreyan_chronicles.tardis.flight.TardisFlightState;
-import uk.nbforge.gallifreyan_chronicles.tardis.flight.FlightTimings;
-import uk.nbforge.gallifreyan_chronicles.tardis.flight.crash.TardisCrash;
-import uk.nbforge.gallifreyan_chronicles.tardis.flight.TardisTravel;
-import uk.nbforge.gallifreyan_chronicles.tardis.mind.refusal.TardisRefusals;
-import uk.nbforge.gallifreyan_chronicles.util.GCSchedulerUtil;
+import java.util.Set;
+import java.util.UUID;
 import net.minecraft.ChatFormatting;
+import net.minecraft.core.BlockPos;
+import net.minecraft.network.chat.Component;
 import net.minecraft.network.protocol.game.ClientboundStopSoundPacket;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundSource;
-import net.minecraft.network.chat.Component;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.phys.Vec3;
 import org.jspecify.annotations.Nullable;
-
-import java.util.HashMap;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.UUID;
+import uk.nbforge.gallifreyan_chronicles.Constants;
+import uk.nbforge.gallifreyan_chronicles.core.GCSounds;
+import uk.nbforge.gallifreyan_chronicles.core.GCTardisControls;
+import uk.nbforge.gallifreyan_chronicles.core.block_entities.TardisConsoleBlockEntity;
+import uk.nbforge.gallifreyan_chronicles.core.block_entities.TardisExteriorBlockEntity;
+import uk.nbforge.gallifreyan_chronicles.core.entity.TardisControlEntity;
+import uk.nbforge.gallifreyan_chronicles.core.sound.timed.TimedSounds;
+import uk.nbforge.gallifreyan_chronicles.network.tardis.TardisDrumShakePayload;
+import uk.nbforge.gallifreyan_chronicles.tardis.Tardis;
+import uk.nbforge.gallifreyan_chronicles.tardis.TardisApi;
+import uk.nbforge.gallifreyan_chronicles.tardis.TardisEvents;
+import uk.nbforge.gallifreyan_chronicles.tardis.control.BaseControl;
+import uk.nbforge.gallifreyan_chronicles.tardis.control.ControlAnimations;
+import uk.nbforge.gallifreyan_chronicles.tardis.ecs.system.ConsoleSyncSystem;
+import uk.nbforge.gallifreyan_chronicles.tardis.ecs.system.TardisLandingSystem;
+import uk.nbforge.gallifreyan_chronicles.tardis.ecs.system.TardisMindSystem;
+import uk.nbforge.gallifreyan_chronicles.tardis.exterior.fade.FadeTiming;
+import uk.nbforge.gallifreyan_chronicles.tardis.flight.FlightTimings;
+import uk.nbforge.gallifreyan_chronicles.tardis.flight.TardisDestinations;
+import uk.nbforge.gallifreyan_chronicles.tardis.flight.TardisFlightState;
+import uk.nbforge.gallifreyan_chronicles.tardis.flight.TardisTravel;
+import uk.nbforge.gallifreyan_chronicles.tardis.flight.crash.TardisCrash;
+import uk.nbforge.gallifreyan_chronicles.tardis.mind.flight.TardisTurbulence;
+import uk.nbforge.gallifreyan_chronicles.tardis.mind.mood.TardisMoods;
+import uk.nbforge.gallifreyan_chronicles.tardis.mind.refusal.TardisRefusals;
+import uk.nbforge.gallifreyan_chronicles.util.GCSchedulerUtil;
+import uk.nbforge.gallifreyan_chronicles.util.MessageUtil;
 
 public class SpaceTimeThrottleControl extends BaseControl {
-    public static final ControlAnimations DEFAULT_ANIMATIONS = new ControlAnimations("space_time_throttle_on", "space_time_throttle_off", false);
+    public static final ControlAnimations DEFAULT_ANIMATIONS =
+            new ControlAnimations("space_time_throttle_on", "space_time_throttle_off", false);
 
     public SpaceTimeThrottleControl(ControlAnimations animations) {
         super(animations);
@@ -109,8 +107,7 @@ public class SpaceTimeThrottleControl extends BaseControl {
             TardisConsoleBlockEntity console,
             @Nullable UUID tardisId,
             boolean takingOff,
-            @Nullable Player pilot
-    ) {
+            @Nullable Player pilot) {
         if (!takingOff && tardisId != null && QUEUED_TAKEOFFS.containsKey(tardisId)) {
             QUEUED_TAKEOFFS.remove(tardisId);
             playAt(level, soundPos, GCSounds.SLIDER, 1.0f);
@@ -119,7 +116,8 @@ public class SpaceTimeThrottleControl extends BaseControl {
         }
 
         TardisExteriorBlockEntity exterior = TardisApi.get(level.getServer(), tardisId)
-                .flatMap(Tardis::exterior).orElse(null);
+                .flatMap(Tardis::exterior)
+                .orElse(null);
         if (exterior == null) {
             return false;
         }
@@ -138,9 +136,16 @@ public class SpaceTimeThrottleControl extends BaseControl {
         if (tardis != null && !takingOff && stillTravelling(level, console, soundPos, leverPos, tardis)) {
             return true;
         }
-        if (tardis != null && takingOff
-                && TardisRefusals.refuseTakeoff(level, console, GCTardisControls.SPACE_TIME_THROTTLE, soundPos, leverPos, tardis,
-                pilot == null ? null : pilot.getUUID())) {
+        if (tardis != null
+                && takingOff
+                && TardisRefusals.refuseTakeoff(
+                        level,
+                        console,
+                        GCTardisControls.SPACE_TIME_THROTTLE,
+                        soundPos,
+                        leverPos,
+                        tardis,
+                        pilot == null ? null : pilot.getUUID())) {
             return true;
         }
 
@@ -155,8 +160,8 @@ public class SpaceTimeThrottleControl extends BaseControl {
         return false;
     }
 
-    private static boolean stillTravelling(ServerLevel level, TardisConsoleBlockEntity console,
-                                           BlockPos soundPos, Vec3 leverPos, Tardis tardis) {
+    private static boolean stillTravelling(
+            ServerLevel level, TardisConsoleBlockEntity console, BlockPos soundPos, Vec3 leverPos, Tardis tardis) {
         long ticksLeft = TardisTravel.remainingTicks(tardis);
         if (ticksLeft <= 0L) return false;
 
@@ -195,7 +200,8 @@ public class SpaceTimeThrottleControl extends BaseControl {
     public static void crashLand(TardisConsoleBlockEntity console, String message) {
         if (!(console.getLevel() instanceof ServerLevel level)) return;
         Tardis tardis = linkedTardis(console).orElse(null);
-        TardisExteriorBlockEntity exterior = tardis == null ? null : tardis.exterior().orElse(null);
+        TardisExteriorBlockEntity exterior =
+                tardis == null ? null : tardis.exterior().orElse(null);
         if (exterior == null || exterior.getFlightState() != TardisFlightState.IN_VORTEX) return;
 
         int ticks = LAND_FADE_DELAY_TICKS + exterior.getFadeType().timing().fadeInTicks();
@@ -215,7 +221,8 @@ public class SpaceTimeThrottleControl extends BaseControl {
     public static boolean emergencyLand(TardisConsoleBlockEntity console, String message) {
         if (!(console.getLevel() instanceof ServerLevel level)) return false;
         Tardis tardis = linkedTardis(console).orElse(null);
-        TardisExteriorBlockEntity exterior = tardis == null ? null : tardis.exterior().orElse(null);
+        TardisExteriorBlockEntity exterior =
+                tardis == null ? null : tardis.exterior().orElse(null);
         if (exterior == null || exterior.getFlightState() != TardisFlightState.IN_VORTEX) return false;
 
         int ticks = LAND_FADE_DELAY_TICKS + exterior.getFadeType().timing().fadeInTicks();
@@ -244,18 +251,23 @@ public class SpaceTimeThrottleControl extends BaseControl {
     }
 
     private static void beginTakeoffEffects(
-            ServerLevel level,
-            TardisConsoleBlockEntity console,
-            String controlId,
-            Vec3 shakePos
-    ) {
+            ServerLevel level, TardisConsoleBlockEntity console, String controlId, Vec3 shakePos) {
         playEverywhere(console, level, GCSounds.TARDIS_DRUM);
         // A stressed TARDIS sounds strained
-        float pitch = linkedTardis(console).map(tardis -> TardisTurbulence.vworpPitch(TardisMindSystem.stress(tardis))).orElse(1.0F);
+        float pitch = linkedTardis(console)
+                .map(tardis -> TardisTurbulence.vworpPitch(TardisMindSystem.stress(tardis)))
+                .orElse(1.0F);
         for (TardisConsoleBlockEntity each : ConsoleSyncSystem.liveConsolesWith(console)) {
             if (!(each.getLevel() instanceof ServerLevel eachLevel)) continue;
-            TimedSounds.playThenLoop(eachLevel, each.getBlockPos(), GCSounds.TARDIS_TAKEOFF, GCSounds.TARDIS_VWORP,
-                    SoundSource.BLOCKS, 1.0F, pitch, VWORP_VOLUME);
+            TimedSounds.playThenLoop(
+                    eachLevel,
+                    each.getBlockPos(),
+                    GCSounds.TARDIS_TAKEOFF,
+                    GCSounds.TARDIS_VWORP,
+                    SoundSource.BLOCKS,
+                    1.0F,
+                    pitch,
+                    VWORP_VOLUME);
         }
         playAtExterior(console, level, GCSounds.TARDIS_TAKEOFF);
         // TODO: make the stabilizers play different takeoff sound and in flight sound
@@ -273,8 +285,8 @@ public class SpaceTimeThrottleControl extends BaseControl {
     private static void queueTakeoff(MinecraftServer server, UUID tardisId, String controlId) {
         int generation = ++queueGeneration;
         QUEUED_TAKEOFFS.put(tardisId, generation);
-        GCSchedulerUtil.runLater(server, QUEUED_TAKEOFF_POLL_TICKS,
-                () -> pollQueuedTakeoff(server, tardisId, controlId, generation));
+        GCSchedulerUtil.runLater(
+                server, QUEUED_TAKEOFF_POLL_TICKS, () -> pollQueuedTakeoff(server, tardisId, controlId, generation));
     }
 
     private static void pollQueuedTakeoff(MinecraftServer server, UUID tardisId, String controlId, int generation) {
@@ -284,7 +296,9 @@ public class SpaceTimeThrottleControl extends BaseControl {
         Optional<Tardis> tardis = TardisApi.get(server, tardisId);
         TardisConsoleBlockEntity console = tardis.flatMap(Tardis::console).orElse(null);
         TardisExteriorBlockEntity exterior = tardis.flatMap(Tardis::exterior).orElse(null);
-        if (console == null || exterior == null || !console.getControlState(controlId)
+        if (console == null
+                || exterior == null
+                || !console.getControlState(controlId)
                 || !(console.getLevel() instanceof ServerLevel level)) {
             QUEUED_TAKEOFFS.remove(tardisId);
             return;
@@ -298,8 +312,8 @@ public class SpaceTimeThrottleControl extends BaseControl {
             return;
         }
 
-        GCSchedulerUtil.runLater(server, QUEUED_TAKEOFF_POLL_TICKS,
-                () -> pollQueuedTakeoff(server, tardisId, controlId, generation));
+        GCSchedulerUtil.runLater(
+                server, QUEUED_TAKEOFF_POLL_TICKS, () -> pollQueuedTakeoff(server, tardisId, controlId, generation));
     }
 
     private static void stopVworp(ServerLevel level) {
@@ -357,17 +371,20 @@ public class SpaceTimeThrottleControl extends BaseControl {
 
         if (console.getLevel() instanceof ServerLevel serverLevel) {
             if (activated) announceDeparture(serverLevel);
-            TardisExteriorBlockEntity exterior = linkedTardis(console).flatMap(Tardis::exterior).orElse(null);
+            TardisExteriorBlockEntity exterior =
+                    linkedTardis(console).flatMap(Tardis::exterior).orElse(null);
             if (exterior != null) {
                 if (activated) {
                     exterior.cancelLanding();
                     exterior.setInFlight(true);
-                    exterior.setFlightState(TardisFlightState.TAKING_OFF,
-                            TAKEOFF_SOUND_DELAY_TICKS + TAKEOFF_SOUND_LENGTH_TICKS);
+                    exterior.setFlightState(
+                            TardisFlightState.TAKING_OFF, TAKEOFF_SOUND_DELAY_TICKS + TAKEOFF_SOUND_LENGTH_TICKS);
                 } else {
                     exterior.scheduleLanding(LAND_FADE_DELAY_TICKS);
-                    exterior.setFlightState(TardisFlightState.LANDING,
-                            LAND_FADE_DELAY_TICKS + exterior.getFadeType().timing().fadeInTicks());
+                    exterior.setFlightState(
+                            TardisFlightState.LANDING,
+                            LAND_FADE_DELAY_TICKS
+                                    + exterior.getFadeType().timing().fadeInTicks());
                 }
             }
         }
@@ -415,8 +432,11 @@ public class SpaceTimeThrottleControl extends BaseControl {
         if (pos == null) return;
         Component where = TardisDestinations.dimensionName(tardis.exteriorDimension());
         for (var player : interior.players()) {
-            player.sendOverlayMessage(Component.translatable("overlay.gallifreyan_chronicles.flight_arrived", where,
-                            Component.literal(pos.getX() + ", " + pos.getY() + ", " + pos.getZ()).withStyle(ChatFormatting.WHITE))
+            player.sendOverlayMessage(Component.translatable(
+                            "overlay.gallifreyan_chronicles.flight_arrived",
+                            where,
+                            Component.literal(pos.getX() + ", " + pos.getY() + ", " + pos.getZ())
+                                    .withStyle(ChatFormatting.WHITE))
                     .withStyle(ChatFormatting.GOLD));
         }
     }
@@ -453,6 +473,8 @@ public class SpaceTimeThrottleControl extends BaseControl {
 
     @Override
     public Component describeState(boolean activated) {
-        return activated ? state("throttle", "engaged", ChatFormatting.GREEN) : state("throttle", "disengaged", ChatFormatting.RED);
+        return activated
+                ? state("throttle", "engaged", ChatFormatting.GREEN)
+                : state("throttle", "disengaged", ChatFormatting.RED);
     }
 }

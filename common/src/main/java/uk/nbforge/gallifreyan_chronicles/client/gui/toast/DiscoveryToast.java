@@ -1,8 +1,6 @@
 package uk.nbforge.gallifreyan_chronicles.client.gui.toast;
 
-import uk.nbforge.gallifreyan_chronicles.Constants;
-import uk.nbforge.gallifreyan_chronicles.core.GCBlocks;
-import uk.nbforge.gallifreyan_chronicles.util.GCUtil;
+import java.util.List;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
@@ -13,8 +11,9 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.resources.Identifier;
 import net.minecraft.util.FormattedCharSequence;
 import net.minecraft.world.item.ItemStack;
-
-import java.util.List;
+import uk.nbforge.gallifreyan_chronicles.Constants;
+import uk.nbforge.gallifreyan_chronicles.core.GCBlocks;
+import uk.nbforge.gallifreyan_chronicles.util.GCUtil;
 
 /** The trait discovered popup, it grows to fit the explanation. */
 public class DiscoveryToast implements Toast {
@@ -57,11 +56,16 @@ public class DiscoveryToast implements Toast {
         Component header = Component.translatable(LANG + kind + ".found");
         Component description = Component.translatable(key + ".desc");
         if (kind.equals("personality")) {
-            description = Component.translatable(LANG + "personality.intro").append(" ").append(description);
+            description = Component.translatable(LANG + "personality.intro")
+                    .append(" ")
+                    .append(description);
         }
         ItemStack icon = new ItemStack(kind.equals("trait") ? GCBlocks.TARDIS_CONSOLE : GCBlocks.TARDIS);
         int colour = kind.equals("disability") ? QUIRK_COLOUR : HEADER_COLOUR;
-        Minecraft.getInstance().gui.toastManager().addToast(new DiscoveryToast(icon, header, colour, name, description));
+        Minecraft.getInstance()
+                .gui
+                .toastManager()
+                .addToast(new DiscoveryToast(icon, header, colour, name, description));
     }
 
     @Override

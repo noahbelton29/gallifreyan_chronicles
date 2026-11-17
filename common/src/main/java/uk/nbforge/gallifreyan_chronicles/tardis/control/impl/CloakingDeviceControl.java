@@ -1,22 +1,23 @@
 package uk.nbforge.gallifreyan_chronicles.tardis.control.impl;
 
-import uk.nbforge.gallifreyan_chronicles.core.block_entities.TardisConsoleBlockEntity;
-import uk.nbforge.gallifreyan_chronicles.core.entity.TardisControlEntity;
-import uk.nbforge.gallifreyan_chronicles.core.GCSounds;
-import uk.nbforge.gallifreyan_chronicles.core.GCTardisControls;
-import uk.nbforge.gallifreyan_chronicles.tardis.Tardis;
-import uk.nbforge.gallifreyan_chronicles.tardis.control.BaseControl;
-import uk.nbforge.gallifreyan_chronicles.tardis.control.ControlAnimations;
-import net.minecraft.server.level.ServerLevel;
-import net.minecraft.sounds.SoundEvent;
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.sounds.SoundEvent;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
+import uk.nbforge.gallifreyan_chronicles.core.GCSounds;
+import uk.nbforge.gallifreyan_chronicles.core.GCTardisControls;
+import uk.nbforge.gallifreyan_chronicles.core.block_entities.TardisConsoleBlockEntity;
+import uk.nbforge.gallifreyan_chronicles.core.entity.TardisControlEntity;
+import uk.nbforge.gallifreyan_chronicles.tardis.Tardis;
+import uk.nbforge.gallifreyan_chronicles.tardis.control.BaseControl;
+import uk.nbforge.gallifreyan_chronicles.tardis.control.ControlAnimations;
 
 public class CloakingDeviceControl extends BaseControl {
-    public static final ControlAnimations DEFAULT_ANIMATIONS = new ControlAnimations("cloaking_device_control_on", "cloaking_device_control_off", true);
+    public static final ControlAnimations DEFAULT_ANIMATIONS =
+            new ControlAnimations("cloaking_device_control_on", "cloaking_device_control_off", true);
 
     public CloakingDeviceControl(ControlAnimations animations) {
         super(animations);
@@ -36,7 +37,9 @@ public class CloakingDeviceControl extends BaseControl {
         if (console == null) {
             return InteractionResult.FAIL;
         }
-        SoundEvent cloakSound = console.getControlState(GCTardisControls.CLOAKING_DEVICE_CONTROL) ? GCSounds.TARDIS_UNCLOAK : GCSounds.TARDIS_CLOAK;
+        SoundEvent cloakSound = console.getControlState(GCTardisControls.CLOAKING_DEVICE_CONTROL)
+                ? GCSounds.TARDIS_UNCLOAK
+                : GCSounds.TARDIS_CLOAK;
         playEverywhere(console, serverLevel, cloakSound);
         return InteractionResult.SUCCESS;
     }
@@ -48,6 +51,8 @@ public class CloakingDeviceControl extends BaseControl {
 
     @Override
     public Component describeState(boolean activated) {
-        return activated ? state("cloak", "active", ChatFormatting.GREEN) : state("cloak", "inactive", ChatFormatting.RED);
+        return activated
+                ? state("cloak", "active", ChatFormatting.GREEN)
+                : state("cloak", "inactive", ChatFormatting.RED);
     }
 }

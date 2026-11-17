@@ -1,22 +1,20 @@
 package uk.nbforge.gallifreyan_chronicles.client.gui.hud;
 
-import uk.nbforge.gallifreyan_chronicles.util.TardisDimensionUtil;
-import uk.nbforge.gallifreyan_chronicles.client.tardis.RematCatchClient;
-import uk.nbforge.gallifreyan_chronicles.client.tardis.TardisFrightClient;
-import uk.nbforge.gallifreyan_chronicles.Constants;
-import uk.nbforge.gallifreyan_chronicles.core.block.ConsoleBlock;
-import uk.nbforge.gallifreyan_chronicles.core.block_entities.TardisConsoleBlockEntity;
-import uk.nbforge.gallifreyan_chronicles.config.GCConfig;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.WeakHashMap;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.world.level.Level;
-
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Set;
-import java.util.List;
-import java.util.Map;
-import java.util.WeakHashMap;
+import uk.nbforge.gallifreyan_chronicles.client.tardis.RematCatchClient;
+import uk.nbforge.gallifreyan_chronicles.client.tardis.TardisFrightClient;
+import uk.nbforge.gallifreyan_chronicles.config.GCConfig;
+import uk.nbforge.gallifreyan_chronicles.core.block.ConsoleBlock;
+import uk.nbforge.gallifreyan_chronicles.core.block_entities.TardisConsoleBlockEntity;
+import uk.nbforge.gallifreyan_chronicles.util.TardisDimensionUtil;
 
 public final class GCPowerDarkness {
     private static final float MAX_ALPHA = 0.88F;
@@ -40,8 +38,7 @@ public final class GCPowerDarkness {
         private long lastNanos;
     }
 
-    private GCPowerDarkness() {
-    }
+    private GCPowerDarkness() {}
 
     public static void track(TardisConsoleBlockEntity console) {
         if (!CONSOLES.contains(console)) {
@@ -67,9 +64,9 @@ public final class GCPowerDarkness {
     }
 
     /**
-       Only TARDIS interiors go dark.
-       A console placed and broken outside or left unpowered outside must not darken the normal world.
-    */
+     * Only TARDIS interiors go dark.
+     * A console placed and broken outside or left unpowered outside must not darken the normal world.
+     */
     private static boolean isTardisLevel(Level level) {
         return TardisDimensionUtil.isInterior(level);
     }
@@ -85,7 +82,8 @@ public final class GCPowerDarkness {
             CONSOLES.remove(console);
             // Only a destroyed console counts, one that was just unloaded with its chunk is still there
             Level consoleLevel = console.getLevel();
-            if (consoleLevel != null && consoleLevel.hasChunkAt(console.getBlockPos())
+            if (consoleLevel != null
+                    && consoleLevel.hasChunkAt(console.getBlockPos())
                     && isTardisLevel(consoleLevel)
                     && !(consoleLevel.getBlockState(console.getBlockPos()).getBlock() instanceof ConsoleBlock)) {
                 NO_CONSOLE_LEVELS.add(consoleLevel);
@@ -164,7 +162,9 @@ public final class GCPowerDarkness {
 
     public static boolean shaderPackHandlesDarkness() {
         long read = shaderBlindnessReadNanos;
-        return read != 0L && System.nanoTime() - read < SHADER_READ_WINDOW_NANOS && ShaderPackDetector.isShaderPackInUse();
+        return read != 0L
+                && System.nanoTime() - read < SHADER_READ_WINDOW_NANOS
+                && ShaderPackDetector.isShaderPackInUse();
     }
 
     public static float overlayMaxAlpha() {
@@ -180,6 +180,11 @@ public final class GCPowerDarkness {
         boolean alarm = GCDangerAlarm.amountFor(playerLevel(minecraft)) > darkness;
         int alpha = (int) (level * (alarm ? ALARM_MAX_ALPHA : maxAlpha) * 255.0F);
         int colour = alarm ? ALARM_RED : 0;
-        graphics.fill(0, 0, minecraft.getWindow().getGuiScaledWidth(), minecraft.getWindow().getGuiScaledHeight(), (alpha << 24) | colour);
+        graphics.fill(
+                0,
+                0,
+                minecraft.getWindow().getGuiScaledWidth(),
+                minecraft.getWindow().getGuiScaledHeight(),
+                (alpha << 24) | colour);
     }
 }

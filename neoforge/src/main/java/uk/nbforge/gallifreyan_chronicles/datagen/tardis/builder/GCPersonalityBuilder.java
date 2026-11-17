@@ -2,7 +2,6 @@ package uk.nbforge.gallifreyan_chronicles.datagen.tardis.builder;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
-
 import java.util.function.Consumer;
 import uk.nbforge.gallifreyan_chronicles.datagen.util.GCJson;
 

@@ -1,10 +1,10 @@
 package uk.nbforge.gallifreyan_chronicles.core;
 
-import uk.nbforge.gallifreyan_chronicles.Constants;
-import uk.nbforge.gallifreyan_chronicles.command.GCCommands;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.event.RegisterCommandsEvent;
+import uk.nbforge.gallifreyan_chronicles.Constants;
+import uk.nbforge.gallifreyan_chronicles.command.GCCommands;
 
 @EventBusSubscriber(modid = Constants.MOD_ID)
 public class GCNeoForgeCommands {

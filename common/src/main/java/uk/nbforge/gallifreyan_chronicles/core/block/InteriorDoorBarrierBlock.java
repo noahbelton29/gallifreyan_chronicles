@@ -27,20 +27,29 @@ public class InteriorDoorBarrierBlock extends Block {
     }
 
     @Override
-    protected @NonNull VoxelShape getShape(@NonNull BlockState state, @NonNull BlockGetter level,
-                                           @NonNull BlockPos pos, @NonNull CollisionContext context) {
+    protected @NonNull VoxelShape getShape(
+            @NonNull BlockState state,
+            @NonNull BlockGetter level,
+            @NonNull BlockPos pos,
+            @NonNull CollisionContext context) {
         return Shapes.empty();
     }
 
     @Override
-    protected @NonNull VoxelShape getCollisionShape(@NonNull BlockState state, @NonNull BlockGetter level,
-                                                    @NonNull BlockPos pos, @NonNull CollisionContext context) {
+    protected @NonNull VoxelShape getCollisionShape(
+            @NonNull BlockState state,
+            @NonNull BlockGetter level,
+            @NonNull BlockPos pos,
+            @NonNull CollisionContext context) {
         return Shapes.empty();
     }
 
     @Override
-    protected @NonNull VoxelShape getVisualShape(@NonNull BlockState state, @NonNull BlockGetter level,
-                                                 @NonNull BlockPos pos, @NonNull CollisionContext context) {
+    protected @NonNull VoxelShape getVisualShape(
+            @NonNull BlockState state,
+            @NonNull BlockGetter level,
+            @NonNull BlockPos pos,
+            @NonNull CollisionContext context) {
         return Shapes.empty();
     }
 

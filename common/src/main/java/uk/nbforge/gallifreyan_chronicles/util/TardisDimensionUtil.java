@@ -1,16 +1,15 @@
 package uk.nbforge.gallifreyan_chronicles.util;
 
-import uk.nbforge.gallifreyan_chronicles.Constants;
 import net.minecraft.resources.Identifier;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.level.Level;
 import org.jspecify.annotations.Nullable;
+import uk.nbforge.gallifreyan_chronicles.Constants;
 
 public final class TardisDimensionUtil {
     public static final String INTERIOR_PREFIX = "tardis/";
 
-    private TardisDimensionUtil() {
-    }
+    private TardisDimensionUtil() {}
 
     public static boolean isInterior(@Nullable Identifier dimension) {
         return dimension != null

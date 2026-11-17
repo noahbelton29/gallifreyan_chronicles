@@ -1,22 +1,19 @@
 package uk.nbforge.gallifreyan_chronicles.core.lifecycle;
 
-import uk.nbforge.gallifreyan_chronicles.util.GCSchedulerUtil;
-
-import uk.nbforge.gallifreyan_chronicles.tardis.flight.crash.CrashSmoke;
-import uk.nbforge.gallifreyan_chronicles.tardis.flight.crash.TardisCrash;
-
 import uk.nbforge.gallifreyan_chronicles.loader.GCJsonReloadListener;
 import uk.nbforge.gallifreyan_chronicles.tardis.control.impl.SpaceTimeThrottleControl;
-import uk.nbforge.gallifreyan_chronicles.tardis.flight.TardisAutopilot;
 import uk.nbforge.gallifreyan_chronicles.tardis.ecs.system.ConsoleSyncSystem;
 import uk.nbforge.gallifreyan_chronicles.tardis.ecs.system.DoorSyncSystem;
 import uk.nbforge.gallifreyan_chronicles.tardis.ecs.system.TardisMindSystem;
+import uk.nbforge.gallifreyan_chronicles.tardis.flight.TardisAutopilot;
+import uk.nbforge.gallifreyan_chronicles.tardis.flight.crash.CrashSmoke;
+import uk.nbforge.gallifreyan_chronicles.tardis.flight.crash.TardisCrash;
 import uk.nbforge.gallifreyan_chronicles.tardis.mind.mood.TardisAlarm;
 import uk.nbforge.gallifreyan_chronicles.tardis.security.IsomorphicPunishment;
+import uk.nbforge.gallifreyan_chronicles.util.GCSchedulerUtil;
 
 public final class ServerLifecycleHandler {
-    private ServerLifecycleHandler() {
-    }
+    private ServerLifecycleHandler() {}
 
     public static void onServerStart() {
         GCSchedulerUtil.clear();

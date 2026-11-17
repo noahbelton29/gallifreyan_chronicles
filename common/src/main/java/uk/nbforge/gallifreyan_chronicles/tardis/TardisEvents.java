@@ -1,13 +1,12 @@
 package uk.nbforge.gallifreyan_chronicles.tardis;
 
-import uk.nbforge.gallifreyan_chronicles.Constants;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.function.Consumer;
+import uk.nbforge.gallifreyan_chronicles.Constants;
 
 public final class TardisEvents {
-    private TardisEvents() {
-    }
+    private TardisEvents() {}
 
     public static final class Event {
         private final List<Consumer<Tardis>> listeners = new CopyOnWriteArrayList<>();

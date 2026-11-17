@@ -1,15 +1,14 @@
 package uk.nbforge.gallifreyan_chronicles.compat.flashback;
 
-import uk.nbforge.gallifreyan_chronicles.Constants;
-import uk.nbforge.gallifreyan_chronicles.client.gui.title.ReplayViewerHook;
+import java.lang.reflect.Constructor;
+import java.nio.file.Path;
 import net.fabricmc.fabric.api.client.screen.v1.ScreenEvents;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.TitleScreen;
-
-import java.lang.reflect.Constructor;
-import java.nio.file.Path;
+import uk.nbforge.gallifreyan_chronicles.Constants;
+import uk.nbforge.gallifreyan_chronicles.client.gui.title.ReplayViewerHook;
 
 /** Moves the replay button of Flashback from the title screen into our options menu. */
 public final class FlashbackOptionsButton {
@@ -19,8 +18,7 @@ public final class FlashbackOptionsButton {
     // The open screen so the screen of Flashback can return to it
     private static volatile Screen lastScreen;
 
-    private FlashbackOptionsButton() {
-    }
+    private FlashbackOptionsButton() {}
 
     public static void register() {
         // The hook of ReplayMod wins if both are installed
@@ -37,7 +35,8 @@ public final class FlashbackOptionsButton {
     /** Hide any widget that is a Flashback class. */
     private static void hideTitleButton(Screen screen) {
         for (Object child : screen.children()) {
-            if (child instanceof AbstractWidget widget && child.getClass().getName().startsWith(PACKAGE)) {
+            if (child instanceof AbstractWidget widget
+                    && child.getClass().getName().startsWith(PACKAGE)) {
                 widget.visible = false;
                 widget.active = false;
             }
@@ -57,7 +56,9 @@ public final class FlashbackOptionsButton {
                     return;
                 }
                 if (params.length == 2 && params[0] == Screen.class && params[1] == Path.class) {
-                    Path folder = (Path) Class.forName(PACKAGE + ".Flashback").getMethod("getReplayFolder").invoke(null);
+                    Path folder = (Path) Class.forName(PACKAGE + ".Flashback")
+                            .getMethod("getReplayFolder")
+                            .invoke(null);
                     minecraft.gui.setScreen((Screen) constructor.newInstance(current, folder));
                     return;
                 }

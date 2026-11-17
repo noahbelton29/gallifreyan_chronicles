@@ -85,6 +85,27 @@ jobs:
             gh api "repos/$REPO/issues/$PR/comments" -f body="$body" > /dev/null
           fi
 
+  formatting:
+    name: Formatting
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: ${{ env.JAVA_VERSION }}
+
+      - uses: gradle/actions/setup-gradle@v5
+
+      - name: Check formatting
+        run: |
+          if ! ./gradlew spotlessCheck --console=plain; then
+            echo "::error::Some files aren't formatted. Run ./gradlew spotlessApply and commit the result."
+            exit 1
+          fi
+
   datagen:
     name: Datagen is up to date
     runs-on: ubuntu-24.04
@@ -182,7 +203,7 @@ jobs:
 
   notify:
     name: Discord
-    needs: [build, datagen, translations, boot-test]
+    needs: [build, formatting, datagen, translations, boot-test]
     if: always() && github.event_name == 'push'
     runs-on: ubuntu-24.04
     timeout-minutes: 5

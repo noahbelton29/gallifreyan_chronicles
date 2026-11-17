@@ -1,6 +1,5 @@
 package uk.nbforge.gallifreyan_chronicles.mixin.client.compat;
 
-import uk.nbforge.gallifreyan_chronicles.compat.soundphysics.SoundPhysicsCompat;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Pseudo;
 import org.spongepowered.asm.mixin.Shadow;
@@ -8,6 +7,7 @@ import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+import uk.nbforge.gallifreyan_chronicles.compat.soundphysics.SoundPhysicsCompat;
 
 @Pseudo
 @Mixin(targets = "com.sonicether.soundphysics.SoundPhysics", remap = false)
@@ -16,16 +16,35 @@ public abstract class SoundPhysicsTardisEchoMixin {
     private static final ThreadLocal<Boolean> GC$APPLYING = ThreadLocal.withInitial(() -> Boolean.FALSE);
 
     @Shadow(remap = false)
-    public static void setEnvironment(int sourceID, float sendGain0, float sendGain1, float sendGain2, float sendGain3,
-                                      float sendCutoff0, float sendCutoff1, float sendCutoff2, float sendCutoff3,
-                                      float directCutoff, float directGain) {
+    public static void setEnvironment(
+            int sourceID,
+            float sendGain0,
+            float sendGain1,
+            float sendGain2,
+            float sendGain3,
+            float sendCutoff0,
+            float sendCutoff1,
+            float sendCutoff2,
+            float sendCutoff3,
+            float directCutoff,
+            float directGain) {
         throw new AssertionError();
     }
 
     @Inject(method = "setEnvironment", at = @At("HEAD"), cancellable = true, remap = false, require = 0)
-    private static void gc$tardisEcho(int sourceID, float sendGain0, float sendGain1, float sendGain2, float sendGain3,
-                                      float sendCutoff0, float sendCutoff1, float sendCutoff2, float sendCutoff3,
-                                      float directCutoff, float directGain, CallbackInfo ci) {
+    private static void gc$tardisEcho(
+            int sourceID,
+            float sendGain0,
+            float sendGain1,
+            float sendGain2,
+            float sendGain3,
+            float sendCutoff0,
+            float sendCutoff1,
+            float sendCutoff2,
+            float sendCutoff3,
+            float directCutoff,
+            float directGain,
+            CallbackInfo ci) {
         if (GC$APPLYING.get()) return;
         if (sendGain0 == 0.0F && sendGain1 == 0.0F && sendGain2 == 0.0F && sendGain3 == 0.0F) return;
 
@@ -41,7 +60,8 @@ public abstract class SoundPhysicsTardisEchoMixin {
 
         GC$APPLYING.set(Boolean.TRUE);
         try {
-            setEnvironment(sourceID,
+            setEnvironment(
+                    sourceID,
                     gain0,
                     SoundPhysicsCompat.boost(gain1, 1.4F, 0.15F, echo),
                     SoundPhysicsCompat.boost(gain2, 1.8F, 0.35F, echo),

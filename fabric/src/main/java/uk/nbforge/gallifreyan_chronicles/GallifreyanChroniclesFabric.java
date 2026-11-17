@@ -1,10 +1,10 @@
 package uk.nbforge.gallifreyan_chronicles;
 
+import net.fabricmc.api.ModInitializer;
+import net.fabricmc.fabric.api.item.v1.ItemComponentTooltipProviderRegistry;
 import uk.nbforge.gallifreyan_chronicles.core.*;
 import uk.nbforge.gallifreyan_chronicles.loader.GCResourceLoaders;
 import uk.nbforge.gallifreyan_chronicles.network.GCFabricNetworking;
-import net.fabricmc.api.ModInitializer;
-import net.fabricmc.fabric.api.item.v1.ItemComponentTooltipProviderRegistry;
 
 public class GallifreyanChroniclesFabric implements ModInitializer {
     @Override

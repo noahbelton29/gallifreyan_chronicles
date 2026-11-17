@@ -1,9 +1,8 @@
 package uk.nbforge.gallifreyan_chronicles.platform.services;
 
-import uk.nbforge.gallifreyan_chronicles.addon.ModAddonEntry;
-
 import java.nio.file.Path;
 import java.util.List;
+import uk.nbforge.gallifreyan_chronicles.addon.ModAddonEntry;
 
 public interface IPlatformHelper {
 
@@ -24,9 +23,9 @@ public interface IPlatformHelper {
     }
 
     /**
-       Finds every loaded mod that says it is a Gallifreyan Chronicles addon, using the metadata of the loader.
-       Fabric uses a custom value in fabric.mod.json and NeoForge uses the same key as a mod property in neoforge.mods.toml.
-       The value is the name of the GCAddon class of the addon, the order is not defined.
-    */
+     * Finds every loaded mod that says it is a Gallifreyan Chronicles addon, using the metadata of the loader.
+     * Fabric uses a custom value in fabric.mod.json and NeoForge uses the same key as a mod property in neoforge.mods.toml.
+     * The value is the name of the GCAddon class of the addon, the order is not defined.
+     */
     List<ModAddonEntry> findModAddons();
 }

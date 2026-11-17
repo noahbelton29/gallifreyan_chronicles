@@ -1,30 +1,28 @@
 package uk.nbforge.gallifreyan_chronicles.command;
 
+import static net.minecraft.commands.Commands.argument;
+import static net.minecraft.commands.Commands.literal;
+import static uk.nbforge.gallifreyan_chronicles.util.CommandUtil.*;
+
 import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.mojang.brigadier.suggestion.Suggestions;
 import com.mojang.brigadier.suggestion.SuggestionsBuilder;
-import uk.nbforge.gallifreyan_chronicles.core.block_entities.TardisExteriorBlockEntity;
-import uk.nbforge.gallifreyan_chronicles.tardis.ecs.system.ExteriorLinkSystem;
-import uk.nbforge.gallifreyan_chronicles.tardis.TardisExterior;
-import uk.nbforge.gallifreyan_chronicles.core.dynamic_registries.TardisExteriorRegistry;
-import uk.nbforge.gallifreyan_chronicles.tardis.exterior.fade.FadeType;
-import uk.nbforge.gallifreyan_chronicles.tardis.exterior.fade.FadeTypes;
-import net.minecraft.commands.CommandSourceStack;
-import net.minecraft.core.BlockPos;
-
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
-
-import static uk.nbforge.gallifreyan_chronicles.util.CommandUtil.*;
-import static net.minecraft.commands.Commands.argument;
-import static net.minecraft.commands.Commands.literal;
+import net.minecraft.commands.CommandSourceStack;
+import net.minecraft.core.BlockPos;
+import uk.nbforge.gallifreyan_chronicles.core.block_entities.TardisExteriorBlockEntity;
+import uk.nbforge.gallifreyan_chronicles.core.dynamic_registries.TardisExteriorRegistry;
+import uk.nbforge.gallifreyan_chronicles.tardis.TardisExterior;
+import uk.nbforge.gallifreyan_chronicles.tardis.ecs.system.ExteriorLinkSystem;
+import uk.nbforge.gallifreyan_chronicles.tardis.exterior.fade.FadeType;
+import uk.nbforge.gallifreyan_chronicles.tardis.exterior.fade.FadeTypes;
 
 public final class ExteriorCommands {
-    private ExteriorCommands() {
-    }
+    private ExteriorCommands() {}
 
     /**
      * Linking and unlinking an exterior block to a TARDIS. Getting/setting which exterior, its glow and its fade live under "data" now.
@@ -67,14 +65,14 @@ public final class ExteriorCommands {
                         .executes(ExteriorCommands::setFade));
     }
 
-    static CompletableFuture<Suggestions> suggestExteriors(CommandContext<CommandSourceStack> ctx,
-                                                           SuggestionsBuilder builder) {
+    static CompletableFuture<Suggestions> suggestExteriors(
+            CommandContext<CommandSourceStack> ctx, SuggestionsBuilder builder) {
         TardisExteriorRegistry.getAll().forEach(exterior -> builder.suggest(exterior.id()));
         return builder.buildFuture();
     }
 
-    private static CompletableFuture<Suggestions> suggestFadeTypes(CommandContext<CommandSourceStack> ctx,
-                                                                   SuggestionsBuilder builder) {
+    private static CompletableFuture<Suggestions> suggestFadeTypes(
+            CommandContext<CommandSourceStack> ctx, SuggestionsBuilder builder) {
         for (String id : FadeTypes.suggestionIds()) {
             builder.suggest(id.contains(":") ? "\"" + id + "\"" : id);
         }
@@ -88,7 +86,8 @@ public final class ExteriorCommands {
     static int get(CommandContext<CommandSourceStack> ctx) throws CommandSyntaxException {
         return withTardis(ctx, (tardis, idText) -> {
             BlockPos pos = manager(ctx).resolveExteriorBlockPos(tardis.id());
-            String exteriorId = exteriorAt(ctx, pos).map(be -> be.getExterior().id()).orElse("unknown");
+            String exteriorId =
+                    exteriorAt(ctx, pos).map(be -> be.getExterior().id()).orElse("unknown");
             return success(ctx, false, "get_exterior", idText, exteriorId);
         });
     }
@@ -98,7 +97,8 @@ public final class ExteriorCommands {
         return withTardis(ctx, (tardis, idText) -> {
             if (!TardisExteriorRegistry.contains(exteriorId)) return fail(ctx, "unknown_exterior", exteriorId);
 
-            Optional<TardisExteriorBlockEntity> be = exteriorAt(ctx, manager(ctx).resolveExteriorBlockPos(tardis.id()));
+            Optional<TardisExteriorBlockEntity> be =
+                    exteriorAt(ctx, manager(ctx).resolveExteriorBlockPos(tardis.id()));
             if (be.isEmpty()) return fail(ctx, "no_exterior", idText);
 
             TardisExterior exterior = TardisExteriorRegistry.get(exteriorId);
@@ -127,14 +127,19 @@ public final class ExteriorCommands {
 
     private static int getGlow(CommandContext<CommandSourceStack> ctx) throws CommandSyntaxException {
         return withTardis(ctx, (tardis, idText) -> {
-            Optional<TardisExteriorBlockEntity> be = exteriorAt(ctx, manager(ctx).getRegisteredBlockPos(tardis.id()));
-            return be.map(tardisExteriorBlockEntity -> success(ctx, false, "get_glow", idText, String.valueOf(tardisExteriorBlockEntity.isGlowing()))).orElseGet(() -> fail(ctx, "no_exterior", idText));
+            Optional<TardisExteriorBlockEntity> be =
+                    exteriorAt(ctx, manager(ctx).getRegisteredBlockPos(tardis.id()));
+            return be.map(tardisExteriorBlockEntity -> success(
+                            ctx, false, "get_glow", idText, String.valueOf(tardisExteriorBlockEntity.isGlowing())))
+                    .orElseGet(() -> fail(ctx, "no_exterior", idText));
         });
     }
 
-    private static int setGlowing(CommandContext<CommandSourceStack> ctx, boolean glowing) throws CommandSyntaxException {
+    private static int setGlowing(CommandContext<CommandSourceStack> ctx, boolean glowing)
+            throws CommandSyntaxException {
         return withTardis(ctx, (tardis, idText) -> {
-            Optional<TardisExteriorBlockEntity> be = exteriorAt(ctx, manager(ctx).getRegisteredBlockPos(tardis.id()));
+            Optional<TardisExteriorBlockEntity> be =
+                    exteriorAt(ctx, manager(ctx).getRegisteredBlockPos(tardis.id()));
             if (be.isEmpty()) return fail(ctx, "no_tardis_id", idText);
 
             be.get().setGlowing(glowing);
@@ -144,8 +149,15 @@ public final class ExteriorCommands {
 
     static int getFade(CommandContext<CommandSourceStack> ctx) throws CommandSyntaxException {
         return withTardis(ctx, (tardis, idText) -> {
-            Optional<TardisExteriorBlockEntity> be = exteriorAt(ctx, manager(ctx).getRegisteredBlockPos(tardis.id()));
-            return be.map(tardisExteriorBlockEntity -> success(ctx, false, "get_fade_type", idText, tardisExteriorBlockEntity.getFadeType().id())).orElseGet(() -> fail(ctx, "no_exterior", idText));
+            Optional<TardisExteriorBlockEntity> be =
+                    exteriorAt(ctx, manager(ctx).getRegisteredBlockPos(tardis.id()));
+            return be.map(tardisExteriorBlockEntity -> success(
+                            ctx,
+                            false,
+                            "get_fade_type",
+                            idText,
+                            tardisExteriorBlockEntity.getFadeType().id()))
+                    .orElseGet(() -> fail(ctx, "no_exterior", idText));
         });
     }
 
@@ -157,7 +169,8 @@ public final class ExteriorCommands {
         FadeType type = FadeTypes.get(typeId);
 
         return withTardis(ctx, (tardis, idText) -> {
-            Optional<TardisExteriorBlockEntity> be = exteriorAt(ctx, manager(ctx).getRegisteredBlockPos(tardis.id()));
+            Optional<TardisExteriorBlockEntity> be =
+                    exteriorAt(ctx, manager(ctx).getRegisteredBlockPos(tardis.id()));
             if (be.isEmpty()) return fail(ctx, "no_exterior", idText);
 
             be.get().setFadeType(type);

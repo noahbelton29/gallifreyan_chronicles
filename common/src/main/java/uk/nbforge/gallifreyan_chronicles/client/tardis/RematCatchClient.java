@@ -1,20 +1,19 @@
 package uk.nbforge.gallifreyan_chronicles.client.tardis;
 
-import uk.nbforge.gallifreyan_chronicles.client.util.FadeTintUtil;
-
-import uk.nbforge.gallifreyan_chronicles.core.block.InteriorDoorBlock;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.QuadInstance;
-import uk.nbforge.gallifreyan_chronicles.network.tardis.RematCatchPayload;
-import uk.nbforge.gallifreyan_chronicles.tardis.exterior.fade.FadeType;
-import uk.nbforge.gallifreyan_chronicles.tardis.exterior.fade.FadeTypes;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.renderer.SubmitNodeCollector;
 import net.minecraft.client.renderer.block.ModelBlockRenderer;
 import net.minecraft.client.renderer.block.dispatch.BlockStateModel;
-import net.minecraft.client.resources.model.geometry.BakedQuad;
 import net.minecraft.client.renderer.rendertype.RenderTypes;
+import net.minecraft.client.resources.model.geometry.BakedQuad;
 import net.minecraft.core.BlockPos;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.util.ARGB;
@@ -24,20 +23,19 @@ import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.RenderShape;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
-import org.jspecify.annotations.Nullable;
 import org.joml.Vector3fc;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
-import java.util.concurrent.ConcurrentHashMap;
+import org.jspecify.annotations.Nullable;
+import uk.nbforge.gallifreyan_chronicles.client.util.FadeTintUtil;
+import uk.nbforge.gallifreyan_chronicles.core.block.InteriorDoorBlock;
+import uk.nbforge.gallifreyan_chronicles.network.tardis.RematCatchPayload;
+import uk.nbforge.gallifreyan_chronicles.tardis.exterior.fade.FadeType;
+import uk.nbforge.gallifreyan_chronicles.tardis.exterior.fade.FadeTypes;
 
 /**
-   Client side of a TARDIS materialising around a player.
-   Other players inside see that player fade in like the TARDIS.
-   That player keeps the floor and the rest of the interior fades in around them.
-*/
+ * Client side of a TARDIS materialising around a player.
+ * Other players inside see that player fade in like the TARDIS.
+ * That player keeps the floor and the rest of the interior fades in around them.
+ */
 public final class RematCatchClient {
     private static final int HIDE_FLAGS = Block.UPDATE_KNOWN_SHAPE | Block.UPDATE_SUPPRESS_DROPS;
     private static final int CAPTURE_TIMEOUT_TICKS = 100;
@@ -61,8 +59,7 @@ public final class RematCatchClient {
     }
 
     /** One block face drawn see through, with the light and tint taken before the block was hidden. */
-    private record GhostQuad(float x, float y, float z, BakedQuad quad, int[] colors, int[] lights) {
-    }
+    private record GhostQuad(float x, float y, float z, BakedQuad quad, int[] colors, int[] lights) {}
 
     private static final Map<UUID, Fade> PLAYERS = new ConcurrentHashMap<>();
 
@@ -78,13 +75,13 @@ public final class RematCatchClient {
     private static float bottomY;
     private static float spanY = 1.0f;
 
-    private RematCatchClient() {
-    }
+    private RematCatchClient() {}
 
     public static void start(RematCatchPayload payload) {
         Minecraft mc = Minecraft.getInstance();
         if (mc.level == null) return;
-        Fade fade = new Fade(payload.fadeType(), mc.level.getGameTime() - payload.elapsedTicks(), payload.durationTicks());
+        Fade fade =
+                new Fade(payload.fadeType(), mc.level.getGameTime() - payload.elapsedTicks(), payload.durationTicks());
         if (!payload.self()) {
             PLAYERS.put(payload.player(), fade);
             return;
@@ -133,14 +130,16 @@ public final class RematCatchClient {
     private static boolean captureReady(ClientLevel level, RematCatchPayload payload) {
         if (Minecraft.getInstance().player == null) return false;
         BlockPos at = Minecraft.getInstance().player.blockPosition();
-        if (at.getY() < payload.boxMin().getY() - 2 || at.getY() > payload.boxMax().getY() + 2) return false;
+        if (at.getY() < payload.boxMin().getY() - 2
+                || at.getY() > payload.boxMax().getY() + 2) return false;
         return level.hasChunkAt(payload.boxMin()) && level.hasChunkAt(payload.boxMax());
     }
 
     /** Draw everything above the floor first so faces between blocks stay hidden, then hide those blocks so only our fading copy shows. */
     private static void capture(ClientLevel level, RematCatchPayload payload) {
         Minecraft mc = Minecraft.getInstance();
-        ModelBlockRenderer renderer = new ModelBlockRenderer(mc.options.ambientOcclusion().get(), true, mc.getBlockColors());
+        ModelBlockRenderer renderer =
+                new ModelBlockRenderer(mc.options.ambientOcclusion().get(), true, mc.getBlockColors());
         List<BlockPos> hide = new ArrayList<>();
         QUADS.clear();
         for (BlockPos pos : BlockPos.betweenClosed(payload.boxMin(), payload.boxMax())) {
@@ -151,16 +150,26 @@ public final class RematCatchClient {
             if (state.getBlock() instanceof InteriorDoorBlock) continue;
             BlockPos fixed = pos.immutable();
             if (state.getRenderShape() == RenderShape.MODEL) {
-                BlockStateModel model = mc.getModelManager().getBlockStateModelSet().get(state);
-                renderer.tesselateBlock((x, y, z, quad, instance) -> {
-                    int[] colors = new int[4];
-                    int[] lights = new int[4];
-                    for (int v = 0; v < 4; v++) {
-                        colors[v] = instance.getColor(v);
-                        lights[v] = instance.getLightCoords(v);
-                    }
-                    QUADS.add(new GhostQuad(x, y, z, quad, colors, lights));
-                }, fixed.getX(), fixed.getY(), fixed.getZ(), level, fixed, state, model, state.getSeed(fixed));
+                BlockStateModel model =
+                        mc.getModelManager().getBlockStateModelSet().get(state);
+                renderer.tesselateBlock(
+                        (x, y, z, quad, instance) -> {
+                            int[] colors = new int[4];
+                            int[] lights = new int[4];
+                            for (int v = 0; v < 4; v++) {
+                                colors[v] = instance.getColor(v);
+                                lights[v] = instance.getLightCoords(v);
+                            }
+                            QUADS.add(new GhostQuad(x, y, z, quad, colors, lights));
+                        },
+                        fixed.getX(),
+                        fixed.getY(),
+                        fixed.getZ(),
+                        level,
+                        fixed,
+                        state,
+                        model,
+                        state.getSeed(fixed));
             }
             hide.add(fixed);
         }
@@ -202,9 +211,9 @@ public final class RematCatchClient {
     }
 
     /**
-       How solid things in this world are for you right now, 1 normally.
-       It is the remat fade while the interior materialises around you, for the console, doors and other players.
-    */
+     * How solid things in this world are for you right now, 1 normally.
+     * It is the remat fade while the interior materialises around you, for the console, doors and other players.
+     */
     public static float opacityIn(@Nullable Level level) {
         Fade fade = self;
         Minecraft mc = Minecraft.getInstance();
@@ -213,15 +222,16 @@ public final class RematCatchClient {
     }
 
     /**
-       Every frame, from the level renderer.
-       How far the build has got at this height, 0 is not started and 1 is done.
-    */
+     * Every frame, from the level renderer.
+     * How far the build has got at this height, 0 is not started and 1 is done.
+     */
     private static float built(float progress, float y) {
         float height = Math.clamp((y - bottomY) / spanY, 0.0f, 1.0f);
         return Math.clamp((progress * (1.0f + SWEEP) - height) / SWEEP, 0.0f, 1.0f);
     }
 
-    public static void submit(PoseStack poseStack, SubmitNodeCollector collector, Vec3 camera, @Nullable Level drawing) {
+    public static void submit(
+            PoseStack poseStack, SubmitNodeCollector collector, Vec3 camera, @Nullable Level drawing) {
         Fade fade = self;
         Minecraft mc = Minecraft.getInstance();
         if (fade == null || QUADS.isEmpty() || mc.level == null || drawing == null) return;
@@ -258,8 +268,12 @@ public final class RematCatchClient {
                     DRAW.setColor(v, ARGB.multiply(ghost.colors()[v], tint));
                     DRAW.setLightCoords(v, ghost.lights()[v]);
                 }
-                buffer.putBlockBakedQuad((float) (ghost.x() - cx), (float) (ghost.y() - cy), (float) (ghost.z() - cz),
-                        ghost.quad(), DRAW);
+                buffer.putBlockBakedQuad(
+                        (float) (ghost.x() - cx),
+                        (float) (ghost.y() - cy),
+                        (float) (ghost.z() - cz),
+                        ghost.quad(),
+                        DRAW);
             }
         });
     }

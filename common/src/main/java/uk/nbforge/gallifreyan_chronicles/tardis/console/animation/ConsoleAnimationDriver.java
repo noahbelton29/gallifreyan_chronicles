@@ -2,18 +2,17 @@ package uk.nbforge.gallifreyan_chronicles.tardis.console.animation;
 
 import com.geckolib.animation.AnimationController;
 import com.geckolib.animation.RawAnimation;
-import uk.nbforge.gallifreyan_chronicles.Constants;
-import uk.nbforge.gallifreyan_chronicles.network.tardis.TardisConsoleAnimationPayload;
-import uk.nbforge.gallifreyan_chronicles.platform.Services;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.function.Supplier;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 import org.jspecify.annotations.Nullable;
-
-import java.util.HashMap;
-import java.util.Map;
-import java.util.function.Supplier;
+import uk.nbforge.gallifreyan_chronicles.Constants;
+import uk.nbforge.gallifreyan_chronicles.network.tardis.TardisConsoleAnimationPayload;
+import uk.nbforge.gallifreyan_chronicles.platform.Services;
 
 public class ConsoleAnimationDriver implements ConsoleAnimatable {
     private static final String ROTOR = "rotor";
@@ -35,11 +34,12 @@ public class ConsoleAnimationDriver implements ConsoleAnimatable {
         this.pos = pos;
     }
 
-    public void bind(Supplier<Level> levelSupplier,
-                     Supplier<String> rotorStateSupplier,
-                     AnimationController<?> idleController,
-                     AnimationController<?> flightController,
-                     Map<String, ? extends AnimationController<?>> controlControllers) {
+    public void bind(
+            Supplier<Level> levelSupplier,
+            Supplier<String> rotorStateSupplier,
+            AnimationController<?> idleController,
+            AnimationController<?> flightController,
+            Map<String, ? extends AnimationController<?>> controlControllers) {
         this.levelSupplier = levelSupplier;
         this.rotorStateSupplier = rotorStateSupplier;
         this.idleController = idleController;
@@ -69,7 +69,8 @@ public class ConsoleAnimationDriver implements ConsoleAnimatable {
         if (level != null && level.isClientSide()) {
             applyAnimationLocally(controllerName, animationName);
         } else if (level instanceof ServerLevel serverLevel) {
-            TardisConsoleAnimationPayload payload = new TardisConsoleAnimationPayload(serverLevel.dimension().identifier(), pos, animationName, controllerName);
+            TardisConsoleAnimationPayload payload = new TardisConsoleAnimationPayload(
+                    serverLevel.dimension().identifier(), pos, animationName, controllerName);
             Services.NETWORK.broadcastTardisConsoleAnimation(serverLevel.getServer(), payload);
         }
     }
@@ -88,7 +89,9 @@ public class ConsoleAnimationDriver implements ConsoleAnimatable {
             RawAnimation raw = RawAnimation.begin().thenPlay(animationName);
             controller.setAnimation(flip ? raw.thenWait(1) : raw);
         } else {
-            Constants.LOG.warn("No animation controller found for control '{}', is it registered in TardisControlRegistry?", controllerName);
+            Constants.LOG.warn(
+                    "No animation controller found for control '{}', is it registered in TardisControlRegistry?",
+                    controllerName);
         }
     }
 }

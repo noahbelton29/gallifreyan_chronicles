@@ -2,13 +2,13 @@ package uk.nbforge.gallifreyan_chronicles.mixin.client.compat.flashback;
 
 import com.llamalad7.mixinextras.injector.wrapmethod.WrapMethod;
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
-import uk.nbforge.gallifreyan_chronicles.compat.flashback.ReplayComponentIds;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Pseudo;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+import uk.nbforge.gallifreyan_chronicles.compat.flashback.ReplayComponentIds;
 
 /** Marks when the replay server of Flashback is reading recorded packets and forgets the component numbers of the recording when the replay closes, see ReplayComponentIds. */
 @Pseudo

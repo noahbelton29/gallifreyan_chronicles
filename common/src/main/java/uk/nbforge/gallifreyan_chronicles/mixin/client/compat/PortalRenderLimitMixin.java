@@ -1,25 +1,24 @@
 package uk.nbforge.gallifreyan_chronicles.mixin.client.compat;
 
-import uk.nbforge.gallifreyan_chronicles.compat.portal.TardisPortalBridge;
+import java.util.function.Supplier;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Pseudo;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import qouteall.imm_ptl.core.portal.Portal;
-
-import java.util.function.Supplier;
+import uk.nbforge.gallifreyan_chronicles.compat.portal.TardisPortalBridge;
 
 /**
-   Applies the Portal Render Distance and Max Rendered Portals video settings to TARDIS door portals.
-   Immersive Portals decides per frame and per portal whether to skip rendering it and we add our own limits there.
-*/
+ * Applies the Portal Render Distance and Max Rendered Portals video settings to TARDIS door portals.
+ * Immersive Portals decides per frame and per portal whether to skip rendering it and we add our own limits there.
+ */
 @Pseudo
 @Mixin(targets = "qouteall.imm_ptl.core.render.renderer.PortalRenderer", remap = false)
 public abstract class PortalRenderLimitMixin {
     @Inject(method = "shouldSkipRenderingPortal", at = @At("HEAD"), cancellable = true, remap = false, require = 0)
-    private static void gc$limitTardisPortals(Portal portal, Supplier<?> frustumSupplier,
-                                              CallbackInfoReturnable<Boolean> cir) {
+    private static void gc$limitTardisPortals(
+            Portal portal, Supplier<?> frustumSupplier, CallbackInfoReturnable<Boolean> cir) {
         if (TardisPortalBridge.shouldSkipPortalRendering(portal)) {
             cir.setReturnValue(true);
         }

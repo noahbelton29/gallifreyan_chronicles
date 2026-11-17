@@ -1,18 +1,17 @@
 package uk.nbforge.gallifreyan_chronicles.event_subscriber;
 
-import uk.nbforge.gallifreyan_chronicles.Constants;
-import uk.nbforge.gallifreyan_chronicles.core.GCDataComponents;
-import uk.nbforge.gallifreyan_chronicles.core.item.tooltip.ItemInfoTooltip;
 import net.minecraft.world.item.ItemStack;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.event.entity.player.ItemTooltipEvent;
+import uk.nbforge.gallifreyan_chronicles.Constants;
+import uk.nbforge.gallifreyan_chronicles.core.GCDataComponents;
+import uk.nbforge.gallifreyan_chronicles.core.item.tooltip.ItemInfoTooltip;
 
 @EventBusSubscriber(modid = Constants.MOD_ID, value = Dist.CLIENT)
 public final class GCTooltipHandler {
-    private GCTooltipHandler() {
-    }
+    private GCTooltipHandler() {}
 
     @SubscribeEvent
     public static void onItemTooltip(ItemTooltipEvent event) {

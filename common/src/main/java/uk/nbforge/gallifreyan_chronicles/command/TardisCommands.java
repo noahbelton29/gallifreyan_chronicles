@@ -1,44 +1,42 @@
 package uk.nbforge.gallifreyan_chronicles.command;
 
-import uk.nbforge.gallifreyan_chronicles.tardis.ecs.system.TardisInteriorSystem;
-import uk.nbforge.gallifreyan_chronicles.tardis.TardisDimensionManager;
-import uk.nbforge.gallifreyan_chronicles.tardis.TardisApi;
-import uk.nbforge.gallifreyan_chronicles.core.block.TardisTopBlock;
+import static net.minecraft.commands.Commands.literal;
+import static uk.nbforge.gallifreyan_chronicles.util.CommandUtil.*;
+
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
-import uk.nbforge.gallifreyan_chronicles.core.block_entities.TardisConsoleBlockEntity;
-import uk.nbforge.gallifreyan_chronicles.core.block_entities.TardisExteriorBlockEntity;
-import uk.nbforge.gallifreyan_chronicles.core.entity.TardisControlEntity;
-import uk.nbforge.gallifreyan_chronicles.tardis.Tardis;
-import uk.nbforge.gallifreyan_chronicles.tardis.ecs.system.TardisLandingSystem;
-import uk.nbforge.gallifreyan_chronicles.tardis.flight.crash.TardisDamage;
-import uk.nbforge.gallifreyan_chronicles.tardis.TardisExterior;
-import uk.nbforge.gallifreyan_chronicles.core.dynamic_registries.TardisExteriorRegistry;
-import uk.nbforge.gallifreyan_chronicles.tardis.manager.deletion.TardisDeletion;
-import uk.nbforge.gallifreyan_chronicles.tardis.manager.deletion.TardisDeletionMode;
-import uk.nbforge.gallifreyan_chronicles.util.TardisDimensionUtil;
+import java.util.Collection;
+import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
+import java.util.stream.Collectors;
 import net.minecraft.ChatFormatting;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.server.permissions.Permissions;
-
-import java.util.Collection;
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
-import java.util.stream.Collectors;
-
-import static uk.nbforge.gallifreyan_chronicles.util.CommandUtil.*;
-import static net.minecraft.commands.Commands.literal;
+import uk.nbforge.gallifreyan_chronicles.core.block.TardisTopBlock;
+import uk.nbforge.gallifreyan_chronicles.core.block_entities.TardisConsoleBlockEntity;
+import uk.nbforge.gallifreyan_chronicles.core.block_entities.TardisExteriorBlockEntity;
+import uk.nbforge.gallifreyan_chronicles.core.dynamic_registries.TardisExteriorRegistry;
+import uk.nbforge.gallifreyan_chronicles.core.entity.TardisControlEntity;
+import uk.nbforge.gallifreyan_chronicles.tardis.Tardis;
+import uk.nbforge.gallifreyan_chronicles.tardis.TardisApi;
+import uk.nbforge.gallifreyan_chronicles.tardis.TardisDimensionManager;
+import uk.nbforge.gallifreyan_chronicles.tardis.TardisExterior;
+import uk.nbforge.gallifreyan_chronicles.tardis.ecs.system.TardisInteriorSystem;
+import uk.nbforge.gallifreyan_chronicles.tardis.ecs.system.TardisLandingSystem;
+import uk.nbforge.gallifreyan_chronicles.tardis.flight.crash.TardisDamage;
+import uk.nbforge.gallifreyan_chronicles.tardis.manager.deletion.TardisDeletion;
+import uk.nbforge.gallifreyan_chronicles.tardis.manager.deletion.TardisDeletionMode;
+import uk.nbforge.gallifreyan_chronicles.util.TardisDimensionUtil;
 
 public final class TardisCommands {
     private static final int SUMMON_DISTANCE = 5;
 
-    private TardisCommands() {
-    }
+    private TardisCommands() {}
 
     public static LiteralArgumentBuilder<CommandSourceStack> list() {
         return literal("list").executes(TardisCommands::list);
@@ -107,9 +105,8 @@ public final class TardisCommands {
         if (player == null) return 0;
 
         ServerLevel level = ctx.getSource().getLevel();
-        Optional<Tardis> tardis = lookedAtBlock(ctx)
-                .flatMap(pos -> tardisAt(level, pos))
-                .or(() -> TardisApi.ofLevel(level));
+        Optional<Tardis> tardis =
+                lookedAtBlock(ctx).flatMap(pos -> tardisAt(level, pos)).or(() -> TardisApi.ofLevel(level));
         if (tardis.isEmpty()) return fail(ctx, "no_tardis_here");
 
         send(ctx, text("tardis_id", idLink(tardis.get().id())), false);
@@ -143,8 +140,7 @@ public final class TardisCommands {
         return literal("debug")
                 .then(literal("exteriors").executes(TardisCommands::listExteriors))
                 .then(literal("controls").executes(TardisCommands::listControls))
-                .then(literal("tardis")
-                        .then(tardisIdArgument().executes(TardisCommands::info)));
+                .then(literal("tardis").then(tardisIdArgument().executes(TardisCommands::info)));
     }
 
     /**
@@ -218,8 +214,8 @@ public final class TardisCommands {
         });
     }
 
-    private static int moveInFrontOf(CommandContext<CommandSourceStack> ctx, Tardis tardis, ServerPlayer player,
-                                     String idText) {
+    private static int moveInFrontOf(
+            CommandContext<CommandSourceStack> ctx, Tardis tardis, ServerPlayer player, String idText) {
         ServerLevel oldLevel = tardis.exteriorLevel().orElse(null);
         BlockPos oldPos = tardis.exteriorPos().orElse(null);
         if (oldLevel == null || oldPos == null || tardis.exterior().isEmpty()) return fail(ctx, "no_exterior", idText);
@@ -238,9 +234,8 @@ public final class TardisCommands {
      * Lists every exterior id.
      */
     private static int listExteriors(CommandContext<CommandSourceStack> ctx) {
-        String ids = TardisExteriorRegistry.getAll().stream()
-                .map(TardisExterior::id)
-                .collect(Collectors.joining(", "));
+        String ids =
+                TardisExteriorRegistry.getAll().stream().map(TardisExterior::id).collect(Collectors.joining(", "));
         return success(ctx, false, "list_exterior", ids);
     }
 
@@ -248,8 +243,8 @@ public final class TardisCommands {
      * Lists the controls of the console you are looking at.
      */
     private static int listControls(CommandContext<CommandSourceStack> ctx) {
-        Optional<TardisConsoleBlockEntity> console = lookedAtBlock(ctx)
-                .flatMap(pos -> findBlockEntity(ctx, pos, TardisConsoleBlockEntity.class));
+        Optional<TardisConsoleBlockEntity> console =
+                lookedAtBlock(ctx).flatMap(pos -> findBlockEntity(ctx, pos, TardisConsoleBlockEntity.class));
         if (console.isEmpty()) return fail(ctx, "not_looking_at_console");
 
         List<TardisControlEntity> controls = console.get().getControlEntities();

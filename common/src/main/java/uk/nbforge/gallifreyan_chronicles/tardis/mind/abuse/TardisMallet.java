@@ -1,19 +1,8 @@
 package uk.nbforge.gallifreyan_chronicles.tardis.mind.abuse;
 
-import uk.nbforge.gallifreyan_chronicles.util.GCSparkUtil;
-import uk.nbforge.gallifreyan_chronicles.tardis.mind.data.MindEnums.Reveal;
-import uk.nbforge.gallifreyan_chronicles.tardis.mind.discovery.TardisDiscovery;
-import uk.nbforge.gallifreyan_chronicles.tardis.ecs.system.TardisMindSystem;
-import uk.nbforge.gallifreyan_chronicles.tardis.mind.TardisPersonality;
-import uk.nbforge.gallifreyan_chronicles.tardis.mind.mood.TardisAlarm;
-
-import uk.nbforge.gallifreyan_chronicles.network.tardis.TardisAlarmPayload;
-import uk.nbforge.gallifreyan_chronicles.network.tardis.TardisDrumShakePayload;
-import uk.nbforge.gallifreyan_chronicles.tardis.Tardis;
-import uk.nbforge.gallifreyan_chronicles.tardis.mind.MindMessages;
-import uk.nbforge.gallifreyan_chronicles.tardis.mind.action.MindActions;
-import uk.nbforge.gallifreyan_chronicles.tardis.mind.action.MindContext;
-import uk.nbforge.gallifreyan_chronicles.util.PlayerMotionUtil;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.UUID;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.ParticleTypes;
@@ -21,15 +10,21 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
-import net.minecraft.util.Mth;
-import net.minecraft.util.RandomSource;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
-
-import java.util.HashMap;
-import java.util.Map;
-import java.util.UUID;
+import uk.nbforge.gallifreyan_chronicles.network.tardis.TardisAlarmPayload;
+import uk.nbforge.gallifreyan_chronicles.network.tardis.TardisDrumShakePayload;
+import uk.nbforge.gallifreyan_chronicles.tardis.Tardis;
+import uk.nbforge.gallifreyan_chronicles.tardis.ecs.system.TardisMindSystem;
+import uk.nbforge.gallifreyan_chronicles.tardis.mind.MindMessages;
+import uk.nbforge.gallifreyan_chronicles.tardis.mind.TardisPersonality;
+import uk.nbforge.gallifreyan_chronicles.tardis.mind.action.MindActions;
+import uk.nbforge.gallifreyan_chronicles.tardis.mind.action.MindContext;
+import uk.nbforge.gallifreyan_chronicles.tardis.mind.data.MindEnums.Reveal;
+import uk.nbforge.gallifreyan_chronicles.tardis.mind.discovery.TardisDiscovery;
+import uk.nbforge.gallifreyan_chronicles.tardis.mind.mood.TardisAlarm;
+import uk.nbforge.gallifreyan_chronicles.util.GCSparkUtil;
 
 public final class TardisMallet {
     private static final float STRESS_PER_HIT = 8f;
@@ -51,11 +46,9 @@ public final class TardisMallet {
     private static final Map<String, Beating> BEATINGS = new HashMap<>();
 
     /** trustBefore is how much it trusted them when the beating started. */
-    private record Beating(int count, long lastTick, float trustBefore) {
-    }
+    private record Beating(int count, long lastTick, float trustBefore) {}
 
-    private TardisMallet() {
-    }
+    private TardisMallet() {}
 
     public static void reset() {
         BEATINGS.clear();
@@ -74,7 +67,12 @@ public final class TardisMallet {
         Vec3 hit = Vec3.atCenterOf(hitPos);
         float blast = BASE_BLAST + TardisMindSystem.fear(tardis, hitter) * BLAST_PER_FEAR;
         level.explode(null, hit.x, hit.y, hit.z, blast, Level.ExplosionInteraction.NONE);
-        level.playSound(null, hitPos, SoundEvents.ANVIL_LAND, SoundSource.BLOCKS, 0.6F,
+        level.playSound(
+                null,
+                hitPos,
+                SoundEvents.ANVIL_LAND,
+                SoundSource.BLOCKS,
+                0.6F,
                 0.7F + level.getRandom().nextFloat() * 0.2F);
         level.sendParticles(ParticleTypes.CRIT, hit.x, hit.y, hit.z, 12, 0.3, 0.3, 0.3, 0.2);
         GCSparkUtil.small(level, hit, 8);

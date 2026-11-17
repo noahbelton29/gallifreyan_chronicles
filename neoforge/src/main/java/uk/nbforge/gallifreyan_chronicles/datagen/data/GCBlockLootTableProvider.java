@@ -1,15 +1,14 @@
 package uk.nbforge.gallifreyan_chronicles.datagen.data;
 
-import uk.nbforge.gallifreyan_chronicles.core.GCBlocks;
-import uk.nbforge.gallifreyan_chronicles.core.GCItems;
+import java.util.Set;
 import net.minecraft.data.loot.BlockLootSubProvider;
 import net.minecraft.data.loot.LootTableSubProvider;
 import net.minecraft.world.flag.FeatureFlags;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.block.Block;
 import org.jspecify.annotations.NonNull;
-
-import java.util.Set;
+import uk.nbforge.gallifreyan_chronicles.core.GCBlocks;
+import uk.nbforge.gallifreyan_chronicles.core.GCItems;
 
 public class GCBlockLootTableProvider extends BlockLootSubProvider {
     public GCBlockLootTableProvider(LootTableSubProvider.Context context) {
@@ -101,7 +100,10 @@ public class GCBlockLootTableProvider extends BlockLootSubProvider {
         add(GCBlocks.POTTED_CADONWOOD_SAPLING, createPotFlowerItemTable(GCBlocks.CADONWOOD_SAPLING));
         add(GCBlocks.GALLIFREYAN_STONE, createSingleItemTable(GCBlocks.GALLIFREYAN_COBBLESTONE));
         add(GCBlocks.GALLIFREYAN_GRASS_BLOCK, createSingleItemTable(GCBlocks.GALLIFREYAN_DIRT));
-        add(GCBlocks.CADONWOOD_LEAVES, createLeavesDrops(GCBlocks.CADONWOOD_LEAVES, GCBlocks.CADONWOOD_SAPLING, NORMAL_LEAVES_SAPLING_CHANCES));
+        add(
+                GCBlocks.CADONWOOD_LEAVES,
+                createLeavesDrops(
+                        GCBlocks.CADONWOOD_LEAVES, GCBlocks.CADONWOOD_SAPLING, NORMAL_LEAVES_SAPLING_CHANCES));
 
         add(GCBlocks.SHORT_GALLIFREYAN_DRY_GRASS, createGrassDrops(GCBlocks.SHORT_GALLIFREYAN_DRY_GRASS));
         add(GCBlocks.SHORT_GALLIFREYAN_GRASS, createGrassDrops(GCBlocks.SHORT_GALLIFREYAN_GRASS));
@@ -110,7 +112,9 @@ public class GCBlockLootTableProvider extends BlockLootSubProvider {
 
         add(GCBlocks.GALLIFREYAN_STONE_IRON_ORE, createOreDrop(GCBlocks.GALLIFREYAN_STONE_IRON_ORE, Items.RAW_IRON));
         add(GCBlocks.GALLIFREYAN_STONE_COAL_ORE, createOreDrop(GCBlocks.GALLIFREYAN_STONE_COAL_ORE, Items.COAL));
-        add(GCBlocks.ARCADIAN_SHALE_TARANIUM_ORE, createOreDrop(GCBlocks.ARCADIAN_SHALE_TARANIUM_ORE, GCItems.TARANIUM_SCRAP));
+        add(
+                GCBlocks.ARCADIAN_SHALE_TARANIUM_ORE,
+                createOreDrop(GCBlocks.ARCADIAN_SHALE_TARANIUM_ORE, GCItems.TARANIUM_SCRAP));
 
         dropSelf(GCBlocks.CADONWOOD_STAIRS);
         add(GCBlocks.CADONWOOD_SLAB, this::createSlabItemTable);

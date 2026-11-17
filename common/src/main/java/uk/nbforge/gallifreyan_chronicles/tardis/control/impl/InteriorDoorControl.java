@@ -1,21 +1,20 @@
-
 package uk.nbforge.gallifreyan_chronicles.tardis.control.impl;
 
-import uk.nbforge.gallifreyan_chronicles.core.block_entities.InteriorDoorBlockEntity;
-import uk.nbforge.gallifreyan_chronicles.core.block_entities.TardisConsoleBlockEntity;
-import uk.nbforge.gallifreyan_chronicles.core.entity.TardisControlEntity;
-import uk.nbforge.gallifreyan_chronicles.core.GCSounds;
-import uk.nbforge.gallifreyan_chronicles.core.GCTardisControls;
-import uk.nbforge.gallifreyan_chronicles.tardis.control.BaseControl;
-import uk.nbforge.gallifreyan_chronicles.tardis.control.ControlAnimations;
-import uk.nbforge.gallifreyan_chronicles.tardis.TardisApi;
-import uk.nbforge.gallifreyan_chronicles.tardis.ecs.system.DoorSyncSystem;
-import net.minecraft.server.level.ServerLevel;
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
+import uk.nbforge.gallifreyan_chronicles.core.GCSounds;
+import uk.nbforge.gallifreyan_chronicles.core.GCTardisControls;
+import uk.nbforge.gallifreyan_chronicles.core.block_entities.InteriorDoorBlockEntity;
+import uk.nbforge.gallifreyan_chronicles.core.block_entities.TardisConsoleBlockEntity;
+import uk.nbforge.gallifreyan_chronicles.core.entity.TardisControlEntity;
+import uk.nbforge.gallifreyan_chronicles.tardis.TardisApi;
+import uk.nbforge.gallifreyan_chronicles.tardis.control.BaseControl;
+import uk.nbforge.gallifreyan_chronicles.tardis.control.ControlAnimations;
+import uk.nbforge.gallifreyan_chronicles.tardis.ecs.system.DoorSyncSystem;
 
 public class InteriorDoorControl extends BaseControl {
 
@@ -32,18 +31,18 @@ public class InteriorDoorControl extends BaseControl {
     }
 
     @Override
-    public InteractionResult onRightClick(
-            TardisControlEntity entity,
-            Player player,
-            InteractionHand hand
-    ) {
+    public InteractionResult onRightClick(TardisControlEntity entity, Player player, InteractionHand hand) {
         if (entity.getConsole() == null) return InteractionResult.FAIL;
         if (entity.level() instanceof ServerLevel) {
             InteriorDoorBlockEntity door = TardisApi.of(entity.getConsole())
-                    .map(tardis -> DoorSyncSystem.primaryDoor(tardis.id())).orElse(null);
+                    .map(tardis -> DoorSyncSystem.primaryDoor(tardis.id()))
+                    .orElse(null);
             if (door != null && door.isOnCooldown()) return InteractionResult.FAIL;
-            announce(player, entity.getConsole().getControlState(entity.getControlId())
-                    ? "message.gallifreyan_chronicles.interior_door_closing" : "message.gallifreyan_chronicles.interior_door_opening");
+            announce(
+                    player,
+                    entity.getConsole().getControlState(entity.getControlId())
+                            ? "message.gallifreyan_chronicles.interior_door_closing"
+                            : "message.gallifreyan_chronicles.interior_door_opening");
         }
         return InteractionResult.SUCCESS;
     }
@@ -55,8 +54,7 @@ public class InteriorDoorControl extends BaseControl {
         }
 
         TardisApi.of(console).ifPresent(tardis -> {
-            InteriorDoorBlockEntity door =
-                    DoorSyncSystem.primaryDoor(tardis.id());
+            InteriorDoorBlockEntity door = DoorSyncSystem.primaryDoor(tardis.id());
 
             if (door == null) {
                 return;
@@ -67,7 +65,9 @@ public class InteriorDoorControl extends BaseControl {
             if (open != activated) {
                 door.interact(true);
                 if (door.getDoorState().isClosed() == activated) {
-                    console.setControlActivated(GCTardisControls.INTERIOR_DOOR_CONTROL, !door.getDoorState().isClosed());
+                    console.setControlActivated(
+                            GCTardisControls.INTERIOR_DOOR_CONTROL,
+                            !door.getDoorState().isClosed());
                 }
             }
         });
@@ -75,6 +75,8 @@ public class InteriorDoorControl extends BaseControl {
 
     @Override
     public Component describeState(boolean activated) {
-        return activated ? state("interior_door", "open", ChatFormatting.GREEN) : state("interior_door", "closed", ChatFormatting.RED);
+        return activated
+                ? state("interior_door", "open", ChatFormatting.GREEN)
+                : state("interior_door", "closed", ChatFormatting.RED);
     }
 }

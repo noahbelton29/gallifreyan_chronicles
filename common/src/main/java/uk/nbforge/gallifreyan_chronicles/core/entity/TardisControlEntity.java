@@ -1,15 +1,6 @@
 package uk.nbforge.gallifreyan_chronicles.core.entity;
 
-import uk.nbforge.gallifreyan_chronicles.tardis.mind.refusal.TardisWariness;
-import uk.nbforge.gallifreyan_chronicles.tardis.console.TardisConsole;
-import uk.nbforge.gallifreyan_chronicles.tardis.control.ControlPower;
-import uk.nbforge.gallifreyan_chronicles.Constants;
-import uk.nbforge.gallifreyan_chronicles.core.block_entities.TardisConsoleBlockEntity;
-import uk.nbforge.gallifreyan_chronicles.tardis.TardisApi;
-import uk.nbforge.gallifreyan_chronicles.tardis.control.ConsoleControlManager;
-import uk.nbforge.gallifreyan_chronicles.tardis.control.TardisControl;
-import uk.nbforge.gallifreyan_chronicles.core.dynamic_registries.TardisControlRegistry;
-import uk.nbforge.gallifreyan_chronicles.tardis.security.IsomorphicPunishment;
+import java.util.function.Supplier;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.syncher.EntityDataAccessor;
@@ -32,8 +23,16 @@ import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
-
-import java.util.function.Supplier;
+import uk.nbforge.gallifreyan_chronicles.Constants;
+import uk.nbforge.gallifreyan_chronicles.core.block_entities.TardisConsoleBlockEntity;
+import uk.nbforge.gallifreyan_chronicles.core.dynamic_registries.TardisControlRegistry;
+import uk.nbforge.gallifreyan_chronicles.tardis.TardisApi;
+import uk.nbforge.gallifreyan_chronicles.tardis.console.TardisConsole;
+import uk.nbforge.gallifreyan_chronicles.tardis.control.ConsoleControlManager;
+import uk.nbforge.gallifreyan_chronicles.tardis.control.ControlPower;
+import uk.nbforge.gallifreyan_chronicles.tardis.control.TardisControl;
+import uk.nbforge.gallifreyan_chronicles.tardis.mind.refusal.TardisWariness;
+import uk.nbforge.gallifreyan_chronicles.tardis.security.IsomorphicPunishment;
 
 public class TardisControlEntity extends Entity {
     public static Supplier<EntityType<TardisControlEntity>> TYPE;
@@ -61,8 +60,7 @@ public class TardisControlEntity extends Entity {
     }
 
     @Override
-    public void tick() {
-    }
+    public void tick() {}
 
     public static TardisControlEntity create(Level level, BlockPos consolePos, String controlId, Vec3 worldPos) {
         TardisControlEntity entity = new TardisControlEntity(TYPE.get(), level);
@@ -130,9 +128,7 @@ public class TardisControlEntity extends Entity {
         double halfDepth = this.getControlDepth() / 2.0;
         double height = this.getControlHeight();
         return new AABB(
-                pos.x - halfWidth, pos.y, pos.z - halfDepth,
-                pos.x + halfWidth, pos.y + height, pos.z + halfDepth
-        );
+                pos.x - halfWidth, pos.y, pos.z - halfDepth, pos.x + halfWidth, pos.y + height, pos.z + halfDepth);
     }
 
     private void refreshControlBoundingBox() {
@@ -203,14 +199,17 @@ public class TardisControlEntity extends Entity {
         if (this.getConsolePos() == null) return null;
         BlockEntity be = this.level().getBlockEntity(this.getConsolePos());
         if (be instanceof TardisConsoleBlockEntity console) return console;
-        Constants.LOG.warn("Control entity '{}' at {} has no console block entity at {}",
-                this.getControlId(), this.position(), this.getConsolePos());
+        Constants.LOG.warn(
+                "Control entity '{}' at {} has no console block entity at {}",
+                this.getControlId(),
+                this.position(),
+                this.getConsolePos());
         return null;
     }
 
     @Override
-    public @NonNull InteractionResult interact(@NonNull Player player, @NonNull InteractionHand hand,
-                                               @NonNull Vec3 location) {
+    public @NonNull InteractionResult interact(
+            @NonNull Player player, @NonNull InteractionHand hand, @NonNull Vec3 location) {
         if (this.level().isClientSide()) {
             return InteractionResult.SUCCESS;
         }
@@ -268,7 +267,8 @@ public class TardisControlEntity extends Entity {
             if (console != null) {
                 boolean currentState = console.getControlState(this.getControlId());
                 boolean newState = !currentState;
-                Constants.LOG.debug("Control {} state toggled from {} to {}", this.getControlId(), currentState, newState);
+                Constants.LOG.debug(
+                        "Control {} state toggled from {} to {}", this.getControlId(), currentState, newState);
                 console.triggerControl(this.getControlId(), newState, player);
             }
         }
@@ -291,15 +291,16 @@ public class TardisControlEntity extends Entity {
 
         String posText = String.format("%.4f, %.4f, %.4f", pos.x, pos.y, pos.z);
         String offsetText = String.format("%.4f, %.4f, %.4f", offset.x, offset.y, offset.z);
-        String sizeText = String.format("%.4f, %.4f, %.4f",
-                this.getControlWidth(), this.getControlHeight(), this.getControlDepth());
+        String sizeText = String.format(
+                "%.4f, %.4f, %.4f", this.getControlWidth(), this.getControlHeight(), this.getControlDepth());
 
         Component idComponent = this.getControlId().isEmpty()
                 ? Component.translatable("debug.gallifreyan_chronicles.control_unset")
                 : Component.literal(idPart);
-        player.sendSystemMessage(Component.translatable("debug.gallifreyan_chronicles.control_position",
-                idComponent, posText, offsetText, sizeText));
-        Constants.LOG.debug("TardisControlEntity {} -> pos=({}) offset=({}) size=({})", idPart, posText, offsetText, sizeText);
+        player.sendSystemMessage(Component.translatable(
+                "debug.gallifreyan_chronicles.control_position", idComponent, posText, offsetText, sizeText));
+        Constants.LOG.debug(
+                "TardisControlEntity {} -> pos=({}) offset=({}) size=({})", idPart, posText, offsetText, sizeText);
     }
 
     @Override
@@ -336,7 +337,8 @@ public class TardisControlEntity extends Entity {
     @Override
     public boolean skipAttackInteraction(@NonNull Entity attacker) {
         // Returning true makes vanilla drop the attack before it calls hurt so a left click never reached onLeftClick
-        // Handle it here on the server and swallow it so it cannot fall through and chip or break the console behind the control
+        // Handle it here on the server and swallow it so it cannot fall through and chip or break the console behind
+        // the control
         if (attacker instanceof Player player && this.level() instanceof ServerLevel serverLevel) {
             this.hurtServer(serverLevel, serverLevel.damageSources().playerAttack(player), 0f);
         }

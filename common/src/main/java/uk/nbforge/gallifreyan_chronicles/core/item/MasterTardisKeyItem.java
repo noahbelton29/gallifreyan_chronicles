@@ -1,9 +1,5 @@
 package uk.nbforge.gallifreyan_chronicles.core.item;
 
-import uk.nbforge.gallifreyan_chronicles.util.MessageUtil;
-import uk.nbforge.gallifreyan_chronicles.core.GCDataComponents;
-import uk.nbforge.gallifreyan_chronicles.tardis.TardisApi;
-import uk.nbforge.gallifreyan_chronicles.core.block_entities.TardisExteriorBlockEntity;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
@@ -11,7 +7,11 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.level.Level;
 import org.jspecify.annotations.NonNull;
+import uk.nbforge.gallifreyan_chronicles.core.GCDataComponents;
+import uk.nbforge.gallifreyan_chronicles.core.block_entities.TardisExteriorBlockEntity;
 import uk.nbforge.gallifreyan_chronicles.core.item.tooltip.ItemInfoTooltip;
+import uk.nbforge.gallifreyan_chronicles.tardis.TardisApi;
+import uk.nbforge.gallifreyan_chronicles.util.MessageUtil;
 
 public class MasterTardisKeyItem extends Item implements ScrollSelectable {
     @Override
@@ -43,7 +43,9 @@ public class MasterTardisKeyItem extends Item implements ScrollSelectable {
         if (level.isClientSide()) return InteractionResult.SUCCESS;
 
         if (exterior.hasKeyRendered()) {
-            return TardisApi.of(exterior).map(tardis -> tardis.returnKeyTo(player)).orElse(false)
+            return TardisApi.of(exterior)
+                            .map(tardis -> tardis.returnKeyTo(player))
+                            .orElse(false)
                     ? InteractionResult.CONSUME
                     : InteractionResult.FAIL;
         }

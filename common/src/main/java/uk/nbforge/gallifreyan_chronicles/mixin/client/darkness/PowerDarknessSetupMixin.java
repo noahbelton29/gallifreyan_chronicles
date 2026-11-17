@@ -1,8 +1,5 @@
 package uk.nbforge.gallifreyan_chronicles.mixin.client.darkness;
 
-import uk.nbforge.gallifreyan_chronicles.client.gui.hud.GCDangerAlarm;
-import uk.nbforge.gallifreyan_chronicles.client.gui.hud.GCPowerDarkness;
-import uk.nbforge.gallifreyan_chronicles.config.GCConfig;
 import net.minecraft.client.Camera;
 import net.minecraft.client.DeltaTracker;
 import net.minecraft.client.Minecraft;
@@ -17,17 +14,26 @@ import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+import uk.nbforge.gallifreyan_chronicles.client.gui.hud.GCDangerAlarm;
+import uk.nbforge.gallifreyan_chronicles.client.gui.hud.GCPowerDarkness;
+import uk.nbforge.gallifreyan_chronicles.config.GCConfig;
 
 @Mixin(BlindnessFogEnvironment.class)
 public abstract class PowerDarknessSetupMixin {
     @Unique
     private static final float MIN_FOG_END = 14.0F;
+
     @Unique
     private static final float ALARM_CURVE = 0.3F;
 
     @Inject(method = "setupFog", at = @At("HEAD"), cancellable = true)
-    private void gcPowerDarkSetup(FogData fog, Camera camera, ClientLevel level, float renderDistance,
-                                  DeltaTracker deltaTracker, CallbackInfo ci) {
+    private void gcPowerDarkSetup(
+            FogData fog,
+            Camera camera,
+            ClientLevel level,
+            float renderDistance,
+            DeltaTracker deltaTracker,
+            CallbackInfo ci) {
         float darkness = GCPowerDarkness.darknessOf(level);
         if (darkness <= 0.0F) return;
         float alarm = GCDangerAlarm.amountFor(level) * (float) GCConfig.powerDarknessStrength();

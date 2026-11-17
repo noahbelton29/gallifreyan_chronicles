@@ -1,16 +1,16 @@
 package uk.nbforge.gallifreyan_chronicles.tardis.mind.action.builtin;
 
-import uk.nbforge.gallifreyan_chronicles.Constants;
-import uk.nbforge.gallifreyan_chronicles.tardis.mind.action.MindAction;
-import uk.nbforge.gallifreyan_chronicles.tardis.mind.action.MindContext;
 import net.minecraft.core.BlockPos;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundSource;
+import uk.nbforge.gallifreyan_chronicles.Constants;
+import uk.nbforge.gallifreyan_chronicles.tardis.mind.action.MindAction;
+import uk.nbforge.gallifreyan_chronicles.tardis.mind.action.MindContext;
 
 /**
-   Plays a sound at the TARDIS.
-   The json fields are sound, volume and pitch.
-*/
+ * Plays a sound at the TARDIS.
+ * The json fields are sound, volume and pitch.
+ */
 public record SoundAction(SoundEvent sound, float volume, float pitch) implements MindAction {
     public static final String TYPE = Constants.MOD_ID + ":sound";
 
@@ -21,6 +21,7 @@ public record SoundAction(SoundEvent sound, float volume, float pitch) implement
 
     @Override
     public void run(MindContext context) {
-        context.here((level, pos) -> level.playSound(null, BlockPos.containing(pos), sound, SoundSource.BLOCKS, volume, pitch));
+        context.here((level, pos) ->
+                level.playSound(null, BlockPos.containing(pos), sound, SoundSource.BLOCKS, volume, pitch));
     }
 }

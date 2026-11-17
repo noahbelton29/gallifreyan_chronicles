@@ -4,11 +4,11 @@ import com.geckolib.GeckoLibConstants;
 import com.geckolib.constant.dataticket.DataTicket;
 import com.geckolib.renderer.base.GeoRenderState;
 import it.unimi.dsi.fastutil.objects.Reference2ObjectOpenHashMap;
+import java.util.Map;
 import net.minecraft.client.renderer.blockentity.state.BlockEntityRenderState;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Nullable;
 import org.jspecify.annotations.NonNull;
-import java.util.Map;
 
 public class GeoBlockRenderState extends BlockEntityRenderState implements GeoRenderState {
     private final Map<DataTicket<?>, Object> data = new Reference2ObjectOpenHashMap<>();

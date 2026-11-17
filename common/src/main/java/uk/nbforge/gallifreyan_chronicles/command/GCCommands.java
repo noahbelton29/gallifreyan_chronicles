@@ -1,15 +1,14 @@
 package uk.nbforge.gallifreyan_chronicles.command;
 
+import static net.minecraft.commands.Commands.literal;
+import static uk.nbforge.gallifreyan_chronicles.util.CommandUtil.tardisIdArgument;
+
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.server.permissions.Permissions;
 
-import static uk.nbforge.gallifreyan_chronicles.util.CommandUtil.tardisIdArgument;
-import static net.minecraft.commands.Commands.literal;
-
 public final class GCCommands {
-    private GCCommands() {
-    }
+    private GCCommands() {}
 
     public static LiteralArgumentBuilder<CommandSourceStack> root() {
         return literal("gc")
@@ -29,7 +28,8 @@ public final class GCCommands {
         return literal("tardis")
                 .then(TardisCommands.list().requires(GCCommands::isOp))
                 .then(TardisCommands.deletion())
-                .then(tardisIdArgument().requires(GCCommands::isOp)
+                .then(tardisIdArgument()
+                        .requires(GCCommands::isOp)
                         .then(TardisCommands.info())
                         .then(TardisCommands.summon())
                         .then(TardisCommands.tp())

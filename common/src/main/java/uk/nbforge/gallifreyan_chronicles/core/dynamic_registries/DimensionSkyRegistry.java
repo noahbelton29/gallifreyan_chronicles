@@ -1,20 +1,16 @@
 package uk.nbforge.gallifreyan_chronicles.core.dynamic_registries;
 
-import net.minecraft.resources.Identifier;
-
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
-
+import net.minecraft.resources.Identifier;
 import uk.nbforge.gallifreyan_chronicles.sky.data.DimensionSky;
-
 
 public class DimensionSkyRegistry {
     private static final GCJsonDataRegistry<DimensionSky> BY_ID = new GCJsonDataRegistry<>();
     private static final Map<Identifier, DimensionSky> BY_DIMENSION = new HashMap<>();
 
-    private DimensionSkyRegistry() {
-    }
+    private DimensionSkyRegistry() {}
 
     public static void clear() {
         BY_ID.clear();

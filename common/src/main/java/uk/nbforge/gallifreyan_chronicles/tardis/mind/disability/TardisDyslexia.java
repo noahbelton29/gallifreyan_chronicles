@@ -1,23 +1,22 @@
 package uk.nbforge.gallifreyan_chronicles.tardis.mind.disability;
 
-import uk.nbforge.gallifreyan_chronicles.tardis.mind.MindMessages;
-import uk.nbforge.gallifreyan_chronicles.tardis.mind.TardisMind;
-import uk.nbforge.gallifreyan_chronicles.tardis.ecs.system.TardisMindSystem;
-import uk.nbforge.gallifreyan_chronicles.tardis.mind.discovery.TardisDiscovery;
-
-import uk.nbforge.gallifreyan_chronicles.tardis.Tardis;
-import uk.nbforge.gallifreyan_chronicles.tardis.TardisEvents;
-import uk.nbforge.gallifreyan_chronicles.tardis.flight.LandingTarget;
-import uk.nbforge.gallifreyan_chronicles.core.block_entities.TardisConsoleBlockEntity;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.util.RandomSource;
+import uk.nbforge.gallifreyan_chronicles.core.block_entities.TardisConsoleBlockEntity;
+import uk.nbforge.gallifreyan_chronicles.tardis.Tardis;
+import uk.nbforge.gallifreyan_chronicles.tardis.TardisEvents;
+import uk.nbforge.gallifreyan_chronicles.tardis.ecs.system.TardisMindSystem;
+import uk.nbforge.gallifreyan_chronicles.tardis.flight.LandingTarget;
+import uk.nbforge.gallifreyan_chronicles.tardis.mind.MindMessages;
+import uk.nbforge.gallifreyan_chronicles.tardis.mind.TardisMind;
+import uk.nbforge.gallifreyan_chronicles.tardis.mind.discovery.TardisDiscovery;
 
 /**
-   How dyslexia affects a TARDIS when it takes off.
-   It can mix up the coordinates of its landing target, stress makes that more likely and worse, and practising flying helps it get better.
-*/
+ * How dyslexia affects a TARDIS when it takes off.
+ * It can mix up the coordinates of its landing target, stress makes that more likely and worse, and practising flying helps it get better.
+ */
 public final class TardisDyslexia {
     private static final float NEW_CHANCE = 0.8f;
     private static final float FLOOR_CHANCE = 0.05f;
@@ -29,33 +28,33 @@ public final class TardisDyslexia {
     // It works out to roughly a 10 percent chance after 100 flights
     private static final float PRACTICE_KEEP = (float) Math.exp(-1.0 / 37.0);
 
-    private TardisDyslexia() {
-    }
+    private TardisDyslexia() {}
 
     public static void init() {
         TardisEvents.TAKE_OFF.register(TardisDyslexia::onTakeOff);
     }
 
     /**
-       If it mixes up the coordinates the owner sees a message.
-       It gets a little practice with each flight whether or not it was mixed up.
-    */
+     * If it mixes up the coordinates the owner sees a message.
+     * It gets a little practice with each flight whether or not it was mixed up.
+     */
     private static void onTakeOff(Tardis tardis) {
         TardisMind mind = TardisMindSystem.mind(tardis);
         if (!mind.has(TardisDisability.DYSLEXIC)) return;
         TardisConsoleBlockEntity console = tardis.console().orElse(null);
         if (console != null && console.getLevel() instanceof ServerLevel level && muddle(tardis, level.getRandom())) {
             TardisDiscovery.disability(tardis, TardisDisability.DYSLEXIC);
-            tardis.ownerPlayer().filter(owner -> owner.level() == level)
+            tardis.ownerPlayer()
+                    .filter(owner -> owner.level() == level)
                     .ifPresent(owner -> MindMessages.say(owner, ChatFormatting.GOLD, "tardis_muddled"));
         }
         practise(tardis);
     }
 
     /**
-       The chance starts high and drops towards the minimum as it gains experience.
-       skill goes from 0 to 1.
-    */
+     * The chance starts high and drops towards the minimum as it gains experience.
+     * skill goes from 0 to 1.
+     */
     public static float calmChance(float skill) {
         return FLOOR_CHANCE + (NEW_CHANCE - FLOOR_CHANCE) * (1f - skill);
     }
@@ -106,9 +105,9 @@ public final class TardisDyslexia {
     }
 
     /**
-       Swaps two neighbouring digits so 142 can become 124.
-       Negative values keep their sign and values with fewer than two digits are left alone.
-    */
+     * Swaps two neighbouring digits so 142 can become 124.
+     * Negative values keep their sign and values with fewer than two digits are left alone.
+     */
     private static int swapDigits(int value, RandomSource random) {
         char[] digits = String.valueOf(Math.abs(value)).toCharArray();
         if (digits.length < 2) return value;

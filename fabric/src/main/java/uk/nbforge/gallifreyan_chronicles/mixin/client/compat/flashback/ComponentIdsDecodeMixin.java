@@ -2,31 +2,41 @@ package uk.nbforge.gallifreyan_chronicles.mixin.client.compat.flashback;
 
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
-import uk.nbforge.gallifreyan_chronicles.compat.flashback.ReplayComponentIds;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.StreamCodec;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
+import uk.nbforge.gallifreyan_chronicles.compat.flashback.ReplayComponentIds;
 
 /**
-   Reads item component numbers the way the recording did while a replay reads its packets, see ReplayComponentIds.
-   Ordinal 0 is added components and 2 is removed ones, ordinal 1 is the value of the component.
-*/
+ * Reads item component numbers the way the recording did while a replay reads its packets, see ReplayComponentIds.
+ * Ordinal 0 is added components and 2 is removed ones, ordinal 1 is the value of the component.
+ */
 @Mixin(targets = "net.minecraft.core.component.DataComponentPatch$3")
 public abstract class ComponentIdsDecodeMixin {
-    @WrapOperation(method = "decode(Lnet/minecraft/network/RegistryFriendlyByteBuf;)Lnet/minecraft/core/component/DataComponentPatch;",
-            at = @At(value = "INVOKE",
-                    target = "Lnet/minecraft/network/codec/StreamCodec;decode(Ljava/lang/Object;)Ljava/lang/Object;",
-                    ordinal = 0),
+    @WrapOperation(
+            method =
+                    "decode(Lnet/minecraft/network/RegistryFriendlyByteBuf;)Lnet/minecraft/core/component/DataComponentPatch;",
+            at =
+                    @At(
+                            value = "INVOKE",
+                            target =
+                                    "Lnet/minecraft/network/codec/StreamCodec;decode(Ljava/lang/Object;)Ljava/lang/Object;",
+                            ordinal = 0),
             require = 0)
     private Object gc$addedType(StreamCodec<?, ?> codec, Object buf, Operation<Object> original) {
         return read(codec, buf, original);
     }
 
-    @WrapOperation(method = "decode(Lnet/minecraft/network/RegistryFriendlyByteBuf;)Lnet/minecraft/core/component/DataComponentPatch;",
-            at = @At(value = "INVOKE",
-                    target = "Lnet/minecraft/network/codec/StreamCodec;decode(Ljava/lang/Object;)Ljava/lang/Object;",
-                    ordinal = 2),
+    @WrapOperation(
+            method =
+                    "decode(Lnet/minecraft/network/RegistryFriendlyByteBuf;)Lnet/minecraft/core/component/DataComponentPatch;",
+            at =
+                    @At(
+                            value = "INVOKE",
+                            target =
+                                    "Lnet/minecraft/network/codec/StreamCodec;decode(Ljava/lang/Object;)Ljava/lang/Object;",
+                            ordinal = 2),
             require = 0)
     private Object gc$removedType(StreamCodec<?, ?> codec, Object buf, Operation<Object> original) {
         return read(codec, buf, original);

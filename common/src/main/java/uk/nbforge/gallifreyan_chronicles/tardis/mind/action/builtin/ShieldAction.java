@@ -1,8 +1,5 @@
 package uk.nbforge.gallifreyan_chronicles.tardis.mind.action.builtin;
 
-import uk.nbforge.gallifreyan_chronicles.Constants;
-import uk.nbforge.gallifreyan_chronicles.tardis.mind.action.MindAction;
-import uk.nbforge.gallifreyan_chronicles.tardis.mind.action.MindContext;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.server.level.ServerLevel;
@@ -11,11 +8,14 @@ import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
+import uk.nbforge.gallifreyan_chronicles.Constants;
+import uk.nbforge.gallifreyan_chronicles.tardis.mind.action.MindAction;
+import uk.nbforge.gallifreyan_chronicles.tardis.mind.action.MindContext;
 
 /**
-   Throws up a glowing shield and gently pushes away anyone too close, no damage.
-   The json fields are radius, push and lift.
-*/
+ * Throws up a glowing shield and gently pushes away anyone too close, no damage.
+ * The json fields are radius, push and lift.
+ */
 public record ShieldAction(float radius, float push, float lift) implements MindAction {
     public static final String TYPE = Constants.MOD_ID + ":shield";
     private static final int DOTS = 80;
@@ -31,7 +31,8 @@ public record ShieldAction(float radius, float push, float lift) implements Mind
     }
 
     private void raise(ServerLevel level, Vec3 centre) {
-        level.playSound(null, BlockPos.containing(centre), SoundEvents.BEACON_POWER_SELECT, SoundSource.BLOCKS, 0.8F, 1.4F);
+        level.playSound(
+                null, BlockPos.containing(centre), SoundEvents.BEACON_POWER_SELECT, SoundSource.BLOCKS, 0.8F, 1.4F);
 
         // Dots spread evenly over a dome
         for (int i = 0; i < DOTS; i++) {

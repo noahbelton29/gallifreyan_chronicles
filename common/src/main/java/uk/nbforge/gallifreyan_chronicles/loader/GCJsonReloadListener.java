@@ -1,7 +1,7 @@
 package uk.nbforge.gallifreyan_chronicles.loader;
 
 import com.mojang.serialization.Codec;
-import uk.nbforge.gallifreyan_chronicles.Constants;
+import java.util.Map;
 import net.minecraft.resources.FileToIdConverter;
 import net.minecraft.resources.Identifier;
 import net.minecraft.server.MinecraftServer;
@@ -9,12 +9,10 @@ import net.minecraft.server.packs.resources.ResourceManager;
 import net.minecraft.server.packs.resources.SimpleJsonResourceReloadListener;
 import net.minecraft.util.profiling.ProfilerFiller;
 import org.jspecify.annotations.NonNull;
-
-import java.util.Map;
+import uk.nbforge.gallifreyan_chronicles.Constants;
 import uk.nbforge.gallifreyan_chronicles.core.data.IdentifiableData;
 
-public abstract class GCJsonReloadListener<T extends IdentifiableData<T>>
-        extends SimpleJsonResourceReloadListener<T> {
+public abstract class GCJsonReloadListener<T extends IdentifiableData<T>> extends SimpleJsonResourceReloadListener<T> {
 
     private static volatile MinecraftServer currentServer;
 
@@ -34,8 +32,8 @@ public abstract class GCJsonReloadListener<T extends IdentifiableData<T>>
     }
 
     @Override
-    public final void apply(Map<Identifier, T> resources, @NonNull ResourceManager manager,
-                                @NonNull ProfilerFiller profiler) {
+    public final void apply(
+            Map<Identifier, T> resources, @NonNull ResourceManager manager, @NonNull ProfilerFiller profiler) {
         clearRegistry();
         for (Map.Entry<Identifier, T> entry : resources.entrySet()) {
             Identifier fileId = entry.getKey();
@@ -55,8 +53,12 @@ public abstract class GCJsonReloadListener<T extends IdentifiableData<T>>
     }
 
     protected abstract void clearRegistry();
+
     protected abstract void register(T value);
+
     protected abstract int registrySize();
+
     protected abstract void broadcastSync(MinecraftServer server);
+
     protected void onReloadComplete() {}
 }

@@ -1,12 +1,5 @@
 package uk.nbforge.gallifreyan_chronicles.mixin.server;
 
-import uk.nbforge.gallifreyan_chronicles.core.block.InteriorDoorBarrierBlock;
-import uk.nbforge.gallifreyan_chronicles.core.block.InteriorDoorBlock;
-import uk.nbforge.gallifreyan_chronicles.core.block.TardisBlock;
-import uk.nbforge.gallifreyan_chronicles.core.block.TardisTopBlock;
-import uk.nbforge.gallifreyan_chronicles.compat.portal.TardisPortalBridge;
-import uk.nbforge.gallifreyan_chronicles.core.GCBlocks;
-import uk.nbforge.gallifreyan_chronicles.tardis.manager.deletion.TardisDeletionMode;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
@@ -21,6 +14,13 @@ import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
+import uk.nbforge.gallifreyan_chronicles.compat.portal.TardisPortalBridge;
+import uk.nbforge.gallifreyan_chronicles.core.GCBlocks;
+import uk.nbforge.gallifreyan_chronicles.core.block.InteriorDoorBarrierBlock;
+import uk.nbforge.gallifreyan_chronicles.core.block.InteriorDoorBlock;
+import uk.nbforge.gallifreyan_chronicles.core.block.TardisBlock;
+import uk.nbforge.gallifreyan_chronicles.core.block.TardisTopBlock;
+import uk.nbforge.gallifreyan_chronicles.tardis.manager.deletion.TardisDeletionMode;
 
 @SuppressWarnings("unused")
 @Mixin(ServerPlayerGameMode.class)
@@ -60,15 +60,16 @@ public abstract class ServerPlayerGameModeTardisMixin {
         Block block = state.getBlock();
 
         boolean isExterior = block instanceof TardisBlock;
-        boolean isTopOfExterior = block instanceof TardisTopBlock && target.getBlockState(pos.below()).is(GCBlocks.TARDIS);
+        boolean isTopOfExterior = block instanceof TardisTopBlock
+                && target.getBlockState(pos.below()).is(GCBlocks.TARDIS);
         if (!isExterior && !isTopOfExterior) return;
 
         if (TardisDeletionMode.shouldWarn(player.getUUID(), level.getGameTime())) {
             player.sendSystemMessage(Component.translatable(
-                    "message.gallifreyan_chronicles.deletion_mode_required",
-                    Component.literal("TARDIS PROTECTED").withStyle(ChatFormatting.RED, ChatFormatting.BOLD),
-                    Component.literal("/gc tardis deletion on").withStyle(ChatFormatting.YELLOW)
-            ).withStyle(ChatFormatting.GRAY));
+                            "message.gallifreyan_chronicles.deletion_mode_required",
+                            Component.literal("TARDIS PROTECTED").withStyle(ChatFormatting.RED, ChatFormatting.BOLD),
+                            Component.literal("/gc tardis deletion on").withStyle(ChatFormatting.YELLOW))
+                    .withStyle(ChatFormatting.GRAY));
         }
         cir.setReturnValue(false);
     }

@@ -10,8 +10,7 @@ public final class TardisDeletionMode {
     private static final Map<UUID, Long> LAST_WARNING = new ConcurrentHashMap<>();
     private static final long WARNING_COOLDOWN_TICKS = 200L;
 
-    private TardisDeletionMode() {
-    }
+    private TardisDeletionMode() {}
 
     public static boolean isEnabled(UUID playerId) {
         return playerId != null && ENABLED.contains(playerId);

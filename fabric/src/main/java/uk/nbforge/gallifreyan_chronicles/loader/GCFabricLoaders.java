@@ -1,10 +1,9 @@
 package uk.nbforge.gallifreyan_chronicles.loader;
 
-import uk.nbforge.gallifreyan_chronicles.Constants;
-import uk.nbforge.gallifreyan_chronicles.loader.GCJsonReloadListener;
 import net.fabricmc.fabric.api.resource.v1.ResourceLoader;
 import net.minecraft.resources.Identifier;
 import net.minecraft.server.packs.PackType;
+import uk.nbforge.gallifreyan_chronicles.Constants;
 
 public final class GCFabricLoaders {
     private GCFabricLoaders() {}

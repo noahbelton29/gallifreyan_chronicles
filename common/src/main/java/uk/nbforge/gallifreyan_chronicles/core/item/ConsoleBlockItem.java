@@ -1,26 +1,22 @@
 package uk.nbforge.gallifreyan_chronicles.core.item;
 
-import uk.nbforge.gallifreyan_chronicles.util.GCUtil;
-
-import uk.nbforge.gallifreyan_chronicles.core.GCDataComponents;
-import uk.nbforge.gallifreyan_chronicles.tardis.console.TardisConsole;
-import uk.nbforge.gallifreyan_chronicles.core.dynamic_registries.TardisConsoleRegistry;
-import uk.nbforge.gallifreyan_chronicles.tardis.console.TardisConsoleVariant;
-import net.minecraft.world.item.BlockItem;
-import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.level.block.Block;
-import org.jspecify.annotations.Nullable;
-
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
-
+import net.minecraft.world.item.BlockItem;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.block.Block;
+import org.jspecify.annotations.Nullable;
+import uk.nbforge.gallifreyan_chronicles.core.GCDataComponents;
+import uk.nbforge.gallifreyan_chronicles.core.dynamic_registries.TardisConsoleRegistry;
 import uk.nbforge.gallifreyan_chronicles.core.item.tooltip.ItemInfoTooltip;
+import uk.nbforge.gallifreyan_chronicles.tardis.console.TardisConsole;
+import uk.nbforge.gallifreyan_chronicles.tardis.console.TardisConsoleVariant;
+import uk.nbforge.gallifreyan_chronicles.util.GCUtil;
 
 public class ConsoleBlockItem extends BlockItem implements ScrollSelectable {
-    private record Entry(String consoleId, @Nullable String variantId) {
-    }
+    private record Entry(String consoleId, @Nullable String variantId) {}
 
     public ConsoleBlockItem(Block block, Properties properties) {
         super(block, properties.component(GCDataComponents.ITEM_INFO, ItemInfoTooltip.CONSOLE));
@@ -36,17 +32,10 @@ public class ConsoleBlockItem extends BlockItem implements ScrollSelectable {
     }
 
     private static final List<String> CONSOLE_ORDER = List.of(
-            "brachacki_console",
-            "second_doctors_console_alt",
-            "inferno_console",
-            "ambassadors_of_death_console"
-    );
+            "brachacki_console", "second_doctors_console_alt", "inferno_console", "ambassadors_of_death_console");
 
-    private static final List<String> VARIANT_ORDER = List.of(
-            "first_doctors_console",
-            "second_doctors_console",
-            "tuat_console"
-    );
+    private static final List<String> VARIANT_ORDER =
+            List.of("first_doctors_console", "second_doctors_console", "tuat_console");
 
     private static String localId(String id) {
         return GCUtil.localPath(id);
@@ -68,8 +57,9 @@ public class ConsoleBlockItem extends BlockItem implements ScrollSelectable {
                 entries.add(new Entry(console.id(), null));
             } else {
                 List<TardisConsoleVariant> variants = new ArrayList<>(console.variants());
-                variants.sort(Comparator.comparingInt((TardisConsoleVariant v) -> orderIndex(VARIANT_ORDER, v.localId()))
-                        .thenComparing(TardisConsoleVariant::localId));
+                variants.sort(
+                        Comparator.comparingInt((TardisConsoleVariant v) -> orderIndex(VARIANT_ORDER, v.localId()))
+                                .thenComparing(TardisConsoleVariant::localId));
                 for (TardisConsoleVariant variant : variants) {
                     entries.add(new Entry(console.id(), variant.localId()));
                 }
@@ -99,9 +89,9 @@ public class ConsoleBlockItem extends BlockItem implements ScrollSelectable {
     }
 
     /**
-       Moves the selected console and variant forward or back by step, wrapping round at the ends.
-       Returns false when there is nothing to switch between.
-    */
+     * Moves the selected console and variant forward or back by step, wrapping round at the ends.
+     * Returns false when there is nothing to switch between.
+     */
     @Override
     public boolean cycleSelection(ItemStack stack, int step) {
         List<Entry> entries = entries();

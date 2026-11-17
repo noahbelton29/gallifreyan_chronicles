@@ -5,14 +5,6 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.mojang.blaze3d.platform.NativeImage;
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.texture.DynamicTexture;
-import net.minecraft.resources.Identifier;
-import net.minecraft.server.packs.resources.ResourceManager;
-import uk.nbforge.gallifreyan_chronicles.Constants;
-import uk.nbforge.gallifreyan_chronicles.core.block.DoorRoundelInteraction;
-import uk.nbforge.gallifreyan_chronicles.util.GCUtil;
-
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
@@ -23,7 +15,13 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
-
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.renderer.texture.DynamicTexture;
+import net.minecraft.resources.Identifier;
+import net.minecraft.server.packs.resources.ResourceManager;
+import uk.nbforge.gallifreyan_chronicles.Constants;
+import uk.nbforge.gallifreyan_chronicles.core.block.DoorRoundelInteraction;
+import uk.nbforge.gallifreyan_chronicles.util.GCUtil;
 
 public final class DoorRoundelTextures {
     private static final int BLOCK_PIXELS = 16;
@@ -34,8 +32,7 @@ public final class DoorRoundelTextures {
     private static final Map<String, Long> LAST_FAILURE = new HashMap<>();
     private static final long RETRY_MS = 5000L;
 
-    private DoorRoundelTextures() {
-    }
+    private DoorRoundelTextures() {}
 
     /**
      * the texture to draw this door with: base with the roundel painted on, or base itself if it can't be built
@@ -46,7 +43,7 @@ public final class DoorRoundelTextures {
         if (cached != null) return cached;
 
         /* a failed build isn't remembered for good, so fixing the cause needs no restart, but it isn't retried
-           every frame either */
+        every frame either */
         long now = System.currentTimeMillis();
         Long lastFailure = LAST_FAILURE.get(key);
         if (lastFailure != null && now - lastFailure < RETRY_MS) return baseTexture;
@@ -60,8 +57,7 @@ public final class DoorRoundelTextures {
         return built;
     }
 
-    private record Leaf(int width, int height, int depth, int u, int v) {
-    }
+    private record Leaf(int width, int height, int depth, int u, int v) {}
 
     private static Identifier build(Identifier model, Identifier baseTexture, String roundelBlockId, String key) {
         ResourceManager resources = Minecraft.getInstance().getResourceManager();
@@ -73,13 +69,15 @@ public final class DoorRoundelTextures {
         Identifier wallId = wallTexture(resources, block);
 
         try (InputStream baseIn = resources.open(baseTexture);
-             InputStream roundelIn = resources.open(roundelId);
-             InputStream geoIn = resources.open(geo);
-             NativeImage roundel = NativeImage.read(roundelIn)) {
+                InputStream roundelIn = resources.open(roundelId);
+                InputStream geoIn = resources.open(geo);
+                NativeImage roundel = NativeImage.read(roundelIn)) {
             NativeImage image = NativeImage.read(baseIn);
-            List<Leaf> leaves = leaves(JsonParser.parseReader(new InputStreamReader(geoIn, StandardCharsets.UTF_8)).getAsJsonObject());
+            List<Leaf> leaves = leaves(JsonParser.parseReader(new InputStreamReader(geoIn, StandardCharsets.UTF_8))
+                    .getAsJsonObject());
             if (leaves.isEmpty()) {
-                Constants.LOG.warn("No door leaves found in model {}, so {} can't be painted on it", model, roundelBlockId);
+                Constants.LOG.warn(
+                        "No door leaves found in model {}, so {} can't be painted on it", model, roundelBlockId);
                 image.close();
                 return baseTexture;
             }
@@ -89,19 +87,26 @@ public final class DoorRoundelTextures {
                 try (InputStream wallIn = resources.open(wallId)) {
                     wall = NativeImage.read(wallIn);
                 } catch (Exception e) {
-                    Constants.LOG.warn("Could not read wall block texture {} for door style {}", wallId, roundelBlockId, e);
+                    Constants.LOG.warn(
+                            "Could not read wall block texture {} for door style {}", wallId, roundelBlockId, e);
                 }
             }
 
             paint(image, roundel, wall, leaves);
             if (wall != null) wall.close();
-            Constants.LOG.info("Built door texture for {} (wall block {}) on {}, {} leaves painted", roundelBlockId,
-                    wallId, baseTexture, leaves.size());
+            Constants.LOG.info(
+                    "Built door texture for {} (wall block {}) on {}, {} leaves painted",
+                    roundelBlockId,
+                    wallId,
+                    baseTexture,
+                    leaves.size());
             dump(image, block);
 
-            Identifier id = GCUtil.modIdentifier("dynamic/door_roundel/"
-                    + Integer.toHexString(key.hashCode()) + "_" + sanitize(block.getPath()));
-            Minecraft.getInstance().getTextureManager().register(id, new DynamicTexture(() -> "GC door roundel " + id, image));
+            Identifier id = GCUtil.modIdentifier(
+                    "dynamic/door_roundel/" + Integer.toHexString(key.hashCode()) + "_" + sanitize(block.getPath()));
+            Minecraft.getInstance()
+                    .getTextureManager()
+                    .register(id, new DynamicTexture(() -> "GC door roundel " + id, image));
             return id;
         } catch (Exception e) {
             Constants.LOG.warn("Could not build a door texture from {} on {}", roundelBlockId, baseTexture, e);
@@ -110,7 +115,7 @@ public final class DoorRoundelTextures {
     }
 
     /* the plain block this roundel block is the roundel version of: brachacki_roundel_block_4 -> brachacki_wall_block_4,
-       oak_half_roundel_block -> oak planks, gray_concrete_roundel_block -> gray concrete */
+    oak_half_roundel_block -> oak planks, gray_concrete_roundel_block -> gray concrete */
     private static Identifier wallTexture(ResourceManager resources, Identifier roundelBlock) {
         for (Identifier candidate : DoorRoundelInteraction.wallBlockCandidates(roundelBlock)) {
             Identifier texture = candidate.withPrefix("textures/block/").withSuffix(".png");
@@ -135,7 +140,8 @@ public final class DoorRoundelTextures {
                 if (!cube.has("uv") || !cube.get("uv").isJsonArray()) continue;
                 if (cube.has("rotation")) {
                     JsonArray rotation = cube.getAsJsonArray("rotation");
-                    boolean flat = Math.abs(rotation.get(0).getAsFloat()) < 0.01F && Math.abs(rotation.get(2).getAsFloat()) < 0.01F;
+                    boolean flat = Math.abs(rotation.get(0).getAsFloat()) < 0.01F
+                            && Math.abs(rotation.get(2).getAsFloat()) < 0.01F;
                     float yaw = Math.abs(rotation.get(1).getAsFloat()) % 360F;
                     if (!flat || (yaw > 0.01F && Math.abs(yaw - 180F) > 0.01F)) continue;
                 }
@@ -145,15 +151,16 @@ public final class DoorRoundelTextures {
                 int height = Math.round(size.get(1).getAsFloat());
                 int depth = Math.round(size.get(2).getAsFloat());
                 if (width < MIN_LEAF_WIDTH || height < MIN_LEAF_HEIGHT) continue;
-                result.add(new Leaf(width, height, depth, uv.get(0).getAsInt(), uv.get(1).getAsInt()));
+                result.add(new Leaf(
+                        width, height, depth, uv.get(0).getAsInt(), uv.get(1).getAsInt()));
             }
         }
         return result;
     }
 
     /* box uv layout, left to right on the row below the top and bottom faces:
-       west (d wide), north (w wide), east (d wide), south (w wide), each h tall. top and bottom (w wide, d tall) sit
-       on the row above, at the north and east columns. */
+    west (d wide), north (w wide), east (d wide), south (w wide), each h tall. top and bottom (w wide, d tall) sit
+    on the row above, at the north and east columns. */
     private static void paint(NativeImage image, NativeImage roundel, NativeImage wall, List<Leaf> leaves) {
         for (Leaf leaf : leaves) {
             int w = leaf.width();
@@ -174,8 +181,8 @@ public final class DoorRoundelTextures {
     }
 
     /* copies the top left of the block texture into a rectangle of the atlas, repeating it down for tall faces, so a
-       face that is half a block wide shows the left half of the block and one that is half a block tall shows
-       the top half */
+    face that is half a block wide shows the left half of the block and one that is half a block tall shows
+    the top half */
     private static void fill(NativeImage image, NativeImage tile, int x, int y, int width, int height) {
         int tileW = tile.getWidth();
         int tileH = tile.getHeight();

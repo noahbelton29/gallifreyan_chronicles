@@ -1,13 +1,11 @@
 package uk.nbforge.gallifreyan_chronicles.core.dynamic_registries;
 
-import uk.nbforge.gallifreyan_chronicles.Constants;
-import org.jspecify.annotations.Nullable;
-
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentSkipListMap;
-
+import org.jspecify.annotations.Nullable;
+import uk.nbforge.gallifreyan_chronicles.Constants;
 import uk.nbforge.gallifreyan_chronicles.tardis.console.TardisConsole;
 import uk.nbforge.gallifreyan_chronicles.tardis.console.TardisConsoleVariant;
 
@@ -20,8 +18,7 @@ public class TardisConsoleRegistry {
     private static TardisConsole defaultConsole;
     private static final Map<String, TardisConsoleVariant> VARIANTS = new ConcurrentSkipListMap<>();
 
-    private TardisConsoleRegistry() {
-    }
+    private TardisConsoleRegistry() {}
 
     public static void clear() {
         REGISTRY.clear();
@@ -91,16 +88,22 @@ public class TardisConsoleRegistry {
         for (TardisConsoleVariant variant : VARIANTS.values()) {
             TardisConsole parent = REGISTRY.getById(variant.parent());
             if (parent == null) {
-                Constants.LOG.warn("Console variant '{}' has unknown parent '{}'; it will not be usable",
-                        variant.id(), variant.parent());
+                Constants.LOG.warn(
+                        "Console variant '{}' has unknown parent '{}'; it will not be usable",
+                        variant.id(),
+                        variant.parent());
                 continue;
             }
 
             for (String group : variant.glowTextures().keySet()) {
-                boolean known = parent.glowGroups().stream().anyMatch(g -> g.name().equals(group));
+                boolean known =
+                        parent.glowGroups().stream().anyMatch(g -> g.name().equals(group));
                 if (!known) {
-                    Constants.LOG.warn("Console variant '{}' overrides glow group '{}' which '{}' does not define",
-                            variant.id(), group, parent.id());
+                    Constants.LOG.warn(
+                            "Console variant '{}' overrides glow group '{}' which '{}' does not define",
+                            variant.id(),
+                            group,
+                            parent.id());
                 }
             }
         }

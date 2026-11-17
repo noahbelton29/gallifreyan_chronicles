@@ -1,12 +1,11 @@
 package uk.nbforge.gallifreyan_chronicles.client.gui.hud;
 
-import uk.nbforge.gallifreyan_chronicles.network.tardis.TardisAlarmPayload;
-import uk.nbforge.gallifreyan_chronicles.tardis.mind.mood.TardisAlarm;
-import net.minecraft.resources.ResourceKey;
-import net.minecraft.world.level.Level;
-
 import java.util.HashMap;
 import java.util.Map;
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.world.level.Level;
+import uk.nbforge.gallifreyan_chronicles.network.tardis.TardisAlarmPayload;
+import uk.nbforge.gallifreyan_chronicles.tardis.mind.mood.TardisAlarm;
 
 public final class GCDangerAlarm {
     private static final long FLASH_NANOS = TardisAlarm.FLASH_TICKS * 50_000_000L;
@@ -19,8 +18,7 @@ public final class GCDangerAlarm {
         long lastHeardNanos;
     }
 
-    private GCDangerAlarm() {
-    }
+    private GCDangerAlarm() {}
 
     public static void start(int count, ResourceKey<Level> dimension) {
         if (count == TardisAlarmPayload.STOP) {

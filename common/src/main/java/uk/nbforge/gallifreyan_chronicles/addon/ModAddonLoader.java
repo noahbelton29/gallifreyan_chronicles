@@ -1,24 +1,22 @@
 package uk.nbforge.gallifreyan_chronicles.addon;
 
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.Map;
 import uk.nbforge.gallifreyan_chronicles.Constants;
 import uk.nbforge.gallifreyan_chronicles.addon.api.AddonApi;
 import uk.nbforge.gallifreyan_chronicles.addon.api.GCAddon;
 import uk.nbforge.gallifreyan_chronicles.platform.Services;
 
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.Map;
-
 /**
-   Starts the addons that are real mods.
-   The loader already loaded their jars and we call each one while we register our own things.
-*/
+ * Starts the addons that are real mods.
+ * The loader already loaded their jars and we call each one while we register our own things.
+ */
 final class ModAddonLoader {
     private static final Map<String, GCAddon> LOADED = new LinkedHashMap<>();
     private static final Map<String, String> FAILURES = new HashMap<>();
 
-    private ModAddonLoader() {
-    }
+    private ModAddonLoader() {}
 
     static synchronized void load() {
         for (ModAddonEntry entry : Services.PLATFORM.findModAddons()) {
@@ -41,7 +39,9 @@ final class ModAddonLoader {
                 Constants.LOG.info("Started addon '{}' (addon API {})", entry.modId(), AddonApi.VERSION);
             } catch (Throwable t) {
                 if (t instanceof VirtualMachineError error) throw error;
-                Throwable cause = t instanceof java.lang.reflect.InvocationTargetException && t.getCause() != null ? t.getCause() : t;
+                Throwable cause = t instanceof java.lang.reflect.InvocationTargetException && t.getCause() != null
+                        ? t.getCause()
+                        : t;
                 Constants.LOG.error("Addon '{}' failed to start", entry.modId(), cause);
                 FAILURES.put(entry.modId(), cause.getClass().getSimpleName() + ": " + cause.getMessage());
             }

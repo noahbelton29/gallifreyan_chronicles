@@ -1,11 +1,5 @@
 package uk.nbforge.gallifreyan_chronicles.core.block_entities;
 
-import uk.nbforge.gallifreyan_chronicles.util.BlockEntitySyncUtil;
-
-import java.util.Optional;
-
-import uk.nbforge.gallifreyan_chronicles.tardis.TardisApi;
-import uk.nbforge.gallifreyan_chronicles.tardis.Tardis;
 import com.geckolib.animatable.GeoBlockEntity;
 import com.geckolib.animatable.instance.AnimatableInstanceCache;
 import com.geckolib.animatable.manager.AnimatableManager;
@@ -13,54 +7,58 @@ import com.geckolib.animation.AnimationController;
 import com.geckolib.animation.RawAnimation;
 import com.geckolib.animation.object.PlayState;
 import com.geckolib.util.GeckoLibUtil;
-import uk.nbforge.gallifreyan_chronicles.core.block.InteriorDoorBlock;
-import uk.nbforge.gallifreyan_chronicles.compat.portal.TardisPortalBridge;
-import uk.nbforge.gallifreyan_chronicles.ecs.ComponentHolder;
-import uk.nbforge.gallifreyan_chronicles.ecs.ComponentStore;
-import uk.nbforge.gallifreyan_chronicles.ecs.ComponentType;
-import uk.nbforge.gallifreyan_chronicles.ecs.Entity;
-import uk.nbforge.gallifreyan_chronicles.core.GCSounds;
-import uk.nbforge.gallifreyan_chronicles.tardis.ecs.TardisComponentTypes;
-import uk.nbforge.gallifreyan_chronicles.core.dynamic_registries.TardisDoorRegistry;
-import uk.nbforge.gallifreyan_chronicles.tardis.door.TardisDoorVariant;
-import uk.nbforge.gallifreyan_chronicles.tardis.ecs.component.DoorState;
-import uk.nbforge.gallifreyan_chronicles.tardis.ecs.component.DoorVariantComponent;
-import uk.nbforge.gallifreyan_chronicles.tardis.ecs.system.DoorSyncSystem;
-import uk.nbforge.gallifreyan_chronicles.tardis.ecs.system.DoorSystem;
-import uk.nbforge.gallifreyan_chronicles.tardis.ecs.system.TardisInteriorSystem;
+import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
+import java.util.function.Supplier;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.Holder;
 import net.minecraft.core.HolderLookup;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.protocol.Packet;
 import net.minecraft.network.protocol.game.ClientGamePacketListener;
 import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
+import net.minecraft.resources.Identifier;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.resources.Identifier;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.level.storage.ValueInput;
 import net.minecraft.world.level.storage.ValueOutput;
+import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.NotNull;
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
-
-import java.util.List;
-import java.util.UUID;
-import java.util.function.Supplier;
+import uk.nbforge.gallifreyan_chronicles.compat.portal.TardisPortalBridge;
+import uk.nbforge.gallifreyan_chronicles.core.GCSounds;
+import uk.nbforge.gallifreyan_chronicles.core.block.InteriorDoorBlock;
+import uk.nbforge.gallifreyan_chronicles.core.dynamic_registries.TardisDoorRegistry;
+import uk.nbforge.gallifreyan_chronicles.ecs.ComponentHolder;
+import uk.nbforge.gallifreyan_chronicles.ecs.ComponentStore;
+import uk.nbforge.gallifreyan_chronicles.ecs.ComponentType;
+import uk.nbforge.gallifreyan_chronicles.ecs.Entity;
+import uk.nbforge.gallifreyan_chronicles.tardis.Tardis;
+import uk.nbforge.gallifreyan_chronicles.tardis.TardisApi;
+import uk.nbforge.gallifreyan_chronicles.tardis.door.TardisDoorVariant;
+import uk.nbforge.gallifreyan_chronicles.tardis.ecs.TardisComponentTypes;
+import uk.nbforge.gallifreyan_chronicles.tardis.ecs.component.DoorState;
+import uk.nbforge.gallifreyan_chronicles.tardis.ecs.component.DoorVariantComponent;
+import uk.nbforge.gallifreyan_chronicles.tardis.ecs.system.DoorSyncSystem;
+import uk.nbforge.gallifreyan_chronicles.tardis.ecs.system.DoorSystem;
+import uk.nbforge.gallifreyan_chronicles.tardis.ecs.system.TardisInteriorSystem;
+import uk.nbforge.gallifreyan_chronicles.util.BlockEntitySyncUtil;
 
 public class InteriorDoorBlockEntity extends BlockEntity implements GeoBlockEntity, ComponentHolder {
     public static Supplier<BlockEntityType<InteriorDoorBlockEntity>> TYPE;
-    private static final List<ComponentType<?>> SAVED = List.of(TardisComponentTypes.DOOR, TardisComponentTypes.DOOR_VARIANT);
+    private static final List<ComponentType<?>> SAVED =
+            List.of(TardisComponentTypes.DOOR, TardisComponentTypes.DOOR_VARIANT);
 
     private final ComponentStore components = new ComponentStore();
     private AnimatableInstanceCache cache = GeckoLibUtil.createInstanceCache(this);
@@ -304,8 +302,8 @@ public class InteriorDoorBlockEntity extends BlockEntity implements GeoBlockEnti
         BlockState state = getBlockState();
         Direction facing = state.getValue(InteriorDoorBlock.FACING);
         Direction right = InteriorDoorBlock.rightDirectionOf(facing, InteriorDoorBlock.isFlipped(state));
-        BlockPos bottom = InteriorDoorBlock.isFlipped(state)
-                ? getBlockPos().below(InteriorDoorBlock.HEIGHT - 1) : getBlockPos();
+        BlockPos bottom =
+                InteriorDoorBlock.isFlipped(state) ? getBlockPos().below(InteriorDoorBlock.HEIGHT - 1) : getBlockPos();
         Vec3 centre = Vec3.atBottomCenterOf(bottom).add(right.getStepX() * 0.5, 0.0, right.getStepZ() * 0.5);
         return (player.getX() - centre.x) * facing.getStepX() + (player.getZ() - centre.z) * facing.getStepZ();
     }
@@ -340,9 +338,11 @@ public class InteriorDoorBlockEntity extends BlockEntity implements GeoBlockEnti
         double dy = player.getY() - centre.y;
         double depth = dx * facing.getStepX() + dz * facing.getStepZ();
         double lateral = dx * right.getStepX() + dz * right.getStepZ();
-        return depth >= EXIT_NEAR && depth <= EXIT_FAR
+        return depth >= EXIT_NEAR
+                && depth <= EXIT_FAR
                 && Math.abs(lateral) <= EXIT_HALF_WIDTH
-                && dy >= EXIT_BOTTOM && dy <= InteriorDoorBlock.HEIGHT;
+                && dy >= EXIT_BOTTOM
+                && dy <= InteriorDoorBlock.HEIGHT;
     }
 
     /**
@@ -358,8 +358,10 @@ public class InteriorDoorBlockEntity extends BlockEntity implements GeoBlockEnti
      */
     public void matchTardis(MinecraftServer server, UUID id) {
         if (!isLinked()) return;
-        TardisApi.get(server, id).flatMap(Tardis::exterior)
-                .map(exterior -> TardisDoorRegistry.interiorVariantForExterior(exterior.getExterior().id()))
+        TardisApi.get(server, id)
+                .flatMap(Tardis::exterior)
+                .map(exterior -> TardisDoorRegistry.interiorVariantForExterior(
+                        exterior.getExterior().id()))
                 .ifPresent(this::setDoorVariant);
     }
 
@@ -383,7 +385,8 @@ public class InteriorDoorBlockEntity extends BlockEntity implements GeoBlockEnti
     public void interact(boolean sneaking) {
         if (isOnCooldown()) return;
         // The lock still holds but the flight seal only guards the exterior door
-        // Inside, the door and its console control work in flight, the portal is already gone while travelling so nothing can walk out through it
+        // Inside, the door and its console control work in flight, the portal is already gone while travelling so
+        // nothing can walk out through it
         if (followsTardisLock() && isTardisLocked()) {
             announceLocked();
             return;
@@ -403,8 +406,13 @@ public class InteriorDoorBlockEntity extends BlockEntity implements GeoBlockEnti
             if (primary) {
                 DoorSyncSystem.syncInteriorDoorControl(serverLevel.getServer(), tardisId, result.state());
             } else {
-                DoorSyncSystem.onInteriorDoorChanged(serverLevel.getServer(), tardisId, this,
-                        result.state(), result.animationName(), result.opening());
+                DoorSyncSystem.onInteriorDoorChanged(
+                        serverLevel.getServer(),
+                        tardisId,
+                        this,
+                        result.state(),
+                        result.animationName(),
+                        result.opening());
             }
         }
     }
@@ -437,8 +445,11 @@ public class InteriorDoorBlockEntity extends BlockEntity implements GeoBlockEnti
     }
 
     public boolean isTardisLocked() {
-        return tardisApi().map(tardis -> tardis.isLocked()
-                        || tardis.exterior().map(TardisExteriorBlockEntity::hasKeyRendered).orElse(false))
+        return tardisApi()
+                .map(tardis -> tardis.isLocked()
+                        || tardis.exterior()
+                                .map(TardisExteriorBlockEntity::hasKeyRendered)
+                                .orElse(false))
                 .orElse(false);
     }
 
@@ -499,8 +510,12 @@ public class InteriorDoorBlockEntity extends BlockEntity implements GeoBlockEnti
      */
     private BlockPos soundPos() {
         if (level instanceof ServerLevel serverLevel) {
-            UUID id = tardisId != null ? tardisId : TardisApi.idOfLevel(serverLevel).orElse(null);
-            return TardisApi.get(serverLevel.getServer(), id).flatMap(Tardis::consolePos).orElse(getBlockPos());
+            UUID id = tardisId != null
+                    ? tardisId
+                    : TardisApi.idOfLevel(serverLevel).orElse(null);
+            return TardisApi.get(serverLevel.getServer(), id)
+                    .flatMap(Tardis::consolePos)
+                    .orElse(getBlockPos());
         }
         return getBlockPos();
     }
@@ -523,11 +538,21 @@ public class InteriorDoorBlockEntity extends BlockEntity implements GeoBlockEnti
      */
     private void playThroughExterior(SoundEvent sound) {
         if (!primary || !(level instanceof ServerLevel)) return;
-        TardisExteriorBlockEntity exterior = tardisApi().flatMap(Tardis::exterior).orElse(null);
+        TardisExteriorBlockEntity exterior =
+                tardisApi().flatMap(Tardis::exterior).orElse(null);
         if (exterior == null || !(exterior.getLevel() instanceof ServerLevel outside)) return;
         Vec3 door = Vec3.atBottomCenterOf(exterior.getBlockPos()).add(0.0, 1.0, 0.0);
-        Holder<SoundEvent> heard = Holder.direct(SoundEvent.createFixedRangeEvent(sound.location(), HEARD_OUTSIDE_RANGE));
-        outside.playSeededSound(null, door.x, door.y, door.z, heard, SoundSource.BLOCKS, 1.0f, 1.0f,
+        Holder<SoundEvent> heard =
+                Holder.direct(SoundEvent.createFixedRangeEvent(sound.location(), HEARD_OUTSIDE_RANGE));
+        outside.playSeededSound(
+                null,
+                door.x,
+                door.y,
+                door.z,
+                heard,
+                SoundSource.BLOCKS,
+                1.0f,
+                1.0f,
                 outside.getRandom().nextLong());
     }
 
@@ -601,8 +626,7 @@ public class InteriorDoorBlockEntity extends BlockEntity implements GeoBlockEnti
         int animSeq = input.getIntOr("DoorAnimSeq", 0);
         String anim = input.getStringOr("DoorAnim", "");
         boolean instant = input.getBooleanOr("DoorAnimInstant", false);
-        if (doorAnimSeqKnown && animSeq != doorAnimSeq && !anim.isEmpty()
-                && level != null && level.isClientSide()) {
+        if (doorAnimSeqKnown && animSeq != doorAnimSeq && !anim.isEmpty() && level != null && level.isClientSide()) {
             if (instant) {
                 startSnapClient();
             } else if (controller != null) {
@@ -637,7 +661,8 @@ public class InteriorDoorBlockEntity extends BlockEntity implements GeoBlockEnti
             }
             return PlayState.CONTINUE;
         });
-        controller.triggerableAnim("open_left", RawAnimation.begin().thenPlay("open_left"))
+        controller
+                .triggerableAnim("open_left", RawAnimation.begin().thenPlay("open_left"))
                 .triggerableAnim("open_right", RawAnimation.begin().thenPlay("open_right"))
                 .triggerableAnim("open_all", RawAnimation.begin().thenPlay("open_all"))
                 .triggerableAnim("close_left", RawAnimation.begin().thenPlay("close_left"))

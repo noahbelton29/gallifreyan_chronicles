@@ -1,9 +1,17 @@
 package uk.nbforge.gallifreyan_chronicles.command;
 
+import static net.minecraft.commands.Commands.argument;
+import static net.minecraft.commands.Commands.literal;
+import static uk.nbforge.gallifreyan_chronicles.util.CommandUtil.*;
+
 import com.mojang.brigadier.arguments.FloatArgumentType;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
+import java.util.List;
+import java.util.Optional;
+import net.minecraft.commands.CommandSourceStack;
+import net.minecraft.util.Mth;
 import uk.nbforge.gallifreyan_chronicles.core.block_entities.InteriorDoorBlockEntity;
 import uk.nbforge.gallifreyan_chronicles.core.block_entities.TardisConsoleBlockEntity;
 import uk.nbforge.gallifreyan_chronicles.core.block_entities.TardisExteriorBlockEntity;
@@ -12,15 +20,6 @@ import uk.nbforge.gallifreyan_chronicles.tardis.ecs.system.DoorSyncSystem;
 import uk.nbforge.gallifreyan_chronicles.tardis.ecs.system.TardisInteriorSystem;
 import uk.nbforge.gallifreyan_chronicles.tardis.flight.TardisTravel;
 import uk.nbforge.gallifreyan_chronicles.tardis.flight.crash.TardisDamage;
-import net.minecraft.commands.CommandSourceStack;
-import net.minecraft.util.Mth;
-
-import java.util.List;
-import java.util.Optional;
-
-import static uk.nbforge.gallifreyan_chronicles.util.CommandUtil.*;
-import static net.minecraft.commands.Commands.argument;
-import static net.minecraft.commands.Commands.literal;
 
 /**
  * Every low-level piece of TARDIS state, in one tree: bare = get, a trailing value = set.
@@ -35,8 +34,7 @@ public final class DataCommands {
     // Deliberately generous: this is meant to allow a silly number of seconds, not just a sane one.
     private static final float MAX_FLIGHT_SECONDS = 1_000_000f;
 
-    private DataCommands() {
-    }
+    private DataCommands() {}
 
     public static LiteralArgumentBuilder<CommandSourceStack> data() {
         return literal("data")
@@ -69,7 +67,8 @@ public final class DataCommands {
     }
 
     private static int getLocked(CommandContext<CommandSourceStack> ctx) throws CommandSyntaxException {
-        return withTardis(ctx, (tardis, idText) -> success(ctx, false, "get_locked", idText, String.valueOf(tardis.isLocked())));
+        return withTardis(
+                ctx, (tardis, idText) -> success(ctx, false, "get_locked", idText, String.valueOf(tardis.isLocked())));
     }
 
     private static int setLocked(CommandContext<CommandSourceStack> ctx, boolean locked) throws CommandSyntaxException {
@@ -93,11 +92,14 @@ public final class DataCommands {
     private static int getCloaked(CommandContext<CommandSourceStack> ctx) throws CommandSyntaxException {
         return withTardis(ctx, (tardis, idText) -> {
             Optional<TardisExteriorBlockEntity> be = tardis.exterior();
-            return be.map(tardisExteriorBlockEntity -> success(ctx, false, "get_cloaked", idText, String.valueOf(tardisExteriorBlockEntity.isCloaked()))).orElseGet(() -> fail(ctx, "no_exterior", idText));
+            return be.map(tardisExteriorBlockEntity -> success(
+                            ctx, false, "get_cloaked", idText, String.valueOf(tardisExteriorBlockEntity.isCloaked())))
+                    .orElseGet(() -> fail(ctx, "no_exterior", idText));
         });
     }
 
-    private static int setCloaked(CommandContext<CommandSourceStack> ctx, boolean cloaked) throws CommandSyntaxException {
+    private static int setCloaked(CommandContext<CommandSourceStack> ctx, boolean cloaked)
+            throws CommandSyntaxException {
         return withTardis(ctx, (tardis, idText) -> {
             Optional<TardisExteriorBlockEntity> be = tardis.exterior();
             if (be.isEmpty()) return fail(ctx, "no_exterior", idText);
@@ -112,14 +114,15 @@ public final class DataCommands {
     private static LiteralArgumentBuilder<CommandSourceStack> yawData() {
         return literal("yaw")
                 .executes(DataCommands::getYaw)
-                .then(argument("degrees", FloatArgumentType.floatArg())
-                        .executes(DataCommands::setYaw));
+                .then(argument("degrees", FloatArgumentType.floatArg()).executes(DataCommands::setYaw));
     }
 
     private static int getYaw(CommandContext<CommandSourceStack> ctx) throws CommandSyntaxException {
         return withTardis(ctx, (tardis, idText) -> {
             Optional<TardisExteriorBlockEntity> be = tardis.exterior();
-            return be.map(tardisExteriorBlockEntity -> success(ctx, false, "get_yaw", idText, String.valueOf(tardisExteriorBlockEntity.getYaw()))).orElseGet(() -> fail(ctx, "no_exterior", idText));
+            return be.map(tardisExteriorBlockEntity ->
+                            success(ctx, false, "get_yaw", idText, String.valueOf(tardisExteriorBlockEntity.getYaw())))
+                    .orElseGet(() -> fail(ctx, "no_exterior", idText));
         });
     }
 
@@ -144,10 +147,14 @@ public final class DataCommands {
     }
 
     private static int getCrashed(CommandContext<CommandSourceStack> ctx) throws CommandSyntaxException {
-        return withTardis(ctx, (tardis, idText) -> success(ctx, false, "get_crashed", idText, String.valueOf(TardisDamage.isCrashed(tardis))));
+        return withTardis(
+                ctx,
+                (tardis, idText) ->
+                        success(ctx, false, "get_crashed", idText, String.valueOf(TardisDamage.isCrashed(tardis))));
     }
 
-    private static int setCrashed(CommandContext<CommandSourceStack> ctx, boolean crashed) throws CommandSyntaxException {
+    private static int setCrashed(CommandContext<CommandSourceStack> ctx, boolean crashed)
+            throws CommandSyntaxException {
         return withTardis(ctx, (tardis, idText) -> {
             if (TardisDamage.isCrashed(tardis) == crashed)
                 return fail(ctx, "crashed_already", idText, String.valueOf(crashed));
@@ -181,7 +188,8 @@ public final class DataCommands {
         });
     }
 
-    private static int setFlightRemaining(CommandContext<CommandSourceStack> ctx, float seconds) throws CommandSyntaxException {
+    private static int setFlightRemaining(CommandContext<CommandSourceStack> ctx, float seconds)
+            throws CommandSyntaxException {
         return withTardis(ctx, (tardis, idText) -> {
             if (tardis.data().getFlightStart(tardis.id()) == null) return fail(ctx, "not_travelling", idText);
 
@@ -204,33 +212,81 @@ public final class DataCommands {
 
             Optional<TardisExteriorBlockEntity> exteriorAtResolved =
                     ExteriorCommands.exteriorAt(ctx, manager(ctx).resolveExteriorBlockPos(tardis.id()));
-            sendLine(ctx, dataLine("exterior", exteriorAtResolved.map(be -> stripModId(be.getExterior().id())).orElse("unknown")));
+            sendLine(
+                    ctx,
+                    dataLine(
+                            "exterior",
+                            exteriorAtResolved
+                                    .map(be -> stripModId(be.getExterior().id()))
+                                    .orElse("unknown")));
 
             Optional<TardisExteriorBlockEntity> exteriorAtRegistered =
                     ExteriorCommands.exteriorAt(ctx, manager(ctx).getRegisteredBlockPos(tardis.id()));
-            sendLine(ctx, dataLine("fade", exteriorAtRegistered.map(be -> stripModId(be.getFadeType().id())).orElse("unknown")));
-            sendLine(ctx, dataLine("glow", exteriorAtRegistered.map(be -> String.valueOf(be.isGlowing())).orElse("unknown")));
+            sendLine(
+                    ctx,
+                    dataLine(
+                            "fade",
+                            exteriorAtRegistered
+                                    .map(be -> stripModId(be.getFadeType().id()))
+                                    .orElse("unknown")));
+            sendLine(
+                    ctx,
+                    dataLine(
+                            "glow",
+                            exteriorAtRegistered
+                                    .map(be -> String.valueOf(be.isGlowing()))
+                                    .orElse("unknown")));
 
-            sendLine(ctx, dataLine("interior", stripModId(TardisInteriorSystem.getInteriorDefinition(tardis.server(), tardis.id()).id())));
+            sendLine(
+                    ctx,
+                    dataLine(
+                            "interior",
+                            stripModId(TardisInteriorSystem.getInteriorDefinition(tardis.server(), tardis.id())
+                                    .id())));
 
             List<InteriorDoorBlockEntity> doors = DoorSyncSystem.doorsOf(tardis.id());
-            sendLine(ctx, dataLine("door variant", doors.isEmpty() ? "none" : stripModId(doors.get(0).getDoorVariantId())));
+            sendLine(
+                    ctx,
+                    dataLine(
+                            "door variant",
+                            doors.isEmpty() ? "none" : stripModId(doors.get(0).getDoorVariantId())));
 
             Optional<TardisConsoleBlockEntity> console = ConsoleCommands.consoleOf(ctx, tardis.id());
-            sendLine(ctx, dataLine("console", console.map(be -> stripModId(be.getConsole().id())).orElse("unknown")));
-            sendLine(ctx, dataLine("console variant", console.map(be -> stripModId(be.getVariant())).orElse("unknown")));
+            sendLine(
+                    ctx,
+                    dataLine(
+                            "console",
+                            console.map(be -> stripModId(be.getConsole().id())).orElse("unknown")));
+            sendLine(
+                    ctx,
+                    dataLine(
+                            "console variant",
+                            console.map(be -> stripModId(be.getVariant())).orElse("unknown")));
 
             sendLine(ctx, dataLine("locked", String.valueOf(tardis.isLocked())));
 
             Optional<TardisExteriorBlockEntity> exterior = tardis.exterior();
-            sendLine(ctx, dataLine("cloaked", exterior.map(be -> String.valueOf(be.isCloaked())).orElse("unknown")));
-            sendLine(ctx, dataLine("yaw", exterior.map(be -> String.valueOf(be.getYaw())).orElse("unknown")));
+            sendLine(
+                    ctx,
+                    dataLine(
+                            "cloaked",
+                            exterior.map(be -> String.valueOf(be.isCloaked())).orElse("unknown")));
+            sendLine(
+                    ctx,
+                    dataLine(
+                            "yaw",
+                            exterior.map(be -> String.valueOf(be.getYaw())).orElse("unknown")));
 
             sendLine(ctx, dataLine("crashed", String.valueOf(TardisDamage.isCrashed(tardis))));
 
             Long flightStart = tardis.data().getFlightStart(tardis.id());
-            sendLine(ctx, dataLine("flight_remaining",
-                    flightStart == null ? "not travelling" : formatSeconds(TardisTravel.remainingTicks(tardis) / 20.0)));
+            sendLine(
+                    ctx,
+                    dataLine(
+                            "flight_remaining",
+                            flightStart == null
+                                    ? "not travelling"
+                                    : formatSeconds(TardisTravel.remainingTicks(tardis) / 20.0)));
             return 1;
         });
     }

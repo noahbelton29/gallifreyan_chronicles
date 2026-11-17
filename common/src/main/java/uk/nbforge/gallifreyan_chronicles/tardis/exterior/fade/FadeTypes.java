@@ -1,25 +1,22 @@
 package uk.nbforge.gallifreyan_chronicles.tardis.exterior.fade;
 
-import uk.nbforge.gallifreyan_chronicles.Constants;
-import org.jetbrains.annotations.Nullable;
-
 import java.util.Collection;
 import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import org.jetbrains.annotations.Nullable;
+import uk.nbforge.gallifreyan_chronicles.Constants;
 
 public final class FadeTypes {
     public static final String NEW_WHO_ID = Constants.MOD_ID + ":newwho";
     public static final String CLASSIC_WHO_ID = Constants.MOD_ID + ":classicwho";
 
     // The modern series fade with the pulse, used for new TARDISes and when a saved id is missing or unknown
-    public static final FadeType NEW_WHO =
-            new PulseFadeType(NEW_WHO_ID, FadeTiming.DEFAULT, 30.0f, 2.5f, 1.0f);
+    public static final FadeType NEW_WHO = new PulseFadeType(NEW_WHO_ID, FadeTiming.DEFAULT, 30.0f, 2.5f, 1.0f);
     // The classic series fade with no pulse
-    public static final FadeType CLASSIC_WHO =
-            new LinearFadeType(CLASSIC_WHO_ID, FadeTiming.DEFAULT, 1.0f);
+    public static final FadeType CLASSIC_WHO = new LinearFadeType(CLASSIC_WHO_ID, FadeTiming.DEFAULT, 1.0f);
     public static final FadeType DEFAULT = NEW_WHO;
 
     private static final Map<String, FadeType> BUILT_IN = new LinkedHashMap<>();
@@ -31,8 +28,7 @@ public final class FadeTypes {
         BUILT_IN.put(CLASSIC_WHO_ID, CLASSIC_WHO);
     }
 
-    private FadeTypes() {
-    }
+    private FadeTypes() {}
 
     public static String normalize(String id) {
         String lowered = id.toLowerCase(Locale.ROOT);

@@ -6,14 +6,16 @@ import uk.nbforge.gallifreyan_chronicles.tardis.mind.action.MindContext;
 import uk.nbforge.gallifreyan_chronicles.util.GCSparkUtil;
 
 /**
-   Size is small for a crackle, big for a burst or blast for an explosion.
-   The json fields are size and height.
-*/
+ * Size is small for a crackle, big for a burst or blast for an explosion.
+ * The json fields are size and height.
+ */
 public record SparksAction(Size size, double height) implements MindAction {
     public static final String TYPE = Constants.MOD_ID + ":sparks";
 
     public enum Size {
-        SMALL, BIG, BLAST
+        SMALL,
+        BIG,
+        BLAST
     }
 
     @Override

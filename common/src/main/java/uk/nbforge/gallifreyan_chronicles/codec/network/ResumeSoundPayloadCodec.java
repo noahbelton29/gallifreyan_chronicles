@@ -22,9 +22,7 @@ public final class ResumeSoundPayloadCodec {
             ResumeSoundPayload::pitch,
             ByteBufCodecs.FLOAT,
             ResumeSoundPayload::offsetSeconds,
-            ResumeSoundPayload::new
-    );
+            ResumeSoundPayload::new);
 
-    private ResumeSoundPayloadCodec() {
-    }
+    private ResumeSoundPayloadCodec() {}
 }

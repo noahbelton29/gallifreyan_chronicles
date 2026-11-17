@@ -7,8 +7,7 @@ public final class ShaderPackDetector {
     private static Object api;
     private static Method inUse;
 
-    private ShaderPackDetector() {
-    }
+    private ShaderPackDetector() {}
 
     public static boolean isShaderPackInUse() {
         if (!resolved) {

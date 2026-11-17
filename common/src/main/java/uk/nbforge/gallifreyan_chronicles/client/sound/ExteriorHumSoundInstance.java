@@ -1,14 +1,14 @@
 package uk.nbforge.gallifreyan_chronicles.client.sound;
 
-import uk.nbforge.gallifreyan_chronicles.core.block_entities.TardisExteriorBlockEntity;
+import net.minecraft.client.Minecraft;
 import uk.nbforge.gallifreyan_chronicles.config.GCConfig;
 import uk.nbforge.gallifreyan_chronicles.core.GCSounds;
-import net.minecraft.client.Minecraft;
+import uk.nbforge.gallifreyan_chronicles.core.block_entities.TardisExteriorBlockEntity;
 
 /**
-   The interior hum heard from outside the TARDIS.
-   With the doors shut only within 3 blocks and quieter and muffled, with them open within 6 blocks and clear.
-*/
+ * The interior hum heard from outside the TARDIS.
+ * With the doors shut only within 3 blocks and quieter and muffled, with them open within 6 blocks and clear.
+ */
 public class ExteriorHumSoundInstance extends ExteriorSoundInstance {
     private static final float OPEN_VOLUME = 0.6F;
     private static final float POWER_FADE_PER_TICK = 0.035F;

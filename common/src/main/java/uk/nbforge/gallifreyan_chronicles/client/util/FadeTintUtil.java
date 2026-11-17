@@ -1,8 +1,7 @@
 package uk.nbforge.gallifreyan_chronicles.client.util;
 
 public final class FadeTintUtil {
-    private FadeTintUtil() {
-    }
+    private FadeTintUtil() {}
 
     public static int of(float opacity) {
         float faded = 1.0f - opacity;

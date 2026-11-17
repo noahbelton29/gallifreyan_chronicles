@@ -1,10 +1,7 @@
 package uk.nbforge.gallifreyan_chronicles.tardis.security;
 
-import uk.nbforge.gallifreyan_chronicles.util.MessageUtil;
-import uk.nbforge.gallifreyan_chronicles.core.GCDataComponents;
-import uk.nbforge.gallifreyan_chronicles.core.GCItems;
-import uk.nbforge.gallifreyan_chronicles.tardis.Tardis;
-import uk.nbforge.gallifreyan_chronicles.tardis.TardisApi;
+import java.util.Optional;
+import java.util.UUID;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.InteractionHand;
@@ -13,13 +10,14 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
-
-import java.util.Optional;
-import java.util.UUID;
+import uk.nbforge.gallifreyan_chronicles.core.GCDataComponents;
+import uk.nbforge.gallifreyan_chronicles.core.GCItems;
+import uk.nbforge.gallifreyan_chronicles.tardis.Tardis;
+import uk.nbforge.gallifreyan_chronicles.tardis.TardisApi;
+import uk.nbforge.gallifreyan_chronicles.util.MessageUtil;
 
 public final class TardisTrust {
-    private TardisTrust() {
-    }
+    private TardisTrust() {}
 
     public static InteractionResult interact(Player clicker, Level level, InteractionHand hand, Entity entity) {
         if (hand != InteractionHand.MAIN_HAND || level.isClientSide()) return InteractionResult.PASS;

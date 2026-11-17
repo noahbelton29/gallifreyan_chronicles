@@ -1,9 +1,5 @@
 package uk.nbforge.gallifreyan_chronicles.tardis.flight.crash;
 
-import uk.nbforge.gallifreyan_chronicles.core.block_entities.TardisExteriorBlockEntity;
-import uk.nbforge.gallifreyan_chronicles.core.GCBlocks;
-import uk.nbforge.gallifreyan_chronicles.tardis.Tardis;
-import uk.nbforge.gallifreyan_chronicles.tardis.ecs.system.TardisLandingSystem;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.server.level.ServerLevel;
@@ -13,6 +9,10 @@ import net.minecraft.util.RandomSource;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
+import uk.nbforge.gallifreyan_chronicles.core.GCBlocks;
+import uk.nbforge.gallifreyan_chronicles.core.block_entities.TardisExteriorBlockEntity;
+import uk.nbforge.gallifreyan_chronicles.tardis.Tardis;
+import uk.nbforge.gallifreyan_chronicles.tardis.ecs.system.TardisLandingSystem;
 
 public final class TardisCrater {
     private static final int RADIUS = 12;
@@ -22,8 +22,7 @@ public final class TardisCrater {
     private static final float FIRE_CHANCE = 0.4F;
     private static final float LASTING_FIRE = 0.5F;
 
-    private TardisCrater() {
-    }
+    private TardisCrater() {}
 
     public static void blast(Tardis tardis) {
         TardisExteriorBlockEntity exterior = tardis.exteriorIfLoaded().orElse(null);
@@ -60,14 +59,15 @@ public final class TardisCrater {
     private static void blastEffects(ServerLevel level, BlockPos ground) {
         double x = ground.getX() + 0.5;
         double z = ground.getZ() + 0.5;
-        level.sendParticles(ParticleTypes.EXPLOSION_EMITTER, x, ground.getY() + 1, z,
-                6, RADIUS * 0.3, 1.0, RADIUS * 0.3, 0);
-        level.sendParticles(ParticleTypes.CAMPFIRE_SIGNAL_SMOKE, x, ground.getY(), z,
-                30, RADIUS * 0.4, 1.0, RADIUS * 0.4, 0.02);
+        level.sendParticles(
+                ParticleTypes.EXPLOSION_EMITTER, x, ground.getY() + 1, z, 6, RADIUS * 0.3, 1.0, RADIUS * 0.3, 0);
+        level.sendParticles(
+                ParticleTypes.CAMPFIRE_SIGNAL_SMOKE, x, ground.getY(), z, 30, RADIUS * 0.4, 1.0, RADIUS * 0.4, 0.02);
         level.playSound(null, ground, SoundEvents.GENERIC_EXPLODE.value(), SoundSource.BLOCKS, 8.0F, 0.5F);
     }
 
-    private static void dropTardisIn(Tardis tardis, TardisExteriorBlockEntity exterior, ServerLevel level, BlockPos ground) {
+    private static void dropTardisIn(
+            Tardis tardis, TardisExteriorBlockEntity exterior, ServerLevel level, BlockPos ground) {
         BlockPos floor = TardisLandingSystem.findLandingSpot(level, ground.below(DEPTH));
         if (!floor.equals(exterior.getBlockPos())) {
             TardisLandingSystem.moveExterior(tardis, level, floor);
@@ -80,8 +80,11 @@ public final class TardisCrater {
     }
 
     private static boolean breakable(ServerLevel level, BlockPos pos, BlockState state) {
-        return !state.isAir() && state.getDestroySpeed(level, pos) >= 0 && level.getBlockEntity(pos) == null
-                && !state.is(GCBlocks.TARDIS) && !state.is(GCBlocks.TARDIS_TOP);
+        return !state.isAir()
+                && state.getDestroySpeed(level, pos) >= 0
+                && level.getBlockEntity(pos) == null
+                && !state.is(GCBlocks.TARDIS)
+                && !state.is(GCBlocks.TARDIS_TOP);
     }
 
     private static void clear(ServerLevel level, BlockPos pos) {
@@ -95,7 +98,8 @@ public final class TardisCrater {
         if (level.isOutsideBuildHeight(floor)) return;
         if (!breakable(level, floor, level.getBlockState(floor))) return;
 
-        boolean onFire = random.nextFloat() < FIRE_CHANCE && level.getBlockState(floor.above()).isAir();
+        boolean onFire = random.nextFloat() < FIRE_CHANCE
+                && level.getBlockState(floor.above()).isAir();
         if (onFire) {
             level.setBlock(floor, randomFireBase(random), Block.UPDATE_CLIENTS);
             level.setBlock(floor.above(), Blocks.FIRE.defaultBlockState(), Block.UPDATE_ALL);
@@ -129,7 +133,8 @@ public final class TardisCrater {
                 if (!onRim || random.nextFloat() > 0.4F) continue;
 
                 BlockPos place = surfaceNear(level, ground.offset(dx, 0, dz)).above();
-                if (level.isOutsideBuildHeight(place) || !level.getBlockState(place).canBeReplaced()) continue;
+                if (level.isOutsideBuildHeight(place)
+                        || !level.getBlockState(place).canBeReplaced()) continue;
                 level.setBlock(place, randomRubble(random), Block.UPDATE_ALL);
             }
         }

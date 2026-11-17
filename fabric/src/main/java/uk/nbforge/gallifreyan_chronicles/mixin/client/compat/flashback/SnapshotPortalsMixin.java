@@ -1,9 +1,6 @@
 package uk.nbforge.gallifreyan_chronicles.mixin.client.compat.flashback;
 
-import uk.nbforge.gallifreyan_chronicles.compat.flashback.FlashbackChunks;
-
 import java.util.function.Consumer;
-
 import net.minecraft.network.protocol.Packet;
 import net.minecraft.network.protocol.game.ClientGamePacketListener;
 import org.spongepowered.asm.mixin.Mixin;
@@ -11,6 +8,7 @@ import org.spongepowered.asm.mixin.Pseudo;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+import uk.nbforge.gallifreyan_chronicles.compat.flashback.FlashbackChunks;
 
 /** Flashback calls this empty method while writing a snapshot so mods can add packets, we add the portals, see FlashbackPortalSnapshot. */
 @Pseudo

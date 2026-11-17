@@ -1,26 +1,24 @@
 package uk.nbforge.gallifreyan_chronicles.mixin.server;
 
-import uk.nbforge.gallifreyan_chronicles.tardis.mind.mood.TardisAlarm;
-import uk.nbforge.gallifreyan_chronicles.tardis.mind.fright.TardisFright;
-
-import uk.nbforge.gallifreyan_chronicles.compat.voicechat.TardisVoiceLinks;
-import uk.nbforge.gallifreyan_chronicles.compat.portal.TardisPortalBridge;
-import uk.nbforge.gallifreyan_chronicles.tardis.key.TardisKeyLocator;
-import uk.nbforge.gallifreyan_chronicles.tardis.ecs.system.ConsoleSyncSystem;
-import uk.nbforge.gallifreyan_chronicles.tardis.TardisDimensionManager;
-import uk.nbforge.gallifreyan_chronicles.tardis.manager.deletion.TardisDeletion;
-import uk.nbforge.gallifreyan_chronicles.util.GCSchedulerUtil;
-import uk.nbforge.gallifreyan_chronicles.core.lifecycle.CiBootTest;
-import uk.nbforge.gallifreyan_chronicles.core.lifecycle.ServerLifecycleHandler;
-import uk.nbforge.gallifreyan_chronicles.core.sound.timed.TimedSounds;
+import java.util.function.BooleanSupplier;
 import net.minecraft.server.MinecraftServer;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
-
-import java.util.function.BooleanSupplier;
+import uk.nbforge.gallifreyan_chronicles.compat.portal.TardisPortalBridge;
+import uk.nbforge.gallifreyan_chronicles.compat.voicechat.TardisVoiceLinks;
+import uk.nbforge.gallifreyan_chronicles.core.lifecycle.CiBootTest;
+import uk.nbforge.gallifreyan_chronicles.core.lifecycle.ServerLifecycleHandler;
+import uk.nbforge.gallifreyan_chronicles.core.sound.timed.TimedSounds;
+import uk.nbforge.gallifreyan_chronicles.tardis.TardisDimensionManager;
+import uk.nbforge.gallifreyan_chronicles.tardis.ecs.system.ConsoleSyncSystem;
+import uk.nbforge.gallifreyan_chronicles.tardis.key.TardisKeyLocator;
+import uk.nbforge.gallifreyan_chronicles.tardis.manager.deletion.TardisDeletion;
+import uk.nbforge.gallifreyan_chronicles.tardis.mind.fright.TardisFright;
+import uk.nbforge.gallifreyan_chronicles.tardis.mind.mood.TardisAlarm;
+import uk.nbforge.gallifreyan_chronicles.util.GCSchedulerUtil;
 
 @Mixin(MinecraftServer.class)
 public abstract class MinecraftServerMixin {

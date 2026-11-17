@@ -14,12 +14,11 @@ import uk.nbforge.gallifreyan_chronicles.config.GCConfig;
 public final class GCKeyMappings {
     private static @Nullable KeyMapping showControlNames;
 
-    private GCKeyMappings() {
-    }
+    private GCKeyMappings() {}
 
     public static KeyMapping createShowControlNames(KeyMapping.Category category) {
-        showControlNames = new KeyMapping("key.gallifreyan_chronicles.show_control_names",
-                InputConstants.KEY_N, category);
+        showControlNames =
+                new KeyMapping("key.gallifreyan_chronicles.show_control_names", InputConstants.KEY_N, category);
         return showControlNames;
     }
 
@@ -35,9 +34,10 @@ public final class GCKeyMappings {
             GCConfig.setShowControlNames(on);
             GCConfig.saveSoon();
             if (minecraft.player != null) {
-                minecraft.player.sendOverlayMessage(Component.translatable(on
-                        ? "message.gallifreyan_chronicles.control_names_on"
-                        : "message.gallifreyan_chronicles.control_names_off"));
+                minecraft.player.sendOverlayMessage(Component.translatable(
+                        on
+                                ? "message.gallifreyan_chronicles.control_names_on"
+                                : "message.gallifreyan_chronicles.control_names_off"));
             }
         }
     }

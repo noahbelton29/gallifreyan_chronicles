@@ -4,17 +4,16 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
-import uk.nbforge.gallifreyan_chronicles.Constants;
-import uk.nbforge.gallifreyan_chronicles.core.data.IdentifiableData;
-import net.minecraft.resources.Identifier;
-import net.minecraft.world.phys.Vec3;
-
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import net.minecraft.resources.Identifier;
+import net.minecraft.world.phys.Vec3;
+import uk.nbforge.gallifreyan_chronicles.Constants;
+import uk.nbforge.gallifreyan_chronicles.core.data.IdentifiableData;
 
 public record TardisExterior(String id) implements IdentifiableData<TardisExterior> {
     public static final Vec3 DEFAULT_KEY_OFFSET = new Vec3(0.0, -0.925, 1.0);
@@ -27,9 +26,9 @@ public record TardisExterior(String id) implements IdentifiableData<TardisExteri
     }
 
     /**
-       Reads where the key bone sits in the model json of an exterior, the pivot is in sixteenths of a block and x is flipped.
-       It falls back to the default offset if the model or the bone is missing.
-    */
+     * Reads where the key bone sits in the model json of an exterior, the pivot is in sixteenths of a block and x is flipped.
+     * It falls back to the default offset if the model or the bone is missing.
+     */
     private static Vec3 readKeyBoneOffset(String exteriorId) {
         Identifier parsed = Identifier.tryParse(exteriorId);
         if (parsed == null) return DEFAULT_KEY_OFFSET;
@@ -39,7 +38,8 @@ public record TardisExterior(String id) implements IdentifiableData<TardisExteri
                 Constants.LOG.warn("No model {} found to read the key bone of exterior {}", resource, exteriorId);
                 return DEFAULT_KEY_OFFSET;
             }
-            JsonObject root = JsonParser.parseReader(new InputStreamReader(in, StandardCharsets.UTF_8)).getAsJsonObject();
+            JsonObject root = JsonParser.parseReader(new InputStreamReader(in, StandardCharsets.UTF_8))
+                    .getAsJsonObject();
             JsonArray geometries = root.getAsJsonArray("minecraft:geometry");
             if (geometries != null) {
                 for (JsonElement geometry : geometries) {
@@ -47,10 +47,12 @@ public record TardisExterior(String id) implements IdentifiableData<TardisExteri
                     if (bones == null) continue;
                     for (JsonElement boneElement : bones) {
                         JsonObject bone = boneElement.getAsJsonObject();
-                        if (!bone.has("name") || !KEY_BONE_NAME.equals(bone.get("name").getAsString())) continue;
+                        if (!bone.has("name")
+                                || !KEY_BONE_NAME.equals(bone.get("name").getAsString())) continue;
                         JsonArray pivot = bone.getAsJsonArray("pivot");
                         if (pivot == null || pivot.size() < 3) continue;
-                        return new Vec3(-pivot.get(0).getAsDouble() / 16.0,
+                        return new Vec3(
+                                -pivot.get(0).getAsDouble() / 16.0,
                                 pivot.get(1).getAsDouble() / 16.0 - 0.5,
                                 pivot.get(2).getAsDouble() / 16.0);
                     }

@@ -1,13 +1,13 @@
 package uk.nbforge.gallifreyan_chronicles.tardis.control;
 
 import com.mojang.serialization.MapCodec;
-import uk.nbforge.gallifreyan_chronicles.core.block_entities.TardisConsoleBlockEntity;
-import uk.nbforge.gallifreyan_chronicles.core.entity.TardisControlEntity;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
 import org.jspecify.annotations.Nullable;
+import uk.nbforge.gallifreyan_chronicles.core.block_entities.TardisConsoleBlockEntity;
+import uk.nbforge.gallifreyan_chronicles.core.entity.TardisControlEntity;
 
 public interface TardisControl {
     MapCodec<? extends TardisControl> codec();
@@ -17,11 +17,10 @@ public interface TardisControl {
     }
 
     /**
-       The sound this control makes when it is used.
-       It is played for you after a successful right click, and on consoles outside a TARDIS which only animate, so onRightClick does not need to play it.
-    */
-    default void playClickSound(TardisControlEntity entity) {
-    }
+     * The sound this control makes when it is used.
+     * It is played for you after a successful right click, and on consoles outside a TARDIS which only animate, so onRightClick does not need to play it.
+     */
+    default void playClickSound(TardisControlEntity entity) {}
 
     default boolean onLeftClick(TardisControlEntity entity, Player player) {
         return false;
@@ -39,6 +38,5 @@ public interface TardisControl {
         return false;
     }
 
-    default void onStateChanged(TardisConsoleBlockEntity console, boolean activated) {
-    }
+    default void onStateChanged(TardisConsoleBlockEntity console, boolean activated) {}
 }

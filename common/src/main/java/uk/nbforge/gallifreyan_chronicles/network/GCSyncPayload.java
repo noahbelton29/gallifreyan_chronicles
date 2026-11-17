@@ -1,21 +1,19 @@
 package uk.nbforge.gallifreyan_chronicles.network;
 
-import uk.nbforge.gallifreyan_chronicles.Constants;
-import uk.nbforge.gallifreyan_chronicles.core.data.IdentifiableData;
-
-import uk.nbforge.gallifreyan_chronicles.client.GCClientHooks;
-
 import java.util.Collection;
 import java.util.List;
 import java.util.Set;
-import java.util.stream.Collectors;
 import java.util.function.Consumer;
+import java.util.stream.Collectors;
+import uk.nbforge.gallifreyan_chronicles.Constants;
+import uk.nbforge.gallifreyan_chronicles.client.GCClientHooks;
+import uk.nbforge.gallifreyan_chronicles.core.data.IdentifiableData;
 
 public final class GCSyncPayload {
-    private GCSyncPayload() {
-    }
+    private GCSyncPayload() {}
 
-    public static <T extends IdentifiableData<T>> void apply(List<T> values, Runnable clear, Consumer<T> register, String label) {
+    public static <T extends IdentifiableData<T>> void apply(
+            List<T> values, Runnable clear, Consumer<T> register, String label) {
         clear.run();
         values.forEach(register);
         Constants.LOG.info("Synced {} {}(s) to client", values.size(), label);

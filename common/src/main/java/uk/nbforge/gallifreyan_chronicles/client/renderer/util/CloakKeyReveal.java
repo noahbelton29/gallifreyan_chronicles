@@ -1,17 +1,15 @@
 package uk.nbforge.gallifreyan_chronicles.client.renderer.util;
 
-import uk.nbforge.gallifreyan_chronicles.core.GCDataComponents;
-import uk.nbforge.gallifreyan_chronicles.core.GCItems;
+import java.util.UUID;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.item.ItemStack;
-
-import java.util.UUID;
+import uk.nbforge.gallifreyan_chronicles.core.GCDataComponents;
+import uk.nbforge.gallifreyan_chronicles.core.GCItems;
 
 public final class CloakKeyReveal {
-    private CloakKeyReveal() {
-    }
+    private CloakKeyReveal() {}
 
     public static boolean isHoldingKeyFor(UUID tardisId) {
         if (tardisId == null) return false;

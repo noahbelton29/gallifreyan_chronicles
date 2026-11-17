@@ -1,10 +1,10 @@
 package uk.nbforge.gallifreyan_chronicles.tardis.flight;
 
-import uk.nbforge.gallifreyan_chronicles.tardis.exterior.fade.FadeType;
-import uk.nbforge.gallifreyan_chronicles.tardis.codec.exterior.fade.FadeTypeKindCodec;
-import uk.nbforge.gallifreyan_chronicles.tardis.exterior.fade.FadeTypes;
 import net.minecraft.world.level.storage.ValueInput;
 import net.minecraft.world.level.storage.ValueOutput;
+import uk.nbforge.gallifreyan_chronicles.tardis.codec.exterior.fade.FadeTypeKindCodec;
+import uk.nbforge.gallifreyan_chronicles.tardis.exterior.fade.FadeType;
+import uk.nbforge.gallifreyan_chronicles.tardis.exterior.fade.FadeTypes;
 
 public final class ExteriorFlight {
     private static final long NO_FADE_START_TICK = Long.MIN_VALUE / 4;
@@ -166,8 +166,8 @@ public final class ExteriorFlight {
         inFlight = input.getBooleanOr("InFlight", false);
         fadeStartTick = input.getLongOr("FadeStartTick", NO_FADE_START_TICK);
         landAtTick = input.getLongOr("LandAtTick", -1L);
-        state = TardisFlightState.parse(input.getStringOr("FlightState", ""),
-                inFlight ? TardisFlightState.IN_VORTEX : TardisFlightState.IDLE);
+        state = TardisFlightState.parse(
+                input.getStringOr("FlightState", ""), inFlight ? TardisFlightState.IN_VORTEX : TardisFlightState.IDLE);
         stateEndTick = input.getLongOr("FlightStateEnd", 0L);
         quickFadeInTicks = input.getIntOr("QuickFadeIn", 0);
         String fadeId = input.getStringOr("FadeType", FadeTypes.DEFAULT.id());

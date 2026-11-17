@@ -6,7 +6,8 @@ import uk.nbforge.gallifreyan_chronicles.util.GCUtil;
 public class GCResourceLoaders {
     public static void registerResourceLoaders() {
         for (GCDataLoaders.Entry entry : GCDataLoaders.ALL) {
-            GCFabricLoaders.register(GCUtil.modIdentifier(entry.path()), entry.factory().get());
+            GCFabricLoaders.register(
+                    GCUtil.modIdentifier(entry.path()), entry.factory().get());
         }
 
         Constants.LOG.info("Registered GC Resource Loaders (Fabric)");

@@ -3,15 +3,12 @@ package uk.nbforge.gallifreyan_chronicles.tardis.codec.exterior.fade;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.DataResult;
 import com.mojang.serialization.MapCodec;
-
 import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Set;
 import java.util.function.Function;
 import uk.nbforge.gallifreyan_chronicles.tardis.exterior.fade.FadeType;
-import uk.nbforge.gallifreyan_chronicles.tardis.exterior.fade.LinearFadeType;
-import uk.nbforge.gallifreyan_chronicles.tardis.exterior.fade.PulseFadeType;
 
 public final class FadeTypeKindCodec {
     private static final Map<String, MapCodec<? extends FadeType>> KINDS = new LinkedHashMap<>();
@@ -22,8 +19,8 @@ public final class FadeTypeKindCodec {
                 MapCodec<? extends FadeType> codec = KINDS.get(id);
                 return codec != null
                         ? DataResult.<MapCodec<? extends FadeType>>success(codec)
-                        : DataResult.<MapCodec<? extends FadeType>>error(() -> "Unknown fade type: " + id
-                                + " (available: " + String.join(", ", KINDS.keySet()) + ")");
+                        : DataResult.<MapCodec<? extends FadeType>>error(() ->
+                                "Unknown fade type: " + id + " (available: " + String.join(", ", KINDS.keySet()) + ")");
             },
             codec -> {
                 String id = IDS.get(codec);
@@ -31,8 +28,7 @@ public final class FadeTypeKindCodec {
                     throw new IllegalStateException("Fade type is not registered: " + codec);
                 }
                 return id;
-            }
-    );
+            });
 
     public static final Codec<FadeType> CODEC = KIND_CODEC.dispatch("type", FadeType::codec, Function.identity());
 
@@ -41,8 +37,7 @@ public final class FadeTypeKindCodec {
         register("fade", FadeCodec.LINEAR);
     }
 
-    private FadeTypeKindCodec() {
-    }
+    private FadeTypeKindCodec() {}
 
     public static void register(String id, MapCodec<? extends FadeType> codec) {
         if (KINDS.putIfAbsent(id, codec) != null) {

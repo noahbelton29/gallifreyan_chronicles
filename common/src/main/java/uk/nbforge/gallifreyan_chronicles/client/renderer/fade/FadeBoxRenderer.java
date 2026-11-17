@@ -34,6 +34,7 @@ import uk.nbforge.gallifreyan_chronicles.Constants;
 import uk.nbforge.gallifreyan_chronicles.client.sky.SkyShaderCompat;
 import uk.nbforge.gallifreyan_chronicles.compat.portal.TardisPortalBridge;
 import uk.nbforge.gallifreyan_chronicles.util.GCUtil;
+import uk.nbforge.gallifreyan_chronicles.client.lifecycle.ClientState;
 
 /**
  * Draws a fading TARDIS on its own canvas, then lays the canvas over the world.
@@ -185,9 +186,9 @@ public final class FadeBoxRenderer {
                     .build());
 
     private static final Map<Identifier, RenderType> TYPES = new HashMap<>();
-    private static final List<Held> HELD = new ArrayList<>();
-    private static final List<Held> HELD_ORBS = new ArrayList<>();
-    private static final List<Held> HELD_GLOWS = new ArrayList<>();
+    private static final List<Held> HELD = ClientState.track(new ArrayList<>());
+    private static final List<Held> HELD_ORBS = ClientState.track(new ArrayList<>());
+    private static final List<Held> HELD_GLOWS = ClientState.track(new ArrayList<>());
     private static final Map<Identifier, RenderType> GLOW_TYPES = new HashMap<>();
     private static @Nullable TextureTarget canvas;
     private static boolean drawingOurOwn;

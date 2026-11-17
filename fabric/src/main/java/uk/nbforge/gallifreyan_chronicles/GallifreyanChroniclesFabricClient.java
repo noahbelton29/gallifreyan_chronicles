@@ -1,6 +1,7 @@
 package uk.nbforge.gallifreyan_chronicles;
 
 import net.fabricmc.api.ClientModInitializer;
+import net.fabricmc.fabric.api.client.networking.v1.ClientPlayConnectionEvents;
 import net.fabricmc.fabric.api.client.keymapping.v1.KeyMappingHelper;
 import net.fabricmc.fabric.api.client.rendering.v1.hud.HudElementRegistry;
 import net.fabricmc.fabric.api.client.rendering.v1.hud.VanillaHudElements;
@@ -27,10 +28,12 @@ import uk.nbforge.gallifreyan_chronicles.core.GCBlocks;
 import uk.nbforge.gallifreyan_chronicles.core.GCEntityTypes;
 import uk.nbforge.gallifreyan_chronicles.network.client.GCFabricClientNetworking;
 import uk.nbforge.gallifreyan_chronicles.util.GCUtil;
+import uk.nbforge.gallifreyan_chronicles.client.lifecycle.ClientState;
 
 public class GallifreyanChroniclesFabricClient implements ClientModInitializer {
     @Override
     public void onInitializeClient() {
+        ClientPlayConnectionEvents.DISCONNECT.register((handler, client) -> client.execute(ClientState::clearAll));
         WatermarkIdentity.enabled();
         //        BlockColorRegistry.register(
         //                List.of(BlockTintSources.constant(0xFF590a0a, 0xFF590a0a)),

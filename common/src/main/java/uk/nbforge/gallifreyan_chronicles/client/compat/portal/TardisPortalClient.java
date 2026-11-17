@@ -30,6 +30,7 @@ import uk.nbforge.gallifreyan_chronicles.core.block.InteriorDoorBlock;
 import uk.nbforge.gallifreyan_chronicles.core.block.TardisBlock;
 import uk.nbforge.gallifreyan_chronicles.core.block.TardisTopBlock;
 import uk.nbforge.gallifreyan_chronicles.util.TardisDimensionUtil;
+import uk.nbforge.gallifreyan_chronicles.client.lifecycle.ClientState;
 
 public final class TardisPortalClient {
     private static final double DOOR_FOOTPRINT_HORIZONTAL = 2.6;
@@ -150,7 +151,7 @@ public final class TardisPortalClient {
     // Immersive Portals draws the outline of the remote hit while the client level is swapped to the destination
     // dimension where the entry portal is not listed, and the portal can disappear once the door is replaced
     // So the centres are remembered and not looked up from the current level
-    private static final java.util.Map<ResourceKey<Level>, Set<Vec3>> DOOR_CENTRES = new java.util.HashMap<>();
+    private static final java.util.Map<ResourceKey<Level>, Set<Vec3>> DOOR_CENTRES = ClientState.track(new java.util.HashMap<>());
 
     private static void rememberDoorCentres(Level playerLevel) {
         for (Portal portal : tardisPortals((ClientLevel) playerLevel)) {

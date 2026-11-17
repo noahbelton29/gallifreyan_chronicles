@@ -8,6 +8,7 @@ import net.minecraft.client.sounds.SoundManager;
 import net.minecraft.world.phys.Vec3;
 import uk.nbforge.gallifreyan_chronicles.core.GCSounds;
 import uk.nbforge.gallifreyan_chronicles.core.block_entities.TardisExteriorBlockEntity;
+import uk.nbforge.gallifreyan_chronicles.client.lifecycle.ClientState;
 
 /** Starts and stops the outside hum for each TARDIS exterior near the player. */
 public final class ExteriorHumSounds {
@@ -19,9 +20,9 @@ public final class ExteriorHumSounds {
     private static final double START_RANGE_SQR =
             (ExteriorHumSoundInstance.OPEN_RANGE + 2) * (ExteriorHumSoundInstance.OPEN_RANGE + 2);
 
-    private static final Map<TardisExteriorBlockEntity, ExteriorHumSoundInstance> HUMS = new WeakHashMap<>();
+    private static final Map<TardisExteriorBlockEntity, ExteriorHumSoundInstance> HUMS = ClientState.track(new WeakHashMap<>());
     // The last power state seen for each exterior, to play the power sound when it flips
-    private static final Map<TardisExteriorBlockEntity, Boolean> LAST_POWER = new WeakHashMap<>();
+    private static final Map<TardisExteriorBlockEntity, Boolean> LAST_POWER = ClientState.track(new WeakHashMap<>());
     private static int ticks;
 
     private ExteriorHumSounds() {}

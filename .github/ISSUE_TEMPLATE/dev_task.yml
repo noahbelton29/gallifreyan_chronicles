@@ -1,0 +1,59 @@
+name: Dev task
+description: For the dev team. Planned work, refactors, tech debt or tooling
+title: "[Task]: "
+labels: ["task"]
+body:
+  - type: markdown
+    attributes:
+      value: For planned work by the dev team. Players, please use Bug report or Feature request instead.
+
+  - type: dropdown
+    id: area
+    attributes:
+      label: Area
+      options:
+        - Gameplay
+        - TARDIS and controls
+        - Mind and personalities
+        - Worldgen and dimensions
+        - Rendering and models
+        - Compatibility with other mods
+        - Translations
+        - Build, CI or tooling
+        - Other
+    validations:
+      required: true
+
+  - type: textarea
+    id: task
+    attributes:
+      label: What needs doing?
+    validations:
+      required: true
+
+  - type: textarea
+    id: done-when
+    attributes:
+      label: Done when
+      description: How we'll know it's finished.
+      placeholder: |
+        - [ ] Works on Fabric and NeoForge
+        - [ ] Translations added
+    validations:
+      required: true
+
+  - type: textarea
+    id: notes
+    attributes:
+      label: Notes
+      description: Links, related issues, technical details.
+
+  - type: dropdown
+    id: priority
+    attributes:
+      label: Priority
+      options:
+        - Low
+        - Medium
+        - High
+        - Blocks a release

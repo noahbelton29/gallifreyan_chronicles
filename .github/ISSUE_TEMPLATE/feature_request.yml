@@ -1,0 +1,40 @@
+name: Feature request
+description: Suggest something new or a change to the mod
+title: "[Feature]: "
+labels: ["enhancement"]
+body:
+  - type: textarea
+    id: idea
+    attributes:
+      label: What's your idea?
+      description: Describe what you'd like added or changed.
+    validations:
+      required: true
+
+  - type: textarea
+    id: why
+    attributes:
+      label: Why?
+      description: What would it add, or what problem would it fix? If it's from the show, which story or era?
+    validations:
+      required: true
+
+  - type: textarea
+    id: how
+    attributes:
+      label: How could it work in game?
+      description: Optional. Controls, items, blocks, or how players would use it.
+
+  - type: textarea
+    id: extra
+    attributes:
+      label: Pictures or references
+      description: Screenshots, sketches, or clips from the show.
+
+  - type: checkboxes
+    id: checks
+    attributes:
+      label: Before submitting
+      options:
+        - label: I searched the existing issues and this hasn't been suggested
+          required: true

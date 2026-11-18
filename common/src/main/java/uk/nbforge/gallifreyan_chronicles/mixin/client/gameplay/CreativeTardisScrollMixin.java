@@ -30,7 +30,7 @@ public abstract class CreativeTardisScrollMixin {
         if (selectable.cycleSelection(stack, scrollY > 0.0 ? 1 : -1)) {
             Minecraft.getInstance()
                     .getSoundManager()
-                    .play(SimpleSoundInstance.forUI(SoundEvents.UI_BUTTON_CLICK, 1.0F));
+                    .play(SimpleSoundInstance.forUI(SoundEvents.UI_BUTTON_CLICK, 1.0f));
             cir.setReturnValue(true);
         }
     }

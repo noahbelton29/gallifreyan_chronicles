@@ -8,7 +8,6 @@ import org.jspecify.annotations.NonNull;
 import uk.nbforge.gallifreyan_chronicles.client.tardis.TardisFrightClient;
 import uk.nbforge.gallifreyan_chronicles.util.GCUtil;
 
-/** The TARDIS is afraid of you, it warps the console hum and makes the lights stutter for a while. */
 public record TardisFrightPayload(float severity, int ticks, Identifier dimension) implements CustomPacketPayload {
     public static final Type<TardisFrightPayload> TYPE = new Type<>(GCUtil.modIdentifier("tardis_fright"));
 

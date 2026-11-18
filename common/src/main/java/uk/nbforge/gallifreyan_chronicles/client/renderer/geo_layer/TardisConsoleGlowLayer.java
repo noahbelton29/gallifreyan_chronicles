@@ -19,7 +19,7 @@ import org.jspecify.annotations.Nullable;
 import uk.nbforge.gallifreyan_chronicles.client.model.GeoAssets;
 import uk.nbforge.gallifreyan_chronicles.client.renderer.GCRenderTypes;
 import uk.nbforge.gallifreyan_chronicles.client.renderer.block.TardisConsoleBlockRenderer;
-import uk.nbforge.gallifreyan_chronicles.core.dynamic_registries.TardisConsoleRegistry;
+import uk.nbforge.gallifreyan_chronicles.core.data_registry.TardisConsoleRegistry;
 import uk.nbforge.gallifreyan_chronicles.tardis.console.GlowGroup;
 import uk.nbforge.gallifreyan_chronicles.tardis.console.TardisConsole;
 import uk.nbforge.gallifreyan_chronicles.tardis.console.TardisConsoleVariant;
@@ -116,7 +116,7 @@ public class TardisConsoleGlowLayer<T extends GeoAnimatable, O, R extends GeoRen
     private static Identifier groupBase(
             Identifier variantBase, @Nullable TardisConsoleVariant variant, GlowGroup group) {
         String override = variant == null ? null : variant.glowTexture(group.name());
-        return override == null ? variantBase : GeoAssets.CONSOLE.texture(override);
+        return override == null ? variantBase : GeoAssets.texture(override);
     }
 
     private static boolean hasGroupTextures(

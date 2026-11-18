@@ -34,7 +34,6 @@ public class TardisInteriorDoorInfoProvider implements IBlockComponentProvider {
                 .append(state));
     }
 
-    /** The title says what kind of door it is and which roundel block it is styled with, if any. */
     private static void renameDoor(ITooltip tooltip, net.minecraft.nbt.CompoundTag data) {
         String role = data.getStringOr(TardisInteriorDoorDataProvider.ROLE_KEY, "");
         if (role.isEmpty()) return;

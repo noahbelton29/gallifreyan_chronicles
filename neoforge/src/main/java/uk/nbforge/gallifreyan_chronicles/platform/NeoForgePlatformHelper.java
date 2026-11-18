@@ -1,9 +1,15 @@
 package uk.nbforge.gallifreyan_chronicles.platform;
 
+import java.io.IOException;
+import java.io.UncheckedIOException;
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.function.Predicate;
 import net.neoforged.fml.ModList;
 import net.neoforged.fml.loading.FMLLoader;
+import net.neoforged.neoforgespi.language.IModFileInfo;
 import net.neoforged.neoforgespi.language.IModInfo;
 import uk.nbforge.gallifreyan_chronicles.addon.ModAddonEntry;
 import uk.nbforge.gallifreyan_chronicles.platform.services.IPlatformHelper;
@@ -48,6 +54,22 @@ public class NeoForgePlatformHelper implements IPlatformHelper {
             Object className = info.getModProperties().get(ModAddonEntry.KEY);
             if (className != null) found.add(new ModAddonEntry(info.getModId(), className.toString()));
         }
+        return found;
+    }
+
+    @Override
+    public Map<String, byte[]> readModFiles(String modId, String folder, Predicate<String> keep) {
+        Map<String, byte[]> found = new LinkedHashMap<>();
+        IModFileInfo file = ModList.get().getModFileById(modId);
+        if (file == null) return found;
+        file.getFile().getContents().visitContent(folder, (path, resource) -> {
+            if (!keep.test(path)) return;
+            try {
+                found.putIfAbsent(path, resource.readAllBytes());
+            } catch (IOException e) {
+                throw new UncheckedIOException("couldn't read " + path + " of " + modId, e);
+            }
+        });
         return found;
     }
 }

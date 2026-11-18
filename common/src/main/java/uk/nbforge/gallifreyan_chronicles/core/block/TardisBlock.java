@@ -25,43 +25,70 @@ import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
-import org.jetbrains.annotations.NotNull;
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 import uk.nbforge.gallifreyan_chronicles.Constants;
 import uk.nbforge.gallifreyan_chronicles.compat.portal.TardisPortalBridge;
 import uk.nbforge.gallifreyan_chronicles.core.GCDataComponents;
-import uk.nbforge.gallifreyan_chronicles.core.block_entities.TardisExteriorBlockEntity;
-import uk.nbforge.gallifreyan_chronicles.core.dynamic_registries.TardisExteriorRegistry;
-import uk.nbforge.gallifreyan_chronicles.core.dynamic_registries.TardisInteriorRegistry;
-import uk.nbforge.gallifreyan_chronicles.ecs.Entity;
-import uk.nbforge.gallifreyan_chronicles.tardis.TardisApi;
-import uk.nbforge.gallifreyan_chronicles.tardis.TardisData;
-import uk.nbforge.gallifreyan_chronicles.tardis.TardisInterior;
-import uk.nbforge.gallifreyan_chronicles.tardis.TardisManager;
-import uk.nbforge.gallifreyan_chronicles.tardis.ecs.component.TardisComponent;
-import uk.nbforge.gallifreyan_chronicles.tardis.ecs.system.ExteriorSystem;
-import uk.nbforge.gallifreyan_chronicles.tardis.ecs.system.TardisLinkSystem;
-import uk.nbforge.gallifreyan_chronicles.tardis.manager.deletion.TardisDeletion;
-import uk.nbforge.gallifreyan_chronicles.util.ExteriorCollisionUtil;
-import uk.nbforge.gallifreyan_chronicles.util.GCSchedulerUtil;
+import uk.nbforge.gallifreyan_chronicles.core.block_entity.TardisExteriorBlockEntity;
+import uk.nbforge.gallifreyan_chronicles.core.data_registry.TardisExteriorRegistry;
+import uk.nbforge.gallifreyan_chronicles.core.data_registry.TardisInteriorRegistry;
+import uk.nbforge.gallifreyan_chronicles.tardis.*;
+import uk.nbforge.gallifreyan_chronicles.tardis.deletion.TardisDeletion;
+import uk.nbforge.gallifreyan_chronicles.tardis.exterior.ExteriorCollisionUtil;
+import uk.nbforge.gallifreyan_chronicles.tardis.interior.TardisInterior;
 import uk.nbforge.gallifreyan_chronicles.util.MessageUtil;
-import uk.nbforge.gallifreyan_chronicles.util.TardisDimensionUtil;
+import uk.nbforge.gallifreyan_chronicles.util.SchedulerUtil;
 
 public class TardisBlock extends BaseEntityBlock {
-    private static final VoxelShape TALL_SHAPE = Block.box(0, 0, 0, 16, 32, 16);
-
     public static final int MAX_LIGHT = 12;
     public static final IntegerProperty LIGHT = IntegerProperty.create("light", 0, MAX_LIGHT);
-
     public static final BooleanProperty GLOWING = BooleanProperty.create("glowing");
     public static final BooleanProperty IN_FLIGHT = BooleanProperty.create("in_flight");
+    private static final VoxelShape TALL_SHAPE = Block.box(0, 0, 0, 16, 32, 16);
 
     public TardisBlock(Properties properties) {
         super(properties);
         this.registerDefaultState(
                 this.stateDefinition.any().setValue(GLOWING, false).setValue(LIGHT, 0));
         this.registerDefaultState(this.stateDefinition.any().setValue(IN_FLIGHT, false));
+    }
+
+    private static void applyChosenInterior(
+            ServerLevel level, TardisExteriorBlockEntity blockEntity, TardisIdentity record, String chosen) {
+        if (chosen == null || !TardisInteriorRegistry.contains(chosen)) return;
+
+        TardisInterior interior = TardisInteriorRegistry.get(chosen);
+        Tardis.get(level.getServer(), record.tardisId())
+                .map(Tardis::data)
+                .ifPresent(data -> data.setInteriorId(interior.id()));
+
+        applyExteriorFromInterior(blockEntity, chosen);
+    }
+
+    /** works on either side cos it only changes the local block entity */
+    private static void applyExteriorFromInterior(
+            TardisExteriorBlockEntity blockEntity, @Nullable String chosenInterior) {
+        if (chosenInterior == null || !TardisInteriorRegistry.contains(chosenInterior)) return;
+
+        String exteriorId = TardisInteriorRegistry.get(chosenInterior).resolveExteriorId();
+        if (TardisExteriorRegistry.contains(exteriorId)) {
+            blockEntity.storeExterior(TardisExteriorRegistry.get(exteriorId));
+        }
+    }
+
+    private static float snapYawTo45(float yaw) {
+        float wrapped = yaw % 360.0f;
+        if (wrapped < 0) wrapped += 360.0f;
+        return Math.round(wrapped / 45.0f) * 45.0f % 360.0f;
+    }
+
+    public static void deleteIfCreative(Level level, BlockPos pos, Player player) {
+        if (!(level instanceof ServerLevel serverLevel) || !player.isCreative()) return;
+        if (!(level.getBlockEntity(pos) instanceof TardisExteriorBlockEntity exterior)) return;
+        UUID tardisId = exterior.getTardisId();
+        if (tardisId == null) return;
+        TardisDeletion.request(tardisId, serverLevel, pos);
     }
 
     @Override
@@ -86,64 +113,37 @@ public class TardisBlock extends BaseEntityBlock {
         if (!(level.getBlockEntity(pos) instanceof TardisExteriorBlockEntity blockEntity)) return;
         String chosenInterior = stack.get(GCDataComponents.TARDIS_INTERIOR);
         stack.shrink(1);
+        assert placer != null;
         blockEntity.setYaw(snapYawTo45(placer.getYRot() + 180));
 
-        // Applied on both sides right away, so the client's own placement prediction shows the chosen
-        // exterior immediately instead of the block entity's default one, which would otherwise flick
-        // to the right exterior only once the server's real sync packet arrives a moment later
-        applyExteriorFromInterior(blockEntity.asEntity(), chosenInterior);
+        applyExteriorFromInterior(blockEntity, chosenInterior);
 
         if (!level.isClientSide()) {
             if (!(level instanceof ServerLevel serverLevel)) return;
             if (!(placer instanceof Player player)) return;
 
-            Entity entity = blockEntity.asEntity();
-            TardisComponent record = TardisLinkSystem.registerNewTardis(
-                    entity,
-                    serverLevel,
-                    player.getUUID(),
-                    player.getGameProfile().name(),
-                    pos);
-            applyChosenInterior(serverLevel, entity, record, chosenInterior);
-            blockEntity.snapDoorsShut();
+            TardisData data = TardisManager.get(serverLevel.getServer())
+                    .createTardis(player.getUUID(), player.getGameProfile().name());
+            data.setRegisteredBlockPos(pos);
+            data.setExteriorDimension(serverLevel.dimension());
+            TardisIdentity record = data.component();
+            blockEntity.linkToTardis(record.tardisId());
+            applyChosenInterior(serverLevel, blockEntity, record, chosenInterior);
+            blockEntity.doors().snapShut();
 
-            blockEntity.spawnKeyEntity();
+            blockEntity.lock().spawnKeyEntity();
 
-            TardisApi.get(serverLevel.getServer(), record.tardisId()).ifPresent(tardis -> tardis.giveKeyTo(player));
+            Tardis.get(serverLevel.getServer(), record.tardisId()).ifPresent(tardis -> tardis.giveKeyTo(player));
 
-            // Building the interior is heavy enough to stall the server for a noticeable moment, so it runs a tick
-            // later instead of inline here, keeping
-            // the block placement itself fast for the player and for any other code reacting to this event
             MinecraftServer server = serverLevel.getServer();
             UUID tardisId = record.tardisId();
-            GCSchedulerUtil.runLater(server, 1, () -> TardisPortalBridge.onExteriorPlaced(server, tardisId));
+            SchedulerUtil.runLater(
+                    server, 1, () -> Tardis.get(server, tardisId).ifPresent(TardisPortalBridge::onExteriorPlaced));
 
             Constants.LOG.debug(
                     "Registered TARDIS {} for player {}",
                     record.tardisId(),
                     player.getName().getString());
-        }
-    }
-
-    private static void applyChosenInterior(ServerLevel level, Entity entity, TardisComponent record, String chosen) {
-        if (chosen == null || !TardisInteriorRegistry.contains(chosen)) return;
-
-        TardisInterior interior = TardisInteriorRegistry.get(chosen);
-        TardisData data = TardisManager.get(level.getServer()).getTardis(record.tardisId());
-        if (data != null) data.setInteriorId(interior.id());
-
-        applyExteriorFromInterior(entity, chosen);
-    }
-
-    /**
-     * Sets the entity's exterior to whichever one the chosen interior resolves to, works on either side since it only touches the local ECS component.
-     */
-    private static void applyExteriorFromInterior(Entity entity, @Nullable String chosenInterior) {
-        if (chosenInterior == null || !TardisInteriorRegistry.contains(chosenInterior)) return;
-
-        String exteriorId = TardisInteriorRegistry.get(chosenInterior).resolveExteriorId();
-        if (TardisExteriorRegistry.contains(exteriorId)) {
-            ExteriorSystem.setExterior(entity, TardisExteriorRegistry.get(exteriorId));
         }
     }
 
@@ -155,18 +155,14 @@ public class TardisBlock extends BaseEntityBlock {
                 && level.getBlockEntity(pos) instanceof TardisExteriorBlockEntity tardis) {
             UUID tardisId = tardis.getTardisId();
             if (tardisId != null) {
-                TardisData data = TardisManager.get(serverLevel.getServer()).getTardis(tardisId);
+                TardisData data = Tardis.get(serverLevel.getServer(), tardisId)
+                        .map(Tardis::data)
+                        .orElse(null);
                 String interiorId = data == null ? null : data.getInteriorId();
                 if (interiorId != null) stack.set(GCDataComponents.TARDIS_INTERIOR, interiorId);
             }
         }
         return stack;
-    }
-
-    private static float snapYawTo45(float yaw) {
-        float wrapped = yaw % 360.0f;
-        if (wrapped < 0) wrapped += 360.0f;
-        return Math.round(wrapped / 45.0f) * 45.0f % 360.0f;
     }
 
     @Override
@@ -180,23 +176,23 @@ public class TardisBlock extends BaseEntityBlock {
             return InteractionResult.CONSUME;
         }
 
-        if (tardis.isFullyInvisible()) return InteractionResult.PASS;
+        if (tardis.travel().isFullyInvisible()) return InteractionResult.PASS;
 
-        if (tardis.hasKeyRendered()) {
+        if (tardis.lock().hasKeyRendered()) {
             if (level.isClientSide()) return InteractionResult.SUCCESS;
 
-            boolean isOwner = player.getUUID().equals(tardis.getRenderedKeyOwner());
+            boolean isOwner = player.getUUID().equals(tardis.lock().getRenderedKeyOwner());
 
-            if (player.isShiftKeyDown() && tardis.canRemoveKey(player)) {
-                if (tardis.areDoorsFullyClosed()) {
-                    TardisApi.of(tardis).ifPresent(api -> api.returnKeyTo(player));
+            if (player.isShiftKeyDown() && tardis.lock().canRemoveKey(player)) {
+                if (tardis.doors().areFullyClosed()) {
+                    Tardis.of(tardis).ifPresent(api -> api.returnKeyTo(player));
                     return InteractionResult.CONSUME;
                 } else {
                     MessageUtil.overlay(player, "close_doors_to_remove_key");
                     return InteractionResult.FAIL;
                 }
             } else if (!player.isShiftKeyDown() && isOwner) {
-                tardis.toggleKeyLockAnimation(player);
+                tardis.lock().toggleKeyLockAnimation(player);
                 return InteractionResult.CONSUME;
             }
 
@@ -207,14 +203,14 @@ public class TardisBlock extends BaseEntityBlock {
             return InteractionResult.CONSUME;
         }
 
-        if (tardis.isLocked()) {
+        if (tardis.lock().isLocked()) {
             if (level.isClientSide()) return InteractionResult.SUCCESS;
-            tardis.announceLocked(player);
+            tardis.lock().announceLocked(player);
             return InteractionResult.CONSUME;
         }
 
         if (level.isClientSide()) return InteractionResult.SUCCESS;
-        tardis.interact(player.isShiftKeyDown());
+        tardis.doors().interact(player.isShiftKeyDown());
         return InteractionResult.CONSUME;
     }
 
@@ -224,7 +220,8 @@ public class TardisBlock extends BaseEntityBlock {
             @NonNull BlockGetter level,
             @NonNull BlockPos pos,
             @NonNull CollisionContext context) {
-        if (level.getBlockEntity(pos) instanceof TardisExteriorBlockEntity tardis && tardis.isFullyInvisible()) {
+        if (level.getBlockEntity(pos) instanceof TardisExteriorBlockEntity tardis
+                && tardis.travel().isFullyInvisible()) {
             return Shapes.empty();
         }
         return TALL_SHAPE;
@@ -253,41 +250,34 @@ public class TardisBlock extends BaseEntityBlock {
     }
 
     @Override
-    public @NotNull BlockState playerWillDestroy(
-            @NotNull Level level, @NotNull BlockPos pos, @NotNull BlockState state, @NotNull Player player) {
+    public @NonNull BlockState playerWillDestroy(
+            @NonNull Level level, @NonNull BlockPos pos, @NonNull BlockState state, @NonNull Player player) {
         deleteIfCreative(level, pos, player);
         return super.playerWillDestroy(level, pos, state, player);
     }
 
-    public static void deleteIfCreative(Level level, BlockPos pos, Player player) {
-        if (!(level instanceof ServerLevel serverLevel) || !player.isCreative()) return;
-        if (!(level.getBlockEntity(pos) instanceof TardisExteriorBlockEntity exterior)) return;
-        UUID tardisId = exterior.getTardisId();
-        if (tardisId == null) return;
-        TardisDeletion.request(serverLevel.getServer(), tardisId, serverLevel, pos);
-    }
-
     @Override
     protected float getShadeBrightness(@NonNull BlockState state, @NonNull BlockGetter level, @NonNull BlockPos pos) {
-        if (level.getBlockEntity(pos) instanceof TardisExteriorBlockEntity tardis && !tardis.isShadowActive()) {
+        if (level.getBlockEntity(pos) instanceof TardisExteriorBlockEntity tardis
+                && !tardis.travel().isShadowActive()) {
             return 1.0f;
         }
         return super.getShadeBrightness(state, level, pos);
     }
 
     @Override
-    public @NotNull RenderShape getRenderShape(@NotNull BlockState state) {
+    public @NonNull RenderShape getRenderShape(@NonNull BlockState state) {
         return RenderShape.INVISIBLE;
     }
 
     @Override
-    public @NotNull BlockEntity newBlockEntity(@NotNull BlockPos pos, @NotNull BlockState state) {
+    public @NonNull BlockEntity newBlockEntity(@NonNull BlockPos pos, @NonNull BlockState state) {
         return new TardisExteriorBlockEntity(pos, state);
     }
 
     @Override
     public @Nullable <T extends BlockEntity> BlockEntityTicker<T> getTicker(
-            @NotNull Level level, @NotNull BlockState state, @NotNull BlockEntityType<T> type) {
+            @NonNull Level level, @NonNull BlockState state, @NonNull BlockEntityType<T> type) {
         if (type != TardisExteriorBlockEntity.TYPE.get()) return null;
         if (level.isClientSide()) {
             return (lvl, _, _, be) -> TardisExteriorBlockEntity.clientTick(lvl, (TardisExteriorBlockEntity) be);

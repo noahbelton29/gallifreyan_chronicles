@@ -24,13 +24,13 @@ import net.minecraft.world.phys.Vec3;
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 import uk.nbforge.gallifreyan_chronicles.Constants;
-import uk.nbforge.gallifreyan_chronicles.core.block_entities.TardisConsoleBlockEntity;
-import uk.nbforge.gallifreyan_chronicles.core.dynamic_registries.TardisControlRegistry;
-import uk.nbforge.gallifreyan_chronicles.tardis.TardisApi;
+import uk.nbforge.gallifreyan_chronicles.core.block_entity.TardisConsoleBlockEntity;
+import uk.nbforge.gallifreyan_chronicles.tardis.Tardis;
 import uk.nbforge.gallifreyan_chronicles.tardis.console.TardisConsole;
 import uk.nbforge.gallifreyan_chronicles.tardis.control.ConsoleControlManager;
 import uk.nbforge.gallifreyan_chronicles.tardis.control.ControlPower;
 import uk.nbforge.gallifreyan_chronicles.tardis.control.TardisControl;
+import uk.nbforge.gallifreyan_chronicles.tardis.control.TardisControls;
 import uk.nbforge.gallifreyan_chronicles.tardis.mind.refusal.TardisWariness;
 import uk.nbforge.gallifreyan_chronicles.tardis.security.IsomorphicPunishment;
 
@@ -88,30 +88,28 @@ public class TardisControlEntity extends Entity {
     protected @NonNull Component getTypeName() {
         String id = this.getControlId();
         if (id.isEmpty()) return super.getTypeName();
-        return Component.translatableWithFallback(TardisControlRegistry.translationKey(id), id);
+        return Component.translatableWithFallback(TardisControls.translationKey(id), id);
     }
 
     @Override
     public boolean hurtServer(@NonNull ServerLevel serverLevel, DamageSource damageSource, float v) {
         if (damageSource.getEntity() instanceof Player player) {
             TardisConsoleBlockEntity console = this.getConsole();
-            // Outside a TARDIS punching a control does nothing
             if (console != null && !console.isInTardis()) return false;
-            if (console != null && TardisApi.cannotUseControls(console, player)) {
+            if (console != null && Tardis.cannotUseControls(console, player)) {
                 IsomorphicPunishment.punish(player, console);
                 return false;
             }
-            if (console != null && !ControlPower.canUse(console, this.getControlId())) {
+            if (console != null && ControlPower.isBlocked(console, this.getControlId())) {
                 return false;
             }
             if (isOnCooldown(console)) {
                 return false;
             }
-            // A left click is still you working the controls so a frightened or wary TARDIS can jam it too
             if (console != null && TardisWariness.jams(this, console, player)) {
                 return false;
             }
-            TardisControl control = TardisControlRegistry.get(this.getControlId());
+            TardisControl control = TardisControls.get(this.getControlId());
             return control.onLeftClick(this, player);
         }
         return false;
@@ -216,20 +214,18 @@ public class TardisControlEntity extends Entity {
 
         TardisConsoleBlockEntity console = this.getConsole();
         if (console != null && !console.isInTardis()) {
-            // Outside a TARDIS the control just moves and does nothing
             if (isOnCooldown(console)) return InteractionResult.FAIL;
-            // Sound first like the real control, it reads the state before it flips
-            TardisControlRegistry.get(this.getControlId()).playClickSound(this);
+            TardisControls.get(this.getControlId()).playClickSound(this);
             boolean newState = !console.getControlState(this.getControlId());
             console.animateControlOnly(this.getControlId(), newState, player);
             return InteractionResult.SUCCESS;
         }
-        if (console != null && TardisApi.cannotUseControls(console, player)) {
+        if (console != null && Tardis.cannotUseControls(console, player)) {
             IsomorphicPunishment.punish(player, console);
             return InteractionResult.FAIL;
         }
 
-        if (console != null && !ControlPower.canUse(console, this.getControlId())) {
+        if (console != null && ControlPower.isBlocked(console, this.getControlId())) {
             return InteractionResult.FAIL;
         }
 
@@ -247,7 +243,7 @@ public class TardisControlEntity extends Entity {
     private boolean isOnCooldown(@Nullable TardisConsoleBlockEntity console) {
         long now = this.level().getGameTime();
         int cooldown = console == null
-                ? Math.round(TardisConsole.ControlEntry.DEFAULT_COOLDOWN_SECONDS * 20.0F)
+                ? Math.round(TardisConsole.ControlEntry.DEFAULT_COOLDOWN_SECONDS * 20.0f)
                 : console.controlCooldownTicks(this.getControlId());
         if (this.lastInteractTick != Long.MIN_VALUE && now - this.lastInteractTick < cooldown) {
             return true;
@@ -257,11 +253,10 @@ public class TardisControlEntity extends Entity {
     }
 
     public InteractionResult activate(@Nullable Player player, InteractionHand hand) {
-        TardisControl control = TardisControlRegistry.get(this.getControlId());
+        TardisControl control = TardisControls.get(this.getControlId());
         InteractionResult result = control.onRightClick(this, player, hand);
 
         if (result == InteractionResult.SUCCESS) {
-            // The own sound of the control before its state flips, the pitch reads the old state
             control.playClickSound(this);
             TardisConsoleBlockEntity console = this.getConsole();
             if (console != null) {
@@ -336,9 +331,6 @@ public class TardisControlEntity extends Entity {
 
     @Override
     public boolean skipAttackInteraction(@NonNull Entity attacker) {
-        // Returning true makes vanilla drop the attack before it calls hurt so a left click never reached onLeftClick
-        // Handle it here on the server and swallow it so it cannot fall through and chip or break the console behind
-        // the control
         if (attacker instanceof Player player && this.level() instanceof ServerLevel serverLevel) {
             this.hurtServer(serverLevel, serverLevel.damageSources().playerAttack(player), 0f);
         }

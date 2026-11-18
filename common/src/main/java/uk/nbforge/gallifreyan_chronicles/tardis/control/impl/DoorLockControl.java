@@ -2,63 +2,54 @@ package uk.nbforge.gallifreyan_chronicles.tardis.control.impl;
 
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
-import net.minecraft.server.level.ServerLevel;
-import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
-import uk.nbforge.gallifreyan_chronicles.core.GCSounds;
+import org.jspecify.annotations.Nullable;
 import uk.nbforge.gallifreyan_chronicles.core.GCTardisControls;
-import uk.nbforge.gallifreyan_chronicles.core.block_entities.TardisConsoleBlockEntity;
-import uk.nbforge.gallifreyan_chronicles.core.block_entities.TardisExteriorBlockEntity;
+import uk.nbforge.gallifreyan_chronicles.core.block_entity.TardisExteriorBlockEntity;
 import uk.nbforge.gallifreyan_chronicles.core.entity.TardisControlEntity;
 import uk.nbforge.gallifreyan_chronicles.tardis.Tardis;
 import uk.nbforge.gallifreyan_chronicles.tardis.control.BaseControl;
+import uk.nbforge.gallifreyan_chronicles.tardis.control.ClickSound;
 import uk.nbforge.gallifreyan_chronicles.tardis.control.ControlAnimations;
+import uk.nbforge.gallifreyan_chronicles.tardis.control.ControlContext;
+import uk.nbforge.gallifreyan_chronicles.util.MessageUtil;
 
 public class DoorLockControl extends BaseControl {
     public static final ControlAnimations DEFAULT_ANIMATIONS =
             new ControlAnimations("door_lock_control_on", "door_lock_control_off", false);
 
     public DoorLockControl(ControlAnimations animations) {
-        super(animations);
+        super(animations, ClickSound.SWITCH);
     }
 
     @Override
-    public void playClickSound(TardisControlEntity entity) {
-        playSound(entity, GCSounds.SWITCH, 0.8f);
-    }
-
-    @Override
-    public InteractionResult onRightClick(TardisControlEntity entity, Player player, InteractionHand hand) {
-        var console = entity.getConsole();
-        if (console == null || !(entity.level() instanceof ServerLevel level)) return InteractionResult.FAIL;
-
+    protected InteractionResult use(ControlContext ctx, TardisControlEntity entity, @Nullable Player player) {
         TardisExteriorBlockEntity exterior =
-                linkedTardis(console).flatMap(Tardis::exterior).orElse(null);
+                ctx.tardis().flatMap(Tardis::exterior).orElse(null);
         if (exterior == null) {
-            tell(player, "message.gallifreyan_chronicles.lock_no_exterior");
+            MessageUtil.overlay(player, ChatFormatting.RED, "lock_no_exterior");
             return InteractionResult.FAIL;
         }
 
-        console.reconcileControl(GCTardisControls.DOOR_LOCK_CONTROL, exterior.isLocked());
+        ctx.console()
+                .reconcileControl(
+                        GCTardisControls.DOOR_LOCK_CONTROL, exterior.lock().isLocked());
 
-        if (!exterior.isLocked() && !exterior.areDoorsFullyClosed()) {
-            tell(player, "message.gallifreyan_chronicles.close_doors_to_lock");
+        if (!exterior.lock().isLocked() && !exterior.doors().areFullyClosed()) {
+            MessageUtil.overlay(player, ChatFormatting.RED, "close_doors_to_lock");
             return InteractionResult.FAIL;
         }
-        announce(
-                player,
-                exterior.isLocked()
-                        ? "message.gallifreyan_chronicles.doors_unlocking"
-                        : "message.gallifreyan_chronicles.doors_locking");
+        MessageUtil.overlay(
+                player, ChatFormatting.GREEN, exterior.lock().isLocked() ? "doors_unlocking" : "doors_locking");
         return InteractionResult.SUCCESS;
     }
 
     @Override
-    public void onStateChanged(TardisConsoleBlockEntity console, boolean activated) {
-        if (!(console.getLevel() instanceof ServerLevel level)) return;
-
-        linkedTardis(console).flatMap(Tardis::exterior).ifPresent(exterior -> exterior.setLockedFromConsole(activated));
+    protected void changed(ControlContext ctx, boolean activated) {
+        ctx.tardis()
+                .flatMap(Tardis::exterior)
+                .ifPresent(exterior -> exterior.lock().setLockedFromConsole(activated));
     }
 
     @Override

@@ -12,21 +12,15 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.level.chunk.LevelChunk;
 import net.minecraft.world.level.levelgen.structure.templatesystem.StructureTemplate;
 import net.minecraft.world.phys.AABB;
-import uk.nbforge.gallifreyan_chronicles.core.block_entities.TardisExteriorBlockEntity;
+import uk.nbforge.gallifreyan_chronicles.core.block_entity.TardisExteriorBlockEntity;
 import uk.nbforge.gallifreyan_chronicles.network.tardis.RematCatchPayload;
 import uk.nbforge.gallifreyan_chronicles.platform.Services;
-import uk.nbforge.gallifreyan_chronicles.tardis.TardisData;
-import uk.nbforge.gallifreyan_chronicles.tardis.TardisManager;
-import uk.nbforge.gallifreyan_chronicles.tardis.ecs.system.TardisInteriorSystem;
-import uk.nbforge.gallifreyan_chronicles.util.GCSchedulerUtil;
+import uk.nbforge.gallifreyan_chronicles.tardis.Tardis;
+import uk.nbforge.gallifreyan_chronicles.tardis.interior.TardisInteriors;
+import uk.nbforge.gallifreyan_chronicles.util.SchedulerUtil;
 
-/**
- * A TARDIS materialising on top of a player pulls them inside.
- * They see the interior fade in around them, floor first, and everyone inside sees them fade in.
- */
 public final class RematCatch {
     private static final Vec3i FALLBACK_SIZE = new Vec3i(48, 32, 48);
-    // After the fade send the real interior again so block entities come back right
     private static final int RESEND_EXTRA_TICKS = 5;
 
     private RematCatch() {}
@@ -42,37 +36,37 @@ public final class RematCatch {
         if (caught.isEmpty()) return;
 
         MinecraftServer server = level.getServer();
-        ServerLevel interior = TardisInteriorSystem.prepareInterior(server, tardisId);
+        Tardis tardis = Tardis.get(server, tardisId).orElse(null);
+        if (tardis == null) return;
+        ServerLevel interior = TardisInteriors.prepareInterior(tardis);
         if (interior == null) return;
-        TardisInteriorSystem.Arrival arrival = TardisInteriorSystem.arrival(interior, tardisId);
+        TardisInteriors.Arrival arrival = TardisInteriors.arrival(tardis, interior);
 
-        TardisData data = TardisManager.get(server).getTardis(tardisId);
-        BlockPos origin = data == null ? null : data.getInteriorOrigin();
-        if (origin == null) origin = TardisInteriorSystem.ORIGIN;
+        BlockPos origin = tardis.data().getInteriorOrigin();
+        if (origin == null) origin = TardisInteriors.ORIGIN;
         Vec3i size = server.getStructureTemplateManager()
-                .get(TardisInteriorSystem.getInteriorDefinition(server, tardisId)
-                        .structure())
+                .get(tardis.interior().structure())
                 .map(StructureTemplate::getSize)
                 .orElse(FALLBACK_SIZE);
         BlockPos boxMin = origin;
         BlockPos boxMax = origin.offset(size.getX() - 1, size.getY() - 1, size.getZ() - 1);
         int floorY = BlockPos.containing(arrival.pos()).getY();
 
-        String fadeType = exterior.getFadeType().id();
-        int duration = Math.max(1, exterior.getFadeType().timing().fadeInTicks());
+        String fadeType = exterior.travel().getFadeType().id();
+        int duration = Math.max(1, exterior.travel().getFadeType().timing().fadeInTicks());
         int elapsed = (int) Math.max(0L, level.getGameTime() - startTick);
 
         for (ServerPlayer player : caught) {
-            TardisInteriorSystem.markArriving(player);
+            TardisInteriors.markArriving(player);
             player.teleportTo(
                     interior, arrival.pos().x, arrival.pos().y, arrival.pos().z, Set.of(), arrival.yaw(), 0.0f, true);
 
-            Services.NETWORK.sendRematCatch(
+            Services.NETWORK.send(
                     player,
                     new RematCatchPayload(player.getUUID(), fadeType, elapsed, duration, true, boxMin, boxMax, floorY));
             for (ServerPlayer other : interior.players()) {
                 if (other == player) continue;
-                Services.NETWORK.sendRematCatch(
+                Services.NETWORK.send(
                         other,
                         new RematCatchPayload(
                                 player.getUUID(), fadeType, elapsed, duration, false, boxMin, boxMax, floorY));
@@ -81,7 +75,7 @@ public final class RematCatch {
             int left = Math.max(0, duration - elapsed) + RESEND_EXTRA_TICKS;
             BlockPos min = boxMin;
             BlockPos max = boxMax;
-            GCSchedulerUtil.runLater(server, left, () -> resendInterior(player, interior, min, max));
+            SchedulerUtil.runLater(server, left, () -> resendInterior(player, interior, min, max));
         }
     }
 

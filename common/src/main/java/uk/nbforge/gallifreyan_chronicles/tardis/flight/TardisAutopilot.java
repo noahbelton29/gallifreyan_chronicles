@@ -9,16 +9,10 @@ import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
 import uk.nbforge.gallifreyan_chronicles.core.lifecycle.ServerState;
 import uk.nbforge.gallifreyan_chronicles.tardis.Tardis;
-import uk.nbforge.gallifreyan_chronicles.tardis.TardisApi;
 import uk.nbforge.gallifreyan_chronicles.tardis.TardisEvents;
 import uk.nbforge.gallifreyan_chronicles.tardis.flight.crash.TardisCrash;
-import uk.nbforge.gallifreyan_chronicles.util.GCSchedulerUtil;
+import uk.nbforge.gallifreyan_chronicles.util.SchedulerUtil;
 
-/**
- * A TARDIS left flying with nobody aboard lands itself at wherever it was last headed, rather than
- * drifting through the vortex empty and unsupervised forever (left mid flight by a player logging
- * off, a crashed client, or anything else that empties the console room).
- */
 public final class TardisAutopilot {
     private static final int CHECK_TICKS = 20;
     private static final int UNOCCUPIED_TICKS_BEFORE_LANDING = 20 * 60;
@@ -42,11 +36,11 @@ public final class TardisAutopilot {
     }
 
     private static void schedule(MinecraftServer server, UUID id) {
-        GCSchedulerUtil.runLater(server, CHECK_TICKS, () -> tick(server, id));
+        SchedulerUtil.runLater(server, CHECK_TICKS, () -> tick(server, id));
     }
 
     private static void tick(MinecraftServer server, UUID id) {
-        Tardis tardis = TardisApi.get(server, id).orElse(null);
+        Tardis tardis = Tardis.get(server, id).orElse(null);
         boolean flying = tardis != null && tardis.isTravelling() && !TardisCrash.isCrashing(tardis);
         if (!flying) {
             FLYING.remove(id);
@@ -61,8 +55,6 @@ public final class TardisAutopilot {
         }
 
         int ticks = UNOCCUPIED_TICKS.merge(id, CHECK_TICKS, Integer::sum);
-        // Once past the threshold, keep trying every check until land() actually succeeds, it is a
-        // no-op while still mid takeoff/landing or before the minimum travel time has passed
         if (ticks < UNOCCUPIED_TICKS_BEFORE_LANDING || !tardis.land()) {
             schedule(server, id);
             return;

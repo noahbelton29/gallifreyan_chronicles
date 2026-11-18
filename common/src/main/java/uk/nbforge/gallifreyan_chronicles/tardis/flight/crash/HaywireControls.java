@@ -3,7 +3,7 @@ package uk.nbforge.gallifreyan_chronicles.tardis.flight.crash;
 import java.util.List;
 import net.minecraft.util.RandomSource;
 import uk.nbforge.gallifreyan_chronicles.core.GCTardisControls;
-import uk.nbforge.gallifreyan_chronicles.core.block_entities.TardisConsoleBlockEntity;
+import uk.nbforge.gallifreyan_chronicles.core.block_entity.TardisConsoleBlockEntity;
 import uk.nbforge.gallifreyan_chronicles.core.entity.TardisControlEntity;
 import uk.nbforge.gallifreyan_chronicles.tardis.Tardis;
 
@@ -15,10 +15,8 @@ public final class HaywireControls {
     public static void flick(Tardis tardis, RandomSource random) {
         for (TardisConsoleBlockEntity console : tardis.consoles()) {
             List<TardisControlEntity> controls = console.getControlEntities().stream()
-                    // Power, handbrake and cloister bell stay put
                     .filter(control -> !control.getControlId().equals(GCTardisControls.POWER_CONTROL))
                     .filter(control -> !control.getControlId().equals(GCTardisControls.TIME_ROTOR_HANDBRAKE))
-                    // The cloister bell shows whether the alarm is ringing
                     .filter(control -> !control.getControlId().equals(GCTardisControls.CLOISTER_BELL_CONTROL))
                     .toList();
             if (controls.isEmpty()) continue;

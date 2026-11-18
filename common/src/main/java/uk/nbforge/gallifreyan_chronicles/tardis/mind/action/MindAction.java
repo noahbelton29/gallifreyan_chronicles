@@ -1,11 +1,22 @@
 package uk.nbforge.gallifreyan_chronicles.tardis.mind.action;
 
-/**
- * One small thing a TARDIS does, written in json with a type field.
- * Personalities and traits list these under hooks like on_unwilling.
- */
+import com.mojang.serialization.Codec;
+import com.mojang.serialization.DataResult;
+import com.mojang.serialization.MapCodec;
+import java.util.List;
+
 public interface MindAction {
-    /** The type this was loaded from. */
+
+    public static final Codec<MindAction> CODEC =
+            Codec.STRING.partialDispatch("type", action -> DataResult.success(action.type()), id -> {
+                MapCodec<? extends MindAction> codec = MindActions.byType(id);
+                return codec == null
+                        ? DataResult.error(() -> "unknown tardis mind action " + id)
+                        : DataResult.success(codec);
+            });
+
+    public static final Codec<List<MindAction>> LIST_CODEC = CODEC.listOf();
+
     String type();
 
     void run(MindContext context);

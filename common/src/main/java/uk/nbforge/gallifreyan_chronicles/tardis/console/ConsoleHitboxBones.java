@@ -6,7 +6,6 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
@@ -35,7 +34,6 @@ final class ConsoleHitboxBones {
         return CACHE.computeIfAbsent(consoleId, ConsoleHitboxBones::load);
     }
 
-    /** Reads the model json of a console and finds every bone ending in the hitbox suffix, the result is keyed by control id. */
     private static Map<String, Box> load(String consoleId) {
         Map<String, Box> boxes = new HashMap<>();
         Identifier parsed =
@@ -47,7 +45,7 @@ final class ConsoleHitboxBones {
                 Constants.LOG.warn("No model {} found to read hitbox bones of console {}", resource, consoleId);
                 return boxes;
             }
-            JsonObject root = JsonParser.parseReader(new InputStreamReader(in, StandardCharsets.UTF_8))
+            JsonObject root = JsonParser.parseString(new String(in.readAllBytes(), StandardCharsets.UTF_8))
                     .getAsJsonObject();
             JsonArray geometries = root.getAsJsonArray("minecraft:geometry");
             if (geometries == null) return boxes;
@@ -85,8 +83,6 @@ final class ConsoleHitboxBones {
         double[] low = {Double.MAX_VALUE, Double.MAX_VALUE, Double.MAX_VALUE};
         double[] high = {-Double.MAX_VALUE, -Double.MAX_VALUE, -Double.MAX_VALUE};
         for (int corner = 0; corner < 8; corner++) {
-            // X is mirrored, as the model is drawn
-            // forgetting this puts every control on the wrong side, ask me how I know
             double[] point = {
                 -(origin[0] + ((corner & 1) != 0 ? size[0] : 0.0)),
                 origin[1] + ((corner & 2) != 0 ? size[1] : 0.0),

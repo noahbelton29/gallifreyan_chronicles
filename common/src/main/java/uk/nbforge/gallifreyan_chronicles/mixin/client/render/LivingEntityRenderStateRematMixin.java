@@ -5,7 +5,6 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
 import uk.nbforge.gallifreyan_chronicles.client.tardis.RematAlpha;
 
-/** How faded a player is while a TARDIS materialises around them. */
 @Mixin(LivingEntityRenderState.class)
 public abstract class LivingEntityRenderStateRematMixin implements RematAlpha {
     @Unique

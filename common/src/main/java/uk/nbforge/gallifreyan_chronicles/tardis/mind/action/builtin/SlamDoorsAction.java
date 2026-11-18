@@ -8,10 +8,6 @@ import uk.nbforge.gallifreyan_chronicles.network.tardis.TardisDrumShakePayload;
 import uk.nbforge.gallifreyan_chronicles.tardis.mind.action.MindAction;
 import uk.nbforge.gallifreyan_chronicles.tardis.mind.action.MindContext;
 
-/**
- * Slams its doors shut with a bang and the room shakes, lock locks them too.
- * The json fields are volume, shake and lock.
- */
 public record SlamDoorsAction(float volume, float shake, boolean lock) implements MindAction {
     public static final String TYPE = Constants.MOD_ID + ":slam_doors";
 
@@ -26,7 +22,7 @@ public record SlamDoorsAction(float volume, float shake, boolean lock) implement
         else context.tardis.closeDoors();
         context.everywhere((level, pos) -> {
             level.playSound(
-                    null, BlockPos.containing(pos), GCSounds.TARDIS_DOOR_CLOSE, SoundSource.BLOCKS, volume, 0.6F);
+                    null, BlockPos.containing(pos), GCSounds.TARDIS_DOOR_CLOSE, SoundSource.BLOCKS, volume, 0.6f);
             TardisDrumShakePayload.broadcast(level, pos, shake);
         });
     }

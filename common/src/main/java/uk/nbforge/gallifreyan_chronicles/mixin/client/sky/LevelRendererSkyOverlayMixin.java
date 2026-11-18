@@ -13,7 +13,6 @@ import uk.nbforge.gallifreyan_chronicles.client.sky.CustomSkyRenderer;
 
 @Mixin(value = LevelRenderer.class, priority = 1500)
 public abstract class LevelRendererSkyOverlayMixin {
-    // The sky canvas is drawn and laid on from LevelRendererFadeBoxMixin so it goes under the fading box
     @Inject(method = "render", at = @At("HEAD"))
     private void gc$beginSkyFrame(
             GraphicsResourceAllocator resourceAllocator,

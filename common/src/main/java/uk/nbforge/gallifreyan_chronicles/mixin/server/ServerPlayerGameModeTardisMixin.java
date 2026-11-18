@@ -15,12 +15,12 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import uk.nbforge.gallifreyan_chronicles.compat.portal.TardisPortalBridge;
-import uk.nbforge.gallifreyan_chronicles.core.GCBlocks;
 import uk.nbforge.gallifreyan_chronicles.core.block.InteriorDoorBarrierBlock;
 import uk.nbforge.gallifreyan_chronicles.core.block.InteriorDoorBlock;
 import uk.nbforge.gallifreyan_chronicles.core.block.TardisBlock;
 import uk.nbforge.gallifreyan_chronicles.core.block.TardisTopBlock;
-import uk.nbforge.gallifreyan_chronicles.tardis.manager.deletion.TardisDeletionMode;
+import uk.nbforge.gallifreyan_chronicles.core.block.registry.TardisBlocks;
+import uk.nbforge.gallifreyan_chronicles.tardis.deletion.TardisDeletionMode;
 
 @SuppressWarnings("unused")
 @Mixin(ServerPlayerGameMode.class)
@@ -61,7 +61,7 @@ public abstract class ServerPlayerGameModeTardisMixin {
 
         boolean isExterior = block instanceof TardisBlock;
         boolean isTopOfExterior = block instanceof TardisTopBlock
-                && target.getBlockState(pos.below()).is(GCBlocks.TARDIS);
+                && target.getBlockState(pos.below()).is(TardisBlocks.TARDIS);
         if (!isExterior && !isTopOfExterior) return;
 
         if (TardisDeletionMode.shouldWarn(player.getUUID(), level.getGameTime())) {

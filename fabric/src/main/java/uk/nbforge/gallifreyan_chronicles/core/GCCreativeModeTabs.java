@@ -8,6 +8,9 @@ import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.ItemStack;
 import uk.nbforge.gallifreyan_chronicles.Constants;
 import uk.nbforge.gallifreyan_chronicles.addon.AddonContent;
+import uk.nbforge.gallifreyan_chronicles.core.block.registry.CadonwoodBlocks;
+import uk.nbforge.gallifreyan_chronicles.core.block.registry.GallifreyBlocks;
+import uk.nbforge.gallifreyan_chronicles.core.block.registry.TardisBlocks;
 import uk.nbforge.gallifreyan_chronicles.util.GCUtil;
 
 public class GCCreativeModeTabs {
@@ -15,7 +18,7 @@ public class GCCreativeModeTabs {
             BuiltInRegistries.CREATIVE_MODE_TAB,
             GCUtil.modIdentifier("tardis"),
             FabricCreativeModeTab.builder()
-                    .icon(() -> new ItemStack(GCBlocks.TARDIS))
+                    .icon(() -> new ItemStack(TardisBlocks.TARDIS))
                     .title(Component.translatable("creativetab.gallifreyan_chronicles.tardis"))
                     .displayItems((parameters, output) -> GCCreativeTabContents.tardis(output::accept))
                     .build());
@@ -24,7 +27,7 @@ public class GCCreativeModeTabs {
             BuiltInRegistries.CREATIVE_MODE_TAB,
             GCUtil.modIdentifier("natural_blocks"),
             FabricCreativeModeTab.builder()
-                    .icon(() -> new ItemStack(GCBlocks.GALLIFREYAN_GRASS_BLOCK))
+                    .icon(() -> new ItemStack(GallifreyBlocks.GALLIFREYAN_GRASS_BLOCK))
                     .title(Component.translatable("creativetab.gallifreyan_chronicles.natural_blocks"))
                     .displayItems((parameters, output) -> GCCreativeTabContents.naturalBlocks(output::accept))
                     .build());
@@ -33,7 +36,7 @@ public class GCCreativeModeTabs {
             BuiltInRegistries.CREATIVE_MODE_TAB,
             GCUtil.modIdentifier("building_blocks"),
             FabricCreativeModeTab.builder()
-                    .icon(() -> new ItemStack(GCBlocks.CADONWOOD_PLANKS))
+                    .icon(() -> new ItemStack(CadonwoodBlocks.CADONWOOD_PLANKS))
                     .title(Component.translatable("creativetab.gallifreyan_chronicles.building_blocks"))
                     .displayItems((parameters, output) -> GCCreativeTabContents.buildingBlocks(output::accept))
                     .build());
@@ -42,7 +45,7 @@ public class GCCreativeModeTabs {
             BuiltInRegistries.CREATIVE_MODE_TAB,
             GCUtil.modIdentifier("flora"),
             FabricCreativeModeTab.builder()
-                    .icon(() -> new ItemStack(GCBlocks.CADONWOOD_LEAVES))
+                    .icon(() -> new ItemStack(CadonwoodBlocks.CADONWOOD_LEAVES))
                     .title(Component.translatable("creativetab.gallifreyan_chronicles.flora"))
                     .displayItems((parameters, output) -> GCCreativeTabContents.flora(output::accept))
                     .build());
@@ -56,7 +59,6 @@ public class GCCreativeModeTabs {
                     .displayItems((parameters, output) -> GCCreativeTabContents.toolsAndArmor(output::accept))
                     .build());
 
-    // Everything addons registered through the addon api, read when the tab is built after addons have started
     public static final CreativeModeTab ADDONS_TAB = Registry.register(
             BuiltInRegistries.CREATIVE_MODE_TAB,
             GCUtil.modIdentifier("addons"),

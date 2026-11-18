@@ -6,10 +6,6 @@ import uk.nbforge.gallifreyan_chronicles.Constants;
 import uk.nbforge.gallifreyan_chronicles.tardis.mind.action.MindAction;
 import uk.nbforge.gallifreyan_chronicles.tardis.mind.action.MindContext;
 
-/**
- * Spawns particles at the TARDIS.
- * The json fields are particle, count, spread, speed and height.
- */
 public record ParticlesAction(SimpleParticleType particle, int count, Vec3 spread, float speed, float height)
         implements MindAction {
     public static final String TYPE = Constants.MOD_ID + ":particles";

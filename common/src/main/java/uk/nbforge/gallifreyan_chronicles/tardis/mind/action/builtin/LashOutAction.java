@@ -8,7 +8,7 @@ import uk.nbforge.gallifreyan_chronicles.Constants;
 import uk.nbforge.gallifreyan_chronicles.tardis.mind.MindMessages;
 import uk.nbforge.gallifreyan_chronicles.tardis.mind.action.MindAction;
 import uk.nbforge.gallifreyan_chronicles.tardis.mind.action.MindContext;
-import uk.nbforge.gallifreyan_chronicles.util.GCSparkUtil;
+import uk.nbforge.gallifreyan_chronicles.util.SparkUtil;
 
 /**
  * Used for when_you_enter, a TARDIS that fears you zaps you and throws you back.
@@ -37,14 +37,13 @@ public record LashOutAction(float fromSeverity, float minDamage, float maxDamage
         float scale = Mth.clamp((context.severity - fromSeverity) / span, 0f, 1f);
         float damage = Mth.lerp(scale, minDamage, maxDamage);
 
-        // Never lethal, whatever the numbers in the json say
         damage = Math.min(damage, player.getHealth() - LEAVES_HEALTH);
         if (damage > 0f) {
             player.hurtServer(level, level.damageSources().lightningBolt(), damage);
         }
         ShockAction.throwBack(player, context.pos, push, lift);
 
-        GCSparkUtil.big(level, player.position().add(0, 1, 0));
+        SparkUtil.big(level, player.position().add(0, 1, 0));
         MindMessages.say(player, ChatFormatting.RED, "tardis_lashes_out");
         context.handled = true;
     }

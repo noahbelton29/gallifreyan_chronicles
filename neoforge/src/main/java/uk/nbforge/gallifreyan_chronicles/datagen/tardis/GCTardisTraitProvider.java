@@ -2,14 +2,13 @@ package uk.nbforge.gallifreyan_chronicles.datagen.tardis;
 
 import com.google.gson.JsonObject;
 import net.minecraft.data.PackOutput;
-import uk.nbforge.gallifreyan_chronicles.datagen.tardis.builder.GCTraitBuilder;
+import uk.nbforge.gallifreyan_chronicles.datagen.tardis.builder.TraitBuilder;
 import uk.nbforge.gallifreyan_chronicles.datagen.util.GCJsonDataProvider;
 import uk.nbforge.gallifreyan_chronicles.tardis.mind.data.MindEnums.Reveal;
 
 /**
- * Generates the tardis_trait json files.
  * To add one copy a block below and change what you want, times values default to 1 and shifts to 0 so only list what the trait changes.
- * Reactions to events come from GCMind.
+ * Reactions to events come from MindReactions.
  */
 public class GCTardisTraitProvider extends GCJsonDataProvider {
     public GCTardisTraitProvider(PackOutput output) {
@@ -93,9 +92,9 @@ public class GCTardisTraitProvider extends GCJsonDataProvider {
                 .revealedWhen(Reveal.A_STRANGER_UPSETS_IT);
     }
 
-    private GCTraitBuilder trait(String name) {
+    private TraitBuilder trait(String name) {
         JsonObject json = new JsonObject();
         add(name, json);
-        return new GCTraitBuilder(json);
+        return new TraitBuilder(json);
     }
 }

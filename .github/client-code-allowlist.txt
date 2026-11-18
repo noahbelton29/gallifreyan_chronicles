@@ -4,8 +4,9 @@ common/src/main/java/uk/nbforge/gallifreyan_chronicles/compat/portal/TardisPorta
 common/src/main/java/uk/nbforge/gallifreyan_chronicles/core/block/InteriorDoorBlock.java  # guarded by level.isClientSide()
 
 # Block entities: client hooks are only called from client-side methods
-common/src/main/java/uk/nbforge/gallifreyan_chronicles/core/block_entities/TardisConsoleBlockEntity.java
-common/src/main/java/uk/nbforge/gallifreyan_chronicles/core/block_entities/TardisExteriorBlockEntity.java
+common/src/main/java/uk/nbforge/gallifreyan_chronicles/core/block_entity/TardisConsoleBlockEntity.java
+common/src/main/java/uk/nbforge/gallifreyan_chronicles/core/block_entity/TardisExteriorBlockEntity.java
+common/src/main/java/uk/nbforge/gallifreyan_chronicles/tardis/exterior/ExteriorTravel.java  # key reveal guarded by level.isClientSide()
 
 # Network payloads: the client part only runs when a client receives the packet
 common/src/main/java/uk/nbforge/gallifreyan_chronicles/network/DiscoveryToastPayload.java

@@ -4,7 +4,6 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.level.Level;
 import org.jspecify.annotations.Nullable;
-import uk.nbforge.gallifreyan_chronicles.core.dynamic_registries.TardisControlRegistry;
 
 public interface ConsoleControlHost {
     Level getHostLevel();
@@ -18,11 +17,11 @@ public interface ConsoleControlHost {
     }
 
     default @Nullable String resolveControlAnimation(String controlId, boolean activated) {
-        return TardisControlRegistry.get(controlId).getAnimation(activated);
+        return TardisControls.get(controlId).getAnimation(activated);
     }
 
     default boolean controlSnapsWhenInactive(String controlId) {
-        return TardisControlRegistry.get(controlId).snapsWhenInactive();
+        return TardisControls.get(controlId).snapsWhenInactive();
     }
 
     default boolean isHostUpsideDown() {

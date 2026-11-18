@@ -1,6 +1,6 @@
 package uk.nbforge.gallifreyan_chronicles.client.renderer.entity;
 
-import java.awt.*;
+import java.awt.Color;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.components.debug.DebugScreenEntries;
 import net.minecraft.client.renderer.culling.Frustum;
@@ -51,7 +51,7 @@ public class TardisControlHitboxDebugRenderer implements DebugRenderer.SimpleDeb
         Vec3 currentPosition = entity.getPosition(partialTicks);
         Vec3 offset = currentPosition.subtract(entity.position());
         Gizmos.cuboid(entity.getBoundingBox().move(offset), GizmoStyle.stroke(color));
-        Gizmos.point(currentPosition, color, 2.0F);
+        Gizmos.point(currentPosition, color, 2.0f);
     }
 
     private static int colorFor(String controlId) {

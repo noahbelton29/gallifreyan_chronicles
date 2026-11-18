@@ -14,37 +14,30 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.phys.Vec3;
 import uk.nbforge.gallifreyan_chronicles.core.lifecycle.ServerState;
 import uk.nbforge.gallifreyan_chronicles.tardis.Tardis;
-import uk.nbforge.gallifreyan_chronicles.tardis.TardisApi;
 import uk.nbforge.gallifreyan_chronicles.tardis.TardisEvents;
-import uk.nbforge.gallifreyan_chronicles.tardis.ecs.system.TardisMindSystem;
 import uk.nbforge.gallifreyan_chronicles.tardis.mind.FearLevel;
 import uk.nbforge.gallifreyan_chronicles.tardis.mind.MindMessages;
 import uk.nbforge.gallifreyan_chronicles.tardis.mind.TardisBond;
+import uk.nbforge.gallifreyan_chronicles.tardis.mind.TardisDiscovery;
 import uk.nbforge.gallifreyan_chronicles.tardis.mind.TardisMind;
+import uk.nbforge.gallifreyan_chronicles.tardis.mind.TardisMinds;
 import uk.nbforge.gallifreyan_chronicles.tardis.mind.TardisPersonality;
 import uk.nbforge.gallifreyan_chronicles.tardis.mind.action.MindActions;
 import uk.nbforge.gallifreyan_chronicles.tardis.mind.action.MindContext;
 import uk.nbforge.gallifreyan_chronicles.tardis.mind.data.MindEnums.Reveal;
 import uk.nbforge.gallifreyan_chronicles.tardis.mind.disability.TardisDisability;
-import uk.nbforge.gallifreyan_chronicles.tardis.mind.discovery.TardisDiscovery;
 import uk.nbforge.gallifreyan_chronicles.tardis.mind.mood.TardisMoods;
 
-/**
- * Long term scars from abuse, each player leaves their own scars and the TARDIS also keeps a total.
- * Enough total trauma gives it PTSD, all of it heals with time and kindness.
- */
 public final class TardisTrauma {
     private static final float PTSD_TRAUMA = 80f;
     private static final float MIN_SENSITIVITY = 0.75f;
     private static final float MAX_SENSITIVITY = 1.25f;
 
-    // The same beating does less lasting harm with every extra hit
     private static final float BEATING_FALLOFF = 0.25f;
     private static final float BEATING_MIN = 0.25f;
 
     private static final float CALM_STRESS = 30f;
     private static final float CALM_LANDING_HEAL = 1.5f;
-    // Each calm landing gets it this much closer to recovering from PTSD
     private static final float RECOVERY_KEEP = 0.97f;
     private static final float EASING_RECOVERY = 0.9f;
 
@@ -67,23 +60,23 @@ public final class TardisTrauma {
 
     /** How much one hit scars it, loyal ones feel it the most, hitInBeating counts from 1. */
     public static void hit(Tardis tardis, UUID player, int hitInBeating) {
-        TardisMind mind = TardisMindSystem.mind(tardis);
-        TardisBond bond = TardisMindSystem.bond(tardis, player);
+        TardisMind mind = TardisMinds.mind(tardis);
+        TardisBond bond = TardisMinds.bond(tardis, player);
         float falloff = Math.max(BEATING_MIN, 1f - BEATING_FALLOFF * (hitInBeating - 1));
         float hurt = mind.personality().traumaPerHit()
                 * sensitivity(tardis)
                 * mind.modifiersFor(bond).traumaGain()
                 * falloff;
 
-        TardisMindSystem.setTraumaFrom(tardis, player, TardisMindSystem.traumaFrom(tardis, player) + hurt);
-        float total = TardisMindSystem.trauma(tardis) + hurt;
-        TardisMindSystem.setTrauma(tardis, total);
+        TardisMinds.setTraumaFrom(tardis, player, TardisMinds.traumaFrom(tardis, player) + hurt);
+        float total = TardisMinds.trauma(tardis) + hurt;
+        TardisMinds.setTrauma(tardis, total);
 
         if (total >= PTSD_TRAUMA && !mind.has(TardisDisability.PTSD)) {
             List<TardisDisability> disabilities = new ArrayList<>(mind.disabilities());
             disabilities.add(TardisDisability.PTSD);
-            TardisMindSystem.setDisabilities(tardis, disabilities);
-            TardisMindSystem.setRecovery(tardis, 0f);
+            TardisMinds.setDisabilities(tardis, disabilities);
+            TardisMinds.setRecovery(tardis, 0f);
             TardisDiscovery.disability(tardis, TardisDisability.PTSD);
         }
     }
@@ -96,46 +89,44 @@ public final class TardisTrauma {
         return Mth.lerp(random.nextFloat(), MIN_SENSITIVITY, MAX_SENSITIVITY);
     }
 
-    /** A calm landing heals a little, its trauma, the scars and hits of the crew and its PTSD. */
     private static void heal(Tardis tardis) {
-        if (TardisMindSystem.stress(tardis) >= CALM_STRESS) return;
+        if (TardisMinds.stress(tardis) >= CALM_STRESS) return;
 
-        float trauma = TardisMindSystem.trauma(tardis);
-        if (trauma > 0f) TardisMindSystem.setTrauma(tardis, Math.max(0f, trauma - CALM_LANDING_HEAL));
+        float trauma = TardisMinds.trauma(tardis);
+        if (trauma > 0f) TardisMinds.setTrauma(tardis, Math.max(0f, trauma - CALM_LANDING_HEAL));
 
         for (UUID player : TardisMoods.crew(tardis)) {
-            if (TardisMindSystem.bond(tardis, player).hurtIt() || TardisMindSystem.traumaFrom(tardis, player) > 0f) {
-                TardisMindSystem.forgiveOneHit(tardis, player, CALM_LANDING_HEAL);
+            if (TardisMinds.bond(tardis, player).hurtIt() || TardisMinds.traumaFrom(tardis, player) > 0f) {
+                TardisMinds.forgiveOneHit(tardis, player, CALM_LANDING_HEAL);
             }
         }
 
-        TardisMind mind = TardisMindSystem.mind(tardis);
+        TardisMind mind = TardisMinds.mind(tardis);
         if (!mind.has(TardisDisability.PTSD)) return;
         float before = mind.recovery();
         float after = 1f - (1f - before) * RECOVERY_KEEP;
-        TardisMindSystem.setRecovery(tardis, after);
+        TardisMinds.setRecovery(tardis, after);
         if (before < EASING_RECOVERY && after >= EASING_RECOVERY) {
             tardis.ownerPlayer()
                     .ifPresent(owner -> MindMessages.say(owner, ChatFormatting.LIGHT_PURPLE, "tardis_ptsd_easing"));
         }
     }
 
-    /** Someone it is afraid of is holding a mallet nearby. */
     public static void sawMallet(Player player, ServerLevel level) {
         for (Tardis tardis : nearby(player, level)) {
             UUID who = player.getUUID();
-            if (!TardisMindSystem.fearLevel(tardis, who).atLeast(FearLevel.AFRAID)) continue;
+            if (!TardisMinds.fearLevel(tardis, who).atLeast(FearLevel.AFRAID)) continue;
 
-            long now = TardisMindSystem.now(tardis.server());
+            long now = TardisMinds.now(tardis.server());
             String key = tardis.id() + "/" + who;
             Long last = LAST_REACTION.get(key);
             if (last != null && now - last < REACT_COOLDOWN_TICKS) continue;
             LAST_REACTION.put(key, now);
 
-            TardisMindSystem.addFear(tardis, who, SIGHT_FEAR);
-            TardisMindSystem.addStress(tardis, SIGHT_STRESS);
+            TardisMinds.addFear(tardis, who, SIGHT_FEAR);
+            TardisMinds.addStress(tardis, SIGHT_STRESS);
             BlockPos at = reactionPos(tardis, level);
-            if (at != null) react(tardis, TardisMindSystem.mind(tardis).personality(), player, level, at);
+            if (at != null) react(tardis, TardisMinds.mind(tardis).personality(), player, level, at);
         }
     }
 
@@ -147,9 +138,8 @@ public final class TardisTrauma {
 
     /** Only TARDISes in this dimension so it does not scan every TARDIS on the server. */
     private static List<Tardis> nearby(Player player, ServerLevel level) {
-        // Only notices the mallet from inside and not from the box outside
         List<Tardis> found = new ArrayList<>();
-        TardisApi.ofLevel(level)
+        Tardis.ofLevel(level)
                 .ifPresent(inside -> inside.consolePos().ifPresent(pos -> {
                     if (player.distanceToSqr(Vec3.atCenterOf(pos)) <= INSIDE_RANGE * INSIDE_RANGE) found.add(inside);
                 }));

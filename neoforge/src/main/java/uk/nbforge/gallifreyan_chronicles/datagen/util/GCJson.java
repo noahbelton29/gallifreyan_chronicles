@@ -5,11 +5,9 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonNull;
 import com.google.gson.JsonObject;
 
-/** A tiny json builder so datagen reads like the files it makes. */
 public final class GCJson {
     private GCJson() {}
 
-    /** Key and value pairs in a row. */
     public static JsonObject obj(Object... keyValues) {
         if (keyValues.length % 2 != 0) throw new IllegalArgumentException("obj needs key/value pairs");
         JsonObject out = new JsonObject();

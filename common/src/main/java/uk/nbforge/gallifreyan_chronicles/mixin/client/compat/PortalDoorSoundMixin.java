@@ -13,7 +13,7 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import uk.nbforge.gallifreyan_chronicles.client.sound.SoundListener;
 import uk.nbforge.gallifreyan_chronicles.core.GCSounds;
-import uk.nbforge.gallifreyan_chronicles.core.dynamic_registries.TardisDoorRegistry;
+import uk.nbforge.gallifreyan_chronicles.core.data_registry.TardisDoorRegistry;
 import uk.nbforge.gallifreyan_chronicles.tardis.door.TardisDoorVariant;
 
 /**

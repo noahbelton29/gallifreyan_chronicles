@@ -39,7 +39,6 @@ public final class SkyPipelines {
     public static final RenderPipeline OVERLAY_BODY =
             texturedBody("sky_overlay_body").withDepthStencilState(BEHIND_SCENE).build();
 
-    // Stars add light but leave the canvas see through
     private static final BlendFunction ADD_KEEP_ALPHA =
             new BlendFunction(BlendFactor.SRC_ALPHA, BlendFactor.ONE, BlendFactor.ZERO, BlendFactor.ONE);
 
@@ -48,7 +47,6 @@ public final class SkyPipelines {
             .withDepthStencilState(BEHIND_SCENE)
             .build();
 
-    // Lays the sky canvas over the screen after a shader pack is done
     public static final RenderPipeline CANVAS_COMPOSITE = RenderPipeline.builder(RenderPipelines.GLOBALS_SNIPPET)
             .withLocation(GCUtil.modIdentifier("pipeline/sky_canvas_composite"))
             .withVertexShader("core/screenquad")

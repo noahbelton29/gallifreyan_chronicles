@@ -7,10 +7,6 @@ import uk.nbforge.gallifreyan_chronicles.Constants;
 import uk.nbforge.gallifreyan_chronicles.tardis.mind.action.MindAction;
 import uk.nbforge.gallifreyan_chronicles.tardis.mind.action.MindContext;
 
-/**
- * Plays a sound at the TARDIS.
- * The json fields are sound, volume and pitch.
- */
 public record SoundAction(SoundEvent sound, float volume, float pitch) implements MindAction {
     public static final String TYPE = Constants.MOD_ID + ":sound";
 

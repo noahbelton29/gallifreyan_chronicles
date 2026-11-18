@@ -15,7 +15,7 @@ import net.minecraft.world.phys.Vec3;
 import uk.nbforge.gallifreyan_chronicles.core.sound.timed.TimedSoundData.Session;
 import uk.nbforge.gallifreyan_chronicles.network.ResumeSoundPayload;
 import uk.nbforge.gallifreyan_chronicles.platform.Services;
-import uk.nbforge.gallifreyan_chronicles.util.GCSchedulerUtil;
+import uk.nbforge.gallifreyan_chronicles.util.SchedulerUtil;
 
 public final class TimedSounds {
     private static final int MIN_TRACKED_TICKS = 40;
@@ -28,7 +28,7 @@ public final class TimedSounds {
 
     public static void play(
             ServerLevel level, BlockPos pos, SoundEvent sound, SoundSource source, float volume, float pitch) {
-        start(level, pos, sound, source, volume, pitch, false, Optional.empty(), 1.0F);
+        start(level, pos, sound, source, volume, pitch, false, Optional.empty(), 1.0f);
     }
 
     public static void playThenLoop(
@@ -56,7 +56,7 @@ public final class TimedSounds {
         level.playSound(null, pos, sound, source, volume, pitch);
 
         double seconds = SoundDurations.seconds(sound.location());
-        int durationTicks = (int) Math.round(seconds * 20.0 / Math.max(pitch, 0.01F));
+        int durationTicks = (int) Math.round(seconds * 20.0 / Math.max(pitch, 0.01f));
         boolean chained = loop || next.isPresent();
         if (durationTicks < (chained ? 1 : MIN_TRACKED_TICKS)) return;
 
@@ -86,7 +86,7 @@ public final class TimedSounds {
         long remaining = session.loop()
                 ? session.durationTicks() - (elapsed % session.durationTicks())
                 : session.durationTicks() - elapsed;
-        GCSchedulerUtil.runLater(server, (int) Math.max(1, remaining), () -> onEnd(server, session));
+        SchedulerUtil.runLater(server, (int) Math.max(1, remaining), () -> onEnd(server, session));
     }
 
     private static void onEnd(MinecraftServer server, Session session) {
@@ -111,7 +111,7 @@ public final class TimedSounds {
                         session.pitch(),
                         true,
                         Optional.empty(),
-                        1.0F);
+                        1.0f);
         } else if (session.loop()) {
             SoundEvent again =
                     BuiltInRegistries.SOUND_EVENT.getOptional(session.sound()).orElse(null);
@@ -125,7 +125,7 @@ public final class TimedSounds {
                         session.pitch(),
                         true,
                         Optional.empty(),
-                        1.0F);
+                        1.0f);
         }
     }
 
@@ -178,8 +178,8 @@ public final class TimedSounds {
             double range = event == null ? 16.0 : event.getRange(session.volume());
             if (player.distanceToSqr(session.pos()) > range * range) continue;
 
-            float offsetSeconds = elapsed / 20.0F * session.pitch();
-            Services.NETWORK.sendResumeSound(
+            float offsetSeconds = elapsed / 20.0f * session.pitch();
+            Services.NETWORK.send(
                     player,
                     new ResumeSoundPayload(
                             session.sound(),

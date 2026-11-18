@@ -12,10 +12,9 @@ import net.minecraft.resources.Identifier;
 import net.minecraft.util.FormattedCharSequence;
 import net.minecraft.world.item.ItemStack;
 import uk.nbforge.gallifreyan_chronicles.Constants;
-import uk.nbforge.gallifreyan_chronicles.core.GCBlocks;
+import uk.nbforge.gallifreyan_chronicles.core.block.registry.TardisBlocks;
 import uk.nbforge.gallifreyan_chronicles.util.GCUtil;
 
-/** The trait discovered popup, it grows to fit the explanation. */
 public class DiscoveryToast implements Toast {
     private static final Identifier BACKGROUND = GCUtil.modIdentifier("toast/discovery");
     private static final String LANG = "discovery.gallifreyan_chronicles.";
@@ -60,7 +59,7 @@ public class DiscoveryToast implements Toast {
                     .append(" ")
                     .append(description);
         }
-        ItemStack icon = new ItemStack(kind.equals("trait") ? GCBlocks.TARDIS_CONSOLE : GCBlocks.TARDIS);
+        ItemStack icon = new ItemStack(kind.equals("trait") ? TardisBlocks.TARDIS_CONSOLE : TardisBlocks.TARDIS);
         int colour = kind.equals("disability") ? QUIRK_COLOUR : HEADER_COLOUR;
         Minecraft.getInstance()
                 .gui

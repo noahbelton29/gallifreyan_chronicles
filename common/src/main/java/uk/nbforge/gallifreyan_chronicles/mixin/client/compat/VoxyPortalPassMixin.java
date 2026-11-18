@@ -17,13 +17,11 @@ import uk.nbforge.gallifreyan_chronicles.compat.portal.VoxyPortalGuard;
 @Pseudo
 @Mixin(targets = "me.cortex.voxy.client.core.VoxyRenderSystem", remap = false)
 public abstract class VoxyPortalPassMixin {
-    // Saves the stencil state of the portal and skips Voxy for this view if the stencil cannot be used safely
     @Inject(method = "renderOpaque", at = @At("HEAD"), cancellable = true, remap = false, require = 0)
     private void gc$enterPortalView(CallbackInfo ci) {
         if (!VoxyPortalGuard.begin()) ci.cancel();
     }
 
-    // Puts the stencil state of the portal back
     @Inject(method = "renderOpaque", at = @At("RETURN"), remap = false, require = 0)
     private void gc$leavePortalView(CallbackInfo ci) {
         VoxyPortalGuard.end();

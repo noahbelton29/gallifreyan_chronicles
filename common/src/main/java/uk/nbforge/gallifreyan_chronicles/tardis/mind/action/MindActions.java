@@ -5,7 +5,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import org.jspecify.annotations.Nullable;
-import uk.nbforge.gallifreyan_chronicles.tardis.codec.mind.action.MindActionBuiltinCodec;
 import uk.nbforge.gallifreyan_chronicles.tardis.mind.action.builtin.AddFearAction;
 import uk.nbforge.gallifreyan_chronicles.tardis.mind.action.builtin.AddStressAction;
 import uk.nbforge.gallifreyan_chronicles.tardis.mind.action.builtin.AddTrustAction;
@@ -15,6 +14,7 @@ import uk.nbforge.gallifreyan_chronicles.tardis.mind.action.builtin.HitBackActio
 import uk.nbforge.gallifreyan_chronicles.tardis.mind.action.builtin.LashOutAction;
 import uk.nbforge.gallifreyan_chronicles.tardis.mind.action.builtin.LockDoorsAction;
 import uk.nbforge.gallifreyan_chronicles.tardis.mind.action.builtin.MessageAction;
+import uk.nbforge.gallifreyan_chronicles.tardis.mind.action.builtin.MindActionBuiltinCodec;
 import uk.nbforge.gallifreyan_chronicles.tardis.mind.action.builtin.ParticlesAction;
 import uk.nbforge.gallifreyan_chronicles.tardis.mind.action.builtin.RefuseAction;
 import uk.nbforge.gallifreyan_chronicles.tardis.mind.action.builtin.RevealAction;
@@ -26,7 +26,6 @@ import uk.nbforge.gallifreyan_chronicles.tardis.mind.action.builtin.SoundAction;
 import uk.nbforge.gallifreyan_chronicles.tardis.mind.action.builtin.SparksAction;
 import uk.nbforge.gallifreyan_chronicles.tardis.mind.data.MindIds;
 
-/** Every action type json can use, addons call register to add their own. */
 public final class MindActions {
     private static final Map<String, MapCodec<? extends MindAction>> TYPES = new ConcurrentHashMap<>();
 

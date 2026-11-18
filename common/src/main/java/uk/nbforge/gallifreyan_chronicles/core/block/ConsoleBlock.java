@@ -21,20 +21,16 @@ import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.level.block.state.properties.EnumProperty;
 import net.minecraft.world.level.block.state.properties.Half;
 import net.minecraft.world.phys.Vec3;
-import org.jetbrains.annotations.NotNull;
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 import uk.nbforge.gallifreyan_chronicles.core.GCDataComponents;
 import uk.nbforge.gallifreyan_chronicles.core.GCSounds;
-import uk.nbforge.gallifreyan_chronicles.core.block_entities.TardisConsoleBlockEntity;
-import uk.nbforge.gallifreyan_chronicles.core.block_entities.TardisExteriorBlockEntity;
-import uk.nbforge.gallifreyan_chronicles.core.dynamic_registries.TardisConsoleRegistry;
+import uk.nbforge.gallifreyan_chronicles.core.block_entity.TardisConsoleBlockEntity;
+import uk.nbforge.gallifreyan_chronicles.core.data_registry.TardisConsoleRegistry;
 import uk.nbforge.gallifreyan_chronicles.tardis.Tardis;
-import uk.nbforge.gallifreyan_chronicles.tardis.TardisApi;
+import uk.nbforge.gallifreyan_chronicles.tardis.console.ConsoleLink;
+import uk.nbforge.gallifreyan_chronicles.tardis.console.ConsoleStackUtil;
 import uk.nbforge.gallifreyan_chronicles.tardis.console.TardisConsole;
-import uk.nbforge.gallifreyan_chronicles.tardis.ecs.system.ConsoleLinkSystem;
-import uk.nbforge.gallifreyan_chronicles.tardis.ecs.system.ConsoleSyncSystem;
-import uk.nbforge.gallifreyan_chronicles.util.ConsoleStackUtil;
 import uk.nbforge.gallifreyan_chronicles.util.PlayerMotionUtil;
 
 public class ConsoleBlock extends BaseEntityBlock {
@@ -74,11 +70,10 @@ public class ConsoleBlock extends BaseEntityBlock {
 
     public static void repel(Level level, BlockPos pos, Entity entity) {
         if (!(level instanceof ServerLevel)) return;
-        // Only a console inside a TARDIS throws you off
         if (level.getBlockEntity(pos) instanceof TardisConsoleBlockEntity console && !console.isInTardis()) return;
         if (!(entity instanceof LivingEntity livingEntity)) return;
 
-        float yaw = livingEntity.getYRot() * ((float) Math.PI / 180F);
+        float yaw = livingEntity.getYRot() * ((float) Math.PI / 180f);
         double power = 0.3;
 
         PlayerMotionUtil.set(livingEntity, new Vec3(Math.sin(yaw) * power, 0.3, -Math.cos(yaw) * power));
@@ -100,7 +95,7 @@ public class ConsoleBlock extends BaseEntityBlock {
     }
 
     @Override
-    public @NotNull BlockEntity newBlockEntity(@NotNull BlockPos pos, @NotNull BlockState state) {
+    public @NonNull BlockEntity newBlockEntity(@NonNull BlockPos pos, @NonNull BlockState state) {
         return new TardisConsoleBlockEntity(pos, state);
     }
 
@@ -128,7 +123,7 @@ public class ConsoleBlock extends BaseEntityBlock {
             console.setConsole(selected);
         }
 
-        ConsoleLinkSystem.onPlaced(console);
+        ConsoleLink.onPlaced(console);
     }
 
     @Override
@@ -136,13 +131,13 @@ public class ConsoleBlock extends BaseEntityBlock {
             @NonNull BlockState state, @NonNull ServerLevel level, @NonNull BlockPos pos, boolean movedByPiston) {
         super.affectNeighborsAfterRemoval(state, level, pos, movedByPiston);
 
-        Tardis tardis = TardisApi.ofLevel(level).orElse(null);
+        Tardis tardis = Tardis.ofLevel(level).orElse(null);
         if (tardis == null) return;
 
-        for (TardisConsoleBlockEntity other : ConsoleSyncSystem.consolesOf(tardis.id())) {
+        for (TardisConsoleBlockEntity other : tardis.consoles()) {
             if (!other.getBlockPos().equals(pos)) return;
         }
-        tardis.exteriorIfLoaded().ifPresent(TardisExteriorBlockEntity::cutPower);
+        tardis.exteriorIfLoaded().ifPresent(exterior -> exterior.lamp().cutPower());
     }
 
     @Override

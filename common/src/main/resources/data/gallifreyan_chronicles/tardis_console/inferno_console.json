@@ -112,5 +112,6 @@
       "hold_ticks": 50,
       "name": "rotor"
     }
-  ]
+  ],
+  "sort_order": 2
 }

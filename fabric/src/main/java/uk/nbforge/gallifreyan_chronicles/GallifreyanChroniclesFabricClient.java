@@ -11,7 +11,7 @@ import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderers;
 import net.minecraft.client.renderer.entity.EntityRenderers;
-import uk.nbforge.gallifreyan_chronicles.client.gui.hud.GCHudRenderer;
+import uk.nbforge.gallifreyan_chronicles.client.gui.hud.HudRenderer;
 import uk.nbforge.gallifreyan_chronicles.client.input.GCKeyMappings;
 import uk.nbforge.gallifreyan_chronicles.client.lifecycle.ClientState;
 import uk.nbforge.gallifreyan_chronicles.client.protection.watermark.WatermarkIdentity;
@@ -25,8 +25,8 @@ import uk.nbforge.gallifreyan_chronicles.client.renderer.util.OutlineHider;
 import uk.nbforge.gallifreyan_chronicles.compat.flashback.FlashbackOptionsButton;
 import uk.nbforge.gallifreyan_chronicles.compat.replaymod.ReplayModOptionsButton;
 import uk.nbforge.gallifreyan_chronicles.core.GCBlockEntities;
-import uk.nbforge.gallifreyan_chronicles.core.GCBlocks;
 import uk.nbforge.gallifreyan_chronicles.core.GCEntityTypes;
+import uk.nbforge.gallifreyan_chronicles.core.block.registry.CadonwoodBlocks;
 import uk.nbforge.gallifreyan_chronicles.network.client.GCFabricClientNetworking;
 import uk.nbforge.gallifreyan_chronicles.util.GCUtil;
 
@@ -36,7 +36,7 @@ public class GallifreyanChroniclesFabricClient implements ClientModInitializer {
         ClientPlayConnectionEvents.DISCONNECT.register((handler, client) -> client.execute(ClientState::clearAll));
         WatermarkIdentity.enabled();
 
-        BlockTransformerHelper.registerStripping(GCBlocks.CADONWOOD_LOG, GCBlocks.STRIPPED_CADONWOOD_LOG);
+        BlockTransformerHelper.registerStripping(CadonwoodBlocks.CADONWOOD_LOG, CadonwoodBlocks.STRIPPED_CADONWOOD_LOG);
         BlockEntityRenderers.register(
                 GCBlockEntities.TARDIS_EXTERIOR_BLOCK_ENTITY_TYPE, TardisExteriorBlockRenderer::new);
         BlockEntityRenderers.register(
@@ -56,16 +56,14 @@ public class GallifreyanChroniclesFabricClient implements ClientModInitializer {
             FlashbackOptionsButton.register();
         }
 
-        // Hide the selection outline on interior doors, returning false cancels the outline
         LevelRenderEvents.BEFORE_BLOCK_OUTLINE.register((_, hit) -> !OutlineHider.shouldHide(hit.pos()));
 
         HudElementRegistry.attachElementAfter(
                 VanillaHudElements.MISC_OVERLAYS,
                 GCUtil.modIdentifier("power_darkness"),
-                (graphics, _) -> GCHudRenderer.renderBelowHud(graphics));
+                (graphics, _) -> HudRenderer.renderBelowHud(graphics));
 
-        HudElementRegistry.addLast(
-                GCUtil.modIdentifier("hud_overlay"), (graphics, _) -> GCHudRenderer.render(graphics));
+        HudElementRegistry.addLast(GCUtil.modIdentifier("hud_overlay"), (graphics, _) -> HudRenderer.render(graphics));
 
         HudElementRegistry.addLast(
                 GCUtil.modIdentifier("watermark_overlay"), (graphics, _) -> WatermarkOverlay.render(graphics));

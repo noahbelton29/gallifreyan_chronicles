@@ -26,7 +26,7 @@ import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 import uk.nbforge.gallifreyan_chronicles.Constants;
 import uk.nbforge.gallifreyan_chronicles.core.GCDataComponents;
-import uk.nbforge.gallifreyan_chronicles.core.block_entities.TardisExteriorBlockEntity;
+import uk.nbforge.gallifreyan_chronicles.core.block_entity.TardisExteriorBlockEntity;
 import uk.nbforge.gallifreyan_chronicles.core.item.MasterTardisKeyItem;
 import uk.nbforge.gallifreyan_chronicles.core.item.TardisKeyItem;
 import uk.nbforge.gallifreyan_chronicles.util.MessageUtil;
@@ -70,7 +70,7 @@ public class TardisKeyEntity extends Entity {
         if (!(this.level().getBlockEntity(this.getExteriorPos()) instanceof TardisExteriorBlockEntity exterior)) {
             return;
         }
-        Vec3 target = exterior.getKeyWorldPos();
+        Vec3 target = exterior.lock().getKeyWorldPos();
         if (this.position().distanceToSqr(target) > 1.0E-6) {
             this.setPos(target);
         }
@@ -182,11 +182,13 @@ public class TardisKeyEntity extends Entity {
         }
 
         TardisExteriorBlockEntity exterior = this.getExterior();
-        if (exterior == null || exterior.hasKeyRendered() || exterior.isFullyInvisible()) {
+        if (exterior == null
+                || exterior.lock().hasKeyRendered()
+                || exterior.travel().isFullyInvisible()) {
             return InteractionResult.PASS;
         }
 
-        if (!exterior.areDoorsFullyClosed()) {
+        if (!exterior.doors().areFullyClosed()) {
             if (!this.level().isClientSide()) {
                 MessageUtil.overlay(player, "close_doors_to_insert_key");
             }
@@ -201,7 +203,7 @@ public class TardisKeyEntity extends Entity {
     }
 
     private InteractionResult tryInsertKey(TardisExteriorBlockEntity exterior, Player player, InteractionHand hand) {
-        if (!exterior.areDoorsFullyClosed()) {
+        if (!exterior.doors().areFullyClosed()) {
             return InteractionResult.FAIL;
         }
 
@@ -228,7 +230,7 @@ public class TardisKeyEntity extends Entity {
             }
         }
 
-        exterior.insertKey(player, hand, held);
+        exterior.lock().insertKey(player, hand, held);
 
         return InteractionResult.CONSUME;
     }
@@ -254,7 +256,7 @@ public class TardisKeyEntity extends Entity {
     @Override
     public boolean isPickable() {
         TardisExteriorBlockEntity exterior = this.getExterior();
-        return exterior == null || !exterior.isFullyInvisible();
+        return exterior == null || !exterior.travel().isFullyInvisible();
     }
 
     @Override

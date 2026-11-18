@@ -2,10 +2,10 @@ package uk.nbforge.gallifreyan_chronicles.tardis.mind.action.builtin;
 
 import java.util.Optional;
 import uk.nbforge.gallifreyan_chronicles.Constants;
+import uk.nbforge.gallifreyan_chronicles.tardis.mind.TardisDiscovery;
 import uk.nbforge.gallifreyan_chronicles.tardis.mind.action.MindAction;
 import uk.nbforge.gallifreyan_chronicles.tardis.mind.action.MindContext;
 import uk.nbforge.gallifreyan_chronicles.tardis.mind.data.MindEnums.Reveal;
-import uk.nbforge.gallifreyan_chronicles.tardis.mind.discovery.TardisDiscovery;
 
 /**
  * The TARDIS just showed who it is so the owner discovers its personality.

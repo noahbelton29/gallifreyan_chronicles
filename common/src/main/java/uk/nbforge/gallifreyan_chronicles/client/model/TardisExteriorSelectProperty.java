@@ -8,14 +8,12 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.item.ItemDisplayContext;
 import net.minecraft.world.item.ItemStack;
 import org.jspecify.annotations.Nullable;
-import uk.nbforge.gallifreyan_chronicles.codec.client.model.TardisExteriorSelectPropertyCodec;
 import uk.nbforge.gallifreyan_chronicles.core.GCDataComponents;
-import uk.nbforge.gallifreyan_chronicles.tardis.TardisInteriorOptions;
+import uk.nbforge.gallifreyan_chronicles.tardis.interior.TardisInteriorOptions;
 
 public record TardisExteriorSelectProperty() implements SelectItemModelProperty<String> {
     public static final SelectItemModelProperty.Type<TardisExteriorSelectProperty, String> TYPE =
-            SelectItemModelProperty.Type.create(
-                    MapCodec.unit(new TardisExteriorSelectProperty()), TardisExteriorSelectPropertyCodec.VALUE_CODEC);
+            SelectItemModelProperty.Type.create(MapCodec.unit(new TardisExteriorSelectProperty()), Codec.STRING);
 
     @Override
     public @Nullable String get(
@@ -31,7 +29,7 @@ public record TardisExteriorSelectProperty() implements SelectItemModelProperty<
 
     @Override
     public Codec<String> valueCodec() {
-        return TardisExteriorSelectPropertyCodec.VALUE_CODEC;
+        return Codec.STRING;
     }
 
     @Override

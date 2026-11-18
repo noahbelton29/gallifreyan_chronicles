@@ -7,11 +7,7 @@ import org.jspecify.annotations.NonNull;
 import uk.nbforge.gallifreyan_chronicles.client.tardis.RematCatchClient;
 import uk.nbforge.gallifreyan_chronicles.util.GCUtil;
 
-/**
- * A TARDIS materialised around a player and pulled them in.
- * self is that player, who sees the interior fade in around them with box and floorY.
- * Everyone else in the interior sees that player fade in like the TARDIS does.
- */
+/** self is the caught player, they see the interior fade in around them using box and floorY */
 public record RematCatchPayload(
         UUID player,
         String fadeType,

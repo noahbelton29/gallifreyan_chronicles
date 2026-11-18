@@ -84,7 +84,7 @@ public final class PowerDarknessTint {
     }
 
     public static void draw(float opacity, int rgb) {
-        int alpha = Mth.clamp(Math.round(opacity * 255.0F), 0, 255);
+        int alpha = Mth.clamp(Math.round(opacity * 255.0f), 0, 255);
         if (alpha <= 0) return;
         RenderPipeline tintPipeline = pipeline();
         if (tintPipeline == null) return;

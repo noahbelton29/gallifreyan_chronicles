@@ -71,7 +71,7 @@ public class ConsoleAnimationDriver implements ConsoleAnimatable {
         } else if (level instanceof ServerLevel serverLevel) {
             TardisConsoleAnimationPayload payload = new TardisConsoleAnimationPayload(
                     serverLevel.dimension().identifier(), pos, animationName, controllerName);
-            Services.NETWORK.broadcastTardisConsoleAnimation(serverLevel.getServer(), payload);
+            Services.NETWORK.broadcast(serverLevel.getServer(), payload);
         }
     }
 
@@ -90,7 +90,7 @@ public class ConsoleAnimationDriver implements ConsoleAnimatable {
             controller.setAnimation(flip ? raw.thenWait(1) : raw);
         } else {
             Constants.LOG.warn(
-                    "No animation controller found for control '{}', is it registered in TardisControlRegistry?",
+                    "No animation controller found for control '{}', is it registered in TardisControls?",
                     controllerName);
         }
     }

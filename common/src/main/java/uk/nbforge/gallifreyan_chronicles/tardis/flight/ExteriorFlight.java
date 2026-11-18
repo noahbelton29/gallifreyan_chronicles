@@ -2,8 +2,8 @@ package uk.nbforge.gallifreyan_chronicles.tardis.flight;
 
 import net.minecraft.world.level.storage.ValueInput;
 import net.minecraft.world.level.storage.ValueOutput;
-import uk.nbforge.gallifreyan_chronicles.tardis.codec.exterior.fade.FadeTypeKindCodec;
 import uk.nbforge.gallifreyan_chronicles.tardis.exterior.fade.FadeType;
+import uk.nbforge.gallifreyan_chronicles.tardis.exterior.fade.FadeTypeKindCodec;
 import uk.nbforge.gallifreyan_chronicles.tardis.exterior.fade.FadeTypes;
 
 public final class ExteriorFlight {

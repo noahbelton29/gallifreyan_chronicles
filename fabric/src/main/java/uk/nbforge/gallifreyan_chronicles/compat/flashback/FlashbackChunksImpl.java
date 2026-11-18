@@ -103,8 +103,8 @@ final class FlashbackChunksImpl {
         RenderStates.portalsRenderedThisFrame = 0;
     }
 
-    static boolean clientKnowsDim(int dimId) {
-        return DimensionIntId.getClientMap().containsIntId(dimId);
+    static boolean isUnknownToClient(int dimId) {
+        return !DimensionIntId.getClientMap().containsIntId(dimId);
     }
 
     static boolean mergeDimSync(Object packet) {
@@ -129,13 +129,12 @@ final class FlashbackChunksImpl {
         });
     }
 
-    /** Jumping on the timeline. */
     static void clearPuppet() {
         FlashbackPuppet.remove();
         FlashbackPuppet.scheduleRebuild();
     }
 
-    /** The number the client uses for this world, MIN_VALUE if the client does not know it. */
+    /** MIN_VALUE if the client doesnt know it */
     private static int clientDimId(ServerLevel level) {
         DimIntIdMap map = DimensionIntId.getClientMap();
         if (!map.containsDimId(level.dimension())) return Integer.MIN_VALUE;
@@ -152,11 +151,7 @@ final class FlashbackChunksImpl {
         if (server == null) return;
         for (ReplayPlayer viewer : server.getReplayViewers()) {
             if (viewer.level() == level) {
-                // Tag the chunk with its world using the numbers of the client so a TARDIS chunk cannot end up in the
-                // overworld
                 int dimId = clientDimId(level);
-                // If the client does not know this world yet skip it, sending it plain put TARDIS chunks into the
-                // overworld and left holes in the ground
                 if (dimId == Integer.MIN_VALUE) continue;
                 viewer.connection.send(
                         new ClientboundCustomPayloadPacket(new PacketRedirection.Payload(dimId, packet)));

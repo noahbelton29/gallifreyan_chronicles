@@ -8,9 +8,9 @@ import snownee.jade.api.BlockAccessor;
 import snownee.jade.api.IBlockComponentProvider;
 import snownee.jade.api.ITooltip;
 import snownee.jade.api.config.IPluginConfig;
-import uk.nbforge.gallifreyan_chronicles.core.block_entities.TardisExteriorBlockEntity;
+import uk.nbforge.gallifreyan_chronicles.core.block_entity.TardisExteriorBlockEntity;
 import uk.nbforge.gallifreyan_chronicles.core.item.tooltip.SelectionTooltip;
-import uk.nbforge.gallifreyan_chronicles.tardis.TardisExterior;
+import uk.nbforge.gallifreyan_chronicles.tardis.exterior.TardisExterior;
 import uk.nbforge.gallifreyan_chronicles.util.GCUtil;
 
 public class TardisExteriorInfoProvider implements IBlockComponentProvider {
@@ -27,7 +27,7 @@ public class TardisExteriorInfoProvider implements IBlockComponentProvider {
                 "tooltip.gallifreyan_chronicles.tardis.exterior",
                 SelectionTooltip.highlight(SelectionTooltip.displayName("tardis_exterior", exterior.id()))));
 
-        Component state = tardis.isLocked()
+        Component state = tardis.lock().isLocked()
                 ? Component.translatable("tooltip.gallifreyan_chronicles.tardis.locked")
                         .withStyle(ChatFormatting.RED)
                 : Component.translatable("tooltip.gallifreyan_chronicles.tardis.unlocked")

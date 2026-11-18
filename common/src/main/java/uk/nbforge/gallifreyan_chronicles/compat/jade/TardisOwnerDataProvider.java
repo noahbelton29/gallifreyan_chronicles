@@ -5,9 +5,8 @@ import net.minecraft.resources.Identifier;
 import org.jspecify.annotations.NonNull;
 import snownee.jade.api.BlockAccessor;
 import snownee.jade.api.IServerDataProvider;
-import uk.nbforge.gallifreyan_chronicles.core.block_entities.TardisExteriorBlockEntity;
+import uk.nbforge.gallifreyan_chronicles.core.block_entity.TardisExteriorBlockEntity;
 import uk.nbforge.gallifreyan_chronicles.tardis.Tardis;
-import uk.nbforge.gallifreyan_chronicles.tardis.TardisApi;
 import uk.nbforge.gallifreyan_chronicles.util.GCUtil;
 
 public class TardisOwnerDataProvider implements IServerDataProvider<BlockAccessor> {
@@ -17,7 +16,7 @@ public class TardisOwnerDataProvider implements IServerDataProvider<BlockAccesso
     @Override
     public void appendServerData(CompoundTag data, BlockAccessor accessor) {
         if (accessor.getBlockEntity() instanceof TardisExteriorBlockEntity exterior) {
-            String name = TardisApi.of(exterior).flatMap(Tardis::ownerName).orElse("");
+            String name = Tardis.of(exterior).flatMap(Tardis::ownerName).orElse("");
             data.putString(KEY, name);
         }
     }

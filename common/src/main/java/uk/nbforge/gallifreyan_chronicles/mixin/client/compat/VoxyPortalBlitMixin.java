@@ -20,7 +20,6 @@ import uk.nbforge.gallifreyan_chronicles.compat.portal.VoxyPortalGuard;
 @Pseudo
 @Mixin(targets = "me.cortex.voxy.client.core.AbstractRenderPipeline", remap = false)
 public abstract class VoxyPortalBlitMixin {
-    // Stops Voxy turning the stencil test off before the composite when it is being clipped
     @WrapOperation(
             method = "transformBlitDepth",
             at = @At(value = "INVOKE", target = "Lorg/lwjgl/opengl/GL11C;glDisable(I)V", ordinal = 0),
@@ -31,7 +30,6 @@ public abstract class VoxyPortalBlitMixin {
         original.call(capability);
     }
 
-    // Attaches the stencil buffer to the scratch framebuffer of Voxy once it is bound
     @Inject(
             method = "transformBlitDepth",
             at =
@@ -45,7 +43,6 @@ public abstract class VoxyPortalBlitMixin {
         VoxyPortalGuard.prepareClippedBlit();
     }
 
-    // Detaches the stencil buffer again once the composite is done
     @Inject(method = "transformBlitDepth", at = @At("RETURN"), remap = false, require = 0)
     private static void gc$unclipComposite(CallbackInfo ci) {
         VoxyPortalGuard.finishClippedBlit();

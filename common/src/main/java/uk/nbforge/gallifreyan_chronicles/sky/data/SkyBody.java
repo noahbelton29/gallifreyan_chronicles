@@ -1,10 +1,13 @@
 package uk.nbforge.gallifreyan_chronicles.sky.data;
 
+import com.mojang.serialization.Codec;
 import com.mojang.serialization.DataResult;
+import com.mojang.serialization.codecs.RecordCodecBuilder;
 import java.util.Optional;
 import net.minecraft.resources.Identifier;
 import net.minecraft.util.StringRepresentable;
-import uk.nbforge.gallifreyan_chronicles.core.dynamic_registries.CelestialBodyRegistry;
+import uk.nbforge.gallifreyan_chronicles.codec.HexColorCodec;
+import uk.nbforge.gallifreyan_chronicles.core.data_registry.CelestialBodyRegistry;
 
 public record SkyBody(
         Optional<Identifier> body,
@@ -18,7 +21,32 @@ public record SkyBody(
         Optional<Boolean> fadesInRain,
         Optional<SkyOrbit> orbit,
         Visibility visibility) {
-    public static final float DEFAULT_SIZE = 20.0F;
+    public static final float DEFAULT_SIZE = 20.0f;
+
+    public static final Codec<SkyBody.Blend> BLEND = StringRepresentable.fromEnum(SkyBody.Blend::values);
+
+    public static final Codec<SkyBody.Visibility> VISIBILITY = StringRepresentable.fromEnum(SkyBody.Visibility::values);
+
+    public static final Codec<SkyBody> CODEC = RecordCodecBuilder.<SkyBody>create(inst -> inst.group(
+                            Identifier.CODEC.optionalFieldOf("body").forGetter(SkyBody::body),
+                            Identifier.CODEC.optionalFieldOf("texture").forGetter(SkyBody::texture),
+                            Codec.FLOAT.optionalFieldOf("yaw", 0.0f).forGetter(SkyBody::yaw),
+                            Codec.floatRange(-90.0f, 90.0f)
+                                    .optionalFieldOf("pitch", 0.0f)
+                                    .forGetter(SkyBody::pitch),
+                            Codec.FLOAT.optionalFieldOf("roll", 0.0f).forGetter(SkyBody::roll),
+                            Codec.floatRange(0.0f, 200.0f)
+                                    .optionalFieldOf("size")
+                                    .forGetter(SkyBody::size),
+                            HexColorCodec.CODEC.optionalFieldOf("color").forGetter(SkyBody::color),
+                            BLEND.optionalFieldOf("blend").forGetter(SkyBody::blend),
+                            Codec.BOOL.optionalFieldOf("fades_in_rain").forGetter(SkyBody::fadesInRain),
+                            SkyCodec.ORBIT.optionalFieldOf("orbit").forGetter(SkyBody::orbit),
+                            VISIBILITY
+                                    .optionalFieldOf("visibility", SkyBody.Visibility.ALWAYS)
+                                    .forGetter(SkyBody::visibility))
+                    .apply(inst, SkyBody::new))
+            .validate(SkyBody::validate);
 
     public static DataResult<SkyBody> validate(SkyBody body) {
         return body.body().isPresent() || body.texture().isPresent()
@@ -30,9 +58,9 @@ public record SkyBody(
         return new SkyBody(
                 Optional.of(body),
                 Optional.empty(),
-                0.0F,
-                0.0F,
-                0.0F,
+                0.0f,
+                0.0f,
+                0.0f,
                 Optional.empty(),
                 Optional.empty(),
                 Optional.empty(),

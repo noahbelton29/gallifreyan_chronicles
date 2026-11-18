@@ -7,7 +7,7 @@ import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
-import uk.nbforge.gallifreyan_chronicles.client.camera.GCCameraShake;
+import uk.nbforge.gallifreyan_chronicles.client.camera.CameraShake;
 
 @Mixin(Camera.class)
 public abstract class CameraShakeMixin {
@@ -16,7 +16,7 @@ public abstract class CameraShakeMixin {
 
     @Inject(method = "update", at = @At("TAIL"))
     private void gallifreyan_chronicles$applyDrumShake(DeltaTracker deltaTracker, CallbackInfo ci) {
-        GCCameraShake.Sample shake = GCCameraShake.current();
+        CameraShake.Sample shake = CameraShake.current();
         if (shake == null) return;
 
         Camera camera = (Camera) (Object) this;

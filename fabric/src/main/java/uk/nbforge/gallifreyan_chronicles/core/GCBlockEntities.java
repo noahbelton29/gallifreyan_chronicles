@@ -5,9 +5,10 @@ import net.minecraft.core.Registry;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import uk.nbforge.gallifreyan_chronicles.Constants;
-import uk.nbforge.gallifreyan_chronicles.core.block_entities.InteriorDoorBlockEntity;
-import uk.nbforge.gallifreyan_chronicles.core.block_entities.TardisConsoleBlockEntity;
-import uk.nbforge.gallifreyan_chronicles.core.block_entities.TardisExteriorBlockEntity;
+import uk.nbforge.gallifreyan_chronicles.core.block.registry.TardisBlocks;
+import uk.nbforge.gallifreyan_chronicles.core.block_entity.InteriorDoorBlockEntity;
+import uk.nbforge.gallifreyan_chronicles.core.block_entity.TardisConsoleBlockEntity;
+import uk.nbforge.gallifreyan_chronicles.core.block_entity.TardisExteriorBlockEntity;
 import uk.nbforge.gallifreyan_chronicles.util.GCUtil;
 
 public class GCBlockEntities {
@@ -19,13 +20,13 @@ public class GCBlockEntities {
         TARDIS_EXTERIOR_BLOCK_ENTITY_TYPE = Registry.register(
                 BuiltInRegistries.BLOCK_ENTITY_TYPE,
                 GCUtil.modIdentifier("tardis_block_entity"),
-                FabricBlockEntityTypeBuilder.create(TardisExteriorBlockEntity::new, GCBlocks.TARDIS)
+                FabricBlockEntityTypeBuilder.create(TardisExteriorBlockEntity::new, TardisBlocks.TARDIS)
                         .build());
 
         TARDIS_CONSOLE_BLOCK_ENTITY_TYPE = Registry.register(
                 BuiltInRegistries.BLOCK_ENTITY_TYPE,
                 GCUtil.modIdentifier("tardis_console_block_entity"),
-                FabricBlockEntityTypeBuilder.create(TardisConsoleBlockEntity::new, GCBlocks.TARDIS_CONSOLE)
+                FabricBlockEntityTypeBuilder.create(TardisConsoleBlockEntity::new, TardisBlocks.TARDIS_CONSOLE)
                         .build());
 
         INTERIOR_DOOR_BLOCK_ENTITY_TYPE = Registry.register(

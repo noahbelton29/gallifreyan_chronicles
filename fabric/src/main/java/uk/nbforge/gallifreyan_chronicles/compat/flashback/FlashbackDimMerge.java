@@ -22,9 +22,6 @@ final class FlashbackDimMerge {
     static boolean merge(Object packetObj) {
         if (merging) return false;
         MiscNetworking.DimIdSyncPacket packet = (MiscNetworking.DimIdSyncPacket) packetObj;
-        // isInReplay is false for a moment while Flashback jumps on the timeline which wiped the saved list right when
-        // it was needed
-        // Only forget it once the replay server is gone
         if (Flashback.getReplayServer() == null) {
             ids = null;
             return false;

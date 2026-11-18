@@ -1,7 +1,7 @@
 package uk.nbforge.gallifreyan_chronicles.command;
 
 import static net.minecraft.commands.Commands.literal;
-import static uk.nbforge.gallifreyan_chronicles.util.CommandUtil.tardisIdArgument;
+import static uk.nbforge.gallifreyan_chronicles.command.CommandUtil.tardisIdArgument;
 
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import net.minecraft.commands.CommandSourceStack;
@@ -17,9 +17,6 @@ public final class GCCommands {
                 .then(TardisCommands.debug().requires(GCCommands::isOp));
     }
 
-    /**
-     * Only server operators can use TARDIS commands.
-     */
     private static boolean isOp(CommandSourceStack source) {
         return source.permissions().hasPermission(Permissions.COMMANDS_GAMEMASTER);
     }

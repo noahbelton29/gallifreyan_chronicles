@@ -30,10 +30,16 @@ final class AddonIcons {
         try {
             NativeImage image = NativeImage.read(info.icon());
             Identifier id = GCUtil.modIdentifier("addon_icon/" + key.replaceAll("[^a-z0-9/._-]", "_"));
-            Minecraft.getInstance()
-                    .getTextureManager()
-                    .register(id, new DynamicTexture(() -> "GC addon icon " + id, image));
-            icon = new Icon(id, image.getWidth(), image.getHeight());
+            Icon read = new Icon(id, image.getWidth(), image.getHeight());
+            try {
+                Minecraft.getInstance()
+                        .getTextureManager()
+                        .register(id, new DynamicTexture(() -> "GC addon icon " + id, image));
+            } catch (RuntimeException e) {
+                image.close();
+                throw e;
+            }
+            icon = read;
         } catch (Exception e) {
             Constants.LOG.warn("Addon '{}' has an icon that could not be read", info.id(), e);
         }

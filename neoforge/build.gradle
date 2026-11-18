@@ -23,13 +23,7 @@ neoForge {
             clientData()
             gameDirectory = this.mkdir(this.file('runs/data'))
             // DataGen can be run by - "./gradlew :neoforge:runData" in Terminal.
-            // Specify the modid for data generation, where to output the resulting resource, and where to look for existing resources.
-            // IMPORTANT: --output must stay isolated to neoforge's own folder.
-            // NeoForge's datagen treats --output as territory it fully owns and
-            // will delete files there that it doesn't recognize as current
-            // output. Pointing --output at common's hand-authored resources
-            // caused it to wipe manually-placed files. The generated result is
-            // copied into common separately by copyGeneratedToCommon below.
+            // keep --output out of common, datagen nukes any file in there it didnt generate itself
             programArguments.addAll '--mod', project.mod_id, '--all', '--output', file('src/generated/resources/').getAbsolutePath(), '--existing', new File(rootDir, 'common/src/main/resources').getAbsolutePath()
         }
         server {
@@ -106,12 +100,7 @@ dependencies {
 
 sourceSets.main.resources { srcDir 'src/generated/resources' }
 
-// NeoForge datagen writes to its own isolated folder (src/generated/resources)
-// because --output is territory NeoForge fully owns and will prune — pointing
-// it at common directly deletes hand-placed files. This task instead copies
-// the generated output into common afterward. Copy (not Sync) is used so
-// files already in common that aren't part of this run's output are left
-// alone — nothing in common gets deleted, only added/overwritten.
+// Copy not Sync, Sync would delete the hand placed files in common
 tasks.register('copyGeneratedToCommon', Copy) {
     from('src/generated/resources') {
         exclude '.cache/**'
@@ -119,9 +108,6 @@ tasks.register('copyGeneratedToCommon', Copy) {
     into(new File(rootDir, 'common/src/main/resources'))
 }
 
-// Once the generated output has been copied into common, the local
-// neoforge/src/generated/resources folder is no longer needed — delete it so
-// it doesn't linger around as a second, possibly-stale copy.
 tasks.register('deleteGeneratedFolder', Delete) {
     delete 'src/generated/resources'
 }

@@ -1,6 +1,9 @@
 package uk.nbforge.gallifreyan_chronicles.core.item.tooltip;
 
+import com.mojang.serialization.Codec;
+import com.mojang.serialization.DataResult;
 import java.util.List;
+import java.util.Locale;
 import java.util.UUID;
 import java.util.function.Consumer;
 import net.minecraft.ChatFormatting;
@@ -11,13 +14,13 @@ import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.item.component.TooltipProvider;
 import uk.nbforge.gallifreyan_chronicles.Constants;
 import uk.nbforge.gallifreyan_chronicles.core.GCDataComponents;
-import uk.nbforge.gallifreyan_chronicles.core.dynamic_registries.TardisConsoleRegistry;
-import uk.nbforge.gallifreyan_chronicles.core.dynamic_registries.TardisDoorRegistry;
+import uk.nbforge.gallifreyan_chronicles.core.data_registry.TardisConsoleRegistry;
+import uk.nbforge.gallifreyan_chronicles.core.data_registry.TardisDoorRegistry;
 import uk.nbforge.gallifreyan_chronicles.core.item.ConsoleBlockItem;
 import uk.nbforge.gallifreyan_chronicles.core.item.DoorBlockItem;
 import uk.nbforge.gallifreyan_chronicles.core.item.TardisKeyItem;
-import uk.nbforge.gallifreyan_chronicles.tardis.TardisInteriorOptions;
 import uk.nbforge.gallifreyan_chronicles.tardis.console.TardisConsoleVariant;
+import uk.nbforge.gallifreyan_chronicles.tardis.interior.TardisInteriorOptions;
 
 public enum ItemInfoTooltip implements TooltipProvider {
     TARDIS,
@@ -27,6 +30,16 @@ public enum ItemInfoTooltip implements TooltipProvider {
     KEY,
     MASTER_KEY,
     STATTENHEIM_REMOTE;
+
+    public static final Codec<ItemInfoTooltip> CODEC = Codec.STRING.comapFlatMap(
+            name -> {
+                try {
+                    return DataResult.success(ItemInfoTooltip.valueOf(name.toUpperCase(Locale.ROOT)));
+                } catch (IllegalArgumentException e) {
+                    return DataResult.error(() -> "Unknown item info tooltip: " + name);
+                }
+            },
+            kind -> kind.name().toLowerCase(Locale.ROOT));
 
     @Override
     public void addToTooltip(

@@ -29,14 +29,11 @@ import java.util.UUID;
    Everything goes to gc_tester_log.jsonl in the game folder, and if report_url in gc_build.properties is set, each line is sent there too.
 */
 public final class TesterReport {
-    // optional server, gets each report as a json post, empty means file only
     private static final String REPORT_URL = "";
     private static final String RESOURCE = "/gc_build.properties";
-    // one json line per report, in the game folder
     private static final String LOG_FILE = "gc_tester_log.jsonl";
     private static final long CHECK_EVERY_SECONDS = 5;
 
-    // process names of common recording or screenshot programs
     private static final Set<String> RECORDERS = Set.of(
             "obs64.exe", "obs32.exe", "obs.exe", "streamlabs obs.exe",
             "bandicam.exe", "bdcam.exe", "sharex.exe", "medal.exe", "fraps.exe",
@@ -86,7 +83,6 @@ public final class TesterReport {
             String file = Path.of(command).getFileName().toString().toLowerCase(Locale.ROOT);
             if (RECORDERS.contains(file)) found.add(file);
         }));
-        // java cant read the path of windows store apps like the new snipping tool, so on windows also ask tasklist, which lists every process by name
         if (System.getProperty("os.name", "").toLowerCase(Locale.ROOT).startsWith("windows")) {
             try {
                 Process tasklist = new ProcessBuilder("tasklist", "/fo", "csv", "/nh").redirectErrorStream(true).start();

@@ -20,7 +20,6 @@ import qouteall.imm_ptl.core.portal.Portal;
 @Mixin(targets = "qouteall.imm_ptl.core.portal.Portal", remap = false)
 public abstract class PortalReplayServerMixin {
 
-    // Normal way, do not track an empty portal at all
     @Inject(method = "broadcastToPlayer", at = @At("HEAD"), cancellable = true, remap = false, require = 0)
     private void gc$skipEmptyPortal(ServerPlayer player, CallbackInfoReturnable<Boolean> cir) {
         if (((Portal) (Object) this).getAxisW() == null) {
@@ -28,7 +27,6 @@ public abstract class PortalReplayServerMixin {
         }
     }
 
-    // Backup, if it still gets here send a harmless remove packet and not a broken portal
     @WrapMethod(method = "getAddEntityPacket", remap = false, require = 0)
     private Packet<ClientGamePacketListener> gc$safePacket(
             ServerEntity serverEntity, Operation<Packet<ClientGamePacketListener>> original) {

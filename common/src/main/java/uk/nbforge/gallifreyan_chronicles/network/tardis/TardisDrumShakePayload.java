@@ -19,7 +19,7 @@ public record TardisDrumShakePayload(double x, double y, double z, float strengt
         double maxDistanceSqr = MAX_DISTANCE * MAX_DISTANCE;
         for (ServerPlayer player : level.players()) {
             if (player.distanceToSqr(origin) < maxDistanceSqr) {
-                Services.NETWORK.sendTardisDrumShake(player, payload);
+                Services.NETWORK.send(player, payload);
             }
         }
     }

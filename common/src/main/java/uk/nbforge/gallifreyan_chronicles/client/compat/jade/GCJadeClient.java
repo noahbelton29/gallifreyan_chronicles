@@ -19,10 +19,10 @@ import uk.nbforge.gallifreyan_chronicles.compat.jade.TardisConsoleInfoProvider;
 import uk.nbforge.gallifreyan_chronicles.compat.jade.TardisExteriorInfoProvider;
 import uk.nbforge.gallifreyan_chronicles.compat.jade.TardisInteriorDoorInfoProvider;
 import uk.nbforge.gallifreyan_chronicles.compat.jade.TardisOwnerProvider;
-import uk.nbforge.gallifreyan_chronicles.core.GCBlocks;
 import uk.nbforge.gallifreyan_chronicles.core.block.ConsoleBlock;
 import uk.nbforge.gallifreyan_chronicles.core.block.InteriorDoorBlock;
 import uk.nbforge.gallifreyan_chronicles.core.block.TardisBlock;
+import uk.nbforge.gallifreyan_chronicles.core.block.registry.TardisBlocks;
 import uk.nbforge.gallifreyan_chronicles.core.entity.TardisControlEntity;
 
 public final class GCJadeClient {
@@ -32,7 +32,6 @@ public final class GCJadeClient {
 
     public static void register(IWailaClientRegistration registration) {
         registration.addRayTraceCallback((hitResult, accessor, originalAccessor) -> {
-            // Looking at a portal, show the info of the TARDIS exterior or interior door it belongs to
             if (accessor instanceof EntityAccessor entityAccessor && isPortal(entityAccessor.getEntity())) {
                 Entity portal = entityAccessor.getEntity();
 
@@ -45,22 +44,20 @@ public final class GCJadeClient {
                 return accessor;
             }
 
-            // Only show the tooltip of a control while the crosshair is really on its hitbox
             if (accessor instanceof EntityAccessor entityAccessor
                     && entityAccessor.getEntity() instanceof TardisControlEntity control) {
                 Player player = Minecraft.getInstance().player;
                 if (player == null) return null;
 
                 Vec3 eye = player.getEyePosition();
-                Vec3 end = eye.add(player.getViewVector(1.0F).scale(player.entityInteractionRange()));
+                Vec3 end = eye.add(player.getViewVector(1.0f).scale(player.entityInteractionRange()));
                 if (control.getBoundingBox().clip(eye, end).isEmpty()) return null;
             }
 
-            // Looking at the top half of the TARDIS, show the info of the exterior instead
             if (accessor instanceof BlockAccessor blockAccessor
-                    && blockAccessor.getBlockState().is(GCBlocks.TARDIS_TOP)) {
+                    && blockAccessor.getBlockState().is(TardisBlocks.TARDIS_TOP)) {
                 BlockPos base = blockAccessor.getPosition().below();
-                if (!blockAccessor.getLevel().getBlockState(base).is(GCBlocks.TARDIS)) return null;
+                if (!blockAccessor.getLevel().getBlockState(base).is(TardisBlocks.TARDIS)) return null;
                 return blockAccessor(registration, base);
             }
 

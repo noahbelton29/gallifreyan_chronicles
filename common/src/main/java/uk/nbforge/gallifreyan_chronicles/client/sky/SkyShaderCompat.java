@@ -8,7 +8,7 @@ import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.resources.Identifier;
 import org.jspecify.annotations.Nullable;
 import uk.nbforge.gallifreyan_chronicles.Constants;
-import uk.nbforge.gallifreyan_chronicles.core.dynamic_registries.DimensionSkyRegistry;
+import uk.nbforge.gallifreyan_chronicles.core.data_registry.DimensionSkyRegistry;
 import uk.nbforge.gallifreyan_chronicles.sky.data.DimensionSky;
 
 public final class SkyShaderCompat {
@@ -64,7 +64,6 @@ public final class SkyShaderCompat {
                 Class<?> api = Class.forName("net.irisshaders.iris.api.v0.IrisApi");
                 irisApi = api.getMethod("getInstance").invoke(null);
                 isShaderPackInUse = api.getMethod("isShaderPackInUse");
-                // Looked up on its own so an older Iris without it still works
                 try {
                     isRenderingShadowPass = api.getMethod("isRenderingShadowPass");
                 } catch (NoSuchMethodException e) {

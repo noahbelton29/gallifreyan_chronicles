@@ -7,7 +7,6 @@ import net.minecraft.client.Options;
 import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
 import uk.nbforge.gallifreyan_chronicles.client.sky.StarDensity;
-import uk.nbforge.gallifreyan_chronicles.codec.client.sky.StarDensityCodec;
 import uk.nbforge.gallifreyan_chronicles.config.GCConfig;
 
 public final class GCOptions {
@@ -139,7 +138,7 @@ public final class GCOptions {
                 OptionInstance.cachedConstantTooltip(
                         Component.translatable("options.gallifreyan_chronicles.star_density.tooltip")),
                 (caption, value) -> Options.genericValueLabel(caption, Component.translatable(value.translationKey())),
-                new OptionInstance.Enum<>(Arrays.asList(StarDensity.values()), StarDensityCodec.CODEC),
+                new OptionInstance.Enum<>(Arrays.asList(StarDensity.values()), StarDensity.CODEC),
                 StarDensity.byName(GCConfig.starDensity()),
                 value -> {
                     GCConfig.setStarDensity(value.getSerializedName());

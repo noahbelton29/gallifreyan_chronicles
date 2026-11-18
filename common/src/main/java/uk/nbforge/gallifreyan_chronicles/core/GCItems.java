@@ -8,7 +8,7 @@ import net.minecraft.core.component.DataComponents;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.world.item.*;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.item.equipment.ArmorType;
 import uk.nbforge.gallifreyan_chronicles.Constants;
 import uk.nbforge.gallifreyan_chronicles.core.item.MalletItem;
@@ -42,7 +42,6 @@ public class GCItems {
     public static final Item STATTENHEIM_REMOTE =
             registerItem("stattenheim_remote", properties -> new StattenheimRemoteItem(properties.stacksTo(1)));
 
-    // TOOLS
     public static final Item TARANIUM_SWORD = registerItem(
             "taranium_sword",
             properties -> new Item(
@@ -68,7 +67,6 @@ public class GCItems {
             properties ->
                     new Item(properties.hoe(GCToolMaterials.TARANIUM, 0, -3f).fireResistant()));
 
-    // ARMOR
     public static final Item TARANIUM_HELMET = registerItem(
             "taranium_helmet",
             properties -> new Item(properties

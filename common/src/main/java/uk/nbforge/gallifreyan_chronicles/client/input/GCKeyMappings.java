@@ -8,7 +8,6 @@ import org.jspecify.annotations.Nullable;
 import uk.nbforge.gallifreyan_chronicles.config.GCConfig;
 
 /**
- * The keybinds of the mod.
  * The key mappings are built here but registered by each loader because Fabric and NeoForge register them and their category differently.
  */
 public final class GCKeyMappings {

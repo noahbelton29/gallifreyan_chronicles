@@ -20,12 +20,11 @@ import net.minecraft.world.level.Level;
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 import uk.nbforge.gallifreyan_chronicles.core.GCDataComponents;
-import uk.nbforge.gallifreyan_chronicles.core.block_entities.TardisConsoleBlockEntity;
-import uk.nbforge.gallifreyan_chronicles.core.block_entities.TardisExteriorBlockEntity;
+import uk.nbforge.gallifreyan_chronicles.core.block_entity.TardisConsoleBlockEntity;
+import uk.nbforge.gallifreyan_chronicles.core.block_entity.TardisExteriorBlockEntity;
 import uk.nbforge.gallifreyan_chronicles.core.item.tooltip.ItemInfoTooltip;
-import uk.nbforge.gallifreyan_chronicles.tardis.TardisApi;
+import uk.nbforge.gallifreyan_chronicles.tardis.Tardis;
 import uk.nbforge.gallifreyan_chronicles.tardis.TardisData;
-import uk.nbforge.gallifreyan_chronicles.tardis.TardisManager;
 import uk.nbforge.gallifreyan_chronicles.util.MessageUtil;
 
 public class TardisKeyItem extends Item implements ScrollSelectable {
@@ -83,7 +82,7 @@ public class TardisKeyItem extends Item implements ScrollSelectable {
         if (tardisId == null) return;
         MinecraftServer server = level.getServer();
         List<String> names = new ArrayList<>();
-        TardisData data = TardisManager.get(server).getTardis(tardisId);
+        TardisData data = Tardis.get(server, tardisId).map(Tardis::data).orElse(null);
         for (UUID player : data == null ? Set.<UUID>of() : data.trustedPlayers()) {
             names.add(server.services()
                     .nameToIdCache()
@@ -130,35 +129,34 @@ public class TardisKeyItem extends Item implements ScrollSelectable {
         if (level.isClientSide()) return InteractionResult.SUCCESS;
 
         if (keyTardisId == null || !keyTardisId.equals(exteriorTardisId)) {
-            if (Boolean.TRUE.equals(stack.get(GCDataComponents.KEY_INSERTED)) || exterior.hasKeyRendered()) {
+            if (Boolean.TRUE.equals(stack.get(GCDataComponents.KEY_INSERTED))
+                    || exterior.lock().hasKeyRendered()) {
                 return InteractionResult.FAIL;
             }
-            if (exterior.isWrongKeyLockedOut(player, stack)) return InteractionResult.FAIL;
-            if (!exterior.areDoorsFullyClosed()) {
+            if (exterior.lock().isWrongKeyLockedOut(player, stack)) return InteractionResult.FAIL;
+            if (!exterior.doors().areFullyClosed()) {
                 MessageUtil.overlay(player, "close_doors_to_insert_key");
                 return InteractionResult.FAIL;
             }
-            exterior.insertWrongKey(player, context.getHand(), stack);
+            exterior.lock().insertWrongKey(player, context.getHand(), stack);
             return InteractionResult.CONSUME;
         }
 
         boolean inserted = Boolean.TRUE.equals(stack.get(GCDataComponents.KEY_INSERTED));
 
         if (!inserted) {
-            if (exterior.hasKeyRendered()) return InteractionResult.FAIL;
+            if (exterior.lock().hasKeyRendered()) return InteractionResult.FAIL;
 
-            if (exterior.rejectKeyIfLockBroken(player)) return InteractionResult.FAIL;
+            if (exterior.lock().rejectKeyIfLockBroken(player)) return InteractionResult.FAIL;
 
-            if (!exterior.areDoorsFullyClosed()) {
+            if (!exterior.doors().areFullyClosed()) {
                 MessageUtil.overlay(player, "close_doors_to_insert_key");
                 return InteractionResult.FAIL;
             }
 
-            exterior.insertKey(player, context.getHand(), stack);
+            exterior.lock().insertKey(player, context.getHand(), stack);
         } else {
-            if (!TardisApi.of(exterior)
-                    .map(tardis -> tardis.returnKeyTo(player))
-                    .orElse(false)) {
+            if (!Tardis.of(exterior).map(tardis -> tardis.returnKeyTo(player)).orElse(false)) {
                 return InteractionResult.FAIL;
             }
         }

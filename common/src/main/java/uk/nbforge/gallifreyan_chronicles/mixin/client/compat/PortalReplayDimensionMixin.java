@@ -29,7 +29,6 @@ public abstract class PortalReplayDimensionMixin {
         var registry = BuiltInRegistries.ENTITY_TYPE;
         var key = type == null ? null : registry.getKey(type);
         var portalKey = registry.getKey(portalType);
-        // Keep other portal types from the same mod
         if (key != null && key.getNamespace().equals(portalKey.getNamespace())) return packet;
         return new ImmPtlNetworking.PortalSyncPacket(
                 packet.id(),

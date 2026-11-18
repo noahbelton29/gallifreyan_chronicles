@@ -18,15 +18,10 @@ import org.lwjgl.opengl.GL45C;
 public final class VoxyPortalGuard {
     private static final boolean SKIP_IN_PORTALS = Boolean.getBoolean("gc.voxy.skipInPortals");
 
-    // Everything below is only touched from the render thread
-
-    // True once begin has saved the stencil state so end knows to put it back
     private static boolean active;
 
-    // True when the composite of Voxy has to be clipped to the stencil of the portal
     private static boolean clip;
 
-    // The stencil state of the portal from when Voxy started drawing
     private static boolean stencilWasOn;
     private static int func;
     private static int ref;
@@ -36,13 +31,10 @@ public final class VoxyPortalGuard {
     private static int opDepthFail;
     private static int opDepthPass;
 
-    // The kind of object, texture or renderbuffer, that holds the stencil buffer
     private static int stencilType;
 
-    // The GL name of the stencil buffer being drawn into
     private static int stencilName;
 
-    // The scratch framebuffer the stencil is attached to, 0 when none
     private static int attachedTo;
 
     private VoxyPortalGuard() {}
@@ -66,8 +58,6 @@ public final class VoxyPortalGuard {
         opDepthPass = GL11C.glGetInteger(GL11C.GL_STENCIL_PASS_DEPTH_PASS);
 
         if (stencilWasOn) {
-            // The portal clips with the stencil so the composite of Voxy has to as well
-            // Find the stencil buffer of the framebuffer being drawn into so it can be attached for the composite
             int framebuffer = GL11C.glGetInteger(GL30C.GL_DRAW_FRAMEBUFFER_BINDING);
             if (framebuffer == 0) return false;
             stencilType = GL30C.glGetFramebufferAttachmentParameteri(
@@ -123,7 +113,6 @@ public final class VoxyPortalGuard {
         attachStencil(framebuffer, stencilName);
         if (GL45C.glCheckNamedFramebufferStatus(framebuffer, GL30C.GL_DRAW_FRAMEBUFFER)
                 != GL30C.GL_FRAMEBUFFER_COMPLETE) {
-            /** Cannot clip with this framebuffer so fall back to the unclipped composite of Voxy. */
             attachStencil(framebuffer, 0);
             GL11C.glDisable(GL11C.GL_STENCIL_TEST);
             return;
@@ -136,7 +125,6 @@ public final class VoxyPortalGuard {
         GL11C.glStencilMask(0);
     }
 
-    /** Takes the stencil off the scratch framebuffer again. */
     public static void finishClippedBlit() {
         if (attachedTo == 0) return;
         attachStencil(attachedTo, 0);

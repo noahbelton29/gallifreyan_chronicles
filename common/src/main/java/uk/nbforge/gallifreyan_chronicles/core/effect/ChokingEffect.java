@@ -10,7 +10,6 @@ import net.minecraft.world.effect.MobEffectCategory;
 import net.minecraft.world.entity.LivingEntity;
 import uk.nbforge.gallifreyan_chronicles.util.GCUtil;
 
-/** Choking on smoke, it hurts every 2 seconds and each level hurts half a heart more. */
 public class ChokingEffect extends MobEffect {
     public static final ResourceKey<DamageType> SMOKE =
             ResourceKey.create(Registries.DAMAGE_TYPE, GCUtil.modIdentifier("smoke"));

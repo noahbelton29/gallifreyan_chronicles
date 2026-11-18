@@ -6,8 +6,8 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import uk.nbforge.gallifreyan_chronicles.client.protection.build.TesterReport;
-import uk.nbforge.gallifreyan_chronicles.client.render.detail.RenderCapability;
-import uk.nbforge.gallifreyan_chronicles.client.render.detail.TrialTimer;
+import uk.nbforge.gallifreyan_chronicles.client.renderer.detail.RenderCapability;
+import uk.nbforge.gallifreyan_chronicles.client.renderer.detail.TrialTimer;
 
 @Mixin(Minecraft.class)
 public abstract class ClientInitMixin {

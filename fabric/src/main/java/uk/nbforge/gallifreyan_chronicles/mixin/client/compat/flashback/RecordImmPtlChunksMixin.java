@@ -7,12 +7,12 @@ import java.util.concurrent.atomic.AtomicReferenceArray;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.world.level.chunk.LevelChunk;
-import org.slf4j.LoggerFactory;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Pseudo;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Coerce;
 import qouteall.imm_ptl.core.chunk_loading.ImmPtlClientChunkMap;
+import uk.nbforge.gallifreyan_chronicles.Constants;
 
 /**
  * When you start recording Flashback saves the chunks that are already loaded.
@@ -47,12 +47,11 @@ public abstract class RecordImmPtlChunksMixin {
                     }
                 if (!solid) air++;
             }
-            LoggerFactory.getLogger("gallifreyan_chronicles/record")
-                    .info(
-                            "[record snapshot] {} chunks, {} all-air, level={}",
-                            chunks.size(),
-                            air,
-                            level.dimension().identifier());
+            Constants.LOG.info(
+                    "[record snapshot] {} chunks, {} all-air, level={}",
+                    chunks.size(),
+                    air,
+                    level.dimension().identifier());
             AtomicReferenceArray<LevelChunk> array = new AtomicReferenceArray<>(chunks.size());
             for (int i = 0; i < chunks.size(); i++) array.set(i, chunks.get(i));
             return array;

@@ -10,18 +10,15 @@ import net.minecraft.client.gui.screens.TitleScreen;
 import uk.nbforge.gallifreyan_chronicles.Constants;
 import uk.nbforge.gallifreyan_chronicles.client.gui.title.ReplayViewerHook;
 
-/** Moves the replay button of Flashback from the title screen into our options menu. */
 public final class FlashbackOptionsButton {
     private static final String PACKAGE = "com.moulberry.flashback";
     private static final String SELECT_SCREEN = PACKAGE + ".screen.select_replay.SelectReplayScreen";
 
-    // The open screen so the screen of Flashback can return to it
     private static volatile Screen lastScreen;
 
     private FlashbackOptionsButton() {}
 
     public static void register() {
-        // The hook of ReplayMod wins if both are installed
         if (ReplayViewerHook.opener == null) {
             ReplayViewerHook.opener = FlashbackOptionsButton::open;
         }
@@ -32,7 +29,6 @@ public final class FlashbackOptionsButton {
         });
     }
 
-    /** Hide any widget that is a Flashback class. */
     private static void hideTitleButton(Screen screen) {
         for (Object child : screen.children()) {
             if (child instanceof AbstractWidget widget

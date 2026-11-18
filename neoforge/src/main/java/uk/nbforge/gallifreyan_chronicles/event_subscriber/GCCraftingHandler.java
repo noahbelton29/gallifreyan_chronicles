@@ -5,8 +5,8 @@ import net.minecraft.world.item.Items;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.neoforge.event.entity.player.PlayerEvent;
 import uk.nbforge.gallifreyan_chronicles.Constants;
-import uk.nbforge.gallifreyan_chronicles.core.GCBlocks;
 import uk.nbforge.gallifreyan_chronicles.core.GCDataComponents;
+import uk.nbforge.gallifreyan_chronicles.core.block.registry.GallifreyBlocks;
 
 public class GCCraftingHandler {
     @SubscribeEvent
@@ -18,7 +18,7 @@ public class GCCraftingHandler {
 
             for (int i = 0; i < event.getInventory().getContainerSize(); i++) {
                 ItemStack stack = event.getInventory().getItem(i);
-                if (!stack.isEmpty() && stack.getItem() == GCBlocks.GALLIFREYAN_COBBLESTONE.asItem()) {
+                if (!stack.isEmpty() && stack.getItem() == GallifreyBlocks.GALLIFREYAN_COBBLESTONE.asItem()) {
                     hasGallifreyan = true;
                     break;
                 }

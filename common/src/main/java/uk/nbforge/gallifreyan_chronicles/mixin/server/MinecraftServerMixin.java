@@ -13,12 +13,12 @@ import uk.nbforge.gallifreyan_chronicles.core.lifecycle.CiBootTest;
 import uk.nbforge.gallifreyan_chronicles.core.lifecycle.ServerLifecycleHandler;
 import uk.nbforge.gallifreyan_chronicles.core.sound.timed.TimedSounds;
 import uk.nbforge.gallifreyan_chronicles.tardis.TardisDimensionManager;
-import uk.nbforge.gallifreyan_chronicles.tardis.ecs.system.ConsoleSyncSystem;
+import uk.nbforge.gallifreyan_chronicles.tardis.console.ConsoleSync;
+import uk.nbforge.gallifreyan_chronicles.tardis.deletion.TardisDeletion;
 import uk.nbforge.gallifreyan_chronicles.tardis.key.TardisKeyLocator;
-import uk.nbforge.gallifreyan_chronicles.tardis.manager.deletion.TardisDeletion;
-import uk.nbforge.gallifreyan_chronicles.tardis.mind.fright.TardisFright;
+import uk.nbforge.gallifreyan_chronicles.tardis.mind.TardisFright;
 import uk.nbforge.gallifreyan_chronicles.tardis.mind.mood.TardisAlarm;
-import uk.nbforge.gallifreyan_chronicles.util.GCSchedulerUtil;
+import uk.nbforge.gallifreyan_chronicles.util.SchedulerUtil;
 
 @Mixin(MinecraftServer.class)
 public abstract class MinecraftServerMixin {
@@ -41,10 +41,10 @@ public abstract class MinecraftServerMixin {
         if (gallifreyan_chronicles$isReplay(server)) return;
         TardisDeletion.tick(server);
         TardisDimensionManager.processPendingEntries(server);
-        GCSchedulerUtil.tick(server);
+        SchedulerUtil.tick(server);
         TardisKeyLocator.tick(server);
         TardisPortalBridge.tick(server);
-        ConsoleSyncSystem.tick(server);
+        ConsoleSync.tick(server);
         TardisVoiceLinks.tick(server);
         TardisFright.tick(server);
     }

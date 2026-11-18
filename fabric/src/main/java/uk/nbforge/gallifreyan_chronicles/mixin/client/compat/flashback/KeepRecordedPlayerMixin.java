@@ -30,7 +30,7 @@ public abstract class KeepRecordedPlayerMixin {
 
     @Inject(method = "removeEntity", at = @At("HEAD"), cancellable = true, require = 0)
     private void gc$keepPlayer(int id, Entity.RemovalReason reason, CallbackInfo ci) {
-        if (id == gc$addingId) return; // Replacing it with the new one
+        if (id == gc$addingId) return;
         if (FlashbackChunks.keepPlayer((ClientLevel) (Object) this, id)) ci.cancel();
     }
 }

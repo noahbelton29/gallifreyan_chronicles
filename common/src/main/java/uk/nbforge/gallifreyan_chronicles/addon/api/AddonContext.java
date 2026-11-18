@@ -17,7 +17,6 @@ import uk.nbforge.gallifreyan_chronicles.tardis.Tardis;
 import uk.nbforge.gallifreyan_chronicles.tardis.control.TardisControl;
 
 /**
- * What a java addon gets to work with.
  * It is a normal mod so mixins work too.
  * We call onInitialize while the game registers things, so the register methods work there.
  */
@@ -30,10 +29,8 @@ public interface AddonContext {
 
     boolean isModLoaded(String modId);
 
-    /** A folder just for this addon. */
     Path dataFolder();
 
-    /** Reads config.json, empty if there is none yet. */
     JsonObject loadConfig();
 
     void saveConfig(JsonObject config);
@@ -46,10 +43,8 @@ public interface AddonContext {
      */
     <T extends Item> T registerItem(String name, Function<Item.Properties, T> factory);
 
-    /** Adds a block and its item. */
     Block registerBlock(String name, Function<BlockBehaviour.Properties, Block> factory);
 
-    /** Same but you build the item. */
     Block registerBlock(
             String name,
             Function<BlockBehaviour.Properties, Block> factory,
@@ -60,7 +55,6 @@ public interface AddonContext {
     /** Put the sound itself in sounds.json. */
     SoundEvent registerSound(String name);
 
-    /** Same with a max range. */
     SoundEvent registerSound(String name, float range);
 
     /** The id must start with the addon id and an underscore. */
@@ -70,6 +64,5 @@ public interface AddonContext {
 
     void onLand(Consumer<Tardis> listener);
 
-    /** 20 ticks is 1 second. */
     void runLater(MinecraftServer server, int delayTicks, Runnable action);
 }

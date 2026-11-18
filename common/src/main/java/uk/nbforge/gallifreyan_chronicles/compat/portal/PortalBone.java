@@ -6,7 +6,6 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
@@ -16,7 +15,7 @@ import net.minecraft.resources.Identifier;
 import org.jspecify.annotations.Nullable;
 import uk.nbforge.gallifreyan_chronicles.Constants;
 
-/** Where the portal goes, read from the portal bone of a geo model, in blocks and Blockbench space. */
+/** in blocks and Blockbench space */
 public record PortalBone(double x, double bottom, double width, double height, double front, double back) {
     public static final String BONE_NAME = "portal";
 
@@ -43,7 +42,7 @@ public record PortalBone(double x, double bottom, double width, double height, d
         String resource = "/assets/" + id.getNamespace() + "/geckolib/models/" + id.getPath() + ".json";
         try (InputStream in = PortalBone.class.getResourceAsStream(resource)) {
             if (in == null) return Optional.empty();
-            JsonObject root = JsonParser.parseReader(new InputStreamReader(in, StandardCharsets.UTF_8))
+            JsonObject root = JsonParser.parseString(new String(in.readAllBytes(), StandardCharsets.UTF_8))
                     .getAsJsonObject();
             JsonArray geometries = root.getAsJsonArray("minecraft:geometry");
             if (geometries == null) return Optional.empty();
@@ -80,7 +79,6 @@ public record PortalBone(double x, double bottom, double width, double height, d
                 double[] p = {
                     o[0] + ((i & 1) != 0 ? s[0] : 0), o[1] + ((i & 2) != 0 ? s[1] : 0), o[2] + ((i & 4) != 0 ? s[2] : 0)
                 };
-                // The spin of the cube, then every bone up the chain
                 p = turn(p, cube);
                 JsonObject at = bone;
                 while (at != null) {
@@ -93,8 +91,6 @@ public record PortalBone(double x, double bottom, double width, double height, d
                 }
             }
         }
-        // Geo json has x flipped compared to Blockbench
-        // blockbench and geo json disagree on x and this bit me twice
         double x = -(min[0] + max[0]) / 2.0;
         return new PortalBone(
                 x / 16.0,

@@ -2,7 +2,7 @@ package uk.nbforge.gallifreyan_chronicles.command;
 
 import static net.minecraft.commands.Commands.argument;
 import static net.minecraft.commands.Commands.literal;
-import static uk.nbforge.gallifreyan_chronicles.util.CommandUtil.*;
+import static uk.nbforge.gallifreyan_chronicles.command.CommandUtil.*;
 
 import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
@@ -15,15 +15,13 @@ import java.util.concurrent.CompletableFuture;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
-import uk.nbforge.gallifreyan_chronicles.core.block_entities.TardisConsoleBlockEntity;
-import uk.nbforge.gallifreyan_chronicles.core.dynamic_registries.TardisControlRegistry;
+import uk.nbforge.gallifreyan_chronicles.core.block_entity.TardisConsoleBlockEntity;
 import uk.nbforge.gallifreyan_chronicles.core.entity.TardisControlEntity;
+import uk.nbforge.gallifreyan_chronicles.tardis.control.TardisControls;
 
-/** Whether a console control is on or off lives entirely under "data" now, since it goes through the control's real activate() logic. */
 public final class ControlCommands {
     private ControlCommands() {}
 
-    /** {@code data control <control_id> [on|off]} */
     public static LiteralArgumentBuilder<CommandSourceStack> controlData() {
         return literal("control")
                 .then(argument("control", StringArgumentType.word())
@@ -39,7 +37,7 @@ public final class ControlCommands {
         if (console.isPresent()) {
             console.get().getControlEntities().forEach(control -> builder.suggest(control.getControlId()));
         } else {
-            TardisControlRegistry.allIds().forEach(builder::suggest);
+            TardisControls.ids().forEach(builder::suggest);
         }
         return builder.buildFuture();
     }
@@ -47,7 +45,7 @@ public final class ControlCommands {
     private static int get(CommandContext<CommandSourceStack> ctx) throws CommandSyntaxException {
         String controlId = StringArgumentType.getString(ctx, "control");
         return withTardis(ctx, (tardis, idText) -> {
-            if (!TardisControlRegistry.allIds().contains(controlId)) return fail(ctx, "unknown_control", controlId);
+            if (!TardisControls.ids().contains(controlId)) return fail(ctx, "unknown_control", controlId);
 
             Optional<TardisConsoleBlockEntity> console = tardis.console();
             if (console.isEmpty()) return fail(ctx, "no_console", idText);
@@ -64,7 +62,7 @@ public final class ControlCommands {
         String state = on ? "on" : "off";
 
         return withTardis(ctx, (tardis, idText) -> {
-            if (!TardisControlRegistry.allIds().contains(controlId)) return fail(ctx, "unknown_control", controlId);
+            if (!TardisControls.ids().contains(controlId)) return fail(ctx, "unknown_control", controlId);
 
             Optional<TardisConsoleBlockEntity> console = tardis.console();
             if (console.isEmpty()) return fail(ctx, "no_console", idText);

@@ -1,7 +1,7 @@
 package uk.nbforge.gallifreyan_chronicles.util;
 
 public final class FadingValue {
-    private static final float MAX_STEP_SECONDS = 0.1F;
+    private static final float MAX_STEP_SECONDS = 0.1f;
 
     private final float fadeSeconds;
     private float value;
@@ -28,7 +28,7 @@ public final class FadingValue {
             value = target;
             initialised = true;
         } else {
-            float elapsed = lastNanos == 0L ? 0.0F : Math.min((now - lastNanos) / 1.0E9F, MAX_STEP_SECONDS);
+            float elapsed = lastNanos == 0L ? 0.0f : Math.min((now - lastNanos) / 1.0E9f, MAX_STEP_SECONDS);
             float step = elapsed / fadeSeconds;
             value = value < target ? Math.min(target, value + step) : Math.max(target, value - step);
         }

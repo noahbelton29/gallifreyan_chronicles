@@ -4,19 +4,15 @@ import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.util.RandomSource;
-import uk.nbforge.gallifreyan_chronicles.core.block_entities.TardisConsoleBlockEntity;
+import uk.nbforge.gallifreyan_chronicles.core.block_entity.TardisConsoleBlockEntity;
 import uk.nbforge.gallifreyan_chronicles.tardis.Tardis;
 import uk.nbforge.gallifreyan_chronicles.tardis.TardisEvents;
-import uk.nbforge.gallifreyan_chronicles.tardis.ecs.system.TardisMindSystem;
 import uk.nbforge.gallifreyan_chronicles.tardis.flight.LandingTarget;
 import uk.nbforge.gallifreyan_chronicles.tardis.mind.MindMessages;
+import uk.nbforge.gallifreyan_chronicles.tardis.mind.TardisDiscovery;
 import uk.nbforge.gallifreyan_chronicles.tardis.mind.TardisMind;
-import uk.nbforge.gallifreyan_chronicles.tardis.mind.discovery.TardisDiscovery;
+import uk.nbforge.gallifreyan_chronicles.tardis.mind.TardisMinds;
 
-/**
- * How dyslexia affects a TARDIS when it takes off.
- * It can mix up the coordinates of its landing target, stress makes that more likely and worse, and practising flying helps it get better.
- */
 public final class TardisDyslexia {
     private static final float NEW_CHANCE = 0.8f;
     private static final float FLOOR_CHANCE = 0.05f;
@@ -24,8 +20,6 @@ public final class TardisDyslexia {
     private static final float STRESSED = 50f;
     private static final float PANICKED = 80f;
 
-    // Each flight reduces the confusion it has left to learn from
-    // It works out to roughly a 10 percent chance after 100 flights
     private static final float PRACTICE_KEEP = (float) Math.exp(-1.0 / 37.0);
 
     private TardisDyslexia() {}
@@ -34,12 +28,8 @@ public final class TardisDyslexia {
         TardisEvents.TAKE_OFF.register(TardisDyslexia::onTakeOff);
     }
 
-    /**
-     * If it mixes up the coordinates the owner sees a message.
-     * It gets a little practice with each flight whether or not it was mixed up.
-     */
     private static void onTakeOff(Tardis tardis) {
-        TardisMind mind = TardisMindSystem.mind(tardis);
+        TardisMind mind = TardisMinds.mind(tardis);
         if (!mind.has(TardisDisability.DYSLEXIC)) return;
         TardisConsoleBlockEntity console = tardis.console().orElse(null);
         if (console != null && console.getLevel() instanceof ServerLevel level && muddle(tardis, level.getRandom())) {
@@ -59,14 +49,13 @@ public final class TardisDyslexia {
         return FLOOR_CHANCE + (NEW_CHANCE - FLOOR_CHANCE) * (1f - skill);
     }
 
-    /** Higher stress makes a mix up more likely and can change the coordinates several times and not just once. */
     public static boolean muddle(Tardis tardis, RandomSource random) {
-        TardisMind mind = TardisMindSystem.mind(tardis);
+        TardisMind mind = TardisMinds.mind(tardis);
         if (!mind.has(TardisDisability.DYSLEXIC)) return false;
         LandingTarget target = tardis.landingTarget().orElse(null);
         if (target == null) return false;
 
-        float stress = TardisMindSystem.stress(tardis);
+        float stress = TardisMinds.stress(tardis);
         float calm = calmChance(mind.skill());
         float chance = calm + (1f - calm) * (stress / TardisMind.MAX) * STRESS_WEIGHT;
         if (random.nextFloat() >= chance) return false;
@@ -100,14 +89,11 @@ public final class TardisDyslexia {
     }
 
     private static void practise(Tardis tardis) {
-        float skill = TardisMindSystem.skill(tardis);
-        TardisMindSystem.setSkill(tardis, 1f - (1f - skill) * PRACTICE_KEEP);
+        float skill = TardisMinds.skill(tardis);
+        TardisMinds.setSkill(tardis, 1f - (1f - skill) * PRACTICE_KEEP);
     }
 
-    /**
-     * Swaps two neighbouring digits so 142 can become 124.
-     * Negative values keep their sign and values with fewer than two digits are left alone.
-     */
+    /** negative values keep their sign, anything under two digits is left alone */
     private static int swapDigits(int value, RandomSource random) {
         char[] digits = String.valueOf(Math.abs(value)).toCharArray();
         if (digits.length < 2) return value;

@@ -9,18 +9,18 @@ import net.minecraft.util.RandomSource;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
-import uk.nbforge.gallifreyan_chronicles.core.GCBlocks;
-import uk.nbforge.gallifreyan_chronicles.core.block_entities.TardisExteriorBlockEntity;
+import uk.nbforge.gallifreyan_chronicles.core.block.registry.TardisBlocks;
+import uk.nbforge.gallifreyan_chronicles.core.block_entity.TardisExteriorBlockEntity;
 import uk.nbforge.gallifreyan_chronicles.tardis.Tardis;
-import uk.nbforge.gallifreyan_chronicles.tardis.ecs.system.TardisLandingSystem;
+import uk.nbforge.gallifreyan_chronicles.tardis.flight.TardisLanding;
 
 public final class TardisCrater {
     private static final int RADIUS = 12;
     private static final int DEPTH = 6;
     private static final int CLEAR_ABOVE = 4;
     private static final int RIM = 2;
-    private static final float FIRE_CHANCE = 0.4F;
-    private static final float LASTING_FIRE = 0.5F;
+    private static final float FIRE_CHANCE = 0.4f;
+    private static final float LASTING_FIRE = 0.5f;
 
     private TardisCrater() {}
 
@@ -63,14 +63,14 @@ public final class TardisCrater {
                 ParticleTypes.EXPLOSION_EMITTER, x, ground.getY() + 1, z, 6, RADIUS * 0.3, 1.0, RADIUS * 0.3, 0);
         level.sendParticles(
                 ParticleTypes.CAMPFIRE_SIGNAL_SMOKE, x, ground.getY(), z, 30, RADIUS * 0.4, 1.0, RADIUS * 0.4, 0.02);
-        level.playSound(null, ground, SoundEvents.GENERIC_EXPLODE.value(), SoundSource.BLOCKS, 8.0F, 0.5F);
+        level.playSound(null, ground, SoundEvents.GENERIC_EXPLODE.value(), SoundSource.BLOCKS, 8.0f, 0.5f);
     }
 
     private static void dropTardisIn(
             Tardis tardis, TardisExteriorBlockEntity exterior, ServerLevel level, BlockPos ground) {
-        BlockPos floor = TardisLandingSystem.findLandingSpot(level, ground.below(DEPTH));
+        BlockPos floor = TardisLanding.findLandingSpot(level, ground.below(DEPTH));
         if (!floor.equals(exterior.getBlockPos())) {
-            TardisLandingSystem.moveExterior(tardis, level, floor);
+            TardisLanding.moveExterior(tardis, level, floor);
         }
     }
 
@@ -79,24 +79,24 @@ public final class TardisCrater {
         return !state.isAir() && state.getFluidState().isEmpty() && !state.canBeReplaced();
     }
 
-    private static boolean breakable(ServerLevel level, BlockPos pos, BlockState state) {
-        return !state.isAir()
-                && state.getDestroySpeed(level, pos) >= 0
-                && level.getBlockEntity(pos) == null
-                && !state.is(GCBlocks.TARDIS)
-                && !state.is(GCBlocks.TARDIS_TOP);
+    private static boolean unbreakable(ServerLevel level, BlockPos pos, BlockState state) {
+        return state.isAir()
+                || state.getDestroySpeed(level, pos) < 0
+                || level.getBlockEntity(pos) != null
+                || state.is(TardisBlocks.TARDIS)
+                || state.is(TardisBlocks.TARDIS_TOP);
     }
 
     private static void clear(ServerLevel level, BlockPos pos) {
         if (level.isOutsideBuildHeight(pos)) return;
         BlockState state = level.getBlockState(pos);
-        if (!breakable(level, pos, state)) return;
+        if (unbreakable(level, pos, state)) return;
         level.setBlock(pos, Blocks.AIR.defaultBlockState(), Block.UPDATE_CLIENTS | Block.UPDATE_SUPPRESS_DROPS);
     }
 
     private static void scorch(ServerLevel level, BlockPos floor, RandomSource random) {
         if (level.isOutsideBuildHeight(floor)) return;
-        if (!breakable(level, floor, level.getBlockState(floor))) return;
+        if (unbreakable(level, floor, level.getBlockState(floor))) return;
 
         boolean onFire = random.nextFloat() < FIRE_CHANCE
                 && level.getBlockState(floor.above()).isAir();
@@ -106,7 +106,7 @@ public final class TardisCrater {
             return;
         }
 
-        if (random.nextFloat() < 0.7F) {
+        if (random.nextFloat() < 0.7f) {
             level.setBlock(floor, randomBurntBlock(random), Block.UPDATE_CLIENTS);
         }
     }
@@ -119,9 +119,9 @@ public final class TardisCrater {
 
     private static BlockState randomBurntBlock(RandomSource random) {
         float roll = random.nextFloat();
-        if (roll < 0.35F) return Blocks.COARSE_DIRT.defaultBlockState();
-        if (roll < 0.65F) return Blocks.BLACKSTONE.defaultBlockState();
-        if (roll < 0.85F) return Blocks.BASALT.defaultBlockState();
+        if (roll < 0.35f) return Blocks.COARSE_DIRT.defaultBlockState();
+        if (roll < 0.65f) return Blocks.BLACKSTONE.defaultBlockState();
+        if (roll < 0.85f) return Blocks.BASALT.defaultBlockState();
         return Blocks.MAGMA_BLOCK.defaultBlockState();
     }
 
@@ -130,7 +130,7 @@ public final class TardisCrater {
             for (int dz = -RADIUS - RIM; dz <= RADIUS + RIM; dz++) {
                 double distance = Math.sqrt(dx * dx + dz * dz);
                 boolean onRim = distance > RADIUS && distance <= RADIUS + RIM;
-                if (!onRim || random.nextFloat() > 0.4F) continue;
+                if (!onRim || random.nextFloat() > 0.4f) continue;
 
                 BlockPos place = surfaceNear(level, ground.offset(dx, 0, dz)).above();
                 if (level.isOutsideBuildHeight(place)

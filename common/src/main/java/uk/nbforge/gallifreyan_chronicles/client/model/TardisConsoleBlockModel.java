@@ -5,18 +5,19 @@ import com.geckolib.renderer.base.GeoRenderState;
 import net.minecraft.resources.Identifier;
 import org.jspecify.annotations.NonNull;
 import uk.nbforge.gallifreyan_chronicles.client.renderer.block.TardisConsoleBlockRenderer;
-import uk.nbforge.gallifreyan_chronicles.core.block_entities.TardisConsoleBlockEntity;
-import uk.nbforge.gallifreyan_chronicles.core.dynamic_registries.TardisConsoleRegistry;
+import uk.nbforge.gallifreyan_chronicles.core.block_entity.TardisConsoleBlockEntity;
+import uk.nbforge.gallifreyan_chronicles.core.data_registry.TardisConsoleRegistry;
 
 public class TardisConsoleBlockModel extends GeoModel<TardisConsoleBlockEntity> {
     @Override
     public @NonNull Identifier getModelResource(@NonNull GeoRenderState renderState) {
-        return GeoAssets.CONSOLE.model(getConsoleId(renderState));
+        return GeoAssets.model(consoleId(renderState));
     }
 
     @Override
     public @NonNull Identifier getTextureResource(@NonNull GeoRenderState renderState) {
-        return GeoAssets.CONSOLE.texture(getTextureId(renderState));
+        String texture = GeoAssets.read(renderState, TardisConsoleBlockRenderer.CONSOLE_TEXTURE_ID);
+        return GeoAssets.texture(texture != null ? texture : consoleId(renderState));
     }
 
     @Override
@@ -24,23 +25,10 @@ public class TardisConsoleBlockModel extends GeoModel<TardisConsoleBlockEntity> 
         return GeoAssets.CONSOLE.animation(animatable.getConsole().id());
     }
 
-    private String getConsoleId(GeoRenderState renderState) {
-        if (renderState.hasGeckolibData(TardisConsoleBlockRenderer.CONSOLE_ID)) {
-            String id = renderState.getGeckolibData(TardisConsoleBlockRenderer.CONSOLE_ID);
-            if (TardisConsoleRegistry.contains(id)) {
-                return id;
-            }
-        }
-        return TardisConsoleRegistry.getDefault().id();
-    }
-
-    private String getTextureId(GeoRenderState renderState) {
-        if (renderState.hasGeckolibData(TardisConsoleBlockRenderer.CONSOLE_TEXTURE_ID)) {
-            String textureId = renderState.getGeckolibData(TardisConsoleBlockRenderer.CONSOLE_TEXTURE_ID);
-            if (textureId != null && !textureId.isEmpty()) {
-                return textureId;
-            }
-        }
-        return getConsoleId(renderState);
+    private static String consoleId(GeoRenderState renderState) {
+        String id = GeoAssets.read(renderState, TardisConsoleBlockRenderer.CONSOLE_ID);
+        return id != null && TardisConsoleRegistry.contains(id)
+                ? id
+                : TardisConsoleRegistry.getDefault().id();
     }
 }

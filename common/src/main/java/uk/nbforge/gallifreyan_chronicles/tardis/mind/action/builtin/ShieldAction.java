@@ -12,10 +12,6 @@ import uk.nbforge.gallifreyan_chronicles.Constants;
 import uk.nbforge.gallifreyan_chronicles.tardis.mind.action.MindAction;
 import uk.nbforge.gallifreyan_chronicles.tardis.mind.action.MindContext;
 
-/**
- * Throws up a glowing shield and gently pushes away anyone too close, no damage.
- * The json fields are radius, push and lift.
- */
 public record ShieldAction(float radius, float push, float lift) implements MindAction {
     public static final String TYPE = Constants.MOD_ID + ":shield";
     private static final int DOTS = 80;
@@ -32,9 +28,8 @@ public record ShieldAction(float radius, float push, float lift) implements Mind
 
     private void raise(ServerLevel level, Vec3 centre) {
         level.playSound(
-                null, BlockPos.containing(centre), SoundEvents.BEACON_POWER_SELECT, SoundSource.BLOCKS, 0.8F, 1.4F);
+                null, BlockPos.containing(centre), SoundEvents.BEACON_POWER_SELECT, SoundSource.BLOCKS, 0.8f, 1.4f);
 
-        // Dots spread evenly over a dome
         for (int i = 0; i < DOTS; i++) {
             double up = (i + 0.5) / DOTS;
             double around = i * 2.39996;

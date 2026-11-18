@@ -18,15 +18,8 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.BlockHitResult;
 import org.jspecify.annotations.Nullable;
 import uk.nbforge.gallifreyan_chronicles.Constants;
-import uk.nbforge.gallifreyan_chronicles.core.block_entities.InteriorDoorBlockEntity;
+import uk.nbforge.gallifreyan_chronicles.core.block_entity.InteriorDoorBlockEntity;
 
-/**
- * Shift + right click on an interior door with one of this mod's roundel blocks gives the door that block's look.
- * Shift + right click with a brush takes it off again.
- *
- * <p>Sneaking with an item in hand makes vanilla skip the block's own use method and try to place the item instead,
- * so this can't live on the block. Each loader calls it from its right-click-block event.</p>
- */
 public final class DoorRoundelInteraction {
     private DoorRoundelInteraction() {}
 
@@ -48,13 +41,13 @@ public final class DoorRoundelInteraction {
         }
         if (level.isClientSide()) return InteractionResult.SUCCESS;
 
-        if (!door.canTakeRoundel()) {
+        if (door.rejectsRoundel()) {
             player.sendOverlayMessage(Component.translatable("overlay.gallifreyan_chronicles.door_style_primary")
                     .withStyle(ChatFormatting.RED));
         } else if (brush) {
             door.setRoundelBlock("");
             player.sendOverlayMessage(Component.translatable("overlay.gallifreyan_chronicles.door_style_cleared"));
-        } else if (!hasWallBlock(roundel)) {
+        } else if (lacksWallBlock(roundel)) {
             player.sendOverlayMessage(
                     Component.translatable("overlay.gallifreyan_chronicles.door_style_no_match", stack.getHoverName())
                             .withStyle(ChatFormatting.RED));
@@ -66,12 +59,11 @@ public final class DoorRoundelInteraction {
         return InteractionResult.SUCCESS;
     }
 
-    /** true if the roundel block has a plain wall block to take the door's sides from */
-    public static boolean hasWallBlock(Identifier roundelBlock) {
+    public static boolean lacksWallBlock(Identifier roundelBlock) {
         for (Identifier candidate : wallBlockCandidates(roundelBlock)) {
-            if (BuiltInRegistries.BLOCK.containsKey(candidate)) return true;
+            if (BuiltInRegistries.BLOCK.containsKey(candidate)) return false;
         }
-        return false;
+        return true;
     }
 
     /** the ids of the plain blocks a roundel block could be the roundel version of, best match first. the block and
@@ -102,7 +94,6 @@ public final class DoorRoundelInteraction {
         return candidates;
     }
 
-    /* the id of this mod's roundel block if the item is one, otherwise null */
     private static @Nullable Identifier roundelIdOf(ItemStack stack) {
         if (!(stack.getItem() instanceof BlockItem blockItem)) return null;
         Identifier id = BuiltInRegistries.BLOCK.getKey(blockItem.getBlock());

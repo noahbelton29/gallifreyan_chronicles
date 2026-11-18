@@ -38,7 +38,7 @@ import uk.nbforge.gallifreyan_chronicles.client.util.DetailLevelUtil;
 import uk.nbforge.gallifreyan_chronicles.codec.HexColorCodec;
 import uk.nbforge.gallifreyan_chronicles.compat.portal.TardisPortalBridge;
 import uk.nbforge.gallifreyan_chronicles.config.GCConfig;
-import uk.nbforge.gallifreyan_chronicles.core.dynamic_registries.DimensionSkyRegistry;
+import uk.nbforge.gallifreyan_chronicles.core.data_registry.DimensionSkyRegistry;
 import uk.nbforge.gallifreyan_chronicles.sky.data.DimensionSky;
 import uk.nbforge.gallifreyan_chronicles.sky.data.ResolvedSkyBody;
 import uk.nbforge.gallifreyan_chronicles.sky.data.SkyBody;
@@ -47,11 +47,11 @@ import uk.nbforge.gallifreyan_chronicles.sky.data.SkyStars;
 import uk.nbforge.gallifreyan_chronicles.sky.shader.ShaderSky;
 
 public final class CustomSkyRenderer {
-    private static final float BODY_DISTANCE = 100.0F;
-    private static final float DARK_DISC_OFFSET = 12.0F;
-    private static final float GOLDEN_ANGLE = 2.3999632F;
+    private static final float BODY_DISTANCE = 100.0f;
+    private static final float DARK_DISC_OFFSET = 12.0f;
+    private static final float GOLDEN_ANGLE = 2.3999632f;
     private static final float TWO_PI = (float) (Math.PI * 2.0);
-    private static final float DAY_FADE = 0.12F;
+    private static final float DAY_FADE = 0.12f;
 
     private static @Nullable StarDensity meshDensity;
     private static final Map<DimensionSky, SkyMeshes> MESHES = new IdentityHashMap<>();
@@ -59,10 +59,10 @@ public final class CustomSkyRenderer {
     private static @Nullable SkyRenderState canvasState;
     private static @Nullable GpuBufferSlice canvasFog;
     private static @Nullable ClientLevel canvasLevel;
-    private static float canvasDepthFar = 1024.0F;
+    private static float canvasDepthFar = 1024.0f;
     private static boolean canvasWaiting;
     private static @Nullable TextureTarget skyCanvas;
-    private static final float OVERLAY_DISTANCE = 0.5F;
+    private static final float OVERLAY_DISTANCE = 0.5f;
 
     private record PreparedBody(ResolvedSkyBody body, AbstractTexture texture) {}
 
@@ -74,11 +74,9 @@ public final class CustomSkyRenderer {
 
         DimensionSky sky =
                 DimensionSkyRegistry.getForDimension(level.dimension().identifier());
-        if (sky == null || !DetailLevelUtil.highDetail()) return false;
+        if (sky == null || DetailLevelUtil.lowDetail()) return false;
 
         SkyShaderCompat.assignPipelines();
-        // Pack skies, the pack paints over the sky so stars and bodies go on a canvas laid on after it
-        // Overlay skies are drawn here as normal and a pack that supports them keeps them, the patched Solas
         boolean onCanvas = sky.shaderSky() == ShaderSky.PACK
                 && SkyShaderCompat.isShaderPackInUse()
                 && !TardisPortalBridge.isRenderingAnyPortal();
@@ -106,24 +104,23 @@ public final class CustomSkyRenderer {
             drawDisc(pass, skyMeshes.topDisc(), RenderSystem.getModelViewMatrixCopy(), skyColor(sky, state));
             if (!onCanvas) {
                 SkyShaderCompat.setPhase(SkyShaderCompat.Phase.STARS);
-                drawStars(pass, skyMeshes, sky, state.rainBrightness, RenderPipelines.STARS, 1.0F);
+                drawStars(pass, skyMeshes, sky, state.rainBrightness, RenderPipelines.STARS, 1.0f);
                 SkyShaderCompat.setPhase(SkyShaderCompat.Phase.CUSTOM_SKY);
                 float daylight = daylight(state.sunAngle);
                 for (PreparedBody prepared : bodies) {
-                    drawBody(pass, skyMeshes, prepared, state, daylight, SkyPipelines.BODY, 1.0F);
+                    drawBody(pass, skyMeshes, prepared, state, daylight, SkyPipelines.BODY, 1.0f);
                 }
             }
             SkyShaderCompat.setPhase(SkyShaderCompat.Phase.SKY);
             if (sky.darkDisc() && state.shouldRenderDarkDisc) {
-                Matrix4f darkDisc = RenderSystem.getModelViewMatrixCopy().translate(0.0F, DARK_DISC_OFFSET, 0.0F);
-                drawDisc(pass, skyMeshes.bottomDisc(), darkDisc, new Vector3f(0.0F, 0.0F, 0.0F));
+                Matrix4f darkDisc = RenderSystem.getModelViewMatrixCopy().translate(0.0f, DARK_DISC_OFFSET, 0.0f);
+                drawDisc(pass, skyMeshes.bottomDisc(), darkDisc, new Vector3f(0.0f, 0.0f, 0.0f));
             }
             SkyShaderCompat.setPhase(SkyShaderCompat.Phase.NONE);
         }
         return true;
     }
 
-    /** Start of a frame, remembers how far the camera can see. */
     public static void beginFrame(float depthFar) {
         if (TardisPortalBridge.isRenderingAnyPortal()) return;
         canvasDepthFar = depthFar;
@@ -161,7 +158,7 @@ public final class CustomSkyRenderer {
                 .createRenderPass(
                         () -> "GC sky canvas",
                         target.getColorTextureView(),
-                        Optional.of(new Vector4f(0.0F)),
+                        Optional.of(new Vector4f(0.0f)),
                         target.getDepthTextureView(),
                         OptionalDouble.empty())) {
             RenderSystem.bindDefaultUniforms(pass);
@@ -197,7 +194,6 @@ public final class CustomSkyRenderer {
         }
     }
 
-    /** The depth of the world so the sky only shows where nothing is in front. */
     private static void copyWorldDepth(RenderTarget main, TextureTarget target) {
         var nearest = RenderSystem.getSamplerCache().getClampToEdge(FilterMode.NEAREST);
         RenderPassDescriptor depthCopy = RenderPassDescriptor.builder(() -> "GC sky canvas depth")
@@ -277,12 +273,12 @@ public final class CustomSkyRenderer {
             int color = sky.skyColor().get();
             return new Vector3f(HexColorCodec.red(color), HexColorCodec.green(color), HexColorCodec.blue(color));
         }
-        return state.skyColor != null ? state.skyColor : new Vector3f(0.0F, 0.0F, 0.0F);
+        return state.skyColor != null ? state.skyColor : new Vector3f(0.0f, 0.0f, 0.0f);
     }
 
     private static void drawDisc(RenderPass pass, GpuBuffer disc, Matrix4f modelView, Vector3fc color) {
         GpuBufferSlice transforms =
-                RenderSystem.getDynamicUniforms().writeTransform(modelView, new Vector4f(color, 1.0F));
+                RenderSystem.getDynamicUniforms().writeTransform(modelView, new Vector4f(color, 1.0f));
         pass.pushDebugGroup(() -> "GC sky disc");
         pass.setPipeline(RenderSystem.getCompiledPipeline(RenderPipelines.SKY));
         pass.setUniform("DynamicTransforms", transforms);
@@ -302,8 +298,8 @@ public final class CustomSkyRenderer {
         if (stars == null || sky.stars().isEmpty()) return;
 
         SkyStars settings = sky.stars().get();
-        float brightness = settings.brightness() * (settings.fadesInRain() ? rainBrightness : 1.0F);
-        if (brightness <= 0.0F) return;
+        float brightness = settings.brightness() * (settings.fadesInRain() ? rainBrightness : 1.0f);
+        if (brightness <= 0.0f) return;
 
         RenderSystem.AutoStorageIndexBuffer indices = RenderSystem.getSequentialBuffer(PrimitiveTopology.QUADS);
         int color = settings.color();
@@ -314,16 +310,16 @@ public final class CustomSkyRenderer {
         pass.setVertexBuffer(0, stars.slice());
         pass.setIndexBuffer(indices.getBuffer(skyMeshes.starIndexCount()), indices.type());
 
-        if (settings.twinkle() <= 0.0F) {
+        if (settings.twinkle() <= 0.0f) {
             pass.setUniform("DynamicTransforms", starTransform(modelView, color, brightness));
             pass.drawIndexed(skyMeshes.starIndexCount(), 1, 0, 0, 0);
         } else {
-            float time = (Util.getMillis() % 3_600_000L) / 1000.0F * settings.twinkleSpeed();
+            float time = (Util.getMillis() % 3_600_000L) / 1000.0f * settings.twinkleSpeed();
             for (int group = 0; group < SkyMeshes.STAR_GROUPS; group++) {
                 int quads = skyMeshes.groupQuadCount(group);
                 if (quads == 0) continue;
                 float shimmer = twinkle(time, group);
-                float groupBrightness = brightness * (1.0F - settings.twinkle() * shimmer);
+                float groupBrightness = brightness * (1.0f - settings.twinkle() * shimmer);
                 pass.setUniform("DynamicTransforms", starTransform(modelView, color, groupBrightness));
                 pass.drawIndexed(quads * 6, 1, 0, skyMeshes.groupFirstQuad(group) * 4, 0);
             }
@@ -344,21 +340,21 @@ public final class CustomSkyRenderer {
 
     private static float twinkle(float time, int group) {
         float phase = group * GOLDEN_ANGLE;
-        float rate = 0.55F + 0.9F * ((group * 0.618034F) % 1.0F);
-        float wave = 0.6F * Mth.sin(time * rate * TWO_PI + phase)
-                + 0.4F * Mth.sin(time * rate * 2.3F * TWO_PI + phase * 1.7F);
-        return 0.5F + 0.5F * wave;
+        float rate = 0.55f + 0.9f * ((group * 0.618034f) % 1.0f);
+        float wave = 0.6f * Mth.sin(time * rate * TWO_PI + phase)
+                + 0.4f * Mth.sin(time * rate * 2.3f * TWO_PI + phase * 1.7f);
+        return 0.5f + 0.5f * wave;
     }
 
     private static float daylight(float sunAngle) {
-        return Mth.clamp((Mth.cos(sunAngle) + DAY_FADE) / (DAY_FADE * 2.0F), 0.0F, 1.0F);
+        return Mth.clamp((Mth.cos(sunAngle) + DAY_FADE) / (DAY_FADE * 2.0f), 0.0f, 1.0f);
     }
 
     private static float visibility(SkyBody.Visibility visibility, float daylight) {
         return switch (visibility) {
-            case ALWAYS -> 1.0F;
+            case ALWAYS -> 1.0f;
             case DAY -> daylight;
-            case NIGHT -> 1.0F - daylight;
+            case NIGHT -> 1.0f - daylight;
         };
     }
 
@@ -368,17 +364,17 @@ public final class CustomSkyRenderer {
             SkyOrbit orbit = body.orbit().get();
             float angle = orbit.follows() == SkyOrbit.Follows.MOON ? state.moonAngle : state.sunAngle;
             modelView
-                    .rotateY((float) Math.toRadians(-90.0F - body.yaw()))
+                    .rotateY((float) Math.toRadians(-90.0f - body.yaw()))
                     .rotateZ((float) Math.toRadians(orbit.tilt()))
                     .rotateX(angle + (float) Math.toRadians(orbit.offset()));
         } else {
             modelView.rotateY((float) Math.toRadians(-body.yaw())).rotateX((float)
-                    Math.toRadians(body.pitch() - 90.0F));
+                    Math.toRadians(body.pitch() - 90.0f));
         }
         return modelView
                 .rotateY((float) Math.toRadians(body.roll()))
-                .translate(0.0F, BODY_DISTANCE, 0.0F)
-                .scale(body.size(), 1.0F, body.size());
+                .translate(0.0f, BODY_DISTANCE, 0.0f)
+                .scale(body.size(), 1.0f, body.size());
     }
 
     private static void drawBody(
@@ -391,9 +387,9 @@ public final class CustomSkyRenderer {
             float scale) {
         ResolvedSkyBody body = prepared.body();
         float alpha = HexColorCodec.alpha(body.color())
-                * (body.fadesInRain() ? state.rainBrightness : 1.0F)
+                * (body.fadesInRain() ? state.rainBrightness : 1.0f)
                 * visibility(body.visibility(), daylight);
-        if (alpha <= 0.0F || body.size() <= 0.0F) return;
+        if (alpha <= 0.0f || body.size() <= 0.0f) return;
 
         Matrix4f modelView = bodyTransform(body, state, scale);
 

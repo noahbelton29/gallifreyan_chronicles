@@ -9,7 +9,6 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import uk.nbforge.gallifreyan_chronicles.client.renderer.fade.FadeBoxRenderer;
 
-/** A fading TARDIS is not drawn with everything else, it is kept for its own canvas later. */
 @Mixin(PreparedRenderType.class)
 public abstract class PreparedRenderTypeFadeMixin {
     @Inject(method = "drawFromBuffer", at = @At("HEAD"), cancellable = true)

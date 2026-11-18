@@ -115,7 +115,6 @@ public final class EssentialMenuCompat {
         }
     }
 
-    /** Tucks the Essential buttons away on a screen and adds our own entries that click them for you. */
     public static void sync(Screen screen, Consumer<AbstractWidget> add) {
         List<AbstractWidget> proxies = new ArrayList<>();
         for (GuiEventListener child : screen.children()) {

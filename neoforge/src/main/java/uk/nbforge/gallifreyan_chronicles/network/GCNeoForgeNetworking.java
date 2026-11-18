@@ -9,9 +9,6 @@ import net.neoforged.neoforge.event.server.ServerStoppedEvent;
 import net.neoforged.neoforge.network.event.RegisterPayloadHandlersEvent;
 import net.neoforged.neoforge.network.registration.PayloadRegistrar;
 import uk.nbforge.gallifreyan_chronicles.Constants;
-import uk.nbforge.gallifreyan_chronicles.codec.network.DimensionSkySyncPayloadCodec;
-import uk.nbforge.gallifreyan_chronicles.codec.network.DiscoveryToastPayloadCodec;
-import uk.nbforge.gallifreyan_chronicles.codec.network.ResumeSoundPayloadCodec;
 import uk.nbforge.gallifreyan_chronicles.core.lifecycle.ServerLifecycleHandler;
 import uk.nbforge.gallifreyan_chronicles.core.sound.timed.TimedSounds;
 import uk.nbforge.gallifreyan_chronicles.loader.GCJsonReloadListener;
@@ -25,8 +22,8 @@ import uk.nbforge.gallifreyan_chronicles.network.tardis.TardisDrumShakePayload;
 import uk.nbforge.gallifreyan_chronicles.network.tardis.TardisExteriorSyncPayload;
 import uk.nbforge.gallifreyan_chronicles.network.tardis.TardisFrightPayload;
 import uk.nbforge.gallifreyan_chronicles.network.tardis.TardisInteriorSyncPayload;
+import uk.nbforge.gallifreyan_chronicles.network.tardis.TardisPayloadCodec;
 import uk.nbforge.gallifreyan_chronicles.platform.Services;
-import uk.nbforge.gallifreyan_chronicles.tardis.codec.network.TardisPayloadCodec;
 
 @EventBusSubscriber(modid = Constants.MOD_ID)
 public final class GCNeoForgeNetworking {
@@ -45,7 +42,7 @@ public final class GCNeoForgeNetworking {
                 (payload, context) -> context.enqueueWork(payload::apply));
         registrar.playToClient(
                 DimensionSkySyncPayload.TYPE,
-                DimensionSkySyncPayloadCodec.STREAM_CODEC,
+                DimensionSkySyncPayload.STREAM_CODEC,
                 (payload, context) -> context.enqueueWork(payload::apply));
         registrar.playToClient(
                 TardisConsoleSyncPayload.TYPE,
@@ -73,7 +70,7 @@ public final class GCNeoForgeNetworking {
                 (payload, context) -> context.enqueueWork(payload::apply));
         registrar.playToClient(
                 DiscoveryToastPayload.TYPE,
-                DiscoveryToastPayloadCodec.STREAM_CODEC,
+                DiscoveryToastPayload.STREAM_CODEC,
                 (payload, context) -> context.enqueueWork(payload::apply));
         registrar.playToClient(
                 TardisCrashRumblePayload.TYPE,
@@ -85,7 +82,7 @@ public final class GCNeoForgeNetworking {
                 (payload, context) -> context.enqueueWork(payload::apply));
         registrar.playToClient(
                 ResumeSoundPayload.TYPE,
-                ResumeSoundPayloadCodec.STREAM_CODEC,
+                ResumeSoundPayload.STREAM_CODEC,
                 (payload, context) -> context.enqueueWork(payload::apply));
         Constants.LOG.info("Registered GC Networking");
     }
@@ -103,10 +100,10 @@ public final class GCNeoForgeNetworking {
     @SubscribeEvent
     public static void onPlayerLoggedIn(PlayerEvent.PlayerLoggedInEvent event) {
         if (!(event.getEntity() instanceof ServerPlayer player)) return;
-        Services.NETWORK.sendTardisExteriorSync(player, TardisExteriorSyncPayload.create());
-        Services.NETWORK.sendTardisInteriorSync(player, TardisInteriorSyncPayload.create());
-        Services.NETWORK.sendTardisConsoleSync(player, TardisConsoleSyncPayload.create());
-        Services.NETWORK.sendDimensionSkySync(player, DimensionSkySyncPayload.create());
+        Services.NETWORK.send(player, TardisExteriorSyncPayload.create());
+        Services.NETWORK.send(player, TardisInteriorSyncPayload.create());
+        Services.NETWORK.send(player, TardisConsoleSyncPayload.create());
+        Services.NETWORK.send(player, DimensionSkySyncPayload.create());
         TimedSounds.resume(player);
     }
 

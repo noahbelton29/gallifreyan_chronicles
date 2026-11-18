@@ -3,11 +3,10 @@ package uk.nbforge.gallifreyan_chronicles.datagen.tardis;
 import com.google.gson.JsonObject;
 import net.minecraft.data.PackOutput;
 import uk.nbforge.gallifreyan_chronicles.core.GCTardisControls;
-import uk.nbforge.gallifreyan_chronicles.datagen.tardis.builder.GCConsoleBuilder;
+import uk.nbforge.gallifreyan_chronicles.datagen.tardis.builder.ConsoleBuilder;
 import uk.nbforge.gallifreyan_chronicles.datagen.util.GCJsonDataProvider;
 
 /**
- * Generates the tardis_console json files.
  * To add a console copy a block below, standardControls adds every normal control with its usual cooldown, use adjust to place or resize one for the model of this console, and use the ids in GCTardisControls for anything else.
  */
 public class GCTardisConsoleProvider extends GCJsonDataProvider {
@@ -18,6 +17,7 @@ public class GCTardisConsoleProvider extends GCJsonDataProvider {
     @Override
     protected void addEntries() {
         console("ambassadors_of_death_console")
+                .sortOrder(3)
                 .standardGlowGroups()
                 .standardControls()
                 .adjust(
@@ -31,12 +31,14 @@ public class GCTardisConsoleProvider extends GCJsonDataProvider {
                         c -> c.at(0.7715, 0.6968, 0.168).size(0.125, 0.1875, 0.1875));
 
         console("brachacki_console")
+                .sortOrder(0)
                 .defaultVariant("first_doctors_console")
                 .standardGlowGroups()
                 .standardControls()
                 .interiorDoorControl();
 
         console("inferno_console")
+                .sortOrder(2)
                 .standardGlowGroups()
                 .standardControls()
                 .adjust(
@@ -50,15 +52,16 @@ public class GCTardisConsoleProvider extends GCJsonDataProvider {
                         c -> c.at(0.7715, 0.6968, 0.168).size(0.125, 0.1875, 0.1875));
 
         console("second_doctors_console_alt")
+                .sortOrder(1)
                 .defaultVariant("second_doctors_console_alt")
                 .standardGlowGroups()
                 .standardControls()
                 .interiorDoorControl(c -> c.at(1.0237, 0.5653, 0.388).size(0.125, 0.125, 0.1875));
     }
 
-    private GCConsoleBuilder console(String name) {
+    private ConsoleBuilder console(String name) {
         JsonObject json = new JsonObject();
         add(name, json);
-        return new GCConsoleBuilder(json);
+        return new ConsoleBuilder(json);
     }
 }

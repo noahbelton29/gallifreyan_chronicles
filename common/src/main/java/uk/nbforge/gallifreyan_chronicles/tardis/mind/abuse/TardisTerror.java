@@ -10,17 +10,13 @@ import net.minecraft.world.phys.Vec3;
 import org.jspecify.annotations.Nullable;
 import uk.nbforge.gallifreyan_chronicles.core.lifecycle.ServerState;
 import uk.nbforge.gallifreyan_chronicles.tardis.Tardis;
-import uk.nbforge.gallifreyan_chronicles.tardis.ecs.system.TardisMindSystem;
 import uk.nbforge.gallifreyan_chronicles.tardis.mind.FearLevel;
 import uk.nbforge.gallifreyan_chronicles.tardis.mind.MindMessages;
+import uk.nbforge.gallifreyan_chronicles.tardis.mind.TardisMinds;
 import uk.nbforge.gallifreyan_chronicles.tardis.mind.TardisPersonality;
 import uk.nbforge.gallifreyan_chronicles.tardis.mind.action.MindActions;
 import uk.nbforge.gallifreyan_chronicles.tardis.mind.action.MindContext;
 
-/**
- * So scared of a player it freezes up for them.
- * It wears off by itself as its fear fades, leave it alone a few minutes, or the mallet snaps it out of it for a while.
- */
 public final class TardisTerror {
     private static final long COMPLY_TICKS = 600L;
 
@@ -42,24 +38,22 @@ public final class TardisTerror {
         return tardis.id() + "/" + player;
     }
 
-    /** This player snapped it out of a freeze recently so it does what they say. */
     public static boolean compliant(Tardis tardis, @Nullable UUID player) {
         if (player == null) return false;
         Episode episode = EPISODES.get(key(tardis, player));
-        return episode != null && TardisMindSystem.now(tardis.server()) < episode.compliantUntil;
+        return episode != null && TardisMinds.now(tardis.server()) < episode.compliantUntil;
     }
 
-    /** Only freezes up around players who hurt it. */
     public static boolean terrified(Tardis tardis, UUID player) {
-        return TardisMindSystem.hasHurt(tardis, player)
-                && TardisMindSystem.fearLevel(tardis, player) == FearLevel.TERRIFIED
+        return TardisMinds.hasHurt(tardis, player)
+                && TardisMinds.fearLevel(tardis, player) == FearLevel.TERRIFIED
                 && !compliant(tardis, player);
     }
 
     /** True if the hit was part of snapping it out of a freeze. */
     public static boolean strike(Tardis tardis, ServerLevel level, Vec3 hit, Player player) {
         if (!terrified(tardis, player.getUUID())) return false;
-        TardisPersonality personality = TardisMindSystem.mind(tardis).personality();
+        TardisPersonality personality = TardisMinds.mind(tardis).personality();
         Episode episode = EPISODES.computeIfAbsent(key(tardis, player.getUUID()), id -> new Episode());
         if (episode.required == 0)
             episode.required = Math.max(1, personality.terrorHits().pickInt(level.getRandom()));
@@ -70,7 +64,7 @@ public final class TardisTerror {
         MindActions.run(personality.onTerrorHit(), context);
 
         if (episode.hits >= episode.required) {
-            episode.compliantUntil = TardisMindSystem.now(tardis.server()) + COMPLY_TICKS;
+            episode.compliantUntil = TardisMinds.now(tardis.server()) + COMPLY_TICKS;
             episode.hits = 0;
             episode.required = 0;
             MindMessages.say(player, ChatFormatting.GRAY, "tardis_terror_complies");

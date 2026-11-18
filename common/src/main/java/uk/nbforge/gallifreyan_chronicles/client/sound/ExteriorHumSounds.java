@@ -8,11 +8,8 @@ import net.minecraft.client.sounds.SoundManager;
 import net.minecraft.world.phys.Vec3;
 import uk.nbforge.gallifreyan_chronicles.client.lifecycle.ClientState;
 import uk.nbforge.gallifreyan_chronicles.core.GCSounds;
-import uk.nbforge.gallifreyan_chronicles.core.block_entities.TardisExteriorBlockEntity;
+import uk.nbforge.gallifreyan_chronicles.core.block_entity.TardisExteriorBlockEntity;
 
-/**
- * Starts and stops the outside hum for each TARDIS exterior near the player.
- */
 public final class ExteriorHumSounds {
     private static final int CHECK_INTERVAL_TICKS = 1;
     private static final double START_RANGE_SQR =
@@ -21,15 +18,11 @@ public final class ExteriorHumSounds {
     private static final Map<TardisExteriorBlockEntity, ExteriorHumSoundInstance> HUMS =
             ClientState.track(new WeakHashMap<>());
 
-    // The last power state seen for each exterior, to play the power sound when it flips
     private static final Map<TardisExteriorBlockEntity, Boolean> LAST_POWER = ClientState.track(new WeakHashMap<>());
     private static int ticks;
 
     private ExteriorHumSounds() {}
 
-    /**
-     * Every tick, did the power flip on an exterior near us, then play the power sound there.
-     */
     private static void checkPowerChanges(Minecraft minecraft) {
         double maxRangeSqr = ExteriorHumSoundInstance.OPEN_RANGE * ExteriorHumSoundInstance.OPEN_RANGE;
         for (TardisExteriorBlockEntity exterior : HUMS.keySet()) {
@@ -37,12 +30,10 @@ public final class ExteriorHumSounds {
                 LAST_POWER.remove(exterior);
                 continue;
             }
-            boolean powered = exterior.isPowered();
+            boolean powered = exterior.lamp().isPowered();
             Boolean last = LAST_POWER.put(exterior, powered);
             if (last == null || last == powered) continue;
-            // Still tracked above so a flip missed while gone does not fire the click once it is back,
-            // but there is nothing there for the click itself to come from while fully dematerialised
-            if (exterior.isFullyInvisible()) continue;
+            if (exterior.travel().isFullyInvisible()) continue;
             if (SoundListener.pos().distanceToSqr(Vec3.atCenterOf(exterior.getBlockPos())) > maxRangeSqr) continue;
             ExteriorPowerSoundInstance sound = new ExteriorPowerSoundInstance(
                     exterior, powered ? GCSounds.TARDIS_POWER_ON : GCSounds.TARDIS_POWER_OFF);
@@ -55,9 +46,6 @@ public final class ExteriorHumSounds {
         HUMS.putIfAbsent(exterior, null);
     }
 
-    /**
-     * Every few ticks, start the hum of exteriors that are powered and near you and fade out the ones that are gone or in another world.
-     */
     public static void tick() {
         Minecraft minecraft = Minecraft.getInstance();
         if (minecraft.level == null || minecraft.player == null) return;
@@ -73,7 +61,6 @@ public final class ExteriorHumSounds {
             TardisExteriorBlockEntity exterior = entry.getKey();
             ExteriorHumSoundInstance hum = entry.getValue();
 
-            // The hum fades itself out, cutting it off made a pop
             if (exterior.isRemoved()) {
                 if (hum != null) hum.fadeOut();
                 iterator.remove();
@@ -86,9 +73,7 @@ public final class ExteriorHumSounds {
                 }
                 continue;
             }
-            // Fully dematerialised means genuinely gone, not just mid fade, so the hum should not be
-            // heard from an empty patch of air; it comes back on its own once any part of it rematerialises
-            if (exterior.isFullyInvisible()) {
+            if (exterior.travel().isFullyInvisible()) {
                 if (hum != null) {
                     hum.fadeOut();
                     entry.setValue(null);
@@ -96,7 +81,7 @@ public final class ExteriorHumSounds {
                 continue;
             }
             if (hum != null && sounds.isActive(hum)) continue;
-            if (!exterior.isPowered()) continue;
+            if (!exterior.lamp().isPowered()) continue;
             if (SoundListener.pos().distanceToSqr(Vec3.atCenterOf(exterior.getBlockPos())) > START_RANGE_SQR) continue;
 
             ExteriorHumSoundInstance fresh = new ExteriorHumSoundInstance(exterior);

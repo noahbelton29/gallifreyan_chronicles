@@ -5,5 +5,6 @@
     "lights": "gallifreyan_chronicles:console_shared/standard",
     "rotor": "gallifreyan_chronicles:console_shared/standard"
   },
+  "sort_order": 1,
   "texture": "gallifreyan_chronicles:brachacki_console/second_doctors_console"
 }

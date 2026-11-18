@@ -6,17 +6,17 @@ import com.geckolib.renderer.base.RenderPassInfo;
 import com.mojang.math.Axis;
 import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
 import net.minecraft.world.phys.Vec3;
-import org.jetbrains.annotations.NotNull;
+import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 import uk.nbforge.gallifreyan_chronicles.client.model.TardisConsoleBlockModel;
 import uk.nbforge.gallifreyan_chronicles.client.renderer.geo_layer.TardisConsoleGlowLayer;
 import uk.nbforge.gallifreyan_chronicles.client.util.ModelRenderRangeUtil;
 import uk.nbforge.gallifreyan_chronicles.config.GCConfig;
 import uk.nbforge.gallifreyan_chronicles.core.block.ConsoleBlock;
-import uk.nbforge.gallifreyan_chronicles.core.block_entities.TardisConsoleBlockEntity;
+import uk.nbforge.gallifreyan_chronicles.core.block_entity.TardisConsoleBlockEntity;
 
 public class TardisConsoleBlockRenderer
-        extends GeoBlockRenderer<@NotNull TardisConsoleBlockEntity, @NotNull TardisConsoleBlockRenderState> {
+        extends GeoBlockRenderer<@NonNull TardisConsoleBlockEntity, @NonNull TardisConsoleBlockRenderState> {
     public static final DataTicket<String> CONSOLE_ID = DataTicket.create("console_id", String.class);
     public static final DataTicket<String> CONSOLE_VARIANT = DataTicket.create("console_variant", String.class);
     public static final DataTicket<String> CONSOLE_TEXTURE_ID = DataTicket.create("console_texture_id", String.class);
@@ -31,15 +31,15 @@ public class TardisConsoleBlockRenderer
     }
 
     @Override
-    public @NotNull TardisConsoleBlockRenderState createRenderState() {
+    public @NonNull TardisConsoleBlockRenderState createRenderState() {
         return new TardisConsoleBlockRenderState();
     }
 
     @Override
     public void addRenderData(
-            @NotNull TardisConsoleBlockEntity animatable,
+            @NonNull TardisConsoleBlockEntity animatable,
             @Nullable Void relatedObject,
-            @NotNull TardisConsoleBlockRenderState renderState,
+            @NonNull TardisConsoleBlockRenderState renderState,
             float partialTick) {
         renderState.addGeckolibData(CONSOLE_ID, animatable.getConsole().id());
         renderState.addGeckolibData(CONSOLE_VARIANT, animatable.getVariant());
@@ -52,7 +52,7 @@ public class TardisConsoleBlockRenderer
     }
 
     @Override
-    public void adjustRenderPose(@NotNull RenderPassInfo<TardisConsoleBlockRenderState> renderPassInfo) {
+    public void adjustRenderPose(@NonNull RenderPassInfo<TardisConsoleBlockRenderState> renderPassInfo) {
         super.adjustRenderPose(renderPassInfo);
 
         if (!renderPassInfo.renderState().getOrDefaultGeckolibData(UPSIDE_DOWN, false)) return;
@@ -64,7 +64,7 @@ public class TardisConsoleBlockRenderer
     }
 
     @Override
-    public boolean shouldRender(@NotNull TardisConsoleBlockEntity blockEntity, @NotNull Vec3 cameraPos) {
+    public boolean shouldRender(@NonNull TardisConsoleBlockEntity blockEntity, @NonNull Vec3 cameraPos) {
         return ModelRenderRangeUtil.inRange(blockEntity, cameraPos);
     }
 

@@ -10,8 +10,18 @@ import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.level.levelgen.VerticalAnchor;
 import net.minecraft.world.level.levelgen.blockpredicates.BlockPredicate;
 import net.minecraft.world.level.levelgen.feature.Feature;
-import net.minecraft.world.level.levelgen.placement.*;
-import uk.nbforge.gallifreyan_chronicles.core.GCBlocks;
+import net.minecraft.world.level.levelgen.placement.BiomeFilter;
+import net.minecraft.world.level.levelgen.placement.BlockPredicateFilter;
+import net.minecraft.world.level.levelgen.placement.CountPlacement;
+import net.minecraft.world.level.levelgen.placement.HeightRangePlacement;
+import net.minecraft.world.level.levelgen.placement.InSquarePlacement;
+import net.minecraft.world.level.levelgen.placement.NoiseThresholdCountPlacement;
+import net.minecraft.world.level.levelgen.placement.OffsetPlacement;
+import net.minecraft.world.level.levelgen.placement.PlacedFeature;
+import net.minecraft.world.level.levelgen.placement.PlacementModifier;
+import net.minecraft.world.level.levelgen.placement.RarityFilter;
+import uk.nbforge.gallifreyan_chronicles.core.block.registry.CadonwoodBlocks;
+import uk.nbforge.gallifreyan_chronicles.core.block.registry.FloraBlocks;
 import uk.nbforge.gallifreyan_chronicles.util.GCUtil;
 
 public class GCPlacedFeatures {
@@ -77,7 +87,7 @@ public class GCPlacedFeatures {
                 CountPlacement.of(10),
                 triangleOffset(7, 3),
                 BlockPredicateFilter.forPredicate(BlockPredicate.allOf(
-                        BlockPredicate.ONLY_IN_AIR_PREDICATE, BlockPredicate.wouldSurvive(GCBlocks.THORIVINE))));
+                        BlockPredicate.ONLY_IN_AIR_PREDICATE, BlockPredicate.wouldSurvive(FloraBlocks.THORIVINE))));
 
         register(context, GALLIFREYAN_STONE_PATCH, gallifreyanStonePatch, rareOnSurface(8));
 
@@ -188,7 +198,8 @@ public class GCPlacedFeatures {
                 context,
                 CADONWOOD_TREE_PLACED,
                 configuredFeatures.getOrThrow(GCConfiguredFeatures.CADONWOOD_TREE),
-                VegetationPlacements.treePlacement(PlacementUtils.countExtra(2, 0.1f, 2), GCBlocks.CADONWOOD_SAPLING));
+                VegetationPlacements.treePlacement(
+                        PlacementUtils.countExtra(2, 0.1f, 2), CadonwoodBlocks.CADONWOOD_SAPLING));
 
         register(
                 context,

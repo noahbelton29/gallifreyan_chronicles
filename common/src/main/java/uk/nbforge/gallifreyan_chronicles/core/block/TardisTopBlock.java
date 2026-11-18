@@ -17,11 +17,10 @@ import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
-import org.jetbrains.annotations.NotNull;
 import org.jspecify.annotations.NonNull;
-import uk.nbforge.gallifreyan_chronicles.core.GCBlocks;
-import uk.nbforge.gallifreyan_chronicles.core.block_entities.TardisExteriorBlockEntity;
-import uk.nbforge.gallifreyan_chronicles.util.ExteriorCollisionUtil;
+import uk.nbforge.gallifreyan_chronicles.core.block.registry.TardisBlocks;
+import uk.nbforge.gallifreyan_chronicles.core.block_entity.TardisExteriorBlockEntity;
+import uk.nbforge.gallifreyan_chronicles.tardis.exterior.ExteriorCollisionUtil;
 
 public class TardisTopBlock extends Block {
     private static final VoxelShape SHAPE = Block.box(0, -16, 0, 16, 16, 16);
@@ -35,13 +34,13 @@ public class TardisTopBlock extends Block {
         if (level.isOutsideBuildHeight(above)) return;
 
         BlockState existing = level.getBlockState(above);
-        if (existing.is(GCBlocks.TARDIS_TOP) || !existing.canBeReplaced()) return;
+        if (existing.is(TardisBlocks.TARDIS_TOP) || !existing.canBeReplaced()) return;
 
-        level.setBlock(above, GCBlocks.TARDIS_TOP.defaultBlockState(), Block.UPDATE_ALL);
+        level.setBlock(above, TardisBlocks.TARDIS_TOP.defaultBlockState(), Block.UPDATE_ALL);
     }
 
     public static BlockPos baseOf(Level level, BlockPos pos) {
-        return level.getBlockState(pos).is(GCBlocks.TARDIS_TOP) ? pos.below() : pos;
+        return level.getBlockState(pos).is(TardisBlocks.TARDIS_TOP) ? pos.below() : pos;
     }
 
     @Override
@@ -53,7 +52,7 @@ public class TardisTopBlock extends Block {
             @NonNull BlockHitResult hitResult) {
         BlockPos below = pos.below();
         BlockState bottom = level.getBlockState(below);
-        if (!bottom.is(GCBlocks.TARDIS)) {
+        if (!bottom.is(TardisBlocks.TARDIS)) {
             if (!level.isClientSide()) level.removeBlock(pos, false);
             return InteractionResult.PASS;
         }
@@ -67,7 +66,7 @@ public class TardisTopBlock extends Block {
             @NonNull BlockPos pos,
             @NonNull CollisionContext context) {
         if (!(level.getBlockEntity(pos.below()) instanceof TardisExteriorBlockEntity tardis)
-                || tardis.isFullyInvisible()) {
+                || tardis.travel().isFullyInvisible()) {
             return Shapes.empty();
         }
         return SHAPE;
@@ -83,7 +82,7 @@ public class TardisTopBlock extends Block {
             @NonNull BlockPos neighborPos,
             @NonNull BlockState neighborState,
             @NonNull RandomSource random) {
-        if (direction == Direction.DOWN && !neighborState.is(GCBlocks.TARDIS)) {
+        if (direction == Direction.DOWN && !neighborState.is(TardisBlocks.TARDIS)) {
             return Blocks.AIR.defaultBlockState();
         }
         return super.updateShape(state, level, ticks, pos, direction, neighborPos, neighborState, random);
@@ -99,10 +98,10 @@ public class TardisTopBlock extends Block {
     }
 
     @Override
-    public @NotNull BlockState playerWillDestroy(
-            @NotNull Level level, @NotNull BlockPos pos, @NotNull BlockState state, @NotNull Player player) {
+    public @NonNull BlockState playerWillDestroy(
+            @NonNull Level level, @NonNull BlockPos pos, @NonNull BlockState state, @NonNull Player player) {
         BlockPos below = pos.below();
-        if (!level.isClientSide() && level.getBlockState(below).is(GCBlocks.TARDIS)) {
+        if (!level.isClientSide() && level.getBlockState(below).is(TardisBlocks.TARDIS)) {
             TardisBlock.deleteIfCreative(level, below, player);
             level.removeBlock(below, false);
         }
@@ -111,14 +110,15 @@ public class TardisTopBlock extends Block {
 
     @Override
     protected float getShadeBrightness(@NonNull BlockState state, @NonNull BlockGetter level, @NonNull BlockPos pos) {
-        if (level.getBlockEntity(pos.below()) instanceof TardisExteriorBlockEntity tardis && !tardis.isShadowActive()) {
+        if (level.getBlockEntity(pos.below()) instanceof TardisExteriorBlockEntity tardis
+                && !tardis.travel().isShadowActive()) {
             return 1.0f;
         }
         return super.getShadeBrightness(state, level, pos);
     }
 
     @Override
-    public @NotNull RenderShape getRenderShape(@NotNull BlockState state) {
+    public @NonNull RenderShape getRenderShape(@NonNull BlockState state) {
         return RenderShape.INVISIBLE;
     }
 }

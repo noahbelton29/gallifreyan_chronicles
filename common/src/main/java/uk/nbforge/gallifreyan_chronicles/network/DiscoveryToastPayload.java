@@ -1,5 +1,8 @@
 package uk.nbforge.gallifreyan_chronicles.network;
 
+import net.minecraft.network.RegistryFriendlyByteBuf;
+import net.minecraft.network.codec.ByteBufCodecs;
+import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.server.level.ServerPlayer;
 import org.jspecify.annotations.NonNull;
@@ -11,8 +14,16 @@ import uk.nbforge.gallifreyan_chronicles.util.GCUtil;
 public record DiscoveryToastPayload(String kind, String id) implements CustomPacketPayload {
     public static final Type<DiscoveryToastPayload> TYPE = new Type<>(GCUtil.modIdentifier("discovery_toast"));
 
+    public static final StreamCodec<RegistryFriendlyByteBuf, DiscoveryToastPayload> STREAM_CODEC =
+            StreamCodec.composite(
+                    ByteBufCodecs.STRING_UTF8,
+                    DiscoveryToastPayload::kind,
+                    ByteBufCodecs.STRING_UTF8,
+                    DiscoveryToastPayload::id,
+                    DiscoveryToastPayload::new);
+
     public static void send(ServerPlayer player, String kind, String id) {
-        Services.NETWORK.sendDiscoveryToast(player, new DiscoveryToastPayload(kind, id));
+        Services.NETWORK.send(player, new DiscoveryToastPayload(kind, id));
     }
 
     public void apply() {

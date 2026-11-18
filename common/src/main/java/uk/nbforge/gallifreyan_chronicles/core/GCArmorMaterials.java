@@ -23,8 +23,8 @@ public class GCArmorMaterials {
             makeDefense(4, 7, 9, 4, 20),
             17,
             SoundEvents.ARMOR_EQUIP_NETHERITE,
-            3.5F,
-            0.15F,
+            3.5f,
+            0.15f,
             GCTags.Items.TARANIUM_REPAIRABLE,
             TARANIUM_KEY);
 

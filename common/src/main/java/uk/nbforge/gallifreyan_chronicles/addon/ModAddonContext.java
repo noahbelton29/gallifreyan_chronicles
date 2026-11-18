@@ -29,15 +29,13 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import uk.nbforge.gallifreyan_chronicles.Constants;
 import uk.nbforge.gallifreyan_chronicles.addon.api.AddonContext;
-import uk.nbforge.gallifreyan_chronicles.core.dynamic_registries.TardisControlRegistry;
 import uk.nbforge.gallifreyan_chronicles.platform.Services;
 import uk.nbforge.gallifreyan_chronicles.tardis.Tardis;
 import uk.nbforge.gallifreyan_chronicles.tardis.TardisEvents;
 import uk.nbforge.gallifreyan_chronicles.tardis.control.TardisControl;
-import uk.nbforge.gallifreyan_chronicles.tardis.control.TardisControlTypes;
-import uk.nbforge.gallifreyan_chronicles.util.GCSchedulerUtil;
+import uk.nbforge.gallifreyan_chronicles.tardis.control.TardisControls;
+import uk.nbforge.gallifreyan_chronicles.util.SchedulerUtil;
 
-/** What one addon gets, everything it adds is tagged with its id. */
 final class ModAddonContext implements AddonContext {
     private static final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
     private static final Pattern NAME = Pattern.compile("[a-z0-9_./-]+");
@@ -74,7 +72,6 @@ final class ModAddonContext implements AddonContext {
         return Services.PLATFORM.isModLoaded(modId);
     }
 
-    /** The folder of this addon inside the config folder, made if it is missing. */
     @Override
     public Path dataFolder() {
         Path path = Services.PLATFORM
@@ -90,7 +87,6 @@ final class ModAddonContext implements AddonContext {
         return path;
     }
 
-    /** Reads config.json of the addon, an empty config if the file is missing or broken. */
     @Override
     public JsonObject loadConfig() {
         Path file = dataFolder().resolve("config.json");
@@ -103,7 +99,6 @@ final class ModAddonContext implements AddonContext {
         }
     }
 
-    /** Writes config.json of the addon. */
     @Override
     public void saveConfig(JsonObject config) {
         Path file = dataFolder().resolve("config.json");
@@ -122,7 +117,6 @@ final class ModAddonContext implements AddonContext {
         return Identifier.fromNamespaceAndPath(addonId, path);
     }
 
-    /** Registers an item under the id of the addon and adds it to the addons tab. */
     @Override
     public <T extends Item> T registerItem(String name, Function<Item.Properties, T> factory) {
         Identifier id = id(name);
@@ -158,7 +152,6 @@ final class ModAddonContext implements AddonContext {
         return block;
     }
 
-    /** Registers a block under the id of the addon, no item is made for it. */
     @Override
     public Block registerBlockWithoutItem(String name, Function<BlockBehaviour.Properties, Block> factory) {
         Identifier id = id(name);
@@ -168,21 +161,18 @@ final class ModAddonContext implements AddonContext {
                 factory.apply(BlockBehaviour.Properties.of().setId(ResourceKey.create(Registries.BLOCK, id))));
     }
 
-    /** Registers a sound that gets quieter with distance the normal way. */
     @Override
     public SoundEvent registerSound(String name) {
         Identifier id = id(name);
         return Registry.register(BuiltInRegistries.SOUND_EVENT, id, SoundEvent.createVariableRangeEvent(id));
     }
 
-    /** Registers a sound that can be heard up to range blocks. */
     @Override
     public SoundEvent registerSound(String name, float range) {
         Identifier id = id(name);
         return Registry.register(BuiltInRegistries.SOUND_EVENT, id, SoundEvent.createFixedRangeEvent(id, range));
     }
 
-    /** Registers a control, the id must be lower case letters, digits and underscores, start with the prefix of the addon and not be taken already. */
     @Override
     public <T extends TardisControl> void registerControl(String id, MapCodec<T> codec, T control) {
         if (!CONTROL_ID.matcher(id).matches()
@@ -192,11 +182,10 @@ final class ModAddonContext implements AddonContext {
                     "Control id '" + id + "' must be lower case letters, digits and underscores, " + "and start with '"
                             + controlPrefix + "'");
         }
-        if (TardisControlRegistry.isRegistered(id)) {
+        if (TardisControls.isRegistered(id)) {
             throw new IllegalStateException("A control called '" + id + "' is already registered");
         }
-        TardisControlTypes.register(id, codec);
-        TardisControlRegistry.register(id, control);
+        TardisControls.register(id, codec, control);
     }
 
     @Override
@@ -209,10 +198,9 @@ final class ModAddonContext implements AddonContext {
         TardisEvents.LAND.register(guard("land", listener, TardisEvents.LAND));
     }
 
-    /** Runs the action on the server after delayTicks, if it throws the error is logged and nothing crashes. */
     @Override
     public void runLater(MinecraftServer server, int delayTicks, Runnable action) {
-        GCSchedulerUtil.runLater(server, delayTicks, () -> {
+        SchedulerUtil.runLater(server, delayTicks, () -> {
             try {
                 action.run();
             } catch (Throwable t) {
@@ -222,12 +210,10 @@ final class ModAddonContext implements AddonContext {
         });
     }
 
-    /** Catches errors from the addon and drops the listener after too many. */
     private Consumer<Tardis> guard(String eventName, Consumer<Tardis> listener, TardisEvents.Event event) {
         return new Consumer<>() {
             private int failures;
 
-            /** Runs the listener and logs it if it throws, after too many failures the listener is removed. */
             @Override
             public void accept(Tardis tardis) {
                 try {

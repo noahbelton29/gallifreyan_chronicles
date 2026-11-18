@@ -27,7 +27,6 @@ import uk.nbforge.gallifreyan_chronicles.client.tardis.RematAlpha;
 import uk.nbforge.gallifreyan_chronicles.client.tardis.RematCatchClient;
 import uk.nbforge.gallifreyan_chronicles.client.util.FadeTintUtil;
 
-/** A player that a TARDIS materialised around fades in for everyone else like the TARDIS. */
 @Mixin(LivingEntityRenderer.class)
 public abstract class LivingEntityRendererRematMixin {
     @Inject(
@@ -38,7 +37,6 @@ public abstract class LivingEntityRendererRematMixin {
             LivingEntity entity, LivingEntityRenderState state, float partialTicks, CallbackInfo ci) {
         float alpha = 1.0f;
         if (entity instanceof Player player && !(player instanceof LocalPlayer)) {
-            // They fade in for others and fade with the interior for someone it is materialising around
             alpha = Math.min(
                     RematCatchClient.playerAlpha(entity.getUUID(), partialTicks),
                     RematCatchClient.opacityIn(entity.level()));
@@ -46,7 +44,6 @@ public abstract class LivingEntityRendererRematMixin {
         ((RematAlpha) state).gc$setRematAlpha(alpha);
     }
 
-    // See through body while fading
     @WrapOperation(
             method =
                     "submit(Lnet/minecraft/client/renderer/entity/state/LivingEntityRenderState;Lcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/client/renderer/SubmitNodeCollector;Lnet/minecraft/client/renderer/state/level/CameraRenderState;)V",
@@ -74,7 +71,6 @@ public abstract class LivingEntityRendererRematMixin {
         return renderer.getTextureLocation(state);
     }
 
-    // Fade like the exterior, depth mask first so only the front shows and then the tinted see through body
     @WrapOperation(
             method =
                     "submit(Lnet/minecraft/client/renderer/entity/state/LivingEntityRenderState;Lcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/client/renderer/SubmitNodeCollector;Lnet/minecraft/client/renderer/state/level/CameraRenderState;)V",
@@ -137,7 +133,6 @@ public abstract class LivingEntityRendererRematMixin {
                 .submitModel(model, modelState, poseStack, RenderTypes.waterMask(), light, overlay, -1, uv, 0);
     }
 
-    // Armour and held items would stay solid so hide them until the player is back
     @ModifyExpressionValue(
             method =
                     "submit(Lnet/minecraft/client/renderer/entity/state/LivingEntityRenderState;Lcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/client/renderer/SubmitNodeCollector;Lnet/minecraft/client/renderer/state/level/CameraRenderState;)V",

@@ -4,7 +4,7 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 import uk.nbforge.gallifreyan_chronicles.Constants;
-import uk.nbforge.gallifreyan_chronicles.core.dynamic_registries.TardisControlRegistry;
+import uk.nbforge.gallifreyan_chronicles.tardis.control.TardisControls;
 
 public final class TardisConsoleValidator {
     private TardisConsoleValidator() {}
@@ -20,15 +20,11 @@ public final class TardisConsoleValidator {
         return problems;
     }
 
-    /**
-     * Checks a console file and logs what is wrong, returns how many problems it found.
-     * Problems are unknown controls, repeated controls and sizes of zero or less.
-     */
     private static int validate(TardisConsole console) {
         int problems = 0;
         Set<String> seen = new HashSet<>();
         for (TardisConsole.ControlEntry entry : console.controls()) {
-            if (!TardisControlRegistry.isRegistered(entry.id())) {
+            if (!TardisControls.isRegistered(entry.id())) {
                 Constants.LOG.warn("Console '{}' lists unknown control '{}'", console.id(), entry.id());
                 problems++;
             }
@@ -36,7 +32,7 @@ public final class TardisConsoleValidator {
                 Constants.LOG.warn("Console '{}' lists control '{}' more than once", console.id(), entry.id());
                 problems++;
             }
-            if (entry.width() <= 0.0F || entry.height() <= 0.0F || entry.depth() <= 0.0F) {
+            if (entry.width() <= 0.0f || entry.height() <= 0.0f || entry.depth() <= 0.0f) {
                 Constants.LOG.warn(
                         "Console '{}' control '{}' has a non-positive size ({} x {} x {})",
                         console.id(),
@@ -47,7 +43,7 @@ public final class TardisConsoleValidator {
                 problems++;
             }
         }
-        for (String id : TardisControlRegistry.allIds()) {
+        for (String id : TardisControls.ids()) {
             if (!seen.contains(id)) {
                 Constants.LOG.debug("Console '{}' has no entry for control '{}'", console.id(), id);
             }

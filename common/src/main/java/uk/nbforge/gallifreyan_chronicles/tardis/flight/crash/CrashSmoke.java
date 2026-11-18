@@ -17,48 +17,36 @@ import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.phys.Vec3;
 import org.jspecify.annotations.Nullable;
 import uk.nbforge.gallifreyan_chronicles.core.GCEffects;
-import uk.nbforge.gallifreyan_chronicles.core.block_entities.InteriorDoorBlockEntity;
-import uk.nbforge.gallifreyan_chronicles.core.block_entities.TardisExteriorBlockEntity;
+import uk.nbforge.gallifreyan_chronicles.core.block_entity.InteriorDoorBlockEntity;
+import uk.nbforge.gallifreyan_chronicles.core.block_entity.TardisExteriorBlockEntity;
 import uk.nbforge.gallifreyan_chronicles.core.lifecycle.ServerState;
 import uk.nbforge.gallifreyan_chronicles.tardis.Tardis;
-import uk.nbforge.gallifreyan_chronicles.util.GCSchedulerUtil;
 import uk.nbforge.gallifreyan_chronicles.util.MessageUtil;
+import uk.nbforge.gallifreyan_chronicles.util.SchedulerUtil;
 
-/**
- * A crashed TARDIS keeps pouring smoke out of its console until it is repaired.
- * Open the doors and the smoke is pulled through the room and out of the box.
- */
 public final class CrashSmoke {
     private static final int PUFF_TICKS = 5;
 
-    // Pouring out of the console
     private static final int CONSOLE_PUFFS = 12;
     private static final int CONSOLE_COLUMN = 4;
 
-    // Hanging in the room
     private static final double ROOM_SPREAD = 8.0;
     private static final double ROOM_HEIGHT = 3.0;
     private static final int ROOM_PUFFS = 40;
 
-    // Pulled towards the doors when they are open
     private static final int DRAFT_PUFFS = 30;
     private static final double DRAFT_SPEED = 0.15;
     private static final int DOORWAY_PUFFS = 15;
     private static final int OUTSIDE_PUFFS = 25;
     private static final double OUTSIDE_SPEED = 0.2;
 
-    // Breathing it in, about 10 seconds before you start choking and it gets worse the longer you stay
-    // Open doors let some out so it builds slower
     private static final int SAFE_TICKS = 200;
     private static final int WARN_TICKS = 100;
-    // Choking goes up a level this often
     private static final int WORSE_EVERY_TICKS = 80;
     private static final int MAX_LEVEL = 4;
-    // How long choking lasts after you get out
     private static final int LINGER_TICKS = 100;
 
     private static final Set<UUID> RUNNING = ServerState.track(new HashSet<>());
-    // How long each player has been breathing it, per TARDIS
     private static final Map<UUID, Map<UUID, Integer>> BREATHED = ServerState.track(new HashMap<>());
 
     private CrashSmoke() {}
@@ -93,7 +81,7 @@ public final class CrashSmoke {
         }
         if (!tardis.doorState().isClosed()) pourOutOfBox(tardis);
 
-        GCSchedulerUtil.runLater(tardis.server(), PUFF_TICKS, () -> puff(tardis));
+        SchedulerUtil.runLater(tardis.server(), PUFF_TICKS, () -> puff(tardis));
     }
 
     private static void pourFromConsole(ServerLevel level, Vec3 console) {
@@ -111,7 +99,6 @@ public final class CrashSmoke {
                 0.01);
     }
 
-    /** Doors shut so it just fills the room. */
     private static void hangInRoom(ServerLevel level, Vec3 console) {
         level.sendParticles(
                 ParticleTypes.CAMPFIRE_COSY_SMOKE,
@@ -135,7 +122,6 @@ public final class CrashSmoke {
                 0.01);
     }
 
-    /** Doors open so smoke all over the room drifts towards the doorway and out. */
     private static void draftToDoor(ServerLevel level, Vec3 console, InteriorDoorBlockEntity door) {
         RandomSource random = level.getRandom();
         Vec3 doorway = Vec3.atCenterOf(door.getBlockPos()).add(0, 0.5, 0);
@@ -149,7 +135,6 @@ public final class CrashSmoke {
             send(level, random, from, towards, DRAFT_SPEED);
         }
 
-        // A thick stream right at the doorway going through it
         Direction facing = door.getFacing();
         Vec3 through = new Vec3(-facing.getStepX(), 0.05, -facing.getStepZ());
         Vec3 inFront = doorway.add(facing.getStepX() * 1.2, 0, facing.getStepZ() * 1.2);
@@ -162,7 +147,6 @@ public final class CrashSmoke {
         }
     }
 
-    /** Smoke pours out of the doors of the exterior, outwards is the way the doors face worked out from the yaw. */
     private static void pourOutOfBox(Tardis tardis) {
         TardisExteriorBlockEntity exterior = tardis.exteriorIfLoaded().orElse(null);
         if (exterior == null || !(exterior.getLevel() instanceof ServerLevel outside)) return;
@@ -197,13 +181,11 @@ public final class CrashSmoke {
             if (now < SAFE_TICKS) continue;
             int level = Math.min((now - SAFE_TICKS) / WORSE_EVERY_TICKS, MAX_LEVEL);
             MobEffectInstance current = player.getEffect(GCEffects.CHOKING);
-            // Only top it up when it gets worse or is about to run out so its timer keeps ticking
             boolean worse = current == null || current.getAmplifier() < level;
             if (worse || current.getDuration() < LINGER_TICKS / 2) {
                 player.addEffect(new MobEffectInstance(GCEffects.CHOKING, LINGER_TICKS, level));
             }
         }
-        // Leaving lets you catch your breath
         breathed.keySet().removeIf(id -> interior.getPlayerByUUID(id) == null);
     }
 

@@ -4,8 +4,8 @@ import net.minecraft.core.registries.Registries;
 import net.minecraft.data.worldgen.BootstrapContext;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.level.biome.Biome;
-import uk.nbforge.gallifreyan_chronicles.core.world.biomes.GCGallifreyBiomes;
-import uk.nbforge.gallifreyan_chronicles.core.world.biomes.GCMoonBiomes;
+import uk.nbforge.gallifreyan_chronicles.core.world.biomes.GallifreyBiomes;
+import uk.nbforge.gallifreyan_chronicles.core.world.biomes.MoonBiomes;
 import uk.nbforge.gallifreyan_chronicles.util.GCUtil;
 
 public class GCBiomes {
@@ -18,10 +18,10 @@ public class GCBiomes {
     public static void bootstrap(BootstrapContext<Biome> context) {
         var carvers = context.lookup(Registries.CARVER);
         var placedFeatures = context.lookup(Registries.PLACED_FEATURE);
-        register(context, GALLIFREYAN_DESERT, GCGallifreyBiomes.gallifreyanDesert(placedFeatures, carvers));
-        register(context, GALLIFREYAN_PLAINS, GCGallifreyBiomes.gallifreyanPlains(placedFeatures, carvers));
-        register(context, GALLIFREYAN_BADLANDS, GCGallifreyBiomes.gallifreyanBadlands(placedFeatures, carvers));
-        register(context, MOON, GCMoonBiomes.moon(placedFeatures, carvers));
+        register(context, GALLIFREYAN_DESERT, GallifreyBiomes.gallifreyanDesert(placedFeatures, carvers));
+        register(context, GALLIFREYAN_PLAINS, GallifreyBiomes.gallifreyanPlains(placedFeatures, carvers));
+        register(context, GALLIFREYAN_BADLANDS, GallifreyBiomes.gallifreyanBadlands(placedFeatures, carvers));
+        register(context, MOON, MoonBiomes.moon(placedFeatures, carvers));
     }
 
     private static void register(BootstrapContext<Biome> context, ResourceKey<Biome> key, Biome biome) {

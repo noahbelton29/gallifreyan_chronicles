@@ -10,11 +10,10 @@ import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.level.Level;
-import uk.nbforge.gallifreyan_chronicles.core.block_entities.InteriorDoorBlockEntity;
-import uk.nbforge.gallifreyan_chronicles.core.block_entities.TardisExteriorBlockEntity;
+import uk.nbforge.gallifreyan_chronicles.core.block_entity.InteriorDoorBlockEntity;
+import uk.nbforge.gallifreyan_chronicles.core.block_entity.TardisExteriorBlockEntity;
 import uk.nbforge.gallifreyan_chronicles.tardis.Tardis;
-import uk.nbforge.gallifreyan_chronicles.tardis.TardisApi;
-import uk.nbforge.gallifreyan_chronicles.tardis.ecs.component.DoorState;
+import uk.nbforge.gallifreyan_chronicles.tardis.door.DoorState;
 
 public final class TardisVoiceLinks {
     private static final int REFRESH_TICKS = 5;
@@ -66,11 +65,11 @@ public final class TardisVoiceLinks {
         players = List.copyOf(playerSnapshot);
 
         List<Link> linkSnapshot = new ArrayList<>();
-        for (Tardis tardis : TardisApi.all(server)) {
+        for (Tardis tardis : Tardis.all(server)) {
             Optional<TardisExteriorBlockEntity> exterior = tardis.exteriorIfLoaded();
             if (exterior.isEmpty()) continue;
             TardisExteriorBlockEntity ext = exterior.get();
-            if (ext.isFullyInvisible()) continue;
+            if (ext.travel().isFullyInvisible()) continue;
             InteriorDoorBlockEntity door = pickDoor(tardis.interiorDoors());
             if (door == null || !(door.getLevel() instanceof ServerLevel interiorLevel)) continue;
             BlockPos exteriorPos = ext.getBlockPos();
@@ -86,7 +85,7 @@ public final class TardisVoiceLinks {
                     doorPos.getX() + 0.5,
                     doorPos.getY() + 1.0,
                     doorPos.getZ() + 0.5,
-                    ext.getDoorState()));
+                    ext.doors().getState()));
         }
         links = List.copyOf(linkSnapshot);
     }

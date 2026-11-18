@@ -9,6 +9,13 @@ import net.minecraft.world.level.block.Block;
 import org.jspecify.annotations.NonNull;
 import uk.nbforge.gallifreyan_chronicles.core.GCBlocks;
 import uk.nbforge.gallifreyan_chronicles.core.GCItems;
+import uk.nbforge.gallifreyan_chronicles.core.block.registry.CadonwoodBlocks;
+import uk.nbforge.gallifreyan_chronicles.core.block.registry.FloraBlocks;
+import uk.nbforge.gallifreyan_chronicles.core.block.registry.GallifreyBlocks;
+import uk.nbforge.gallifreyan_chronicles.core.block.registry.InteriorBlocks;
+import uk.nbforge.gallifreyan_chronicles.core.block.registry.MoonBlocks;
+import uk.nbforge.gallifreyan_chronicles.core.block.registry.RoundelBlocks;
+import uk.nbforge.gallifreyan_chronicles.core.block.registry.TardisBlocks;
 
 public class GCBlockLootTableProvider extends BlockLootSubProvider {
     public GCBlockLootTableProvider(LootTableSubProvider.Context context) {
@@ -17,114 +24,120 @@ public class GCBlockLootTableProvider extends BlockLootSubProvider {
 
     @Override
     protected void generate() {
-        dropSelf(GCBlocks.CADONWOOD_PLANKS);
-        dropSelf(GCBlocks.GALLIFREYAN_DIRT);
-        dropSelf(GCBlocks.CADONWOOD_WOOD);
-        dropSelf(GCBlocks.STRIPPED_CADONWOOD_LOG);
-        dropSelf(GCBlocks.STRIPPED_CADONWOOD_WOOD);
-        dropSelf(GCBlocks.GALLIFREYAN_GRAVEL);
-        dropSelf(GCBlocks.ARCADIAN_SHALE);
-        dropSelf(GCBlocks.BRACHACKI_WALL_BLOCK);
-        dropSelf(GCBlocks.BRACHACKI_WALL_BLOCK_2);
-        dropSelf(GCBlocks.BRACHACKI_ROUNDEL_BLOCK);
-        GCBlocks.WOOD_ROUNDELS.values().forEach(this::dropSelf);
-        GCBlocks.WOOD_HALF_ROUNDELS.values().forEach(this::dropSelf);
-        GCBlocks.CONCRETE_ROUNDELS.values().forEach(this::dropSelf);
-        GCBlocks.CONCRETE_HALF_ROUNDELS.values().forEach(this::dropSelf);
-        dropSelf(GCBlocks.BRACHACKI_HALF_ROUNDEL_BLOCK);
-        dropSelf(GCBlocks.BRACHACKI_ROUNDEL_ALT_BLOCK);
-        dropSelf(GCBlocks.BRACHACKI_HALF_ROUNDEL_ALT_BLOCK);
-        dropSelf(GCBlocks.BRACHACKI_ROUNDEL_BLOCK_2);
-        dropSelf(GCBlocks.BRACHACKI_HALF_ROUNDEL_BLOCK_2);
-        dropSelf(GCBlocks.BRACHACKI_WALL_BLOCK_3);
-        dropSelf(GCBlocks.BRACHACKI_WALL_BLOCK_4);
-        dropSelf(GCBlocks.BRACHACKI_ROUNDEL_BLOCK_3);
-        dropSelf(GCBlocks.BRACHACKI_ROUNDEL_BLOCK_4);
-        dropSelf(GCBlocks.BRACHACKI_HALF_ROUNDEL_BLOCK_3);
-        dropSelf(GCBlocks.BRACHACKI_HALF_ROUNDEL_BLOCK_4);
-        dropSelf(GCBlocks.BRACHACKI_LIGHT_STRIP_BLOCK);
-        dropSelf(GCBlocks.BRACHACKI_TUAT_WALL_BLOCK);
-        dropSelf(GCBlocks.BRACHACKI_TUAT_ROUNDEL_BLOCK);
-        dropSelf(GCBlocks.BRACHACKI_TUAT_HALF_ROUNDEL_BLOCK);
-        dropSelf(GCBlocks.BRACHACKI_TUAT_HEXAGONAL_ROUNDEL_BLOCK);
-        dropSelf(GCBlocks.BRACHACKI_TUAT_HALF_HEXAGONAL_ROUNDEL_BLOCK);
-        dropSelf(GCBlocks.BRACHACKI_FLOOR_BLOCK);
-        dropSelf(GCBlocks.BRACHACKI_STAIRS);
-        add(GCBlocks.BRACHACKI_SLAB, this::createSlabItemTable);
-        dropSelf(GCBlocks.BRACHACKI_PRESSURE_PLATE);
-        dropSelf(GCBlocks.BRACHACKI_WALL);
-        dropSelf(GCBlocks.BRACHACKI_FENCE);
-        dropSelf(GCBlocks.BRACHACKI_FENCE_GATE);
-        dropSelf(GCBlocks.BRACHACKI_STAIRS_2);
-        add(GCBlocks.BRACHACKI_SLAB_2, this::createSlabItemTable);
-        dropSelf(GCBlocks.BRACHACKI_PRESSURE_PLATE_2);
-        dropSelf(GCBlocks.BRACHACKI_WALL_2);
-        dropSelf(GCBlocks.BRACHACKI_FENCE_2);
-        dropSelf(GCBlocks.BRACHACKI_FENCE_GATE_2);
-        dropSelf(GCBlocks.BRACHACKI_TUAT_FLOOR_BLOCK);
-        dropSelf(GCBlocks.VOID_BLOCK);
-        dropSelf(GCBlocks.BRACHACKI_STAIRS_3);
-        dropSelf(GCBlocks.BRACHACKI_STAIRS_4);
-        add(GCBlocks.BRACHACKI_SLAB_3, this::createSlabItemTable);
-        add(GCBlocks.BRACHACKI_SLAB_4, this::createSlabItemTable);
-        dropSelf(GCBlocks.BRACHACKI_PRESSURE_PLATE_3);
-        dropSelf(GCBlocks.BRACHACKI_PRESSURE_PLATE_4);
-        dropSelf(GCBlocks.BRACHACKI_WALL_3);
-        dropSelf(GCBlocks.BRACHACKI_WALL_4);
-        dropSelf(GCBlocks.BRACHACKI_FENCE_3);
-        dropSelf(GCBlocks.BRACHACKI_FENCE_4);
-        dropSelf(GCBlocks.BRACHACKI_FENCE_GATE_3);
-        dropSelf(GCBlocks.BRACHACKI_FENCE_GATE_4);
-        dropSelf(GCBlocks.BRACHACKI_TUAT_STAIRS);
-        add(GCBlocks.BRACHACKI_TUAT_SLAB, this::createSlabItemTable);
-        dropSelf(GCBlocks.BRACHACKI_TUAT_PRESSURE_PLATE);
-        dropSelf(GCBlocks.BRACHACKI_TUAT_WALL);
-        dropSelf(GCBlocks.BRACHACKI_TUAT_FENCE);
-        dropSelf(GCBlocks.BRACHACKI_TUAT_FENCE_GATE);
-        dropSelf(GCBlocks.GALLIFREYAN_SAND);
-        dropSelf(GCBlocks.GALLIFREYAN_MUD);
-        dropSelf(GCBlocks.CADONWOOD_LOG);
-        dropSelf(GCBlocks.CADONWOOD_SAPLING);
-        dropSelf(GCBlocks.GALLIFREYAN_COBBLESTONE);
-        dropSelf(GCBlocks.GALLIFREYAN_VINE);
-        dropSelf(GCBlocks.COBBLED_LIMESTONE);
-        dropSelf(GCBlocks.THORIVINE);
-        dropSelf(GCBlocks.THORIVINE_FLOWER);
-        dropSelf(GCBlocks.GALLIFREYAN_MUDSTONE);
-        dropSelf(GCBlocks.LUNAR_REGOLITH);
-        dropSelf(GCBlocks.MOONSLATE);
-        dropSelf(GCBlocks.MOON_DUST);
-        dropSelf(GCBlocks.TARDIS);
-        dropSelf(GCBlocks.TARDIS_CONSOLE);
+        dropSelf(CadonwoodBlocks.CADONWOOD_PLANKS);
+        dropSelf(GallifreyBlocks.GALLIFREYAN_DIRT);
+        dropSelf(CadonwoodBlocks.CADONWOOD_WOOD);
+        dropSelf(CadonwoodBlocks.STRIPPED_CADONWOOD_LOG);
+        dropSelf(CadonwoodBlocks.STRIPPED_CADONWOOD_WOOD);
+        dropSelf(GallifreyBlocks.GALLIFREYAN_GRAVEL);
+        dropSelf(GallifreyBlocks.ARCADIAN_SHALE);
+        dropSelf(InteriorBlocks.BRACHACKI_WALL_BLOCK);
+        dropSelf(InteriorBlocks.BRACHACKI_WALL_BLOCK_2);
+        dropSelf(InteriorBlocks.BRACHACKI_ROUNDEL_BLOCK);
+        RoundelBlocks.WOOD_ROUNDELS.values().forEach(this::dropSelf);
+        RoundelBlocks.WOOD_HALF_ROUNDELS.values().forEach(this::dropSelf);
+        RoundelBlocks.CONCRETE_ROUNDELS.values().forEach(this::dropSelf);
+        RoundelBlocks.CONCRETE_HALF_ROUNDELS.values().forEach(this::dropSelf);
+        dropSelf(InteriorBlocks.BRACHACKI_HALF_ROUNDEL_BLOCK);
+        dropSelf(InteriorBlocks.BRACHACKI_ROUNDEL_ALT_BLOCK);
+        dropSelf(InteriorBlocks.BRACHACKI_HALF_ROUNDEL_ALT_BLOCK);
+        dropSelf(InteriorBlocks.BRACHACKI_ROUNDEL_BLOCK_2);
+        dropSelf(InteriorBlocks.BRACHACKI_HALF_ROUNDEL_BLOCK_2);
+        dropSelf(InteriorBlocks.BRACHACKI_WALL_BLOCK_3);
+        dropSelf(InteriorBlocks.BRACHACKI_WALL_BLOCK_4);
+        dropSelf(InteriorBlocks.BRACHACKI_ROUNDEL_BLOCK_3);
+        dropSelf(InteriorBlocks.BRACHACKI_ROUNDEL_BLOCK_4);
+        dropSelf(InteriorBlocks.BRACHACKI_HALF_ROUNDEL_BLOCK_3);
+        dropSelf(InteriorBlocks.BRACHACKI_HALF_ROUNDEL_BLOCK_4);
+        dropSelf(InteriorBlocks.BRACHACKI_LIGHT_STRIP_BLOCK);
+        dropSelf(InteriorBlocks.BRACHACKI_TUAT_WALL_BLOCK);
+        dropSelf(InteriorBlocks.BRACHACKI_TUAT_ROUNDEL_BLOCK);
+        dropSelf(InteriorBlocks.BRACHACKI_TUAT_HALF_ROUNDEL_BLOCK);
+        dropSelf(InteriorBlocks.BRACHACKI_TUAT_HEXAGONAL_ROUNDEL_BLOCK);
+        dropSelf(InteriorBlocks.BRACHACKI_TUAT_HALF_HEXAGONAL_ROUNDEL_BLOCK);
+        dropSelf(InteriorBlocks.BRACHACKI_FLOOR_BLOCK);
+        dropSelf(InteriorBlocks.BRACHACKI_STAIRS);
+        add(InteriorBlocks.BRACHACKI_SLAB, this::createSlabItemTable);
+        dropSelf(InteriorBlocks.BRACHACKI_PRESSURE_PLATE);
+        dropSelf(InteriorBlocks.BRACHACKI_WALL);
+        dropSelf(InteriorBlocks.BRACHACKI_FENCE);
+        dropSelf(InteriorBlocks.BRACHACKI_FENCE_GATE);
+        dropSelf(InteriorBlocks.BRACHACKI_STAIRS_2);
+        add(InteriorBlocks.BRACHACKI_SLAB_2, this::createSlabItemTable);
+        dropSelf(InteriorBlocks.BRACHACKI_PRESSURE_PLATE_2);
+        dropSelf(InteriorBlocks.BRACHACKI_WALL_2);
+        dropSelf(InteriorBlocks.BRACHACKI_FENCE_2);
+        dropSelf(InteriorBlocks.BRACHACKI_FENCE_GATE_2);
+        dropSelf(InteriorBlocks.BRACHACKI_TUAT_FLOOR_BLOCK);
+        dropSelf(InteriorBlocks.VOID_BLOCK);
+        dropSelf(InteriorBlocks.BRACHACKI_STAIRS_3);
+        dropSelf(InteriorBlocks.BRACHACKI_STAIRS_4);
+        add(InteriorBlocks.BRACHACKI_SLAB_3, this::createSlabItemTable);
+        add(InteriorBlocks.BRACHACKI_SLAB_4, this::createSlabItemTable);
+        dropSelf(InteriorBlocks.BRACHACKI_PRESSURE_PLATE_3);
+        dropSelf(InteriorBlocks.BRACHACKI_PRESSURE_PLATE_4);
+        dropSelf(InteriorBlocks.BRACHACKI_WALL_3);
+        dropSelf(InteriorBlocks.BRACHACKI_WALL_4);
+        dropSelf(InteriorBlocks.BRACHACKI_FENCE_3);
+        dropSelf(InteriorBlocks.BRACHACKI_FENCE_4);
+        dropSelf(InteriorBlocks.BRACHACKI_FENCE_GATE_3);
+        dropSelf(InteriorBlocks.BRACHACKI_FENCE_GATE_4);
+        dropSelf(InteriorBlocks.BRACHACKI_TUAT_STAIRS);
+        add(InteriorBlocks.BRACHACKI_TUAT_SLAB, this::createSlabItemTable);
+        dropSelf(InteriorBlocks.BRACHACKI_TUAT_PRESSURE_PLATE);
+        dropSelf(InteriorBlocks.BRACHACKI_TUAT_WALL);
+        dropSelf(InteriorBlocks.BRACHACKI_TUAT_FENCE);
+        dropSelf(InteriorBlocks.BRACHACKI_TUAT_FENCE_GATE);
+        dropSelf(GallifreyBlocks.GALLIFREYAN_SAND);
+        dropSelf(GallifreyBlocks.GALLIFREYAN_MUD);
+        dropSelf(CadonwoodBlocks.CADONWOOD_LOG);
+        dropSelf(CadonwoodBlocks.CADONWOOD_SAPLING);
+        dropSelf(GallifreyBlocks.GALLIFREYAN_COBBLESTONE);
+        dropSelf(FloraBlocks.GALLIFREYAN_VINE);
+        dropSelf(GallifreyBlocks.COBBLED_LIMESTONE);
+        dropSelf(FloraBlocks.THORIVINE);
+        dropSelf(FloraBlocks.THORIVINE_FLOWER);
+        dropSelf(GallifreyBlocks.GALLIFREYAN_MUDSTONE);
+        dropSelf(MoonBlocks.LUNAR_REGOLITH);
+        dropSelf(MoonBlocks.MOONSLATE);
+        dropSelf(MoonBlocks.MOON_DUST);
+        dropSelf(TardisBlocks.TARDIS);
+        dropSelf(TardisBlocks.TARDIS_CONSOLE);
 
-        add(GCBlocks.POTTED_CADONWOOD_SAPLING, createPotFlowerItemTable(GCBlocks.CADONWOOD_SAPLING));
-        add(GCBlocks.GALLIFREYAN_STONE, createSingleItemTable(GCBlocks.GALLIFREYAN_COBBLESTONE));
-        add(GCBlocks.GALLIFREYAN_GRASS_BLOCK, createSingleItemTable(GCBlocks.GALLIFREYAN_DIRT));
+        add(CadonwoodBlocks.POTTED_CADONWOOD_SAPLING, createPotFlowerItemTable(CadonwoodBlocks.CADONWOOD_SAPLING));
+        add(GallifreyBlocks.GALLIFREYAN_STONE, createSingleItemTable(GallifreyBlocks.GALLIFREYAN_COBBLESTONE));
+        add(GallifreyBlocks.GALLIFREYAN_GRASS_BLOCK, createSingleItemTable(GallifreyBlocks.GALLIFREYAN_DIRT));
         add(
-                GCBlocks.CADONWOOD_LEAVES,
+                CadonwoodBlocks.CADONWOOD_LEAVES,
                 createLeavesDrops(
-                        GCBlocks.CADONWOOD_LEAVES, GCBlocks.CADONWOOD_SAPLING, NORMAL_LEAVES_SAPLING_CHANCES));
+                        CadonwoodBlocks.CADONWOOD_LEAVES,
+                        CadonwoodBlocks.CADONWOOD_SAPLING,
+                        NORMAL_LEAVES_SAPLING_CHANCES));
 
-        add(GCBlocks.SHORT_GALLIFREYAN_DRY_GRASS, createGrassDrops(GCBlocks.SHORT_GALLIFREYAN_DRY_GRASS));
-        add(GCBlocks.SHORT_GALLIFREYAN_GRASS, createGrassDrops(GCBlocks.SHORT_GALLIFREYAN_GRASS));
-        add(GCBlocks.TALL_GALLIFREYAN_GRASS, createGrassDrops(GCBlocks.TALL_GALLIFREYAN_GRASS));
-        add(GCBlocks.TALL_GALLIFREYAN_DRY_GRASS, createGrassDrops(GCBlocks.TALL_GALLIFREYAN_DRY_GRASS));
+        add(FloraBlocks.SHORT_GALLIFREYAN_DRY_GRASS, createGrassDrops(FloraBlocks.SHORT_GALLIFREYAN_DRY_GRASS));
+        add(FloraBlocks.SHORT_GALLIFREYAN_GRASS, createGrassDrops(FloraBlocks.SHORT_GALLIFREYAN_GRASS));
+        add(FloraBlocks.TALL_GALLIFREYAN_GRASS, createGrassDrops(FloraBlocks.TALL_GALLIFREYAN_GRASS));
+        add(FloraBlocks.TALL_GALLIFREYAN_DRY_GRASS, createGrassDrops(FloraBlocks.TALL_GALLIFREYAN_DRY_GRASS));
 
-        add(GCBlocks.GALLIFREYAN_STONE_IRON_ORE, createOreDrop(GCBlocks.GALLIFREYAN_STONE_IRON_ORE, Items.RAW_IRON));
-        add(GCBlocks.GALLIFREYAN_STONE_COAL_ORE, createOreDrop(GCBlocks.GALLIFREYAN_STONE_COAL_ORE, Items.COAL));
         add(
-                GCBlocks.ARCADIAN_SHALE_TARANIUM_ORE,
-                createOreDrop(GCBlocks.ARCADIAN_SHALE_TARANIUM_ORE, GCItems.TARANIUM_SCRAP));
+                GallifreyBlocks.GALLIFREYAN_STONE_IRON_ORE,
+                createOreDrop(GallifreyBlocks.GALLIFREYAN_STONE_IRON_ORE, Items.RAW_IRON));
+        add(
+                GallifreyBlocks.GALLIFREYAN_STONE_COAL_ORE,
+                createOreDrop(GallifreyBlocks.GALLIFREYAN_STONE_COAL_ORE, Items.COAL));
+        add(
+                GallifreyBlocks.ARCADIAN_SHALE_TARANIUM_ORE,
+                createOreDrop(GallifreyBlocks.ARCADIAN_SHALE_TARANIUM_ORE, GCItems.TARANIUM_SCRAP));
 
-        dropSelf(GCBlocks.CADONWOOD_STAIRS);
-        add(GCBlocks.CADONWOOD_SLAB, this::createSlabItemTable);
+        dropSelf(CadonwoodBlocks.CADONWOOD_STAIRS);
+        add(CadonwoodBlocks.CADONWOOD_SLAB, this::createSlabItemTable);
 
-        dropSelf(GCBlocks.CADONWOOD_PRESSURE_PLATE);
-        dropSelf(GCBlocks.CADONWOOD_BUTTON);
+        dropSelf(CadonwoodBlocks.CADONWOOD_PRESSURE_PLATE);
+        dropSelf(CadonwoodBlocks.CADONWOOD_BUTTON);
 
-        dropSelf(GCBlocks.CADONWOOD_FENCE);
-        dropSelf(GCBlocks.CADONWOOD_FENCE_GATE);
-        dropSelf(GCBlocks.CADONWOOD_WALL);
+        dropSelf(CadonwoodBlocks.CADONWOOD_FENCE);
+        dropSelf(CadonwoodBlocks.CADONWOOD_FENCE_GATE);
+        dropSelf(CadonwoodBlocks.CADONWOOD_WALL);
     }
 
     @Override

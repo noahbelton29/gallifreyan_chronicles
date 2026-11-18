@@ -5,16 +5,11 @@ import net.minecraft.util.Mth;
 import net.minecraft.world.level.Level;
 import org.jspecify.annotations.Nullable;
 
-/**
- * What a player sees and hears when the TARDIS is afraid of them.
- * The console hum warps and the lights dip.
- * The dips are soft, at most two a second, and go through the power darkness strength setting so turning that down or off turns this down too.
- */
 public final class TardisFrightClient {
     private static final long SLOT_MS = 500L;
     private static final long FADE_IN_NANOS = 500_000_000L;
     private static final long FADE_OUT_NANOS = 2_000_000_000L;
-    private static final float MAX_DIP = 0.85F;
+    private static final float MAX_DIP = 0.85f;
 
     private static volatile @Nullable State state;
 
@@ -55,14 +50,12 @@ public final class TardisFrightClient {
         return current.dimension.equals(level.dimension()) ? current : null;
     }
 
-    /** Eases in, holds, then fades out so it never snaps on or off. */
     private static float envelope(State s, long now) {
         float in = Mth.clamp((now - s.startNanos) / (float) FADE_IN_NANOS, 0f, 1f);
         float out = Mth.clamp((s.endNanos - now) / (float) FADE_OUT_NANOS, 0f, 1f);
         return Math.min(in, out);
     }
 
-    /** How much the lights are dipping right now, 0 to 1. */
     public static float flickerOf(@Nullable Level level) {
         State s = active(level);
         if (s == null) return 0f;
@@ -72,15 +65,14 @@ public final class TardisFrightClient {
         long slot = elapsedMs / SLOT_MS;
         float t = (elapsedMs % SLOT_MS) / (float) SLOT_MS;
 
-        float chance = 0.3F + 0.5F * s.severity;
+        float chance = 0.3f + 0.5f * s.severity;
         if (hash01(s.seed, slot) > chance) return 0f;
 
-        float depth = (0.35F + 0.5F * hash01(s.seed ^ 0x5DEECE66DL, slot)) * (0.5F + 0.5F * s.severity);
+        float depth = (0.35f + 0.5f * hash01(s.seed ^ 0x5DEECE66DL, slot)) * (0.5f + 0.5f * s.severity);
         float dip = envelope(s, now) * depth * (float) Math.sin(Math.PI * t);
         return Math.min(MAX_DIP, dip);
     }
 
-    /** 0 when the hum is normal, up to 1 when it is badly warped. */
     public static float humWarp(@Nullable Level level) {
         State s = active(level);
         return s == null ? 0f : envelope(s, System.nanoTime()) * s.severity;
@@ -91,13 +83,13 @@ public final class TardisFrightClient {
         double wobble = 0.5 + 0.5 * Math.sin(t * 2.0 * Math.PI * 0.7);
         double shiver = Math.sin(t * 2.0 * Math.PI * 3.1) * 0.08;
         float pitch = (float) (1.0 - warp * (0.25 + 0.25 * wobble) + warp * shiver);
-        return Mth.clamp(pitch, 0.5F, 1.2F);
+        return Mth.clamp(pitch, 0.5f, 1.2f);
     }
 
     public static float warpedVolume(float warp) {
         double t = System.nanoTime() / 1.0E9;
         float tremble = (float) (0.5 + 0.5 * Math.sin(t * 2.0 * Math.PI * 2.3));
-        return 1.0F - 0.35F * warp * tremble;
+        return 1.0f - 0.35f * warp * tremble;
     }
 
     private static float hash01(long seed, long n) {

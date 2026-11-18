@@ -2,51 +2,41 @@ package uk.nbforge.gallifreyan_chronicles.tardis.control.impl;
 
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
-import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvent;
-import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
+import org.jspecify.annotations.Nullable;
 import uk.nbforge.gallifreyan_chronicles.core.GCSounds;
 import uk.nbforge.gallifreyan_chronicles.core.GCTardisControls;
-import uk.nbforge.gallifreyan_chronicles.core.block_entities.TardisConsoleBlockEntity;
 import uk.nbforge.gallifreyan_chronicles.core.entity.TardisControlEntity;
 import uk.nbforge.gallifreyan_chronicles.tardis.Tardis;
+import uk.nbforge.gallifreyan_chronicles.tardis.console.ConsoleSounds;
 import uk.nbforge.gallifreyan_chronicles.tardis.control.BaseControl;
+import uk.nbforge.gallifreyan_chronicles.tardis.control.ClickSound;
 import uk.nbforge.gallifreyan_chronicles.tardis.control.ControlAnimations;
+import uk.nbforge.gallifreyan_chronicles.tardis.control.ControlContext;
 
 public class CloakingDeviceControl extends BaseControl {
     public static final ControlAnimations DEFAULT_ANIMATIONS =
             new ControlAnimations("cloaking_device_control_on", "cloaking_device_control_off", true);
 
     public CloakingDeviceControl(ControlAnimations animations) {
-        super(animations);
+        super(animations, ClickSound.LEVER);
     }
 
     @Override
-    public void playClickSound(TardisControlEntity entity) {
-        playSound(entity, GCSounds.LEVER, 0.8f);
-    }
-
-    @Override
-    public InteractionResult onRightClick(TardisControlEntity entity, Player player, InteractionHand hand) {
-        if (!(entity.level() instanceof ServerLevel serverLevel)) {
-            return InteractionResult.FAIL;
-        }
-        var console = entity.getConsole();
-        if (console == null) {
-            return InteractionResult.FAIL;
-        }
-        SoundEvent cloakSound = console.getControlState(GCTardisControls.CLOAKING_DEVICE_CONTROL)
-                ? GCSounds.TARDIS_UNCLOAK
-                : GCSounds.TARDIS_CLOAK;
-        playEverywhere(console, serverLevel, cloakSound);
+    protected InteractionResult use(ControlContext ctx, TardisControlEntity entity, @Nullable Player player) {
+        SoundEvent cloakSound =
+                ctx.state(GCTardisControls.CLOAKING_DEVICE_CONTROL) ? GCSounds.TARDIS_UNCLOAK : GCSounds.TARDIS_CLOAK;
+        ConsoleSounds.everywhere(ctx.console(), cloakSound);
         return InteractionResult.SUCCESS;
     }
 
     @Override
-    public void onStateChanged(TardisConsoleBlockEntity console, boolean activated) {
-        linkedTardis(console).flatMap(Tardis::exterior).ifPresent(exterior -> exterior.setCloaked(activated));
+    protected void changed(ControlContext ctx, boolean activated) {
+        ctx.tardis()
+                .flatMap(Tardis::exterior)
+                .ifPresent(exterior -> exterior.travel().setCloaked(activated));
     }
 
     @Override

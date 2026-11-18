@@ -4,9 +4,9 @@ import java.util.List;
 import java.util.Set;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import org.jspecify.annotations.NonNull;
-import uk.nbforge.gallifreyan_chronicles.core.dynamic_registries.TardisExteriorRegistry;
+import uk.nbforge.gallifreyan_chronicles.core.data_registry.TardisExteriorRegistry;
 import uk.nbforge.gallifreyan_chronicles.network.GCSyncPayload;
-import uk.nbforge.gallifreyan_chronicles.tardis.TardisExterior;
+import uk.nbforge.gallifreyan_chronicles.tardis.exterior.TardisExterior;
 import uk.nbforge.gallifreyan_chronicles.util.GCUtil;
 
 public record TardisExteriorSyncPayload(List<TardisExterior> exteriors, String defaultId)

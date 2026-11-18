@@ -1,55 +1,39 @@
 package uk.nbforge.gallifreyan_chronicles.tardis.control.impl;
 
-import java.util.Optional;
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
-import net.minecraft.server.level.ServerLevel;
-import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
-import uk.nbforge.gallifreyan_chronicles.core.GCSounds;
-import uk.nbforge.gallifreyan_chronicles.core.block_entities.TardisConsoleBlockEntity;
+import org.jspecify.annotations.Nullable;
 import uk.nbforge.gallifreyan_chronicles.core.entity.TardisControlEntity;
 import uk.nbforge.gallifreyan_chronicles.tardis.Tardis;
 import uk.nbforge.gallifreyan_chronicles.tardis.control.BaseControl;
+import uk.nbforge.gallifreyan_chronicles.tardis.control.ClickSound;
 import uk.nbforge.gallifreyan_chronicles.tardis.control.ControlAnimations;
-import uk.nbforge.gallifreyan_chronicles.tardis.ecs.system.DoorSyncSystem;
+import uk.nbforge.gallifreyan_chronicles.tardis.control.ControlContext;
+import uk.nbforge.gallifreyan_chronicles.tardis.door.DoorSync;
+import uk.nbforge.gallifreyan_chronicles.util.MessageUtil;
 
 public class DoorControl extends BaseControl {
     public static final ControlAnimations DEFAULT_ANIMATIONS =
             new ControlAnimations("door_control_off", "door_control_on", true);
 
     public DoorControl(ControlAnimations animations) {
-        super(animations);
+        super(animations, ClickSound.SWITCH);
     }
 
     @Override
-    public void playClickSound(TardisControlEntity entity) {
-        playSound(entity, GCSounds.SWITCH, 0.8f);
-    }
-
-    @Override
-    public InteractionResult onRightClick(TardisControlEntity entity, Player player, InteractionHand hand) {
-        var console = entity.getConsole();
-        if (console == null) return InteractionResult.FAIL;
-
-        if (entity.level() instanceof ServerLevel level) {
-            Optional<Tardis> tardis = linkedTardis(console);
-            if (tardis.isPresent() && doorsBlocked(tardis.get(), player)) return InteractionResult.FAIL;
-            announce(
-                    player,
-                    console.getControlState(entity.getControlId())
-                            ? "message.gallifreyan_chronicles.doors_closing"
-                            : "message.gallifreyan_chronicles.doors_opening");
-        }
+    protected InteractionResult use(ControlContext ctx, TardisControlEntity entity, @Nullable Player player) {
+        Tardis tardis = ctx.tardis().orElse(null);
+        if (tardis != null && doorsBlocked(tardis, player)) return InteractionResult.FAIL;
+        MessageUtil.overlay(
+                player, ChatFormatting.GREEN, ctx.state(entity.getControlId()) ? "doors_closing" : "doors_opening");
         return InteractionResult.SUCCESS;
     }
 
     @Override
-    public void onStateChanged(TardisConsoleBlockEntity console, boolean activated) {
-        if (!(console.getLevel() instanceof ServerLevel level)) return;
-
-        linkedTardis(console).ifPresent(tardis -> DoorSyncSystem.toggleAllDoors(level.getServer(), tardis.id()));
+    protected void changed(ControlContext ctx, boolean activated) {
+        ctx.tardis().ifPresent(DoorSync::toggleAllDoors);
     }
 
     @Override

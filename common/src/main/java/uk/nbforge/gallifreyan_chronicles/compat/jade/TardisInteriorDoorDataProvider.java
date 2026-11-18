@@ -5,7 +5,7 @@ import net.minecraft.resources.Identifier;
 import org.jspecify.annotations.NonNull;
 import snownee.jade.api.BlockAccessor;
 import snownee.jade.api.IServerDataProvider;
-import uk.nbforge.gallifreyan_chronicles.core.block_entities.InteriorDoorBlockEntity;
+import uk.nbforge.gallifreyan_chronicles.core.block_entity.InteriorDoorBlockEntity;
 import uk.nbforge.gallifreyan_chronicles.util.GCUtil;
 
 public class TardisInteriorDoorDataProvider implements IServerDataProvider<BlockAccessor> {

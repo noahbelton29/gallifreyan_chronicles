@@ -5,7 +5,6 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
@@ -25,7 +24,7 @@ public final class SoundDurations {
         String soundsJson = "/assets/" + event.getNamespace() + "/sounds.json";
         try (InputStream in = SoundDurations.class.getResourceAsStream(soundsJson)) {
             if (in == null) return 0.0;
-            JsonObject root = JsonParser.parseReader(new InputStreamReader(in, StandardCharsets.UTF_8))
+            JsonObject root = JsonParser.parseString(new String(in.readAllBytes(), StandardCharsets.UTF_8))
                     .getAsJsonObject();
             JsonObject entry = root.has(event.getPath()) ? root.getAsJsonObject(event.getPath()) : null;
             if (entry == null || !entry.has("sounds")) return 0.0;

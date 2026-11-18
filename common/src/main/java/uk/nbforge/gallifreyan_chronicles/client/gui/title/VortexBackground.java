@@ -40,7 +40,7 @@ public final class VortexBackground {
         int row = frame % FRAMES_PER_SHEET;
 
         int reach = Math.max(Math.max(centerX, width - centerX), Math.max(centerY, height - centerY));
-        int scale = Math.max(1, Mth.ceil(reach * 2.0F / FRAME_SIZE));
+        int scale = Math.max(1, Mth.ceil(reach * 2.0f / FRAME_SIZE));
         int size = FRAME_SIZE * scale;
         int x = centerX - size / 2;
         int y = centerY - size / 2;
@@ -50,7 +50,7 @@ public final class VortexBackground {
                 sheet,
                 x,
                 y,
-                0.0F,
+                0.0f,
                 (float) (row * FRAME_SIZE),
                 size,
                 size,
@@ -58,6 +58,6 @@ public final class VortexBackground {
                 FRAME_SIZE,
                 FRAME_SIZE,
                 FRAME_SIZE * FRAMES_PER_SHEET,
-                ARGB.white(1.0F));
+                ARGB.white(1.0f));
     }
 }

@@ -5,17 +5,15 @@ import java.util.Map;
 import java.util.Set;
 import java.util.function.Predicate;
 import uk.nbforge.gallifreyan_chronicles.core.GCTardisControls;
-import uk.nbforge.gallifreyan_chronicles.core.block_entities.TardisConsoleBlockEntity;
-import uk.nbforge.gallifreyan_chronicles.core.dynamic_registries.TardisControlRegistry;
+import uk.nbforge.gallifreyan_chronicles.core.block_entity.TardisConsoleBlockEntity;
 import uk.nbforge.gallifreyan_chronicles.tardis.Tardis;
-import uk.nbforge.gallifreyan_chronicles.tardis.TardisApi;
 
 public final class ControlPower {
     private static final Set<String> USABLE_WITHOUT_POWER =
             Set.of(GCTardisControls.POWER_CONTROL, GCTardisControls.DOOR_CONTROL, GCTardisControls.DOOR_LOCK_CONTROL);
 
     private static final Predicate<TardisConsoleBlockEntity> TRAVELLING =
-            console -> TardisApi.of(console).map(Tardis::isTravelling).orElse(false);
+            console -> Tardis.of(console).map(Tardis::isTravelling).orElse(false);
 
     private static final Predicate<TardisConsoleBlockEntity> CLOAKED =
             console -> console.getControlState(GCTardisControls.CLOAKING_DEVICE_CONTROL);
@@ -32,15 +30,15 @@ public final class ControlPower {
     }
 
     private static void requireRegistered(String id) {
-        if (!TardisControlRegistry.isRegistered(id)) {
+        if (!TardisControls.isRegistered(id)) {
             throw new IllegalStateException("ControlPower references unregistered TARDIS control: " + id);
         }
     }
 
-    public static boolean canUse(TardisConsoleBlockEntity console, String controlId) {
+    public static boolean isBlocked(TardisConsoleBlockEntity console, String controlId) {
         for (Predicate<TardisConsoleBlockEntity> blocker : BLOCKED_WHEN.getOrDefault(controlId, List.of())) {
-            if (blocker.test(console)) return false;
+            if (blocker.test(console)) return true;
         }
-        return console.hasPower() || USABLE_WITHOUT_POWER.contains(controlId);
+        return !console.hasPower() && !USABLE_WITHOUT_POWER.contains(controlId);
     }
 }

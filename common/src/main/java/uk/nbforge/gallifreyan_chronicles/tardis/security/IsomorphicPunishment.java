@@ -12,13 +12,13 @@ import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.player.Player;
 import org.joml.Math;
 import uk.nbforge.gallifreyan_chronicles.core.block.ConsoleBlock;
-import uk.nbforge.gallifreyan_chronicles.core.block_entities.TardisConsoleBlockEntity;
+import uk.nbforge.gallifreyan_chronicles.core.block_entity.TardisConsoleBlockEntity;
 import uk.nbforge.gallifreyan_chronicles.core.lifecycle.ServerState;
 import uk.nbforge.gallifreyan_chronicles.util.MessageUtil;
 
 public final class IsomorphicPunishment {
-    private static final float FIRST_DAMAGE = 3.0F;
-    private static final float EXTRA_DAMAGE_PER_STRIKE = 2.0F;
+    private static final float FIRST_DAMAGE = 3.0f;
+    private static final float EXTRA_DAMAGE_PER_STRIKE = 2.0f;
 
     private static final int FIRST_BLINDNESS_TICKS = 100;
     private static final int EXTRA_EFFECT_TICKS_PER_STRIKE = 40;

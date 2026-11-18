@@ -1,14 +1,21 @@
 package uk.nbforge.gallifreyan_chronicles.tardis.mind.disability;
 
+import com.mojang.serialization.Codec;
+import com.mojang.serialization.DataResult;
 import java.util.Arrays;
 import java.util.Optional;
 
-/** The disabilities a TARDIS can have, each with an id for saving and a chance of a new TARDIS having it. */
 public enum TardisDisability {
     DYSLEXIC("dyslexic", 0.15f),
 
     /** PTSD is not something a TARDIS is born with, it only develops through abuse. */
     PTSD("ptsd", 0f);
+
+    public static final Codec<TardisDisability> CODEC = Codec.STRING.comapFlatMap(
+            id -> TardisDisability.byId(id)
+                    .map(DataResult::success)
+                    .orElseGet(() -> DataResult.error(() -> "unknown tardis disability " + id)),
+            TardisDisability::id);
 
     private final String id;
     private final float chance;

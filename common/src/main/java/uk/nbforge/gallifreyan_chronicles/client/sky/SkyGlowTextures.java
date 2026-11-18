@@ -30,9 +30,14 @@ public final class SkyGlowTextures {
             converted = GCUtil.modIdentifier("sky_glow/" + source.getNamespace() + "/" + source.getPath());
             try (InputStream in = minecraft.getResourceManager().open(source)) {
                 NativeImage image = NativeImage.read(in);
-                convert(image);
                 Identifier label = converted;
-                textures.register(converted, new DynamicTexture(() -> "GC sky glow " + label, image));
+                try {
+                    convert(image);
+                    textures.register(converted, new DynamicTexture(() -> "GC sky glow " + label, image));
+                } catch (RuntimeException e) {
+                    image.close();
+                    throw e;
+                }
                 CONVERTED.put(source, converted);
             } catch (Exception e) {
                 Constants.LOG.warn("Could not prepare glowing sky texture {}", source, e);
@@ -48,19 +53,19 @@ public final class SkyGlowTextures {
         for (int y = 0; y < image.getHeight(); y++) {
             for (int x = 0; x < image.getWidth(); x++) {
                 int argb = image.getPixel(x, y);
-                float alpha = ((argb >>> 24) & 0xFF) / 255.0F;
-                float red = ((argb >> 16) & 0xFF) / 255.0F * alpha;
-                float green = ((argb >> 8) & 0xFF) / 255.0F * alpha;
-                float blue = (argb & 0xFF) / 255.0F * alpha;
+                float alpha = ((argb >>> 24) & 0xFF) / 255.0f;
+                float red = ((argb >> 16) & 0xFF) / 255.0f * alpha;
+                float green = ((argb >> 8) & 0xFF) / 255.0f * alpha;
+                float blue = (argb & 0xFF) / 255.0f * alpha;
                 float light = Math.max(red, Math.max(green, blue));
-                if (light <= 0.0F) {
+                if (light <= 0.0f) {
                     image.setPixel(x, y, 0);
                     continue;
                 }
-                int a = Math.round(light * 255.0F);
-                int r = Math.round(red / light * 255.0F);
-                int g = Math.round(green / light * 255.0F);
-                int b = Math.round(blue / light * 255.0F);
+                int a = Math.round(light * 255.0f);
+                int r = Math.round(red / light * 255.0f);
+                int g = Math.round(green / light * 255.0f);
+                int b = Math.round(blue / light * 255.0f);
                 image.setPixel(x, y, (a << 24) | (r << 16) | (g << 8) | b);
             }
         }

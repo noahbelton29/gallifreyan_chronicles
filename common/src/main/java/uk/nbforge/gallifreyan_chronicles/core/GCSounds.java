@@ -8,7 +8,7 @@ import net.minecraft.sounds.SoundEvent;
 import uk.nbforge.gallifreyan_chronicles.util.GCUtil;
 
 public class GCSounds {
-    public static final float HEARING_RANGE = 10.0F;
+    public static final float HEARING_RANGE = 10.0f;
     public static final SoundEvent TARDIS_DOOR_OPEN = registerFixedRange("tardis_door_open", HEARING_RANGE);
     public static final SoundEvent TARDIS_DOOR_CLOSE = registerFixedRange("tardis_door_close", HEARING_RANGE);
     public static final SoundEvent SLIDER = registerFixedRange("slider_sound", HEARING_RANGE);
@@ -29,14 +29,14 @@ public class GCSounds {
     public static final SoundEvent TARDIS_LANDING_NOTIFICATION =
             registerFixedRange("landing_notification", HEARING_RANGE);
     public static final SoundEvent TARDIS_STABILIZERS_ON = registerFixedRange("stabilizers_on", HEARING_RANGE);
-    public static final float FX_HEARING_RANGE = 24.0F;
+    public static final float FX_HEARING_RANGE = 24.0f;
     public static final SoundEvent SPARK = registerFixedRange("spark", HEARING_RANGE);
     public static final SoundEvent SPARK_EXPLOSION = registerFixedRange("spark_explosion", FX_HEARING_RANGE);
     public static final SoundEvent EXPLOSION = registerFixedRange("explosion", FX_HEARING_RANGE);
 
     public static final SoundEvent TITLE_THEME = register("title_theme");
 
-    public static final float TAKEOFF_HEARING_RANGE = 25.0F;
+    public static final float TAKEOFF_HEARING_RANGE = 25.0f;
 
     public static final SoundEvent TARDIS_DRUM = registerFixedRange("tardis_drum", TAKEOFF_HEARING_RANGE);
     public static final SoundEvent TARDIS_LAND = registerFixedRange("tardis_land", TAKEOFF_HEARING_RANGE);

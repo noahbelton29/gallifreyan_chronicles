@@ -30,8 +30,6 @@ public abstract class PortalReplayTickMixin {
         }
     }
 
-    // The renderer asks this before the portal ticks, no shape means very far away
-    // hacky but it works
     @WrapMethod(method = "getDistanceToNearestPointInPortal", remap = false, require = 0)
     private double gc$noShapeFar(Vec3 pos, Operation<Double> original) {
         if (((Portal) (Object) this).getAxisW() == null) return Double.MAX_VALUE;

@@ -1,13 +1,12 @@
 package uk.nbforge.gallifreyan_chronicles.tardis.control.impl;
 
-import java.util.UUID;
-import net.minecraft.server.MinecraftServer;
-import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.player.Player;
-import uk.nbforge.gallifreyan_chronicles.core.block_entities.TardisConsoleBlockEntity;
+import org.jspecify.annotations.Nullable;
 import uk.nbforge.gallifreyan_chronicles.core.entity.TardisControlEntity;
 import uk.nbforge.gallifreyan_chronicles.tardis.Tardis;
+import uk.nbforge.gallifreyan_chronicles.tardis.control.ClickSound;
 import uk.nbforge.gallifreyan_chronicles.tardis.control.ControlAnimations;
+import uk.nbforge.gallifreyan_chronicles.tardis.control.ControlContext;
 import uk.nbforge.gallifreyan_chronicles.tardis.flight.TardisDestinations;
 
 public class CoordinateStepControl extends DestinationControl {
@@ -15,32 +14,26 @@ public class CoordinateStepControl extends DestinationControl {
             new ControlAnimations("coordinate_step_control", "coordinate_step_control", false);
 
     public CoordinateStepControl(ControlAnimations animations) {
-        super(animations);
+        super(animations, ClickSound.NONE);
     }
 
     @Override
-    protected boolean apply(MinecraftServer server, UUID tardisId, Player player) {
+    protected boolean apply(Tardis tardis, @Nullable Player player) {
         int increment = player != null && player.isShiftKeyDown()
-                ? TardisDestinations.toggleNegative(server, tardisId)
-                : TardisDestinations.cycleIncrement(server, tardisId);
+                ? TardisDestinations.toggleNegative(tardis)
+                : TardisDestinations.cycleIncrement(tardis);
         TardisDestinations.showIncrement(player, increment);
         return true;
     }
 
     @Override
     public boolean onLeftClick(TardisControlEntity entity, Player player) {
-        TardisConsoleBlockEntity console = entity.getConsole();
-        if (console == null || !(entity.level() instanceof ServerLevel level)) return false;
-        UUID tardisId = linkedTardis(console).map(Tardis::id).orElse(null);
-        if (tardisId == null) return false;
-        int increment = TardisDestinations.cycleIncrementBack(level.getServer(), tardisId);
+        ControlContext ctx = ControlContext.of(entity);
+        Tardis tardis = ctx == null ? null : ctx.tardis().orElse(null);
+        if (tardis == null) return false;
+        int increment = TardisDestinations.cycleIncrementBack(tardis);
         TardisDestinations.showIncrement(player, increment);
-        console.playControlAnimationReversed(entity.getControlId(), player);
+        ctx.console().playControlAnimationReversed(entity.getControlId(), player);
         return true;
-    }
-
-    @Override
-    protected boolean playsSound() {
-        return false;
     }
 }

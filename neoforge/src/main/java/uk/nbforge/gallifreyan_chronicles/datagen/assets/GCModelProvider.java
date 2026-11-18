@@ -12,7 +12,13 @@ import net.minecraft.client.data.models.ModelProvider;
 import net.minecraft.client.data.models.MultiVariant;
 import net.minecraft.client.data.models.blockstates.MultiVariantGenerator;
 import net.minecraft.client.data.models.blockstates.PropertyDispatch;
-import net.minecraft.client.data.models.model.*;
+import net.minecraft.client.data.models.model.ItemModelUtils;
+import net.minecraft.client.data.models.model.ModelLocationUtils;
+import net.minecraft.client.data.models.model.ModelTemplate;
+import net.minecraft.client.data.models.model.ModelTemplates;
+import net.minecraft.client.data.models.model.TextureMapping;
+import net.minecraft.client.data.models.model.TextureSlot;
+import net.minecraft.client.data.models.model.TexturedModel;
 import net.minecraft.client.renderer.block.dispatch.Variant;
 import net.minecraft.client.renderer.item.ItemModel;
 import net.minecraft.client.renderer.item.SelectItemModel;
@@ -30,6 +36,13 @@ import uk.nbforge.gallifreyan_chronicles.core.GCBlocks;
 import uk.nbforge.gallifreyan_chronicles.core.GCDataComponents;
 import uk.nbforge.gallifreyan_chronicles.core.GCItems;
 import uk.nbforge.gallifreyan_chronicles.core.block.TardisBlock;
+import uk.nbforge.gallifreyan_chronicles.core.block.registry.CadonwoodBlocks;
+import uk.nbforge.gallifreyan_chronicles.core.block.registry.FloraBlocks;
+import uk.nbforge.gallifreyan_chronicles.core.block.registry.GallifreyBlocks;
+import uk.nbforge.gallifreyan_chronicles.core.block.registry.InteriorBlocks;
+import uk.nbforge.gallifreyan_chronicles.core.block.registry.MoonBlocks;
+import uk.nbforge.gallifreyan_chronicles.core.block.registry.RoundelBlocks;
+import uk.nbforge.gallifreyan_chronicles.core.block.registry.TardisBlocks;
 import uk.nbforge.gallifreyan_chronicles.tardis.door.DoorBlockJson;
 import uk.nbforge.gallifreyan_chronicles.tardis.door.TardisDoorVariant;
 
@@ -57,9 +70,9 @@ public class GCModelProvider extends ModelProvider {
 
     @Override
     protected void registerModels(BlockModelGenerators blockModels, ItemModelGenerators itemModels) {
-        blockModels.createTrivialCube(GCBlocks.MOONSLATE);
-        blockModels.createTrivialCube(GCBlocks.MOON_DUST);
-        blockModels.createTrivialCube(GCBlocks.LUNAR_REGOLITH);
+        blockModels.createTrivialCube(MoonBlocks.MOONSLATE);
+        blockModels.createTrivialCube(MoonBlocks.MOON_DUST);
+        blockModels.createTrivialCube(MoonBlocks.LUNAR_REGOLITH);
 
         TextureMapping tardisTextures = new TextureMapping()
                 .put(
@@ -68,54 +81,53 @@ public class GCModelProvider extends ModelProvider {
 
         Identifier normalModel = Identifier.fromNamespaceAndPath(Constants.MOD_ID, "block/tardis_base");
 
-        Identifier flyingModel = TARDIS_FLYING.create(GCBlocks.TARDIS, tardisTextures, blockModels.modelOutput);
+        Identifier flyingModel = TARDIS_FLYING.create(TardisBlocks.TARDIS, tardisTextures, blockModels.modelOutput);
 
         registerBrachackiSet(blockModels);
 
-        blockModels.createTrivialCube(GCBlocks.GALLIFREYAN_DIRT);
-        blockModels.createTrivialCube(GCBlocks.GALLIFREYAN_SAND);
-        blockModels.createTrivialCube(GCBlocks.GALLIFREYAN_STONE);
-        blockModels.createTrivialCube(GCBlocks.GALLIFREYAN_COBBLESTONE);
-        blockModels.createTrivialCube(GCBlocks.GALLIFREYAN_GRAVEL);
-        blockModels.createTrivialCube(GCBlocks.GALLIFREYAN_MUD);
-        blockModels.createTrivialCube(GCBlocks.GALLIFREYAN_MUDSTONE);
-        blockModels.createTrivialCube(GCBlocks.ARCADIAN_SHALE);
-        blockModels.createTrivialCube(GCBlocks.GALLIFREYAN_STONE_IRON_ORE);
-        blockModels.createTrivialCube(GCBlocks.GALLIFREYAN_STONE_COAL_ORE);
-        blockModels.createTrivialCube(GCBlocks.COBBLED_LIMESTONE);
-        blockModels.createTrivialCube(GCBlocks.ARCADIAN_SHALE_TARANIUM_ORE);
+        blockModels.createTrivialCube(GallifreyBlocks.GALLIFREYAN_DIRT);
+        blockModels.createTrivialCube(GallifreyBlocks.GALLIFREYAN_SAND);
+        blockModels.createTrivialCube(GallifreyBlocks.GALLIFREYAN_STONE);
+        blockModels.createTrivialCube(GallifreyBlocks.GALLIFREYAN_COBBLESTONE);
+        blockModels.createTrivialCube(GallifreyBlocks.GALLIFREYAN_GRAVEL);
+        blockModels.createTrivialCube(GallifreyBlocks.GALLIFREYAN_MUD);
+        blockModels.createTrivialCube(GallifreyBlocks.GALLIFREYAN_MUDSTONE);
+        blockModels.createTrivialCube(GallifreyBlocks.ARCADIAN_SHALE);
+        blockModels.createTrivialCube(GallifreyBlocks.GALLIFREYAN_STONE_IRON_ORE);
+        blockModels.createTrivialCube(GallifreyBlocks.GALLIFREYAN_STONE_COAL_ORE);
+        blockModels.createTrivialCube(GallifreyBlocks.COBBLED_LIMESTONE);
+        blockModels.createTrivialCube(GallifreyBlocks.ARCADIAN_SHALE_TARANIUM_ORE);
         registerThorivine(blockModels);
         blockModels.createCrossBlockWithDefaultItem(
-                GCBlocks.THORIVINE_FLOWER, BlockModelGenerators.PlantType.NOT_TINTED);
+                FloraBlocks.THORIVINE_FLOWER, BlockModelGenerators.PlantType.NOT_TINTED);
 
         blockModels.createCrossBlockWithDefaultItem(
-                GCBlocks.SHORT_GALLIFREYAN_DRY_GRASS, BlockModelGenerators.PlantType.NOT_TINTED);
+                FloraBlocks.SHORT_GALLIFREYAN_DRY_GRASS, BlockModelGenerators.PlantType.NOT_TINTED);
 
         blockModels.createCrossBlockWithDefaultItem(
-                GCBlocks.TALL_GALLIFREYAN_DRY_GRASS, BlockModelGenerators.PlantType.NOT_TINTED);
+                FloraBlocks.TALL_GALLIFREYAN_DRY_GRASS, BlockModelGenerators.PlantType.NOT_TINTED);
 
-        blockModels.createDoublePlant(GCBlocks.TALL_GALLIFREYAN_GRASS, BlockModelGenerators.PlantType.TINTED);
+        blockModels.createDoublePlant(FloraBlocks.TALL_GALLIFREYAN_GRASS, BlockModelGenerators.PlantType.TINTED);
 
         blockModels.registerSimpleTintedItemModel(
-                GCBlocks.TALL_GALLIFREYAN_GRASS,
-                ModelLocationUtils.getModelLocation(GCBlocks.TALL_GALLIFREYAN_GRASS, "_top"),
+                FloraBlocks.TALL_GALLIFREYAN_GRASS,
+                ModelLocationUtils.getModelLocation(FloraBlocks.TALL_GALLIFREYAN_GRASS, "_top"),
                 ItemModelUtils.constantTint(GALLIFREYAN_GRASS_TINT));
 
-        blockModels.createCrossBlock(GCBlocks.SHORT_GALLIFREYAN_GRASS, BlockModelGenerators.PlantType.TINTED);
+        blockModels.createCrossBlock(FloraBlocks.SHORT_GALLIFREYAN_GRASS, BlockModelGenerators.PlantType.TINTED);
 
         Identifier itemModel = blockModels.createFlatItemModelWithBlockTexture(
-                GCBlocks.SHORT_GALLIFREYAN_GRASS.asItem(), GCBlocks.SHORT_GALLIFREYAN_GRASS);
+                FloraBlocks.SHORT_GALLIFREYAN_GRASS.asItem(), FloraBlocks.SHORT_GALLIFREYAN_GRASS);
 
         blockModels.registerSimpleTintedItemModel(
-                GCBlocks.SHORT_GALLIFREYAN_GRASS, itemModel, ItemModelUtils.constantTint(GALLIFREYAN_GRASS_TINT));
+                FloraBlocks.SHORT_GALLIFREYAN_GRASS, itemModel, ItemModelUtils.constantTint(GALLIFREYAN_GRASS_TINT));
 
-        blockModels.blockStateOutput.accept(MultiVariantGenerator.dispatch(GCBlocks.TARDIS)
+        blockModels.blockStateOutput.accept(MultiVariantGenerator.dispatch(TardisBlocks.TARDIS)
                 .with(PropertyDispatch.initial(TardisBlock.IN_FLIGHT)
                         .select(false, BlockModelGenerators.plainVariant(normalModel))
                         .select(true, BlockModelGenerators.plainVariant(flyingModel))));
-        blockModels.createParticleOnlyBlock(GCBlocks.TARDIS_CONSOLE);
-        blockModels.createParticleOnlyBlock(GCBlocks.TARDIS_TOP);
-        // Every door block just needs a particle, the wall it is set in
+        blockModels.createParticleOnlyBlock(TardisBlocks.TARDIS_CONSOLE);
+        blockModels.createParticleOnlyBlock(TardisBlocks.TARDIS_TOP);
         Map<String, String> doorParticles = new HashMap<>();
         for (DoorBlockJson.Entry door : DoorBlockJson.entries()) doorParticles.put(door.block(), door.particle());
         for (Block door : GCBlocks.interiorDoorBlocks()) {
@@ -123,15 +135,15 @@ public class GCModelProvider extends ModelProvider {
                     doorParticles.get(BuiltInRegistries.BLOCK.getKey(door).getPath());
             Block particleBlock = particle != null
                     ? BuiltInRegistries.BLOCK.getValue(Identifier.parse(particle))
-                    : GCBlocks.BRACHACKI_WALL_BLOCK;
+                    : InteriorBlocks.BRACHACKI_WALL_BLOCK;
             blockModels.createParticleOnlyBlock(door, particleBlock);
         }
-        blockModels.createParticleOnlyBlock(GCBlocks.INTERIOR_DOOR_BARRIER, GCBlocks.VOID_BLOCK);
+        blockModels.createParticleOnlyBlock(TardisBlocks.INTERIOR_DOOR_BARRIER, InteriorBlocks.VOID_BLOCK);
         registerSelectableItems(itemModels);
 
         registerGrassBlock(blockModels);
         registerCadonwoodSet(blockModels);
-        createCustomVine(blockModels, GCBlocks.GALLIFREYAN_VINE, GCBlocks.GALLIFREYAN_VINE.asItem());
+        createCustomVine(blockModels, FloraBlocks.GALLIFREYAN_VINE, FloraBlocks.GALLIFREYAN_VINE.asItem());
 
         ItemModel.Unbaked tardisKey =
                 ItemModelUtils.plainModel(itemModels.createFlatItemModel(GCItems.TARDIS_KEY, ModelTemplates.FLAT_ITEM));
@@ -175,9 +187,9 @@ public class GCModelProvider extends ModelProvider {
 
     private void registerSelectableItems(ItemModelGenerators itemModels) {
         ItemModel.Unbaked tardis = ItemModelUtils.plainModel(
-                itemModels.createFlatItemModel(GCBlocks.TARDIS.asItem(), ModelTemplates.FLAT_ITEM));
+                itemModels.createFlatItemModel(TardisBlocks.TARDIS.asItem(), ModelTemplates.FLAT_ITEM));
         itemModels.itemModelOutput.accept(
-                GCBlocks.TARDIS.asItem(),
+                TardisBlocks.TARDIS.asItem(),
                 ItemModelUtils.select(
                         new TardisExteriorSelectProperty(),
                         tardis,
@@ -190,9 +202,9 @@ public class GCModelProvider extends ModelProvider {
                         ItemModelUtils.when(Constants.MOD_ID + ":tuat_exterior", flatItem(itemModels, "tuat_tardis"))));
 
         ItemModel.Unbaked console = ItemModelUtils.plainModel(
-                itemModels.createFlatItemModel(GCBlocks.TARDIS_CONSOLE.asItem(), ModelTemplates.FLAT_ITEM));
+                itemModels.createFlatItemModel(TardisBlocks.TARDIS_CONSOLE.asItem(), ModelTemplates.FLAT_ITEM));
         itemModels.itemModelOutput.accept(
-                GCBlocks.TARDIS_CONSOLE.asItem(),
+                TardisBlocks.TARDIS_CONSOLE.asItem(),
                 ItemModelUtils.select(
                         new ConsoleVariantSelectProperty(),
                         console,
@@ -209,7 +221,6 @@ public class GCModelProvider extends ModelProvider {
                                 "ambassadors_of_death_console",
                                 flatItem(itemModels, "tardis_console/ambassadors_of_death_console"))));
 
-        // TARDIS interior doors have one item and a model per interior door variant in the data
         List<String> interiorVariants = interiorDoorVariants();
         if (!interiorVariants.isEmpty()) {
             List<SelectItemModel.SwitchCase<String>> interiorCases = new ArrayList<>();
@@ -220,12 +231,11 @@ public class GCModelProvider extends ModelProvider {
                 interiorCases.add(ItemModelUtils.when(variant, model));
             }
             itemModels.itemModelOutput.accept(
-                    GCBlocks.TARDIS_INTERIOR_DOOR.asItem(),
+                    TardisBlocks.TARDIS_INTERIOR_DOOR.asItem(),
                     ItemModelUtils.select(
                             new ComponentContents<>(GCDataComponents.DOOR_TYPE), interiorFallback, interiorCases));
         }
 
-        // Plain doors, every door item can show every door type
         Map<Block, ItemModel.Unbaked> doorModels = new LinkedHashMap<>();
         for (Block door : GCBlocks.pickableDoors()) {
             doorModels.put(
@@ -240,7 +250,6 @@ public class GCModelProvider extends ModelProvider {
                 ItemModelUtils.select(new ComponentContents<>(GCDataComponents.DOOR_TYPE), fallback, doorCases)));
     }
 
-    /** Interior door variant ids from the same files the game reads with its codec, in priority order. */
     private static List<String> interiorDoorVariants() {
         return DoorBlockJson.bundledVariants().stream()
                 .filter(TardisDoorVariant::interior)
@@ -258,140 +267,143 @@ public class GCModelProvider extends ModelProvider {
         blockModelGenerators.createMultifaceBlockStates(vineBlock);
         blockModelGenerators.registerSimpleItemModel(
                 vineItem, blockModelGenerators.createFlatItemModelWithBlockTexture(vineItem, vineBlock));
-        //        this.registerSimpleTintedItemModel(Blocks.VINE, itemModel, ItemModelUtils.constantTint(-12012264));
     }
 
     private void registerBrachackiSet(BlockModelGenerators generators) {
-        generators.createTrivialCube(GCBlocks.BRACHACKI_FLOOR_BLOCK);
-        generators.createTrivialCube(GCBlocks.BRACHACKI_ROUNDEL_BLOCK);
-        GCBlocks.WOOD_ROUNDELS.values().forEach(generators::createTrivialCube);
-        GCBlocks.WOOD_HALF_ROUNDELS.values().forEach(generators::createTrivialCube);
-        GCBlocks.CONCRETE_ROUNDELS.values().forEach(generators::createTrivialCube);
-        GCBlocks.CONCRETE_HALF_ROUNDELS.values().forEach(generators::createTrivialCube);
-        generators.createTrivialCube(GCBlocks.BRACHACKI_HALF_ROUNDEL_BLOCK);
-        generators.createTrivialCube(GCBlocks.BRACHACKI_ROUNDEL_ALT_BLOCK);
-        generators.createTrivialCube(GCBlocks.BRACHACKI_HALF_ROUNDEL_ALT_BLOCK);
-        generators.createTrivialCube(GCBlocks.BRACHACKI_ROUNDEL_BLOCK_2);
-        generators.createTrivialCube(GCBlocks.BRACHACKI_HALF_ROUNDEL_BLOCK_2);
-        generators.createTrivialCube(GCBlocks.BRACHACKI_ROUNDEL_BLOCK_3);
-        generators.createTrivialCube(GCBlocks.BRACHACKI_ROUNDEL_BLOCK_4);
-        generators.createTrivialCube(GCBlocks.BRACHACKI_HALF_ROUNDEL_BLOCK_3);
-        generators.createTrivialCube(GCBlocks.BRACHACKI_HALF_ROUNDEL_BLOCK_4);
-        generators.createTrivialCube(GCBlocks.BRACHACKI_LIGHT_STRIP_BLOCK);
-        generators.createTrivialCube(GCBlocks.BRACHACKI_TUAT_FLOOR_BLOCK);
-        generators.createTrivialCube(GCBlocks.VOID_BLOCK);
-        generators.createTrivialCube(GCBlocks.BRACHACKI_TUAT_ROUNDEL_BLOCK);
-        generators.createTrivialCube(GCBlocks.BRACHACKI_TUAT_HALF_ROUNDEL_BLOCK);
-        generators.createTrivialCube(GCBlocks.BRACHACKI_TUAT_HEXAGONAL_ROUNDEL_BLOCK);
-        generators.createTrivialCube(GCBlocks.BRACHACKI_TUAT_HALF_HEXAGONAL_ROUNDEL_BLOCK);
+        generators.createTrivialCube(InteriorBlocks.BRACHACKI_FLOOR_BLOCK);
+        generators.createTrivialCube(InteriorBlocks.BRACHACKI_ROUNDEL_BLOCK);
+        RoundelBlocks.WOOD_ROUNDELS.values().forEach(generators::createTrivialCube);
+        RoundelBlocks.WOOD_HALF_ROUNDELS.values().forEach(generators::createTrivialCube);
+        RoundelBlocks.CONCRETE_ROUNDELS.values().forEach(generators::createTrivialCube);
+        RoundelBlocks.CONCRETE_HALF_ROUNDELS.values().forEach(generators::createTrivialCube);
+        generators.createTrivialCube(InteriorBlocks.BRACHACKI_HALF_ROUNDEL_BLOCK);
+        generators.createTrivialCube(InteriorBlocks.BRACHACKI_ROUNDEL_ALT_BLOCK);
+        generators.createTrivialCube(InteriorBlocks.BRACHACKI_HALF_ROUNDEL_ALT_BLOCK);
+        generators.createTrivialCube(InteriorBlocks.BRACHACKI_ROUNDEL_BLOCK_2);
+        generators.createTrivialCube(InteriorBlocks.BRACHACKI_HALF_ROUNDEL_BLOCK_2);
+        generators.createTrivialCube(InteriorBlocks.BRACHACKI_ROUNDEL_BLOCK_3);
+        generators.createTrivialCube(InteriorBlocks.BRACHACKI_ROUNDEL_BLOCK_4);
+        generators.createTrivialCube(InteriorBlocks.BRACHACKI_HALF_ROUNDEL_BLOCK_3);
+        generators.createTrivialCube(InteriorBlocks.BRACHACKI_HALF_ROUNDEL_BLOCK_4);
+        generators.createTrivialCube(InteriorBlocks.BRACHACKI_LIGHT_STRIP_BLOCK);
+        generators.createTrivialCube(InteriorBlocks.BRACHACKI_TUAT_FLOOR_BLOCK);
+        generators.createTrivialCube(InteriorBlocks.VOID_BLOCK);
+        generators.createTrivialCube(InteriorBlocks.BRACHACKI_TUAT_ROUNDEL_BLOCK);
+        generators.createTrivialCube(InteriorBlocks.BRACHACKI_TUAT_HALF_ROUNDEL_BLOCK);
+        generators.createTrivialCube(InteriorBlocks.BRACHACKI_TUAT_HEXAGONAL_ROUNDEL_BLOCK);
+        generators.createTrivialCube(InteriorBlocks.BRACHACKI_TUAT_HALF_HEXAGONAL_ROUNDEL_BLOCK);
 
         generators
-                .family(GCBlocks.BRACHACKI_WALL_BLOCK_2)
-                .stairs(GCBlocks.BRACHACKI_STAIRS_2)
-                .slab(GCBlocks.BRACHACKI_SLAB_2)
-                .pressurePlate(GCBlocks.BRACHACKI_PRESSURE_PLATE_2)
-                .wall(GCBlocks.BRACHACKI_WALL_2)
-                .fence(GCBlocks.BRACHACKI_FENCE_2)
-                .fenceGate(GCBlocks.BRACHACKI_FENCE_GATE_2);
+                .family(InteriorBlocks.BRACHACKI_WALL_BLOCK_2)
+                .stairs(InteriorBlocks.BRACHACKI_STAIRS_2)
+                .slab(InteriorBlocks.BRACHACKI_SLAB_2)
+                .pressurePlate(InteriorBlocks.BRACHACKI_PRESSURE_PLATE_2)
+                .wall(InteriorBlocks.BRACHACKI_WALL_2)
+                .fence(InteriorBlocks.BRACHACKI_FENCE_2)
+                .fenceGate(InteriorBlocks.BRACHACKI_FENCE_GATE_2);
 
         generators
-                .family(GCBlocks.BRACHACKI_WALL_BLOCK_3)
-                .stairs(GCBlocks.BRACHACKI_STAIRS_3)
-                .slab(GCBlocks.BRACHACKI_SLAB_3)
-                .pressurePlate(GCBlocks.BRACHACKI_PRESSURE_PLATE_3)
-                .wall(GCBlocks.BRACHACKI_WALL_3)
-                .fence(GCBlocks.BRACHACKI_FENCE_3)
-                .fenceGate(GCBlocks.BRACHACKI_FENCE_GATE_3);
+                .family(InteriorBlocks.BRACHACKI_WALL_BLOCK_3)
+                .stairs(InteriorBlocks.BRACHACKI_STAIRS_3)
+                .slab(InteriorBlocks.BRACHACKI_SLAB_3)
+                .pressurePlate(InteriorBlocks.BRACHACKI_PRESSURE_PLATE_3)
+                .wall(InteriorBlocks.BRACHACKI_WALL_3)
+                .fence(InteriorBlocks.BRACHACKI_FENCE_3)
+                .fenceGate(InteriorBlocks.BRACHACKI_FENCE_GATE_3);
         generators
-                .family(GCBlocks.BRACHACKI_WALL_BLOCK_4)
-                .stairs(GCBlocks.BRACHACKI_STAIRS_4)
-                .slab(GCBlocks.BRACHACKI_SLAB_4)
-                .pressurePlate(GCBlocks.BRACHACKI_PRESSURE_PLATE_4)
-                .wall(GCBlocks.BRACHACKI_WALL_4)
-                .fence(GCBlocks.BRACHACKI_FENCE_4)
-                .fenceGate(GCBlocks.BRACHACKI_FENCE_GATE_4);
+                .family(InteriorBlocks.BRACHACKI_WALL_BLOCK_4)
+                .stairs(InteriorBlocks.BRACHACKI_STAIRS_4)
+                .slab(InteriorBlocks.BRACHACKI_SLAB_4)
+                .pressurePlate(InteriorBlocks.BRACHACKI_PRESSURE_PLATE_4)
+                .wall(InteriorBlocks.BRACHACKI_WALL_4)
+                .fence(InteriorBlocks.BRACHACKI_FENCE_4)
+                .fenceGate(InteriorBlocks.BRACHACKI_FENCE_GATE_4);
 
         generators
-                .family(GCBlocks.BRACHACKI_TUAT_WALL_BLOCK)
-                .stairs(GCBlocks.BRACHACKI_TUAT_STAIRS)
-                .slab(GCBlocks.BRACHACKI_TUAT_SLAB)
-                .pressurePlate(GCBlocks.BRACHACKI_TUAT_PRESSURE_PLATE)
-                .wall(GCBlocks.BRACHACKI_TUAT_WALL)
-                .fence(GCBlocks.BRACHACKI_TUAT_FENCE)
-                .fenceGate(GCBlocks.BRACHACKI_TUAT_FENCE_GATE);
+                .family(InteriorBlocks.BRACHACKI_TUAT_WALL_BLOCK)
+                .stairs(InteriorBlocks.BRACHACKI_TUAT_STAIRS)
+                .slab(InteriorBlocks.BRACHACKI_TUAT_SLAB)
+                .pressurePlate(InteriorBlocks.BRACHACKI_TUAT_PRESSURE_PLATE)
+                .wall(InteriorBlocks.BRACHACKI_TUAT_WALL)
+                .fence(InteriorBlocks.BRACHACKI_TUAT_FENCE)
+                .fenceGate(InteriorBlocks.BRACHACKI_TUAT_FENCE_GATE);
 
         generators
-                .family(GCBlocks.BRACHACKI_WALL_BLOCK)
-                .stairs(GCBlocks.BRACHACKI_STAIRS)
-                .slab(GCBlocks.BRACHACKI_SLAB)
-                .pressurePlate(GCBlocks.BRACHACKI_PRESSURE_PLATE)
-                .wall(GCBlocks.BRACHACKI_WALL)
-                .fence(GCBlocks.BRACHACKI_FENCE)
-                .fenceGate(GCBlocks.BRACHACKI_FENCE_GATE);
+                .family(InteriorBlocks.BRACHACKI_WALL_BLOCK)
+                .stairs(InteriorBlocks.BRACHACKI_STAIRS)
+                .slab(InteriorBlocks.BRACHACKI_SLAB)
+                .pressurePlate(InteriorBlocks.BRACHACKI_PRESSURE_PLATE)
+                .wall(InteriorBlocks.BRACHACKI_WALL)
+                .fence(InteriorBlocks.BRACHACKI_FENCE)
+                .fenceGate(InteriorBlocks.BRACHACKI_FENCE_GATE);
     }
 
     private void registerThorivine(BlockModelGenerators generators) {
         TextureMapping mapping = new TextureMapping()
-                .put(TextureSlot.TOP, TextureMapping.getBlockTexture(GCBlocks.THORIVINE, "_bottom"))
-                .put(TextureSlot.SIDE, TextureMapping.getBlockTexture(GCBlocks.THORIVINE, "_side"))
-                .put(TextureSlot.BOTTOM, TextureMapping.getBlockTexture(GCBlocks.THORIVINE, "_bottom"));
+                .put(TextureSlot.TOP, TextureMapping.getBlockTexture(FloraBlocks.THORIVINE, "_bottom"))
+                .put(TextureSlot.SIDE, TextureMapping.getBlockTexture(FloraBlocks.THORIVINE, "_side"))
+                .put(TextureSlot.BOTTOM, TextureMapping.getBlockTexture(FloraBlocks.THORIVINE, "_bottom"));
 
-        Identifier model = THORIVINE_TEMPLATE.create(GCBlocks.THORIVINE, mapping, generators.modelOutput);
+        Identifier model = THORIVINE_TEMPLATE.create(FloraBlocks.THORIVINE, mapping, generators.modelOutput);
 
-        generators.blockStateOutput.accept(
-                BlockModelGenerators.createSimpleBlock(GCBlocks.THORIVINE, BlockModelGenerators.plainVariant(model)));
-        generators.registerSimpleItemModel(GCBlocks.THORIVINE, model);
+        generators.blockStateOutput.accept(BlockModelGenerators.createSimpleBlock(
+                FloraBlocks.THORIVINE, BlockModelGenerators.plainVariant(model)));
+        generators.registerSimpleItemModel(FloraBlocks.THORIVINE, model);
     }
 
     private static TextureMapping grassMapping(String sideSuffix) {
         return new TextureMapping()
-                .put(TextureSlot.BOTTOM, TextureMapping.getBlockTexture(GCBlocks.GALLIFREYAN_DIRT))
+                .put(TextureSlot.BOTTOM, TextureMapping.getBlockTexture(GallifreyBlocks.GALLIFREYAN_DIRT))
                 .copyForced(TextureSlot.BOTTOM, TextureSlot.PARTICLE)
-                .put(TextureSlot.TOP, TextureMapping.getBlockTexture(GCBlocks.GALLIFREYAN_GRASS_BLOCK, "_top"))
-                .put(TextureSlot.SIDE, TextureMapping.getBlockTexture(GCBlocks.GALLIFREYAN_GRASS_BLOCK, sideSuffix));
+                .put(TextureSlot.TOP, TextureMapping.getBlockTexture(GallifreyBlocks.GALLIFREYAN_GRASS_BLOCK, "_top"))
+                .put(
+                        TextureSlot.SIDE,
+                        TextureMapping.getBlockTexture(GallifreyBlocks.GALLIFREYAN_GRASS_BLOCK, sideSuffix));
     }
 
     private void registerGrassBlock(BlockModelGenerators generators) {
         TextureMapping normalMapping = grassMapping("_side");
 
         Identifier normalModel = ModelTemplates.CUBE_BOTTOM_TOP.create(
-                GCBlocks.GALLIFREYAN_GRASS_BLOCK, normalMapping, generators.modelOutput);
+                GallifreyBlocks.GALLIFREYAN_GRASS_BLOCK, normalMapping, generators.modelOutput);
 
         TextureMapping snowyMapping = grassMapping("_snow");
 
         MultiVariant snowyVariant = BlockModelGenerators.plainVariant(ModelTemplates.CUBE_BOTTOM_TOP.createWithSuffix(
-                GCBlocks.GALLIFREYAN_GRASS_BLOCK, "_snow", snowyMapping, generators.modelOutput));
+                GallifreyBlocks.GALLIFREYAN_GRASS_BLOCK, "_snow", snowyMapping, generators.modelOutput));
 
         generators.createGrassLikeBlock(
-                GCBlocks.GALLIFREYAN_GRASS_BLOCK,
+                GallifreyBlocks.GALLIFREYAN_GRASS_BLOCK,
                 BlockModelGenerators.createRotatedVariants(new Variant(normalModel)),
                 snowyVariant);
     }
 
     private void registerCadonwoodSet(BlockModelGenerators generators) {
         generators
-                .family(GCBlocks.CADONWOOD_PLANKS)
-                .stairs(GCBlocks.CADONWOOD_STAIRS)
-                .slab(GCBlocks.CADONWOOD_SLAB)
-                .pressurePlate(GCBlocks.CADONWOOD_PRESSURE_PLATE)
-                .button(GCBlocks.CADONWOOD_BUTTON)
-                .fence(GCBlocks.CADONWOOD_FENCE)
-                .fenceGate(GCBlocks.CADONWOOD_FENCE_GATE)
-                .wall(GCBlocks.CADONWOOD_WALL);
+                .family(CadonwoodBlocks.CADONWOOD_PLANKS)
+                .stairs(CadonwoodBlocks.CADONWOOD_STAIRS)
+                .slab(CadonwoodBlocks.CADONWOOD_SLAB)
+                .pressurePlate(CadonwoodBlocks.CADONWOOD_PRESSURE_PLATE)
+                .button(CadonwoodBlocks.CADONWOOD_BUTTON)
+                .fence(CadonwoodBlocks.CADONWOOD_FENCE)
+                .fenceGate(CadonwoodBlocks.CADONWOOD_FENCE_GATE)
+                .wall(CadonwoodBlocks.CADONWOOD_WALL);
 
         generators
-                .woodProvider(GCBlocks.CADONWOOD_LOG)
-                .log(GCBlocks.CADONWOOD_LOG)
-                .wood(GCBlocks.CADONWOOD_WOOD);
+                .woodProvider(CadonwoodBlocks.CADONWOOD_LOG)
+                .log(CadonwoodBlocks.CADONWOOD_LOG)
+                .wood(CadonwoodBlocks.CADONWOOD_WOOD);
 
         generators
-                .woodProvider(GCBlocks.STRIPPED_CADONWOOD_LOG)
-                .log(GCBlocks.STRIPPED_CADONWOOD_LOG)
-                .wood(GCBlocks.STRIPPED_CADONWOOD_WOOD);
+                .woodProvider(CadonwoodBlocks.STRIPPED_CADONWOOD_LOG)
+                .log(CadonwoodBlocks.STRIPPED_CADONWOOD_LOG)
+                .wood(CadonwoodBlocks.STRIPPED_CADONWOOD_WOOD);
 
-        generators.createTrivialBlock(GCBlocks.CADONWOOD_LEAVES, TexturedModel.LEAVES);
+        generators.createTrivialBlock(CadonwoodBlocks.CADONWOOD_LEAVES, TexturedModel.LEAVES);
 
         generators.createPlantWithDefaultItem(
-                GCBlocks.CADONWOOD_SAPLING, GCBlocks.POTTED_CADONWOOD_SAPLING, BlockModelGenerators.PlantType.TINTED);
+                CadonwoodBlocks.CADONWOOD_SAPLING,
+                CadonwoodBlocks.POTTED_CADONWOOD_SAPLING,
+                BlockModelGenerators.PlantType.TINTED);
     }
 }

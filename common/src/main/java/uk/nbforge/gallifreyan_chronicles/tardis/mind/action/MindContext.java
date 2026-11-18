@@ -8,27 +8,19 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.phys.Vec3;
 import org.jspecify.annotations.Nullable;
 import uk.nbforge.gallifreyan_chronicles.tardis.Tardis;
-import uk.nbforge.gallifreyan_chronicles.tardis.ecs.system.TardisMindSystem.Refusal;
+import uk.nbforge.gallifreyan_chronicles.tardis.mind.TardisMinds.Refusal;
 
-/**
- * What is going on when a hook runs.
- * Level, player and pos are only there when the hook has them.
- */
+/** Level, player and pos are only there when the hook has them. */
 public final class MindContext {
     public final Tardis tardis;
     public final @Nullable ServerLevel level;
     public final @Nullable Player player;
     public final @Nullable Vec3 pos;
 
-    // Who pulled the lever for when_unwilling_to_fly, null means the owner
     public @Nullable UUID pilot;
-    // How far through something it is from 0 to 1, used by terror
     public float progress;
-    // How afraid of the player it is from 0 to 1, used by when_you_enter
     public float severity;
-    // Set by actions on on_unwilling to decide what the lever does
     public @Nullable Refusal refusal;
-    // Set when an action replaces the normal reaction
     public boolean handled;
 
     public MindContext(Tardis tardis, @Nullable ServerLevel level, @Nullable Player player, @Nullable Vec3 pos) {
@@ -43,7 +35,6 @@ public final class MindContext {
         return player != null ? player.getUUID() : pilot;
     }
 
-    /** Runs at the console inside and the box outside. */
     public void everywhere(BiConsumer<ServerLevel, Vec3> run) {
         ServerLevel inside = tardis.interiorLevel().orElse(null);
         BlockPos console = tardis.consolePos().orElse(null);

@@ -1,34 +1,19 @@
 package uk.nbforge.gallifreyan_chronicles.client.model;
 
+import com.geckolib.constant.dataticket.DataTicket;
+import com.geckolib.renderer.base.GeoRenderState;
 import net.minecraft.resources.Identifier;
+import org.jspecify.annotations.Nullable;
 
-public final class GeoAssets {
-    public static final GeoAssets CONSOLE = new GeoAssets("console/");
-    public static final GeoAssets EXTERIOR = new GeoAssets("tardis_door/");
-    public static final GeoAssets INTERIOR_DOOR = new GeoAssets("interior_doors/");
-
-    private static final String TEXTURE_FOLDER = "textures/block_entity/";
+public enum GeoAssets {
+    CONSOLE("console/"),
+    EXTERIOR("tardis_door/"),
+    INTERIOR_DOOR("interior_doors/");
 
     private final String animationFolder;
 
-    private GeoAssets(String animationFolder) {
+    GeoAssets(String animationFolder) {
         this.animationFolder = animationFolder;
-    }
-
-    public Identifier model(Identifier id) {
-        return id;
-    }
-
-    public Identifier model(String id) {
-        return model(Identifier.parse(id));
-    }
-
-    public Identifier texture(Identifier id) {
-        return id.withPrefix(TEXTURE_FOLDER).withSuffix(".png");
-    }
-
-    public Identifier texture(String id) {
-        return texture(Identifier.parse(id));
     }
 
     public Identifier animation(Identifier id) {
@@ -37,5 +22,23 @@ public final class GeoAssets {
 
     public Identifier animation(String id) {
         return animation(Identifier.parse(id));
+    }
+
+    public static Identifier model(String id) {
+        return Identifier.parse(id);
+    }
+
+    public static Identifier texture(Identifier id) {
+        return id.withPrefix("textures/block_entity/").withSuffix(".png");
+    }
+
+    public static Identifier texture(String id) {
+        return texture(Identifier.parse(id));
+    }
+
+    public static @Nullable String read(GeoRenderState renderState, DataTicket<String> ticket) {
+        if (!renderState.hasGeckolibData(ticket)) return null;
+        String value = renderState.getGeckolibData(ticket);
+        return value == null || value.isEmpty() ? null : value;
     }
 }

@@ -32,12 +32,11 @@ import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
-import org.jetbrains.annotations.NotNull;
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
-import uk.nbforge.gallifreyan_chronicles.core.GCBlocks;
 import uk.nbforge.gallifreyan_chronicles.core.GCDataComponents;
-import uk.nbforge.gallifreyan_chronicles.core.block_entities.InteriorDoorBlockEntity;
+import uk.nbforge.gallifreyan_chronicles.core.block.registry.TardisBlocks;
+import uk.nbforge.gallifreyan_chronicles.core.block_entity.InteriorDoorBlockEntity;
 import uk.nbforge.gallifreyan_chronicles.core.item.InteriorDoorBlockItem;
 
 public class InteriorDoorBlock extends BaseEntityBlock {
@@ -210,7 +209,7 @@ public class InteriorDoorBlock extends BaseEntityBlock {
         for (BlockPos p : barrierPositions(master, state)) {
             if (level.isOutsideBuildHeight(p)) continue;
             BlockState existing = level.getBlockState(p);
-            if (existing.is(GCBlocks.INTERIOR_DOOR_BARRIER) || existing.canBeReplaced()) continue;
+            if (existing.is(TardisBlocks.INTERIOR_DOOR_BARRIER) || existing.canBeReplaced()) continue;
             if (existing.getCollisionShape(level, p).isEmpty()) continue;
             return true;
         }
@@ -225,7 +224,7 @@ public class InteriorDoorBlock extends BaseEntityBlock {
     public static void removeBarriers(Level level, BlockPos master, BlockState state) {
         if (level.isClientSide() || isFlush(state)) return;
         for (BlockPos p : barrierPositions(master, state)) {
-            if (level.getBlockState(p).is(GCBlocks.INTERIOR_DOOR_BARRIER)) {
+            if (level.getBlockState(p).is(TardisBlocks.INTERIOR_DOOR_BARRIER)) {
                 level.setBlock(p, Blocks.AIR.defaultBlockState(), Block.UPDATE_ALL | Block.UPDATE_SUPPRESS_DROPS);
             }
         }
@@ -265,11 +264,10 @@ public class InteriorDoorBlock extends BaseEntityBlock {
     }
 
     @Override
-    public @NotNull BlockState playerWillDestroy(
-            @NotNull Level level, @NotNull BlockPos pos, @NotNull BlockState state, @NotNull Player player) {
+    public @NonNull BlockState playerWillDestroy(
+            @NonNull Level level, @NonNull BlockPos pos, @NonNull BlockState state, @NonNull Player player) {
         if (!level.isClientSide()) {
             BlockPos master = masterBlockPos(state, pos);
-            // Read this first, breaking a part that is not the master removes the master and its block entity below
             boolean primary = level.getBlockEntity(master) instanceof InteriorDoorBlockEntity masterDoor
                     && masterDoor.isPrimary();
             Direction right = rightDirectionOf(state);
@@ -325,8 +323,6 @@ public class InteriorDoorBlock extends BaseEntityBlock {
             @NonNull BlockGetter level,
             @NonNull BlockPos pos,
             @NonNull CollisionContext context) {
-        // Seen from outside through the portal of the exterior there is no selection shape so no outline, and the
-        // targeting ray passes through the door instead of selecting it
         if (level instanceof Level l
                 && l.isClientSide()
                 && uk.nbforge.gallifreyan_chronicles.client.renderer.util.RemoteDoorView.isSeenThroughPortal(l)) {
@@ -360,18 +356,18 @@ public class InteriorDoorBlock extends BaseEntityBlock {
     }
 
     @Override
-    public @NotNull RenderShape getRenderShape(@NotNull BlockState state) {
+    public @NonNull RenderShape getRenderShape(@NonNull BlockState state) {
         return RenderShape.INVISIBLE;
     }
 
     @Override
-    public @Nullable BlockEntity newBlockEntity(@NotNull BlockPos pos, @NotNull BlockState state) {
+    public @Nullable BlockEntity newBlockEntity(@NonNull BlockPos pos, @NonNull BlockState state) {
         return isMaster(state) ? new InteriorDoorBlockEntity(pos, state) : null;
     }
 
     @Override
     public @Nullable <T extends BlockEntity> BlockEntityTicker<T> getTicker(
-            @NotNull Level level, @NotNull BlockState state, @NotNull BlockEntityType<T> type) {
+            @NonNull Level level, @NonNull BlockState state, @NonNull BlockEntityType<T> type) {
         if (level.isClientSide()) return null;
         return type == InteriorDoorBlockEntity.TYPE.get()
                 ? (_, _, _, be) -> ((InteriorDoorBlockEntity) be).serverTick()

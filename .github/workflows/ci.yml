@@ -162,6 +162,15 @@ jobs:
       - name: Check static state is cleared between worlds
         run: python3 .github/scripts/check_server_state.py
 
+  style:
+    name: Code style
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v5
+      - name: Check imports, annotations, literals and logging
+        run: python3 .github/scripts/check_style.py
+
   boot-test:
     name: Server boots (${{ matrix.loader }})
     needs: build
@@ -221,7 +230,7 @@ jobs:
 
   notify:
     name: Discord
-    needs: [build, formatting, datagen, translations, client-code, static-state, boot-test]
+    needs: [build, formatting, datagen, translations, client-code, static-state, style, boot-test]
     if: always() && github.event_name == 'push'
     runs-on: ubuntu-24.04
     timeout-minutes: 5

@@ -23,17 +23,12 @@ import uk.nbforge.gallifreyan_chronicles.client.renderer.block.TardisExteriorBlo
 import uk.nbforge.gallifreyan_chronicles.client.renderer.fade.FadeBoxRenderer;
 import uk.nbforge.gallifreyan_chronicles.client.sky.SkyShaderCompat;
 import uk.nbforge.gallifreyan_chronicles.client.util.DetailLevelUtil;
-import uk.nbforge.gallifreyan_chronicles.tardis.TardisExterior;
+import uk.nbforge.gallifreyan_chronicles.tardis.exterior.TardisExterior;
 import uk.nbforge.gallifreyan_chronicles.util.GCUtil;
 
-/**
- * A glowing orb on the lamp bone of the exterior that always faces you.
- * Only used during a new who takeoff or landing where it pulses in and out.
- */
 public class TardisLampOrbLayer<T extends GeoAnimatable, O, R extends GeoRenderState> extends GeoRenderLayer<T, O, R> {
     public static final String LAMP_BONE = "lamp";
     private static final Identifier TEXTURE = GCUtil.modIdentifier("textures/effect/lamp_orb.png");
-    // Block and sky light both at the max
     private static final int FULL_BRIGHT = 0xF000F0;
     private static final float SIZE = 0.45f;
     private static final float TOWARDS_CAMERA = 1.2f;
@@ -70,7 +65,6 @@ public class TardisLampOrbLayer<T extends GeoAnimatable, O, R extends GeoRenderS
         draw(state, centre, tasks);
     }
 
-    // Where the lamp sits on each exterior, relative to the block with the turn of the box taken off
     private static final Map<String, Vector3f> LAMP_SPOTS = new HashMap<>();
 
     private static void rememberLampSpot(GeoRenderState state, Vector3f centre) {
@@ -86,16 +80,10 @@ public class TardisLampOrbLayer<T extends GeoAnimatable, O, R extends GeoRenderS
         return new Quaternionf().rotateY((float) Math.toRadians(TardisExterior.modelRotationDegrees(yaw)));
     }
 
-    /** Draws the glowing orb on the lamp as a flat square that always faces the camera, pulse sets how big it is. */
     private static void draw(GeoRenderState state, Vector3f centre, SubmitNodeCollector tasks) {
-        // The pulse only changes its size and it is always fully bright
-        // The box going see through does not touch it
         float pulse = Math.clamp(state.getOrDefaultGeckolibData(TardisExteriorBlockRenderer.LAMP_ORB, 0f), 0f, 1f);
-        if (pulse <= 0.01f || !DetailLevelUtil.highDetail()) return;
+        if (pulse <= 0.01f || DetailLevelUtil.lowDetail()) return;
 
-        // While fading on the canvas the box is not in the depth of the world and the orb draws after it so it is
-        // already in front and stays exactly on the lamp
-        // Only a solid box needs it pulled forward
         boolean onCanvas = FadeBoxRenderer.active()
                 && state.getOrDefaultGeckolibData(TardisExteriorBlockRenderer.OPACITY, 1.0f) < 1.0f;
         float distance = centre.length();
@@ -108,7 +96,6 @@ public class TardisLampOrbLayer<T extends GeoAnimatable, O, R extends GeoRenderS
         orb.scale(size, size, size);
 
         int argb = 0xFFFFFFFF;
-        // Drawn after the box so the box never shows through it
         tasks.order(DRAW_AFTER_BOX).submitCustomGeometry(orb, GCRenderTypes.glowOrb(TEXTURE), (pose, buffer) -> {
             vertex(buffer, pose, -0.5f, -0.5f, 0f, 1f, argb);
             vertex(buffer, pose, 0.5f, -0.5f, 1f, 1f, argb);

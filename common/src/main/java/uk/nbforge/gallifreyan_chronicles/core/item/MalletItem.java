@@ -15,10 +15,9 @@ import net.minecraft.world.level.Level;
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 import uk.nbforge.gallifreyan_chronicles.core.block.TardisTopBlock;
-import uk.nbforge.gallifreyan_chronicles.core.block_entities.TardisConsoleBlockEntity;
-import uk.nbforge.gallifreyan_chronicles.core.block_entities.TardisExteriorBlockEntity;
+import uk.nbforge.gallifreyan_chronicles.core.block_entity.TardisConsoleBlockEntity;
+import uk.nbforge.gallifreyan_chronicles.core.block_entity.TardisExteriorBlockEntity;
 import uk.nbforge.gallifreyan_chronicles.tardis.Tardis;
-import uk.nbforge.gallifreyan_chronicles.tardis.TardisApi;
 import uk.nbforge.gallifreyan_chronicles.tardis.mind.MindMessages;
 import uk.nbforge.gallifreyan_chronicles.tardis.mind.abuse.TardisMallet;
 import uk.nbforge.gallifreyan_chronicles.tardis.mind.abuse.TardisTrauma;
@@ -35,12 +34,10 @@ public class MalletItem extends Item {
     public @NonNull InteractionResult useOn(@NonNull UseOnContext context) {
         Level level = context.getLevel();
         Player player = context.getPlayer();
-        // Console only, hitting the box would set off the alarm fog out in the world
         Optional<Tardis> tardis = consoleAt(level, context.getClickedPos());
         if (player == null || tardis.isEmpty()) return InteractionResult.PASS;
         if (!(level instanceof ServerLevel serverLevel)) return InteractionResult.SUCCESS;
 
-        // Only the owner or trusted crew can use it so strangers cannot wreck your TARDIS
         if (!tardis.get().isOwner(player) && !tardis.get().isTrusted(player.getUUID())) {
             MindMessages.say(player, ChatFormatting.RED, "mallet_not_yours");
             return InteractionResult.FAIL;
@@ -51,7 +48,6 @@ public class MalletItem extends Item {
         return InteractionResult.SUCCESS;
     }
 
-    /** A scarred TARDIS notices you holding it. */
     @Override
     public void inventoryTick(ItemStack stack, ServerLevel level, Entity owner, @Nullable EquipmentSlot slot) {
         if (slot != EquipmentSlot.MAINHAND || !(owner instanceof Player player)) return;
@@ -60,17 +56,17 @@ public class MalletItem extends Item {
     }
 
     private static Optional<Tardis> consoleAt(Level level, BlockPos pos) {
-        if (level.getBlockEntity(pos) instanceof TardisConsoleBlockEntity console) return TardisApi.of(console);
+        if (level.getBlockEntity(pos) instanceof TardisConsoleBlockEntity console) return Tardis.of(console);
         return Optional.empty();
     }
 
     static Optional<Tardis> tardisAt(Level level, BlockPos pos) {
         BlockPos exteriorPos = level.getBlockState(pos).getBlock() instanceof TardisTopBlock ? pos.below() : pos;
         if (level.getBlockEntity(exteriorPos) instanceof TardisExteriorBlockEntity exterior) {
-            return TardisApi.of(exterior);
+            return Tardis.of(exterior);
         }
         if (level.getBlockEntity(pos) instanceof TardisConsoleBlockEntity console) {
-            return TardisApi.of(console);
+            return Tardis.of(console);
         }
         return Optional.empty();
     }

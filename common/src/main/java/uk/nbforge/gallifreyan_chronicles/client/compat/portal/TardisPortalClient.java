@@ -1,6 +1,14 @@
 package uk.nbforge.gallifreyan_chronicles.client.compat.portal;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.IdentityHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.core.BlockPos;
@@ -15,7 +23,7 @@ import qouteall.imm_ptl.core.ClientWorldLoader;
 import qouteall.imm_ptl.core.portal.Portal;
 import qouteall.imm_ptl.core.render.context_management.PortalRendering;
 import qouteall.imm_ptl.core.render.renderer.RendererUsingStencil;
-import uk.nbforge.gallifreyan_chronicles.client.gui.hud.GCPowerDarkness;
+import uk.nbforge.gallifreyan_chronicles.client.gui.hud.PowerDarkness;
 import uk.nbforge.gallifreyan_chronicles.client.gui.hud.PowerDarknessTint;
 import uk.nbforge.gallifreyan_chronicles.client.lifecycle.ClientState;
 import uk.nbforge.gallifreyan_chronicles.compat.portal.TardisPortalBridge;
@@ -24,7 +32,7 @@ import uk.nbforge.gallifreyan_chronicles.core.block.InteriorDoorBarrierBlock;
 import uk.nbforge.gallifreyan_chronicles.core.block.InteriorDoorBlock;
 import uk.nbforge.gallifreyan_chronicles.core.block.TardisBlock;
 import uk.nbforge.gallifreyan_chronicles.core.block.TardisTopBlock;
-import uk.nbforge.gallifreyan_chronicles.util.TardisDimensionUtil;
+import uk.nbforge.gallifreyan_chronicles.tardis.TardisDimensionUtil;
 
 public final class TardisPortalClient {
     private static final double DOOR_FOOTPRINT_HORIZONTAL = 2.6;
@@ -151,10 +159,7 @@ public final class TardisPortalClient {
         }
     }
 
-    /**
-     * True when the position is inside the doorway of a TARDIS interior seen through a portal, whatever block is there.
-     * It keeps the outline hidden after the interior door or its barriers were replaced by another block.
-     */
+    /** doesnt care what block is there so the outline stays hidden even after the door or its barriers got replaced */
     public static boolean isInDoorFootprintOfAnyTardisPortal(BlockPos pos) {
         Minecraft mc = Minecraft.getInstance();
         if (mc.level == null || mc.player == null) {
@@ -169,7 +174,6 @@ public final class TardisPortalClient {
         double y = pos.getY() + 0.5;
         double z = pos.getZ() + 0.5;
         for (var entry : DOOR_CENTRES.entrySet()) {
-            // Standing inside that TARDIS the door area is ordinary space that can be targeted
             if (entry.getKey().equals(playerLevel.dimension())) continue;
             for (Vec3 dest : entry.getValue()) {
                 double dx = x - dest.x;
@@ -183,9 +187,7 @@ public final class TardisPortalClient {
         return false;
     }
 
-    /**
-     * True when the interior door behind the portal has a block flush against its back, unknown counts as not blocked because the door or level is not loaded.
-     */
+    /** unknown counts as not blocked, means the door or level isnt loaded */
     public static boolean isDoorBackBlocked(Object object) {
         if (!(object instanceof Portal portal)) return false;
         Level dest = ClientWorldLoader.peekWorld(portal.getDestDim());
@@ -200,9 +202,6 @@ public final class TardisPortalClient {
         return false;
     }
 
-    /**
-     * The base block of the exterior TARDIS this portal sits in, null when it cannot be found.
-     */
     public static @Nullable BlockPos exteriorBaseOf(Object object) {
         if (!(object instanceof Portal portal)) return null;
         Level level = portal.level();
@@ -231,16 +230,16 @@ public final class TardisPortalClient {
 
     public static void tintPortalForPowerDarkness(Object object) {
         if (!(object instanceof Portal portal)) return;
-        if (GCPowerDarkness.shaderPackHandlesDarkness()) return;
+        if (PowerDarkness.shaderPackHandlesDarkness()) return;
         Level destination = ClientWorldLoader.peekWorld(portal.getDestDim());
-        float power = GCPowerDarkness.powerDarknessOf(destination);
-        float alarm = GCPowerDarkness.alarmOf(destination);
-        if (power <= 0.0F && alarm <= 0.0F) return;
+        float power = PowerDarkness.powerDarknessOf(destination);
+        float alarm = PowerDarkness.alarmOf(destination);
+        if (power <= 0.0f && alarm <= 0.0f) return;
         RendererUsingStencil.setStencilLimitation(PortalRendering.getPortalLayer() + 1);
         if (alarm > power) {
-            PowerDarknessTint.draw(alarm * GCPowerDarkness.ALARM_MAX_ALPHA, GCPowerDarkness.ALARM_RED);
+            PowerDarknessTint.draw(alarm * PowerDarkness.ALARM_MAX_ALPHA, PowerDarkness.ALARM_RED);
         } else {
-            PowerDarknessTint.draw(power * GCPowerDarkness.overlayMaxAlpha());
+            PowerDarknessTint.draw(power * PowerDarkness.overlayMaxAlpha());
         }
     }
 }

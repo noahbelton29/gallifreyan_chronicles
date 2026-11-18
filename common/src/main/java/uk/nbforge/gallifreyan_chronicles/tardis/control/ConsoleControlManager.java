@@ -13,8 +13,7 @@ import net.minecraft.world.phys.Vec3;
 import org.jspecify.annotations.Nullable;
 import uk.nbforge.gallifreyan_chronicles.Constants;
 import uk.nbforge.gallifreyan_chronicles.core.GCTardisControls;
-import uk.nbforge.gallifreyan_chronicles.core.block_entities.TardisConsoleBlockEntity;
-import uk.nbforge.gallifreyan_chronicles.core.dynamic_registries.TardisControlRegistry;
+import uk.nbforge.gallifreyan_chronicles.core.block_entity.TardisConsoleBlockEntity;
 import uk.nbforge.gallifreyan_chronicles.core.entity.TardisControlEntity;
 import uk.nbforge.gallifreyan_chronicles.tardis.console.animation.ConsoleAnimatable;
 
@@ -170,7 +169,7 @@ public class ConsoleControlManager {
         setControlState(id, activated);
         playControlAnimation(id, activated, triggeringPlayer);
 
-        TardisControl control = TardisControlRegistry.get(id);
+        TardisControl control = TardisControls.get(id);
         control.onStateChanged(console, activated);
     }
 

@@ -1,17 +1,16 @@
 package uk.nbforge.gallifreyan_chronicles.tardis.mind;
 
+import com.mojang.serialization.Codec;
+import com.mojang.serialization.codecs.RecordCodecBuilder;
 import java.util.List;
-import uk.nbforge.gallifreyan_chronicles.core.data.IdentifiableData;
+import uk.nbforge.gallifreyan_chronicles.loader.IdentifiableData;
 import uk.nbforge.gallifreyan_chronicles.tardis.mind.action.MindAction;
+import uk.nbforge.gallifreyan_chronicles.tardis.mind.data.MindEnums;
 import uk.nbforge.gallifreyan_chronicles.tardis.mind.data.MindEnums.Reveal;
 import uk.nbforge.gallifreyan_chronicles.tardis.mind.data.MindIds;
 import uk.nbforge.gallifreyan_chronicles.tardis.mind.data.TraitModifiers;
 import uk.nbforge.gallifreyan_chronicles.util.GCUtil;
 
-/**
- * A trait is a quirk that changes how a TARDIS acts.
- * It can also block some personalities and some other traits.
- */
 public record TardisTrait(
         String id,
         int weight,
@@ -23,8 +22,58 @@ public record TardisTrait(
         List<MindAction> onTakeOff,
         List<MindAction> onLand)
         implements IdentifiableData<TardisTrait> {
+    /**
+     * The traits and personalities that cannot be used with a trait.
+     * traits are the ones that clash with this trait and personalities are the ones that cannot use it.
+     */
+    private record NeverWith(List<String> traits, List<String> personalities) {
 
-    /** The id without the mod name at the front. */
+        static final NeverWith NOTHING = new NeverWith(List.of(), List.of());
+
+        static final Codec<NeverWith> CODEC = RecordCodecBuilder.create(inst -> inst.group(
+                        Codec.STRING
+                                .listOf()
+                                .optionalFieldOf("traits", List.of())
+                                .forGetter(NeverWith::traits),
+                        Codec.STRING
+                                .listOf()
+                                .optionalFieldOf("personalities", List.of())
+                                .forGetter(NeverWith::personalities))
+                .apply(inst, NeverWith::new));
+    }
+
+    public static final Codec<TardisTrait> CODEC = RecordCodecBuilder.create(inst -> inst.group(
+                    Codec.STRING.optionalFieldOf("id", "").forGetter(TardisTrait::id),
+                    Codec.INT.optionalFieldOf("how_common", 10).forGetter(TardisTrait::weight),
+                    TraitModifiers.MAP_CODEC.forGetter(TardisTrait::modifiers),
+                    NeverWith.CODEC
+                            .optionalFieldOf("never_with", NeverWith.NOTHING)
+                            .forGetter(t -> new NeverWith(t.clashesWith(), t.bannedPersonalities())),
+                    MindEnums.codec(Reveal.class)
+                            .optionalFieldOf("revealed_when", Reveal.NEVER)
+                            .forGetter(TardisTrait::reveal),
+                    MindAction.LIST_CODEC
+                            .optionalFieldOf("when_unwilling_to_fly", List.of())
+                            .forGetter(TardisTrait::onUnwilling),
+                    MindAction.LIST_CODEC
+                            .optionalFieldOf("when_taking_off", List.of())
+                            .forGetter(TardisTrait::onTakeOff),
+                    MindAction.LIST_CODEC
+                            .optionalFieldOf("when_landing", List.of())
+                            .forGetter(TardisTrait::onLand))
+            .apply(
+                    inst,
+                    (id, rarity, modifiers, never, reveal, unwilling, takeOff, land) -> new TardisTrait(
+                            id,
+                            rarity,
+                            modifiers,
+                            never.traits(),
+                            never.personalities(),
+                            reveal,
+                            unwilling,
+                            takeOff,
+                            land)));
+
     public String localId() {
         return GCUtil.localPath(id);
     }
@@ -34,12 +83,10 @@ public record TardisTrait(
         return lists(clashesWith, other.id) || lists(other.clashesWith, id);
     }
 
-    /** Not allowed if the personality is on the banned list. */
     public boolean fits(TardisPersonality personality) {
         return !lists(bannedPersonalities, personality.id());
     }
 
-    /** Same as above but it also cannot clash with traits already picked. */
     public boolean fits(TardisPersonality personality, List<TardisTrait> others) {
         return fits(personality) && others.stream().noneMatch(this::clashesWith);
     }

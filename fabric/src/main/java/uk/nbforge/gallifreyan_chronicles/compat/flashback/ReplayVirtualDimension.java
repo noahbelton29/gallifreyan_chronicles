@@ -27,13 +27,6 @@ import qouteall.imm_ptl.core.ClientWorldLoader;
 import qouteall.imm_ptl.core.network.ImmPtlNetworking;
 import qouteall.imm_ptl.core.teleportation.ClientTeleportationManager;
 
-/**
- * In a replay the camera really goes through doors, Immersive Portals moves it into the TARDIS world on the client like in the real game.
- * The replay server only has the overworld and cannot follow, so only the client moves.
- * The message that I went through a portal and the movement of the camera are not sent while it is in another world, so the server keeps it parked outside and does not pull it back.
- * Packets from the replay server are for its world, the overworld, so while the camera is somewhere else they are applied to that world and not the one we are in.
- * Flying back out through the door puts it back in the overworld.
- */
 final class ReplayVirtualDimension {
     private ReplayVirtualDimension() {}
 
@@ -61,7 +54,6 @@ final class ReplayVirtualDimension {
         return packet instanceof ServerboundMovePlayerPacket && isAway();
     }
 
-    // Where the camera was before Flashback reloaded the world, a timeline jump
     private static @Nullable ResourceKey<Level> pendingDim;
     private static @Nullable Vec3 pendingEye;
     private static int pendingTicks;
@@ -85,7 +77,6 @@ final class ReplayVirtualDimension {
                 ClientTeleportationManager.forceTeleportPlayer(pendingDim, pendingEye);
                 pendingDim = null;
             } else if (pendingTicks < -100) {
-                // That world never came back so give up
                 pendingDim = null;
             }
         });
@@ -115,7 +106,7 @@ final class ReplayVirtualDimension {
         }
         ResourceKey<Level> server = serverDim();
         if (packet instanceof ClientboundPlayerPositionPacket) {
-            /** Flashback moving the camera, put it back in its world first. */
+            // Flashback moving the camera, put it back in its world first.
             comeBack(server);
             return false;
         }

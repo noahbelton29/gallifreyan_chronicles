@@ -38,17 +38,11 @@ public abstract class ReplayKeepViewerTrackingMixin {
     @Final
     private Set<ServerPlayerConnection> seenBy;
 
-    // The other half, Immersive Portals never adds the replay camera either
-    // After jumping back on the timeline every entity is made again so nothing was sent to the camera and the player
-    // froze, so we add the camera ourselves
     @Inject(method = "ip_updateEntityTrackingStatus", at = @At("TAIL"), remap = false, require = 0)
     private void gc$addReplayCamera(CallbackInfo ci) {
         this.gc$ensureCamera();
     }
 
-    // Flashback sends recorded movement through here, also while paused or jumping on the timeline when Immersive
-    // Portals does not run
-    // So make sure the camera is on the list first or the moves go to nobody
     @Inject(method = "sendToTrackingPlayers", at = @At("HEAD"), require = 0)
     private void gc$addCameraBeforeSend(Packet<?> packet, CallbackInfo ci) {
         this.gc$ensureCamera();

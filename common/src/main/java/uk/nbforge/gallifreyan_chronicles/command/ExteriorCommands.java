@@ -2,7 +2,7 @@ package uk.nbforge.gallifreyan_chronicles.command;
 
 import static net.minecraft.commands.Commands.argument;
 import static net.minecraft.commands.Commands.literal;
-import static uk.nbforge.gallifreyan_chronicles.util.CommandUtil.*;
+import static uk.nbforge.gallifreyan_chronicles.command.CommandUtil.*;
 
 import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
@@ -14,28 +14,22 @@ import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.core.BlockPos;
-import uk.nbforge.gallifreyan_chronicles.core.block_entities.TardisExteriorBlockEntity;
-import uk.nbforge.gallifreyan_chronicles.core.dynamic_registries.TardisExteriorRegistry;
-import uk.nbforge.gallifreyan_chronicles.tardis.TardisExterior;
-import uk.nbforge.gallifreyan_chronicles.tardis.ecs.system.ExteriorLinkSystem;
+import uk.nbforge.gallifreyan_chronicles.core.block_entity.TardisExteriorBlockEntity;
+import uk.nbforge.gallifreyan_chronicles.core.data_registry.TardisExteriorRegistry;
+import uk.nbforge.gallifreyan_chronicles.tardis.exterior.ExteriorLink;
+import uk.nbforge.gallifreyan_chronicles.tardis.exterior.TardisExterior;
 import uk.nbforge.gallifreyan_chronicles.tardis.exterior.fade.FadeType;
 import uk.nbforge.gallifreyan_chronicles.tardis.exterior.fade.FadeTypes;
 
 public final class ExteriorCommands {
     private ExteriorCommands() {}
 
-    /**
-     * Linking and unlinking an exterior block to a TARDIS. Getting/setting which exterior, its glow and its fade live under "data" now.
-     */
     public static LiteralArgumentBuilder<CommandSourceStack> exterior() {
         return literal("exterior")
                 .then(literal("link").executes(ExteriorCommands::link))
                 .then(literal("unlink").executes(ExteriorCommands::unlink));
     }
 
-    /**
-     * {@code data exterior [<exterior_id>]}
-     */
     public static LiteralArgumentBuilder<CommandSourceStack> exteriorData() {
         return literal("exterior")
                 .executes(ExteriorCommands::get)
@@ -44,9 +38,6 @@ public final class ExteriorCommands {
                         .executes(ExteriorCommands::set));
     }
 
-    /**
-     * data glow [on|off]
-     */
     public static LiteralArgumentBuilder<CommandSourceStack> glowData() {
         return literal("glow")
                 .executes(ExteriorCommands::getGlow)
@@ -54,9 +45,6 @@ public final class ExteriorCommands {
                 .then(literal("off").executes(ctx -> setGlowing(ctx, false)));
     }
 
-    /**
-     * {@code data fade [<fade_type>]}
-     */
     public static LiteralArgumentBuilder<CommandSourceStack> fadeData() {
         return literal("fade")
                 .executes(ExteriorCommands::getFade)
@@ -113,14 +101,14 @@ public final class ExteriorCommands {
             if (pos.isEmpty() || exteriorAt(ctx, pos.get()).isEmpty()) {
                 return fail(ctx, "not_looking_at_exterior");
             }
-            ExteriorLinkSystem.link(ctx.getSource().getLevel(), tardis.id(), pos.get());
+            ExteriorLink.link(tardis, ctx.getSource().getLevel(), pos.get());
             return success(ctx, true, "link_exterior", idText);
         });
     }
 
     private static int unlink(CommandContext<CommandSourceStack> ctx) throws CommandSyntaxException {
         return withTardis(ctx, (tardis, idText) -> {
-            ExteriorLinkSystem.unlink(ctx.getSource().getLevel(), tardis.id());
+            ExteriorLink.unlink(tardis);
             return success(ctx, true, "unlink_exterior", idText);
         });
     }
@@ -130,7 +118,11 @@ public final class ExteriorCommands {
             Optional<TardisExteriorBlockEntity> be =
                     exteriorAt(ctx, tardis.data().getRegisteredBlockPos());
             return be.map(tardisExteriorBlockEntity -> success(
-                            ctx, false, "get_glow", idText, String.valueOf(tardisExteriorBlockEntity.isGlowing())))
+                            ctx,
+                            false,
+                            "get_glow",
+                            idText,
+                            String.valueOf(tardisExteriorBlockEntity.lamp().isGlowing())))
                     .orElseGet(() -> fail(ctx, "no_exterior", idText));
         });
     }
@@ -142,7 +134,7 @@ public final class ExteriorCommands {
                     exteriorAt(ctx, tardis.data().getRegisteredBlockPos());
             if (be.isEmpty()) return fail(ctx, "no_tardis_id", idText);
 
-            be.get().setGlowing(glowing);
+            be.get().lamp().setGlowing(glowing);
             return success(ctx, true, "set_glow", idText, String.valueOf(glowing));
         });
     }
@@ -156,7 +148,7 @@ public final class ExteriorCommands {
                             false,
                             "get_fade_type",
                             idText,
-                            tardisExteriorBlockEntity.getFadeType().id()))
+                            tardisExteriorBlockEntity.travel().getFadeType().id()))
                     .orElseGet(() -> fail(ctx, "no_exterior", idText));
         });
     }
@@ -173,7 +165,7 @@ public final class ExteriorCommands {
                     exteriorAt(ctx, tardis.data().getRegisteredBlockPos());
             if (be.isEmpty()) return fail(ctx, "no_exterior", idText);
 
-            be.get().setFadeType(type);
+            be.get().travel().setFadeType(type);
             return success(ctx, true, "set_fade_type", idText, type.id());
         });
     }

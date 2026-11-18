@@ -38,9 +38,6 @@ final class FlashbackPortalSnapshot {
             ClientLevel level = mc.level;
             if (level == null) return;
 
-            // The dimension list first so the client knows the TARDIS worlds
-            // Only possible in singleplayer where the server is right here
-            // The item component numbers of the recording, see ReplayComponentIds
             out.accept(new ClientboundCustomPayloadPacket(ReplayComponentIds.current()));
 
             MinecraftServer server = mc.getSingleplayerServer();
@@ -49,10 +46,6 @@ final class FlashbackPortalSnapshot {
             DimIntIdMap map = DimensionIntId.getClientMap();
             if (map == null || !map.containsDimId(level.dimension())) return;
 
-            // Every other loaded world, the TARDIS inside or the overworld when you stand inside the TARDIS
-            // Flashback only saves the world you stand in
-            // It also takes a new snapshot when you walk through the door and an export plays those, so the outside
-            // portal has to be in it too
             for (ClientLevel other : ClientWorldLoader.getClientWorlds()) {
                 if (other == level || !map.containsDimId(other.dimension())) continue;
                 if (!(other.getChunkSource() instanceof ImmPtlClientChunkMap chunkMap)) continue;
@@ -64,7 +57,6 @@ final class FlashbackPortalSnapshot {
                 }
             }
 
-            // The portals in every loaded world with the world they are in
             for (ClientLevel world : ClientWorldLoader.getClientWorlds()) {
                 if (!map.containsDimId(world.dimension())) continue;
                 int worldId = map.toIntegerId(world.dimension());

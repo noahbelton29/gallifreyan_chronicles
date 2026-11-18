@@ -6,7 +6,7 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.Block;
 import uk.nbforge.gallifreyan_chronicles.core.GCDataComponents;
 import uk.nbforge.gallifreyan_chronicles.core.item.tooltip.ItemInfoTooltip;
-import uk.nbforge.gallifreyan_chronicles.tardis.TardisInteriorOptions;
+import uk.nbforge.gallifreyan_chronicles.tardis.interior.TardisInteriorOptions;
 
 public class TardisBlockItem extends BlockItem implements ScrollSelectable {
     public TardisBlockItem(Block block, Properties properties) {

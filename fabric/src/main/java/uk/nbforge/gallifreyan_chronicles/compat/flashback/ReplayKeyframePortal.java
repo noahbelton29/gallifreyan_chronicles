@@ -12,17 +12,8 @@ import qouteall.imm_ptl.core.ClientWorldLoader;
 import qouteall.imm_ptl.core.portal.Portal;
 import qouteall.imm_ptl.core.teleportation.ClientTeleportationManager;
 
-/**
- * Camera keyframes through a door.
- * Flashback keyframes are only positions with no world, so every keyframe is kept in the coordinates of the replay own world, the overworld, even ones placed inside the TARDIS, which are converted back through the door they came in by.
- * When keyframes play the path is followed in overworld coordinates, the moment it passes through a door the camera moves into the world behind it and each position is converted through that door.
- * Passing back out brings it back.
- * So a path flies smoothly in and out, in the editor and in exports.
- */
 final class ReplayKeyframePortal {
-    // The door the camera went through to leave the replay world, null means not away
     private static @Nullable Portal entry;
-    // The last path position in overworld coordinates at eye height
     private static @Nullable Vec3 lastPath;
     private static long lastApplyNanos;
     private static final double MAX_STEP = 16.0;
@@ -64,7 +55,6 @@ final class ReplayKeyframePortal {
                         || !entry.getDestDim().equals(mc.player.level().dimension()))) {
             entry = null;
         }
-        // The camera is behind a door but we lost which one after a timeline jump, find it again
         if (entry == null && !mc.player.level().dimension().equals(server)) {
             entry = doorInto(server, mc.player.level().dimension(), path);
         }
@@ -91,14 +81,9 @@ final class ReplayKeyframePortal {
         return new double[] {eye.x, eye.y - eyeHeight, eye.z, yawOf(look), pitchOf(look)};
     }
 
-    /**
-     * A keyframe was just made from the camera.
-     * If the camera is inside, store it in overworld coordinates so the path stays one continuous line.
-     */
     static void onKeyframeCreated(Vector3d position, float[] yawPitch) {
         Minecraft mc = Minecraft.getInstance();
         if (entry == null || mc.player == null) return;
-        // Only if the camera really is behind that door right now
         if (!entry.getDestDim().equals(mc.player.level().dimension())) {
             entry = null;
             return;
@@ -122,7 +107,6 @@ final class ReplayKeyframePortal {
         return null;
     }
 
-    /** The nearest door in the replay world that leads to that world. */
     private static @Nullable Portal doorInto(ResourceKey<Level> server, ResourceKey<Level> dest, Vec3 near) {
         ClientLevel level = ClientWorldLoader.getOptionalWorld(server);
         if (level == null) return null;
@@ -145,7 +129,6 @@ final class ReplayKeyframePortal {
         return !portal.isInFrontOfPortal(a) && portal.isInFrontOfPortal(b) && throughRect(portal, a, b);
     }
 
-    /** Whether going from a to b passes through the rectangle of the door. */
     private static boolean throughRect(Portal portal, Vec3 a, Vec3 b) {
         Vec3 origin = portal.getOriginPos();
         Vec3 normal = portal.getNormal();

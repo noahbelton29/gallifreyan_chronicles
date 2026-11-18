@@ -15,7 +15,7 @@ import uk.nbforge.gallifreyan_chronicles.core.entity.TardisControlEntity;
 
 public class TardisControlEntityRenderer extends EntityRenderer<TardisControlEntity, EntityRenderState> {
     private static final double TAG_OFFSET = 0.1;
-    private static final float TAG_SCALE = 0.3F;
+    private static final float TAG_SCALE = 0.3f;
 
     public TardisControlEntityRenderer(EntityRendererProvider.Context context) {
         super(context);

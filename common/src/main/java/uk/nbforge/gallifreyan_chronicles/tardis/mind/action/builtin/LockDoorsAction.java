@@ -4,12 +4,8 @@ import uk.nbforge.gallifreyan_chronicles.Constants;
 import uk.nbforge.gallifreyan_chronicles.tardis.Tardis;
 import uk.nbforge.gallifreyan_chronicles.tardis.mind.action.MindAction;
 import uk.nbforge.gallifreyan_chronicles.tardis.mind.action.MindContext;
-import uk.nbforge.gallifreyan_chronicles.util.GCSchedulerUtil;
+import uk.nbforge.gallifreyan_chronicles.util.SchedulerUtil;
 
-/**
- * Shuts the doors then locks them.
- * The json field only_outside means only if the player is outside it.
- */
 public record LockDoorsAction(boolean onlyOutside) implements MindAction {
     public static final String TYPE = Constants.MOD_ID + ":lock_doors";
     private static final int CHECK_TICKS = 5;
@@ -40,6 +36,6 @@ public record LockDoorsAction(boolean onlyOutside) implements MindAction {
             return;
         }
         if (triesLeft <= 0) return;
-        GCSchedulerUtil.runLater(tardis.server(), CHECK_TICKS, () -> lockWhenShut(tardis, triesLeft - 1));
+        SchedulerUtil.runLater(tardis.server(), CHECK_TICKS, () -> lockWhenShut(tardis, triesLeft - 1));
     }
 }

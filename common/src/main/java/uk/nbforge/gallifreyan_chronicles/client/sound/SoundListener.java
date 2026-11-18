@@ -4,15 +4,11 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
 import org.jspecify.annotations.Nullable;
-import uk.nbforge.gallifreyan_chronicles.util.TardisDimensionUtil;
+import uk.nbforge.gallifreyan_chronicles.tardis.TardisDimensionUtil;
 
-/**
- * Where our sounds are heard from, normally the player.
- * In a Flashback replay the camera is the listener and once it flies through a door it hears the TARDIS world instead of the overworld, the replay side sets the override.
- */
+/** In a Flashback replay the camera is the listener and once it flies through a door it hears the TARDIS world instead of the overworld, the replay side sets the override. */
 public final class SoundListener {
     public interface Override {
-        // Null when not in a replay
         @Nullable
         Level level();
 
@@ -27,7 +23,6 @@ public final class SoundListener {
         override = value;
     }
 
-    /** True while a replay decides what is heard. */
     public static boolean inReplay() {
         return override != null && override.level() != null;
     }

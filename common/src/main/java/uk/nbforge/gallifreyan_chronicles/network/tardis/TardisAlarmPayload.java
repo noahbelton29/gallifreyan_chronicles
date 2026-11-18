@@ -7,7 +7,7 @@ import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import org.jspecify.annotations.NonNull;
-import uk.nbforge.gallifreyan_chronicles.client.gui.hud.GCDangerAlarm;
+import uk.nbforge.gallifreyan_chronicles.client.gui.hud.DangerAlarm;
 import uk.nbforge.gallifreyan_chronicles.platform.Services;
 import uk.nbforge.gallifreyan_chronicles.tardis.mind.mood.TardisAlarm;
 import uk.nbforge.gallifreyan_chronicles.util.GCUtil;
@@ -23,21 +23,21 @@ public record TardisAlarmPayload(int flashes, Identifier dimension) implements C
         TardisAlarmPayload payload =
                 new TardisAlarmPayload(flashes, level.dimension().identifier());
         for (ServerPlayer player : level.players()) {
-            Services.NETWORK.sendTardisAlarm(player, payload);
+            Services.NETWORK.send(player, payload);
         }
         for (ServerPlayer player : TardisAlarm.playersOutside(level)) {
-            Services.NETWORK.sendTardisAlarm(player, payload);
+            Services.NETWORK.send(player, payload);
         }
     }
 
     public static void sendTo(ServerPlayer player, int flashes) {
-        Services.NETWORK.sendTardisAlarm(
+        Services.NETWORK.send(
                 player,
                 new TardisAlarmPayload(flashes, player.level().dimension().identifier()));
     }
 
     public void apply() {
-        GCDangerAlarm.start(flashes, ResourceKey.create(Registries.DIMENSION, dimension));
+        DangerAlarm.start(flashes, ResourceKey.create(Registries.DIMENSION, dimension));
     }
 
     @Override

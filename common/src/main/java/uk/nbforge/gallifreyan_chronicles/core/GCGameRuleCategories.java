@@ -1,19 +1,12 @@
 package uk.nbforge.gallifreyan_chronicles.core;
 
-import net.minecraft.resources.Identifier;
 import net.minecraft.world.level.gamerules.GameRuleCategory;
-import uk.nbforge.gallifreyan_chronicles.Constants;
 import uk.nbforge.gallifreyan_chronicles.util.GCUtil;
 
-public class GCGameRuleCategories {
-    public static final GameRuleCategory GALLIFREYAN_CHRONICLES = register("gallifreyan_chronicles");
+/** each loader registers these itself, neoforge thru its event and fabric thru the vanilla method cos neo deprecated it for some fucking reason */
+public final class GCGameRuleCategories {
+    public static final GameRuleCategory GALLIFREYAN_CHRONICLES =
+            new GameRuleCategory(GCUtil.modIdentifier("gallifreyan_chronicles"));
 
-    private static GameRuleCategory register(String name) {
-        Identifier id = GCUtil.modIdentifier(name);
-        return GameRuleCategory.register(id);
-    }
-
-    public static void registerGameRuleCategories() {
-        Constants.LOG.info("Registered GC Game Rule Categories");
-    }
+    private GCGameRuleCategories() {}
 }

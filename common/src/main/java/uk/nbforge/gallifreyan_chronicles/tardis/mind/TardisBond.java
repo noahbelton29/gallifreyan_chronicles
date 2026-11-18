@@ -1,12 +1,25 @@
 package uk.nbforge.gallifreyan_chronicles.tardis.mind;
 
+import com.mojang.serialization.Codec;
+import com.mojang.serialization.codecs.RecordCodecBuilder;
+
 /**
- * How a TARDIS feels about one player.
  * hits are unforgiven mallet hits and kindness takes them away again.
  * trauma is the scars from this player and they fade slowly on their own.
  */
 public record TardisBond(
         float trust, float fear, long fearTick, int hits, boolean betrayed, float trauma, long traumaTick) {
+
+    public static final Codec<TardisBond> CODEC = RecordCodecBuilder.create(inst -> inst.group(
+                    Codec.FLOAT.optionalFieldOf("trust", TardisMind.START_TRUST).forGetter(TardisBond::trust),
+                    Codec.FLOAT.optionalFieldOf("fear", 0f).forGetter(TardisBond::fear),
+                    Codec.LONG.optionalFieldOf("fear_tick", 0L).forGetter(TardisBond::fearTick),
+                    Codec.INT.optionalFieldOf("hits", 0).forGetter(TardisBond::hits),
+                    Codec.BOOL.optionalFieldOf("betrayed", false).forGetter(TardisBond::betrayed),
+                    Codec.FLOAT.optionalFieldOf("trauma", 0f).forGetter(TardisBond::trauma),
+                    Codec.LONG.optionalFieldOf("trauma_tick", 0L).forGetter(TardisBond::traumaTick))
+            .apply(inst, TardisBond::new));
+
     public TardisBond {
         trust = Math.clamp(trust, 0f, TardisMind.MAX);
         fear = Math.clamp(fear, 0f, TardisMind.MAX);
@@ -18,7 +31,6 @@ public record TardisBond(
         return new TardisBond(trust, 0f, 0L, 0, false, 0f, 0L);
     }
 
-    /** Has this player hurt it and not been forgiven yet. */
     public boolean hurtIt() {
         return hits > 0;
     }

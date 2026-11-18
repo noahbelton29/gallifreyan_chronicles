@@ -46,30 +46,30 @@ public abstract class SoundPhysicsTardisEchoMixin {
             float directGain,
             CallbackInfo ci) {
         if (GC$APPLYING.get()) return;
-        if (sendGain0 == 0.0F && sendGain1 == 0.0F && sendGain2 == 0.0F && sendGain3 == 0.0F) return;
+        if (sendGain0 == 0.0f && sendGain1 == 0.0f && sendGain2 == 0.0f && sendGain3 == 0.0f) return;
 
         if (!SoundPhysicsCompat.inTardisInterior()) return;
         SoundPhysicsCompat.markActive();
         float echo = SoundPhysicsCompat.tardisEcho();
-        float hum = 1.0F - echo;
+        float hum = 1.0f - echo;
 
-        float gain0 = SoundPhysicsCompat.damp(sendGain0, 0.0F, hum);
-        float gain1 = SoundPhysicsCompat.damp(sendGain1, 0.0F, hum);
-        float gain2 = SoundPhysicsCompat.damp(sendGain2, 0.0F, hum);
-        float gain3 = SoundPhysicsCompat.damp(sendGain3, 0.0F, hum);
+        float gain0 = SoundPhysicsCompat.damp(sendGain0, 0.0f, hum);
+        float gain1 = SoundPhysicsCompat.damp(sendGain1, 0.0f, hum);
+        float gain2 = SoundPhysicsCompat.damp(sendGain2, 0.0f, hum);
+        float gain3 = SoundPhysicsCompat.damp(sendGain3, 0.0f, hum);
 
         GC$APPLYING.set(Boolean.TRUE);
         try {
             setEnvironment(
                     sourceID,
                     gain0,
-                    SoundPhysicsCompat.boost(gain1, 1.4F, 0.15F, echo),
-                    SoundPhysicsCompat.boost(gain2, 1.8F, 0.35F, echo),
-                    SoundPhysicsCompat.boost(gain3, 2.2F, 0.5F, echo),
+                    SoundPhysicsCompat.boost(gain1, 1.4f, 0.15f, echo),
+                    SoundPhysicsCompat.boost(gain2, 1.8f, 0.35f, echo),
+                    SoundPhysicsCompat.boost(gain3, 2.2f, 0.5f, echo),
                     sendCutoff0,
                     sendCutoff1,
-                    SoundPhysicsCompat.boost(sendCutoff2, 1.0F, 0.25F, echo),
-                    SoundPhysicsCompat.boost(sendCutoff3, 1.0F, 0.25F, echo),
+                    SoundPhysicsCompat.boost(sendCutoff2, 1.0f, 0.25f, echo),
+                    SoundPhysicsCompat.boost(sendCutoff3, 1.0f, 0.25f, echo),
                     directCutoff,
                     directGain);
         } finally {

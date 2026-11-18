@@ -32,12 +32,6 @@ import uk.nbforge.gallifreyan_chronicles.Constants;
 import uk.nbforge.gallifreyan_chronicles.addon.api.AddonApi;
 import uk.nbforge.gallifreyan_chronicles.platform.Services;
 
-/**
- * Runs the addon system.
- * Data addons are a zip or folder in gc_addons and have no code.
- * Java addons are mod jars in the mods folder and the loader loads them.
- * Turning a java addon on or off needs a restart.
- */
 public final class AddonManager {
     public static final String FOLDER_NAME = "gc_addons";
     public static final String DESCRIPTOR = "addon.json";
@@ -49,9 +43,7 @@ public final class AddonManager {
 
     private static volatile List<AddonInfo> addons = List.of();
     private static volatile Map<String, AddonProblem> problems = Map.of();
-    // Data addons the player turned off
     private static final Set<String> DISABLED = Collections.synchronizedSet(new LinkedHashSet<>());
-    // Java addons the player toggled and what they picked
     private static final Map<String, Boolean> MOD_STATE = Collections.synchronizedMap(new LinkedHashMap<>());
     private static boolean scanned;
     private static boolean initialised;
@@ -70,7 +62,6 @@ public final class AddonManager {
         return Services.PLATFORM.getConfigDir().resolve(STATE_FILE);
     }
 
-    /** Loads saved state and scans the folders, only once. */
     private static synchronized void ensureScanned() {
         if (scanned) return;
         scanned = true;
@@ -78,7 +69,6 @@ public final class AddonManager {
         scan();
     }
 
-    /** Starts java addons after our own things are registered. */
     public static synchronized void init() {
         if (initialised) return;
         initialised = true;
@@ -106,7 +96,6 @@ public final class AddonManager {
         return null;
     }
 
-    /** It can still have a problem even when it is on. */
     public static boolean isEnabled(AddonInfo info) {
         ensureScanned();
         if (info.hasJava()) {
@@ -261,7 +250,6 @@ public final class AddonManager {
         try {
             return range.matches(Version.parse(version));
         } catch (IllegalArgumentException e) {
-            // Only a star has no numbers in the version range
             return range.toString().equals("*");
         }
     }
@@ -278,10 +266,6 @@ public final class AddonManager {
         Constants.LOG.info("Found {} addon(s)", found.size());
     }
 
-    /**
-     * Goes through an addon folder and adds every addon it finds to found, skipping hidden files, other file types and ids that are already used.
-     * In the mods folder only jars count and unreadable ones are ignored without a warning.
-     */
     private static void scanFolder(Path folder, boolean modsFolder, List<AddonInfo> found, Set<String> ids) {
         try {
             Files.createDirectories(folder);
@@ -378,7 +362,6 @@ public final class AddonManager {
                 : fileName;
 
         if (descriptor == null && !hasData) {
-            // Just another mod or an empty zip
             if (!inModsFolder && (fileName.toLowerCase().endsWith(".zip") || Files.isDirectory(path))) {
                 return broken(path, "no addon.json or pack.mcmeta found");
             }
@@ -449,7 +432,6 @@ public final class AddonManager {
             icon = null;
         }
 
-        // Java addon data is loaded by the loader
         return new AddonInfo(
                 id,
                 name,
@@ -486,7 +468,6 @@ public final class AddonManager {
         }
     }
 
-    /** Quick fingerprint of both folders. */
     public static long folderSignature() {
         long signature = 17;
         for (Path folder : List.of(folder(), modsFolder())) {
@@ -499,13 +480,11 @@ public final class AddonManager {
                             + Files.getLastModifiedTime(path).toMillis();
                 }
             } catch (IOException | RuntimeException ignored) {
-                // A missing folder gives a different fingerprint
             }
         }
         return signature;
     }
 
-    /** Jars go to mods and everything else goes to gc_addons. */
     public static synchronized List<String> install(List<Path> dropped) {
         List<String> added = new ArrayList<>();
         for (Path source : dropped) {
@@ -524,7 +503,6 @@ public final class AddonManager {
                         javaAddon = json.has("java");
                     }
                 } catch (IOException | RuntimeException ignored) {
-                    // If it cannot be read it goes to gc_addons
                 }
             }
 

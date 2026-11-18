@@ -28,17 +28,15 @@ import qouteall.imm_ptl.core.portal.Portal;
 import qouteall.q_misc_util.dimension.DimensionIntId;
 import qouteall.q_misc_util.my_util.DQuaternion;
 import uk.nbforge.gallifreyan_chronicles.Constants;
-import uk.nbforge.gallifreyan_chronicles.core.GCBlocks;
 import uk.nbforge.gallifreyan_chronicles.core.block.InteriorDoorBlock;
-import uk.nbforge.gallifreyan_chronicles.core.block_entities.InteriorDoorBlockEntity;
-import uk.nbforge.gallifreyan_chronicles.core.block_entities.TardisExteriorBlockEntity;
+import uk.nbforge.gallifreyan_chronicles.core.block.registry.TardisBlocks;
+import uk.nbforge.gallifreyan_chronicles.core.block_entity.InteriorDoorBlockEntity;
+import uk.nbforge.gallifreyan_chronicles.core.block_entity.TardisExteriorBlockEntity;
 import uk.nbforge.gallifreyan_chronicles.core.lifecycle.ServerState;
 import uk.nbforge.gallifreyan_chronicles.tardis.Tardis;
-import uk.nbforge.gallifreyan_chronicles.tardis.TardisApi;
-import uk.nbforge.gallifreyan_chronicles.tardis.TardisExterior;
 import uk.nbforge.gallifreyan_chronicles.tardis.TardisManager;
-import uk.nbforge.gallifreyan_chronicles.tardis.ecs.system.DoorSyncSystem;
-import uk.nbforge.gallifreyan_chronicles.tardis.ecs.system.TardisInteriorSystem;
+import uk.nbforge.gallifreyan_chronicles.tardis.exterior.TardisExterior;
+import uk.nbforge.gallifreyan_chronicles.tardis.interior.TardisInteriors;
 
 public final class TardisPortals {
     public static final String PORTAL_TAG = TardisPortalBridge.PORTAL_TAG;
@@ -185,9 +183,9 @@ public final class TardisPortals {
         }
     }
 
-    static void onDoorsChanged(MinecraftServer server, UUID tardisId) {
-        Tardis tardis = TardisApi.get(server, tardisId).orElse(null);
-        if (tardis == null) return;
+    static void onDoorsChanged(Tardis tardis) {
+        MinecraftServer server = tardis.server();
+        UUID tardisId = tardis.id();
         tardis.exterior();
         if (!DOORS.containsKey(tardisId)) locateDoor(server, tardisId, true);
         DoorLocation door = DOORS.get(tardisId);
@@ -238,7 +236,7 @@ public final class TardisPortals {
         if (link != null && (link.visible || link.hideAt >= 0L || link.exteriorShown || link.interiorShown)) {
             return true;
         }
-        Tardis tardis = TardisApi.get(server, tardisId).orElse(null);
+        Tardis tardis = Tardis.get(server, tardisId).orElse(null);
         if (tardis == null) return false;
         DoorLocation door = DOORS.get(tardisId);
         return hasPlayersNearby(
@@ -294,9 +292,9 @@ public final class TardisPortals {
             DOORS.remove(tardisId);
             return false;
         }
-        if (!level.hasChunkAt(door.pos())) return false;
+        if (!level.isLoaded(door.pos())) return false;
         BlockState state = level.getBlockState(door.pos());
-        if (!state.is(GCBlocks.TARDIS_INTERIOR_DOOR) || !InteriorDoorBlock.isMaster(state)) {
+        if (!state.is(TardisBlocks.TARDIS_INTERIOR_DOOR) || !InteriorDoorBlock.isMaster(state)) {
             DOORS.remove(tardisId);
             NEXT_SCAN.remove(tardisId);
             return true;
@@ -307,7 +305,7 @@ public final class TardisPortals {
     private static void registerDoor(MinecraftServer server, @Nullable DoorLocation location) {
         if (location == null) return;
         ServerLevel level = server.getLevel(location.dimension());
-        if (level == null || !level.hasChunkAt(location.pos())) return;
+        if (level == null || !level.isLoaded(location.pos())) return;
         if (level.getBlockEntity(location.pos()) instanceof InteriorDoorBlockEntity door) {
             door.serverTick();
         }
@@ -319,9 +317,11 @@ public final class TardisPortals {
         if (!force && next != null && now < next) return;
         NEXT_SCAN.put(tardisId, now + SCAN_RETRY_TICKS);
 
-        ServerLevel interior = TardisInteriorSystem.prepareInterior(server, tardisId);
+        Tardis tardis = Tardis.get(server, tardisId).orElse(null);
+        if (tardis == null) return;
+        ServerLevel interior = TardisInteriors.prepareInterior(tardis);
         if (interior == null) return;
-        BlockPos pos = TardisInteriorSystem.findInteriorDoor(interior, tardisId);
+        BlockPos pos = TardisInteriors.findInteriorDoor(tardis, interior);
         if (pos == null) {
             Constants.LOG.warn("[GC] No TARDIS interior door found in the interior of {}, portals disabled", tardisId);
             return;
@@ -330,16 +330,17 @@ public final class TardisPortals {
         LAST_TICKET.remove(tardisId);
     }
 
-    static void onExteriorPlaced(MinecraftServer server, UUID tardisId) {
+    static void onExteriorPlaced(Tardis tardis) {
+        MinecraftServer server = tardis.server();
+        UUID tardisId = tardis.id();
         locateDoor(server, tardisId, true);
         LAST_TICKET.remove(tardisId);
         tickTardis(server, tardisId);
     }
 
-    /** Runs every tick for one TARDIS, keeps the location of its door up to date and makes sure a portal links the exterior to the door. */
     private static void tickTardis(MinecraftServer server, UUID tardisId) {
-        Tardis tardis = TardisApi.get(server, tardisId).orElse(null);
-        InteriorDoorBlockEntity door = findDoor(tardisId);
+        Tardis tardis = Tardis.get(server, tardisId).orElse(null);
+        InteriorDoorBlockEntity door = findDoor(tardis);
         if (door != null && door.getLevel() instanceof ServerLevel doorLevel) {
             DOORS.put(tardisId, new DoorLocation(doorLevel.dimension(), door.getBlockPos()));
         }
@@ -358,11 +359,11 @@ public final class TardisPortals {
         Placement placement = placementOf(server, exterior, DOORS.get(tardisId));
         Link link = LINKS.get(tardisId);
 
-        // No place for the portal right now, wait a short while before dropping the link in case the door is only
-        // missing for a moment
         if (placement == null) {
             boolean definitelyGone = doorDestroyed && !DOORS.containsKey(tardisId)
-                    || exterior != null && (exterior.isTravelling() || exterior.isFullyInvisible());
+                    || exterior != null
+                            && (exterior.travel().isTravelling()
+                                    || exterior.travel().isFullyInvisible());
             if (link != null && !definitelyGone && link.isAlive()) {
                 long now = server.getTickCount();
                 if (link.missingSince < 0L) link.missingSince = now;
@@ -398,7 +399,7 @@ public final class TardisPortals {
         }
 
         long now = server.getTickCount();
-        boolean open = !exterior.getDoorState().isClosed();
+        boolean open = !exterior.doors().getState().isClosed();
         if (open) {
             link.hideAt = -1L;
         } else if (link.visible && link.hideAt < 0L) {
@@ -428,13 +429,12 @@ public final class TardisPortals {
         }
     }
 
-    // Runs every tick for every hot TARDIS, so this is a manual loop rather than a stream pipeline,
-    // no Stream/lambda/boxed-Long allocations per call, just a plain scan over what is usually one door
-    private static @Nullable InteriorDoorBlockEntity findDoor(UUID tardisId) {
+    private static @Nullable InteriorDoorBlockEntity findDoor(@Nullable Tardis tardis) {
+        if (tardis == null) return null;
         InteriorDoorBlockEntity best = null;
         long bestPos = 0L;
-        for (InteriorDoorBlockEntity door : DoorSyncSystem.doorsOf(tardisId)) {
-            if (!door.isLinked() || !door.getBlockState().is(GCBlocks.TARDIS_INTERIOR_DOOR)) continue;
+        for (InteriorDoorBlockEntity door : tardis.interiorDoors()) {
+            if (!door.isLinked() || !door.getBlockState().is(TardisBlocks.TARDIS_INTERIOR_DOOR)) continue;
             if (!(door.getLevel() instanceof ServerLevel)) continue;
             long pos = door.getBlockPos().asLong();
             if (best == null || pos < bestPos) {
@@ -449,11 +449,11 @@ public final class TardisPortals {
             MinecraftServer server, @Nullable TardisExteriorBlockEntity exterior, @Nullable DoorLocation door) {
         if (exterior == null || door == null) return null;
         if (!(exterior.getLevel() instanceof ServerLevel exteriorLevel)) return null;
-        if (exterior.isTravelling() || exterior.isFullyInvisible()) return null;
+        if (exterior.travel().isTravelling() || exterior.travel().isFullyInvisible()) return null;
         ServerLevel interiorLevel = server.getLevel(door.dimension());
-        if (interiorLevel == null || !interiorLevel.hasChunkAt(door.pos())) return null;
+        if (interiorLevel == null || !interiorLevel.isLoaded(door.pos())) return null;
         BlockState state = interiorLevel.getBlockState(door.pos());
-        if (!state.is(GCBlocks.TARDIS_INTERIOR_DOOR) || !InteriorDoorBlock.isMaster(state)) return null;
+        if (!state.is(TardisBlocks.TARDIS_INTERIOR_DOOR) || !InteriorDoorBlock.isMaster(state)) return null;
         String doorModel = interiorLevel.getBlockEntity(door.pos()) instanceof InteriorDoorBlockEntity doorEntity
                 ? doorEntity.getVariant()
                 : "";
@@ -485,7 +485,6 @@ public final class TardisPortals {
         Direction right = InteriorDoorBlock.rightDirectionOf(placement.doorFacing(), flipped);
         Direction facing = placement.doorFacing();
 
-        // Portal bones from the models, old numbers if a model has none
         PortalBone exteriorBone = PortalBone.of(placement.exteriorModel());
         PortalBone doorBone = PortalBone.of(placement.doorModel());
         double width = exteriorBone != null ? exteriorBone.width() : PORTAL_WIDTH;
@@ -493,7 +492,6 @@ public final class TardisPortals {
         Vec3 exteriorOffset = exteriorBone != null
                 ? new Vec3(exteriorBone.x(), exteriorBone.centerY(), exteriorBone.front() - PORTAL_GAP)
                 : EXTERIOR_PORTAL_OFFSET;
-        // Same size at both ends and the interior lines up on its bottom
         Vec3 doorLocal = doorBone != null
                 ? new Vec3(doorBone.x(), doorBone.bottom() + height / 2.0, doorBone.back() + PORTAL_GAP)
                 : INTERIOR_PORTAL_OFFSET;

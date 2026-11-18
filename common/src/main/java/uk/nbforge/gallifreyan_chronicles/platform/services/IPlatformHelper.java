@@ -2,6 +2,8 @@ package uk.nbforge.gallifreyan_chronicles.platform.services;
 
 import java.nio.file.Path;
 import java.util.List;
+import java.util.Map;
+import java.util.function.Predicate;
 import uk.nbforge.gallifreyan_chronicles.addon.ModAddonEntry;
 
 public interface IPlatformHelper {
@@ -28,4 +30,10 @@ public interface IPlatformHelper {
      * The value is the name of the GCAddon class of the addon, the order is not defined.
      */
     List<ModAddonEntry> findModAddons();
+
+    /**
+     * reads files straight out of a mod's own jar, for stuff needed before datapacks exist (like registering blocks).
+     * keyed by path from the jar root with / separators, only files under folder that keep accepts get read
+     */
+    Map<String, byte[]> readModFiles(String modId, String folder, Predicate<String> keep);
 }

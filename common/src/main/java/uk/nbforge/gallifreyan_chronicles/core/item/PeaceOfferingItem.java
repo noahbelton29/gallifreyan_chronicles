@@ -9,9 +9,8 @@ import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.level.Level;
 import org.jspecify.annotations.NonNull;
 import uk.nbforge.gallifreyan_chronicles.tardis.Tardis;
-import uk.nbforge.gallifreyan_chronicles.tardis.mind.offering.TardisPeaceOffering;
+import uk.nbforge.gallifreyan_chronicles.tardis.mind.TardisPeaceOffering;
 
-/** A treat to make peace with a TARDIS, use it on the console or the box. */
 public class PeaceOfferingItem extends Item {
     private static final int USE_COOLDOWN_TICKS = 20;
 

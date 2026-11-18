@@ -1,5 +1,6 @@
 package uk.nbforge.gallifreyan_chronicles.client;
 
+import java.util.UUID;
 import net.minecraft.client.Minecraft;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.registries.BuiltInRegistries;
@@ -10,10 +11,11 @@ import net.minecraft.sounds.SoundEvent;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
 import org.jspecify.annotations.Nullable;
-import uk.nbforge.gallifreyan_chronicles.client.camera.GCCameraShake;
-import uk.nbforge.gallifreyan_chronicles.client.gui.hud.GCPowerDarkness;
+import uk.nbforge.gallifreyan_chronicles.client.camera.CameraShake;
+import uk.nbforge.gallifreyan_chronicles.client.gui.hud.PowerDarkness;
 import uk.nbforge.gallifreyan_chronicles.client.input.GCKeyMappings;
-import uk.nbforge.gallifreyan_chronicles.client.render.detail.TrialTimer;
+import uk.nbforge.gallifreyan_chronicles.client.renderer.detail.TrialTimer;
+import uk.nbforge.gallifreyan_chronicles.client.renderer.util.CloakKeyReveal;
 import uk.nbforge.gallifreyan_chronicles.client.sound.ConsoleHumSounds;
 import uk.nbforge.gallifreyan_chronicles.client.sound.ExteriorHumSounds;
 import uk.nbforge.gallifreyan_chronicles.client.sound.GCMusic;
@@ -24,8 +26,8 @@ import uk.nbforge.gallifreyan_chronicles.client.tardis.RematCatchClient;
 import uk.nbforge.gallifreyan_chronicles.compat.portal.TardisPortalBridge;
 import uk.nbforge.gallifreyan_chronicles.config.GCConfig;
 import uk.nbforge.gallifreyan_chronicles.core.GCTardisControls;
-import uk.nbforge.gallifreyan_chronicles.core.block_entities.TardisConsoleBlockEntity;
-import uk.nbforge.gallifreyan_chronicles.core.block_entities.TardisExteriorBlockEntity;
+import uk.nbforge.gallifreyan_chronicles.core.block_entity.TardisConsoleBlockEntity;
+import uk.nbforge.gallifreyan_chronicles.core.block_entity.TardisExteriorBlockEntity;
 import uk.nbforge.gallifreyan_chronicles.network.ResumeSoundPayload;
 import uk.nbforge.gallifreyan_chronicles.util.GameClockUtil;
 
@@ -33,7 +35,6 @@ public final class GCClientHooks {
     private GCClientHooks() {}
 
     static {
-        // Fades use the time of the world you are standing in, the one the server keeps right
         GameClockUtil.setClient(() -> {
             Minecraft minecraft = Minecraft.getInstance();
             return minecraft.player != null ? minecraft.player.level().getGameTime() : -1L;
@@ -71,8 +72,6 @@ public final class GCClientHooks {
     public static void playResumedSound(ResumeSoundPayload payload) {
         Minecraft minecraft = Minecraft.getInstance();
         if (minecraft.level == null) return;
-        // These restart flight loops for whoever just joined
-        // A replay plays them again on every timeline jump and they do not say which world they are in
         if (SoundListener.inReplay()) return;
         SoundEvent event = BuiltInRegistries.SOUND_EVENT
                 .getOptional(payload.sound())
@@ -91,9 +90,8 @@ public final class GCClientHooks {
     }
 
     public static void triggerCameraShake(Vec3 origin, float strength) {
-        // In a replay only shake when the camera is inside the TARDIS
         if (SoundListener.inReplay() && !SoundListener.isTardisLevel(SoundListener.level())) return;
-        GCCameraShake.trigger(origin, strength);
+        CameraShake.trigger(origin, strength);
     }
 
     public static void clientTick() {
@@ -111,14 +109,18 @@ public final class GCClientHooks {
         ExteriorHumSounds.track(be);
     }
 
+    public static boolean isHoldingKeyFor(@Nullable UUID tardisId) {
+        return CloakKeyReveal.isHoldingKeyFor(tardisId);
+    }
+
     public static void startConsoleClientEffects(TardisConsoleBlockEntity be) {
         BlockPos pos = be.getBlockPos();
-        GCPowerDarkness.track(be);
+        PowerDarkness.track(be);
 
         ConsoleHumSounds.track(be);
 
         Vec3 center = Vec3.atCenterOf(pos);
-        GCCameraShake.addFlightSource(new GCCameraShake.FlightSource() {
+        CameraShake.addFlightSource(new CameraShake.FlightSource() {
             @Override
             public Vec3 position() {
                 return center;

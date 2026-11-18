@@ -1,46 +1,35 @@
 package uk.nbforge.gallifreyan_chronicles.tardis.control.impl;
 
-import java.util.UUID;
-import net.minecraft.server.MinecraftServer;
-import net.minecraft.server.level.ServerLevel;
-import net.minecraft.world.InteractionHand;
+import net.minecraft.ChatFormatting;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
-import uk.nbforge.gallifreyan_chronicles.core.GCSounds;
-import uk.nbforge.gallifreyan_chronicles.core.block_entities.TardisConsoleBlockEntity;
+import org.jspecify.annotations.Nullable;
 import uk.nbforge.gallifreyan_chronicles.core.entity.TardisControlEntity;
 import uk.nbforge.gallifreyan_chronicles.tardis.Tardis;
 import uk.nbforge.gallifreyan_chronicles.tardis.control.BaseControl;
+import uk.nbforge.gallifreyan_chronicles.tardis.control.ClickSound;
 import uk.nbforge.gallifreyan_chronicles.tardis.control.ControlAnimations;
+import uk.nbforge.gallifreyan_chronicles.tardis.control.ControlContext;
+import uk.nbforge.gallifreyan_chronicles.util.MessageUtil;
 
 public abstract class DestinationControl extends BaseControl {
+    protected DestinationControl(ControlAnimations animations, ClickSound clickSound) {
+        super(animations, clickSound);
+    }
+
     protected DestinationControl(ControlAnimations animations) {
-        super(animations);
+        this(animations, ClickSound.SWITCH);
     }
 
-    protected abstract boolean apply(MinecraftServer server, UUID tardisId, Player player);
-
-    protected boolean playsSound() {
-        return true;
-    }
+    protected abstract boolean apply(Tardis tardis, @Nullable Player player);
 
     @Override
-    public void playClickSound(TardisControlEntity entity) {
-        if (playsSound()) playSound(entity, GCSounds.SWITCH, 0.8f);
-    }
-
-    @Override
-    public InteractionResult onRightClick(TardisControlEntity entity, Player player, InteractionHand hand) {
-        TardisConsoleBlockEntity console = entity.getConsole();
-        if (console == null) return InteractionResult.FAIL;
-        if (!(entity.level() instanceof ServerLevel level)) return InteractionResult.SUCCESS;
-
-        UUID tardisId = linkedTardis(console).map(Tardis::id).orElse(null);
-        if (tardisId == null || !apply(level.getServer(), tardisId, player)) {
-            tell(player, "message.gallifreyan_chronicles.no_destination_to_set");
+    protected InteractionResult use(ControlContext ctx, TardisControlEntity entity, @Nullable Player player) {
+        Tardis tardis = ctx.tardis().orElse(null);
+        if (tardis == null || !apply(tardis, player)) {
+            MessageUtil.overlay(player, ChatFormatting.RED, "no_destination_to_set");
             return InteractionResult.FAIL;
         }
-
         return InteractionResult.SUCCESS;
     }
 }

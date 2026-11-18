@@ -16,7 +16,6 @@ import net.minecraft.core.Direction;
 import net.minecraft.resources.Identifier;
 import net.minecraft.util.ARGB;
 import net.minecraft.world.phys.Vec3;
-import org.jetbrains.annotations.NotNull;
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 import uk.nbforge.gallifreyan_chronicles.client.model.InteriorDoorBlockModel;
@@ -27,11 +26,11 @@ import uk.nbforge.gallifreyan_chronicles.client.util.ModelRenderRangeUtil;
 import uk.nbforge.gallifreyan_chronicles.compat.portal.PortalBone;
 import uk.nbforge.gallifreyan_chronicles.config.GCConfig;
 import uk.nbforge.gallifreyan_chronicles.core.block.InteriorDoorBlock;
-import uk.nbforge.gallifreyan_chronicles.core.block_entities.InteriorDoorBlockEntity;
-import uk.nbforge.gallifreyan_chronicles.tardis.TardisExterior;
+import uk.nbforge.gallifreyan_chronicles.core.block_entity.InteriorDoorBlockEntity;
+import uk.nbforge.gallifreyan_chronicles.tardis.exterior.TardisExterior;
 
 public class InteriorDoorBlockRenderer
-        extends GeoBlockRenderer<@NotNull InteriorDoorBlockEntity, @NotNull TardisExteriorBlockRenderState> {
+        extends GeoBlockRenderer<@NonNull InteriorDoorBlockEntity, @NonNull TardisExteriorBlockRenderState> {
     public static final DataTicket<String> VARIANT = DataTicket.create("interior_door_variant", String.class);
     public static final DataTicket<String> TEXTURE_ID = DataTicket.create("interior_door_texture_id", String.class);
     public static final DataTicket<String> ROUNDEL = DataTicket.create("interior_door_roundel", String.class);
@@ -124,11 +123,9 @@ public class InteriorDoorBlockRenderer
     public void adjustModelBonesForRender(
             @NonNull RenderPassInfo<TardisExteriorBlockRenderState> renderPassInfo, @NonNull BoneSnapshots snapshots) {
         super.adjustModelBonesForRender(renderPassInfo, snapshots);
-        // The portal bone is only a marker
         snapshots.ifPresent(PortalBone.BONE_NAME, snapshot -> snapshot.skipRender(true));
     }
 
-    /** Fades with the interior while it materialises around you, like the exterior does. */
     @Override
     public int getRenderColor(InteriorDoorBlockEntity animatable, @Nullable Void relatedObject, float partialTick) {
         int color = super.getRenderColor(animatable, relatedObject, partialTick);
@@ -140,7 +137,6 @@ public class InteriorDoorBlockRenderer
     public @Nullable RenderType getRenderType(TardisExteriorBlockRenderState renderState, Identifier texture) {
         float opacity = renderState.getOrDefaultGeckolibData(REMAT, 1.0f);
         if (opacity <= 0.0f) return null;
-        // Ask for the texture here and do not trust the one passed in so a roundel style always shows
         Identifier skin = InteriorDoorBlockModel.textureFor(renderState);
         if (!skin.equals(texture) || skin.getPath().startsWith("dynamic/")) {
             if (LOGGED_SKINS.add(skin)) {

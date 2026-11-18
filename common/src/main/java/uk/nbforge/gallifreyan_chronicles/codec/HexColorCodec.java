@@ -30,18 +30,18 @@ public final class HexColorCodec {
     }
 
     public static float red(int argb) {
-        return ((argb >> 16) & 0xFF) / 255.0F;
+        return ((argb >> 16) & 0xFF) / 255.0f;
     }
 
     public static float green(int argb) {
-        return ((argb >> 8) & 0xFF) / 255.0F;
+        return ((argb >> 8) & 0xFF) / 255.0f;
     }
 
     public static float blue(int argb) {
-        return (argb & 0xFF) / 255.0F;
+        return (argb & 0xFF) / 255.0f;
     }
 
     public static float alpha(int argb) {
-        return ((argb >>> 24) & 0xFF) / 255.0F;
+        return ((argb >>> 24) & 0xFF) / 255.0f;
     }
 }

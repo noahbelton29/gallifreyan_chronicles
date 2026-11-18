@@ -2,7 +2,7 @@ package uk.nbforge.gallifreyan_chronicles.command;
 
 import static net.minecraft.commands.Commands.argument;
 import static net.minecraft.commands.Commands.literal;
-import static uk.nbforge.gallifreyan_chronicles.util.CommandUtil.*;
+import static uk.nbforge.gallifreyan_chronicles.command.CommandUtil.*;
 
 import com.mojang.brigadier.arguments.FloatArgumentType;
 import com.mojang.brigadier.arguments.StringArgumentType;
@@ -14,17 +14,11 @@ import com.mojang.brigadier.suggestion.SuggestionsBuilder;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import net.minecraft.commands.CommandSourceStack;
-import uk.nbforge.gallifreyan_chronicles.core.block_entities.TardisExteriorBlockEntity;
-import uk.nbforge.gallifreyan_chronicles.tardis.ecs.component.TardisSubsystem;
+import uk.nbforge.gallifreyan_chronicles.core.block_entity.TardisExteriorBlockEntity;
+import uk.nbforge.gallifreyan_chronicles.tardis.subsystem.TardisSubsystem;
+import uk.nbforge.gallifreyan_chronicles.tardis.subsystem.TardisSubsystems;
 
-/**
- * Subsystem health lives entirely under "data" now.
- */
 public final class SubsystemCommands {
-    private interface SubsystemAction {
-        int run(TardisExteriorBlockEntity exterior, TardisSubsystem subsystem, String idText);
-    }
-
     private SubsystemCommands() {}
 
     public static LiteralArgumentBuilder<CommandSourceStack> subsystemData() {
@@ -39,7 +33,7 @@ public final class SubsystemCommands {
 
     private static CompletableFuture<Suggestions> suggestSubsystems(
             CommandContext<CommandSourceStack> ctx, SuggestionsBuilder builder) {
-        for (TardisSubsystem subsystem : TardisSubsystem.values()) {
+        for (TardisSubsystem subsystem : TardisSubsystems.all()) {
             builder.suggest(subsystem.id());
         }
         return builder.buildFuture();
@@ -64,7 +58,7 @@ public final class SubsystemCommands {
     private static int withSubsystem(CommandContext<CommandSourceStack> ctx, SubsystemAction action)
             throws CommandSyntaxException {
         String subsystemId = StringArgumentType.getString(ctx, "subsystem");
-        Optional<TardisSubsystem> subsystem = TardisSubsystem.byId(subsystemId);
+        Optional<TardisSubsystem> subsystem = TardisSubsystems.byId(subsystemId);
         if (subsystem.isEmpty()) return fail(ctx, "unknown_subsystem", subsystemId);
 
         return withTardis(ctx, (tardis, idText) -> {
@@ -74,5 +68,9 @@ public final class SubsystemCommands {
                             tardisExteriorBlockEntity -> action.run(tardisExteriorBlockEntity, subsystem.get(), idText))
                     .orElseGet(() -> fail(ctx, "no_exterior", idText));
         });
+    }
+
+    private interface SubsystemAction {
+        int run(TardisExteriorBlockEntity exterior, TardisSubsystem subsystem, String idText);
     }
 }

@@ -29,9 +29,15 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.dimension.DimensionType;
 import net.minecraft.world.level.dimension.LevelStem;
-import net.minecraft.world.level.levelgen.*;
+import net.minecraft.world.level.levelgen.NoiseBasedChunkGenerator;
+import net.minecraft.world.level.levelgen.NoiseGeneratorSettings;
+import net.minecraft.world.level.levelgen.NoiseRouter;
+import net.minecraft.world.level.levelgen.NoiseRouterData;
+import net.minecraft.world.level.levelgen.NoiseSettings;
 import net.minecraft.world.level.levelgen.densityfunction.DensityFunction;
 import net.minecraft.world.timeline.Timeline;
+import uk.nbforge.gallifreyan_chronicles.core.block.registry.GallifreyBlocks;
+import uk.nbforge.gallifreyan_chronicles.core.block.registry.MoonBlocks;
 import uk.nbforge.gallifreyan_chronicles.core.world.biomes.GCMaterialRules;
 import uk.nbforge.gallifreyan_chronicles.util.GCUtil;
 
@@ -148,7 +154,7 @@ public class GCDimensions {
                 GALLIFREY_NOISE_SETTINGS,
                 new NoiseGeneratorSettings(
                         NoiseSettings.create(-64, 384),
-                        GCBlocks.GALLIFREYAN_STONE.defaultBlockState(),
+                        GallifreyBlocks.GALLIFREYAN_STONE.defaultBlockState(),
                         Blocks.AIR.defaultBlockState(),
                         overworldRouter,
                         Holder.direct(GCMaterialRules.gallifrey(biomes)),
@@ -163,7 +169,7 @@ public class GCDimensions {
                 MOON_NOISE_SETTINGS,
                 new NoiseGeneratorSettings(
                         NoiseSettings.create(-64, 384),
-                        GCBlocks.LUNAR_REGOLITH.defaultBlockState(),
+                        MoonBlocks.LUNAR_REGOLITH.defaultBlockState(),
                         Blocks.AIR.defaultBlockState(),
                         overworldRouter,
                         Holder.direct(GCMaterialRules.moon(biomes)),
@@ -184,7 +190,6 @@ public class GCDimensions {
             Climate.Parameter.span(-1.0f, 1.0f),
             0.0f);
 
-    /** Sets up the Gallifrey world, which biome goes where in the climate ranges, and the terrain generator. */
     public static void bootstrapStem(BootstrapContext<LevelStem> context) {
         var biomes = context.lookup(Registries.BIOME);
         var dimensionTypes = context.lookup(Registries.DIMENSION_TYPE);

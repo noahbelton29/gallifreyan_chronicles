@@ -1,13 +1,16 @@
 package uk.nbforge.gallifreyan_chronicles.client.sky;
 
+import com.mojang.serialization.Codec;
 import java.util.Locale;
 import net.minecraft.util.StringRepresentable;
 
 public enum StarDensity implements StringRepresentable {
-    OFF("off", 0.0F),
-    LOW("low", 0.5F),
-    NORMAL("normal", 1.0F),
-    HIGH("high", 2.0F);
+    OFF("off", 0.0f),
+    LOW("low", 0.5f),
+    NORMAL("normal", 1.0f),
+    HIGH("high", 2.0f);
+
+    public static final Codec<StarDensity> CODEC = StringRepresentable.fromEnum(StarDensity::values);
 
     private final String name;
     private final float multiplier;

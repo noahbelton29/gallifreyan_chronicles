@@ -5,19 +5,19 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.ItemStack;
-import org.jetbrains.annotations.Nullable;
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 import snownee.jade.api.EntityAccessor;
 import snownee.jade.api.IEntityComponentProvider;
 import snownee.jade.api.ITooltip;
 import snownee.jade.api.config.IPluginConfig;
 import snownee.jade.api.ui.Element;
 import snownee.jade.api.ui.JadeUI;
-import uk.nbforge.gallifreyan_chronicles.core.GCBlocks;
 import uk.nbforge.gallifreyan_chronicles.core.GCTardisControls;
-import uk.nbforge.gallifreyan_chronicles.core.block_entities.TardisConsoleBlockEntity;
-import uk.nbforge.gallifreyan_chronicles.core.dynamic_registries.TardisControlRegistry;
+import uk.nbforge.gallifreyan_chronicles.core.block.registry.TardisBlocks;
+import uk.nbforge.gallifreyan_chronicles.core.block_entity.TardisConsoleBlockEntity;
 import uk.nbforge.gallifreyan_chronicles.core.entity.TardisControlEntity;
+import uk.nbforge.gallifreyan_chronicles.tardis.control.TardisControls;
 import uk.nbforge.gallifreyan_chronicles.tardis.flight.TardisDestinations;
 import uk.nbforge.gallifreyan_chronicles.util.GCUtil;
 
@@ -33,7 +33,7 @@ public class ControlIconProvider implements IEntityComponentProvider {
                         instanceof TardisConsoleBlockEntity console) {
             return JadeUI.item(TardisBlockIconProvider.consoleStack(console));
         }
-        return JadeUI.item(new ItemStack(GCBlocks.TARDIS_CONSOLE));
+        return JadeUI.item(new ItemStack(TardisBlocks.TARDIS_CONSOLE));
     }
 
     @Override
@@ -43,21 +43,18 @@ public class ControlIconProvider implements IEntityComponentProvider {
                 && accessor.getLevel().getBlockEntity(control.getConsolePos())
                         instanceof TardisConsoleBlockEntity console
                 && console.isPowerKnown()) {
-            Component text = TardisControlRegistry.get(control.getControlId())
+            Component text = TardisControls.get(control.getControlId())
                     .describeState(console.getControlState(control.getControlId()));
             if (text != null) tooltip.add(text);
             appendDestination(tooltip, control.getControlId(), accessor.getServerData());
         }
     }
 
-    /**
-     * The destination controls, what they would set or show, read from the server data.
-     */
     private static void appendDestination(ITooltip tooltip, String id, CompoundTag data) {
         switch (id) {
-            case GCTardisControls.X_INCREMENT_CONTROL -> coord(tooltip, "target_x", data);
-            case GCTardisControls.Y_INCREMENT_CONTROL -> coord(tooltip, "target_y", data);
-            case GCTardisControls.Z_INCREMENT_CONTROL -> coord(tooltip, "target_z", data);
+            case GCTardisControls.X_INCREMENT -> coord(tooltip, "target_x", data);
+            case GCTardisControls.Y_INCREMENT -> coord(tooltip, "target_y", data);
+            case GCTardisControls.Z_INCREMENT -> coord(tooltip, "target_z", data);
             case GCTardisControls.COORDINATE_STEP_CONTROL -> {
                 if (!data.contains(ControlDataProvider.STEP)) return;
                 int step = data.getIntOr(ControlDataProvider.STEP, 0);
@@ -68,7 +65,7 @@ public class ControlIconProvider implements IEntityComponentProvider {
                 if (!data.contains(ControlDataProvider.YAW)) return;
                 tooltip.add(line(
                         "facing",
-                        TardisDestinations.facingName(data.getFloatOr(ControlDataProvider.YAW, 0F))
+                        TardisDestinations.facingName(data.getFloatOr(ControlDataProvider.YAW, 0f))
                                 .copy()
                                 .withStyle(ChatFormatting.WHITE)));
             }

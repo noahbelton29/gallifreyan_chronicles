@@ -12,10 +12,8 @@ import net.minecraft.data.PackOutput;
 import net.minecraft.resources.Identifier;
 import org.jspecify.annotations.NonNull;
 import uk.nbforge.gallifreyan_chronicles.Constants;
-import uk.nbforge.gallifreyan_chronicles.codec.sky.data.CelestialBodyCodec;
-import uk.nbforge.gallifreyan_chronicles.codec.sky.data.DimensionSkyCodec;
 import uk.nbforge.gallifreyan_chronicles.core.GCDimensions;
-import uk.nbforge.gallifreyan_chronicles.core.data.IdentifiableData;
+import uk.nbforge.gallifreyan_chronicles.loader.IdentifiableData;
 import uk.nbforge.gallifreyan_chronicles.sky.data.CelestialBody;
 import uk.nbforge.gallifreyan_chronicles.sky.data.DimensionSky;
 import uk.nbforge.gallifreyan_chronicles.sky.data.OverlayFog;
@@ -50,9 +48,9 @@ public class GCDimensionSkyProvider implements DataProvider {
     }
 
     private void registerBodies() {
-        addBody(SUN, SUN_TEXTURE, 20.0F, SkyBody.Blend.ADDITIVE, true);
-        addBody(FULL_MOON, FULL_MOON_TEXTURE, 24.0F, SkyBody.Blend.ADDITIVE, true);
-        addBody(EARTH, EARTH_TEXTURE, 32.0F, SkyBody.Blend.NORMAL, false);
+        addBody(SUN, SUN_TEXTURE, 20.0f, SkyBody.Blend.ADDITIVE, true);
+        addBody(FULL_MOON, FULL_MOON_TEXTURE, 24.0f, SkyBody.Blend.ADDITIVE, true);
+        addBody(EARTH, EARTH_TEXTURE, 32.0f, SkyBody.Blend.NORMAL, false);
     }
 
     private void registerSkies() {
@@ -65,17 +63,17 @@ public class GCDimensionSkyProvider implements DataProvider {
                 Optional.empty(),
                 Optional.empty(),
                 List.of(
-                        SkyBody.of(SUN).orbiting(new SkyOrbit(SkyOrbit.Follows.SUN, 0.0F, -25.0F)),
+                        SkyBody.of(SUN).orbiting(new SkyOrbit(SkyOrbit.Follows.SUN, 0.0f, -25.0f)),
                         SkyBody.of(SUN)
-                                .orbiting(new SkyOrbit(SkyOrbit.Follows.SUN, 12.0F, -25.0F))
-                                .sized(13.0F)
+                                .orbiting(new SkyOrbit(SkyOrbit.Follows.SUN, 12.0f, -25.0f))
+                                .sized(13.0f)
                                 .colored(0xFFFFD08A),
                         SkyBody.of(FULL_MOON)
-                                .orbiting(new SkyOrbit(SkyOrbit.Follows.MOON, 0.0F, -14.0F))
+                                .orbiting(new SkyOrbit(SkyOrbit.Follows.MOON, 0.0f, -14.0f))
                                 .visibleDuring(SkyBody.Visibility.NIGHT),
                         SkyBody.of(FULL_MOON)
-                                .orbiting(new SkyOrbit(SkyOrbit.Follows.MOON, 30.0F, 20.0F))
-                                .sized(13.0F)
+                                .orbiting(new SkyOrbit(SkyOrbit.Follows.MOON, 30.0f, 20.0f))
+                                .sized(13.0f)
                                 .visibleDuring(SkyBody.Visibility.NIGHT)));
 
         addSky(
@@ -84,11 +82,11 @@ public class GCDimensionSkyProvider implements DataProvider {
                 Optional.of(0xFF000000),
                 Optional.of(ShaderDimension.OVERWORLD),
                 ShaderSky.OVERLAY,
-                Optional.of(new OverlayFog(0xFF000000, 0.1F, 0.7F)),
-                Optional.of(new SkyStars(4000, 10842L, 0.15F, 0.35F, 1.0F, WHITE, false, 0.5F, 1.0F)),
+                Optional.of(new OverlayFog(0xFF000000, 0.1f, 0.7f)),
+                Optional.of(new SkyStars(4000, 10842L, 0.15f, 0.35f, 1.0f, WHITE, false, 0.5f, 1.0f)),
                 List.of(
-                        SkyBody.of(SUN).at(120.0F, 35.0F).sized(24.0F).fadingInRain(false),
-                        SkyBody.of(EARTH).at(210.0F, 30.0F)));
+                        SkyBody.of(SUN).at(120.0f, 35.0f).sized(24.0f).fadingInRain(false),
+                        SkyBody.of(EARTH).at(210.0f, 30.0f)));
     }
 
     private void addBody(Identifier id, Identifier texture, float size, SkyBody.Blend blend, boolean fadesInRain) {
@@ -112,8 +110,8 @@ public class GCDimensionSkyProvider implements DataProvider {
     @Override
     public @NonNull CompletableFuture<?> run(@NonNull CachedOutput cache) {
         List<CompletableFuture<?>> futures = new ArrayList<>();
-        save(cache, futures, bodies, CelestialBodyCodec.CODEC, bodyPathProvider, "celestial body");
-        save(cache, futures, skies, DimensionSkyCodec.CODEC, skyPathProvider, "dimension sky");
+        save(cache, futures, bodies, CelestialBody.CODEC, bodyPathProvider, "celestial body");
+        save(cache, futures, skies, DimensionSky.CODEC, skyPathProvider, "dimension sky");
         return CompletableFuture.allOf(futures.toArray(CompletableFuture[]::new));
     }
 

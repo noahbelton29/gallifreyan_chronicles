@@ -18,8 +18,8 @@ import uk.nbforge.gallifreyan_chronicles.sky.data.SkyStars;
 
 public final class SkyMeshes implements AutoCloseable {
     public static final int DISC_VERTICES = 10;
-    private static final float DISC_RADIUS = 512.0F;
-    private static final float STAR_DISTANCE = 100.0F;
+    private static final float DISC_RADIUS = 512.0f;
+    private static final float STAR_DISTANCE = 100.0f;
     private static final int MAX_STARS = 40000;
     public static final int STAR_GROUPS = 16;
     public static final int BACKDROP_INDEX_COUNT = 36;
@@ -78,8 +78,8 @@ public final class SkyMeshes implements AutoCloseable {
             }
         }
         return new SkyMeshes(
-                buildDisc("GC sky top disc", 16.0F),
-                buildDisc("GC sky bottom disc", -16.0F),
+                buildDisc("GC sky top disc", 16.0f),
+                buildDisc("GC sky bottom disc", -16.0f),
                 buildQuad(),
                 buildBackdrop(),
                 buildSphere(),
@@ -100,24 +100,24 @@ public final class SkyMeshes implements AutoCloseable {
         int attempts = 0;
         while (added < count && attempts < count * 8) {
             attempts++;
-            float x = random.nextFloat() * 2.0F - 1.0F;
-            float y = random.nextFloat() * 2.0F - 1.0F;
-            float z = random.nextFloat() * 2.0F - 1.0F;
+            float x = random.nextFloat() * 2.0f - 1.0f;
+            float y = random.nextFloat() * 2.0f - 1.0f;
+            float z = random.nextFloat() * 2.0f - 1.0f;
             float lengthSq = Mth.lengthSquared(x, y, z);
-            if (lengthSq <= 0.01F || lengthSq >= 1.0F) continue;
+            if (lengthSq <= 0.01f || lengthSq >= 1.0f) continue;
 
             float size = minSize + random.nextFloat() * (maxSize - minSize);
 
             Vector3f center = new Vector3f(x, y, z).normalize(STAR_DISTANCE);
             float spin = (float) (random.nextDouble() * Math.PI * 2.0);
             Matrix3f rotation = new Matrix3f()
-                    .rotateTowards(new Vector3f(center).negate(), new Vector3f(0.0F, 1.0F, 0.0F))
+                    .rotateTowards(new Vector3f(center).negate(), new Vector3f(0.0f, 1.0f, 0.0f))
                     .rotateZ(-spin);
             groups.get(random.nextInt(STAR_GROUPS)).add(new Vector3f[] {
-                new Vector3f(size, -size, 0.0F).mul(rotation).add(center),
-                new Vector3f(size, size, 0.0F).mul(rotation).add(center),
-                new Vector3f(-size, size, 0.0F).mul(rotation).add(center),
-                new Vector3f(-size, -size, 0.0F).mul(rotation).add(center)
+                new Vector3f(size, -size, 0.0f).mul(rotation).add(center),
+                new Vector3f(size, size, 0.0f).mul(rotation).add(center),
+                new Vector3f(-size, size, 0.0f).mul(rotation).add(center),
+                new Vector3f(-size, -size, 0.0f).mul(rotation).add(center)
             });
             added++;
         }
@@ -140,7 +140,7 @@ public final class SkyMeshes implements AutoCloseable {
             BufferBuilder builder =
                     new BufferBuilder(bytes, PrimitiveTopology.TRIANGLE_FAN, DefaultVertexFormat.POSITION);
             float x = Math.signum(y) * DISC_RADIUS;
-            builder.addVertex(0.0F, y, 0.0F);
+            builder.addVertex(0.0f, y, 0.0f);
             for (int degrees = -180; degrees <= 180; degrees += 45) {
                 float radians = (float) Math.toRadians(degrees);
                 builder.addVertex(x * Mth.cos(radians), y, DISC_RADIUS * Mth.sin(radians));
@@ -155,10 +155,10 @@ public final class SkyMeshes implements AutoCloseable {
         try (ByteBufferBuilder bytes =
                 ByteBufferBuilder.exactlySized(4 * DefaultVertexFormat.POSITION_TEX.getVertexSize())) {
             BufferBuilder builder = new BufferBuilder(bytes, PrimitiveTopology.QUADS, DefaultVertexFormat.POSITION_TEX);
-            builder.addVertex(-1.0F, 0.0F, -1.0F).setUv(0.0F, 1.0F);
-            builder.addVertex(1.0F, 0.0F, -1.0F).setUv(1.0F, 1.0F);
-            builder.addVertex(1.0F, 0.0F, 1.0F).setUv(1.0F, 0.0F);
-            builder.addVertex(-1.0F, 0.0F, 1.0F).setUv(0.0F, 0.0F);
+            builder.addVertex(-1.0f, 0.0f, -1.0f).setUv(0.0f, 1.0f);
+            builder.addVertex(1.0f, 0.0f, -1.0f).setUv(1.0f, 1.0f);
+            builder.addVertex(1.0f, 0.0f, 1.0f).setUv(1.0f, 0.0f);
+            builder.addVertex(-1.0f, 0.0f, 1.0f).setUv(0.0f, 0.0f);
             try (MeshData mesh = builder.buildOrThrow()) {
                 return RenderSystem.getDevice().createBuffer(() -> "GC sky body quad", 32, mesh.vertexBuffer());
             }

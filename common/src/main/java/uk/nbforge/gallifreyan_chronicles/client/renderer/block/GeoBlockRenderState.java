@@ -7,8 +7,8 @@ import it.unimi.dsi.fastutil.objects.Reference2ObjectOpenHashMap;
 import java.util.Map;
 import net.minecraft.client.renderer.blockentity.state.BlockEntityRenderState;
 import org.jetbrains.annotations.ApiStatus;
-import org.jetbrains.annotations.Nullable;
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 public class GeoBlockRenderState extends BlockEntityRenderState implements GeoRenderState {
     private final Map<DataTicket<?>, Object> data = new Reference2ObjectOpenHashMap<>();

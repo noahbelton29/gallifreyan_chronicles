@@ -2,7 +2,7 @@ package uk.nbforge.gallifreyan_chronicles.command;
 
 import static net.minecraft.commands.Commands.argument;
 import static net.minecraft.commands.Commands.literal;
-import static uk.nbforge.gallifreyan_chronicles.util.CommandUtil.*;
+import static uk.nbforge.gallifreyan_chronicles.command.CommandUtil.*;
 
 import com.mojang.brigadier.arguments.BoolArgumentType;
 import com.mojang.brigadier.arguments.FloatArgumentType;
@@ -26,8 +26,8 @@ import net.minecraft.server.level.ServerPlayer;
 import org.jspecify.annotations.Nullable;
 import uk.nbforge.gallifreyan_chronicles.Constants;
 import uk.nbforge.gallifreyan_chronicles.tardis.Tardis;
-import uk.nbforge.gallifreyan_chronicles.tardis.ecs.system.TardisMindSystem;
 import uk.nbforge.gallifreyan_chronicles.tardis.mind.TardisMind;
+import uk.nbforge.gallifreyan_chronicles.tardis.mind.TardisMinds;
 import uk.nbforge.gallifreyan_chronicles.tardis.mind.TardisPersonality;
 import uk.nbforge.gallifreyan_chronicles.tardis.mind.TardisTrait;
 import uk.nbforge.gallifreyan_chronicles.tardis.mind.data.TardisPersonalities;
@@ -37,9 +37,6 @@ import uk.nbforge.gallifreyan_chronicles.tardis.mind.disability.TardisDisability
 public final class MindCommands {
     private MindCommands() {}
 
-    /**
-     * Actions that don't fit the get/set shape of "data": rolling, forgetting and forgiving. Everything else about the mind lives under "data mind" now.
-     */
     public static LiteralArgumentBuilder<CommandSourceStack> mind() {
         return literal("mind")
                 .then(literal("inspect").executes(MindCommands::inspect))
@@ -50,9 +47,6 @@ public final class MindCommands {
                         .then(argument("player", EntityArgument.player()).executes(MindCommands::forgive)));
     }
 
-    /**
-     * data mind ... : personality, traits, disabilities, betrayed status and every numeric mind value.
-     */
     public static LiteralArgumentBuilder<CommandSourceStack> mindData() {
         return literal("mind")
                 .then(literal("betrayed")
@@ -99,15 +93,11 @@ public final class MindCommands {
                 .then(literal("dump").executes(MindCommands::dump));
     }
 
-    /**
-     * data mind dump, every low-level mind field for the owner at once, read only, in the same compact coloured
-     * format as "data dump".
-     */
     private static int dump(CommandContext<CommandSourceStack> ctx) throws CommandSyntaxException {
         return withTardis(ctx, (tardis, idText) -> {
             send(ctx, dataHeader("TARDIS mind dump", tardis.id()), false);
 
-            TardisMind mind = TardisMindSystem.mind(tardis);
+            TardisMind mind = TardisMinds.mind(tardis);
             sendLine(ctx, dataLine("personality", shortId(mind.personality().id())));
             sendLine(ctx, dataLine("traits", traitList(mind)));
             sendLine(ctx, dataLine("disabilities", disabilityList(mind)));
@@ -115,7 +105,7 @@ public final class MindCommands {
                     ctx,
                     dataLine(
                             "betrayed",
-                            String.valueOf(TardisMindSystem.bond(tardis, null).betrayed())));
+                            String.valueOf(TardisMinds.bond(tardis, null).betrayed())));
             for (MindValue which : MindValue.values()) {
                 sendLine(ctx, dataLine(which.name, oneDecimal(which.get(tardis, null))));
             }
@@ -147,32 +137,31 @@ public final class MindCommands {
 
         private float get(Tardis tardis, @Nullable UUID player) {
             return switch (this) {
-                case STRESS -> TardisMindSystem.stress(tardis);
-                case TRUST -> TardisMindSystem.trust(tardis, player);
-                case FEAR -> TardisMindSystem.fear(tardis, player);
-                case SKILL -> TardisMindSystem.skill(tardis) * 100f;
-                case TRAUMA -> TardisMindSystem.traumaFrom(tardis, player);
-                case TOTAL_TRAUMA -> TardisMindSystem.trauma(tardis);
-                case HITS -> TardisMindSystem.bond(tardis, player).hits();
+                case STRESS -> TardisMinds.stress(tardis);
+                case TRUST -> TardisMinds.trust(tardis, player);
+                case FEAR -> TardisMinds.fear(tardis, player);
+                case SKILL -> TardisMinds.skill(tardis) * 100f;
+                case TRAUMA -> TardisMinds.traumaFrom(tardis, player);
+                case TOTAL_TRAUMA -> TardisMinds.trauma(tardis);
+                case HITS -> TardisMinds.bond(tardis, player).hits();
             };
         }
 
         private void set(Tardis tardis, @Nullable UUID player, float value) {
             switch (this) {
-                case STRESS -> TardisMindSystem.setStress(tardis, value);
-                case TRUST -> TardisMindSystem.setTrust(tardis, player, value);
+                case STRESS -> TardisMinds.setStress(tardis, value);
+                case TRUST -> TardisMinds.setTrust(tardis, player, value);
                 case FEAR -> {
-                    // Trauma keeps fear from going below a floor, so lower it enough for the new fear to stick
                     float maxTrauma = value / TardisMind.TRAUMA_FEAR_SHARE;
-                    if (TardisMindSystem.traumaFrom(tardis, player) > maxTrauma) {
-                        TardisMindSystem.setTraumaFrom(tardis, player, maxTrauma);
+                    if (TardisMinds.traumaFrom(tardis, player) > maxTrauma) {
+                        TardisMinds.setTraumaFrom(tardis, player, maxTrauma);
                     }
-                    TardisMindSystem.setFear(tardis, player, value);
+                    TardisMinds.setFear(tardis, player, value);
                 }
-                case SKILL -> TardisMindSystem.setSkill(tardis, value / 100f);
-                case TRAUMA -> TardisMindSystem.setTraumaFrom(tardis, player, value);
-                case TOTAL_TRAUMA -> TardisMindSystem.setTrauma(tardis, value);
-                case HITS -> TardisMindSystem.setHits(tardis, player, Math.round(value));
+                case SKILL -> TardisMinds.setSkill(tardis, value / 100f);
+                case TRAUMA -> TardisMinds.setTraumaFrom(tardis, player, value);
+                case TOTAL_TRAUMA -> TardisMinds.setTrauma(tardis, value);
+                case HITS -> TardisMinds.setHits(tardis, player, Math.round(value));
             }
         }
     }
@@ -209,25 +198,22 @@ public final class MindCommands {
         return builder.buildFuture();
     }
 
-    /**
-     * Everything about its mind and how it feels about every player it knows.
-     */
     private static int inspect(CommandContext<CommandSourceStack> ctx) throws CommandSyntaxException {
         return withTardis(ctx, (tardis, idText) -> {
-            TardisMind mind = TardisMindSystem.mind(tardis);
-            long now = TardisMindSystem.now(tardis.server());
+            TardisMind mind = TardisMinds.mind(tardis);
+            long now = TardisMinds.now(tardis.server());
             Map<String, String> lines = new LinkedHashMap<>();
 
             lines.put("personality", shortId(mind.personality().id()));
             lines.put("traits", traitList(mind));
             lines.put("disabilities", disabilityList(mind));
             lines.put("skill", oneDecimal(mind.skill() * 100f));
-            lines.put("stress", oneDecimal(TardisMindSystem.stress(tardis)));
-            lines.put("trauma (total)", oneDecimal(TardisMindSystem.trauma(tardis)));
+            lines.put("stress", oneDecimal(TardisMinds.stress(tardis)));
+            lines.put("trauma (total)", oneDecimal(TardisMinds.trauma(tardis)));
             lines.put(
                     "ptsd recovery",
                     mind.has(TardisDisability.PTSD) ? oneDecimal(mind.recovery() * 100f) + "%" : "no ptsd");
-            lines.put("willing to fly", String.valueOf(!TardisMindSystem.unwilling(tardis)));
+            lines.put("willing to fly", String.valueOf(!TardisMinds.unwilling(tardis)));
             lines.put("discovered", mind.discovered().isEmpty() ? "nothing" : String.join(", ", mind.discovered()));
 
             success(ctx, false, "mind_header", idText);
@@ -241,8 +227,8 @@ public final class MindCommands {
                             "mind_bond",
                             playerName(tardis, player) + (tardis.isOwner(player) ? " (owner)" : ""),
                             oneDecimal(bond.trust()),
-                            oneDecimal(TardisMindSystem.fear(tardis, player)),
-                            TardisMindSystem.fearLevel(tardis, player).name().toLowerCase(Locale.ROOT),
+                            oneDecimal(TardisMinds.fear(tardis, player)),
+                            TardisMinds.fearLevel(tardis, player).name().toLowerCase(Locale.ROOT),
                             oneDecimal(bond.traumaAt(now)),
                             bond.hits(),
                             bond.betrayed()));
@@ -257,7 +243,7 @@ public final class MindCommands {
 
     private static int reroll(CommandContext<CommandSourceStack> ctx) throws CommandSyntaxException {
         return withTardis(ctx, (tardis, idText) -> {
-            TardisMindSystem.reroll(tardis);
+            TardisMinds.reroll(tardis);
             return inspect(ctx);
         });
     }
@@ -270,7 +256,7 @@ public final class MindCommands {
                         ctx,
                         tardis,
                         "betrayed",
-                        String.valueOf(TardisMindSystem.bond(tardis, player).betrayed()),
+                        String.valueOf(TardisMinds.bond(tardis, player).betrayed()),
                         false));
     }
 
@@ -278,7 +264,7 @@ public final class MindCommands {
         boolean betrayed = BoolArgumentType.getBool(ctx, "betrayed");
         UUID player = playerArg(ctx);
         return withTardis(ctx, (tardis, idText) -> {
-            TardisMindSystem.setBetrayed(tardis, player, betrayed);
+            TardisMinds.setBetrayed(tardis, player, betrayed);
             return reply(ctx, tardis, "betrayed", String.valueOf(betrayed), true);
         });
     }
@@ -286,14 +272,14 @@ public final class MindCommands {
     private static int forgive(CommandContext<CommandSourceStack> ctx) throws CommandSyntaxException {
         UUID player = playerArg(ctx);
         return withTardis(ctx, (tardis, idText) -> {
-            TardisMindSystem.forgive(tardis, player);
+            TardisMinds.forgive(tardis, player);
             return reply(ctx, tardis, "fear, trauma, hits and betrayal", "cleared", true);
         });
     }
 
     private static int undiscover(CommandContext<CommandSourceStack> ctx) throws CommandSyntaxException {
         return withTardis(ctx, (tardis, idText) -> {
-            TardisMindSystem.setDiscovered(tardis, List.of());
+            TardisMinds.setDiscovered(tardis, List.of());
             return reply(ctx, tardis, "discovered", "none", true);
         });
     }
@@ -328,7 +314,7 @@ public final class MindCommands {
                         ctx,
                         tardis,
                         "personality",
-                        shortId(TardisMindSystem.mind(tardis).personality().id()),
+                        shortId(TardisMinds.mind(tardis).personality().id()),
                         false));
     }
 
@@ -338,14 +324,14 @@ public final class MindCommands {
             Optional<TardisPersonality> personality = TardisPersonalities.byId(id);
             if (personality.isEmpty()) return fail(ctx, "unknown_personality", id);
 
-            TardisMindSystem.setPersonality(tardis, personality.get());
+            TardisMinds.setPersonality(tardis, personality.get());
             return reply(ctx, tardis, "personality", id, true);
         });
     }
 
     private static int getTraits(CommandContext<CommandSourceStack> ctx) throws CommandSyntaxException {
         return withTardis(
-                ctx, (tardis, idText) -> reply(ctx, tardis, "traits", traitList(TardisMindSystem.mind(tardis)), false));
+                ctx, (tardis, idText) -> reply(ctx, tardis, "traits", traitList(TardisMinds.mind(tardis)), false));
     }
 
     private static int addTrait(CommandContext<CommandSourceStack> ctx) throws CommandSyntaxException {
@@ -354,11 +340,10 @@ public final class MindCommands {
             Optional<TardisTrait> trait = TardisTraits.byId(id);
             if (trait.isEmpty()) return fail(ctx, "unknown_trait", id);
 
-            List<TardisTrait> traits =
-                    new ArrayList<>(TardisMindSystem.mind(tardis).traits());
+            List<TardisTrait> traits = new ArrayList<>(TardisMinds.mind(tardis).traits());
             if (traits.contains(trait.get())) return fail(ctx, "trait_already", id);
             if (traits.size() >= TardisMind.MAX_TRAITS) return fail(ctx, "traits_full", TardisMind.MAX_TRAITS);
-            TardisPersonality personality = TardisMindSystem.mind(tardis).personality();
+            TardisPersonality personality = TardisMinds.mind(tardis).personality();
             if (!trait.get().fits(personality)) return fail(ctx, "trait_doesnt_fit", id, shortId(personality.id()));
             Optional<TardisTrait> clash =
                     traits.stream().filter(trait.get()::clashesWith).findFirst();
@@ -376,8 +361,7 @@ public final class MindCommands {
             Optional<TardisTrait> trait = TardisTraits.byId(id);
             if (trait.isEmpty()) return fail(ctx, "unknown_trait", id);
 
-            List<TardisTrait> traits =
-                    new ArrayList<>(TardisMindSystem.mind(tardis).traits());
+            List<TardisTrait> traits = new ArrayList<>(TardisMinds.mind(tardis).traits());
             if (!traits.remove(trait.get())) return fail(ctx, "trait_missing", id);
 
             return saveTraits(ctx, tardis, traits);
@@ -389,8 +373,8 @@ public final class MindCommands {
     }
 
     private static int saveTraits(CommandContext<CommandSourceStack> ctx, Tardis tardis, List<TardisTrait> traits) {
-        TardisMindSystem.setTraits(tardis, traits);
-        return reply(ctx, tardis, "traits", traitList(TardisMindSystem.mind(tardis)), true);
+        TardisMinds.setTraits(tardis, traits);
+        return reply(ctx, tardis, "traits", traitList(TardisMinds.mind(tardis)), true);
     }
 
     private static int reply(
@@ -416,7 +400,7 @@ public final class MindCommands {
         return withTardis(
                 ctx,
                 (tardis, idText) ->
-                        reply(ctx, tardis, "disabilities", disabilityList(TardisMindSystem.mind(tardis)), false));
+                        reply(ctx, tardis, "disabilities", disabilityList(TardisMinds.mind(tardis)), false));
     }
 
     private static int changeDisability(CommandContext<CommandSourceStack> ctx, boolean add)
@@ -427,7 +411,7 @@ public final class MindCommands {
             if (disability.isEmpty()) return fail(ctx, "unknown_disability", id);
 
             List<TardisDisability> disabilities =
-                    new ArrayList<>(TardisMindSystem.mind(tardis).disabilities());
+                    new ArrayList<>(TardisMinds.mind(tardis).disabilities());
             if (add && disabilities.contains(disability.get())) return fail(ctx, "disability_already", id);
             if (!add && !disabilities.contains(disability.get())) return fail(ctx, "disability_missing", id);
 
@@ -443,8 +427,8 @@ public final class MindCommands {
 
     private static int saveDisabilities(
             CommandContext<CommandSourceStack> ctx, Tardis tardis, List<TardisDisability> disabilities) {
-        TardisMindSystem.setDisabilities(tardis, disabilities);
-        return reply(ctx, tardis, "disabilities", disabilityList(TardisMindSystem.mind(tardis)), true);
+        TardisMinds.setDisabilities(tardis, disabilities);
+        return reply(ctx, tardis, "disabilities", disabilityList(TardisMinds.mind(tardis)), true);
     }
 
     private static String disabilityList(TardisMind mind) {

@@ -13,7 +13,6 @@ public final class TardisTravel {
     private static final double POWER = 0.557;
     private static final double MIN_SECONDS = 3.0;
     private static final double DIMENSION_SECONDS = 15.0;
-    // Generous rather than tight: "data flight_remaining" is meant to allow a deliberately absurd number of seconds.
     private static final long MIN_OVERRIDE_TICKS = 0L;
     private static final long MAX_OVERRIDE_TICKS = 20_000_000L;
 
@@ -64,12 +63,12 @@ public final class TardisTravel {
 
     public static float progress(Tardis tardis) {
         long required = requiredTicks(tardis);
-        if (required <= 0L) return 1F;
-        return Mth.clamp(vortexTicks(tardis) / (float) required, 0F, 1F);
+        if (required <= 0L) return 1f;
+        return Mth.clamp(vortexTicks(tardis) / (float) required, 0f, 1f);
     }
 
     public static LandingTarget crashTarget(Tardis tardis) {
-        return partWayTarget(tardis, 0F);
+        return partWayTarget(tardis, 0f);
     }
 
     /**
@@ -78,10 +77,10 @@ public final class TardisTravel {
     public static LandingTarget partWayTarget(Tardis tardis, float atLeast) {
         LandingTarget target = tardis.landingTarget().orElse(null);
         BlockPos from = tardis.exteriorPos().orElse(BlockPos.ZERO);
-        if (target == null) return new LandingTarget(tardis.exteriorDimension(), from, 0F);
+        if (target == null) return new LandingTarget(tardis.exteriorDimension(), from, 0f);
         float progress = Math.max(progress(tardis), atLeast);
         BlockPos partWay = between(from, target.pos(), progress);
-        boolean pastHalfway = progress >= 0.5F;
+        boolean pastHalfway = progress >= 0.5f;
         ResourceKey<Level> dimension = pastHalfway ? target.dimension() : tardis.exteriorDimension();
         return new LandingTarget(dimension, partWay, target.yaw());
     }

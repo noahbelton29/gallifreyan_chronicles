@@ -9,7 +9,6 @@ import net.minecraft.core.UUIDUtil;
 import net.minecraft.core.component.DataComponentType;
 import net.minecraft.core.registries.BuiltInRegistries;
 import uk.nbforge.gallifreyan_chronicles.Constants;
-import uk.nbforge.gallifreyan_chronicles.codec.item.ItemInfoTooltipCodec;
 import uk.nbforge.gallifreyan_chronicles.core.item.tooltip.ItemInfoTooltip;
 import uk.nbforge.gallifreyan_chronicles.util.GCUtil;
 
@@ -34,7 +33,6 @@ public class GCDataComponents {
             "door_type",
             () -> DataComponentType.<String>builder().persistent(Codec.STRING).build());
 
-    // Set on a door item that was picked up or dropped from a primary door so placing it makes a primary door again
     public static final DataComponentType<Boolean> PRIMARY_DOOR = register(
             "primary_door",
             () -> DataComponentType.<Boolean>builder().persistent(Codec.BOOL).build());
@@ -42,7 +40,7 @@ public class GCDataComponents {
     public static final DataComponentType<ItemInfoTooltip> ITEM_INFO = register(
             "item_info",
             () -> DataComponentType.<ItemInfoTooltip>builder()
-                    .persistent(ItemInfoTooltipCodec.CODEC)
+                    .persistent(ItemInfoTooltip.CODEC)
                     .build());
 
     public static final DataComponentType<UUID> TARDIS_ID = register(

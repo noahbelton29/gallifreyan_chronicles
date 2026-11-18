@@ -11,9 +11,9 @@ import uk.nbforge.gallifreyan_chronicles.client.renderer.block.TardisExteriorBlo
 import uk.nbforge.gallifreyan_chronicles.client.renderer.entity.TardisControlEntityRenderer;
 import uk.nbforge.gallifreyan_chronicles.client.renderer.entity.TardisKeyEntityRenderer;
 import uk.nbforge.gallifreyan_chronicles.core.GCEntityTypes;
-import uk.nbforge.gallifreyan_chronicles.core.block_entities.InteriorDoorBlockEntity;
-import uk.nbforge.gallifreyan_chronicles.core.block_entities.TardisConsoleBlockEntity;
-import uk.nbforge.gallifreyan_chronicles.core.block_entities.TardisExteriorBlockEntity;
+import uk.nbforge.gallifreyan_chronicles.core.block_entity.InteriorDoorBlockEntity;
+import uk.nbforge.gallifreyan_chronicles.core.block_entity.TardisConsoleBlockEntity;
+import uk.nbforge.gallifreyan_chronicles.core.block_entity.TardisExteriorBlockEntity;
 
 @EventBusSubscriber(modid = Constants.MOD_ID, value = Dist.CLIENT)
 public class NeoForgeClientRenderers {

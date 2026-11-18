@@ -1,7 +1,6 @@
 package uk.nbforge.gallifreyan_chronicles.tardis.exterior.fade;
 
 import com.mojang.serialization.MapCodec;
-import uk.nbforge.gallifreyan_chronicles.tardis.codec.exterior.fade.FadeCodec;
 
 public final class PulseFadeType extends FadeType {
     private final float pulseTicks;

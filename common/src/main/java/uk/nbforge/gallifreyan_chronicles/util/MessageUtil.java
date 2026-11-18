@@ -7,6 +7,7 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.phys.Vec3;
+import org.jspecify.annotations.Nullable;
 import uk.nbforge.gallifreyan_chronicles.Constants;
 
 public final class MessageUtil {
@@ -19,12 +20,18 @@ public final class MessageUtil {
         return Component.translatable(PREFIX + key, args);
     }
 
-    public static void overlay(Player player, String key, Object... args) {
-        player.sendOverlayMessage(text(key, args));
+    public static void overlay(@Nullable Player player, String key, Object... args) {
+        if (player != null) player.sendOverlayMessage(text(key, args));
     }
 
-    public static void overlay(Player player, ChatFormatting colour, String key, Object... args) {
-        player.sendOverlayMessage(text(key, args).withStyle(colour));
+    public static void overlay(@Nullable Player player, ChatFormatting colour, String key, Object... args) {
+        if (player != null) player.sendOverlayMessage(text(key, args).withStyle(colour));
+    }
+
+    public static void overlayAll(ServerLevel level, Component message) {
+        for (ServerPlayer player : level.players()) {
+            player.sendOverlayMessage(message);
+        }
     }
 
     public static void overlayNearby(ServerLevel level, Vec3 pos, ChatFormatting colour, String key, Object... args) {

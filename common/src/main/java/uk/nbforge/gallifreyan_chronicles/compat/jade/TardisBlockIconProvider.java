@@ -2,20 +2,20 @@ package uk.nbforge.gallifreyan_chronicles.compat.jade;
 
 import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.ItemStack;
-import org.jetbrains.annotations.Nullable;
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 import snownee.jade.api.BlockAccessor;
 import snownee.jade.api.IBlockComponentProvider;
 import snownee.jade.api.ITooltip;
 import snownee.jade.api.config.IPluginConfig;
 import snownee.jade.api.ui.Element;
 import snownee.jade.api.ui.JadeUI;
-import uk.nbforge.gallifreyan_chronicles.core.GCBlocks;
 import uk.nbforge.gallifreyan_chronicles.core.GCDataComponents;
-import uk.nbforge.gallifreyan_chronicles.core.block_entities.TardisConsoleBlockEntity;
-import uk.nbforge.gallifreyan_chronicles.core.block_entities.TardisExteriorBlockEntity;
-import uk.nbforge.gallifreyan_chronicles.tardis.TardisInteriorOptions;
-import uk.nbforge.gallifreyan_chronicles.util.ConsoleStackUtil;
+import uk.nbforge.gallifreyan_chronicles.core.block.registry.TardisBlocks;
+import uk.nbforge.gallifreyan_chronicles.core.block_entity.TardisConsoleBlockEntity;
+import uk.nbforge.gallifreyan_chronicles.core.block_entity.TardisExteriorBlockEntity;
+import uk.nbforge.gallifreyan_chronicles.tardis.console.ConsoleStackUtil;
+import uk.nbforge.gallifreyan_chronicles.tardis.interior.TardisInteriorOptions;
 import uk.nbforge.gallifreyan_chronicles.util.GCUtil;
 
 public class TardisBlockIconProvider implements IBlockComponentProvider {
@@ -34,11 +34,11 @@ public class TardisBlockIconProvider implements IBlockComponentProvider {
     }
 
     public static ItemStack consoleStack(TardisConsoleBlockEntity console) {
-        return ConsoleStackUtil.withConsoleData(new ItemStack(GCBlocks.TARDIS_CONSOLE), console);
+        return ConsoleStackUtil.withConsoleData(new ItemStack(TardisBlocks.TARDIS_CONSOLE), console);
     }
 
     private static ItemStack exteriorStack(TardisExteriorBlockEntity exterior) {
-        ItemStack stack = new ItemStack(GCBlocks.TARDIS);
+        ItemStack stack = new ItemStack(TardisBlocks.TARDIS);
         String exteriorId = exterior.getExterior().id();
         for (TardisInteriorOptions.Option option : TardisInteriorOptions.client()) {
             if (exteriorId.equals(option.exteriorId())) {

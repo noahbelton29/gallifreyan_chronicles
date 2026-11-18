@@ -1,11 +1,11 @@
 package uk.nbforge.gallifreyan_chronicles.datagen.tardis;
 
-import static uk.nbforge.gallifreyan_chronicles.datagen.tardis.builder.GCMind.*;
+import static uk.nbforge.gallifreyan_chronicles.datagen.tardis.builder.MindReactions.*;
 
 import com.google.gson.JsonObject;
 import net.minecraft.ChatFormatting;
 import net.minecraft.data.PackOutput;
-import uk.nbforge.gallifreyan_chronicles.datagen.tardis.builder.GCPersonalityBuilder;
+import uk.nbforge.gallifreyan_chronicles.datagen.tardis.builder.PersonalityBuilder;
 import uk.nbforge.gallifreyan_chronicles.datagen.util.GCJsonDataProvider;
 import uk.nbforge.gallifreyan_chronicles.tardis.mind.action.builtin.SparksAction.Size;
 
@@ -16,7 +16,6 @@ public class GCTardisPersonalityProvider extends GCJsonDataProvider {
 
     @Override
     protected void addEntries() {
-        // Fights back and slams doors, it only obeys when it is very afraid
         personality("aggressive")
                 .howCommon(10)
                 .refusesToFlyWhen(45, 30)
@@ -35,7 +34,6 @@ public class GCTardisPersonalityProvider extends GCJsonDataProvider {
                 .whenHitWhileTerrified(savage(4, 10, 3), revealIfItReacted())
                 .whenYouEnter(lashOut(0.35, 2, 6, 0.9, 0.35), revealIfItReacted());
 
-        // Locks up and shields itself instead of attacking
         personality("defensive")
                 .howCommon(32)
                 .refusesToFlyWhen(50, 30)
@@ -51,7 +49,6 @@ public class GCTardisPersonalityProvider extends GCJsonDataProvider {
                         reveal())
                 .whenYouEnter(lashOut(0.65, 1, 3, 0.5, 0.25), revealIfItReacted());
 
-        // Always does what it is told, never refuses to fly
         personality("obedient")
                 .howCommon(28)
                 .mallet(m ->
@@ -60,7 +57,6 @@ public class GCTardisPersonalityProvider extends GCJsonDataProvider {
                 .whenItSeesTheMallet(sound("stop_demat", 0.4, 1.6), message("mallet_seen_flinch", ChatFormatting.GRAY))
                 .whenHit(reveal());
 
-        // Gives in easily, it balks when it will not fly but does not fight
         personality("submissive")
                 .howCommon(30)
                 .refusesToFlyWhen(60, 20)
@@ -70,10 +66,9 @@ public class GCTardisPersonalityProvider extends GCJsonDataProvider {
                 .whenItSeesTheMallet(sound("stop_demat", 0.4, 1.6), message("mallet_seen_flinch", ChatFormatting.GRAY));
     }
 
-    /** Starts an empty personality under this name and returns the builder for it. */
-    private GCPersonalityBuilder personality(String name) {
+    private PersonalityBuilder personality(String name) {
         JsonObject json = new JsonObject();
         add(name, json);
-        return new GCPersonalityBuilder(json);
+        return new PersonalityBuilder(json);
     }
 }

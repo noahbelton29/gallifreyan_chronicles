@@ -26,7 +26,7 @@ import net.minecraft.world.phys.Vec3;
 import org.joml.Vector4f;
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
-import uk.nbforge.gallifreyan_chronicles.core.block_entities.TardisExteriorBlockEntity;
+import uk.nbforge.gallifreyan_chronicles.core.block_entity.TardisExteriorBlockEntity;
 
 public class TardisExteriorKeyLayer<
                 T extends GeoAnimatable & TardisExteriorKeyLayer.TardisExteriorRenderable, O, R extends GeoRenderState>
@@ -117,7 +117,7 @@ public class TardisExteriorKeyLayer<
         BlockPos pos = exterior.getBlockPos();
         Vec3 worldPos = new Vec3(pos.getX() + origin.x(), pos.getY() + origin.y(), pos.getZ() + origin.z());
 
-        exterior.setCachedKeyBoneWorldPos(worldPos);
+        exterior.lock().setCachedKeyBoneWorldPos(worldPos);
     }
 
     public interface TardisExteriorRenderable {

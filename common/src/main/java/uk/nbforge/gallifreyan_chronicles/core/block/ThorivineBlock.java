@@ -26,7 +26,8 @@ public class ThorivineBlock extends CactusBlock {
             Entity entity,
             @NonNull InsideBlockEffectApplier effectApplier,
             boolean isPrecise) {
-        entity.hurt(level.damageSources().cactus(), 3.0F);
+        if (level instanceof ServerLevel serverLevel)
+            entity.hurtServer(serverLevel, level.damageSources().cactus(), 3.0f);
         if (entity instanceof LivingEntity livingEntity) {
             livingEntity.addEffect(new MobEffectInstance(MobEffects.POISON, 100, 0));
             livingEntity.addEffect(new MobEffectInstance(MobEffects.NAUSEA, 140, 0));

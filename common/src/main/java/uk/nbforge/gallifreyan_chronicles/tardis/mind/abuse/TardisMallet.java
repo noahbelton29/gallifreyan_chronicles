@@ -17,32 +17,30 @@ import uk.nbforge.gallifreyan_chronicles.core.lifecycle.ServerState;
 import uk.nbforge.gallifreyan_chronicles.network.tardis.TardisAlarmPayload;
 import uk.nbforge.gallifreyan_chronicles.network.tardis.TardisDrumShakePayload;
 import uk.nbforge.gallifreyan_chronicles.tardis.Tardis;
-import uk.nbforge.gallifreyan_chronicles.tardis.ecs.system.TardisMindSystem;
 import uk.nbforge.gallifreyan_chronicles.tardis.mind.MindMessages;
+import uk.nbforge.gallifreyan_chronicles.tardis.mind.TardisDiscovery;
+import uk.nbforge.gallifreyan_chronicles.tardis.mind.TardisMinds;
 import uk.nbforge.gallifreyan_chronicles.tardis.mind.TardisPersonality;
 import uk.nbforge.gallifreyan_chronicles.tardis.mind.action.MindActions;
 import uk.nbforge.gallifreyan_chronicles.tardis.mind.action.MindContext;
 import uk.nbforge.gallifreyan_chronicles.tardis.mind.data.MindEnums.Reveal;
-import uk.nbforge.gallifreyan_chronicles.tardis.mind.discovery.TardisDiscovery;
 import uk.nbforge.gallifreyan_chronicles.tardis.mind.mood.TardisAlarm;
-import uk.nbforge.gallifreyan_chronicles.util.GCSparkUtil;
+import uk.nbforge.gallifreyan_chronicles.util.SparkUtil;
 
 public final class TardisMallet {
     private static final float STRESS_PER_HIT = 8f;
     private static final float TRUST_LOSS_PER_HIT = 6f;
-    private static final float SHUDDER_SHAKE = 0.4F;
+    private static final float SHUDDER_SHAKE = 0.4f;
     private static final float FLINCH_FEAR = 30f;
     private static final float COWER_FEAR = 60f;
-    private static final float BASE_BLAST = 0.6F;
-    private static final float BLAST_PER_FEAR = 0.02F;
+    private static final float BASE_BLAST = 0.6f;
+    private static final float BLAST_PER_FEAR = 0.02f;
 
     private static final int ALARM_HITS = 2;
-    // A betrayal is a real beating of a TARDIS that trusted you and not a couple of taps
     private static final int BETRAYAL_HITS = 8;
     private static final float BETRAYAL_NEEDS_TRUST = 50f;
     private static final int LONG_ALARM_HITS = 5;
     private static final int LONG_ALARM_FLASHES = 3;
-    // Hits within this long of each other count as one beating
     private static final long BEATING_GAP_TICKS = 6000L;
     private static final Map<String, Beating> BEATINGS = ServerState.track(new HashMap<>());
 
@@ -56,32 +54,32 @@ public final class TardisMallet {
     }
 
     public static void strike(Tardis tardis, ServerLevel level, BlockPos hitPos, Player player) {
-        TardisPersonality personality = TardisMindSystem.mind(tardis).personality();
+        TardisPersonality personality = TardisMinds.mind(tardis).personality();
         UUID hitter = player.getUUID();
         Beating beating = countHit(tardis, hitter);
-        TardisMindSystem.addFear(tardis, hitter, personality.malletFear().pick(level.getRandom()));
-        TardisMindSystem.addStress(tardis, STRESS_PER_HIT);
-        TardisMindSystem.abuse(tardis, hitter, TRUST_LOSS_PER_HIT);
+        TardisMinds.addFear(tardis, hitter, personality.malletFear().pick(level.getRandom()));
+        TardisMinds.addStress(tardis, STRESS_PER_HIT);
+        TardisMinds.abuse(tardis, hitter, TRUST_LOSS_PER_HIT);
         TardisTrauma.hit(tardis, hitter, beating.count());
         TardisDiscovery.reveal(tardis, Reveal.IT_IS_HIT);
 
         Vec3 hit = Vec3.atCenterOf(hitPos);
-        float blast = BASE_BLAST + TardisMindSystem.fear(tardis, hitter) * BLAST_PER_FEAR;
+        float blast = BASE_BLAST + TardisMinds.fear(tardis, hitter) * BLAST_PER_FEAR;
         level.explode(null, hit.x, hit.y, hit.z, blast, Level.ExplosionInteraction.NONE);
         level.playSound(
                 null,
                 hitPos,
                 SoundEvents.ANVIL_LAND,
                 SoundSource.BLOCKS,
-                0.6F,
-                0.7F + level.getRandom().nextFloat() * 0.2F);
+                0.6f,
+                0.7f + level.getRandom().nextFloat() * 0.2f);
         level.sendParticles(ParticleTypes.CRIT, hit.x, hit.y, hit.z, 12, 0.3, 0.3, 0.3, 0.2);
-        GCSparkUtil.small(level, hit, 8);
+        SparkUtil.small(level, hit, 8);
         TardisDrumShakePayload.broadcast(level, hit, SHUDDER_SHAKE);
         shudderInside(tardis);
         alarm(tardis, level, hitPos, player, beating.count());
         boolean betrayal = beating.count() >= BETRAYAL_HITS && beating.trustBefore() >= BETRAYAL_NEEDS_TRUST;
-        if (betrayal && TardisMindSystem.betray(tardis, hitter)) {
+        if (betrayal && TardisMinds.betray(tardis, hitter)) {
             MindMessages.say(player, ChatFormatting.DARK_RED, "tardis_betrayed");
             return;
         }
@@ -91,25 +89,23 @@ public final class TardisMallet {
         MindContext context = new MindContext(tardis, level, player, hit);
         MindActions.run(personality.onMalletHit(), context);
         if (context.handled) return;
-        MindMessages.say(player, ChatFormatting.DARK_GRAY, reaction(TardisMindSystem.fear(tardis, hitter)));
+        MindMessages.say(player, ChatFormatting.DARK_GRAY, reaction(TardisMinds.fear(tardis, hitter)));
     }
 
-    /** Each player hits on each TARDIS grouped into beatings. */
     private static Beating countHit(Tardis tardis, UUID hitter) {
-        long now = TardisMindSystem.now(tardis.server());
+        long now = TardisMinds.now(tardis.server());
         String key = tardis.id() + "/" + hitter;
         Beating last = BEATINGS.get(key);
         boolean fresh = last == null || now - last.lastTick() > BEATING_GAP_TICKS;
         Beating beating = fresh
-                ? new Beating(1, now, TardisMindSystem.trust(tardis, hitter))
+                ? new Beating(1, now, TardisMinds.trust(tardis, hitter))
                 : new Beating(last.count() + 1, now, last.trustBefore());
         BEATINGS.put(key, beating);
         return beating;
     }
 
-    /** After a couple of hits the cloister bell rings and the lights go red. */
     private static void alarm(Tardis tardis, ServerLevel level, BlockPos hitPos, Player player, int hits) {
-        if (hits < ALARM_HITS) return;
+        if (hits < ALARM_HITS || !tardis.hasPower()) return;
         int flashes = hits >= LONG_ALARM_HITS ? LONG_ALARM_FLASHES : 1;
 
         ServerLevel interior = tardis.interiorLevel().orElse(null);

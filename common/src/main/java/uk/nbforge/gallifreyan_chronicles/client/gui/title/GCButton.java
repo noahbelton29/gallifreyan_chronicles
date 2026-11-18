@@ -12,8 +12,8 @@ public class GCButton extends Button {
     private static final int BACKGROUND = 0x80000000;
     private static final int BACKGROUND_DISABLED = 0x40000000;
     private static final int WHITE = 0xFFFFFF;
-    private static final float HOVER_WHITE_ALPHA = 48.0F;
-    private static final float HOVER_MILLIS = 120.0F;
+    private static final float HOVER_WHITE_ALPHA = 48.0f;
+    private static final float HOVER_MILLIS = 120.0f;
 
     private float hoverProgress;
     private long lastFrameMillis = -1L;
@@ -24,12 +24,12 @@ public class GCButton extends Button {
 
     private float updateHover() {
         long now = Util.getMillis();
-        float delta = this.lastFrameMillis < 0L ? 0.0F : (now - this.lastFrameMillis) / HOVER_MILLIS;
+        float delta = this.lastFrameMillis < 0L ? 0.0f : (now - this.lastFrameMillis) / HOVER_MILLIS;
         this.lastFrameMillis = now;
-        float target = this.active && this.isHoveredOrFocused() ? 1.0F : 0.0F;
+        float target = this.active && this.isHoveredOrFocused() ? 1.0f : 0.0f;
         this.hoverProgress = Mth.approach(this.hoverProgress, target, delta);
         float t = this.hoverProgress;
-        return t * t * (3.0F - 2.0F * t);
+        return t * t * (3.0f - 2.0f * t);
     }
 
     @Override
@@ -41,7 +41,7 @@ public class GCButton extends Button {
         float hover = this.updateHover();
 
         graphics.fill(x, y, x + width, y + height, this.active ? BACKGROUND : BACKGROUND_DISABLED);
-        if (hover > 0.0F) {
+        if (hover > 0.0f) {
             graphics.fill(x, y, x + width, y + height, ARGB.color(Math.round(hover * HOVER_WHITE_ALPHA), WHITE));
         }
 

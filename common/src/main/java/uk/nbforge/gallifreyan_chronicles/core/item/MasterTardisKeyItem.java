@@ -8,9 +8,9 @@ import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.level.Level;
 import org.jspecify.annotations.NonNull;
 import uk.nbforge.gallifreyan_chronicles.core.GCDataComponents;
-import uk.nbforge.gallifreyan_chronicles.core.block_entities.TardisExteriorBlockEntity;
+import uk.nbforge.gallifreyan_chronicles.core.block_entity.TardisExteriorBlockEntity;
 import uk.nbforge.gallifreyan_chronicles.core.item.tooltip.ItemInfoTooltip;
-import uk.nbforge.gallifreyan_chronicles.tardis.TardisApi;
+import uk.nbforge.gallifreyan_chronicles.tardis.Tardis;
 import uk.nbforge.gallifreyan_chronicles.util.MessageUtil;
 
 public class MasterTardisKeyItem extends Item implements ScrollSelectable {
@@ -42,24 +42,22 @@ public class MasterTardisKeyItem extends Item implements ScrollSelectable {
 
         if (level.isClientSide()) return InteractionResult.SUCCESS;
 
-        if (exterior.hasKeyRendered()) {
-            return TardisApi.of(exterior)
-                            .map(tardis -> tardis.returnKeyTo(player))
-                            .orElse(false)
+        if (exterior.lock().hasKeyRendered()) {
+            return Tardis.of(exterior).map(tardis -> tardis.returnKeyTo(player)).orElse(false)
                     ? InteractionResult.CONSUME
                     : InteractionResult.FAIL;
         }
 
-        if (exterior.rejectKeyIfLockBroken(player)) return InteractionResult.FAIL;
+        if (exterior.lock().rejectKeyIfLockBroken(player)) return InteractionResult.FAIL;
 
-        if (!exterior.areDoorsFullyClosed()) {
+        if (!exterior.doors().areFullyClosed()) {
             MessageUtil.overlay(player, "close_doors_to_insert_key");
             return InteractionResult.FAIL;
         }
 
         ItemStack stack = context.getItemInHand();
-        exterior.insertKey(player, context.getHand(), stack);
-        exterior.toggleKeyLockAnimation(player);
+        exterior.lock().insertKey(player, context.getHand(), stack);
+        exterior.lock().toggleKeyLockAnimation(player);
 
         return InteractionResult.CONSUME;
     }

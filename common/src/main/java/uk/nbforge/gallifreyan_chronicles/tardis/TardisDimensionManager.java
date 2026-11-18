@@ -19,10 +19,10 @@ import org.jspecify.annotations.Nullable;
 import uk.nbforge.gallifreyan_chronicles.Constants;
 import uk.nbforge.gallifreyan_chronicles.compat.portal.TardisPortalBridge;
 import uk.nbforge.gallifreyan_chronicles.core.GCDimensions;
-import uk.nbforge.gallifreyan_chronicles.core.block_entities.TardisConsoleBlockEntity;
+import uk.nbforge.gallifreyan_chronicles.core.block_entity.TardisConsoleBlockEntity;
 import uk.nbforge.gallifreyan_chronicles.core.lifecycle.ServerState;
 import uk.nbforge.gallifreyan_chronicles.mixin.server.MinecraftServerAccessor;
-import uk.nbforge.gallifreyan_chronicles.tardis.ecs.system.TardisInteriorSystem;
+import uk.nbforge.gallifreyan_chronicles.tardis.interior.TardisInteriors;
 import uk.nbforge.gallifreyan_chronicles.util.GCUtil;
 
 public final class TardisDimensionManager {
@@ -36,12 +36,14 @@ public final class TardisDimensionManager {
         return ResourceKey.create(Registries.DIMENSION, GCUtil.modIdentifier("tardis/" + tardisId));
     }
 
-    public static @Nullable ServerLevel get(MinecraftServer server, UUID tardisId) {
-        return server.getLevel(levelKey(tardisId));
+    /** Use {@link Tardis#interiorLevel()}, this is what it reads. */
+    public static @Nullable ServerLevel get(Tardis tardis) {
+        return tardis.server().getLevel(levelKey(tardis.id()));
     }
 
-    public static ServerLevel getOrCreate(MinecraftServer server, UUID tardisId) {
-        ResourceKey<Level> key = levelKey(tardisId);
+    public static ServerLevel getOrCreate(Tardis tardis) {
+        MinecraftServer server = tardis.server();
+        ResourceKey<Level> key = levelKey(tardis.id());
         ServerLevel existing = server.getLevel(key);
         if (existing != null) return existing;
 
@@ -83,21 +85,20 @@ public final class TardisDimensionManager {
         PLACE_CONTROLS.clear();
         for (UUID tardisId : TardisManager.get(server).getInteriorIds()) {
             try {
-                getOrCreate(server, tardisId);
+                Tardis.get(server, tardisId).ifPresent(TardisDimensionManager::getOrCreate);
             } catch (Exception e) {
                 Constants.LOG.error("failed to restore tardis dimension for {}", tardisId, e);
             }
         }
     }
 
-    /** If the interior is not loaded yet the player waits in the queue. */
-    public static void requestEntry(MinecraftServer server, ServerPlayer player, UUID tardisId) {
-        ServerLevel level = get(server, tardisId);
+    public static void requestEntry(Tardis tardis, ServerPlayer player) {
+        ServerLevel level = get(tardis);
         if (level != null) {
-            teleportPlayerIntoInterior(player, level, tardisId);
+            teleportPlayerIntoInterior(tardis, player, level);
             return;
         }
-        PENDING.putIfAbsent(player.getUUID(), tardisId);
+        PENDING.putIfAbsent(player.getUUID(), tardis.id());
     }
 
     public static void processPendingEntries(MinecraftServer server) {
@@ -111,27 +112,29 @@ public final class TardisDimensionManager {
             ServerPlayer player = server.getPlayerList().getPlayer(entry.getKey());
             if (player == null) continue;
             try {
-                ServerLevel level = getOrCreate(server, entry.getValue());
-                teleportPlayerIntoInterior(player, level, entry.getValue());
+                Tardis tardis = Tardis.get(server, entry.getValue()).orElse(null);
+                if (tardis == null) continue;
+                ServerLevel level = getOrCreate(tardis);
+                teleportPlayerIntoInterior(tardis, player, level);
             } catch (Exception e) {
                 Constants.LOG.error("failed to enter tardis {}", entry.getValue(), e);
             }
         }
     }
 
-    public static void scheduleControlPlacement(UUID tardisId) {
-        PLACE_CONTROLS.put(tardisId, CONTROL_PLACE_DELAY_TICKS);
+    public static void scheduleControlPlacement(Tardis tardis) {
+        PLACE_CONTROLS.put(tardis.id(), CONTROL_PLACE_DELAY_TICKS);
     }
 
-    private static void teleportPlayerIntoInterior(ServerPlayer player, ServerLevel interior, UUID tardisId) {
-        boolean firstEntry = TardisInteriorSystem.buildInteriorIfMissing(interior, tardisId);
-        TardisInteriorSystem.Arrival arrival = TardisInteriorSystem.arrival(interior, tardisId);
-        TardisInteriorSystem.markArriving(player);
+    private static void teleportPlayerIntoInterior(Tardis tardis, ServerPlayer player, ServerLevel interior) {
+        boolean firstEntry = TardisInteriors.buildInteriorIfMissing(tardis, interior);
+        TardisInteriors.Arrival arrival = TardisInteriors.arrival(tardis, interior);
+        TardisInteriors.markArriving(player);
         player.teleportTo(
                 interior, arrival.pos().x, arrival.pos().y, arrival.pos().z, Set.of(), arrival.yaw(), 0.0f, true);
 
         if (firstEntry) {
-            PLACE_CONTROLS.put(tardisId, CONTROL_PLACE_DELAY_TICKS);
+            scheduleControlPlacement(tardis);
         }
     }
 
@@ -148,7 +151,7 @@ public final class TardisDimensionManager {
             iterator.remove();
 
             UUID tardisId = entry.getKey();
-            TardisApi.get(server, tardisId)
+            Tardis.get(server, tardisId)
                     .flatMap(Tardis::console)
                     .ifPresentOrElse(
                             TardisConsoleBlockEntity::respawnControls,

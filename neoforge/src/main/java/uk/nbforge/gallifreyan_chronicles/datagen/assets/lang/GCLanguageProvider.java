@@ -12,7 +12,8 @@ import uk.nbforge.gallifreyan_chronicles.Constants;
 import uk.nbforge.gallifreyan_chronicles.core.GCBlocks;
 import uk.nbforge.gallifreyan_chronicles.core.GCItems;
 import uk.nbforge.gallifreyan_chronicles.core.GCTardisControls;
-import uk.nbforge.gallifreyan_chronicles.core.dynamic_registries.TardisControlRegistry;
+import uk.nbforge.gallifreyan_chronicles.core.block.registry.TardisBlocks;
+import uk.nbforge.gallifreyan_chronicles.tardis.control.TardisControls;
 
 public class GCLanguageProvider extends LanguageProvider {
     public GCLanguageProvider(PackOutput output) {
@@ -27,13 +28,12 @@ public class GCLanguageProvider extends LanguageProvider {
 
     @Override
     protected void addTranslations() {
-        // Blocks
         for (Block block : GCBlocks.BLOCKS) {
-            if (block == GCBlocks.TARDIS) {
+            if (block == TardisBlocks.TARDIS) {
                 add(block, "TARDIS");
-            } else if (block == GCBlocks.TARDIS_CONSOLE) {
+            } else if (block == TardisBlocks.TARDIS_CONSOLE) {
                 add(block, "TARDIS Console");
-            } else if (block == GCBlocks.TARDIS_INTERIOR_DOOR) {
+            } else if (block == TardisBlocks.TARDIS_INTERIOR_DOOR) {
                 add(block, "TARDIS Interior Door");
             } else if (BuiltInRegistries.BLOCK.getKey(block).getPath().equals("tardis_top")) {
                 add(block, "TARDIS Top");
@@ -51,7 +51,6 @@ public class GCLanguageProvider extends LanguageProvider {
             }
         }
 
-        // Items
         for (Item item : GCItems.ITEMS) {
             if (item == GCItems.TARDIS_KEY) {
                 add(item, "TARDIS Key");
@@ -64,23 +63,20 @@ public class GCLanguageProvider extends LanguageProvider {
             add(item, titleCase(BuiltInRegistries.ITEM.getKey(item).getPath()));
         }
 
-        // TARDIS controls
-        for (String id : TardisControlRegistry.allIds()) {
+        for (String id : TardisControls.ids()) {
             if (Objects.equals(id, GCTardisControls.SPACE_TIME_THROTTLE)) {
-                add(TardisControlRegistry.translationKey(id), "Space-Time Throttle");
+                add(TardisControls.translationKey(id), "Space-Time Throttle");
                 continue;
             }
             if (Objects.equals(id, GCTardisControls.TIME_ROTOR_HANDBRAKE)) {
-                add(TardisControlRegistry.translationKey(id), "Time-Rotor Handbrake");
+                add(TardisControls.translationKey(id), "Time-Rotor Handbrake");
                 continue;
             }
-            add(TardisControlRegistry.translationKey(id), titleCase(id));
+            add(TardisControls.translationKey(id), titleCase(id));
         }
 
-        /** Entities. */
         add("entity.gallifreyan_chronicles.tardis_control", "TARDIS Control");
 
-        /** Miscellaneous. */
         add("gamerule.category.gallifreyan_chronicles.gallifreyan_chronicles", "Gallifreyan Chronicles");
         add("gamerule.gallifreyan_chronicles.gc_tardis_griefing", "Crashing TARDISes Make Craters");
 
@@ -121,7 +117,6 @@ public class GCLanguageProvider extends LanguageProvider {
                 "message.gallifreyan_chronicles.tardis_dreads_you",
                 "The TARDIS shudders. Its hum twists and the lights gutter in fear");
 
-        /** Creative tabs. */
         add("creativetab.gallifreyan_chronicles.tardis", "GC: TARDIS");
         add("tooltip.gallifreyan_chronicles.tardis.schema", "Schema");
         add("tooltip.gallifreyan_chronicles.console.model", "Console");
@@ -148,7 +143,6 @@ public class GCLanguageProvider extends LanguageProvider {
         add("creativetab.gallifreyan_chronicles.flora", "GC: Flora");
         add("creativetab.gallifreyan_chronicles.tools_and_armor", "GC: Tools & Armor");
 
-        /** Menus. */
         add("menu.gallifreyan_chronicles.credits", "Credits");
         add("menu.gallifreyan_chronicles.game_version", "Minecraft %s %s");
         add("menu.gallifreyan_chronicles.mods", "Mods");
@@ -182,7 +176,6 @@ public class GCLanguageProvider extends LanguageProvider {
         add("menu.gallifreyan_chronicles.settings", "Mod Settings");
         add("menu.gallifreyan_chronicles.version", "Gallifreyan Chronicles v%s");
 
-        /** Commands, general. */
         add("command.gallifreyan_chronicles.invalid_id", "Invalid TARDIS ID: %s");
         add("command.gallifreyan_chronicles.mind_header", "TARDIS %s mind:");
         add(
@@ -198,7 +191,6 @@ public class GCLanguageProvider extends LanguageProvider {
         add("command.gallifreyan_chronicles.click_to_copy", "Click to copy");
         add("command.gallifreyan_chronicles.no_tardis_id", "No TARDIS found with ID: %s");
 
-        /** Commands, exteriors. */
         add("command.gallifreyan_chronicles.unknown_exterior", "Unknown exterior: %s");
         add(
                 "command.gallifreyan_chronicles.remove_tardis",
@@ -210,14 +202,12 @@ public class GCLanguageProvider extends LanguageProvider {
         add("command.gallifreyan_chronicles.unlink_exterior", "Exterior unlinked from TARDIS ID: %s");
         add("command.gallifreyan_chronicles.not_looking_at_exterior", "You are not looking at a TARDIS exterior.");
 
-        /** Commands, interiors. */
         add("command.gallifreyan_chronicles.get_interior", "Interior of TARDIS %s: %s");
         add("command.gallifreyan_chronicles.set_interior", "Set interior of TARDIS %s to %s");
         add("command.gallifreyan_chronicles.unknown_interior", "Unknown interior: %s");
         add("command.gallifreyan_chronicles.missing_interior_template", "Missing template for interior: %s");
         add("command.gallifreyan_chronicles.interior_unchanged", "Interior of TARDIS %s is already set to %s");
 
-        /** Commands, consoles. */
         add("command.gallifreyan_chronicles.unknown_console", "Unknown console: %s");
         add("command.gallifreyan_chronicles.set_console", "Set console of TARDIS %s to %s");
         add("command.gallifreyan_chronicles.get_console", "Console of TARDIS %s: %s");
@@ -226,38 +216,31 @@ public class GCLanguageProvider extends LanguageProvider {
         add("command.gallifreyan_chronicles.unlink_console", "Console unlinked from TARDIS ID: %s");
         add("command.gallifreyan_chronicles.not_looking_at_console", "You are not looking at a TARDIS console.");
 
-        /** Commands, console variants. */
         add("command.gallifreyan_chronicles.unknown_console_variant", "Unknown console variant '%s' for console '%s'");
         add("command.gallifreyan_chronicles.set_console_variant", "Set console variant of TARDIS %s to %s");
 
-        /** Commands, interior door variants. */
         add("command.gallifreyan_chronicles.no_interior_door", "No interior doors found for TARDIS ID: %s");
         add("command.gallifreyan_chronicles.unknown_door_variant", "Unknown door variant '%s' for door type '%s'");
         add(
                 "command.gallifreyan_chronicles.set_door_variant",
                 "Set door variant of TARDIS %s to %s (%s doors updated)");
 
-        /** Commands, summon. */
         add("command.gallifreyan_chronicles.summon_tardis", "Summoned TARDIS %s to %s");
         add("command.gallifreyan_chronicles.summon_blocked", "Something is in the way, move and try again");
         add(
                 "command.gallifreyan_chronicles.summon_inside_tardis",
                 "A TARDIS cannot be summoned inside a TARDIS interior");
 
-        /** Commands, exterior glow. */
         add("command.gallifreyan_chronicles.set_glow", "Set exterior glow of TARDIS %s to %s");
 
-        /** Commands, fade type. */
         add("command.gallifreyan_chronicles.get_fade_type", "TARDIS %s uses the %s fade");
         add("command.gallifreyan_chronicles.set_fade_type", "Set fade type of TARDIS %s to %s");
         add("command.gallifreyan_chronicles.unknown_fade_type", "Unknown fade type %s (available: %s)");
 
-        /** Commands, subsystems. */
         add("command.gallifreyan_chronicles.unknown_subsystem", "Unknown TARDIS subsystem: %s");
         add("command.gallifreyan_chronicles.set_subsystem_health", "Set health of subsystem %s in TARDIS %s to %s");
         add("command.gallifreyan_chronicles.get_subsystem_health", "Health of subsystem %s in TARDIS %s: %s");
 
-        /** Commands, mind. */
         add("command.gallifreyan_chronicles.get_mind", "%s of TARDIS %s: %s");
         add("command.gallifreyan_chronicles.unknown_personality", "Unknown personality: %s");
         add("command.gallifreyan_chronicles.unknown_trait", "Unknown trait: %s");
@@ -274,17 +257,14 @@ public class GCLanguageProvider extends LanguageProvider {
         add("command.gallifreyan_chronicles.data_line", "  %s: %s");
         add("command.gallifreyan_chronicles.set_mind", "Set %s of TARDIS %s to %s");
 
-        /** Commands, TARDIS listing. */
         add("command.gallifreyan_chronicles.no_tardises", "No TARDISes found.");
         add("command.gallifreyan_chronicles.list_tardis", "%s | Exterior: %s | Position: %s");
 
-        /** Commands, debug. */
         add("command.gallifreyan_chronicles.debug", "=== TARDIS Debug: %s ===");
         add("command.gallifreyan_chronicles.owner", "Owner: %s");
         add("command.gallifreyan_chronicles.exterior", "Exterior: %s");
         add("command.gallifreyan_chronicles.position", "Position: %s");
 
-        /** Commands, console controls. */
         add("command.gallifreyan_chronicles.no_control_entities", "This console has no control entities.");
         add("command.gallifreyan_chronicles.player_only", "This command must be run by a player.");
         add("command.gallifreyan_chronicles.unknown_control", "Unknown TARDIS control: %s");
@@ -293,7 +273,6 @@ public class GCLanguageProvider extends LanguageProvider {
         add("command.gallifreyan_chronicles.control_refused", "Control %s refused to turn %s");
         add("command.gallifreyan_chronicles.set_control", "Turned control %s of TARDIS %s %s");
 
-        /** Commands, destinations. */
         add("command.gallifreyan_chronicles.destination_bad_facing", "Unknown facing: %s");
         add("command.gallifreyan_chronicles.destination_interior", "A destination can't be inside a TARDIS interior");
         add("command.gallifreyan_chronicles.destination_out_of_world", "That position is outside the world");
@@ -302,10 +281,8 @@ public class GCLanguageProvider extends LanguageProvider {
         add("command.gallifreyan_chronicles.destination_none", "TARDIS %s has no destination set");
         add("command.gallifreyan_chronicles.destination_cleared", "Cleared destination of TARDIS %s");
 
-        /** Commands, debug listing. */
         add("command.gallifreyan_chronicles.list_exterior", "Exteriors: %s");
 
-        /** Commands, low-level data fields. */
         add("command.gallifreyan_chronicles.get_glow", "Exterior glow of TARDIS %s: %s");
         add("command.gallifreyan_chronicles.get_console_variant", "Console variant of TARDIS %s: %s");
         add("command.gallifreyan_chronicles.get_door_variant", "Door variant of TARDIS %s: %s");
@@ -329,13 +306,11 @@ public class GCLanguageProvider extends LanguageProvider {
                 "command.gallifreyan_chronicles.set_flight_remaining",
                 "Skipped ahead, TARDIS %s now has %s seconds left of its flight");
 
-        /** Overlays. */
         add("overlay.gallifreyan_chronicles.destination", "Destination: %s  |  %s");
         add("overlay.gallifreyan_chronicles.destination_dimension", "Dimension: %s  (%s)");
         add("overlay.gallifreyan_chronicles.coord_increment", "Increment: %s");
         add("overlay.gallifreyan_chronicles.destination_direction", "Facing: %s");
 
-        /** Messages. */
         add(
                 "message.gallifreyan_chronicles.tardis_balks.stressed",
                 "The TARDIS is stressed and doesn't want to take off... pull it again to make it");
@@ -480,7 +455,6 @@ public class GCLanguageProvider extends LanguageProvider {
         add(
                 "discovery.gallifreyan_chronicles.disability.dyslexic.desc",
                 "It sometimes mixes up its coordinates, especially when stressed. It gets better with practice, but it never fully goes away.");
-        /** Sound subtitles. */
         add("sound.gallifreyan_chronicles.first_doctors_hum", "TARDIS hums");
         add("sound.gallifreyan_chronicles.spark", "Sparks crackle");
         add("sound.gallifreyan_chronicles.spark_explosion", "Sparks burst");
@@ -685,7 +659,6 @@ public class GCLanguageProvider extends LanguageProvider {
                 "message.gallifreyan_chronicles.isomorphic_denied",
                 "Isomorphic security: only the owner can use these controls.");
 
-        /** Facing. */
         add("facing.gallifreyan_chronicles.north", "North");
         add("facing.gallifreyan_chronicles.north_east", "North-East");
         add("facing.gallifreyan_chronicles.east", "East");
@@ -695,15 +668,11 @@ public class GCLanguageProvider extends LanguageProvider {
         add("facing.gallifreyan_chronicles.west", "West");
         add("facing.gallifreyan_chronicles.north_west", "North-West");
 
-        /** Debug. */
         add("debug.gallifreyan_chronicles.control_position", "[%s] pos=(%s) offset=(%s) size=(%s)");
         add("debug.gallifreyan_chronicles.control_unset", "<unset>");
 
         add("tooltip.gallifreyan_chronicles.label_separator", ": ");
 
-        // Config screen
-
-        /** Sound subtitles. */
         add("sounds.gallifreyan_chronicles.block_entity.tardis_door_open", "TARDIS door opens");
         add("sounds.gallifreyan_chronicles.block_entity.slider_sound", "TARDIS slider moves");
         add("sounds.gallifreyan_chronicles.block_entity.door_lock", "TARDIS door locks");
@@ -713,7 +682,6 @@ public class GCLanguageProvider extends LanguageProvider {
         add("sounds.gallifreyan_chronicles.block_entity.first_doctors_hum", "TARDIS hums");
         add("gallifreyan_chronicles.title.tile_screen", "Gallifreyan Chronicles Main Theme");
 
-        /** Jade. */
         add("tooltip.gallifreyan_chronicles.tardis.owner", "Owner");
         add("tooltip.gallifreyan_chronicles.key.style", "Style");
         add("key_style.gallifreyan_chronicles.tardis", "TARDIS");

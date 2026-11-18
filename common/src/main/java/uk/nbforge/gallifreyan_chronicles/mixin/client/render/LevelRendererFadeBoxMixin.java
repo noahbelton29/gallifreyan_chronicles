@@ -24,15 +24,12 @@ public abstract class LevelRendererFadeBoxMixin {
         FadeBoxRenderer.clear();
     }
 
-    // With a shader pack this is after the pack has finished the frame
     @Inject(method = "blitEntityOutline", at = @At("HEAD"))
     private void gc$layCanvasAfterShaders(CallbackInfo ci) {
-        // Sky first so the box goes on top of it
         CustomSkyRenderer.afterShaders(this.gameRenderer.mainRenderTarget());
         FadeBoxRenderer.afterShaders(this.gameRenderer.mainRenderTarget());
     }
 
-    // Runs right after the main and see through water passes have finished
     @Inject(method = "executeOutline", at = @At("HEAD"))
     private void gc$drawFadingBoxes(FeatureRenderDispatcher.PreparedFrame featureFrame, CallbackInfo ci) {
         CustomSkyRenderer.drawCanvas(this.gameRenderer.mainRenderTarget());

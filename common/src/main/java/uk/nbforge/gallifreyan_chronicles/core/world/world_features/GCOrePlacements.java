@@ -1,7 +1,11 @@
 package uk.nbforge.gallifreyan_chronicles.core.world.world_features;
 
 import java.util.List;
-import net.minecraft.world.level.levelgen.placement.*;
+import net.minecraft.world.level.levelgen.placement.BiomeFilter;
+import net.minecraft.world.level.levelgen.placement.CountPlacement;
+import net.minecraft.world.level.levelgen.placement.InSquarePlacement;
+import net.minecraft.world.level.levelgen.placement.PlacementModifier;
+import net.minecraft.world.level.levelgen.placement.RarityFilter;
 
 public class GCOrePlacements {
     public static List<PlacementModifier> orePlacement(

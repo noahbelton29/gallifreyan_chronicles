@@ -3,12 +3,18 @@ package uk.nbforge.gallifreyan_chronicles;
 import java.util.concurrent.atomic.AtomicBoolean;
 import uk.nbforge.gallifreyan_chronicles.addon.AddonManager;
 import uk.nbforge.gallifreyan_chronicles.config.GCConfig;
-import uk.nbforge.gallifreyan_chronicles.core.*;
-import uk.nbforge.gallifreyan_chronicles.core.GCGameRuleCategories;
+import uk.nbforge.gallifreyan_chronicles.core.GCBlocks;
+import uk.nbforge.gallifreyan_chronicles.core.GCDataComponents;
+import uk.nbforge.gallifreyan_chronicles.core.GCEffects;
+import uk.nbforge.gallifreyan_chronicles.core.GCFeatures;
 import uk.nbforge.gallifreyan_chronicles.core.GCGameRules;
-import uk.nbforge.gallifreyan_chronicles.tardis.ecs.system.TardisMindSystem;
+import uk.nbforge.gallifreyan_chronicles.core.GCItems;
+import uk.nbforge.gallifreyan_chronicles.core.GCSounds;
+import uk.nbforge.gallifreyan_chronicles.core.GCTardisControls;
+import uk.nbforge.gallifreyan_chronicles.core.GCTreeDecoratorTypes;
 import uk.nbforge.gallifreyan_chronicles.tardis.flight.TardisAutopilot;
 import uk.nbforge.gallifreyan_chronicles.tardis.flight.TardisTravel;
+import uk.nbforge.gallifreyan_chronicles.tardis.mind.TardisMinds;
 
 public class CommonClass {
     private static final AtomicBoolean INITIALIZED = new AtomicBoolean(false);
@@ -19,7 +25,6 @@ public class CommonClass {
         }
 
         GCConfig.load();
-        GCGameRuleCategories.registerGameRuleCategories();
         GCGameRules.registerGameRules();
         GCDataComponents.registerDataComponents();
         GCTardisControls.registerTardisControls();
@@ -29,7 +34,7 @@ public class CommonClass {
         GCTreeDecoratorTypes.registerTreeDecoratorTypes();
         GCSounds.registerSounds();
         GCEffects.registerEffects();
-        TardisMindSystem.init();
+        TardisMinds.init();
         TardisTravel.init();
         TardisAutopilot.init();
         AddonManager.init();

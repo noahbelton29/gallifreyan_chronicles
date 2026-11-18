@@ -2,20 +2,15 @@ package uk.nbforge.gallifreyan_chronicles.tardis.mind.mood;
 
 import java.util.List;
 import java.util.UUID;
-import uk.nbforge.gallifreyan_chronicles.core.block_entities.TardisExteriorBlockEntity;
+import uk.nbforge.gallifreyan_chronicles.core.block_entity.TardisExteriorBlockEntity;
 import uk.nbforge.gallifreyan_chronicles.tardis.Tardis;
 import uk.nbforge.gallifreyan_chronicles.tardis.TardisEvents;
-import uk.nbforge.gallifreyan_chronicles.tardis.ecs.component.TardisSubsystem;
-import uk.nbforge.gallifreyan_chronicles.tardis.ecs.system.SubsystemSystem;
-import uk.nbforge.gallifreyan_chronicles.tardis.ecs.system.TardisMindSystem;
 import uk.nbforge.gallifreyan_chronicles.tardis.mind.TardisMind;
+import uk.nbforge.gallifreyan_chronicles.tardis.mind.TardisMinds;
+import uk.nbforge.gallifreyan_chronicles.tardis.subsystem.TardisSubsystem;
+import uk.nbforge.gallifreyan_chronicles.tardis.subsystem.TardisSubsystems;
 
-/**
- * Changes the mood of a TARDIS from flight events.
- * Taking off too soon, flying with damaged systems and using the wrong key can raise stress, a calm landing can improve trust with the crew.
- */
 public final class TardisMoods {
-    // Minimum time between landing and takeoff before overuse causes stress
     private static final long OVERUSE_TICKS = 600L;
 
     private static final float OVERUSE_STRESS = 10f;
@@ -23,7 +18,6 @@ public final class TardisMoods {
     private static final float WRONG_KEY_STRESS = 4f;
     private static final float ABORTED_TAKEOFF_STRESS = 6f;
 
-    // Highest stress that still counts as a calm landing
     private static final float CALM_LANDING_STRESS = 30f;
 
     private static final float CALM_LANDING_TRUST = 2f;
@@ -36,34 +30,36 @@ public final class TardisMoods {
     }
 
     public static void onTakeoffForcedStop(Tardis tardis) {
-        TardisMindSystem.addStress(tardis, ABORTED_TAKEOFF_STRESS);
+        TardisMinds.addStress(tardis, ABORTED_TAKEOFF_STRESS);
     }
 
     public static void onWrongKey(Tardis tardis) {
-        TardisMindSystem.addStress(tardis, WRONG_KEY_STRESS);
+        TardisMinds.addStress(tardis, WRONG_KEY_STRESS);
     }
 
     private static void onTakeOff(Tardis tardis) {
         if (tookOffTooSoon(tardis)) {
-            TardisMindSystem.addStress(tardis, OVERUSE_STRESS);
+            TardisMinds.addStress(tardis, OVERUSE_STRESS);
         }
         if (hasDamagedSystems(tardis)) {
-            TardisMindSystem.addStress(tardis, DAMAGED_FLIGHT_STRESS);
+            TardisMinds.addStress(tardis, DAMAGED_FLIGHT_STRESS);
         }
     }
 
     private static void onLand(Tardis tardis) {
-        if (TardisMindSystem.stress(tardis) < CALM_LANDING_STRESS) {
+        if (TardisMinds.stress(tardis) < CALM_LANDING_STRESS) {
             for (UUID player : crew(tardis)) {
-                if (!TardisMindSystem.afraidOf(tardis, player)) {
-                    TardisMindSystem.addTrust(tardis, player, CALM_LANDING_TRUST);
+                if (!TardisMinds.afraidOf(tardis, player)) {
+                    TardisMinds.addTrust(tardis, player, CALM_LANDING_TRUST);
                 }
             }
         }
-        TardisMindSystem.markLanded(tardis);
+        TardisMinds.markLanded(tardis);
     }
 
-    /** Everyone aboard, or the owner if nobody is in the interior. */
+    /**
+     * Everyone aboard, or the owner if nobody is in the interior.
+     */
     public static List<UUID> crew(Tardis tardis) {
         List<UUID> aboard = tardis.interiorLevel()
                 .map(level ->
@@ -73,17 +69,19 @@ public final class TardisMoods {
     }
 
     private static boolean tookOffTooSoon(Tardis tardis) {
-        long lastLand = TardisMindSystem.mind(tardis).lastLand();
-        long now = TardisMindSystem.now(tardis.server());
+        long lastLand = TardisMinds.mind(tardis).lastLand();
+        long now = TardisMinds.now(tardis.server());
         return lastLand != TardisMind.NEVER && now - lastLand < OVERUSE_TICKS;
     }
 
-    /** An unloaded exterior counts as having no faults. */
+    /**
+     * An unloaded exterior counts as having no faults.
+     */
     private static boolean hasDamagedSystems(Tardis tardis) {
         TardisExteriorBlockEntity exterior = tardis.exteriorIfLoaded().orElse(null);
         if (exterior == null) return false;
-        for (TardisSubsystem subsystem : TardisSubsystem.values()) {
-            if (SubsystemSystem.isFaulty(exterior.asEntity(), subsystem)) return true;
+        for (TardisSubsystem subsystem : TardisSubsystems.all()) {
+            if (subsystem.isFaulty(exterior.getSubsystemHealth(subsystem))) return true;
         }
         return false;
     }

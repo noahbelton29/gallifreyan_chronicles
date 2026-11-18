@@ -24,10 +24,6 @@ public final class GCRenderTypes {
 
     private static final Map<Identifier, RenderType> GLOW_ORB = new HashMap<>();
 
-    // The lamp orb adds light so it glows with no dark edges and it does not write depth so it never hides the sky or
-    // the box behind it
-    // Same setup as the eyes pipeline of vanilla, those snippets are private so it is copied here
-    // annoying but there is no other way to get at them
     private static final RenderPipeline GLOW_ORB_PIPELINE =
             RenderPipelines.register(RenderPipeline.builder(RenderPipelines.GLOBALS_SNIPPET)
                     .withBindGroupLayout(BindGroupLayouts.PROJECTION)

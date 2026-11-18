@@ -5,18 +5,18 @@ import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.client.event.RenderGuiEvent;
 import uk.nbforge.gallifreyan_chronicles.Constants;
-import uk.nbforge.gallifreyan_chronicles.client.gui.hud.GCHudRenderer;
+import uk.nbforge.gallifreyan_chronicles.client.gui.hud.HudRenderer;
 
 @EventBusSubscriber(modid = Constants.MOD_ID, value = Dist.CLIENT)
 public class NeoForgeClientHud {
 
     @SubscribeEvent
     public static void renderBelowHud(RenderGuiEvent.Pre event) {
-        GCHudRenderer.renderBelowHud(event.getGuiGraphics());
+        HudRenderer.renderBelowHud(event.getGuiGraphics());
     }
 
     @SubscribeEvent
     public static void renderHud(RenderGuiEvent.Post event) {
-        GCHudRenderer.render(event.getGuiGraphics());
+        HudRenderer.render(event.getGuiGraphics());
     }
 }

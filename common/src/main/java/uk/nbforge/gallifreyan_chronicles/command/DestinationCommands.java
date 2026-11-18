@@ -2,7 +2,7 @@ package uk.nbforge.gallifreyan_chronicles.command;
 
 import static net.minecraft.commands.Commands.argument;
 import static net.minecraft.commands.Commands.literal;
-import static uk.nbforge.gallifreyan_chronicles.util.CommandUtil.*;
+import static uk.nbforge.gallifreyan_chronicles.command.CommandUtil.*;
 
 import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
@@ -21,7 +21,6 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.util.Mth;
 import uk.nbforge.gallifreyan_chronicles.tardis.Tardis;
-import uk.nbforge.gallifreyan_chronicles.tardis.TardisApi;
 import uk.nbforge.gallifreyan_chronicles.tardis.flight.LandingTarget;
 
 public final class DestinationCommands {
@@ -45,7 +44,6 @@ public final class DestinationCommands {
 
     private DestinationCommands() {}
 
-    /** {@code data destination [here|clear|<dimension> <pos> <facing>]} */
     public static LiteralArgumentBuilder<CommandSourceStack> destinationData() {
         return literal("destination")
                 .executes(DestinationCommands::get)
@@ -97,7 +95,7 @@ public final class DestinationCommands {
             BlockPos pos,
             float yaw,
             String facing) {
-        if (TardisApi.idOfLevel(level).isPresent()) return fail(ctx, "destination_interior");
+        if (Tardis.idOfLevel(level).isPresent()) return fail(ctx, "destination_interior");
         if (level.isOutsideBuildHeight(pos) || level.isOutsideBuildHeight(pos.above())) {
             return fail(ctx, "destination_out_of_world");
         }

@@ -186,7 +186,7 @@ public class GCAddonsScreen extends Screen {
 
     private static boolean canSwitch(AddonInfo info) {
         AddonProblem problem = AddonManager.problem(info);
-        return problem == null || !problem.kind().cannotBeSwitchedOn();
+        return problem == null || problem.kind().canBeSwitchedOn();
     }
 
     private void closeDetails() {
@@ -230,9 +230,7 @@ public class GCAddonsScreen extends Screen {
 
         @Override
         protected void extractContents(
-                @NonNull GuiGraphicsExtractor graphics, int mouseX, int mouseY, float partialTick) {
-            // The screen draws the row itself
-        }
+                @NonNull GuiGraphicsExtractor graphics, int mouseX, int mouseY, float partialTick) {}
     }
 
     @Override
@@ -247,7 +245,6 @@ public class GCAddonsScreen extends Screen {
     @Override
     public void tick() {
         super.tick();
-        // Picks up addons added to or removed from the folder while this screen is open, for example from Explorer
         if (++ticksSinceCheck < 20) return;
         ticksSinceCheck = 0;
         long signature = AddonManager.folderSignature();
@@ -353,8 +350,8 @@ public class GCAddonsScreen extends Screen {
                 icon.texture(),
                 iconX,
                 iconY,
-                0.0F,
-                0.0F,
+                0.0f,
+                0.0f,
                 ICON_SIZE,
                 ICON_SIZE,
                 icon.width(),
@@ -413,8 +410,8 @@ public class GCAddonsScreen extends Screen {
                 icon.texture(),
                 x,
                 headerY,
-                0.0F,
-                0.0F,
+                0.0f,
+                0.0f,
                 32,
                 32,
                 icon.width(),

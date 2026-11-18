@@ -8,13 +8,11 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.item.ItemDisplayContext;
 import net.minecraft.world.item.ItemStack;
 import org.jspecify.annotations.Nullable;
-import uk.nbforge.gallifreyan_chronicles.codec.client.model.ConsoleVariantSelectPropertyCodec;
 import uk.nbforge.gallifreyan_chronicles.core.item.ConsoleBlockItem;
 
 public record ConsoleVariantSelectProperty() implements SelectItemModelProperty<String> {
     public static final SelectItemModelProperty.Type<ConsoleVariantSelectProperty, String> TYPE =
-            SelectItemModelProperty.Type.create(
-                    MapCodec.unit(new ConsoleVariantSelectProperty()), ConsoleVariantSelectPropertyCodec.VALUE_CODEC);
+            SelectItemModelProperty.Type.create(MapCodec.unit(new ConsoleVariantSelectProperty()), Codec.STRING);
 
     @Override
     public String get(
@@ -28,7 +26,7 @@ public record ConsoleVariantSelectProperty() implements SelectItemModelProperty<
 
     @Override
     public Codec<String> valueCodec() {
-        return ConsoleVariantSelectPropertyCodec.VALUE_CODEC;
+        return Codec.STRING;
     }
 
     @Override

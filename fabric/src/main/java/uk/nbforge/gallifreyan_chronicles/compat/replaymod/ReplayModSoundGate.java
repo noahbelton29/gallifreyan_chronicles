@@ -4,7 +4,7 @@ import com.replaymod.replay.ReplayModReplay;
 import net.minecraft.client.Minecraft;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.level.Level;
-import uk.nbforge.gallifreyan_chronicles.util.TardisDimensionUtil;
+import uk.nbforge.gallifreyan_chronicles.tardis.TardisDimensionUtil;
 
 public final class ReplayModSoundGate {
     private ReplayModSoundGate() {}

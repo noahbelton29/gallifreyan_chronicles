@@ -3,9 +3,9 @@ package uk.nbforge.gallifreyan_chronicles.client.compat.soundphysics;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientLevel;
 import uk.nbforge.gallifreyan_chronicles.Constants;
-import uk.nbforge.gallifreyan_chronicles.client.gui.hud.GCPowerDarkness;
+import uk.nbforge.gallifreyan_chronicles.client.gui.hud.PowerDarkness;
 import uk.nbforge.gallifreyan_chronicles.core.GCDimensions;
-import uk.nbforge.gallifreyan_chronicles.util.TardisDimensionUtil;
+import uk.nbforge.gallifreyan_chronicles.tardis.TardisDimensionUtil;
 
 public final class SoundPhysicsCompat {
     private static volatile boolean loggedActive;
@@ -26,7 +26,7 @@ public final class SoundPhysicsCompat {
     }
 
     public static float tardisEcho() {
-        return inTardisInterior() ? GCPowerDarkness.powerOffAmount() : 0.0F;
+        return inTardisInterior() ? PowerDarkness.powerOffAmount() : 0.0f;
     }
 
     public static float damp(float value, float scale, float amount) {
@@ -34,7 +34,7 @@ public final class SoundPhysicsCompat {
     }
 
     public static float boost(float value, float scale, float lift, float amount) {
-        float boosted = Math.min(1.0F, value * scale + lift);
+        float boosted = Math.min(1.0f, value * scale + lift);
         return value + (boosted - value) * amount;
     }
 }

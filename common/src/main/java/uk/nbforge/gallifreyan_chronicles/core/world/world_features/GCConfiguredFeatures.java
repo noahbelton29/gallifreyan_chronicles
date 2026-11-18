@@ -7,7 +7,11 @@ import net.minecraft.core.registries.Registries;
 import net.minecraft.data.worldgen.BootstrapContext;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.util.random.WeightedList;
-import net.minecraft.util.valueproviders.*;
+import net.minecraft.util.valueproviders.BiasedToBottomInt;
+import net.minecraft.util.valueproviders.ConstantInt;
+import net.minecraft.util.valueproviders.IntProvider;
+import net.minecraft.util.valueproviders.UniformInt;
+import net.minecraft.util.valueproviders.WeightedListInt;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.levelgen.blockpredicates.BlockPredicate;
@@ -25,8 +29,11 @@ import net.minecraft.world.level.levelgen.feature.stateproviders.WeightedStatePr
 import net.minecraft.world.level.levelgen.feature.treedecorators.AttachedToLogsDecorator;
 import net.minecraft.world.level.levelgen.feature.trunkplacers.StraightTrunkPlacer;
 import net.minecraft.world.level.levelgen.structure.templatesystem.TagMatchTest;
-import uk.nbforge.gallifreyan_chronicles.core.GCBlocks;
 import uk.nbforge.gallifreyan_chronicles.core.GCTags;
+import uk.nbforge.gallifreyan_chronicles.core.block.registry.CadonwoodBlocks;
+import uk.nbforge.gallifreyan_chronicles.core.block.registry.FloraBlocks;
+import uk.nbforge.gallifreyan_chronicles.core.block.registry.GallifreyBlocks;
+import uk.nbforge.gallifreyan_chronicles.core.block.registry.MoonBlocks;
 import uk.nbforge.gallifreyan_chronicles.core.world.world_features.tree_decorators.CadonwoodTrunkVineDecorator;
 import uk.nbforge.gallifreyan_chronicles.util.GCUtil;
 
@@ -58,78 +65,81 @@ public class GCConfiguredFeatures {
                 context,
                 CADONWOOD_TREE,
                 new TreeFeature.Builder(
-                                BlockStateProvider.of(GCBlocks.CADONWOOD_LOG),
+                                BlockStateProvider.of(CadonwoodBlocks.CADONWOOD_LOG),
                                 new StraightTrunkPlacer(4, 2, 0),
-                                BlockStateProvider.of(GCBlocks.CADONWOOD_LEAVES),
+                                BlockStateProvider.of(CadonwoodBlocks.CADONWOOD_LEAVES),
                                 new BlobFoliagePlacer(ConstantInt.of(2), ConstantInt.of(0), 3),
                                 new TwoLayersFeatureSize(1, 0, 1),
-                                BlockStateProvider.holderOf(GCBlocks.GALLIFREYAN_DIRT))
+                                BlockStateProvider.holderOf(GallifreyBlocks.GALLIFREYAN_DIRT))
                         .build());
 
         register(
                 context,
                 IRON_GALLIFREY_ORES_KEY,
-                new OreFeature(stoneReplaceables, GCBlocks.GALLIFREYAN_STONE_IRON_ORE.defaultBlockState(), 9));
+                new OreFeature(stoneReplaceables, GallifreyBlocks.GALLIFREYAN_STONE_IRON_ORE.defaultBlockState(), 9));
         register(
                 context,
                 IRON_GALLIFREY_ORES_SMALL_KEY,
-                new OreFeature(stoneReplaceables, GCBlocks.GALLIFREYAN_STONE_IRON_ORE.defaultBlockState(), 4));
+                new OreFeature(stoneReplaceables, GallifreyBlocks.GALLIFREYAN_STONE_IRON_ORE.defaultBlockState(), 4));
         register(
                 context,
                 COAL_GALLIFREY_ORES_KEY,
-                new OreFeature(stoneReplaceables, GCBlocks.GALLIFREYAN_STONE_COAL_ORE.defaultBlockState(), 17));
+                new OreFeature(stoneReplaceables, GallifreyBlocks.GALLIFREYAN_STONE_COAL_ORE.defaultBlockState(), 17));
         register(
                 context,
                 GRAVEL_GALLIFREY_ORES_KEY,
-                new OreFeature(baseStone, GCBlocks.GALLIFREYAN_GRAVEL.defaultBlockState(), 33));
+                new OreFeature(baseStone, GallifreyBlocks.GALLIFREYAN_GRAVEL.defaultBlockState(), 33));
         register(
                 context,
                 COBBLED_LIMESTONE_GALLIFREY_ORES_KEY,
-                new OreFeature(baseStone, GCBlocks.COBBLED_LIMESTONE.defaultBlockState(), 26));
+                new OreFeature(baseStone, GallifreyBlocks.COBBLED_LIMESTONE.defaultBlockState(), 26));
 
         register(
                 context,
                 GALLIFREYAN_DRY_GRASS,
                 new SimpleBlockFeature(new WeightedStateProvider(WeightedList.<BlockState>builder()
-                        .add(GCBlocks.SHORT_GALLIFREYAN_DRY_GRASS.defaultBlockState(), 1)
-                        .add(GCBlocks.TALL_GALLIFREYAN_DRY_GRASS.defaultBlockState(), 1)
+                        .add(FloraBlocks.SHORT_GALLIFREYAN_DRY_GRASS.defaultBlockState(), 1)
+                        .add(FloraBlocks.TALL_GALLIFREYAN_DRY_GRASS.defaultBlockState(), 1)
                         .build())));
         register(
                 context,
                 GALLIFREYAN_GRASS,
-                new SimpleBlockFeature(BlockStateProvider.of(GCBlocks.SHORT_GALLIFREYAN_GRASS)));
+                new SimpleBlockFeature(BlockStateProvider.of(FloraBlocks.SHORT_GALLIFREYAN_GRASS)));
         register(
                 context,
                 GALLIFREYAN_TALL_GRASS,
-                new SimpleBlockFeature(BlockStateProvider.of(GCBlocks.TALL_GALLIFREYAN_GRASS)));
+                new SimpleBlockFeature(BlockStateProvider.of(FloraBlocks.TALL_GALLIFREYAN_GRASS)));
 
         register(context, FALLEN_CADONWOOD_TREE, createFallenCadonwood().build());
 
         register(
                 context,
                 GALLIFREYAN_STONE_BOULDER,
-                new GCBoulderFeature(List.of(GCBlocks.GALLIFREYAN_STONE, GCBlocks.GALLIFREYAN_COBBLESTONE)));
-        register(context, MOON_BOULDER, new GCBoulderFeature(List.of(GCBlocks.LUNAR_REGOLITH, GCBlocks.MOONSLATE)));
+                new BoulderFeature(
+                        List.of(GallifreyBlocks.GALLIFREYAN_STONE, GallifreyBlocks.GALLIFREYAN_COBBLESTONE)));
+        register(context, MOON_BOULDER, new BoulderFeature(List.of(MoonBlocks.LUNAR_REGOLITH, MoonBlocks.MOONSLATE)));
         register(
                 context,
                 GALLIFREYAN_ARCADIAN_SHALE_BOULDER,
-                new GCBoulderFeature(
-                        List.of(GCBlocks.ARCADIAN_SHALE, GCBlocks.GALLIFREYAN_MUD, GCBlocks.GALLIFREYAN_MUDSTONE)));
+                new BoulderFeature(List.of(
+                        GallifreyBlocks.ARCADIAN_SHALE,
+                        GallifreyBlocks.GALLIFREYAN_MUD,
+                        GallifreyBlocks.GALLIFREYAN_MUDSTONE)));
 
         register(
                 context,
                 GALLIFREYAN_STONE_PATCH,
                 new ReplaceBlobsFeature(
-                        GCBlocks.GALLIFREYAN_SAND.defaultBlockState(),
-                        GCBlocks.GALLIFREYAN_STONE.defaultBlockState(),
+                        GallifreyBlocks.GALLIFREYAN_SAND.defaultBlockState(),
+                        GallifreyBlocks.GALLIFREYAN_STONE.defaultBlockState(),
                         UniformInt.of(3, 5)));
 
         register(
                 context,
                 GALLIFREYAN_MUDSTONE_PATCH,
                 new ReplaceBlobsFeature(
-                        GCBlocks.ARCADIAN_SHALE.defaultBlockState(),
-                        GCBlocks.GALLIFREYAN_MUDSTONE.defaultBlockState(),
+                        GallifreyBlocks.ARCADIAN_SHALE.defaultBlockState(),
+                        GallifreyBlocks.GALLIFREYAN_MUDSTONE.defaultBlockState(),
                         UniformInt.of(5, 8)));
 
         register(
@@ -138,22 +148,22 @@ public class GCConfiguredFeatures {
                 new BlockColumnFeature(
                         List.of(
                                 BlockColumnFeature.layer(
-                                        BiasedToBottomInt.of(2, 5), BlockStateProvider.of(GCBlocks.THORIVINE)),
+                                        BiasedToBottomInt.of(2, 5), BlockStateProvider.of(FloraBlocks.THORIVINE)),
                                 BlockColumnFeature.layer(
                                         new WeightedListInt(WeightedList.<IntProvider>builder()
                                                 .add(ConstantInt.of(0), 5)
                                                 .add(ConstantInt.of(1), 1)
                                                 .build()),
-                                        BlockStateProvider.of(GCBlocks.THORIVINE_FLOWER))),
+                                        BlockStateProvider.of(FloraBlocks.THORIVINE_FLOWER))),
                         Direction.UP,
                         BlockPredicate.ONLY_IN_AIR_PREDICATE,
                         false));
     }
 
     private static FallenTreeFeature.Builder createFallenTrees() {
-        return FallenTreeFeature.builder(BlockStateProvider.of(GCBlocks.CADONWOOD_LOG), UniformInt.of(4, 7))
+        return FallenTreeFeature.builder(BlockStateProvider.of(CadonwoodBlocks.CADONWOOD_LOG), UniformInt.of(4, 7))
                 .logDecorator(new AttachedToLogsDecorator(
-                        0.1F,
+                        0.1f,
                         Holder.direct(new WeightedStateProvider(WeightedList.<BlockState>builder()
                                 .add(Blocks.RED_MUSHROOM.defaultBlockState(), 2)
                                 .add(Blocks.BROWN_MUSHROOM.defaultBlockState(), 1)
@@ -163,7 +173,8 @@ public class GCConfiguredFeatures {
 
     private static FallenTreeFeature.Builder createFallenCadonwood() {
         return createFallenTrees()
-                .stumpDecorator(new CadonwoodTrunkVineDecorator(GCBlocks.GALLIFREYAN_VINE.defaultBlockState(), 0.5f));
+                .stumpDecorator(
+                        new CadonwoodTrunkVineDecorator(FloraBlocks.GALLIFREYAN_VINE.defaultBlockState(), 0.5f));
     }
 
     public static ResourceKey<Feature> registerKey(String name) {

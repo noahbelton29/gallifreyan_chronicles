@@ -51,7 +51,7 @@ public final class GCTitleScreenLayout {
     private GCTitleScreenLayout() {}
 
     public static int panelWidth(int screenWidth) {
-        return Mth.clamp(Math.round(screenWidth * 0.42F), 180, 240);
+        return Mth.clamp(Math.round(screenWidth * 0.42f), 180, 240);
     }
 
     private static int logoWidth(int screenWidth) {
@@ -173,7 +173,7 @@ public final class GCTitleScreenLayout {
         int panel = panelWidth(width);
         VortexBackground.render(graphics, width, height, panel + (width - panel) / 2, height / 2);
 
-        Screen.extractMenuBackgroundTexture(graphics, Screen.MENU_BACKGROUND, 0, 0, 0.0F, 0.0F, panel, height);
+        Screen.extractMenuBackgroundTexture(graphics, Screen.MENU_BACKGROUND, 0, 0, 0.0f, 0.0f, panel, height);
         graphics.fill(0, 0, panel, height, PANEL_SHADE);
         graphics.fill(panel, 0, panel + 1, height, EDGE_DARK);
 
@@ -184,13 +184,13 @@ public final class GCTitleScreenLayout {
                 LOGO,
                 LOGO_PADDING,
                 contentTop(width, height),
-                0.0F,
-                0.0F,
+                0.0f,
+                0.0f,
                 logoWidth,
                 logoHeight,
                 logoWidth,
                 logoHeight,
-                ARGB.white(1.0F));
+                ARGB.white(1.0f));
     }
 
     public static void renderOverlay(GuiGraphicsExtractor graphics, Font font, int width, int height) {

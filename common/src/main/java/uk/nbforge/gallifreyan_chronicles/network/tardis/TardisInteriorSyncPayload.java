@@ -3,8 +3,8 @@ package uk.nbforge.gallifreyan_chronicles.network.tardis;
 import java.util.List;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import org.jspecify.annotations.NonNull;
-import uk.nbforge.gallifreyan_chronicles.core.dynamic_registries.TardisInteriorRegistry;
-import uk.nbforge.gallifreyan_chronicles.tardis.TardisInteriorOptions;
+import uk.nbforge.gallifreyan_chronicles.core.data_registry.TardisInteriorRegistry;
+import uk.nbforge.gallifreyan_chronicles.tardis.interior.TardisInteriorOptions;
 import uk.nbforge.gallifreyan_chronicles.util.GCUtil;
 
 public record TardisInteriorSyncPayload(List<TardisInteriorOptions.Option> options, String defaultId)

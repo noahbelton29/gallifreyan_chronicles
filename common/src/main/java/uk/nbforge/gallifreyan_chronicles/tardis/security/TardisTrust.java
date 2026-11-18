@@ -13,7 +13,6 @@ import net.minecraft.world.level.Level;
 import uk.nbforge.gallifreyan_chronicles.core.GCDataComponents;
 import uk.nbforge.gallifreyan_chronicles.core.GCItems;
 import uk.nbforge.gallifreyan_chronicles.tardis.Tardis;
-import uk.nbforge.gallifreyan_chronicles.tardis.TardisApi;
 import uk.nbforge.gallifreyan_chronicles.util.MessageUtil;
 
 public final class TardisTrust {
@@ -67,7 +66,7 @@ public final class TardisTrust {
             ItemStack stack = holder.getItemInHand(hand);
             if (stack.getItem() != GCItems.TARDIS_KEY) continue;
             UUID tardisId = stack.get(GCDataComponents.TARDIS_ID);
-            Optional<Tardis> tardis = TardisApi.get(server, tardisId);
+            Optional<Tardis> tardis = Tardis.get(server, tardisId);
             if (tardis.isPresent()) return tardis;
         }
         return Optional.empty();

@@ -30,7 +30,7 @@ public abstract class SoundEngineMixin {
             Channel channel,
             CallbackInfo ci) {
         SoundResumeStatus.markEngineHooked();
-        float offset = instance instanceof OffsetSoundInstance offsetInstance ? offsetInstance.offsetSeconds() : 0.0F;
+        float offset = instance instanceof OffsetSoundInstance offsetInstance ? offsetInstance.offsetSeconds() : 0.0f;
         ((OffsetChannel) channel).gc$setOffsetSeconds(offset);
     }
 }

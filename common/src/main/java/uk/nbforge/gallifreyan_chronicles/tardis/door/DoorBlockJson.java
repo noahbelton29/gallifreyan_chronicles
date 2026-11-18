@@ -1,28 +1,25 @@
 package uk.nbforge.gallifreyan_chronicles.tardis.door;
 
-import com.google.gson.JsonElement;
 import com.google.gson.JsonParser;
 import com.mojang.serialization.JsonOps;
-import java.net.URI;
-import java.net.URL;
-import java.nio.file.FileSystem;
-import java.nio.file.FileSystemAlreadyExistsException;
-import java.nio.file.FileSystems;
-import java.nio.file.Files;
-import java.nio.file.Path;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
-import java.util.Map;
-import java.util.stream.Stream;
+import net.minecraft.resources.FileToIdConverter;
+import net.minecraft.resources.Identifier;
 import org.jspecify.annotations.Nullable;
 import uk.nbforge.gallifreyan_chronicles.Constants;
-import uk.nbforge.gallifreyan_chronicles.tardis.codec.door.TardisDoorVariantCodec;
+import uk.nbforge.gallifreyan_chronicles.platform.Services;
 import uk.nbforge.gallifreyan_chronicles.util.GCUtil;
 
+/**
+ * door blocks register before datapacks exist, so this reads the door variant jsons straight out of our jar. same
+ * folder, ids and codec as the reload listener so the two never disagree about what a variant is called
+ */
 public final class DoorBlockJson {
-    public static final String FOLDER = "/data/" + Constants.MOD_ID + "/tardis_door_variant";
-    private static final String MARKER = "first_doctors_doors.json";
+    private static final String DATA_ROOT = "data";
+    private static final FileToIdConverter FILES = FileToIdConverter.json(TardisDoorVariant.FOLDER);
     private static final String DEFAULT_PARTICLE = Constants.MOD_ID + ":brachacki_wall_block";
 
     public record Entry(String block, String variant, String model, int priority, String particle) {}
@@ -53,69 +50,39 @@ public final class DoorBlockJson {
         if (variants != null) return variants;
         List<TardisDoorVariant> found = new ArrayList<>();
         try {
-            URL url = folderUrl();
-            if (url == null) {
-                Constants.LOG.warn("[GC] no door variant folder found, no door blocks registered");
-                return variants = List.of();
-            }
-            URI uri = url.toURI();
-            if ("jar".equals(uri.getScheme())) {
-                FileSystem jar;
-                boolean opened = false;
-                try {
-                    jar = FileSystems.newFileSystem(uri, Map.of());
-                    opened = true;
-                } catch (FileSystemAlreadyExistsException e) {
-                    jar = FileSystems.getFileSystem(uri);
-                }
-                try {
-                    read(jar.getPath(FOLDER), found);
-                } finally {
-                    if (opened) jar.close();
-                }
-            } else {
-                read(Path.of(uri), found);
-            }
-        } catch (Exception e) {
+            Services.PLATFORM
+                    .readModFiles(Constants.MOD_ID, DATA_ROOT, path -> variantId(path) != null)
+                    .forEach((path, bytes) -> parse(variantId(path), bytes, found));
+        } catch (RuntimeException e) {
             Constants.LOG.error("[GC] couldn't read the door variant jsons", e);
         }
+        if (found.isEmpty()) Constants.LOG.warn("[GC] no door variants found, no door blocks registered");
         found.sort(Comparator.comparingInt(TardisDoorVariant::priority).thenComparing(TardisDoorVariant::localId));
         return variants = List.copyOf(found);
     }
 
-    /** Datagen cannot look up folders, only files, so find a shipped file and use its folder. */
-    private static @Nullable URL folderUrl() throws Exception {
-        URL url = DoorBlockJson.class.getResource(FOLDER);
-        if (url != null) return url;
-        URL marker = DoorBlockJson.class.getResource(FOLDER + "/" + MARKER);
-        if (marker != null) {
-            String text = marker.toString();
-            return URI.create(text.substring(0, text.lastIndexOf('/'))).toURL();
-        }
-        return sourceFolderUrl();
+    /** data/<namespace>/tardis_door_variant/<path>.json -> namespace:path, same as the reload listener names them */
+    private static @Nullable Identifier variantId(String jarPath) {
+        String prefix = DATA_ROOT + "/";
+        if (!jarPath.startsWith(prefix)) return null;
+        int slash = jarPath.indexOf('/', prefix.length());
+        if (slash < 0) return null;
+        Identifier file = Identifier.tryBuild(jarPath.substring(prefix.length(), slash), jarPath.substring(slash + 1));
+        if (file == null
+                || !file.getPath().startsWith(TardisDoorVariant.FOLDER + "/")
+                || !file.getPath().endsWith(".json")) return null;
+        return FILES.fileToId(file);
     }
 
-    /** Last resort in dev, walk up from the run folder to the resources of common. */
-    private static @Nullable URL sourceFolderUrl() throws Exception {
-        for (Path dir = Path.of("").toAbsolutePath(); dir != null; dir = dir.getParent()) {
-            Path folder = dir.resolve("common/src/main/resources" + FOLDER);
-            if (Files.isDirectory(folder)) return folder.toUri().toURL();
-        }
-        return null;
-    }
-
-    private static void read(Path folder, List<TardisDoorVariant> out) throws Exception {
-        try (Stream<Path> files = Files.list(folder)) {
-            for (Path file : files.toList()) {
-                String name = file.getFileName().toString();
-                if (!name.endsWith(".json")) continue;
-                String id = Constants.MOD_ID + ":" + name.substring(0, name.length() - ".json".length());
-                JsonElement json = JsonParser.parseString(Files.readString(file));
-                TardisDoorVariantCodec.CODEC
-                        .parse(JsonOps.INSTANCE, json)
-                        .resultOrPartial(error -> Constants.LOG.error("[GC] bad door variant {}: {}", id, error))
-                        .ifPresent(v -> out.add(v.withId(id)));
-            }
+    private static void parse(@Nullable Identifier id, byte[] bytes, List<TardisDoorVariant> out) {
+        if (id == null) return;
+        try {
+            TardisDoorVariant.CODEC
+                    .parse(JsonOps.INSTANCE, JsonParser.parseString(new String(bytes, StandardCharsets.UTF_8)))
+                    .resultOrPartial(error -> Constants.LOG.error("[GC] bad door variant {}: {}", id, error))
+                    .ifPresent(v -> out.add(v.withId(id.toString())));
+        } catch (RuntimeException e) {
+            Constants.LOG.error("[GC] bad door variant {}", id, e);
         }
     }
 

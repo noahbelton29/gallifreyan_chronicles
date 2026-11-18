@@ -35,9 +35,6 @@ public final class FlashbackPuppet {
     private static int errors;
     private static int lastTickCount = -1;
 
-    // The TARDIS world may not tick our copy and then its legs never move, so tick it if nothing ticked it since last
-    // time
-    // Ticks until we rebuild the render of the world, like pressing F3 plus A
     private static int rebuildIn = -1;
     private static Object lastLevel;
 
@@ -49,17 +46,12 @@ public final class FlashbackPuppet {
         rebuildIn = 40;
     }
 
-    // On first play Flashback loads the start of the replay before the camera joined, so the TARDIS world of Immersive
-    // Portals was not ready and the door drew black
-    // Jumping on the timeline loads it again with everything ready, which is why going back fixed it, so we do that one
-    // jump ourselves
     private static Object lastReplayServer;
     private static int waitTicks = -1;
     private static int step;
     private static int backTo;
 
     private static void tickFirstPlayReload() {
-        // Never jump the timeline in the middle of an export
         if (Flashback.isExporting()) {
             waitTicks = -1;
             return;
@@ -76,14 +68,10 @@ public final class FlashbackPuppet {
         }
         if (waitTicks < 0 || --waitTicks > 0) return;
         if (step == 0) {
-            // Only needed when a door leads to an empty world, each reload also restarts Voxy so do not do it for
-            // nothing
-            if (!portalLeadsNowhere(Minecraft.getInstance())) {
+            if (allPortalsLeadSomewhere(Minecraft.getInstance())) {
                 waitTicks = -1;
                 return;
             }
-            // Flashback only reloads when going backwards, so step one tick forward first and then back a few ticks
-            // later
             backTo = server.getReplayTick();
             if (backTo + 1 >= server.getTotalReplayTicks()) {
                 waitTicks = -1;
@@ -112,19 +100,19 @@ public final class FlashbackPuppet {
                 camera.z() + radius);
     }
 
-    /** True if a portal here leads to a world with no chunks, the black door. */
-    private static boolean portalLeadsNowhere(Minecraft client) {
-        if (client.level == null) return false;
+    /** A portal into a world with no chunks shows as a black door. */
+    private static boolean allPortalsLeadSomewhere(Minecraft client) {
+        if (client.level == null) return true;
         for (Entity entity : client.level.entitiesForRendering()) {
             if (!(entity instanceof Portal portal) || portal.getAxisW() == null) continue;
             ResourceKey<Level> dest = portal.getDestDim();
             if (dest == null || dest.equals(client.level.dimension())) continue;
             ClientLevel destLevel = ClientWorldLoader.peekWorld(dest);
-            if (destLevel == null) return true;
+            if (destLevel == null) return false;
             if (destLevel.getChunkSource() instanceof ImmPtlClientChunkMap map
-                    && map.getCopiedChunkList().isEmpty()) return true;
+                    && map.getCopiedChunkList().isEmpty()) return false;
         }
-        return false;
+        return true;
     }
 
     static void registerClient() {
@@ -139,8 +127,6 @@ public final class FlashbackPuppet {
                 if (client.level != null && FlashbackChunksImpl.inReplay()) rebuildSections(client);
             }
             if (puppet == null || puppet.isRemoved()) return;
-            // Copies sprinting and sneaking from the hidden real player so the copy makes the sprint particles and
-            // poses itself
             Entity real = client.level == null ? null : client.level.getEntity(realId);
             if (real != null) {
                 puppet.setSprinting(real.isSprinting());
@@ -148,7 +134,6 @@ public final class FlashbackPuppet {
                 puppet.setPose(real.getPose());
             }
             if (puppet.tickCount == lastTickCount) {
-                // Same as the game ticking an entity
                 puppet.commonTick();
                 puppet.tick();
             }
@@ -200,7 +185,6 @@ public final class FlashbackPuppet {
             if (real != null) break;
         }
         if (!exists) {
-            // Hide the real one and move the puppet
             if (real != null && !real.isInvisible()) {
                 real.setInvisible(true);
                 hidden = true;
@@ -240,8 +224,6 @@ public final class FlashbackPuppet {
             level.addEntity(puppet);
             return;
         }
-        // Same way the game moves other players, it slides there over a few ticks and that movement swings the arms and
-        // legs
         puppet.moveOrInterpolateTo(new Vec3(x, y, z), yaw, pitch);
         puppet.lerpHeadTo(head, 3);
         puppet.setOnGround(onGround);

@@ -8,12 +8,12 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
-import uk.nbforge.gallifreyan_chronicles.core.GCBlocks;
 import uk.nbforge.gallifreyan_chronicles.core.block.InteriorDoorBarrierBlock;
 import uk.nbforge.gallifreyan_chronicles.core.block.InteriorDoorBlock;
 import uk.nbforge.gallifreyan_chronicles.core.block.TardisBlock;
 import uk.nbforge.gallifreyan_chronicles.core.block.TardisTopBlock;
-import uk.nbforge.gallifreyan_chronicles.util.TardisDimensionUtil;
+import uk.nbforge.gallifreyan_chronicles.core.block.registry.TardisBlocks;
+import uk.nbforge.gallifreyan_chronicles.tardis.TardisDimensionUtil;
 
 @SuppressWarnings("unused")
 @Mixin(MultiPlayerGameMode.class)
@@ -33,7 +33,7 @@ public abstract class CreativeTardisBreakMixin {
                 block instanceof InteriorDoorBarrierBlock || block instanceof InteriorDoorBlock door && door.isLinked();
         boolean exterior = block instanceof TardisBlock
                 || block instanceof TardisTopBlock
-                        && mc.level.getBlockState(pos.below()).is(GCBlocks.TARDIS);
+                        && mc.level.getBlockState(pos.below()).is(TardisBlocks.TARDIS);
 
         if (interiorDoor || exterior) cir.setReturnValue(false);
     }

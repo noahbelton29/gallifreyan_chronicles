@@ -8,18 +8,13 @@ import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
 import org.jspecify.annotations.Nullable;
 
-/** Finds a safe landing spot, it searches nearby columns and prefers spots close to the requested one with enough room. */
 public final class TardisLandingSite {
-    // The furthest sideways distance searched
     public static final int MAX_RADIUS = 12;
 
-    // How far up and down to check in each column
     private static final int VERTICAL_WINDOW = 24;
 
-    // How much vertical distance counts against the score
     private static final double VERTICAL_WEIGHT = 0.35;
 
-    // Penalty for spots surrounded by solid blocks
     private static final double ENCLOSED_PENALTY = 100.0;
 
     private record Candidate(BlockPos feet, double score) {}
@@ -34,13 +29,10 @@ public final class TardisLandingSite {
         Candidate best = null;
 
         for (int radius = 0; radius <= MAX_RADIUS; radius++) {
-            // Everything outside this radius is at least this far away sideways, if it cannot beat the best score there
-            // is no reason to keep searching
             if (best != null && (double) radius * radius >= best.score()) break;
 
             for (int dx = -radius; dx <= radius; dx++) {
                 for (int dz = -radius; dz <= radius; dz++) {
-                    // Only the outer edge of the current radius is new
                     if (Math.max(Math.abs(dx), Math.abs(dz)) != radius) continue;
 
                     double horizontal = (double) dx * dx + (double) dz * dz;
@@ -51,7 +43,6 @@ public final class TardisLandingSite {
 
                     if (!level.getWorldBorder().isWithinBounds(column)) continue;
 
-                    // Loads the chunk before checking its blocks
                     level.getChunkAt(column);
 
                     Candidate found = bestInColumn(level, column, horizontal, own);
@@ -76,7 +67,6 @@ public final class TardisLandingSite {
 
         for (int dy = 0; dy <= VERTICAL_WINDOW; dy++) {
             for (int side = 0; side < 2; side++) {
-                // The target height is only checked once
                 if (dy == 0 && side == 1) continue;
 
                 int y = side == 0 ? column.getY() - dy : column.getY() + dy;
@@ -94,7 +84,6 @@ public final class TardisLandingSite {
                 }
             }
 
-            // Once the next vertical step cannot beat the best score, higher spots in this column are pointless
             double next = horizontal + VERTICAL_WEIGHT * (dy + 1.0) * (dy + 1.0);
 
             if (best != null && next >= best.score()) break;
@@ -137,7 +126,6 @@ public final class TardisLandingSite {
 
         if (level.isOutsideBuildHeight(below) || level.isOutsideBuildHeight(head)) return false;
 
-        // The TARDIS may overlap its own blocks but not land inside them
         if (own != null && !feet.equals(own) && (feet.equals(own.above()) || head.equals(own))) return false;
 
         if (isBlocked(level, feet, own) || isBlocked(level, head, own)) return false;
@@ -151,7 +139,6 @@ public final class TardisLandingSite {
     }
 
     private static boolean isBlocked(ServerLevel level, BlockPos pos, @Nullable BlockPos own) {
-        // Its own blocks count as clear so it can land where it already is
         if (own != null && (pos.equals(own) || pos.equals(own.above()))) return false;
 
         BlockState state = level.getBlockState(pos);

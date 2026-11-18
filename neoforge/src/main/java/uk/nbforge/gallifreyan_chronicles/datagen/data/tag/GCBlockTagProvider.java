@@ -15,6 +15,12 @@ import org.jspecify.annotations.NonNull;
 import uk.nbforge.gallifreyan_chronicles.Constants;
 import uk.nbforge.gallifreyan_chronicles.core.GCBlocks;
 import uk.nbforge.gallifreyan_chronicles.core.GCTags;
+import uk.nbforge.gallifreyan_chronicles.core.block.registry.CadonwoodBlocks;
+import uk.nbforge.gallifreyan_chronicles.core.block.registry.FloraBlocks;
+import uk.nbforge.gallifreyan_chronicles.core.block.registry.GallifreyBlocks;
+import uk.nbforge.gallifreyan_chronicles.core.block.registry.InteriorBlocks;
+import uk.nbforge.gallifreyan_chronicles.core.block.registry.MoonBlocks;
+import uk.nbforge.gallifreyan_chronicles.core.block.registry.RoundelBlocks;
 
 public class GCBlockTagProvider extends BlockTagsProvider {
     public GCBlockTagProvider(PackOutput output, CompletableFuture<HolderLookup.Provider> lookupProvider) {
@@ -42,139 +48,143 @@ public class GCBlockTagProvider extends BlockTagsProvider {
 
     @Override
     protected void addTags(HolderLookup.@NonNull Provider provider) {
-        tagAdd(BlockTags.CLIMBABLE, GCBlocks.GALLIFREYAN_VINE);
+        tagAdd(BlockTags.CLIMBABLE, FloraBlocks.GALLIFREYAN_VINE);
 
-        tagAdd(BlockTags.SAND, GCBlocks.GALLIFREYAN_SAND);
+        tagAdd(BlockTags.SAND, GallifreyBlocks.GALLIFREYAN_SAND);
 
-        tagAppend(GCTags.Blocks.NEEDS_NETHERITE_TOOL, GCBlocks.ARCADIAN_SHALE_TARANIUM_ORE);
+        tagAppend(GCTags.Blocks.NEEDS_NETHERITE_TOOL, GallifreyBlocks.ARCADIAN_SHALE_TARANIUM_ORE);
 
         tagAppend(BlockTags.INCORRECT_FOR_DIAMOND_TOOL).addTag(GCTags.Blocks.NEEDS_NETHERITE_TOOL);
 
         tagAdd(
                 BlockTags.MINEABLE_WITH_PICKAXE,
-                GCBlocks.GALLIFREYAN_COBBLESTONE,
-                GCBlocks.GALLIFREYAN_STONE,
-                GCBlocks.GALLIFREYAN_STONE_IRON_ORE,
-                GCBlocks.GALLIFREYAN_STONE_COAL_ORE,
-                GCBlocks.ARCADIAN_SHALE_TARANIUM_ORE,
-                GCBlocks.ARCADIAN_SHALE,
-                GCBlocks.GALLIFREYAN_MUDSTONE,
-                GCBlocks.MOONSLATE,
-                GCBlocks.LUNAR_REGOLITH);
+                GallifreyBlocks.GALLIFREYAN_COBBLESTONE,
+                GallifreyBlocks.GALLIFREYAN_STONE,
+                GallifreyBlocks.GALLIFREYAN_STONE_IRON_ORE,
+                GallifreyBlocks.GALLIFREYAN_STONE_COAL_ORE,
+                GallifreyBlocks.ARCADIAN_SHALE_TARANIUM_ORE,
+                GallifreyBlocks.ARCADIAN_SHALE,
+                GallifreyBlocks.GALLIFREYAN_MUDSTONE,
+                MoonBlocks.MOONSLATE,
+                MoonBlocks.LUNAR_REGOLITH);
         tagAdd(BlockTags.MINEABLE_WITH_PICKAXE, GCBlocks.interiorDoorBlocks());
 
         tagAdd(
                 BlockTags.MINEABLE_WITH_SHOVEL,
-                GCBlocks.GALLIFREYAN_DIRT,
-                GCBlocks.GALLIFREYAN_GRASS_BLOCK,
-                GCBlocks.GALLIFREYAN_GRAVEL,
-                GCBlocks.GALLIFREYAN_SAND,
-                GCBlocks.GALLIFREYAN_MUD,
-                GCBlocks.MOON_DUST);
+                GallifreyBlocks.GALLIFREYAN_DIRT,
+                GallifreyBlocks.GALLIFREYAN_GRASS_BLOCK,
+                GallifreyBlocks.GALLIFREYAN_GRAVEL,
+                GallifreyBlocks.GALLIFREYAN_SAND,
+                GallifreyBlocks.GALLIFREYAN_MUD,
+                MoonBlocks.MOON_DUST);
 
         tagAdd(
                 BlockTags.MINEABLE_WITH_AXE,
-                GCBlocks.CADONWOOD_PLANKS,
-                GCBlocks.CADONWOOD_LOG,
-                GCBlocks.STRIPPED_CADONWOOD_LOG,
-                GCBlocks.CADONWOOD_WOOD,
-                GCBlocks.STRIPPED_CADONWOOD_WOOD,
-                GCBlocks.CADONWOOD_STAIRS,
-                GCBlocks.CADONWOOD_FENCE,
-                GCBlocks.CADONWOOD_FENCE_GATE,
-                GCBlocks.CADONWOOD_WALL,
-                GCBlocks.CADONWOOD_BUTTON,
-                GCBlocks.CADONWOOD_PRESSURE_PLATE);
-        tagAdd(BlockTags.MINEABLE_WITH_AXE, GCBlocks.WOOD_ROUNDELS.values().toArray(Block[]::new));
-        tagAdd(BlockTags.MINEABLE_WITH_AXE, GCBlocks.WOOD_HALF_ROUNDELS.values().toArray(Block[]::new));
+                CadonwoodBlocks.CADONWOOD_PLANKS,
+                CadonwoodBlocks.CADONWOOD_LOG,
+                CadonwoodBlocks.STRIPPED_CADONWOOD_LOG,
+                CadonwoodBlocks.CADONWOOD_WOOD,
+                CadonwoodBlocks.STRIPPED_CADONWOOD_WOOD,
+                CadonwoodBlocks.CADONWOOD_STAIRS,
+                CadonwoodBlocks.CADONWOOD_FENCE,
+                CadonwoodBlocks.CADONWOOD_FENCE_GATE,
+                CadonwoodBlocks.CADONWOOD_WALL,
+                CadonwoodBlocks.CADONWOOD_BUTTON,
+                CadonwoodBlocks.CADONWOOD_PRESSURE_PLATE);
+        tagAdd(BlockTags.MINEABLE_WITH_AXE, RoundelBlocks.WOOD_ROUNDELS.values().toArray(Block[]::new));
+        tagAdd(
+                BlockTags.MINEABLE_WITH_AXE,
+                RoundelBlocks.WOOD_HALF_ROUNDELS.values().toArray(Block[]::new));
         tagAdd(
                 BlockTags.MINEABLE_WITH_PICKAXE,
-                GCBlocks.CONCRETE_ROUNDELS.values().toArray(Block[]::new));
+                RoundelBlocks.CONCRETE_ROUNDELS.values().toArray(Block[]::new));
         tagAdd(
                 BlockTags.MINEABLE_WITH_PICKAXE,
-                GCBlocks.CONCRETE_HALF_ROUNDELS.values().toArray(Block[]::new));
+                RoundelBlocks.CONCRETE_HALF_ROUNDELS.values().toArray(Block[]::new));
 
-        tagAdd(BlockTags.MINEABLE_WITH_HOE, GCBlocks.CADONWOOD_LEAVES);
+        tagAdd(BlockTags.MINEABLE_WITH_HOE, CadonwoodBlocks.CADONWOOD_LEAVES);
 
-        tagAdd(BlockTags.NEEDS_STONE_TOOL, GCBlocks.GALLIFREYAN_STONE_IRON_ORE, GCBlocks.ARCADIAN_SHALE);
+        tagAdd(BlockTags.NEEDS_STONE_TOOL, GallifreyBlocks.GALLIFREYAN_STONE_IRON_ORE, GallifreyBlocks.ARCADIAN_SHALE);
 
-        tagAppend(BlockTags.ANIMALS_SPAWNABLE_ON, GCBlocks.GALLIFREYAN_SAND).replace(false);
+        tagAppend(BlockTags.ANIMALS_SPAWNABLE_ON, GallifreyBlocks.GALLIFREYAN_SAND)
+                .replace(false);
 
-        tagAppend(BlockTags.REPLACEABLE, GCBlocks.SHORT_GALLIFREYAN_DRY_GRASS, GCBlocks.TALL_GALLIFREYAN_DRY_GRASS);
+        tagAppend(
+                BlockTags.REPLACEABLE, FloraBlocks.SHORT_GALLIFREYAN_DRY_GRASS, FloraBlocks.TALL_GALLIFREYAN_DRY_GRASS);
 
-        tagAppend(BlockTags.GRASS_BLOCKS, GCBlocks.GALLIFREYAN_GRASS_BLOCK, GCBlocks.GALLIFREYAN_SAND);
+        tagAppend(BlockTags.GRASS_BLOCKS, GallifreyBlocks.GALLIFREYAN_GRASS_BLOCK, GallifreyBlocks.GALLIFREYAN_SAND);
 
-        tagAppend(GCTags.Blocks.GALLIFREYAN_STONE_REPLACEABLES, GCBlocks.GALLIFREYAN_STONE);
+        tagAppend(GCTags.Blocks.GALLIFREYAN_STONE_REPLACEABLES, GallifreyBlocks.GALLIFREYAN_STONE);
 
-        tagAppend(GCTags.Blocks.BASE_STONE_GALLIFREY, GCBlocks.GALLIFREYAN_STONE);
+        tagAppend(GCTags.Blocks.BASE_STONE_GALLIFREY, GallifreyBlocks.GALLIFREYAN_STONE);
 
         tagAddBlockItem(
                 BlockItemTags.LOGS_THAT_BURN,
-                GCBlocks.CADONWOOD_LOG,
-                GCBlocks.CADONWOOD_WOOD,
-                GCBlocks.STRIPPED_CADONWOOD_LOG,
-                GCBlocks.STRIPPED_CADONWOOD_WOOD);
+                CadonwoodBlocks.CADONWOOD_LOG,
+                CadonwoodBlocks.CADONWOOD_WOOD,
+                CadonwoodBlocks.STRIPPED_CADONWOOD_LOG,
+                CadonwoodBlocks.STRIPPED_CADONWOOD_WOOD);
 
-        tagAddBlockItem(BlockItemTags.SAPLINGS, GCBlocks.CADONWOOD_SAPLING);
+        tagAddBlockItem(BlockItemTags.SAPLINGS, CadonwoodBlocks.CADONWOOD_SAPLING);
 
-        tagAdd(BlockTags.DIRT, GCBlocks.GALLIFREYAN_GRASS_BLOCK, GCBlocks.GALLIFREYAN_DIRT);
+        tagAdd(BlockTags.DIRT, GallifreyBlocks.GALLIFREYAN_GRASS_BLOCK, GallifreyBlocks.GALLIFREYAN_DIRT);
 
-        tagAddBlockItem(BlockItemTags.LOGS, GCBlocks.CADONWOOD_LOG, GCBlocks.STRIPPED_CADONWOOD_LOG);
+        tagAddBlockItem(BlockItemTags.LOGS, CadonwoodBlocks.CADONWOOD_LOG, CadonwoodBlocks.STRIPPED_CADONWOOD_LOG);
 
         tagAdd(
                 BlockTags.STAIRS,
-                GCBlocks.CADONWOOD_STAIRS,
-                GCBlocks.BRACHACKI_SLAB,
-                GCBlocks.BRACHACKI_STAIRS_2,
-                GCBlocks.BRACHACKI_STAIRS_3,
-                GCBlocks.BRACHACKI_STAIRS_4,
-                GCBlocks.BRACHACKI_TUAT_STAIRS);
+                CadonwoodBlocks.CADONWOOD_STAIRS,
+                InteriorBlocks.BRACHACKI_SLAB,
+                InteriorBlocks.BRACHACKI_STAIRS_2,
+                InteriorBlocks.BRACHACKI_STAIRS_3,
+                InteriorBlocks.BRACHACKI_STAIRS_4,
+                InteriorBlocks.BRACHACKI_TUAT_STAIRS);
 
         tagAdd(
                 BlockTags.SLABS,
-                GCBlocks.CADONWOOD_SLAB,
-                GCBlocks.BRACHACKI_SLAB,
-                GCBlocks.BRACHACKI_SLAB_2,
-                GCBlocks.BRACHACKI_SLAB_3,
-                GCBlocks.BRACHACKI_SLAB_4,
-                GCBlocks.BRACHACKI_TUAT_SLAB);
+                CadonwoodBlocks.CADONWOOD_SLAB,
+                InteriorBlocks.BRACHACKI_SLAB,
+                InteriorBlocks.BRACHACKI_SLAB_2,
+                InteriorBlocks.BRACHACKI_SLAB_3,
+                InteriorBlocks.BRACHACKI_SLAB_4,
+                InteriorBlocks.BRACHACKI_TUAT_SLAB);
 
         tagAdd(
                 BlockTags.PRESSURE_PLATES,
-                GCBlocks.CADONWOOD_PRESSURE_PLATE,
-                GCBlocks.BRACHACKI_PRESSURE_PLATE,
-                GCBlocks.BRACHACKI_PRESSURE_PLATE_2,
-                GCBlocks.BRACHACKI_PRESSURE_PLATE_3,
-                GCBlocks.BRACHACKI_PRESSURE_PLATE_4,
-                GCBlocks.BRACHACKI_TUAT_PRESSURE_PLATE);
+                CadonwoodBlocks.CADONWOOD_PRESSURE_PLATE,
+                InteriorBlocks.BRACHACKI_PRESSURE_PLATE,
+                InteriorBlocks.BRACHACKI_PRESSURE_PLATE_2,
+                InteriorBlocks.BRACHACKI_PRESSURE_PLATE_3,
+                InteriorBlocks.BRACHACKI_PRESSURE_PLATE_4,
+                InteriorBlocks.BRACHACKI_TUAT_PRESSURE_PLATE);
 
-        tagAdd(BlockTags.BUTTONS, GCBlocks.CADONWOOD_BUTTON);
+        tagAdd(BlockTags.BUTTONS, CadonwoodBlocks.CADONWOOD_BUTTON);
 
         tagAdd(
                 BlockTags.FENCES,
-                GCBlocks.CADONWOOD_FENCE,
-                GCBlocks.BRACHACKI_FENCE,
-                GCBlocks.BRACHACKI_FENCE_2,
-                GCBlocks.BRACHACKI_FENCE_3,
-                GCBlocks.BRACHACKI_FENCE_4,
-                GCBlocks.BRACHACKI_TUAT_FENCE);
+                CadonwoodBlocks.CADONWOOD_FENCE,
+                InteriorBlocks.BRACHACKI_FENCE,
+                InteriorBlocks.BRACHACKI_FENCE_2,
+                InteriorBlocks.BRACHACKI_FENCE_3,
+                InteriorBlocks.BRACHACKI_FENCE_4,
+                InteriorBlocks.BRACHACKI_TUAT_FENCE);
 
         tagAdd(
                 BlockTags.FENCE_GATES,
-                GCBlocks.CADONWOOD_FENCE_GATE,
-                GCBlocks.BRACHACKI_FENCE_GATE,
-                GCBlocks.BRACHACKI_FENCE_GATE_2,
-                GCBlocks.BRACHACKI_FENCE_GATE_3,
-                GCBlocks.BRACHACKI_FENCE_GATE_4,
-                GCBlocks.BRACHACKI_TUAT_FENCE_GATE);
+                CadonwoodBlocks.CADONWOOD_FENCE_GATE,
+                InteriorBlocks.BRACHACKI_FENCE_GATE,
+                InteriorBlocks.BRACHACKI_FENCE_GATE_2,
+                InteriorBlocks.BRACHACKI_FENCE_GATE_3,
+                InteriorBlocks.BRACHACKI_FENCE_GATE_4,
+                InteriorBlocks.BRACHACKI_TUAT_FENCE_GATE);
 
         tagAdd(
                 BlockTags.WALLS,
-                GCBlocks.CADONWOOD_WALL,
-                GCBlocks.BRACHACKI_WALL,
-                GCBlocks.BRACHACKI_WALL_2,
-                GCBlocks.BRACHACKI_WALL_3,
-                GCBlocks.BRACHACKI_WALL_4,
-                GCBlocks.BRACHACKI_TUAT_WALL);
+                CadonwoodBlocks.CADONWOOD_WALL,
+                InteriorBlocks.BRACHACKI_WALL,
+                InteriorBlocks.BRACHACKI_WALL_2,
+                InteriorBlocks.BRACHACKI_WALL_3,
+                InteriorBlocks.BRACHACKI_WALL_4,
+                InteriorBlocks.BRACHACKI_TUAT_WALL);
     }
 }

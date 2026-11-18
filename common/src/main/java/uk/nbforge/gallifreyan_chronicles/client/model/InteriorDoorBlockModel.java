@@ -7,7 +7,7 @@ import org.jspecify.annotations.NonNull;
 import uk.nbforge.gallifreyan_chronicles.client.renderer.block.InteriorDoorBlockRenderer;
 import uk.nbforge.gallifreyan_chronicles.client.renderer.util.DoorRoundelTextures;
 import uk.nbforge.gallifreyan_chronicles.client.util.DetailLevelUtil;
-import uk.nbforge.gallifreyan_chronicles.core.block_entities.InteriorDoorBlockEntity;
+import uk.nbforge.gallifreyan_chronicles.core.block_entity.InteriorDoorBlockEntity;
 import uk.nbforge.gallifreyan_chronicles.util.GCUtil;
 
 public class InteriorDoorBlockModel extends GeoModel<InteriorDoorBlockEntity> {
@@ -15,7 +15,7 @@ public class InteriorDoorBlockModel extends GeoModel<InteriorDoorBlockEntity> {
 
     @Override
     public @NonNull Identifier getModelResource(@NonNull GeoRenderState renderState) {
-        return GeoAssets.INTERIOR_DOOR.model(getVariantId(renderState));
+        return getVariantId(renderState);
     }
 
     @Override
@@ -29,21 +29,14 @@ public class InteriorDoorBlockModel extends GeoModel<InteriorDoorBlockEntity> {
      */
     public static Identifier textureFor(GeoRenderState renderState) {
         Identifier base = baseTexture(renderState);
-        String roundel = renderState.hasGeckolibData(InteriorDoorBlockRenderer.ROUNDEL)
-                ? renderState.getGeckolibData(InteriorDoorBlockRenderer.ROUNDEL)
-                : null;
-        if (roundel == null || roundel.isEmpty() || !DetailLevelUtil.highDetail()) return base;
-        return DoorRoundelTextures.get(GeoAssets.INTERIOR_DOOR.model(getVariantId(renderState)), base, roundel);
+        String roundel = GeoAssets.read(renderState, InteriorDoorBlockRenderer.ROUNDEL);
+        if (roundel == null || DetailLevelUtil.lowDetail()) return base;
+        return DoorRoundelTextures.get(getVariantId(renderState), base, roundel);
     }
 
     private static Identifier baseTexture(GeoRenderState renderState) {
-        if (renderState.hasGeckolibData(InteriorDoorBlockRenderer.TEXTURE_ID)) {
-            String textureId = renderState.getGeckolibData(InteriorDoorBlockRenderer.TEXTURE_ID);
-            if (textureId != null && !textureId.isEmpty()) {
-                return GeoAssets.INTERIOR_DOOR.texture(textureId);
-            }
-        }
-        return GeoAssets.INTERIOR_DOOR.texture(getVariantId(renderState));
+        String textureId = GeoAssets.read(renderState, InteriorDoorBlockRenderer.TEXTURE_ID);
+        return textureId != null ? GeoAssets.texture(textureId) : GeoAssets.texture(getVariantId(renderState));
     }
 
     @Override
@@ -52,12 +45,7 @@ public class InteriorDoorBlockModel extends GeoModel<InteriorDoorBlockEntity> {
     }
 
     private static Identifier getVariantId(GeoRenderState renderState) {
-        if (renderState.hasGeckolibData(InteriorDoorBlockRenderer.VARIANT)) {
-            String id = renderState.getGeckolibData(InteriorDoorBlockRenderer.VARIANT);
-            if (id != null) {
-                return GCUtil.modIdentifier(id);
-            }
-        }
-        return GCUtil.modIdentifier(DEFAULT_VARIANT);
+        String id = GeoAssets.read(renderState, InteriorDoorBlockRenderer.VARIANT);
+        return GCUtil.modIdentifier(id != null ? id : DEFAULT_VARIANT);
     }
 }

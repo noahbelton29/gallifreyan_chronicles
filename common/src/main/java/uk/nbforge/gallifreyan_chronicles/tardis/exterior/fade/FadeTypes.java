@@ -6,16 +6,14 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 import uk.nbforge.gallifreyan_chronicles.Constants;
 
 public final class FadeTypes {
     public static final String NEW_WHO_ID = Constants.MOD_ID + ":newwho";
     public static final String CLASSIC_WHO_ID = Constants.MOD_ID + ":classicwho";
 
-    // The modern series fade with the pulse, used for new TARDISes and when a saved id is missing or unknown
     public static final FadeType NEW_WHO = new PulseFadeType(NEW_WHO_ID, FadeTiming.DEFAULT, 30.0f, 2.5f, 1.0f);
-    // The classic series fade with no pulse
     public static final FadeType CLASSIC_WHO = new LinearFadeType(CLASSIC_WHO_ID, FadeTiming.DEFAULT, 1.0f);
     public static final FadeType DEFAULT = NEW_WHO;
 

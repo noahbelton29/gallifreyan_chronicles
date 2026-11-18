@@ -7,7 +7,7 @@ import java.util.function.Consumer;
 import java.util.stream.Collectors;
 import uk.nbforge.gallifreyan_chronicles.Constants;
 import uk.nbforge.gallifreyan_chronicles.client.GCClientHooks;
-import uk.nbforge.gallifreyan_chronicles.core.data.IdentifiableData;
+import uk.nbforge.gallifreyan_chronicles.loader.IdentifiableData;
 
 public final class GCSyncPayload {
     private GCSyncPayload() {}

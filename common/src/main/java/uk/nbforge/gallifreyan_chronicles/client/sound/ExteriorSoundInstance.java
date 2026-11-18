@@ -5,15 +5,14 @@ import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.phys.Vec3;
-import uk.nbforge.gallifreyan_chronicles.core.block_entities.TardisExteriorBlockEntity;
+import uk.nbforge.gallifreyan_chronicles.core.block_entity.TardisExteriorBlockEntity;
 
-/** A sound played at the exterior that gets louder, reaches further and gets clearer as the doors open. */
 public abstract class ExteriorSoundInstance extends AbstractTickableSoundInstance {
     public static final double OPEN_RANGE = 6.0;
     public static final double CLOSED_RANGE = 3.0;
-    public static final float CLOSED_MUFFLE = 0.02F;
-    public static final float CHANGE_PER_TICK = 0.08F;
-    protected static final float CLOSED_GAIN = 0.55F;
+    public static final float CLOSED_MUFFLE = 0.02f;
+    public static final float CHANGE_PER_TICK = 0.08f;
+    protected static final float CLOSED_GAIN = 0.55f;
 
     protected final TardisExteriorBlockEntity exterior;
     protected float openness;
@@ -36,7 +35,7 @@ public abstract class ExteriorSoundInstance extends AbstractTickableSoundInstanc
     }
 
     protected float doorsOpenTarget() {
-        return exterior.areDoorsFullyClosed() ? 0.0F : 1.0F;
+        return exterior.doors().areFullyClosed() ? 0.0f : 1.0f;
     }
 
     protected void stepOpenness() {
@@ -46,7 +45,7 @@ public abstract class ExteriorSoundInstance extends AbstractTickableSoundInstanc
     protected float falloff() {
         double range = CLOSED_RANGE + (OPEN_RANGE - CLOSED_RANGE) * openness;
         double distance = SoundListener.pos().distanceTo(new Vec3(x, y, z));
-        return distance >= range ? 0.0F : (float) (1.0 - distance / range);
+        return distance >= range ? 0.0f : (float) (1.0 - distance / range);
     }
 
     protected float doorLoudness(float openVolume) {
@@ -55,7 +54,7 @@ public abstract class ExteriorSoundInstance extends AbstractTickableSoundInstanc
     }
 
     protected void applyMuffle() {
-        SoundMuffle.set(this, CLOSED_MUFFLE + (1.0F - CLOSED_MUFFLE) * openness);
+        SoundMuffle.set(this, CLOSED_MUFFLE + (1.0f - CLOSED_MUFFLE) * openness);
     }
 
     protected static float approach(float value, float target, float step) {

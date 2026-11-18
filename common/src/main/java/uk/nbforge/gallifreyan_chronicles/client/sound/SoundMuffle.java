@@ -6,7 +6,7 @@ import net.minecraft.client.sounds.ChannelAccess;
 import uk.nbforge.gallifreyan_chronicles.mixin.client.audio.SoundEngineAccessor;
 import uk.nbforge.gallifreyan_chronicles.mixin.client.audio.SoundManagerAccessor;
 
-/** Muffles a playing sound like hearing it through a wall, 1 is clear and lower is more muffled. */
+/** 1 is clear, lower is more muffled */
 public final class SoundMuffle {
     private SoundMuffle() {}
 

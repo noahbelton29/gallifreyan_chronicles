@@ -1,5 +1,8 @@
 package uk.nbforge.gallifreyan_chronicles.core.world.world_features.tree_decorators;
 
+import com.mojang.serialization.Codec;
+import com.mojang.serialization.MapCodec;
+import com.mojang.serialization.codecs.RecordCodecBuilder;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.util.RandomSource;
@@ -9,10 +12,18 @@ import net.minecraft.world.level.block.state.properties.BooleanProperty;
 import net.minecraft.world.level.levelgen.feature.treedecorators.TreeDecorator;
 import net.minecraft.world.level.levelgen.feature.treedecorators.TreeDecoratorType;
 import org.jspecify.annotations.NonNull;
-import uk.nbforge.gallifreyan_chronicles.core.GCBlocks;
 import uk.nbforge.gallifreyan_chronicles.core.GCTreeDecoratorTypes;
+import uk.nbforge.gallifreyan_chronicles.core.block.registry.FloraBlocks;
 
 public class CadonwoodTrunkVineDecorator extends TreeDecorator {
+    public static final MapCodec<CadonwoodTrunkVineDecorator> CODEC =
+            RecordCodecBuilder.mapCodec(instance -> instance.group(
+                            BlockState.CODEC.fieldOf("vine_state").forGetter(CadonwoodTrunkVineDecorator::vineState),
+                            Codec.floatRange(0.0f, 1.0f)
+                                    .fieldOf("probability")
+                                    .forGetter(CadonwoodTrunkVineDecorator::probability))
+                    .apply(instance, CadonwoodTrunkVineDecorator::new));
+
     private final BlockState vineState;
     private final float probability;
 
@@ -41,28 +52,32 @@ public class CadonwoodTrunkVineDecorator extends TreeDecorator {
                 BlockPos west = pos.west();
                 if (context.isAir(west)) {
                     context.setBlock(
-                            west, GCBlocks.GALLIFREYAN_VINE.defaultBlockState().setValue(VineBlock.EAST, true));
+                            west,
+                            FloraBlocks.GALLIFREYAN_VINE.defaultBlockState().setValue(VineBlock.EAST, true));
                 }
             }
             if (random.nextInt(3) > 0) {
                 BlockPos east = pos.east();
                 if (context.isAir(east)) {
                     context.setBlock(
-                            east, GCBlocks.GALLIFREYAN_VINE.defaultBlockState().setValue(VineBlock.WEST, true));
+                            east,
+                            FloraBlocks.GALLIFREYAN_VINE.defaultBlockState().setValue(VineBlock.WEST, true));
                 }
             }
             if (random.nextInt(3) > 0) {
                 BlockPos north = pos.north();
                 if (context.isAir(north)) {
                     context.setBlock(
-                            north, GCBlocks.GALLIFREYAN_VINE.defaultBlockState().setValue(VineBlock.SOUTH, true));
+                            north,
+                            FloraBlocks.GALLIFREYAN_VINE.defaultBlockState().setValue(VineBlock.SOUTH, true));
                 }
             }
             if (random.nextInt(3) > 0) {
                 BlockPos south = pos.south();
                 if (context.isAir(south)) {
                     context.setBlock(
-                            south, GCBlocks.GALLIFREYAN_VINE.defaultBlockState().setValue(VineBlock.NORTH, true));
+                            south,
+                            FloraBlocks.GALLIFREYAN_VINE.defaultBlockState().setValue(VineBlock.NORTH, true));
                 }
             }
         });

@@ -37,9 +37,9 @@ public class GCCreditsScreen extends Screen {
     private static final int KEY_SPACE = 32;
     private static final int KEY_LEFT_CONTROL = 1073742048;
     private static final int KEY_RIGHT_CONTROL = 1073742052;
-    private static final float BASE_SPEED = 0.8F;
-    private static final float SPEEDUP = 5.0F;
-    private static final float SPEEDUP_FAST = 15.0F;
+    private static final float BASE_SPEED = 0.8f;
+    private static final float SPEEDUP = 5.0f;
+    private static final float SPEEDUP_FAST = 15.0f;
 
     private final Screen parent;
     private final List<FormattedCharSequence> lines = new ArrayList<>();
@@ -96,7 +96,6 @@ public class GCCreditsScreen extends Screen {
         this.addLine(Component.empty(), false);
     }
 
-    /** Centred paragraphs with one line each, for notices that are not a name under a heading. */
     private void addNotice(String... lineKeys) {
         for (String key : lineKeys) {
             this.addLine(Component.translatable(key).withStyle(ChatFormatting.WHITE), true);
@@ -110,7 +109,7 @@ public class GCCreditsScreen extends Screen {
     }
 
     private void updateSpeed() {
-        float multiplier = this.speedup ? SPEEDUP + this.heldModifiers.size() * SPEEDUP_FAST : 1.0F;
+        float multiplier = this.speedup ? SPEEDUP + this.heldModifiers.size() * SPEEDUP_FAST : 1.0f;
         this.scrollSpeed = BASE_SPEED * multiplier * this.direction;
     }
 
@@ -152,38 +151,38 @@ public class GCCreditsScreen extends Screen {
     public void extractRenderState(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float partialTick) {
         super.extractRenderState(graphics, mouseX, mouseY, partialTick);
         graphics.blit(
-                RenderPipelines.VIGNETTE, VIGNETTE, 0, 0, 0.0F, 0.0F, this.width, this.height, this.width, this.height);
-        this.scroll = Math.max(0.0F, this.scroll + partialTick * this.scrollSpeed);
+                RenderPipelines.VIGNETTE, VIGNETTE, 0, 0, 0.0f, 0.0f, this.width, this.height, this.width, this.height);
+        this.scroll = Math.max(0.0f, this.scroll + partialTick * this.scrollSpeed);
 
         int columnX = this.width / 2 - COLUMN_HALF_WIDTH;
         int logoY = this.height + LOGO_OFFSET;
         float offset = -this.scroll;
 
         graphics.pose().pushMatrix();
-        graphics.pose().translate(0.0F, offset);
+        graphics.pose().translate(0.0f, offset);
         graphics.nextStratum();
         graphics.blit(
                 RenderPipelines.GUI_TEXTURED,
                 LOGO,
                 this.width / 2 - LOGO_WIDTH / 2,
                 logoY,
-                0.0F,
-                0.0F,
+                0.0f,
+                0.0f,
                 LOGO_WIDTH,
                 LOGO_HEIGHT,
                 LOGO_WIDTH,
                 LOGO_HEIGHT,
-                ARGB.white(1.0F));
+                ARGB.white(1.0f));
 
         int y = logoY + LINES_OFFSET;
         for (int i = 0; i < this.lines.size(); i++) {
             if (i == this.lines.size() - 1) {
-                float overshoot = y + offset - (this.height / 2.0F - 6.0F);
-                if (overshoot < 0.0F) {
-                    graphics.pose().translate(0.0F, -overshoot);
+                float overshoot = y + offset - (this.height / 2.0f - 6.0f);
+                if (overshoot < 0.0f) {
+                    graphics.pose().translate(0.0f, -overshoot);
                 }
             }
-            if (y + offset + LINE_HEIGHT + 8.0F > 0.0F && y + offset < this.height) {
+            if (y + offset + LINE_HEIGHT + 8.0f > 0.0f && y + offset < this.height) {
                 FormattedCharSequence line = this.lines.get(i);
                 if (this.centeredLines.contains(i)) {
                     graphics.centeredText(this.font, line, columnX + COLUMN_HALF_WIDTH, y, -1);
@@ -199,7 +198,7 @@ public class GCCreditsScreen extends Screen {
     @Override
     protected void extractMenuBackground(GuiGraphicsExtractor graphics, int x, int y, int width, int height) {
         Screen.extractMenuBackgroundTexture(
-                graphics, Screen.MENU_BACKGROUND, 0, 0, 0.0F, this.scroll * 0.5F, width, height);
+                graphics, Screen.MENU_BACKGROUND, 0, 0, 0.0f, this.scroll * 0.5f, width, height);
     }
 
     @Override

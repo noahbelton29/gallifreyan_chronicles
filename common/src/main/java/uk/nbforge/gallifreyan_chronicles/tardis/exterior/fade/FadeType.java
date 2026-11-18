@@ -1,7 +1,7 @@
 package uk.nbforge.gallifreyan_chronicles.tardis.exterior.fade;
 
 import com.mojang.serialization.MapCodec;
-import uk.nbforge.gallifreyan_chronicles.core.data.IdentifiableData;
+import uk.nbforge.gallifreyan_chronicles.loader.IdentifiableData;
 
 public abstract class FadeType implements IdentifiableData<FadeType> {
     private final String id;

@@ -1,10 +1,8 @@
 package uk.nbforge.gallifreyan_chronicles.tardis.control;
 
 import com.mojang.serialization.MapCodec;
-import java.util.Optional;
 import java.util.function.Function;
 import net.minecraft.ChatFormatting;
-import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvent;
@@ -13,25 +11,26 @@ import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
 import org.jspecify.annotations.Nullable;
-import uk.nbforge.gallifreyan_chronicles.core.GCSounds;
-import uk.nbforge.gallifreyan_chronicles.core.block_entities.TardisConsoleBlockEntity;
-import uk.nbforge.gallifreyan_chronicles.core.block_entities.TardisExteriorBlockEntity;
+import uk.nbforge.gallifreyan_chronicles.core.block_entity.TardisConsoleBlockEntity;
 import uk.nbforge.gallifreyan_chronicles.core.entity.TardisControlEntity;
-import uk.nbforge.gallifreyan_chronicles.core.sound.timed.TimedSounds;
 import uk.nbforge.gallifreyan_chronicles.tardis.Tardis;
-import uk.nbforge.gallifreyan_chronicles.tardis.TardisApi;
-import uk.nbforge.gallifreyan_chronicles.tardis.ecs.system.ConsoleSyncSystem;
-import uk.nbforge.gallifreyan_chronicles.tardis.ecs.system.DoorSyncSystem;
+import uk.nbforge.gallifreyan_chronicles.tardis.console.ConsoleSounds;
+import uk.nbforge.gallifreyan_chronicles.tardis.door.DoorSync;
+import uk.nbforge.gallifreyan_chronicles.tardis.flight.crash.TardisCrash;
+import uk.nbforge.gallifreyan_chronicles.util.MessageUtil;
 
-/**
- * Base class for console controls with shared animations, sounds and door helpers.
- */
+/** use and changed only ever run on the server with a console */
 public abstract class BaseControl implements TardisControl {
-
     private final ControlAnimations animations;
+    private final ClickSound clickSound;
+
+    protected BaseControl(ControlAnimations animations, ClickSound clickSound) {
+        this.animations = animations;
+        this.clickSound = clickSound;
+    }
 
     protected BaseControl(ControlAnimations animations) {
-        this.animations = animations;
+        this(animations, ClickSound.SLIDER);
     }
 
     public static <T extends BaseControl> MapCodec<T> codec(
@@ -45,7 +44,7 @@ public abstract class BaseControl implements TardisControl {
 
     @Override
     public MapCodec<? extends TardisControl> codec() {
-        return TardisControlTypes.codecFor(this);
+        return TardisControls.codecFor(this);
     }
 
     @Override
@@ -59,73 +58,43 @@ public abstract class BaseControl implements TardisControl {
     }
 
     @Override
+    public InteractionResult onRightClick(TardisControlEntity entity, @Nullable Player player, InteractionHand hand) {
+        ControlContext ctx = ControlContext.of(entity);
+        if (ctx == null) return InteractionResult.FAIL;
+        return use(ctx, entity, player);
+    }
+
+    protected InteractionResult use(ControlContext ctx, TardisControlEntity entity, @Nullable Player player) {
+        return InteractionResult.SUCCESS;
+    }
+
+    @Override
     public boolean onLeftClick(TardisControlEntity entity, Player player) {
         return true;
     }
 
     @Override
-    public InteractionResult onRightClick(TardisControlEntity entity, Player player, InteractionHand hand) {
-        if (entity.getConsole() == null) return InteractionResult.FAIL;
-        return InteractionResult.SUCCESS;
+    public void onStateChanged(TardisConsoleBlockEntity console, boolean activated) {
+        ControlContext ctx = ControlContext.of(console);
+        if (ctx != null) changed(ctx, activated);
     }
+
+    protected void changed(ControlContext ctx, boolean activated) {}
 
     @Override
     public void playClickSound(TardisControlEntity entity) {
-        playSound(entity, GCSounds.SLIDER, 0.9F);
+        SoundEvent sound = clickSound.sound();
+        if (sound != null) playSound(entity, sound, clickSound.offPitch());
     }
 
-    /**
-     * The pitch depends on whether the control is active.
-     */
     protected static void playSound(TardisControlEntity entity, SoundEvent sound, float offPitch) {
         TardisConsoleBlockEntity console = entity.getConsole();
         boolean on = console != null && console.getControlState(entity.getControlId());
-        float pitch = on ? 1.0F : offPitch;
-
+        float pitch = on ? 1.0f : offPitch;
         if (entity.level() instanceof ServerLevel serverLevel) {
-            TimedSounds.play(serverLevel, entity.blockPosition(), sound, SoundSource.BLOCKS, 1.0F, pitch);
+            ConsoleSounds.at(serverLevel, entity.blockPosition(), sound, pitch);
         } else {
-            entity.level().playSound(null, entity.blockPosition(), sound, SoundSource.BLOCKS, 1.0F, pitch);
-        }
-    }
-
-    protected static void playAt(ServerLevel level, BlockPos pos, SoundEvent sound, float pitch) {
-        TimedSounds.play(level, pos, sound, SoundSource.BLOCKS, 1.0F, pitch);
-    }
-
-    protected static void playAtConsole(TardisConsoleBlockEntity console, ServerLevel level, SoundEvent sound) {
-        playAt(level, console.getBlockPos(), sound, 1.0F);
-    }
-
-    protected static void playAtAllConsoles(TardisConsoleBlockEntity console, ServerLevel level, SoundEvent sound) {
-        for (TardisConsoleBlockEntity each : ConsoleSyncSystem.liveConsolesWith(console)) {
-            playAt(
-                    each.getLevel() instanceof ServerLevel eachLevel ? eachLevel : level,
-                    each.getBlockPos(),
-                    sound,
-                    1.0F);
-        }
-    }
-
-    protected static void playAtExterior(TardisConsoleBlockEntity console, ServerLevel level, SoundEvent sound) {
-        linkedTardis(console).flatMap(Tardis::exterior).ifPresent(exterior -> {
-            if (exterior.getLevel() instanceof ServerLevel exteriorLevel) {
-                playAt(exteriorLevel, exterior.getBlockPos(), sound, 1.0F);
-            }
-        });
-    }
-
-    protected static void playEverywhere(TardisConsoleBlockEntity console, ServerLevel level, SoundEvent sound) {
-        playAtAllConsoles(console, level, sound);
-        playAtExterior(console, level, sound);
-    }
-
-    /**
-     * A red message above the hotbar.
-     */
-    protected static void announce(@Nullable Player player, String translationKey) {
-        if (player != null) {
-            player.sendOverlayMessage(Component.translatable(translationKey).withStyle(ChatFormatting.GREEN));
+            entity.level().playSound(null, entity.blockPosition(), sound, SoundSource.BLOCKS, 1.0f, pitch);
         }
     }
 
@@ -137,36 +106,26 @@ public abstract class BaseControl implements TardisControl {
                         .withStyle(colour));
     }
 
-    protected static void tell(@Nullable Player player, String translationKey) {
-        if (player != null) {
-            player.sendOverlayMessage(Component.translatable(translationKey).withStyle(ChatFormatting.RED));
-        }
+    protected static boolean lockedWhileCrashing(ControlContext ctx, @Nullable Player player, String message) {
+        if (!ctx.tardis().map(TardisCrash::isCrashing).orElse(false)) return false;
+        MessageUtil.overlay(player, ChatFormatting.RED, message);
+        return true;
     }
 
-    /**
-     * True if the doors are locked or sealed for travel, it tells the player if so.
-     */
     protected static boolean doorsBlocked(Tardis tardis, @Nullable Player player) {
         if (tardis.isLocked()) {
-            tell(player, "message.gallifreyan_chronicles.doors_locked");
+            MessageUtil.overlay(player, ChatFormatting.RED, "doors_locked");
             return true;
         }
-
-        if (tardis.exterior().map(TardisExteriorBlockEntity::hasKeyRendered).orElse(false)) {
-            tell(player, "message.gallifreyan_chronicles.doors_key_in_lock");
+        if (tardis.exterior().map(exterior -> exterior.lock().hasKeyRendered()).orElse(false)) {
+            MessageUtil.overlay(player, ChatFormatting.RED, "doors_key_in_lock");
             return true;
         }
-
         if (tardis.areDoorsSealedForTravel()) {
-            DoorSyncSystem.announceSealed(tardis.id());
-            tell(player, "message.gallifreyan_chronicles.doors_sealed");
+            DoorSync.announceSealed(tardis);
+            MessageUtil.overlay(player, ChatFormatting.RED, "doors_sealed");
             return true;
         }
-
         return false;
-    }
-
-    protected static Optional<Tardis> linkedTardis(TardisConsoleBlockEntity console) {
-        return TardisApi.of(console);
     }
 }

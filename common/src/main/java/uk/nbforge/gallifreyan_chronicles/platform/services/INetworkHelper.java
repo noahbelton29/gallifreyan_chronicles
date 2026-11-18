@@ -1,60 +1,21 @@
 package uk.nbforge.gallifreyan_chronicles.platform.services;
 
+import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerPlayer;
-import uk.nbforge.gallifreyan_chronicles.network.DimensionSkySyncPayload;
-import uk.nbforge.gallifreyan_chronicles.network.DiscoveryToastPayload;
-import uk.nbforge.gallifreyan_chronicles.network.ResumeSoundPayload;
-import uk.nbforge.gallifreyan_chronicles.network.tardis.RematCatchPayload;
-import uk.nbforge.gallifreyan_chronicles.network.tardis.TardisAlarmPayload;
-import uk.nbforge.gallifreyan_chronicles.network.tardis.TardisConsoleAnimationPayload;
-import uk.nbforge.gallifreyan_chronicles.network.tardis.TardisConsoleRotorStatePayload;
-import uk.nbforge.gallifreyan_chronicles.network.tardis.TardisConsoleSyncPayload;
-import uk.nbforge.gallifreyan_chronicles.network.tardis.TardisCrashRumblePayload;
-import uk.nbforge.gallifreyan_chronicles.network.tardis.TardisDrumShakePayload;
-import uk.nbforge.gallifreyan_chronicles.network.tardis.TardisExteriorSyncPayload;
-import uk.nbforge.gallifreyan_chronicles.network.tardis.TardisFrightPayload;
-import uk.nbforge.gallifreyan_chronicles.network.tardis.TardisInteriorSyncPayload;
+import org.jspecify.annotations.Nullable;
 
 public interface INetworkHelper {
-    void sendTardisExteriorSync(ServerPlayer player, TardisExteriorSyncPayload payload);
+    void send(ServerPlayer player, CustomPacketPayload payload);
 
-    void broadcastTardisExteriorSync(MinecraftServer server, TardisExteriorSyncPayload payload);
+    default void broadcast(MinecraftServer server, CustomPacketPayload payload) {
+        broadcast(server, payload, null);
+    }
 
-    void sendTardisInteriorSync(ServerPlayer player, TardisInteriorSyncPayload payload);
-
-    void broadcastTardisInteriorSync(MinecraftServer server, TardisInteriorSyncPayload payload);
-
-    void sendDimensionSkySync(ServerPlayer player, DimensionSkySyncPayload payload);
-
-    void broadcastDimensionSkySync(MinecraftServer server, DimensionSkySyncPayload payload);
-
-    void sendTardisConsoleSync(ServerPlayer player, TardisConsoleSyncPayload payload);
-
-    void broadcastTardisConsoleSync(MinecraftServer server, TardisConsoleSyncPayload payload);
-
-    void sendTardisConsoleAnimation(ServerPlayer player, TardisConsoleAnimationPayload payload);
-
-    void broadcastTardisConsoleAnimation(MinecraftServer server, TardisConsoleAnimationPayload payload);
-
-    void broadcastTardisConsoleAnimation(
-            MinecraftServer server, TardisConsoleAnimationPayload payload, ServerPlayer excludedPlayer);
-
-    void sendTardisConsoleRotorState(ServerPlayer player, TardisConsoleRotorStatePayload payload);
-
-    void broadcastTardisConsoleRotorState(MinecraftServer server, TardisConsoleRotorStatePayload payload);
-
-    void sendTardisDrumShake(ServerPlayer player, TardisDrumShakePayload payload);
-
-    void sendTardisAlarm(ServerPlayer player, TardisAlarmPayload payload);
-
-    void sendTardisFright(ServerPlayer player, TardisFrightPayload payload);
-
-    void sendDiscoveryToast(ServerPlayer player, DiscoveryToastPayload payload);
-
-    void sendTardisCrashRumble(ServerPlayer player, TardisCrashRumblePayload payload);
-
-    void sendRematCatch(ServerPlayer player, RematCatchPayload payload);
-
-    void sendResumeSound(ServerPlayer player, ResumeSoundPayload payload);
+    default void broadcast(MinecraftServer server, CustomPacketPayload payload, @Nullable ServerPlayer excluded) {
+        for (ServerPlayer player : server.getPlayerList().getPlayers()) {
+            if (excluded != null && player.getUUID().equals(excluded.getUUID())) continue;
+            send(player, payload);
+        }
+    }
 }

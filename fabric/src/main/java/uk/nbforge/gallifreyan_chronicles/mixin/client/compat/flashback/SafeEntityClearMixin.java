@@ -30,7 +30,6 @@ public abstract class SafeEntityClearMixin {
         return copy.iterator();
     }
 
-    // Also drop the TARDIS copy of the player
     @Inject(method = "lambda$onInitializeClient$3", at = @At("HEAD"), remap = false, require = 0)
     private static void gc$clearPuppet(CallbackInfo ci) {
         FlashbackChunks.clearPuppet();

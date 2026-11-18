@@ -2,7 +2,7 @@ package uk.nbforge.gallifreyan_chronicles.command;
 
 import static net.minecraft.commands.Commands.argument;
 import static net.minecraft.commands.Commands.literal;
-import static uk.nbforge.gallifreyan_chronicles.util.CommandUtil.*;
+import static uk.nbforge.gallifreyan_chronicles.command.CommandUtil.*;
 
 import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
@@ -15,27 +15,22 @@ import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.core.BlockPos;
-import uk.nbforge.gallifreyan_chronicles.core.block_entities.TardisConsoleBlockEntity;
-import uk.nbforge.gallifreyan_chronicles.core.dynamic_registries.TardisConsoleRegistry;
+import uk.nbforge.gallifreyan_chronicles.core.block_entity.TardisConsoleBlockEntity;
+import uk.nbforge.gallifreyan_chronicles.core.data_registry.TardisConsoleRegistry;
+import uk.nbforge.gallifreyan_chronicles.tardis.Tardis;
 import uk.nbforge.gallifreyan_chronicles.tardis.TardisData;
+import uk.nbforge.gallifreyan_chronicles.tardis.console.ConsoleLink;
 import uk.nbforge.gallifreyan_chronicles.tardis.console.TardisConsole;
-import uk.nbforge.gallifreyan_chronicles.tardis.ecs.system.ConsoleLinkSystem;
 
 public final class ConsoleCommands {
     private ConsoleCommands() {}
 
-    /**
-     * Linking and unlinking a console block to a TARDIS. Getting/setting which console and its variant live under "data" now.
-     */
     public static LiteralArgumentBuilder<CommandSourceStack> console() {
         return literal("console")
                 .then(literal("link").executes(ConsoleCommands::link))
                 .then(literal("unlink").executes(ConsoleCommands::unlink));
     }
 
-    /**
-     * {@code data console [<console_id>] [variant [<variant_id>]]}
-     */
     public static LiteralArgumentBuilder<CommandSourceStack> consoleData() {
         return literal("console")
                 .executes(ConsoleCommands::get)
@@ -65,7 +60,9 @@ public final class ConsoleCommands {
     }
 
     static Optional<TardisConsoleBlockEntity> consoleOf(CommandContext<CommandSourceStack> ctx, UUID tardisId) {
-        TardisData data = manager(ctx).getTardis(tardisId);
+        TardisData data = Tardis.get(ctx.getSource().getServer(), tardisId)
+                .map(Tardis::data)
+                .orElse(null);
         BlockPos pos = data == null ? null : data.getConsoleBlockPos();
         return findBlockEntity(ctx, pos, TardisConsoleBlockEntity.class);
     }
@@ -87,7 +84,7 @@ public final class ConsoleCommands {
             if (be.isEmpty()) return fail(ctx, "no_console", idText);
 
             be.get().setConsole(TardisConsoleRegistry.get(consoleId));
-            ConsoleLinkSystem.spawnDefaultControls(be.get());
+            ConsoleLink.spawnDefaultControls(be.get());
             syncConsolesTo(ctx);
             return success(ctx, true, "set_console", idText, consoleId);
         });
@@ -125,7 +122,7 @@ public final class ConsoleCommands {
                             .isEmpty()) {
                 return fail(ctx, "not_looking_at_console");
             }
-            ConsoleLinkSystem.link(ctx.getSource().getLevel(), tardis.id(), pos.get());
+            ConsoleLink.link(tardis, ctx.getSource().getLevel(), pos.get());
             return success(ctx, true, "link_console", idText);
         });
     }

@@ -9,8 +9,8 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.function.BooleanSupplier;
 import java.util.function.Supplier;
-import uk.nbforge.gallifreyan_chronicles.core.block_entities.TardisConsoleBlockEntity;
-import uk.nbforge.gallifreyan_chronicles.core.dynamic_registries.TardisControlRegistry;
+import uk.nbforge.gallifreyan_chronicles.core.block_entity.TardisConsoleBlockEntity;
+import uk.nbforge.gallifreyan_chronicles.tardis.control.TardisControls;
 
 public final class ConsoleControllers {
     public static final String IDLE_STATE = "rotor_idle";
@@ -42,7 +42,7 @@ public final class ConsoleControllers {
         });
 
         Map<String, AnimationController<TardisConsoleBlockEntity>> built = new HashMap<>();
-        for (String controlId : TardisControlRegistry.allIds()) {
+        for (String controlId : TardisControls.ids()) {
             built.put(controlId, controlController(controlId));
         }
         this.controlControllers = Collections.unmodifiableMap(built);

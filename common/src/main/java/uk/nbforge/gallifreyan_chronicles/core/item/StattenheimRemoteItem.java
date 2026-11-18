@@ -14,15 +14,14 @@ import net.minecraft.world.item.context.UseOnContext;
 import org.jspecify.annotations.NonNull;
 import uk.nbforge.gallifreyan_chronicles.core.GCDataComponents;
 import uk.nbforge.gallifreyan_chronicles.core.GCTardisControls;
-import uk.nbforge.gallifreyan_chronicles.core.block_entities.TardisExteriorBlockEntity;
+import uk.nbforge.gallifreyan_chronicles.core.block_entity.TardisExteriorBlockEntity;
 import uk.nbforge.gallifreyan_chronicles.core.item.tooltip.ItemInfoTooltip;
 import uk.nbforge.gallifreyan_chronicles.tardis.Tardis;
-import uk.nbforge.gallifreyan_chronicles.tardis.TardisApi;
+import uk.nbforge.gallifreyan_chronicles.tardis.TardisDimensionUtil;
 import uk.nbforge.gallifreyan_chronicles.tardis.flight.FlightTimings;
 import uk.nbforge.gallifreyan_chronicles.tardis.flight.LandingTarget;
 import uk.nbforge.gallifreyan_chronicles.tardis.flight.TardisTravel;
-import uk.nbforge.gallifreyan_chronicles.util.GCSchedulerUtil;
-import uk.nbforge.gallifreyan_chronicles.util.TardisDimensionUtil;
+import uk.nbforge.gallifreyan_chronicles.util.SchedulerUtil;
 
 public class StattenheimRemoteItem extends Item {
     private static final int SUMMON_COOLDOWN_TICKS = 400;
@@ -38,23 +37,21 @@ public class StattenheimRemoteItem extends Item {
         if (player == null) return InteractionResult.PASS;
         ItemStack stack = context.getItemInHand();
 
-        // Link the remote
         if (player.isShiftKeyDown()) {
             return link(serverLevel, context.getClickedPos(), player, stack);
         }
 
-        // Summon the TARDIS
         UUID tardisID = stack.get(GCDataComponents.TARDIS_ID);
         if (tardisID == null) {
             say(player, "stattenheim_not_linked", ChatFormatting.RED);
             return InteractionResult.FAIL;
         }
-        Tardis tardis = TardisApi.get(serverLevel.getServer(), tardisID).orElse(null);
+        Tardis tardis = Tardis.get(serverLevel.getServer(), tardisID).orElse(null);
         if (tardis == null) {
             say(player, "stattenheim_lost", ChatFormatting.RED);
             return InteractionResult.FAIL;
         }
-        if (!mayUse(tardis, player)) {
+        if (isStranger(tardis, player)) {
             say(player, "stattenheim_not_yours", ChatFormatting.RED);
             return InteractionResult.FAIL;
         }
@@ -97,7 +94,7 @@ public class StattenheimRemoteItem extends Item {
         }
 
         long flightTicks = FlightTimings.TAKEOFF_TICKS + TardisTravel.requiredTicks(tardis) + 5;
-        GCSchedulerUtil.runLater(serverLevel.getServer(), (int) flightTicks, tardis::land);
+        SchedulerUtil.runLater(serverLevel.getServer(), (int) flightTicks, tardis::land);
         player.getCooldowns().addCooldown(stack, SUMMON_COOLDOWN_TICKS);
         say(player, "stattenheim_summoned", ChatFormatting.GREEN);
         return InteractionResult.SUCCESS;
@@ -106,12 +103,12 @@ public class StattenheimRemoteItem extends Item {
     private static InteractionResult link(ServerLevel level, BlockPos pos, Player player, ItemStack stack) {
         if (!(level.getBlockEntity(pos) instanceof TardisExteriorBlockEntity exterior)) return InteractionResult.PASS;
         UUID id = exterior.getTardisId();
-        Tardis tardis = id == null ? null : TardisApi.get(level.getServer(), id).orElse(null);
+        Tardis tardis = id == null ? null : Tardis.get(level.getServer(), id).orElse(null);
         if (tardis == null) {
             say(player, "stattenheim_cannot_link", ChatFormatting.RED);
             return InteractionResult.FAIL;
         }
-        if (!mayUse(tardis, player)) {
+        if (isStranger(tardis, player)) {
             say(player, "stattenheim_not_yours", ChatFormatting.RED);
             return InteractionResult.FAIL;
         }
@@ -132,18 +129,12 @@ public class StattenheimRemoteItem extends Item {
         return InteractionResult.SUCCESS;
     }
 
-    /**
-     * The owner and anyone they trust, a remote linked to the TARDIS of a stranger does nothing.
-     */
-    private static boolean mayUse(Tardis tardis, Player player) {
-        return tardis.isOwner(player) || tardis.isTrusted(player.getUUID());
+    private static boolean isStranger(Tardis tardis, Player player) {
+        return !tardis.isOwner(player) && !tardis.isTrusted(player.getUUID());
     }
 
-    /**
-     * A TARDIS cannot land inside the interior of another TARDIS.
-     */
     private static boolean isInsideATardis(ServerLevel level) {
-        return TardisApi.idOfLevel(level).isPresent() || TardisDimensionUtil.isInterior(level);
+        return Tardis.idOfLevel(level).isPresent() || TardisDimensionUtil.isInterior(level);
     }
 
     private static void say(Player player, String key, ChatFormatting colour) {

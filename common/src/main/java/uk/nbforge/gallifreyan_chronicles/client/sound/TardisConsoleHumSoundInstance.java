@@ -14,9 +14,9 @@ import uk.nbforge.gallifreyan_chronicles.core.GCSounds;
 
 public class TardisConsoleHumSoundInstance extends AbstractTickableSoundInstance {
     public static final double HEARING_RANGE = 30.0;
-    private static final float IN_RANGE_VOLUME = .75F;
+    private static final float IN_RANGE_VOLUME = .75f;
 
-    private static final float FADE_PER_TICK = 0.05F;
+    private static final float FADE_PER_TICK = 0.05f;
 
     private final BooleanSupplier stillValid;
     private final BooleanSupplier powered;
@@ -33,7 +33,7 @@ public class TardisConsoleHumSoundInstance extends AbstractTickableSoundInstance
         this.powered = powered;
         this.known = known;
         this.settled = known.getAsBoolean();
-        this.fade = 0.0F;
+        this.fade = 0.0f;
         this.x = pos.getX() + 0.5;
         this.y = pos.getY() + 0.5;
         this.z = pos.getZ() + 0.5;
@@ -41,7 +41,7 @@ public class TardisConsoleHumSoundInstance extends AbstractTickableSoundInstance
         this.looping = true;
         this.delay = 0;
         this.volume = IN_RANGE_VOLUME * fade;
-        this.pitch = 1.0F;
+        this.pitch = 1.0f;
     }
 
     @Override
@@ -57,20 +57,20 @@ public class TardisConsoleHumSoundInstance extends AbstractTickableSoundInstance
 
         if (!settled) {
             if (!known.getAsBoolean()) {
-                this.volume = 0.0F;
+                this.volume = 0.0f;
                 return;
             }
             settled = true;
         }
 
-        float target = powered.getAsBoolean() ? 1.0F : 0.0F;
+        float target = powered.getAsBoolean() ? 1.0f : 0.0f;
         if (fade < target) fade = Math.min(target, fade + FADE_PER_TICK);
         else if (fade > target) fade = Math.max(target, fade - FADE_PER_TICK);
 
         double distance = SoundListener.pos().distanceTo(new Vec3(this.x, this.y, this.z));
 
         if (distance >= HEARING_RANGE) {
-            this.volume = 0.0F;
+            this.volume = 0.0f;
         } else {
             float attenuation = (float) (1.0 - distance / HEARING_RANGE);
             this.volume = IN_RANGE_VOLUME * attenuation;
@@ -82,7 +82,7 @@ public class TardisConsoleHumSoundInstance extends AbstractTickableSoundInstance
             this.pitch = TardisFrightClient.warpedPitch(warp);
             this.volume *= TardisFrightClient.warpedVolume(warp);
         } else {
-            this.pitch = 1.0F;
+            this.pitch = 1.0f;
         }
     }
 

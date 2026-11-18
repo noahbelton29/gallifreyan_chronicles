@@ -9,6 +9,6 @@ public final class NoopControl implements TardisControl {
 
     @Override
     public MapCodec<? extends TardisControl> codec() {
-        return TardisControlTypes.codecFor(this);
+        return TardisControls.codecFor(this);
     }
 }

@@ -23,8 +23,6 @@ import uk.nbforge.gallifreyan_chronicles.Constants;
 public final class FlashbackChunks {
     private static final boolean ACTIVE = FabricLoader.getInstance().isModLoaded("flashback")
             && FabricLoader.getInstance().isModLoaded("seamlessportals");
-    // Replay features that threw once, each is logged once and the game carries on
-    // A broken replay feature should never kick you out of the replay
     private static final Set<String> FAILED = ConcurrentHashMap.newKeySet();
 
     private FlashbackChunks() {}
@@ -51,7 +49,7 @@ public final class FlashbackChunks {
     public static boolean dropUnknownDim(int dimId) {
         if (!inReplay()) return false;
         try {
-            return !FlashbackChunksImpl.clientKnowsDim(dimId);
+            return FlashbackChunksImpl.isUnknownToClient(dimId);
         } catch (Throwable t) {
             failed("unknown dimension check", t);
             return false;
@@ -78,7 +76,6 @@ public final class FlashbackChunks {
             original.run();
             return;
         }
-        // If our part fails before the snapshot of Flashback ran, still let it run once
         boolean[] started = {false};
         try {
             FlashbackChunksImpl.writeSnapshotFromOutside(() -> {

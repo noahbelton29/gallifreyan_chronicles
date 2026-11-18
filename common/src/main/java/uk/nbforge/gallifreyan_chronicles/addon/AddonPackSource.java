@@ -14,7 +14,6 @@ import net.minecraft.server.packs.repository.PackSource;
 import net.minecraft.server.packs.repository.RepositorySource;
 import uk.nbforge.gallifreyan_chronicles.Constants;
 
-/** Offers the enabled addons as required packs. */
 public final class AddonPackSource implements RepositorySource {
     public static final String ID_PREFIX = "gc_addon/";
 

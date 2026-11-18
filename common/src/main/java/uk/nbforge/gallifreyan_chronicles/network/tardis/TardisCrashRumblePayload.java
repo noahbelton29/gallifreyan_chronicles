@@ -5,7 +5,7 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.phys.Vec3;
 import org.jspecify.annotations.NonNull;
-import uk.nbforge.gallifreyan_chronicles.client.camera.GCCameraShake;
+import uk.nbforge.gallifreyan_chronicles.client.camera.CameraShake;
 import uk.nbforge.gallifreyan_chronicles.platform.Services;
 import uk.nbforge.gallifreyan_chronicles.util.GCUtil;
 
@@ -28,13 +28,13 @@ public record TardisCrashRumblePayload(double x, double y, double z, int ticks, 
 
     private static void send(ServerLevel level, TardisCrashRumblePayload payload) {
         for (ServerPlayer player : level.players()) {
-            Services.NETWORK.sendTardisCrashRumble(player, payload);
+            Services.NETWORK.send(player, payload);
         }
     }
 
     public void apply() {
-        if (stress) GCCameraShake.stressRumble(new Vec3(x, y, z), strength);
-        else GCCameraShake.crashRumble(new Vec3(x, y, z), ticks);
+        if (stress) CameraShake.stressRumble(new Vec3(x, y, z), strength);
+        else CameraShake.crashRumble(new Vec3(x, y, z), ticks);
     }
 
     @Override

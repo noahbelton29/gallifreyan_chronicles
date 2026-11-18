@@ -3,7 +3,6 @@ package uk.nbforge.gallifreyan_chronicles.tardis.flight;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
-import java.util.UUID;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
@@ -17,11 +16,9 @@ import net.minecraft.world.level.Level;
 import org.jspecify.annotations.Nullable;
 import uk.nbforge.gallifreyan_chronicles.Constants;
 import uk.nbforge.gallifreyan_chronicles.core.GCDimensions;
-import uk.nbforge.gallifreyan_chronicles.core.block_entities.TardisExteriorBlockEntity;
+import uk.nbforge.gallifreyan_chronicles.core.block_entity.TardisExteriorBlockEntity;
 import uk.nbforge.gallifreyan_chronicles.tardis.Tardis;
-import uk.nbforge.gallifreyan_chronicles.tardis.TardisApi;
 import uk.nbforge.gallifreyan_chronicles.tardis.TardisData;
-import uk.nbforge.gallifreyan_chronicles.tardis.TardisManager;
 
 public final class TardisDestinations {
     public static final int[] INCREMENTS = {1, 10, 100, 1000, 10000};
@@ -48,16 +45,13 @@ public final class TardisDestinations {
 
     private TardisDestinations() {}
 
-    public static int increment(MinecraftServer server, UUID tardisId) {
-        TardisData data = TardisManager.get(server).getTardis(tardisId);
-        if (data == null) return INCREMENTS[0];
+    public static int increment(Tardis tardis) {
+        TardisData data = tardis.data();
         int amount = INCREMENTS[Mth.clamp(data.getCoordIncrementIndex(), 0, INCREMENTS.length - 1)];
         return data.isCoordIncrementNegative() ? -amount : amount;
     }
 
-    public static @Nullable LandingTarget current(MinecraftServer server, UUID tardisId) {
-        Tardis tardis = TardisApi.get(server, tardisId).orElse(null);
-        if (tardis == null) return null;
+    public static @Nullable LandingTarget current(Tardis tardis) {
         LandingTarget target = tardis.landingTarget().orElse(null);
         if (target != null) return target;
 
@@ -68,31 +62,30 @@ public final class TardisDestinations {
         return new LandingTarget(tardis.exteriorDimension(), pos, yaw);
     }
 
-    public static int toggleNegative(MinecraftServer server, UUID tardisId) {
-        TardisData data = TardisManager.get(server).getTardis(tardisId);
-        if (data != null) data.setCoordIncrementNegative(!data.isCoordIncrementNegative());
-        return increment(server, tardisId);
+    public static int toggleNegative(Tardis tardis) {
+        TardisData data = tardis.data();
+        data.setCoordIncrementNegative(!data.isCoordIncrementNegative());
+        return increment(tardis);
     }
 
-    public static int cycleIncrement(MinecraftServer server, UUID tardisId) {
-        TardisData data = TardisManager.get(server).getTardis(tardisId);
-        if (data != null) data.setCoordIncrementIndex((data.getCoordIncrementIndex() + 1) % INCREMENTS.length);
-        return increment(server, tardisId);
+    public static int cycleIncrement(Tardis tardis) {
+        TardisData data = tardis.data();
+        data.setCoordIncrementIndex((data.getCoordIncrementIndex() + 1) % INCREMENTS.length);
+        return increment(tardis);
     }
 
-    /** Left click runs the same cycle backwards so you can undo an overshoot without going all the way round. */
-    public static int cycleIncrementBack(MinecraftServer server, UUID tardisId) {
-        TardisData data = TardisManager.get(server).getTardis(tardisId);
+    public static int cycleIncrementBack(Tardis tardis) {
+        TardisData data = tardis.data();
         int count = INCREMENTS.length;
-        if (data != null) data.setCoordIncrementIndex((data.getCoordIncrementIndex() - 1 + count) % count);
-        return increment(server, tardisId);
+        data.setCoordIncrementIndex((data.getCoordIncrementIndex() - 1 + count) % count);
+        return increment(tardis);
     }
 
-    public static @Nullable LandingTarget step(MinecraftServer server, UUID tardisId, Axis axis) {
-        LandingTarget target = current(server, tardisId);
+    public static @Nullable LandingTarget step(Tardis tardis, Axis axis) {
+        LandingTarget target = current(tardis);
         if (target == null) return null;
 
-        int amount = increment(server, tardisId);
+        int amount = increment(tardis);
         BlockPos pos = target.pos();
         int x = pos.getX();
         int y = pos.getY();
@@ -102,25 +95,23 @@ public final class TardisDestinations {
             case X -> x = wrapWorld(x + (long) amount);
             case Z -> z = wrapWorld(z + (long) amount);
             case Y -> {
-                ServerLevel level = server.getLevel(target.dimension());
+                ServerLevel level = tardis.server().getLevel(target.dimension());
                 y = level == null ? y + amount : wrapHeight(level, y + (long) amount);
             }
         }
 
         LandingTarget updated = new LandingTarget(target.dimension(), new BlockPos(x, y, z), target.yaw());
-        TardisData data = TardisManager.get(server).getTardis(tardisId);
-        if (data != null) data.setLandingTarget(updated);
+        tardis.data().setLandingTarget(updated);
         return updated;
     }
 
-    public static @Nullable LandingTarget rotate(MinecraftServer server, UUID tardisId, int direction) {
-        LandingTarget target = current(server, tardisId);
+    public static @Nullable LandingTarget rotate(Tardis tardis, int direction) {
+        LandingTarget target = current(tardis);
         if (target == null) return null;
 
         int next = Math.floorMod(facingIndex(target.yaw()) + direction, FACING_YAWS.length);
         LandingTarget updated = new LandingTarget(target.dimension(), target.pos(), FACING_YAWS[next]);
-        TardisData data = TardisManager.get(server).getTardis(tardisId);
-        if (data != null) data.setLandingTarget(updated);
+        tardis.data().setLandingTarget(updated);
         return updated;
     }
 
@@ -142,19 +133,19 @@ public final class TardisDestinations {
         return best;
     }
 
-    public static @Nullable LandingTarget nextDimension(MinecraftServer server, UUID tardisId) {
-        return stepDimension(server, tardisId, 1);
+    public static @Nullable LandingTarget nextDimension(Tardis tardis) {
+        return stepDimension(tardis, 1);
     }
 
-    public static @Nullable LandingTarget previousDimension(MinecraftServer server, UUID tardisId) {
-        return stepDimension(server, tardisId, -1);
+    public static @Nullable LandingTarget previousDimension(Tardis tardis) {
+        return stepDimension(tardis, -1);
     }
 
-    private static @Nullable LandingTarget stepDimension(MinecraftServer server, UUID tardisId, int direction) {
-        LandingTarget target = current(server, tardisId);
+    private static @Nullable LandingTarget stepDimension(Tardis tardis, int direction) {
+        LandingTarget target = current(tardis);
         if (target == null) return null;
 
-        List<ServerLevel> levels = landableLevels(server);
+        List<ServerLevel> levels = landableLevels(tardis.server());
         if (levels.isEmpty()) return null;
 
         int index = -1;
@@ -172,8 +163,7 @@ public final class TardisDestinations {
         int y = Mth.clamp(pos.getY(), next.getMinY(), next.getMaxY() - 1);
         LandingTarget updated =
                 new LandingTarget(next.dimension(), new BlockPos(pos.getX(), y, pos.getZ()), target.yaw());
-        TardisData data = TardisManager.get(server).getTardis(tardisId);
-        if (data != null) data.setLandingTarget(updated);
+        tardis.data().setLandingTarget(updated);
         return updated;
     }
 
@@ -200,7 +190,7 @@ public final class TardisDestinations {
     }
 
     private static boolean isTardisInterior(ServerLevel level) {
-        if (TardisApi.idOfLevel(level).isPresent()) return true;
+        if (Tardis.idOfLevel(level).isPresent()) return true;
         if (level.dimension().equals(GCDimensions.TARDIS_INTERIOR_LEVEL_KEY)) return true;
         Identifier id = level.dimension().identifier();
         return id.getNamespace().equals(Constants.MOD_ID) && id.getPath().startsWith("tardis");

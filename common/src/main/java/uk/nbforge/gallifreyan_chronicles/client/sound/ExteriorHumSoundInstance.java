@@ -3,16 +3,12 @@ package uk.nbforge.gallifreyan_chronicles.client.sound;
 import net.minecraft.client.Minecraft;
 import uk.nbforge.gallifreyan_chronicles.config.GCConfig;
 import uk.nbforge.gallifreyan_chronicles.core.GCSounds;
-import uk.nbforge.gallifreyan_chronicles.core.block_entities.TardisExteriorBlockEntity;
+import uk.nbforge.gallifreyan_chronicles.core.block_entity.TardisExteriorBlockEntity;
 
-/**
- * The interior hum heard from outside the TARDIS.
- * With the doors shut only within 3 blocks and quieter and muffled, with them open within 6 blocks and clear.
- */
 public class ExteriorHumSoundInstance extends ExteriorSoundInstance {
-    private static final float OPEN_VOLUME = 0.6F;
-    private static final float POWER_FADE_PER_TICK = 0.035F;
-    private static final float FADE_OUT_TICKS = 15.0F;
+    private static final float OPEN_VOLUME = 0.6f;
+    private static final float POWER_FADE_PER_TICK = 0.035f;
+    private static final float FADE_OUT_TICKS = 15.0f;
 
     private float power;
     private boolean fadingOut;
@@ -20,11 +16,8 @@ public class ExteriorHumSoundInstance extends ExteriorSoundInstance {
 
     public ExteriorHumSoundInstance(TardisExteriorBlockEntity exterior) {
         super(exterior, GCSounds.FIRST_DOCTORS_HUM, true);
-        // Start at the current power level right away, walking out through the door or coming back
-        // into range should sound the same instantly, the fade is only for an actual power change
-        // (approach() in tick() still ramps this if isPowered() flips while this instance is alive)
-        this.power = exterior.isPowered() ? 1.0F : 0.0F;
-        this.volume = 0.0F;
+        this.power = exterior.lamp().isPowered() ? 1.0f : 0.0f;
+        this.volume = 0.0f;
     }
 
     @Override
@@ -34,19 +27,17 @@ public class ExteriorHumSoundInstance extends ExteriorSoundInstance {
             return;
         }
         if (fadingOut || exteriorGone()) {
-            // Went through the door or the TARDIS left, fade out instead of cutting off
             if (!fadingOut) fadeOut();
-            this.volume = Math.max(0.0F, this.volume - fadeOutStep);
-            if (this.volume <= 0.0F) this.stop();
+            this.volume = Math.max(0.0f, this.volume - fadeOutStep);
+            if (this.volume <= 0.0f) this.stop();
             return;
         }
 
         stepOpenness();
-        power = approach(power, exterior.isPowered() ? 1.0F : 0.0F, POWER_FADE_PER_TICK);
+        power = approach(power, exterior.lamp().isPowered() ? 1.0f : 0.0f, POWER_FADE_PER_TICK);
         this.volume = doorLoudness(OPEN_VOLUME) * falloff() * power * (float) GCConfig.tardisHumVolume();
 
-        // Power off and fully faded so stop it, it starts again when the power comes back
-        if (power <= 0.0F && !exterior.isPowered()) {
+        if (power <= 0.0f && !exterior.lamp().isPowered()) {
             this.stop();
             return;
         }
@@ -54,9 +45,8 @@ public class ExteriorHumSoundInstance extends ExteriorSoundInstance {
         applyMuffle();
     }
 
-    /** Stops it smoothly, see tick. */
     public void fadeOut() {
         fadingOut = true;
-        fadeOutStep = Math.max(0.01F, this.volume / FADE_OUT_TICKS);
+        fadeOutStep = Math.max(0.01f, this.volume / FADE_OUT_TICKS);
     }
 }

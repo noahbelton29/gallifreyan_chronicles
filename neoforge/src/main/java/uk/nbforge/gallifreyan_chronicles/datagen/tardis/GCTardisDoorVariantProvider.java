@@ -4,19 +4,17 @@ import com.google.gson.JsonObject;
 import net.minecraft.data.PackOutput;
 import uk.nbforge.gallifreyan_chronicles.datagen.util.GCJson;
 import uk.nbforge.gallifreyan_chronicles.datagen.util.GCJsonDataProvider;
+import uk.nbforge.gallifreyan_chronicles.tardis.door.TardisDoorVariant;
 
-/** Generates the tardis_door_variant json files, to add one copy a line below and change the names. */
 public class GCTardisDoorVariantProvider extends GCJsonDataProvider {
     public GCTardisDoorVariantProvider(PackOutput output) {
-        super(output, "tardis_door_variant", "TARDIS Door Variant");
+        super(output, TardisDoorVariant.FOLDER, "TARDIS Door Variant");
     }
 
     @Override
     protected void addEntries() {
-        /**
-         * exteriorDoor takes name, block and priority, interiorDoor takes name, exterior and priority.
-         * Add a default or particle property for the rare extras.
-         */
+        // exteriorDoor takes name, block and priority, interiorDoor takes name, exterior and priority. Add a default or
+        // particle property for the rare extras.
         exteriorDoor("first_doctors_doors", "first_doctors_door", 1).addProperty("default", true);
         exteriorDoor("hellbent_doors", "hellbent_door", 5).addProperty("particle", mod("brachacki_wall_block_4"));
         exteriorDoor("second_doctors_doors", "second_doctors_door", 2);
@@ -31,7 +29,6 @@ public class GCTardisDoorVariantProvider extends GCJsonDataProvider {
         interiorDoor("tuat_interior_doors", "tuat_exterior", 3).addProperty("default", false);
     }
 
-    /** A Brachacki model outside door, the texture is in brachacki_doors under the same name. */
     private JsonObject exteriorDoor(String name, String block, int priority) {
         return put(
                 name,
@@ -45,7 +42,7 @@ public class GCTardisDoorVariantProvider extends GCJsonDataProvider {
                         "priority", priority));
     }
 
-    /** An interior door, its model and texture share its name. */
+    /** model and texture share its name */
     private JsonObject interiorDoor(String name, String exterior, int priority) {
         return put(
                 name,

@@ -26,7 +26,6 @@ public abstract class ChannelMixin implements OffsetChannel {
     @Unique
     private float gc$offsetSeconds;
 
-    // The OpenAL low pass filter for muffling, made the first time it is needed
     @Unique
     private int gc$filter;
 
@@ -40,7 +39,7 @@ public abstract class ChannelMixin implements OffsetChannel {
     @Unique
     public void gc$setMuffle(float highGain) {
         try {
-            if (highGain >= 0.999F) {
+            if (highGain >= 0.999f) {
                 if (gc$filter != 0) AL10.alSourcei(source, EXTEfx.AL_DIRECT_FILTER, EXTEfx.AL_FILTER_NULL);
                 return;
             }
@@ -48,12 +47,10 @@ public abstract class ChannelMixin implements OffsetChannel {
                 gc$filter = EXTEfx.alGenFilters();
                 EXTEfx.alFilteri(gc$filter, EXTEfx.AL_FILTER_TYPE, EXTEfx.AL_FILTER_LOWPASS);
             }
-            EXTEfx.alFilterf(gc$filter, EXTEfx.AL_LOWPASS_GAIN, 1.0F);
-            EXTEfx.alFilterf(gc$filter, EXTEfx.AL_LOWPASS_GAINHF, Math.max(0.0F, highGain));
+            EXTEfx.alFilterf(gc$filter, EXTEfx.AL_LOWPASS_GAIN, 1.0f);
+            EXTEfx.alFilterf(gc$filter, EXTEfx.AL_LOWPASS_GAINHF, Math.max(0.0f, highGain));
             AL10.alSourcei(source, EXTEfx.AL_DIRECT_FILTER, gc$filter);
         } catch (Throwable ignored) {
-            // No EFX on this sound card so it just will not be muffled
-            // some cards just do not have it, nothing we can do
         }
     }
 
@@ -70,9 +67,9 @@ public abstract class ChannelMixin implements OffsetChannel {
 
     @Inject(method = "play", at = @At("HEAD"), require = 0)
     private void gc$applyOffset(CallbackInfo ci) {
-        if (gc$offsetSeconds > 0.0F && stream == null) {
+        if (gc$offsetSeconds > 0.0f && stream == null) {
             AL10.alSourcef(source, AL11.AL_SEC_OFFSET, gc$offsetSeconds);
         }
-        gc$offsetSeconds = 0.0F;
+        gc$offsetSeconds = 0.0f;
     }
 }

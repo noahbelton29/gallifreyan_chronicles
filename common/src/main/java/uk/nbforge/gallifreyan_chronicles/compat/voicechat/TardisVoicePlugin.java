@@ -17,22 +17,22 @@ import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import net.minecraft.server.level.ServerPlayer;
 import uk.nbforge.gallifreyan_chronicles.Constants;
-import uk.nbforge.gallifreyan_chronicles.tardis.ecs.component.DoorState;
+import uk.nbforge.gallifreyan_chronicles.tardis.door.DoorState;
 
 public class TardisVoicePlugin implements VoicechatPlugin {
-    private static final float SAMPLE_RATE = 48000.0F;
+    private static final float SAMPLE_RATE = 48000.0f;
 
-    private static final float CLOSED_CUTOFF = 450.0F;
-    private static final float CLOSED_GAIN = 0.55F;
-    private static final float ONE_OPEN_CUTOFF = 2200.0F;
-    private static final float ONE_OPEN_GAIN = 0.85F;
-    private static final float BOTH_OPEN_CUTOFF = 7000.0F;
-    private static final float BOTH_OPEN_GAIN = 1.0F;
+    private static final float CLOSED_CUTOFF = 450.0f;
+    private static final float CLOSED_GAIN = 0.55f;
+    private static final float ONE_OPEN_CUTOFF = 2200.0f;
+    private static final float ONE_OPEN_GAIN = 0.85f;
+    private static final float BOTH_OPEN_CUTOFF = 7000.0f;
+    private static final float BOTH_OPEN_GAIN = 1.0f;
 
     private static final double WHISPER_RANGE_FACTOR = 0.5;
     private static final double MAX_HEARING_RANGE = 26;
 
-    private static final float FAR_VOLUME = 0.2F;
+    private static final float FAR_VOLUME = 0.2f;
 
     private final Map<UUID, Stream> streams = new ConcurrentHashMap<>();
     private volatile VoicechatServerApi api;
@@ -124,7 +124,7 @@ public class TardisVoicePlugin implements VoicechatPlugin {
             stream.reset();
         } else {
             float closeness = (float) Math.max(0.0, Math.min(1.0, remaining / range));
-            float proximity = FAR_VOLUME + (1.0F - FAR_VOLUME) * (float) Math.pow(closeness, 1.5);
+            float proximity = FAR_VOLUME + (1.0f - FAR_VOLUME) * (float) Math.pow(closeness, 1.5);
             out = stream.process(data, link.doorState(), proximity, !towardsInterior);
             if (out == null) return;
         }
@@ -191,7 +191,7 @@ public class TardisVoicePlugin implements VoicechatPlugin {
             float cutoff;
             float gain;
             if (clearWhenOpen && !doorState.isClosed()) {
-                cutoff = SAMPLE_RATE / 2.0F;
+                cutoff = SAMPLE_RATE / 2.0f;
                 gain = BOTH_OPEN_GAIN;
             } else if (doorState.isBothOpen()) {
                 cutoff = BOTH_OPEN_CUTOFF;
@@ -203,10 +203,10 @@ public class TardisVoicePlugin implements VoicechatPlugin {
                 cutoff = ONE_OPEN_CUTOFF;
                 gain = ONE_OPEN_GAIN;
             }
-            float alpha = 1.0F - (float) Math.exp(-2.0 * Math.PI * cutoff / SAMPLE_RATE);
+            float alpha = 1.0f - (float) Math.exp(-2.0 * Math.PI * cutoff / SAMPLE_RATE);
             for (int i = 0; i < samples.length; i++) {
                 float value;
-                if (cutoff >= SAMPLE_RATE / 2.0F) {
+                if (cutoff >= SAMPLE_RATE / 2.0f) {
                     lowPassA = samples[i];
                     lowPassB = samples[i];
                     value = samples[i] * gain * proximity;
@@ -221,8 +221,8 @@ public class TardisVoicePlugin implements VoicechatPlugin {
         }
 
         void reset() {
-            lowPassA = 0.0F;
-            lowPassB = 0.0F;
+            lowPassA = 0.0f;
+            lowPassB = 0.0f;
             if (!decoder.isClosed()) decoder.resetState();
             if (!encoder.isClosed()) encoder.resetState();
         }

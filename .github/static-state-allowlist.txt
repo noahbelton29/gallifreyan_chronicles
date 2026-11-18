@@ -1,17 +1,18 @@
 # Registration: filled once at startup
 common/src/main/java/uk/nbforge/gallifreyan_chronicles/core/GCBlocks.java:BLOCKS
-common/src/main/java/uk/nbforge/gallifreyan_chronicles/core/GCBlocks.java:CONCRETE_HALF_ROUNDELS
-common/src/main/java/uk/nbforge/gallifreyan_chronicles/core/GCBlocks.java:CONCRETE_ROUNDELS
+common/src/main/java/uk/nbforge/gallifreyan_chronicles/core/block/registry/RoundelBlocks.java:CONCRETE_HALF_ROUNDELS
+common/src/main/java/uk/nbforge/gallifreyan_chronicles/core/block/registry/RoundelBlocks.java:CONCRETE_ROUNDELS
 common/src/main/java/uk/nbforge/gallifreyan_chronicles/core/GCBlocks.java:PICKABLE_DOORS
-common/src/main/java/uk/nbforge/gallifreyan_chronicles/core/GCBlocks.java:WOOD_HALF_ROUNDELS
-common/src/main/java/uk/nbforge/gallifreyan_chronicles/core/GCBlocks.java:WOOD_ROUNDELS
+common/src/main/java/uk/nbforge/gallifreyan_chronicles/core/block/registry/RoundelBlocks.java:WOOD_HALF_ROUNDELS
+common/src/main/java/uk/nbforge/gallifreyan_chronicles/core/block/registry/RoundelBlocks.java:WOOD_ROUNDELS
 common/src/main/java/uk/nbforge/gallifreyan_chronicles/core/GCItems.java:ITEMS
-common/src/main/java/uk/nbforge/gallifreyan_chronicles/core/dynamic_registries/TardisControlRegistry.java:CONTROLS
-common/src/main/java/uk/nbforge/gallifreyan_chronicles/tardis/control/TardisControlTypes.java:BY_CLASS
-common/src/main/java/uk/nbforge/gallifreyan_chronicles/tardis/control/TardisControlTypes.java:IDS
-common/src/main/java/uk/nbforge/gallifreyan_chronicles/tardis/control/TardisControlTypes.java:TYPES
-common/src/main/java/uk/nbforge/gallifreyan_chronicles/tardis/codec/exterior/fade/FadeTypeKindCodec.java:IDS
-common/src/main/java/uk/nbforge/gallifreyan_chronicles/tardis/codec/exterior/fade/FadeTypeKindCodec.java:KINDS
+common/src/main/java/uk/nbforge/gallifreyan_chronicles/tardis/control/TardisControls.java:CONTROLS
+common/src/main/java/uk/nbforge/gallifreyan_chronicles/tardis/control/TardisControls.java:TYPES
+common/src/main/java/uk/nbforge/gallifreyan_chronicles/tardis/control/TardisControls.java:TYPES_BY_CLASS
+common/src/main/java/uk/nbforge/gallifreyan_chronicles/tardis/control/TardisControls.java:TYPE_IDS
+common/src/main/java/uk/nbforge/gallifreyan_chronicles/tardis/subsystem/TardisSubsystems.java:ALL
+common/src/main/java/uk/nbforge/gallifreyan_chronicles/tardis/exterior/fade/FadeTypeKindCodec.java:IDS
+common/src/main/java/uk/nbforge/gallifreyan_chronicles/tardis/exterior/fade/FadeTypeKindCodec.java:KINDS
 common/src/main/java/uk/nbforge/gallifreyan_chronicles/tardis/exterior/fade/FadeTypes.java:BUILT_IN
 common/src/main/java/uk/nbforge/gallifreyan_chronicles/tardis/mind/action/MindActions.java:TYPES
 common/src/main/java/uk/nbforge/gallifreyan_chronicles/core/lifecycle/ServerState.java:CLEARERS  # the list of things to clear itself
@@ -26,9 +27,9 @@ common/src/main/java/uk/nbforge/gallifreyan_chronicles/addon/ModAddonLoader.java
 common/src/main/java/uk/nbforge/gallifreyan_chronicles/addon/ModAddonLoader.java:LOADED
 
 # Data loaded from resource and data packs: refilled on every reload, which also happens when a world opens
-common/src/main/java/uk/nbforge/gallifreyan_chronicles/core/dynamic_registries/DimensionSkyRegistry.java:BY_DIMENSION
-common/src/main/java/uk/nbforge/gallifreyan_chronicles/core/dynamic_registries/TardisConsoleRegistry.java:VARIANTS
-common/src/main/java/uk/nbforge/gallifreyan_chronicles/core/dynamic_registries/TardisDoorRegistry.java:VARIANTS
+common/src/main/java/uk/nbforge/gallifreyan_chronicles/core/data_registry/DimensionSkyRegistry.java:BY_DIMENSION
+common/src/main/java/uk/nbforge/gallifreyan_chronicles/core/data_registry/TardisConsoleRegistry.java:VARIANTS
+common/src/main/java/uk/nbforge/gallifreyan_chronicles/core/data_registry/TardisDoorRegistry.java:VARIANTS
 common/src/main/java/uk/nbforge/gallifreyan_chronicles/tardis/exterior/fade/FadeTypes.java:LOADED
 common/src/main/java/uk/nbforge/gallifreyan_chronicles/tardis/mind/data/TardisPersonalities.java:ALL
 common/src/main/java/uk/nbforge/gallifreyan_chronicles/tardis/mind/data/TardisTraits.java:ALL
@@ -37,7 +38,7 @@ common/src/main/java/uk/nbforge/gallifreyan_chronicles/tardis/mind/data/TardisTr
 common/src/main/java/uk/nbforge/gallifreyan_chronicles/compat/portal/PortalBone.java:CACHE
 common/src/main/java/uk/nbforge/gallifreyan_chronicles/core/block/InteriorDoorBlock.java:SLABS
 common/src/main/java/uk/nbforge/gallifreyan_chronicles/core/sound/timed/SoundDurations.java:SECONDS
-common/src/main/java/uk/nbforge/gallifreyan_chronicles/tardis/TardisExterior.java:KEY_OFFSETS
+common/src/main/java/uk/nbforge/gallifreyan_chronicles/tardis/exterior/TardisExterior.java:KEY_OFFSETS
 common/src/main/java/uk/nbforge/gallifreyan_chronicles/tardis/console/ConsoleHitboxBones.java:CACHE
 
 # Client-only mod compat (Flashback only runs on the client)

@@ -12,6 +12,7 @@ import org.jspecify.annotations.Nullable;
 import uk.nbforge.gallifreyan_chronicles.client.compat.portal.TardisPortalClient;
 import uk.nbforge.gallifreyan_chronicles.config.GCConfig;
 import uk.nbforge.gallifreyan_chronicles.core.lifecycle.ServerState;
+import uk.nbforge.gallifreyan_chronicles.tardis.Tardis;
 
 public final class TardisPortalBridge {
     public static final String PORTAL_TAG = "gallifreyan_chronicles.tardis_portal";
@@ -101,14 +102,14 @@ public final class TardisPortalBridge {
         TardisPortals.tick(server);
     }
 
-    public static void onDoorsChanged(MinecraftServer server, UUID tardisId) {
+    public static void onDoorsChanged(Tardis tardis) {
         if (!isAvailable() || !GCConfig.immersivePortals()) return;
-        TardisPortals.onDoorsChanged(server, tardisId);
+        TardisPortals.onDoorsChanged(tardis);
     }
 
-    public static void onExteriorPlaced(MinecraftServer server, UUID tardisId) {
+    public static void onExteriorPlaced(Tardis tardis) {
         if (!isAvailable() || !GCConfig.immersivePortals()) return;
-        TardisPortals.onExteriorPlaced(server, tardisId);
+        TardisPortals.onExteriorPlaced(tardis);
     }
 
     public static void onDimensionsChanged(MinecraftServer server) {

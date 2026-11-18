@@ -15,7 +15,6 @@ import net.minecraft.client.renderer.state.level.CameraRenderState;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.resources.Identifier;
 import net.minecraft.world.phys.Vec3;
-import org.jetbrains.annotations.NotNull;
 import org.joml.Quaternionf;
 import org.joml.Vector3f;
 import org.jspecify.annotations.NonNull;
@@ -32,20 +31,17 @@ import uk.nbforge.gallifreyan_chronicles.client.util.ModelRenderRangeUtil;
 import uk.nbforge.gallifreyan_chronicles.compat.portal.PortalBone;
 import uk.nbforge.gallifreyan_chronicles.compat.portal.TardisPortalBridge;
 import uk.nbforge.gallifreyan_chronicles.config.GCConfig;
-import uk.nbforge.gallifreyan_chronicles.core.block_entities.TardisExteriorBlockEntity;
-import uk.nbforge.gallifreyan_chronicles.tardis.TardisExterior;
+import uk.nbforge.gallifreyan_chronicles.core.block_entity.TardisExteriorBlockEntity;
+import uk.nbforge.gallifreyan_chronicles.tardis.exterior.TardisExterior;
 
 public class TardisExteriorBlockRenderer
-        extends GeoBlockRenderer<@NotNull TardisExteriorBlockEntity, @NotNull TardisExteriorBlockRenderState> {
+        extends GeoBlockRenderer<@NonNull TardisExteriorBlockEntity, @NonNull TardisExteriorBlockRenderState> {
     public static final DataTicket<String> EXTERIOR_ID = DataTicket.create("exterior_id", String.class);
     public static final DataTicket<Float> YAW = DataTicket.create("tardis_yaw", Float.class);
     public static final DataTicket<Boolean> GLOWING = DataTicket.create("tardis_glowing", Boolean.class);
-    // How bright the lamp is from 0 to 1, for the flicker
     public static final DataTicket<Float> LAMP = DataTicket.create("tardis_lamp", Float.class);
     public static final DataTicket<Float> LAMP_ORB = DataTicket.create("tardis_lamp_orb", Float.class);
-    // Which way the camera looks, saved each frame for the lamp orb
     public static final Quaternionf cameraOrientation = new Quaternionf();
-    // Where the corner of this block is relative to the camera, saved each frame for the lamp orb
     public static final Vector3f blockOrigin = new Vector3f();
     public static final DataTicket<Float> OPACITY = DataTicket.create("tardis_opacity", Float.class);
 
@@ -78,27 +74,30 @@ public class TardisExteriorBlockRenderer
         renderState.addGeckolibData(EXTERIOR_ID, animatable.getExterior().id());
         renderState.addGeckolibData(YAW, animatable.getYaw());
         boolean hiddenFromInterior = isSeenFromItsInterior(animatable);
-        renderState.addGeckolibData(GLOWING, animatable.isGlowing() && !hiddenFromInterior);
-        renderState.addGeckolibData(LAMP, animatable.lampBrightness(partialTick));
-        renderState.addGeckolibData(LAMP_ORB, hiddenFromInterior ? 0f : animatable.lampOrb(partialTick));
-        renderState.addGeckolibData(OPACITY, hiddenFromInterior ? 0.0f : animatable.getOpacity(partialTick));
+        renderState.addGeckolibData(GLOWING, animatable.lamp().isGlowing() && !hiddenFromInterior);
+        renderState.addGeckolibData(LAMP, animatable.lamp().lampBrightness(partialTick));
+        renderState.addGeckolibData(
+                LAMP_ORB, hiddenFromInterior ? 0f : animatable.lamp().lampOrb(partialTick));
+        renderState.addGeckolibData(
+                OPACITY, hiddenFromInterior ? 0.0f : animatable.travel().getOpacity(partialTick));
     }
 
     private static boolean isSeenFromItsInterior(TardisExteriorBlockEntity animatable) {
-        if (!animatable.isPortalActive() || !SkyShaderCompat.isShaderPackInUse()) return false;
-        return TardisPortalBridge.isViewingThroughPortalNear(Vec3.atBottomCenterOf(animatable.getBlockPos()), 2.0);
+        return animatable.isPortalActive()
+                && SkyShaderCompat.isShaderPackInUse()
+                && TardisPortalBridge.isViewingThroughPortalNear(Vec3.atBottomCenterOf(animatable.getBlockPos()), 2.0);
     }
 
     @Override
     public int getRenderColor(TardisExteriorBlockEntity animatable, @Nullable Void relatedObject, float partialTick) {
-        float opacity = Math.clamp(animatable.getOpacity(partialTick), 0.0f, 1.0f);
+        float opacity = Math.clamp(animatable.travel().getOpacity(partialTick), 0.0f, 1.0f);
         return FadeTintUtil.of(opacity);
     }
 
     @Override
     public int getPackedOverlay(
             TardisExteriorBlockEntity animatable, @Nullable Void relatedObject, float u, float partialTick) {
-        float faded = 1.0f - Math.clamp(animatable.getOpacity(partialTick), 0.0f, 1.0f);
+        float faded = 1.0f - Math.clamp(animatable.travel().getOpacity(partialTick), 0.0f, 1.0f);
         float t = Math.clamp(faded * GLASS_SPEED, 0.0f, 1.0f);
         float glass = t * t * (3.0f - 2.0f * t) * GLASS_STRENGTH;
         return OverlayTexture.pack(OverlayTexture.u(glass), OverlayTexture.v(false));
@@ -123,7 +122,6 @@ public class TardisExteriorBlockRenderer
             OrderedSubmitNodeCollector renderTasks,
             @Nullable RenderType renderType) {
         float opacity = renderPassInfo.renderState().getOrDefaultGeckolibData(OPACITY, 1.0f);
-        // The depth mask is only needed for the old way with shaders and portals
         if (renderType != null && opacity < 1.0f && FadeBoxRenderer.mode() == FadeBoxRenderer.Mode.MASK) {
             OrderedSubmitNodeCollector maskTasks = renderTasks instanceof SubmitNodeCollector collector
                     ? collector.order(DEPTH_MASK_ORDER)
@@ -141,7 +139,6 @@ public class TardisExteriorBlockRenderer
     public void adjustModelBonesForRender(
             @NonNull RenderPassInfo<TardisExteriorBlockRenderState> renderPassInfo, @NonNull BoneSnapshots snapshots) {
         super.adjustModelBonesForRender(renderPassInfo, snapshots);
-        // The portal bone is only a marker
         snapshots.ifPresent(PortalBone.BONE_NAME, snapshot -> snapshot.skipRender(true));
 
         float opacity = renderPassInfo.renderState().getOrDefaultGeckolibData(OPACITY, 1.0f);
@@ -165,14 +162,11 @@ public class TardisExteriorBlockRenderer
             @NonNull SubmitNodeCollector submitNodeCollector,
             @NonNull CameraRenderState cameraState) {
         if (RenderLevelGuard.belongsToOtherLevel(renderState)) return;
-        // The lamp orb needs these to face the camera
-        // Skip the shadow pass of Iris, that is the view of the sun and not yours
         if (!SkyShaderCompat.isRenderingShadowPass()) {
             cameraOrientation.set(cameraState.orientation);
             poseStack.last().pose().transformPosition(blockOrigin.set(0f, 0f, 0f));
         }
         super.submit(renderState, poseStack, submitNodeCollector, cameraState);
-        // GeckoLib skips a fully see through box so the orb draws itself then
         if (renderState.getOrDefaultGeckolibData(OPACITY, 1.0f) <= 0.0f) {
             TardisLampOrbLayer.drawWithoutBox(renderState, poseStack, submitNodeCollector);
         }

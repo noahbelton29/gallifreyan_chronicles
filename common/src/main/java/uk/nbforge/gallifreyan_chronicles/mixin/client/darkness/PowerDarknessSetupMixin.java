@@ -14,17 +14,17 @@ import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
-import uk.nbforge.gallifreyan_chronicles.client.gui.hud.GCDangerAlarm;
-import uk.nbforge.gallifreyan_chronicles.client.gui.hud.GCPowerDarkness;
+import uk.nbforge.gallifreyan_chronicles.client.gui.hud.DangerAlarm;
+import uk.nbforge.gallifreyan_chronicles.client.gui.hud.PowerDarkness;
 import uk.nbforge.gallifreyan_chronicles.config.GCConfig;
 
 @Mixin(BlindnessFogEnvironment.class)
 public abstract class PowerDarknessSetupMixin {
     @Unique
-    private static final float MIN_FOG_END = 14.0F;
+    private static final float MIN_FOG_END = 14.0f;
 
     @Unique
-    private static final float ALARM_CURVE = 0.3F;
+    private static final float ALARM_CURVE = 0.3f;
 
     @Inject(method = "setupFog", at = @At("HEAD"), cancellable = true)
     private void gcPowerDarkSetup(
@@ -34,18 +34,18 @@ public abstract class PowerDarknessSetupMixin {
             float renderDistance,
             DeltaTracker deltaTracker,
             CallbackInfo ci) {
-        float darkness = GCPowerDarkness.darknessOf(level);
-        if (darkness <= 0.0F) return;
-        float alarm = GCDangerAlarm.amountFor(level) * (float) GCConfig.powerDarknessStrength();
-        if (alarm > 0.0F && alarm >= darkness) darkness = (float) Math.pow(alarm, ALARM_CURVE);
+        float darkness = PowerDarkness.darknessOf(level);
+        if (darkness <= 0.0f) return;
+        float alarm = DangerAlarm.amountFor(level) * (float) GCConfig.powerDarknessStrength();
+        if (alarm > 0.0f && alarm >= darkness) darkness = (float) Math.pow(alarm, ALARM_CURVE);
         if (camera.entity() instanceof LivingEntity living && living.hasEffect(MobEffects.BLINDNESS)) return;
 
-        float far = Minecraft.getInstance().options.getEffectiveRenderDistance() * 16.0F;
+        float far = Minecraft.getInstance().options.getEffectiveRenderDistance() * 16.0f;
         float end = Mth.lerp(darkness, far, MIN_FOG_END);
-        fog.environmentalStart = end * 0.25F;
+        fog.environmentalStart = end * 0.25f;
         fog.environmentalEnd = end;
-        fog.skyEnd = end * 0.8F;
-        fog.cloudEnd = end * 0.8F;
+        fog.skyEnd = end * 0.8f;
+        fog.cloudEnd = end * 0.8f;
         ci.cancel();
     }
 }

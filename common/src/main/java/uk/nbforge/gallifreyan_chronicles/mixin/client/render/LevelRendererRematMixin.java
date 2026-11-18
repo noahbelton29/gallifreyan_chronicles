@@ -11,7 +11,6 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import uk.nbforge.gallifreyan_chronicles.client.tardis.RematCatchClient;
 
-/** Draws the fading interior for a player a TARDIS materialised around. */
 @Mixin(LevelRenderer.class)
 public abstract class LevelRendererRematMixin {
     @Inject(method = "submitTransientBlocks", at = @At("HEAD"), require = 0)

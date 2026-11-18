@@ -17,49 +17,39 @@ import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.phys.Vec3;
 import uk.nbforge.gallifreyan_chronicles.core.GCSounds;
 import uk.nbforge.gallifreyan_chronicles.core.GCTardisControls;
-import uk.nbforge.gallifreyan_chronicles.core.block_entities.TardisExteriorBlockEntity;
+import uk.nbforge.gallifreyan_chronicles.core.block_entity.TardisExteriorBlockEntity;
 import uk.nbforge.gallifreyan_chronicles.core.lifecycle.ServerState;
 import uk.nbforge.gallifreyan_chronicles.network.tardis.TardisAlarmPayload;
 import uk.nbforge.gallifreyan_chronicles.tardis.Tardis;
-import uk.nbforge.gallifreyan_chronicles.tardis.TardisApi;
-import uk.nbforge.gallifreyan_chronicles.tardis.ecs.system.TardisMindSystem;
 import uk.nbforge.gallifreyan_chronicles.tardis.flight.crash.CrashSmoke;
-import uk.nbforge.gallifreyan_chronicles.util.GCSchedulerUtil;
+import uk.nbforge.gallifreyan_chronicles.tardis.mind.TardisMinds;
+import uk.nbforge.gallifreyan_chronicles.util.SchedulerUtil;
 
 /**
- * Alarms with flashing lights and cloister bell sounds.
  * The alarm runs while the cloister bell control is on, so anything that wants the alarm flips that control,
  * and switching the control off silences it.
  * An alarm started by something else turns the control back off by itself after a set number of flashes,
  * when the TARDIS calms down, or when a crashed TARDIS is repaired.
  */
 public final class TardisAlarm {
-    // Length of each flash and the gap between repeated sounds, in ticks
     public static final int FLASH_TICKS = 30;
 
-    // Stress below this stops a stress alarm
     private static final float CALM_STRESS = 30f;
 
-    // How many times the bell plays for a loud alarm
     private static final int LOUD_LAYERS = 3;
 
-    private static final float INSIDE_VOLUME = 1.0F;
-    private static final float OUTSIDE_VOLUME = 0.6F;
+    private static final float INSIDE_VOLUME = 1.0f;
+    private static final float OUTSIDE_VOLUME = 0.6f;
 
-    // How far from the exterior the bell can be heard
     private static final double LEAK_RANGE = 32.0;
 
     /**
      * Why the alarm is ringing, which decides when it stops on its own. Later ones win over earlier ones.
      */
     private enum Mode {
-        // A set number of flashes
         TIMED,
-        // Until the TARDIS calms down
         UNTIL_CALM,
-        // Until the TARDIS is repaired
         UNTIL_REPAIRED,
-        // Turned on by hand, until it is turned off by hand
         MANUAL
     }
 
@@ -87,7 +77,7 @@ public final class TardisAlarm {
         boolean finished(Tardis tardis) {
             return switch (mode) {
                 case TIMED -> flashesLeft <= 0;
-                case UNTIL_CALM -> TardisMindSystem.stress(tardis) < CALM_STRESS;
+                case UNTIL_CALM -> TardisMinds.stress(tardis) < CALM_STRESS;
                 case UNTIL_REPAIRED -> !tardis.data().isCrashed();
                 case MANUAL -> false;
             };
@@ -96,10 +86,8 @@ public final class TardisAlarm {
 
     private record Request(Mode mode, int flashes, boolean loud) {}
 
-    // Ringing alarms
     private static final Map<UUID, Alarm> ACTIVE = ServerState.track(new HashMap<>());
 
-    // Why the control is about to be switched on, read when it is
     private static final Map<UUID, Request> PENDING = ServerState.track(new HashMap<>());
 
     private TardisAlarm() {}
@@ -117,9 +105,6 @@ public final class TardisAlarm {
         request(tardis, Mode.UNTIL_REPAIRED, 0, false);
     }
 
-    /**
-     * Runs until the stress falls below the calm level.
-     */
     public static void untilCalm(Tardis tardis, ServerLevel level, BlockPos bellPos) {
         request(tardis, Mode.UNTIL_CALM, 0, false);
     }
@@ -134,12 +119,11 @@ public final class TardisAlarm {
 
     private static void timed(ServerLevel level, int times, boolean loud) {
         if (times <= 0) return;
-        Tardis tardis = TardisApi.ofLevel(level).orElse(null);
+        Tardis tardis = Tardis.ofLevel(level).orElse(null);
         if (tardis == null) {
-            // Not inside a TARDIS, there is no control to flip so just flash
             TardisAlarmPayload.broadcast(level, times);
             for (int i = 0; i < times; i++) {
-                GCSchedulerUtil.runLater(level.getServer(), i * FLASH_TICKS, () -> ring(level, loud));
+                SchedulerUtil.runLater(level.getServer(), i * FLASH_TICKS, () -> ring(level, loud));
             }
             return;
         }
@@ -151,7 +135,7 @@ public final class TardisAlarm {
      * A crashed TARDIS rings until repaired; any other alarm was lost with the restart so the control goes back off.
      */
     public static void resumeCrashAlarms(MinecraftServer server) {
-        for (Tardis tardis : TardisApi.all(server)) {
+        for (Tardis tardis : Tardis.all(server)) {
             if (tardis.data().isCrashed()) {
                 untilRepaired(tardis);
                 CrashSmoke.start(tardis);
@@ -161,10 +145,13 @@ public final class TardisAlarm {
         }
     }
 
-    /**
-     * Something wants the alarm, so the cloister bell control is switched on and that starts it.
-     */
+    public static void silence(Tardis tardis) {
+        tardis.setControlState(GCTardisControls.CLOISTER_BELL_CONTROL, false);
+        controlOff(tardis);
+    }
+
     private static void request(Tardis tardis, Mode mode, int flashes, boolean loud) {
+        if (!tardis.hasPower()) return;
         Alarm running = ACTIVE.get(tardis.id());
         if (running != null) {
             running.merge(mode, flashes, loud);
@@ -174,22 +161,15 @@ public final class TardisAlarm {
         PENDING.put(tardis.id(), new Request(mode, flashes, loud));
         tardis.setControlState(GCTardisControls.CLOISTER_BELL_CONTROL, true);
 
-        // No console loaded, or the control was already on, so it did not start the alarm itself
         Request left = PENDING.remove(tardis.id());
         if (left != null) begin(tardis, left);
     }
 
-    /**
-     * The cloister bell control was switched on.
-     */
     public static void controlOn(Tardis tardis) {
         Request request = PENDING.remove(tardis.id());
         begin(tardis, request == null ? new Request(Mode.MANUAL, 0, false) : request);
     }
 
-    /**
-     * The cloister bell control was switched off, which silences any alarm.
-     */
     public static void controlOff(Tardis tardis) {
         PENDING.remove(tardis.id());
         ACTIVE.remove(tardis.id());
@@ -208,7 +188,6 @@ public final class TardisAlarm {
     }
 
     private static void tick(Tardis tardis, Alarm alarm) {
-        // Switched off, or replaced by a newer alarm
         if (ACTIVE.get(tardis.id()) != alarm) return;
 
         if (!tardis.exists()) {
@@ -216,8 +195,7 @@ public final class TardisAlarm {
             return;
         }
 
-        if (alarm.finished(tardis)) {
-            // Turning the control off stops the alarm, and if no console is loaded stop it here
+        if (alarm.finished(tardis) || !tardis.hasPower()) {
             tardis.setControlState(GCTardisControls.CLOISTER_BELL_CONTROL, false);
             if (ACTIVE.get(tardis.id()) == alarm) {
                 tardis.syncControl(GCTardisControls.CLOISTER_BELL_CONTROL, false);
@@ -226,7 +204,6 @@ public final class TardisAlarm {
             return;
         }
 
-        // Keeps a console that loads in later showing the control as on
         tardis.syncControl(GCTardisControls.CLOISTER_BELL_CONTROL, true);
 
         tardis.interiorLevel().ifPresent(level -> {
@@ -235,7 +212,7 @@ public final class TardisAlarm {
         });
         if (alarm.mode == Mode.TIMED) alarm.flashesLeft--;
 
-        GCSchedulerUtil.runLater(tardis.server(), FLASH_TICKS, () -> tick(tardis, alarm));
+        SchedulerUtil.runLater(tardis.server(), FLASH_TICKS, () -> tick(tardis, alarm));
     }
 
     private static void ring(ServerLevel level, boolean loud) {
@@ -245,9 +222,6 @@ public final class TardisAlarm {
         }
     }
 
-    /**
-     * Full volume inside and quieter outside.
-     */
     private static void bell(ServerLevel level) {
         for (ServerPlayer player : level.players()) {
             ringAt(player, INSIDE_VOLUME);
@@ -266,7 +240,7 @@ public final class TardisAlarm {
                 player.getEyeY(),
                 player.getZ(),
                 volume,
-                1.0F,
+                1.0f,
                 player.getRandom().nextLong()));
     }
 
@@ -274,11 +248,11 @@ public final class TardisAlarm {
      * The distance is measured from the exterior block position.
      */
     public static List<ServerPlayer> playersOutside(ServerLevel interior) {
-        Tardis tardis = TardisApi.ofLevel(interior).orElse(null);
+        Tardis tardis = Tardis.ofLevel(interior).orElse(null);
         if (tardis == null) return List.of();
         TardisExteriorBlockEntity exterior = tardis.exterior().orElse(null);
         if (exterior == null || !(exterior.getLevel() instanceof ServerLevel outside)) return List.of();
-        if (exterior.isFullyInvisible()) return List.of();
+        if (exterior.travel().isFullyInvisible()) return List.of();
         Vec3 doors = Vec3.atCenterOf(exterior.getBlockPos());
         List<ServerPlayer> near = new ArrayList<>();
         for (ServerPlayer player : outside.players()) {

@@ -7,10 +7,6 @@ import uk.nbforge.gallifreyan_chronicles.tardis.mind.action.MindAction;
 import uk.nbforge.gallifreyan_chronicles.tardis.mind.action.MindContext;
 import uk.nbforge.gallifreyan_chronicles.util.PlayerMotionUtil;
 
-/**
- * Zaps the player if they are close enough and throws them back.
- * The json fields are range, damage, push and lift.
- */
 public record ShockAction(float range, float damage, float push, float lift) implements MindAction {
     public static final String TYPE = Constants.MOD_ID + ":shock";
 
@@ -23,7 +19,6 @@ public record ShockAction(float range, float damage, float push, float lift) imp
     public void run(MindContext context) {
         Player player = context.player;
         if (context.level == null || context.pos == null || player == null) return;
-        // It can only zap you from inside, not through the box outside
         if (context.level != context.tardis.interiorLevel().orElse(null)) return;
         if (player.distanceToSqr(context.pos) > range * range) return;
         player.hurtServer(context.level, context.level.damageSources().lightningBolt(), damage);

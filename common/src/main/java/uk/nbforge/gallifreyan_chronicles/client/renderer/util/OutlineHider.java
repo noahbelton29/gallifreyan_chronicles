@@ -13,7 +13,6 @@ import uk.nbforge.gallifreyan_chronicles.core.block.TardisTopBlock;
 public final class OutlineHider {
     private OutlineHider() {}
 
-    /** Interior doors and the whole TARDIS exterior never show a block outline. */
     private static boolean isDoorBlock(Block block) {
         return block instanceof InteriorDoorBlock
                 || block instanceof InteriorDoorBarrierBlock

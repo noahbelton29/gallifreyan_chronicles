@@ -4,9 +4,6 @@ import net.minecraft.data.PackOutput;
 import net.neoforged.neoforge.common.data.LanguageProvider;
 import uk.nbforge.gallifreyan_chronicles.Constants;
 
-/**
- * Spanish translations for Spain, the keys must match GCLanguageProvider.
- */
 public class GCSpanishLanguageProvider extends LanguageProvider {
     public GCSpanishLanguageProvider(PackOutput output) {
         super(output, Constants.MOD_ID, "es_es");

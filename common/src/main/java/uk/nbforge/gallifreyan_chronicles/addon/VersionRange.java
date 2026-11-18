@@ -11,25 +11,6 @@ public final class VersionRange {
     private static final Pattern TOKEN = Pattern.compile("(>=|<=|>|<|=|\\^|~)?\\s*([0-9A-Za-z.*+_-]+)");
     private static final Pattern INTERVAL =
             Pattern.compile("^([\\[(])\\s*([^,\\]\\)]*?)\\s*,\\s*([^,\\]\\)]*?)\\s*([\\])])$");
-
-    private static final class Bound {
-        private final Version version;
-        private final boolean lower;
-        private final boolean inclusive;
-
-        private Bound(Version version, boolean lower, boolean inclusive) {
-            this.version = version;
-            this.lower = lower;
-            this.inclusive = inclusive;
-        }
-
-        private boolean accepts(Version candidate) {
-            int comparison = candidate.compareTo(version);
-            if (lower) return inclusive ? comparison >= 0 : comparison > 0;
-            return inclusive ? comparison <= 0 : comparison < 0;
-        }
-    }
-
     private final String text;
     private final List<List<Bound>> alternatives;
 
@@ -116,7 +97,7 @@ public final class VersionRange {
                     bounds.add(new Bound(version, true, true));
                     bounds.add(new Bound(Version.parse(version.part(0) + "." + (version.part(1) + 1)), false, false));
                     break;
-                default: // Exactly this version
+                default:
                     bounds.add(new Bound(version, true, true));
                     bounds.add(new Bound(version, false, true));
                     break;
@@ -156,21 +137,20 @@ public final class VersionRange {
 
     public boolean matches(Version version) {
         if (alternatives.isEmpty()) return true;
-        for (List<Bound> bounds : alternatives) {
-            boolean all = true;
-            for (Bound bound : bounds) {
-                if (!bound.accepts(version)) {
-                    all = false;
-                    break;
-                }
-            }
-            if (all) return true;
-        }
-        return false;
+        return alternatives.stream().anyMatch(bounds -> bounds.stream().allMatch(bound -> bound.accepts(version)));
     }
 
     @Override
     public String toString() {
         return text;
+    }
+
+    private record Bound(Version version, boolean lower, boolean inclusive) {
+
+        private boolean accepts(Version candidate) {
+            int comparison = candidate.compareTo(version);
+            if (lower) return inclusive ? comparison >= 0 : comparison > 0;
+            return inclusive ? comparison <= 0 : comparison < 0;
+        }
     }
 }

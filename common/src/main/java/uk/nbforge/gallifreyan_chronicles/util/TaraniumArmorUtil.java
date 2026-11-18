@@ -15,9 +15,11 @@ public final class TaraniumArmorUtil {
     private TaraniumArmorUtil() {}
 
     public static boolean blocksFireDamage(Player player, DamageSource source) {
-        if (!isFireDamage(source) || !wearsAnyPiece(player)) return false;
-        player.clearFire();
-        return true;
+        if (isFireDamage(source) && wearsAnyPiece(player)) {
+            player.clearFire();
+            return true;
+        }
+        return false;
     }
 
     private static boolean isFireDamage(DamageSource source) {

@@ -1,10 +1,9 @@
 package uk.nbforge.gallifreyan_chronicles.tardis.mind;
 
 /**
- * Fear of a player as one ladder where each step adds one thing and they do not all pile on at once.
- * Uneasy means the lights dip and the hum warps when they come aboard.
- * Afraid means controls sometimes stick for them and it flinches at the mallet.
- * Terrified means it freezes up and will not move for them at all.
+ * fear of a player as one ladder where each step adds one thing so they dont all pile on at once. uneasy = lights dip
+ * and the hum warps when they come aboard. afraid = controls sometimes stick for them and it flinches at the mallet.
+ * terrified = it freezes up and wont move for them at all
  */
 public enum FearLevel {
     CALM,

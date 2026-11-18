@@ -12,7 +12,7 @@ public class GCTardisConsoleVariantProvider extends GCJsonDataProvider {
 
     @Override
     protected void addEntries() {
-        // consoleVariant takes name, console model, texture and glowing parts.
+        // consoleVariant takes name, console model, texture and glowing parts
         consoleVariant(
                 "ambassadors_of_death_console",
                 "ambassadors_of_death_console",

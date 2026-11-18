@@ -33,6 +33,7 @@ import uk.nbforge.gallifreyan_chronicles.tardis.mind.TardisPersonality;
 import uk.nbforge.gallifreyan_chronicles.tardis.mind.TardisTrait;
 import uk.nbforge.gallifreyan_chronicles.tardis.mind.data.TardisPersonalities;
 import uk.nbforge.gallifreyan_chronicles.tardis.mind.data.TardisTraits;
+import uk.nbforge.gallifreyan_chronicles.util.GCLog;
 
 public final class GCDataLoaders {
     public record Entry(String path, Supplier<GCJsonReloadListener<?>> factory) {}
@@ -147,7 +148,7 @@ public final class GCDataLoaders {
     private static void afterExteriors() {
         TardisExterior def = TardisExteriorRegistry.get(TardisExteriorRegistry.defaultId());
         if (def == null) {
-            Constants.LOG.warn(
+            GCLog.DATA.warn(
                     "No TARDIS exteriors loaded! Expected e.g. data/{}/tardis_exterior/first_doctors_exterior.json",
                     Constants.MOD_ID);
             return;
@@ -156,8 +157,8 @@ public final class GCDataLoaders {
     }
 
     private static void afterInteriors() {
-        if (!TardisInteriorRegistry.contains(TardisInteriorRegistry.defaultId())) {
-            Constants.LOG.warn(
+        if (TardisInteriorRegistry.isUnknown(TardisInteriorRegistry.defaultId())) {
+            GCLog.DATA.warn(
                     "Default TARDIS interior {} not found; expected data/{}/tardis_interior/first_doctors_interior.json",
                     TardisInteriorRegistry.defaultId(),
                     Constants.MOD_ID);
@@ -166,7 +167,7 @@ public final class GCDataLoaders {
 
     private static void afterConsoles() {
         if (TardisConsoleRegistry.size() == 0) {
-            Constants.LOG.error(
+            GCLog.DATA.error(
                     "No TARDIS consoles loaded; console features are disabled until the data errors are fixed");
             TardisConsoleRegistry.setDefault(null);
             return;
@@ -184,7 +185,7 @@ public final class GCDataLoaders {
 
     private static void registerFade(FadeType fade) {
         FadeTypes.register(fade);
-        Constants.LOG.info(
+        GCLog.DATA.info(
                 "Registered TARDIS fade {} ({})",
                 fade.id(),
                 FadeTypeKindCodec.CODEC

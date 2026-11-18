@@ -66,7 +66,7 @@ public final class TardisWariness {
 
         TardisDiscovery.reveal(tardis, MindEnums.Reveal.ITS_CONTROLS_STICK);
 
-        if (trust < CAUTIOUS && !TardisMinds.afraidOf(tardis, player.getUUID())) {
+        if (trust < CAUTIOUS && TardisMinds.calmAround(tardis, player.getUUID())) {
             TardisMinds.addTrust(tardis, player.getUUID(), TRUST_PER_JAM);
         }
 

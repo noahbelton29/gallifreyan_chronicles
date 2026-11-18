@@ -12,7 +12,7 @@ import net.minecraft.server.packs.PathPackResources;
 import net.minecraft.server.packs.repository.Pack;
 import net.minecraft.server.packs.repository.PackSource;
 import net.minecraft.server.packs.repository.RepositorySource;
-import uk.nbforge.gallifreyan_chronicles.Constants;
+import uk.nbforge.gallifreyan_chronicles.util.GCLog;
 
 public final class AddonPackSource implements RepositorySource {
     public static final String ID_PREFIX = "gc_addon/";
@@ -36,7 +36,7 @@ public final class AddonPackSource implements RepositorySource {
                         location, resources, type, new PackSelectionConfig(true, Pack.Position.TOP, false));
                 if (pack != null) output.accept(pack);
             } catch (RuntimeException e) {
-                Constants.LOG.warn("Could not load the data of addon '{}'", info.id(), e);
+                GCLog.ADDONS.warn("Couldn't load the data of addon '{}'", info.id(), e);
             }
         }
     }

@@ -6,11 +6,11 @@ import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.ItemStack;
-import uk.nbforge.gallifreyan_chronicles.Constants;
 import uk.nbforge.gallifreyan_chronicles.addon.AddonContent;
 import uk.nbforge.gallifreyan_chronicles.core.block.registry.CadonwoodBlocks;
 import uk.nbforge.gallifreyan_chronicles.core.block.registry.GallifreyBlocks;
 import uk.nbforge.gallifreyan_chronicles.core.block.registry.TardisBlocks;
+import uk.nbforge.gallifreyan_chronicles.util.GCLog;
 import uk.nbforge.gallifreyan_chronicles.util.GCUtil;
 
 public class GCCreativeModeTabs {
@@ -70,6 +70,6 @@ public class GCCreativeModeTabs {
                     .build());
 
     public static void registerFabricCreativeModeTabs() {
-        Constants.LOG.info("Registering GC Creative Mode Tabs (Fabric)");
+        GCLog.CORE.info("Registering GC Creative Mode Tabs (Fabric)");
     }
 }

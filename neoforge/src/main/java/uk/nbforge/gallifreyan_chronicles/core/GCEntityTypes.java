@@ -8,6 +8,7 @@ import net.neoforged.neoforge.registries.DeferredRegister;
 import uk.nbforge.gallifreyan_chronicles.Constants;
 import uk.nbforge.gallifreyan_chronicles.core.entity.TardisControlEntity;
 import uk.nbforge.gallifreyan_chronicles.core.entity.TardisKeyEntity;
+import uk.nbforge.gallifreyan_chronicles.util.GCLog;
 
 public class GCEntityTypes {
     public static final DeferredRegister<EntityType<?>> ENTITY_TYPES =
@@ -20,7 +21,7 @@ public class GCEntityTypes {
             ENTITY_TYPES.register("tardis_key", GCEntityTypeBuilders::tardisKey);
 
     public static void registerEntityTypes(IEventBus eventBus) {
-        Constants.LOG.info("Registered GC Entity Types (NeoForge)");
+        GCLog.CORE.info("Registered GC Entity Types (NeoForge)");
         ENTITY_TYPES.register(eventBus);
         TardisControlEntity.TYPE = TARDIS_CONTROL_ENTITY_TYPE;
         TardisKeyEntity.TYPE = TARDIS_KEY_ENTITY_TYPE;

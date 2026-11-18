@@ -7,8 +7,8 @@ import uk.nbforge.gallifreyan_chronicles.datagen.util.GCJsonDataProvider;
 import uk.nbforge.gallifreyan_chronicles.tardis.mind.data.MindEnums.Reveal;
 
 /**
- * To add one copy a block below and change what you want, times values default to 1 and shifts to 0 so only list what the trait changes.
- * Reactions to events come from MindReactions.
+ * to add one copy a block below and change what u want. times values default to 1 and shifts to 0 so only list what the
+ * trait changes. reactions to events come from MindReactions
  */
 public class GCTardisTraitProvider extends GCJsonDataProvider {
     public GCTardisTraitProvider(PackOutput output) {

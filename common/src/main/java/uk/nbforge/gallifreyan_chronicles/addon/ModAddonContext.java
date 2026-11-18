@@ -26,7 +26,6 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockBehaviour;
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import uk.nbforge.gallifreyan_chronicles.Constants;
 import uk.nbforge.gallifreyan_chronicles.addon.api.AddonContext;
 import uk.nbforge.gallifreyan_chronicles.platform.Services;
@@ -34,6 +33,7 @@ import uk.nbforge.gallifreyan_chronicles.tardis.Tardis;
 import uk.nbforge.gallifreyan_chronicles.tardis.TardisEvents;
 import uk.nbforge.gallifreyan_chronicles.tardis.control.TardisControl;
 import uk.nbforge.gallifreyan_chronicles.tardis.control.TardisControls;
+import uk.nbforge.gallifreyan_chronicles.util.GCLog;
 import uk.nbforge.gallifreyan_chronicles.util.SchedulerUtil;
 
 final class ModAddonContext implements AddonContext {
@@ -48,7 +48,7 @@ final class ModAddonContext implements AddonContext {
 
     ModAddonContext(String addonId) {
         this.addonId = addonId;
-        this.logger = LoggerFactory.getLogger("GC Addon/" + addonId);
+        this.logger = GCLog.addon(addonId);
         this.controlPrefix = addonId.replace('.', '_').replace('-', '_') + "_";
     }
 

@@ -3,8 +3,8 @@ package uk.nbforge.gallifreyan_chronicles.core;
 import net.minecraft.core.Registry;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.world.level.levelgen.feature.treedecorators.TreeDecoratorType;
-import uk.nbforge.gallifreyan_chronicles.Constants;
 import uk.nbforge.gallifreyan_chronicles.core.world.world_features.tree_decorators.CadonwoodTrunkVineDecorator;
+import uk.nbforge.gallifreyan_chronicles.util.GCLog;
 import uk.nbforge.gallifreyan_chronicles.util.GCUtil;
 
 public class GCTreeDecoratorTypes {
@@ -14,6 +14,6 @@ public class GCTreeDecoratorTypes {
             new TreeDecoratorType<>(CadonwoodTrunkVineDecorator.CODEC));
 
     public static void registerTreeDecoratorTypes() {
-        Constants.LOG.info("Registered GC Tree Decorator Types");
+        GCLog.CORE.info("Registered GC Tree Decorator Types");
     }
 }

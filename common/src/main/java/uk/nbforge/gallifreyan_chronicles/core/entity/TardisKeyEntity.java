@@ -24,11 +24,11 @@ import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
-import uk.nbforge.gallifreyan_chronicles.Constants;
 import uk.nbforge.gallifreyan_chronicles.core.GCDataComponents;
 import uk.nbforge.gallifreyan_chronicles.core.block_entity.TardisExteriorBlockEntity;
 import uk.nbforge.gallifreyan_chronicles.core.item.MasterTardisKeyItem;
 import uk.nbforge.gallifreyan_chronicles.core.item.TardisKeyItem;
+import uk.nbforge.gallifreyan_chronicles.util.GCLog;
 import uk.nbforge.gallifreyan_chronicles.util.MessageUtil;
 
 public class TardisKeyEntity extends Entity {
@@ -169,7 +169,7 @@ public class TardisKeyEntity extends Entity {
         if (be instanceof TardisExteriorBlockEntity exterior) return exterior;
         if (!this.warnedNoExterior) {
             this.warnedNoExterior = true;
-            Constants.LOG.warn("Key entity at {} has no exterior block entity at {}", this.position(), pos);
+            GCLog.CORE.warn("Key entity at {} has no exterior block entity at {}", this.position(), pos);
         }
         return null;
     }

@@ -9,6 +9,7 @@ import net.minecraft.client.gui.screens.TitleScreen;
 import net.minecraft.network.chat.Component;
 import uk.nbforge.gallifreyan_chronicles.Constants;
 import uk.nbforge.gallifreyan_chronicles.platform.Services;
+import uk.nbforge.gallifreyan_chronicles.util.GCLog;
 
 public final class TrialTimer {
     private static final String RESOURCE = "/gc_build.properties";
@@ -34,7 +35,7 @@ public final class TrialTimer {
             return;
         }
         if (expiresAt > 0L) {
-            Constants.LOG.info("[GC] Build window ends at {}", Instant.ofEpochMilli(expiresAt));
+            GCLog.CLIENT.info("Build window ends at {}", Instant.ofEpochMilli(expiresAt));
         }
     }
 

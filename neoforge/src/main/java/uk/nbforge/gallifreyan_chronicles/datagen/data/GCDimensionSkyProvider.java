@@ -22,6 +22,7 @@ import uk.nbforge.gallifreyan_chronicles.sky.data.SkyOrbit;
 import uk.nbforge.gallifreyan_chronicles.sky.data.SkyStars;
 import uk.nbforge.gallifreyan_chronicles.sky.shader.ShaderDimension;
 import uk.nbforge.gallifreyan_chronicles.sky.shader.ShaderSky;
+import uk.nbforge.gallifreyan_chronicles.util.GCLog;
 import uk.nbforge.gallifreyan_chronicles.util.GCUtil;
 
 public class GCDimensionSkyProvider implements DataProvider {
@@ -129,7 +130,7 @@ public class GCDimensionSkyProvider implements DataProvider {
             encodeResult.ifSuccess(
                     json -> futures.add(DataProvider.saveStable(cache, json, pathProvider.json(fileId))));
             encodeResult.ifError(
-                    err -> Constants.LOG.error("Failed to encode {} {}: {}", label, value.id(), err.message()));
+                    err -> GCLog.DATA.error("Couldn't encode {} {}: {}", label, value.id(), err.message()));
         }
     }
 

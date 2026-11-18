@@ -35,7 +35,7 @@ public final class TardisPeaceOffering {
 
     private static final Map<String, Offering> OFFERINGS = ServerState.track(new HashMap<>());
 
-    /** When it was given and how many in a row. */
+    /** when it was given and how many in a row */
     private static final class Offering {
         final long tick;
         final int streak;

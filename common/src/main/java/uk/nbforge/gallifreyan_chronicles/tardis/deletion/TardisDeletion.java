@@ -23,7 +23,6 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.phys.Vec3;
 import org.jspecify.annotations.NonNull;
-import uk.nbforge.gallifreyan_chronicles.Constants;
 import uk.nbforge.gallifreyan_chronicles.compat.portal.TardisPortalBridge;
 import uk.nbforge.gallifreyan_chronicles.core.block.registry.TardisBlocks;
 import uk.nbforge.gallifreyan_chronicles.core.lifecycle.ServerState;
@@ -31,6 +30,7 @@ import uk.nbforge.gallifreyan_chronicles.mixin.server.MinecraftServerAccessor;
 import uk.nbforge.gallifreyan_chronicles.tardis.Tardis;
 import uk.nbforge.gallifreyan_chronicles.tardis.TardisDimensionManager;
 import uk.nbforge.gallifreyan_chronicles.tardis.TardisManager;
+import uk.nbforge.gallifreyan_chronicles.util.GCLog;
 
 public final class TardisDeletion {
     private record Request(ResourceKey<Level> exitDimension, Vec3 exitPos) {}
@@ -78,7 +78,7 @@ public final class TardisDeletion {
             try {
                 delete(server, tardisId, request);
             } catch (Exception e) {
-                Constants.LOG.error("[GC] Failed to delete TARDIS {}", tardisId, e);
+                GCLog.TARDIS.error("Couldn't delete TARDIS {}", tardisId, e);
             }
         });
     }
@@ -114,7 +114,7 @@ public final class TardisDeletion {
                 try {
                     interior.close();
                 } catch (IOException e) {
-                    Constants.LOG.error("[GC] Failed to close TARDIS dimension {}", key.identifier(), e);
+                    GCLog.TARDIS.error("Couldn't close TARDIS dimension {}", key.identifier(), e);
                 }
                 deleteFolder(dimensionPath);
             });
@@ -123,7 +123,7 @@ public final class TardisDeletion {
         }
 
         TardisManager.get(server).removeTardis(tardisId);
-        Constants.LOG.info("[GC] Deleted TARDIS {} and its dimension", tardisId);
+        GCLog.TARDIS.info("Deleted TARDIS {} and its dimension", tardisId);
     }
 
     private static void deleteFolder(Path folder) {
@@ -143,7 +143,7 @@ public final class TardisDeletion {
                 }
             });
         } catch (IOException e) {
-            Constants.LOG.error("[GC] Failed to delete TARDIS dimension folder {}", folder, e);
+            GCLog.TARDIS.error("Couldn't delete TARDIS dimension folder {}", folder, e);
         }
     }
 }

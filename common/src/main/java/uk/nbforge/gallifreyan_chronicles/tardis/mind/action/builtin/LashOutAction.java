@@ -11,10 +11,9 @@ import uk.nbforge.gallifreyan_chronicles.tardis.mind.action.MindContext;
 import uk.nbforge.gallifreyan_chronicles.util.SparkUtil;
 
 /**
- * Used for when_you_enter, a TARDIS that fears you zaps you and throws you back.
- * Nothing happens below from_severity and the damage grows with how scared it is.
- * It can hurt but never kill, it always leaves the player at least a little health.
- * The json fields are from_severity, min_damage, max_damage, push and lift.
+ * for when_you_enter, a tardis that fears u zaps u and throws u back. nothing below from_severity and the damage scales
+ * with how scared it is. can hurt but never kill, always leaves the player a bit of health. json fields are
+ * from_severity, min_damage, max_damage, push and lift
  */
 public record LashOutAction(float fromSeverity, float minDamage, float maxDamage, float push, float lift)
         implements MindAction {

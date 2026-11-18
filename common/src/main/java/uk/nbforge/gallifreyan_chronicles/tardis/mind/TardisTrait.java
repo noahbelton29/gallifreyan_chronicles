@@ -22,10 +22,7 @@ public record TardisTrait(
         List<MindAction> onTakeOff,
         List<MindAction> onLand)
         implements IdentifiableData<TardisTrait> {
-    /**
-     * The traits and personalities that cannot be used with a trait.
-     * traits are the ones that clash with this trait and personalities are the ones that cannot use it.
-     */
+    /** traits are the ones that clash with this trait, personalities are the ones that cant use it */
     private record NeverWith(List<String> traits, List<String> personalities) {
 
         static final NeverWith NOTHING = new NeverWith(List.of(), List.of());
@@ -78,7 +75,7 @@ public record TardisTrait(
         return GCUtil.localPath(id);
     }
 
-    /** Either trait can list the clash, so it only needs to be written once. */
+    /** either trait can list the clash so it only needs writing once */
     public boolean clashesWith(TardisTrait other) {
         return lists(clashesWith, other.id) || lists(other.clashesWith, id);
     }
@@ -91,7 +88,7 @@ public record TardisTrait(
         return fits(personality) && others.stream().noneMatch(this::clashesWith);
     }
 
-    /** An id with no mod name counts as one from this mod. */
+    /** an id with no namespace counts as the mod's */
     private static boolean lists(List<String> ids, String id) {
         String wanted = MindIds.normalize(id);
         return ids.stream().anyMatch(each -> MindIds.normalize(each).equals(wanted));

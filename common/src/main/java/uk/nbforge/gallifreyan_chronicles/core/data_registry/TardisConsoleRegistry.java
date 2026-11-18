@@ -8,6 +8,7 @@ import org.jspecify.annotations.Nullable;
 import uk.nbforge.gallifreyan_chronicles.Constants;
 import uk.nbforge.gallifreyan_chronicles.tardis.console.TardisConsole;
 import uk.nbforge.gallifreyan_chronicles.tardis.console.TardisConsoleVariant;
+import uk.nbforge.gallifreyan_chronicles.util.GCLog;
 
 public class TardisConsoleRegistry {
     public static String defaultId() {
@@ -88,7 +89,7 @@ public class TardisConsoleRegistry {
         for (TardisConsoleVariant variant : VARIANTS.values()) {
             TardisConsole parent = REGISTRY.getById(variant.parent());
             if (parent == null) {
-                Constants.LOG.warn(
+                GCLog.DATA.warn(
                         "Console variant '{}' has unknown parent '{}'; it will not be usable",
                         variant.id(),
                         variant.parent());
@@ -99,7 +100,7 @@ public class TardisConsoleRegistry {
                 boolean known =
                         parent.glowGroups().stream().anyMatch(g -> g.name().equals(group));
                 if (!known) {
-                    Constants.LOG.warn(
+                    GCLog.DATA.warn(
                             "Console variant '{}' overrides glow group '{}' which '{}' does not define",
                             variant.id(),
                             group,

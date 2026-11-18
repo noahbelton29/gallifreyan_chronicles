@@ -9,6 +9,7 @@ import uk.nbforge.gallifreyan_chronicles.core.block.registry.TardisBlocks;
 import uk.nbforge.gallifreyan_chronicles.core.block_entity.InteriorDoorBlockEntity;
 import uk.nbforge.gallifreyan_chronicles.core.block_entity.TardisConsoleBlockEntity;
 import uk.nbforge.gallifreyan_chronicles.core.block_entity.TardisExteriorBlockEntity;
+import uk.nbforge.gallifreyan_chronicles.util.GCLog;
 
 public class GCBlockEntities {
     public static final DeferredRegister<BlockEntityType<?>> BLOCK_ENTITIES =
@@ -26,6 +27,6 @@ public class GCBlockEntities {
                 () -> new BlockEntityType<>(InteriorDoorBlockEntity::new, GCBlocks.interiorDoorBlocks()));
         BLOCK_ENTITIES.register(eventBus);
 
-        Constants.LOG.info("Registered GC Block Entities (NeoForge)");
+        GCLog.CORE.info("Registered GC Block Entities (NeoForge)");
     }
 }

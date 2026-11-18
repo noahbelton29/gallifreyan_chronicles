@@ -21,7 +21,8 @@ public final class TardisRemat {
     }
 
     public static boolean rematerialise(Tardis tardis) {
-        if (tardis.landingTarget().isEmpty() || !vanish(tardis)) return false;
+        boolean vanished = tardis.landingTarget().isPresent() && vanish(tardis);
+        if (!vanished) return false;
 
         TardisLanding.relocate(tardis);
         TardisExteriorBlockEntity landed = tardis.exterior().orElse(null);

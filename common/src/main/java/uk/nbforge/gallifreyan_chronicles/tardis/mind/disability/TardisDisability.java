@@ -8,7 +8,7 @@ import java.util.Optional;
 public enum TardisDisability {
     DYSLEXIC("dyslexic", 0.15f),
 
-    /** PTSD is not something a TARDIS is born with, it only develops through abuse. */
+    /** a tardis isnt born with PTSD, it only develops thru abuse */
     PTSD("ptsd", 0f);
 
     public static final Codec<TardisDisability> CODEC = Codec.STRING.comapFlatMap(

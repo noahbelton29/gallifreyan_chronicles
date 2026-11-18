@@ -23,10 +23,6 @@ public final class ConsoleHumSounds {
 
     private ConsoleHumSounds() {}
 
-    private static boolean isTardisLevel(TardisConsoleBlockEntity console) {
-        return TardisDimensionUtil.isInterior(console.getLevel());
-    }
-
     public static void track(TardisConsoleBlockEntity console) {
         HUMS.putIfAbsent(console, null);
     }
@@ -59,7 +55,7 @@ public final class ConsoleHumSounds {
                 continue;
             }
 
-            if (!isTardisLevel(console)) {
+            if (!TardisDimensionUtil.isInterior(console.getLevel())) {
                 if (hum != null) {
                     sounds.stop(hum);
                     entry.setValue(null);

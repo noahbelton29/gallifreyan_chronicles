@@ -54,7 +54,7 @@ public final class TardisTurbulence {
         return 1f + t * (MAX_VWORP_PITCH - 1f);
     }
 
-    /** 0 when calm, curving up to 1 at 100 stress, gentle at first and violent near the top. */
+    /** 0 when calm, curves up to 1 at 100 stress, gentle at first and violent near the top */
     public static float intensity(float stress) {
         float t = Mth.clamp((stress - CALM_BELOW) / (100f - CALM_BELOW), 0f, 1f);
         return t * t;
@@ -118,9 +118,9 @@ public final class TardisTurbulence {
                 .filter(each -> each.getLevel() == interior)
                 .findFirst()
                 .orElseGet(() -> tardis.console().orElse(null));
-        if (console == null || !TardisFlight.emergencyLand(console, "crash_landing_stress")) return false;
-        TardisMinds.setStress(tardis, AFTER_CRASH);
-        return true;
+        boolean landed = console != null && TardisFlight.emergencyLand(console, "crash_landing_stress");
+        if (landed) TardisMinds.setStress(tardis, AFTER_CRASH);
+        return landed;
     }
 
     private static boolean inVortex(Tardis tardis) {

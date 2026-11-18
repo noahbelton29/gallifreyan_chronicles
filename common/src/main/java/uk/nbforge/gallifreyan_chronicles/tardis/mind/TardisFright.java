@@ -59,10 +59,7 @@ public final class TardisFright {
         LAST.clear();
     }
 
-    /**
-     * Fear of one player from 0 to 1.
-     * Trauma, fear and hits all add to it, betrayal and PTSD make it worse.
-     */
+    /** fear of one player from 0 to 1. trauma, fear and hits all add to it, betrayal and PTSD make it worse */
     public static float severity(Tardis tardis, UUID player) {
         TardisMind mind = TardisMinds.mind(tardis);
         TardisBond bond = TardisMinds.bond(tardis, player);
@@ -76,7 +73,10 @@ public final class TardisFright {
         return Mth.clamp(fear * worse, 0f, 1f);
     }
 
-    /** Reactions are only checked when someone enters a different TARDIS, staying in the same one does not keep triggering them. */
+    /**
+     * reactions only get checked when someone enters a different tardis, staying in the same one doesnt keep triggering
+     * them
+     */
     public static void tick(MinecraftServer server) {
         long now = TardisMinds.now(server);
         if (now % CHECK_TICKS != 0L) return;

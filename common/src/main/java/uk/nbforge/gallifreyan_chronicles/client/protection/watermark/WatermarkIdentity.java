@@ -6,8 +6,8 @@ import java.security.MessageDigest;
 import java.util.Locale;
 import java.util.Properties;
 import java.util.UUID;
-import uk.nbforge.gallifreyan_chronicles.Constants;
 import uk.nbforge.gallifreyan_chronicles.platform.Services;
+import uk.nbforge.gallifreyan_chronicles.util.GCLog;
 
 public final class WatermarkIdentity {
     private static final String RESOURCE = "/gc_build.properties";
@@ -35,7 +35,7 @@ public final class WatermarkIdentity {
                 if (!id.isEmpty()) buildId = id.toUpperCase(Locale.ROOT);
             }
         } catch (Exception e) {
-            Constants.LOG.error("Could not read {}", RESOURCE, e);
+            GCLog.TESTER.error("Couldn't read {}", RESOURCE, e);
         }
 
         fileEnabled = enabled;
@@ -43,7 +43,7 @@ public final class WatermarkIdentity {
         if (Services.PLATFORM.isDevelopmentEnvironment() && !Boolean.getBoolean(FORCE_PROPERTY)) {
             enabled = false;
         }
-        Constants.LOG.info("[GC] Watermark config: enabled={}, build ID={}", enabled, buildId);
+        GCLog.TESTER.info("Watermark config: enabled={}, build ID={}", enabled, buildId);
     }
 
     public static boolean enabled() {
@@ -51,9 +51,9 @@ public final class WatermarkIdentity {
         return enabled;
     }
 
-    public static boolean bannerEnabled() {
+    public static boolean bannerHidden() {
         load();
-        return fileEnabled;
+        return !fileEnabled;
     }
 
     public static String buildId() {

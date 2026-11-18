@@ -128,9 +128,7 @@ public final class MindCommands {
             this.name = name;
         }
 
-        /**
-         * Trust and fear are per player, null means the owner.
-         */
+        /** trust and fear are per player, null means the owner */
         private boolean perPlayer() {
             return this == TRUST || this == FEAR || this == TRAUMA || this == HITS;
         }
@@ -167,7 +165,8 @@ public final class MindCommands {
     }
 
     /**
-     * Bare = get for the owner, a trailing float = set for the owner; a per-player value also takes an optional player before either.
+     * bare = get for the owner, trailing float = set for the owner. per player values also take an optional player
+     * before either
      */
     private static LiteralArgumentBuilder<CommandSourceStack> value(MindValue which) {
         LiteralArgumentBuilder<CommandSourceStack> node = literal(which.name)

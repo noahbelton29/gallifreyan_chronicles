@@ -10,7 +10,10 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import uk.nbforge.gallifreyan_chronicles.compat.flashback.FlashbackChunks;
 
-/** Flashback calls this empty method while writing a snapshot so mods can add packets, we add the portals, see FlashbackPortalSnapshot. */
+/**
+ * flashback calls this empty method while writing a snapshot so mods can add packets, the portals get added here, see
+ * FlashbackPortalSnapshot
+ */
 @Pseudo
 @Mixin(targets = "com.moulberry.flashback.record.Recorder", remap = false)
 public abstract class SnapshotPortalsMixin {

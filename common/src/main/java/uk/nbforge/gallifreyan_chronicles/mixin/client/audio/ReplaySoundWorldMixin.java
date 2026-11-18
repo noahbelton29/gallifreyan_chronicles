@@ -8,9 +8,8 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import uk.nbforge.gallifreyan_chronicles.client.sound.SoundListener;
 
 /**
- * In a replay only the world the camera is in makes sounds.
- * The TARDIS world is kept loaded behind the door and its sounds, controls, doors and flight, were heard from the overworld.
- * The outside hum and power sounds do not go through here.
+ * in a replay only the world the camera is in makes sounds. the tardis world stays loaded behind the door and its
+ * sounds (controls, doors, flight) were being heard from the overworld. outside hum and power sounds dont go thru here
  */
 @Mixin(ClientLevel.class)
 public abstract class ReplaySoundWorldMixin {

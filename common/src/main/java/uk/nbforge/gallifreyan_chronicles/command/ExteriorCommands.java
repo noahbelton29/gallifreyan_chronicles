@@ -155,7 +155,7 @@ public final class ExteriorCommands {
 
     static int setFade(CommandContext<CommandSourceStack> ctx) throws CommandSyntaxException {
         String typeId = StringArgumentType.getString(ctx, "fade_type");
-        if (!FadeTypes.contains(typeId)) {
+        if (FadeTypes.isUnknown(typeId)) {
             return fail(ctx, "unknown_fade_type", typeId, String.join(", ", FadeTypes.suggestionIds()));
         }
         FadeType type = FadeTypes.get(typeId);

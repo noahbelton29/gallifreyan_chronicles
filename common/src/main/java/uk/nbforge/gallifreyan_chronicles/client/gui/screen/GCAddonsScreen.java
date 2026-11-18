@@ -15,11 +15,11 @@ import net.minecraft.util.FormattedCharSequence;
 import net.minecraft.util.Util;
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
-import uk.nbforge.gallifreyan_chronicles.Constants;
 import uk.nbforge.gallifreyan_chronicles.addon.AddonInfo;
 import uk.nbforge.gallifreyan_chronicles.addon.AddonManager;
 import uk.nbforge.gallifreyan_chronicles.addon.AddonProblem;
 import uk.nbforge.gallifreyan_chronicles.client.gui.title.GCButton;
+import uk.nbforge.gallifreyan_chronicles.util.GCLog;
 
 public class GCAddonsScreen extends Screen {
     private static final int ROW_HEIGHT = 36;
@@ -281,7 +281,7 @@ public class GCAddonsScreen extends Screen {
             };
             builder.start();
         } catch (IOException e) {
-            Constants.LOG.warn("Could not open the addons folder {}", folder, e);
+            GCLog.ADDONS.warn("Couldn't open the addons folder {}", folder, e);
         }
     }
 

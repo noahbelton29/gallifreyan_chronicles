@@ -11,9 +11,9 @@ import qouteall.imm_ptl.core.network.PacketRedirection;
 import uk.nbforge.gallifreyan_chronicles.compat.flashback.FlashbackChunks;
 
 /**
- * The recording has packets for other worlds, the TARDIS inside, wrapped up by Immersive Portals.
- * When the replay server read one, Immersive Portals unwrapped it right there and fed it to the replay server as if it was for the world of the replay.
- * So TARDIS chunks were put into the overworld and sent as overworld chunks.
+ * the recording has packets for other worlds (the tardis inside) wrapped up by immersive portals. when the replay
+ * server read one, immersive portals unwrapped it right there and fed it to the replay server like it was for the
+ * replay's world. so tardis chunks got put into the overworld and sent as overworld chunks
  */
 @Pseudo
 @Mixin(targets = "qouteall.imm_ptl.core.network.PacketRedirectionClient", remap = false)

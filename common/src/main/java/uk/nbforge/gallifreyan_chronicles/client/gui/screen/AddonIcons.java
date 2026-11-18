@@ -7,8 +7,8 @@ import java.util.Map;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.texture.DynamicTexture;
 import net.minecraft.resources.Identifier;
-import uk.nbforge.gallifreyan_chronicles.Constants;
 import uk.nbforge.gallifreyan_chronicles.addon.AddonInfo;
+import uk.nbforge.gallifreyan_chronicles.util.GCLog;
 import uk.nbforge.gallifreyan_chronicles.util.GCUtil;
 
 final class AddonIcons {
@@ -41,7 +41,7 @@ final class AddonIcons {
             }
             icon = read;
         } catch (Exception e) {
-            Constants.LOG.warn("Addon '{}' has an icon that could not be read", info.id(), e);
+            GCLog.ADDONS.warn("Addon '{}' has an icon that could not be read", info.id(), e);
         }
         CACHE.put(key, icon);
         return icon;

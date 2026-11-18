@@ -27,7 +27,6 @@ import qouteall.imm_ptl.core.chunk_loading.ImmPtlChunkTracking;
 import qouteall.imm_ptl.core.portal.Portal;
 import qouteall.q_misc_util.dimension.DimensionIntId;
 import qouteall.q_misc_util.my_util.DQuaternion;
-import uk.nbforge.gallifreyan_chronicles.Constants;
 import uk.nbforge.gallifreyan_chronicles.core.block.InteriorDoorBlock;
 import uk.nbforge.gallifreyan_chronicles.core.block.registry.TardisBlocks;
 import uk.nbforge.gallifreyan_chronicles.core.block_entity.InteriorDoorBlockEntity;
@@ -37,6 +36,7 @@ import uk.nbforge.gallifreyan_chronicles.tardis.Tardis;
 import uk.nbforge.gallifreyan_chronicles.tardis.TardisManager;
 import uk.nbforge.gallifreyan_chronicles.tardis.exterior.TardisExterior;
 import uk.nbforge.gallifreyan_chronicles.tardis.interior.TardisInteriors;
+import uk.nbforge.gallifreyan_chronicles.util.GCLog;
 
 public final class TardisPortals {
     public static final String PORTAL_TAG = TardisPortalBridge.PORTAL_TAG;
@@ -144,16 +144,16 @@ public final class TardisPortals {
         try {
             ImmPtlChunkTracking.onDimensionRemove(level);
         } catch (RuntimeException e) {
-            Constants.LOG.error(
-                    "[GC] Failed to clear portal chunk tracking for {}",
+            GCLog.COMPAT.error(
+                    "Couldn't clear portal chunk tracking for {}",
                     level.dimension().identifier(),
                     e);
         }
         try {
             ImmPtlChunkTickets.onDimensionRemove(level);
         } catch (RuntimeException e) {
-            Constants.LOG.error(
-                    "[GC] Failed to clear portal chunk tickets for {}",
+            GCLog.COMPAT.error(
+                    "Couldn't clear portal chunk tickets for {}",
                     level.dimension().identifier(),
                     e);
         }
@@ -323,7 +323,7 @@ public final class TardisPortals {
         if (interior == null) return;
         BlockPos pos = TardisInteriors.findInteriorDoor(tardis, interior);
         if (pos == null) {
-            Constants.LOG.warn("[GC] No TARDIS interior door found in the interior of {}, portals disabled", tardisId);
+            GCLog.COMPAT.warn("No TARDIS interior door found in the interior of {}, portals disabled", tardisId);
             return;
         }
         DOORS.put(tardisId, new DoorLocation(interior.dimension(), pos));
@@ -389,8 +389,8 @@ public final class TardisPortals {
                 return;
             }
             LINKS.put(tardisId, link);
-            Constants.LOG.info(
-                    "[GC] Linked TARDIS {} doors with portals: exterior {} in {}, interior door {} in {}",
+            GCLog.COMPAT.info(
+                    "Linked TARDIS {} doors with portals: exterior {} in {}, interior door {} in {}",
                     tardisId,
                     placement.exteriorPos(),
                     placement.exteriorDimension().identifier(),
@@ -662,9 +662,9 @@ public final class TardisPortals {
     }
 
     /**
-     * Works out the rotation that turns the source directions into the destination ones.
-     * The destination x and z are flipped because the portal faces the other way.
-     * It is built from a matrix and turned into an axis and an angle, with special cases for no turn and a half turn.
+     * rotation that turns the source directions into the destination ones. destination x and z are flipped cuz the
+     * portal faces the other way. built from a matrix then turned into axis + angle, with special cases for no turn and
+     * a half turn
      */
     private static DQuaternion transformation(Vec3[] source, Vec3[] destination) {
         Vec3[] target = {destination[0].scale(-1.0), destination[1], destination[2].scale(-1.0)};

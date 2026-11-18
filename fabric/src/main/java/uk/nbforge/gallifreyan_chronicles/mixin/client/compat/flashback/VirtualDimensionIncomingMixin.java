@@ -8,7 +8,10 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import uk.nbforge.gallifreyan_chronicles.compat.flashback.FlashbackChunks;
 
-/** While the replay camera is in the TARDIS world, packets from the replay server still belong to its world, the overworld, see ReplayVirtualDimension. */
+/**
+ * while the replay camera is in the tardis world, packets from the replay server still belong to its world (the
+ * overworld), see ReplayVirtualDimension
+ */
 @Mixin(targets = "net.minecraft.network.PacketProcessor$ListenerAndPacket")
 public abstract class VirtualDimensionIncomingMixin {
     @WrapOperation(
@@ -20,8 +23,7 @@ public abstract class VirtualDimensionIncomingMixin {
                                     "Lnet/minecraft/network/protocol/Packet;handle(Lnet/minecraft/network/PacketListener;)V"),
             require = 0)
     private void gc$serverWorld(Packet<PacketListener> packet, PacketListener listener, Operation<Void> original) {
-        if (!FlashbackChunks.handleIncoming(packet, () -> original.call(packet, listener))) {
-            original.call(packet, listener);
-        }
+        if (FlashbackChunks.handleIncoming(packet, () -> original.call(packet, listener))) return;
+        original.call(packet, listener);
     }
 }

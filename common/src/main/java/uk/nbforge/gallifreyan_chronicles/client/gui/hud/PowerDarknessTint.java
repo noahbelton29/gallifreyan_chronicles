@@ -22,6 +22,7 @@ import net.minecraft.resources.Identifier;
 import net.minecraft.util.Mth;
 import org.jspecify.annotations.Nullable;
 import uk.nbforge.gallifreyan_chronicles.Constants;
+import uk.nbforge.gallifreyan_chronicles.util.GCLog;
 
 public final class PowerDarknessTint {
     private static @Nullable RenderPipeline pipeline;
@@ -48,7 +49,7 @@ public final class PowerDarknessTint {
                         .build());
             } catch (RuntimeException e) {
                 failed = true;
-                Constants.LOG.error("failed to create power darkness tint pipeline", e);
+                GCLog.CLIENT.error("Couldn't create power darkness tint pipeline", e);
             }
         }
         return pipeline;

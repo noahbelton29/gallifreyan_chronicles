@@ -126,12 +126,12 @@ public final class ExteriorFlight {
         seenFadeGeneration = generation;
 
         String id = fadeType.id();
-        if (!FadeTypes.contains(id)) return false;
+        if (FadeTypes.isUnknown(id)) return false;
         return setFadeType(FadeTypes.get(id), now, true);
     }
 
     public boolean expireState(long now) {
-        if (!state.isTimed() || now < stateEndTick) return false;
+        if (!state.isTransitioning() || now < stateEndTick) return false;
         state = state.afterTimer();
         return true;
     }

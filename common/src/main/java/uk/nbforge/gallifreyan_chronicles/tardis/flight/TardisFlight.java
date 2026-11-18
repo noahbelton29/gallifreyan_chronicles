@@ -19,7 +19,6 @@ import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.phys.Vec3;
 import org.jspecify.annotations.Nullable;
-import uk.nbforge.gallifreyan_chronicles.Constants;
 import uk.nbforge.gallifreyan_chronicles.core.GCSounds;
 import uk.nbforge.gallifreyan_chronicles.core.GCTardisControls;
 import uk.nbforge.gallifreyan_chronicles.core.block_entity.TardisConsoleBlockEntity;
@@ -36,6 +35,7 @@ import uk.nbforge.gallifreyan_chronicles.tardis.mind.TardisMinds;
 import uk.nbforge.gallifreyan_chronicles.tardis.mind.TardisTurbulence;
 import uk.nbforge.gallifreyan_chronicles.tardis.mind.mood.TardisMoods;
 import uk.nbforge.gallifreyan_chronicles.tardis.mind.refusal.TardisRefusals;
+import uk.nbforge.gallifreyan_chronicles.util.GCLog;
 import uk.nbforge.gallifreyan_chronicles.util.MessageUtil;
 import uk.nbforge.gallifreyan_chronicles.util.SchedulerUtil;
 
@@ -99,7 +99,7 @@ public final class TardisFlight {
     }
 
     public static void throttleChanged(TardisConsoleBlockEntity console, boolean activated) {
-        Constants.LOG.debug("Flight lever state changed to: {}", activated);
+        GCLog.TARDIS.debug("Flight lever state changed to: {}", activated);
 
         if (console.getLevel() instanceof ServerLevel serverLevel) {
             if (activated) announceDeparture(serverLevel);
@@ -140,9 +140,7 @@ public final class TardisFlight {
         crashLand(console, "crash_landing");
     }
 
-    /**
-     * The message is the lang key shown as it falls out of the vortex.
-     */
+    /** message is the lang key shown as it falls out of the vortex */
     public static void crashLand(TardisConsoleBlockEntity console, String message) {
         if (!(console.getLevel() instanceof ServerLevel level)) return;
         Tardis tardis = Tardis.of(console).orElse(null);
@@ -162,8 +160,8 @@ public final class TardisFlight {
     }
 
     /**
-     * A stressed TARDIS dropping out of the vortex on its own.
-     * Rough but not a crash, no damage and it gets most of the way there.
+     * stressed tardis dropping out of the vortex on its own. rough but not a crash, no damage and it gets most of the
+     * way there
      */
     public static boolean emergencyLand(TardisConsoleBlockEntity console, String message) {
         if (!(console.getLevel() instanceof ServerLevel level)) return false;

@@ -34,7 +34,7 @@ public final class TardisAnger {
         TardisMinds.addTrust(tardis, pilot, -TRUST_LOSS);
     }
 
-    /** Anger is forgotten if it is not provoked again within FORGET_TICKS ticks. */
+    /** anger is forgotten if it isnt provoked again within FORGET_TICKS */
     public static int level(Tardis tardis) {
         State state = STATES.get(tardis.id());
         if (state == null) return 0;

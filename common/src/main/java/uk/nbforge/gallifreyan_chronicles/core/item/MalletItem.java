@@ -38,7 +38,7 @@ public class MalletItem extends Item {
         if (player == null || tardis.isEmpty()) return InteractionResult.PASS;
         if (!(level instanceof ServerLevel serverLevel)) return InteractionResult.SUCCESS;
 
-        if (!tardis.get().isOwner(player) && !tardis.get().isTrusted(player.getUUID())) {
+        if (tardis.get().isStranger(player)) {
             MindMessages.say(player, ChatFormatting.RED, "mallet_not_yours");
             return InteractionResult.FAIL;
         }

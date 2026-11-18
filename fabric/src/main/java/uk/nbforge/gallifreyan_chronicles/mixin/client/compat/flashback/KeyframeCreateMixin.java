@@ -11,7 +11,9 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import uk.nbforge.gallifreyan_chronicles.compat.flashback.FlashbackChunks;
 
-/** A camera keyframe made while the camera is inside the TARDIS is stored in overworld coordinates, see ReplayKeyframePortal. */
+/**
+ * a camera keyframe made while the camera's inside the tardis is stored in overworld coords, see ReplayKeyframePortal
+ */
 @Pseudo
 @Mixin(targets = "com.moulberry.flashback.keyframe.impl.CameraKeyframe", remap = false)
 public abstract class KeyframeCreateMixin {

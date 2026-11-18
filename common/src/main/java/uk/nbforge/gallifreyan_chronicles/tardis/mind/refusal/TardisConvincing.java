@@ -23,8 +23,8 @@ public final class TardisConvincing {
     private static final float FORCED_TRUST_LOSS = 3f;
 
     /**
-     * How close it is to giving in.
-     * refusals is the pulls in this try, quickPullUntil is the time until another pull counts as quick, lastBalk is the last refusal and workedUp is how worked up it is.
+     * how close it is to giving in. refusals is the pulls this try, quickPullUntil is when another pull stops counting
+     * as quick, lastBalk is the last refusal and workedUp is how worked up it is
      */
     private record State(int refusals, long quickPullUntil, long lastBalk, int workedUp) {}
 
@@ -82,7 +82,7 @@ public final class TardisConvincing {
         return Refusal.NONE;
     }
 
-    /** A positive refusal shift raises the base number of pulls needed. */
+    /** positive refusal shift raises the base number of pulls needed */
     private static int pullsNeeded(Tardis tardis, State state) {
         int base = TardisMinds.mind(tardis).modifiers().refusalShift() > 0f ? 2 : 1;
         return base + state.workedUp();

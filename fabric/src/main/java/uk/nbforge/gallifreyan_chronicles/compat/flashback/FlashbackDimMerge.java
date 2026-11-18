@@ -8,10 +8,11 @@ import net.minecraft.nbt.Tag;
 import qouteall.q_misc_util.MiscNetworking;
 
 /**
- * In a replay the client gets two dimension lists from Immersive Portals, the one of the recording with the TARDIS worlds and the one of the replay server with only the overworld, nether and end.
- * The second one replaced the first so the client forgot the TARDIS worlds and the door showed nothing.
- * In a replay we keep every dimension we have been told about.
- * This runs before the list is used so a TARDIS world never gets removed and made again, that happened when a Flashback export started and the portal stopped drawing a bit later.
+ * in a replay the client gets two dimension lists from immersive portals, the recording's with the tardis worlds and
+ * the replay server's with only overworld, nether and end. the second replaced the first so the client forgot the
+ * tardis worlds and the door showed nothing. in a replay every dimension the client's been told about gets kept. runs
+ * before the list is used so a tardis world never gets removed and made again, that happened when a flashback export
+ * started and the portal stopped drawing a bit later
  */
 final class FlashbackDimMerge {
     private static CompoundTag ids, types, seaLevels;

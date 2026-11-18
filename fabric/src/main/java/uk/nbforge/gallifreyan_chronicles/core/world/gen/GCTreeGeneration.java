@@ -3,9 +3,9 @@ package uk.nbforge.gallifreyan_chronicles.core.world.gen;
 import net.fabricmc.fabric.api.biome.v1.BiomeModifications;
 import net.fabricmc.fabric.api.biome.v1.BiomeSelectors;
 import net.minecraft.world.level.levelgen.GenerationStep;
-import uk.nbforge.gallifreyan_chronicles.Constants;
 import uk.nbforge.gallifreyan_chronicles.core.GCBiomes;
 import uk.nbforge.gallifreyan_chronicles.core.world.world_features.GCPlacedFeatures;
+import uk.nbforge.gallifreyan_chronicles.util.GCLog;
 
 public class GCTreeGeneration {
     public static void generateTrees() {
@@ -22,6 +22,6 @@ public class GCTreeGeneration {
                 GenerationStep.Decoration.VEGETAL_DECORATION,
                 GCPlacedFeatures.PATCH_THORIVINE);
 
-        Constants.LOG.info("Registered GC Tree Generation (Fabric)");
+        GCLog.CORE.info("Registered GC Tree Generation (Fabric)");
     }
 }

@@ -14,7 +14,7 @@ public interface IPlatformHelper {
 
     boolean isModLoaded(String modId);
 
-    /** Use minecraft for the game itself, returns unknown if the mod is not loaded. */
+    /** use minecraft for the game itself, gives unknown if the mod isnt loaded */
     String getModVersion(String modId);
 
     boolean isDevelopmentEnvironment();
@@ -25,9 +25,9 @@ public interface IPlatformHelper {
     }
 
     /**
-     * Finds every loaded mod that says it is a Gallifreyan Chronicles addon, using the metadata of the loader.
-     * Fabric uses a custom value in fabric.mod.json and NeoForge uses the same key as a mod property in neoforge.mods.toml.
-     * The value is the name of the GCAddon class of the addon, the order is not defined.
+     * every loaded mod that says its a gallifreyan chronicles addon, from the loader metadata. fabric uses a custom
+     * value in fabric.mod.json, neoforge uses the same key as a mod property in neoforge.mods.toml. value is the
+     * addon's GCAddon class name, order isnt defined
      */
     List<ModAddonEntry> findModAddons();
 

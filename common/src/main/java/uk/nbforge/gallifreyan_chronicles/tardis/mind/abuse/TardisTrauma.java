@@ -58,7 +58,7 @@ public final class TardisTrauma {
         LAST_REACTION.clear();
     }
 
-    /** How much one hit scars it, loyal ones feel it the most, hitInBeating counts from 1. */
+    /** how much one hit scars it, loyal ones feel it the most, hitInBeating counts from 1 */
     public static void hit(Tardis tardis, UUID player, int hitInBeating) {
         TardisMind mind = TardisMinds.mind(tardis);
         TardisBond bond = TardisMinds.bond(tardis, player);
@@ -81,7 +81,7 @@ public final class TardisTrauma {
         }
     }
 
-    /** Every TARDIS takes it differently but always the same for the same TARDIS. */
+    /** every tardis takes it differently but always the same for the same tardis */
     private static float sensitivity(Tardis tardis) {
         UUID id = tardis.id();
         RandomSource random =
@@ -136,7 +136,7 @@ public final class TardisTrauma {
         TardisDiscovery.reveal(tardis, Reveal.IT_SEES_THE_MALLET);
     }
 
-    /** Only TARDISes in this dimension so it does not scan every TARDIS on the server. */
+    /** only tardises in this dimension so it doesnt scan every tardis on the server */
     private static List<Tardis> nearby(Player player, ServerLevel level) {
         List<Tardis> found = new ArrayList<>();
         Tardis.ofLevel(level)

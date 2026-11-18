@@ -5,9 +5,9 @@ import net.fabricmc.fabric.api.biome.v1.BiomeModifications;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.level.levelgen.GenerationStep;
 import net.minecraft.world.level.levelgen.placement.PlacedFeature;
-import uk.nbforge.gallifreyan_chronicles.Constants;
 import uk.nbforge.gallifreyan_chronicles.core.GCDimensions;
 import uk.nbforge.gallifreyan_chronicles.core.world.world_features.GCPlacedFeatures;
+import uk.nbforge.gallifreyan_chronicles.util.GCLog;
 
 public class GCOresGeneration {
     private static final List<ResourceKey<PlacedFeature>> GALLIFREY_ORES = List.of(
@@ -26,6 +26,6 @@ public class GCOresGeneration {
                     ore);
         }
 
-        Constants.LOG.info("Registered GC Ore Generation (Fabric)");
+        GCLog.CORE.info("Registered GC Ore Generation (Fabric)");
     }
 }

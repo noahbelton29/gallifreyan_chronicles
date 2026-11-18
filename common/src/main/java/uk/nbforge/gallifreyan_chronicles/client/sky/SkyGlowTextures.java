@@ -11,7 +11,7 @@ import net.minecraft.client.renderer.texture.AbstractTexture;
 import net.minecraft.client.renderer.texture.DynamicTexture;
 import net.minecraft.client.renderer.texture.TextureManager;
 import net.minecraft.resources.Identifier;
-import uk.nbforge.gallifreyan_chronicles.Constants;
+import uk.nbforge.gallifreyan_chronicles.util.GCLog;
 import uk.nbforge.gallifreyan_chronicles.util.GCUtil;
 
 public final class SkyGlowTextures {
@@ -40,7 +40,7 @@ public final class SkyGlowTextures {
                 }
                 CONVERTED.put(source, converted);
             } catch (Exception e) {
-                Constants.LOG.warn("Could not prepare glowing sky texture {}", source, e);
+                GCLog.CLIENT.warn("Couldn't prepare glowing sky texture {}", source, e);
                 FAILED.add(source);
                 return textures.getTexture(source);
             }
@@ -48,7 +48,7 @@ public final class SkyGlowTextures {
         return textures.getTexture(converted);
     }
 
-    /** Turns the image into a glow mask, the brightest colour channel becomes the alpha and the colour is scaled back up to full strength. */
+    /** turns it into a glow mask, brightest channel becomes alpha and the colour gets scaled back up to full */
     private static void convert(NativeImage image) {
         for (int y = 0; y < image.getHeight(); y++) {
             for (int x = 0; x < image.getWidth(); x++) {

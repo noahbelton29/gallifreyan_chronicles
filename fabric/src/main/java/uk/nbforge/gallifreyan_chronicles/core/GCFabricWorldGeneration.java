@@ -1,10 +1,10 @@
 package uk.nbforge.gallifreyan_chronicles.core;
 
-import uk.nbforge.gallifreyan_chronicles.Constants;
 import uk.nbforge.gallifreyan_chronicles.core.world.gen.GCBushGeneration;
 import uk.nbforge.gallifreyan_chronicles.core.world.gen.GCOresGeneration;
 import uk.nbforge.gallifreyan_chronicles.core.world.gen.GCSurfaceGeneration;
 import uk.nbforge.gallifreyan_chronicles.core.world.gen.GCTreeGeneration;
+import uk.nbforge.gallifreyan_chronicles.util.GCLog;
 
 public class GCFabricWorldGeneration {
     public static void registerWorldGeneration() {
@@ -12,6 +12,6 @@ public class GCFabricWorldGeneration {
         GCBushGeneration.generateBushes();
         GCOresGeneration.generateOres();
         GCSurfaceGeneration.generateSurface();
-        Constants.LOG.info("Registered GC World Generation");
+        GCLog.CORE.info("Registered GC World Generation");
     }
 }

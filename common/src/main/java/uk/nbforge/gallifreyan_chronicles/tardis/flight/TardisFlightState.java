@@ -11,12 +11,8 @@ public enum TardisFlightState {
         return this != IDLE;
     }
 
-    /** The lever cannot be used and the doors stay shut during these because the engines are still spinning up or winding down. */
+    /** lever cant be used and the doors stay shut during these cuz the engines are still spinning up or winding down */
     public boolean isTransitioning() {
-        return this == TAKING_OFF || this == LANDING;
-    }
-
-    public boolean isTimed() {
         return this == TAKING_OFF || this == LANDING;
     }
 

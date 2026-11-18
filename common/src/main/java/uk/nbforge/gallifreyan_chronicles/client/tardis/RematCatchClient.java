@@ -54,7 +54,7 @@ public final class RematCatchClient {
         }
     }
 
-    /** One block face drawn see through, with the light and tint taken before the block was hidden. */
+    /** one block face drawn see through, light and tint grabbed before the block got hidden */
     private record GhostQuad(float x, float y, float z, BakedQuad quad, int[] colors, int[] lights) {}
 
     private static final Map<UUID, Fade> PLAYERS = ClientState.track(new ConcurrentHashMap<>());
@@ -129,7 +129,10 @@ public final class RematCatchClient {
         return level.isLoaded(payload.boxMin()) && level.isLoaded(payload.boxMax());
     }
 
-    /** Draw everything above the floor first so faces between blocks stay hidden, then hide those blocks so only our fading copy shows. */
+    /**
+     * draw everything above the floor first so faces between blocks stay hidden, then hide those blocks so only the
+     * fading copy shows
+     */
     private static void capture(ClientLevel level, RematCatchPayload payload) {
         Minecraft mc = Minecraft.getInstance();
         ModelBlockRenderer renderer =

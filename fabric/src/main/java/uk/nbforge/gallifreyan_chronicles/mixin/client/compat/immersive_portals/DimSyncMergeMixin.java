@@ -7,7 +7,7 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import uk.nbforge.gallifreyan_chronicles.compat.flashback.FlashbackChunks;
 
-/** Before the client takes a dimension list, in a replay merge it with the ones from before, see FlashbackDimMerge. */
+/** before the client takes a dimension list, in a replay merge it with the earlier ones, see FlashbackDimMerge */
 @Pseudo
 @Mixin(targets = "qouteall.q_misc_util.MiscNetworking$DimIdSyncPacket", remap = false)
 public abstract class DimSyncMergeMixin {

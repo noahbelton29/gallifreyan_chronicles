@@ -7,9 +7,7 @@ import net.minecraft.network.chat.Component;
 import org.jspecify.annotations.Nullable;
 import uk.nbforge.gallifreyan_chronicles.config.GCConfig;
 
-/**
- * The key mappings are built here but registered by each loader because Fabric and NeoForge register them and their category differently.
- */
+/** built here but each loader registers them cuz fabric and neoforge do keymappings and their category differently */
 public final class GCKeyMappings {
     private static @Nullable KeyMapping showControlNames;
 

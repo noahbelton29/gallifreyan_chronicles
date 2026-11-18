@@ -8,6 +8,7 @@ import java.util.concurrent.ConcurrentSkipListMap;
 import org.jspecify.annotations.Nullable;
 import uk.nbforge.gallifreyan_chronicles.Constants;
 import uk.nbforge.gallifreyan_chronicles.tardis.door.TardisDoorVariant;
+import uk.nbforge.gallifreyan_chronicles.util.GCLog;
 import uk.nbforge.gallifreyan_chronicles.util.GCUtil;
 
 public final class TardisDoorRegistry {
@@ -124,7 +125,7 @@ public final class TardisDoorRegistry {
                     .filter(TardisDoorVariant::isDefault)
                     .count();
             if (defaults > 1) {
-                Constants.LOG.warn(
+                GCLog.DATA.warn(
                         "Door model '{}' has {} variants flagged as default; using the first alphabetically",
                         variant.parent(),
                         defaults);

@@ -11,10 +11,11 @@ import net.minecraft.resources.Identifier;
 import org.jspecify.annotations.Nullable;
 import uk.nbforge.gallifreyan_chronicles.Constants;
 import uk.nbforge.gallifreyan_chronicles.platform.Services;
+import uk.nbforge.gallifreyan_chronicles.util.GCLog;
 import uk.nbforge.gallifreyan_chronicles.util.GCUtil;
 
 /**
- * door blocks register before datapacks exist, so this reads the door variant jsons straight out of our jar. same
+ * door blocks register before datapacks exist, so this reads the door variant jsons straight out of the mod jar. same
  * folder, ids and codec as the reload listener so the two never disagree about what a variant is called
  */
 public final class DoorBlockJson {
@@ -36,8 +37,7 @@ public final class DoorBlockJson {
             if (v.interior() || v.block().isEmpty()) continue;
             String block = v.block().contains(":") ? v.block() : Constants.MOD_ID + ":" + v.block();
             if (!block.startsWith(Constants.MOD_ID + ":")) {
-                Constants.LOG.warn(
-                        "[GC] door variant {} has block {} outside {}, skipped", v.id(), block, Constants.MOD_ID);
+                GCLog.TARDIS.warn("Door variant {} has block {} outside {}, skipped", v.id(), block, Constants.MOD_ID);
                 continue;
             }
             String particle = v.particle().isEmpty() ? DEFAULT_PARTICLE : v.particle();
@@ -54,9 +54,9 @@ public final class DoorBlockJson {
                     .readModFiles(Constants.MOD_ID, DATA_ROOT, path -> variantId(path) != null)
                     .forEach((path, bytes) -> parse(variantId(path), bytes, found));
         } catch (RuntimeException e) {
-            Constants.LOG.error("[GC] couldn't read the door variant jsons", e);
+            GCLog.TARDIS.error("Couldn't read the door variant jsons", e);
         }
-        if (found.isEmpty()) Constants.LOG.warn("[GC] no door variants found, no door blocks registered");
+        if (found.isEmpty()) GCLog.TARDIS.warn("No door variants found, no door blocks registered");
         found.sort(Comparator.comparingInt(TardisDoorVariant::priority).thenComparing(TardisDoorVariant::localId));
         return variants = List.copyOf(found);
     }
@@ -79,10 +79,10 @@ public final class DoorBlockJson {
         try {
             TardisDoorVariant.CODEC
                     .parse(JsonOps.INSTANCE, JsonParser.parseString(new String(bytes, StandardCharsets.UTF_8)))
-                    .resultOrPartial(error -> Constants.LOG.error("[GC] bad door variant {}: {}", id, error))
+                    .resultOrPartial(error -> GCLog.TARDIS.error("Bad door variant {}: {}", id, error))
                     .ifPresent(v -> out.add(v.withId(id.toString())));
         } catch (RuntimeException e) {
-            Constants.LOG.error("[GC] bad door variant {}", id, e);
+            GCLog.TARDIS.error("Bad door variant {}", id, e);
         }
     }
 

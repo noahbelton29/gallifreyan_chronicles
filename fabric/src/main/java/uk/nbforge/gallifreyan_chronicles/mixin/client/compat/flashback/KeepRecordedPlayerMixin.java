@@ -10,8 +10,10 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import uk.nbforge.gallifreyan_chronicles.compat.flashback.FlashbackChunks;
 
 /**
- * In a replay Immersive Portals can send a remove entity for the recorded player because it used the same id and the player vanished for the rest of the replay, so keep the player, see FlashbackChunks keepPlayer.
- * But when the player is added again by jumping on the timeline the game first removes the old one with the same id, that removal must go through or the old player stays stuck where it was.
+ * in a replay immersive portals can send a remove entity for the recorded player cuz it used the same id, and the
+ * player vanished for the rest of the replay, so keep them (see FlashbackChunks keepPlayer). but when the player gets
+ * added again by jumping on the timeline the game removes the old one with the same id first, that removal has to go
+ * thru or the old player stays stuck where it was
  */
 @Mixin(ClientLevel.class)
 public abstract class KeepRecordedPlayerMixin {

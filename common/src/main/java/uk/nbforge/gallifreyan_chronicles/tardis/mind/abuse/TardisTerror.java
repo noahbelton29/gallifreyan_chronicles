@@ -50,7 +50,7 @@ public final class TardisTerror {
                 && !compliant(tardis, player);
     }
 
-    /** True if the hit was part of snapping it out of a freeze. */
+    /** true if the hit was part of snapping it out of a freeze */
     public static boolean strike(Tardis tardis, ServerLevel level, Vec3 hit, Player player) {
         if (!terrified(tardis, player.getUUID())) return false;
         TardisPersonality personality = TardisMinds.mind(tardis).personality();

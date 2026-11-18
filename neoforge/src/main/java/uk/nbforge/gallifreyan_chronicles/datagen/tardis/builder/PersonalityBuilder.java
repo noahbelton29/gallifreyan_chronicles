@@ -18,7 +18,7 @@ public final class PersonalityBuilder {
         return this;
     }
 
-    /** It refuses to fly once stress goes above the first number or trust drops below the second. */
+    /** refuses to fly once stress goes above the first number or trust drops below the second */
     public PersonalityBuilder refusesToFlyWhen(double stressAbove, double trustBelow) {
         json.add("refuses_to_fly_when", GCJson.obj("stress_above", stressAbove, "trust_below", trustBelow));
         return this;

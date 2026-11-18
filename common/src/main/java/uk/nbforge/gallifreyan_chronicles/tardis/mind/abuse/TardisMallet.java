@@ -44,7 +44,7 @@ public final class TardisMallet {
     private static final long BEATING_GAP_TICKS = 6000L;
     private static final Map<String, Beating> BEATINGS = ServerState.track(new HashMap<>());
 
-    /** trustBefore is how much it trusted them when the beating started. */
+    /** trustBefore is how much it trusted them when the beating started */
     private record Beating(int count, long lastTick, float trustBefore) {}
 
     private TardisMallet() {}

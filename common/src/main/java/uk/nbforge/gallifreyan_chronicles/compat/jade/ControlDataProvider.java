@@ -15,7 +15,7 @@ import uk.nbforge.gallifreyan_chronicles.tardis.flight.LandingTarget;
 import uk.nbforge.gallifreyan_chronicles.tardis.flight.TardisDestinations;
 import uk.nbforge.gallifreyan_chronicles.util.GCUtil;
 
-/** The destination data lives on the server so the destination controls send what their tooltip needs from here. */
+/** destination data lives on the server so the destination controls send what their tooltip needs from here */
 public class ControlDataProvider implements IServerDataProvider<EntityAccessor> {
     public static final ControlDataProvider INSTANCE = new ControlDataProvider();
 

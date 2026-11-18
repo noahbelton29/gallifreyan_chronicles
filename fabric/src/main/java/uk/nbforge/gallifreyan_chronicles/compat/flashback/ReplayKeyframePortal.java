@@ -20,7 +20,7 @@ final class ReplayKeyframePortal {
 
     private ReplayKeyframePortal() {}
 
-    /** Immersive Portals moved the camera through a door, free camera. */
+    /** immersive portals moved the camera thru a door, free camera */
     static void onTeleport(Portal portal) {
         Minecraft mc = Minecraft.getInstance();
         ResourceKey<Level> server = ReplayVirtualDimension.serverDim();
@@ -33,14 +33,14 @@ final class ReplayKeyframePortal {
         lastPath = null;
     }
 
-    /** Keyframes are moving the camera right now so Immersive Portals must not also try to. */
+    /** keyframes are moving the camera right now so immersive portals mustnt try to as well */
     static boolean keyframesMovingCamera() {
         return System.nanoTime() - lastApplyNanos < 250_000_000L;
     }
 
     /**
-     * A keyframe position in overworld coordinates is about to be applied.
-     * Returns x, y, z, yaw and pitch to really use.
+     * a keyframe position in overworld coords is about to be applied, gives back the x, y, z, yaw and pitch to actually
+     * use
      */
     static double[] apply(double x, double y, double z, float yaw, float pitch) {
         lastApplyNanos = System.nanoTime();

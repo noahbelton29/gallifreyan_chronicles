@@ -23,7 +23,6 @@ import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
-import uk.nbforge.gallifreyan_chronicles.Constants;
 import uk.nbforge.gallifreyan_chronicles.core.block_entity.TardisConsoleBlockEntity;
 import uk.nbforge.gallifreyan_chronicles.tardis.Tardis;
 import uk.nbforge.gallifreyan_chronicles.tardis.console.TardisConsole;
@@ -33,6 +32,7 @@ import uk.nbforge.gallifreyan_chronicles.tardis.control.TardisControl;
 import uk.nbforge.gallifreyan_chronicles.tardis.control.TardisControls;
 import uk.nbforge.gallifreyan_chronicles.tardis.mind.refusal.TardisWariness;
 import uk.nbforge.gallifreyan_chronicles.tardis.security.IsomorphicPunishment;
+import uk.nbforge.gallifreyan_chronicles.util.GCLog;
 
 public class TardisControlEntity extends Entity {
     public static Supplier<EntityType<TardisControlEntity>> TYPE;
@@ -197,7 +197,7 @@ public class TardisControlEntity extends Entity {
         if (this.getConsolePos() == null) return null;
         BlockEntity be = this.level().getBlockEntity(this.getConsolePos());
         if (be instanceof TardisConsoleBlockEntity console) return console;
-        Constants.LOG.warn(
+        GCLog.CORE.warn(
                 "Control entity '{}' at {} has no console block entity at {}",
                 this.getControlId(),
                 this.position(),
@@ -262,8 +262,7 @@ public class TardisControlEntity extends Entity {
             if (console != null) {
                 boolean currentState = console.getControlState(this.getControlId());
                 boolean newState = !currentState;
-                Constants.LOG.debug(
-                        "Control {} state toggled from {} to {}", this.getControlId(), currentState, newState);
+                GCLog.CORE.debug("Control {} state toggled from {} to {}", this.getControlId(), currentState, newState);
                 console.triggerControl(this.getControlId(), newState, player);
             }
         }
@@ -294,7 +293,7 @@ public class TardisControlEntity extends Entity {
                 : Component.literal(idPart);
         player.sendSystemMessage(Component.translatable(
                 "debug.gallifreyan_chronicles.control_position", idComponent, posText, offsetText, sizeText));
-        Constants.LOG.debug(
+        GCLog.CORE.debug(
                 "TardisControlEntity {} -> pos=({}) offset=({}) size=({})", idPart, posText, offsetText, sizeText);
     }
 

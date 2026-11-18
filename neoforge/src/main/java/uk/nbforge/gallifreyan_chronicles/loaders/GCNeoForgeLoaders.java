@@ -9,6 +9,7 @@ import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.event.AddServerReloadListenersEvent;
 import uk.nbforge.gallifreyan_chronicles.Constants;
 import uk.nbforge.gallifreyan_chronicles.loader.GCJsonReloadListener;
+import uk.nbforge.gallifreyan_chronicles.util.GCLog;
 import uk.nbforge.gallifreyan_chronicles.util.GCUtil;
 
 @EventBusSubscriber(modid = Constants.MOD_ID)
@@ -25,7 +26,7 @@ public final class GCNeoForgeLoaders {
     public static void onAddReloadListeners(AddServerReloadListenersEvent event) {
         for (Map.Entry<Identifier, Supplier<GCJsonReloadListener<?>>> entry : LOADERS.entrySet()) {
             event.addListener(entry.getKey(), entry.getValue().get());
-            Constants.LOG.info("Registered GC NeoForge Reload Listener: {}", entry.getKey());
+            GCLog.DATA.info("Registered GC NeoForge Reload Listener: {}", entry.getKey());
         }
     }
 }

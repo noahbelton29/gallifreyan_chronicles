@@ -13,8 +13,8 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import uk.nbforge.gallifreyan_chronicles.compat.flashback.FlashbackChunks;
 
 /**
- * When you jump back in a replay Flashback removes every entity one by one.
- * Removing a portal also removes its linked portals, which broke the loop of Flashback and kicked you out, so we loop over a copy of the list instead.
+ * when u jump back in a replay flashback removes every entity one by one. removing a portal also removes its linked
+ * portals which broke flashback's loop and kicked u out, so it loops over a copy of the list
  */
 @Pseudo
 @Mixin(targets = "com.moulberry.flashback.Flashback", remap = false)

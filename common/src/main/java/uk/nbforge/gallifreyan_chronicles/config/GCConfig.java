@@ -7,6 +7,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import uk.nbforge.gallifreyan_chronicles.Constants;
 import uk.nbforge.gallifreyan_chronicles.platform.Services;
+import uk.nbforge.gallifreyan_chronicles.util.GCLog;
 
 public final class GCConfig {
     private static final long SAVE_DELAY_NANOS = 1_000_000_000L;
@@ -47,7 +48,7 @@ public final class GCConfig {
             try {
                 loaded = GSON.fromJson(Files.readString(file), Data.class);
             } catch (Exception e) {
-                Constants.LOG.error("Could not read {}, using defaults", file, e);
+                GCLog.CORE.error("Couldn't read {}, using defaults", file, e);
             }
         }
         data = loaded != null ? loaded : new Data();
@@ -83,7 +84,7 @@ public final class GCConfig {
             Files.createDirectories(file.getParent());
             Files.writeString(file, GSON.toJson(data));
         } catch (IOException e) {
-            Constants.LOG.error("Could not write {}", file, e);
+            GCLog.CORE.error("Couldn't write {}", file, e);
         }
     }
 

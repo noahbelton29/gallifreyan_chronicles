@@ -11,8 +11,8 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import uk.nbforge.gallifreyan_chronicles.compat.flashback.FlashbackChunks;
 
 /**
- * Flashback has just put a recorded chunk in the replay world.
- * With Immersive Portals nothing sends it to the viewer so we do, see FlashbackChunks.
+ * flashback just put a recorded chunk in the replay world. with immersive portals nothing sends it to the viewer so it
+ * gets sent from here, see FlashbackChunks
  */
 @Pseudo
 @Mixin(targets = "com.moulberry.flashback.playback.ReplayGamePacketHandler", remap = false)

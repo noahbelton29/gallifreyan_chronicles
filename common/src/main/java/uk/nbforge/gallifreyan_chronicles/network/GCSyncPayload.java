@@ -5,9 +5,9 @@ import java.util.List;
 import java.util.Set;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
-import uk.nbforge.gallifreyan_chronicles.Constants;
 import uk.nbforge.gallifreyan_chronicles.client.GCClientHooks;
 import uk.nbforge.gallifreyan_chronicles.loader.IdentifiableData;
+import uk.nbforge.gallifreyan_chronicles.util.GCLog;
 
 public final class GCSyncPayload {
     private GCSyncPayload() {}
@@ -16,7 +16,7 @@ public final class GCSyncPayload {
             List<T> values, Runnable clear, Consumer<T> register, String label) {
         clear.run();
         values.forEach(register);
-        Constants.LOG.info("Synced {} {}(s) to client", values.size(), label);
+        GCLog.CORE.info("Synced {} {}(s) to client", values.size(), label);
     }
 
     public static <T extends IdentifiableData<T>> Set<String> idsOf(Collection<T> values) {

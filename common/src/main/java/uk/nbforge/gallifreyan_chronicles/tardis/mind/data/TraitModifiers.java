@@ -7,7 +7,7 @@ import java.util.List;
 import java.util.Optional;
 import uk.nbforge.gallifreyan_chronicles.tardis.mind.TardisTrait;
 
-/** The numbers a trait changes, times values default to 1 and by values to 0. */
+/** the numbers a trait changes, times values default to 1 and by values to 0 */
 public record TraitModifiers(
         float stressGain,
         float stressFade,

@@ -15,7 +15,7 @@ import uk.nbforge.gallifreyan_chronicles.tardis.mind.data.TardisTraits;
 import uk.nbforge.gallifreyan_chronicles.tardis.mind.data.TraitModifiers;
 import uk.nbforge.gallifreyan_chronicles.tardis.mind.disability.TardisDisability;
 
-/** Stress and trauma belong to the TARDIS itself, trust and fear are tracked per player in TardisBond. */
+/** stress and trauma belong to the tardis itself, trust and fear are per player in TardisBond */
 public record TardisMind(
         String personalityId,
         List<String> traitIds,
@@ -106,8 +106,8 @@ public record TardisMind(
     }
 
     /**
-     * Makes a fresh bond if the player has none.
-     * The owner starts with the configured trust, others use the starting trust from the traits if any.
+     * makes a fresh bond if the player has none. owner starts with the configured trust, everyone else gets the traits
+     * starting trust if there is one
      */
     public TardisBond bond(UUID player, UUID owner) {
         TardisBond bond = bonds.get(player);
@@ -125,7 +125,7 @@ public record TardisMind(
         return Math.max(0f, stress - pointsCalmed);
     }
 
-    /** Trauma stops fear from fading below a certain level for players who hurt the TARDIS. */
+    /** trauma stops fear fading below a certain level for players who hurt it */
     public float fearAt(TardisBond bond, long now) {
         float pointsFaded = Math.max(0L, now - bond.fearTick())
                 / (float) TICKS_PER_FEAR_POINT
@@ -175,7 +175,7 @@ public record TardisMind(
                 recovery);
     }
 
-    /** Traits that do not suit the new personality are dropped. */
+    /** traits that dont suit the new personality get dropped */
     public TardisMind withPersonality(TardisPersonality value) {
         List<String> kept = traits().stream()
                 .filter(trait -> trait.fits(value))
@@ -334,7 +334,7 @@ public record TardisMind(
                 recovery);
     }
 
-    /** The TARDIS id is the random seed so the same id always gives the same mind. */
+    /** tardis id is the seed so the same id always gives the same mind */
     public static TardisMind roll(UUID tardisId) {
         long seed = tardisId.getMostSignificantBits() ^ tardisId.getLeastSignificantBits();
         RandomSource random = RandomSource.create(seed);

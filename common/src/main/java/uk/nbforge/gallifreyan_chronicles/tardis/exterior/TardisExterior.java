@@ -16,8 +16,8 @@ import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.resources.Identifier;
 import net.minecraft.world.phys.Vec3;
-import uk.nbforge.gallifreyan_chronicles.Constants;
 import uk.nbforge.gallifreyan_chronicles.loader.IdentifiableData;
+import uk.nbforge.gallifreyan_chronicles.util.GCLog;
 
 public record TardisExterior(String id, String waypointStyle) implements IdentifiableData<TardisExterior> {
     public static final String DEFAULT_WAYPOINT_STYLE = "tardis";
@@ -54,7 +54,7 @@ public record TardisExterior(String id, String waypointStyle) implements Identif
         String resource = "/assets/" + parsed.getNamespace() + "/geckolib/models/" + parsed.getPath() + ".json";
         try (InputStream in = TardisExterior.class.getResourceAsStream(resource)) {
             if (in == null) {
-                Constants.LOG.warn("No model {} found to read the key bone of exterior {}", resource, exteriorId);
+                GCLog.TARDIS.warn("No model {} found to read the key bone of exterior {}", resource, exteriorId);
                 return DEFAULT_KEY_OFFSET;
             }
             JsonObject root = JsonParser.parseString(new String(in.readAllBytes(), StandardCharsets.UTF_8))
@@ -77,9 +77,9 @@ public record TardisExterior(String id, String waypointStyle) implements Identif
                     }
                 }
             }
-            Constants.LOG.warn("Model {} has no '{}' bone, using the default key offset", resource, KEY_BONE_NAME);
+            GCLog.TARDIS.warn("Model {} has no '{}' bone, using the default key offset", resource, KEY_BONE_NAME);
         } catch (IOException | RuntimeException e) {
-            Constants.LOG.warn("Failed to read the key bone of exterior {}", exteriorId, e);
+            GCLog.TARDIS.warn("Couldn't read the key bone of exterior {}", exteriorId, e);
         }
         return DEFAULT_KEY_OFFSET;
     }

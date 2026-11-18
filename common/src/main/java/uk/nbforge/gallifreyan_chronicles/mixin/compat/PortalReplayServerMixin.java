@@ -15,7 +15,10 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import qouteall.imm_ptl.core.portal.Portal;
 
-/** Flashback replays have portals with no data, axisW is null, and a portal like that crashed the join and then the renderer so we never send them to the viewer. */
+/**
+ * flashback replays have portals with no data (axisW is null) and one of those crashed the join and then the renderer,
+ * so they never get sent to the viewer
+ */
 @Pseudo
 @Mixin(targets = "qouteall.imm_ptl.core.portal.Portal", remap = false)
 public abstract class PortalReplayServerMixin {

@@ -14,12 +14,14 @@ import net.minecraft.resources.Identifier;
 import net.minecraft.world.phys.Vec3;
 import org.jspecify.annotations.Nullable;
 import uk.nbforge.gallifreyan_chronicles.Constants;
+import uk.nbforge.gallifreyan_chronicles.util.GCLog;
 
 /**
- * Reads control positions from the hitbox bones of a console model, named after the control id, so the model is the one place that says where each control sits.
- * The first cube of a bone is the hitbox.
- * Its eight corners are moved through the own rotation of the cube and then through the rotation of its bone and every parent bone, exactly how GeckoLib draws the model with x mirrored, x and y angles negated and Z then Y then X order.
- * The centre of the moved cube is the control position, divided by 16 with y minus 0.5625 like the rest of the console space, and the size of the cube is the hitbox size since a control hitbox cannot be tilted.
+ * control positions come from the console model's hitbox bones, named after the control id, so the model is the one
+ * place that says where each control sits. first cube of a bone is the hitbox. its eight corners go thru the cube's own
+ * rotation then its bone's and every parent bone's, exactly how geckolib draws it (x mirrored, x and y angles negated,
+ * Z then Y then X). centre of the moved cube is the control position, divided by 16 with y minus 0.5625 like the rest
+ * of console space, and the cube's size is the hitbox size cuz control hitboxes cant be tilted
  */
 final class ConsoleHitboxBones {
     static final String SUFFIX = "_hitbox";
@@ -42,7 +44,7 @@ final class ConsoleHitboxBones {
         String resource = "/assets/" + parsed.getNamespace() + "/geckolib/models/" + parsed.getPath() + ".json";
         try (InputStream in = ConsoleHitboxBones.class.getResourceAsStream(resource)) {
             if (in == null) {
-                Constants.LOG.warn("No model {} found to read hitbox bones of console {}", resource, consoleId);
+                GCLog.TARDIS.warn("No model {} found to read hitbox bones of console {}", resource, consoleId);
                 return boxes;
             }
             JsonObject root = JsonParser.parseString(new String(in.readAllBytes(), StandardCharsets.UTF_8))
@@ -66,7 +68,7 @@ final class ConsoleHitboxBones {
                 if (box != null) boxes.put(name.substring(0, name.length() - SUFFIX.length()), box);
             }
         } catch (IOException | RuntimeException e) {
-            Constants.LOG.warn("Failed to read hitbox bones of console {}", consoleId, e);
+            GCLog.TARDIS.warn("Couldn't read hitbox bones of console {}", consoleId, e);
         }
         return boxes;
     }
@@ -108,7 +110,7 @@ final class ConsoleHitboxBones {
         return new Box(centre, (float) (size[0] / 16.0), (float) (size[1] / 16.0), (float) (size[2] / 16.0));
     }
 
-    /** Turns a point about a pivot the way GeckoLib does, x mirrored, x and y angles negated, then x, y and z. */
+    /** turns a point about a pivot the way geckolib does, x mirrored, x and y angles negated, then x, y and z */
     private static void spin(double[] point, double @Nullable [] pivot, double @Nullable [] rotation) {
         if (rotation == null || (rotation[0] == 0.0 && rotation[1] == 0.0 && rotation[2] == 0.0)) return;
         double px = pivot == null ? 0.0 : -pivot[0];

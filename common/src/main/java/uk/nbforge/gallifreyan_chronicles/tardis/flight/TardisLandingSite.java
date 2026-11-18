@@ -21,10 +21,7 @@ public final class TardisLandingSite {
 
     private TardisLandingSite() {}
 
-    /**
-     * If nothing is found in the radius it checks the original column for the nearest spot.
-     * Returns null if nothing is available.
-     */
+    /** if nothing's in the radius it checks the original column for the nearest spot, null if nothing's free */
     public static @Nullable BlockPos find(ServerLevel level, BlockPos target, @Nullable BlockPos own) {
         Candidate best = null;
 
@@ -110,7 +107,7 @@ public final class TardisLandingSite {
         return null;
     }
 
-    /** Dimensions with a ceiling use their logical height so the search stays below the Nether roof. */
+    /** dimensions with a ceiling use their logical height so the search stays under the nether roof */
     private static int highestFeet(ServerLevel level) {
         if (level.dimensionType().hasCeiling()) {
             return level.getMinY() + level.dimensionType().logicalHeight() - 3;
@@ -119,7 +116,7 @@ public final class TardisLandingSite {
         return level.getMaxY() - 2;
     }
 
-    /** Needs two clear blocks above a solid floor that does not hurt. */
+    /** needs two clear blocks above a solid floor that doesnt hurt */
     public static boolean standable(ServerLevel level, BlockPos feet, @Nullable BlockPos own) {
         BlockPos below = feet.below();
         BlockPos head = feet.above();
@@ -159,7 +156,7 @@ public final class TardisLandingSite {
         return ENCLOSED_PENALTY;
     }
 
-    /** Blocks with block entities are never soft because they may hold data that should not be destroyed. */
+    /** blocks with block entities are never soft cuz they might hold data that shouldnt get wrecked */
     public static boolean isSoft(BlockState state) {
         if (state.isAir() || state.hasBlockEntity()) return false;
 
@@ -182,7 +179,7 @@ public final class TardisLandingSite {
                 || state.is(Blocks.TWISTING_VINES_PLANT);
     }
 
-    /** Destroyed without drops, blocks with fluids are left alone. */
+    /** destroyed without drops, blocks with fluids are left alone */
     public static void clearSoft(ServerLevel level, BlockPos pos) {
         BlockState state = level.getBlockState(pos);
 

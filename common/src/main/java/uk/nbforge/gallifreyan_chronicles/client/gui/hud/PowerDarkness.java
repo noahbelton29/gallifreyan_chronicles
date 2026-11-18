@@ -9,6 +9,7 @@ import java.util.WeakHashMap;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.world.level.Level;
+import uk.nbforge.gallifreyan_chronicles.client.compat.iris.IrisCompat;
 import uk.nbforge.gallifreyan_chronicles.client.lifecycle.ClientState;
 import uk.nbforge.gallifreyan_chronicles.client.tardis.RematCatchClient;
 import uk.nbforge.gallifreyan_chronicles.client.tardis.TardisFrightClient;
@@ -155,13 +156,11 @@ public final class PowerDarkness {
 
     public static boolean shaderPackHandlesDarkness() {
         long read = shaderBlindnessReadNanos;
-        return read != 0L
-                && System.nanoTime() - read < SHADER_READ_WINDOW_NANOS
-                && ShaderPackDetector.isShaderPackInUse();
+        return read != 0L && System.nanoTime() - read < SHADER_READ_WINDOW_NANOS && IrisCompat.shaderPackInUse();
     }
 
     public static float overlayMaxAlpha() {
-        return ShaderPackDetector.isShaderPackInUse() ? SHADER_MAX_ALPHA : MAX_ALPHA;
+        return IrisCompat.shaderPackInUse() ? SHADER_MAX_ALPHA : MAX_ALPHA;
     }
 
     public static void render(GuiGraphicsExtractor graphics) {

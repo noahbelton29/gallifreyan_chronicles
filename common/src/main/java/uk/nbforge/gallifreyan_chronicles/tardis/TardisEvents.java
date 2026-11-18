@@ -3,7 +3,7 @@ package uk.nbforge.gallifreyan_chronicles.tardis;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.function.Consumer;
-import uk.nbforge.gallifreyan_chronicles.Constants;
+import uk.nbforge.gallifreyan_chronicles.util.GCLog;
 
 public final class TardisEvents {
     private TardisEvents() {}
@@ -24,7 +24,7 @@ public final class TardisEvents {
                 try {
                     listener.accept(tardis);
                 } catch (RuntimeException e) {
-                    Constants.LOG.error("TARDIS event listener failed", e);
+                    GCLog.TARDIS.error("TARDIS event listener failed", e);
                 }
             }
         }

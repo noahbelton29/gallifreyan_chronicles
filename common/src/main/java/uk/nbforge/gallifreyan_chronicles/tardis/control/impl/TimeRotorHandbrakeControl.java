@@ -17,7 +17,8 @@ public class TimeRotorHandbrakeControl extends BaseControl {
 
     @Override
     public void onStateChanged(TardisConsoleBlockEntity console, boolean activated) {
-        if (activated && !TardisFlight.abortTakeoff(console)) TardisFlight.crashLand(console);
+        if (!activated || TardisFlight.abortTakeoff(console)) return;
+        TardisFlight.crashLand(console);
     }
 
     @Override

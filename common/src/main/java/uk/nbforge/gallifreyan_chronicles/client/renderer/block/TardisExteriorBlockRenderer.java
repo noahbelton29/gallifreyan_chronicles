@@ -19,13 +19,13 @@ import org.joml.Quaternionf;
 import org.joml.Vector3f;
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
+import uk.nbforge.gallifreyan_chronicles.client.compat.iris.IrisCompat;
 import uk.nbforge.gallifreyan_chronicles.client.model.TardisExteriorBlockModel;
 import uk.nbforge.gallifreyan_chronicles.client.renderer.fade.FadeBoxRenderer;
 import uk.nbforge.gallifreyan_chronicles.client.renderer.geo_layer.TardisExteriorGlowLayer;
 import uk.nbforge.gallifreyan_chronicles.client.renderer.geo_layer.TardisExteriorKeyLayer;
 import uk.nbforge.gallifreyan_chronicles.client.renderer.geo_layer.TardisLampOrbLayer;
 import uk.nbforge.gallifreyan_chronicles.client.renderer.util.RenderLevelGuard;
-import uk.nbforge.gallifreyan_chronicles.client.sky.SkyShaderCompat;
 import uk.nbforge.gallifreyan_chronicles.client.util.FadeTintUtil;
 import uk.nbforge.gallifreyan_chronicles.client.util.ModelRenderRangeUtil;
 import uk.nbforge.gallifreyan_chronicles.compat.portal.PortalBone;
@@ -84,7 +84,7 @@ public class TardisExteriorBlockRenderer
 
     private static boolean isSeenFromItsInterior(TardisExteriorBlockEntity animatable) {
         return animatable.isPortalActive()
-                && SkyShaderCompat.isShaderPackInUse()
+                && IrisCompat.shaderPackInUse()
                 && TardisPortalBridge.isViewingThroughPortalNear(Vec3.atBottomCenterOf(animatable.getBlockPos()), 2.0);
     }
 
@@ -162,7 +162,7 @@ public class TardisExteriorBlockRenderer
             @NonNull SubmitNodeCollector submitNodeCollector,
             @NonNull CameraRenderState cameraState) {
         if (RenderLevelGuard.belongsToOtherLevel(renderState)) return;
-        if (!SkyShaderCompat.isRenderingShadowPass()) {
+        if (!IrisCompat.renderingShadowPass()) {
             cameraOrientation.set(cameraState.orientation);
             poseStack.last().pose().transformPosition(blockOrigin.set(0f, 0f, 0f));
         }

@@ -31,6 +31,7 @@ import org.jspecify.annotations.Nullable;
 import uk.nbforge.gallifreyan_chronicles.Constants;
 import uk.nbforge.gallifreyan_chronicles.addon.api.AddonApi;
 import uk.nbforge.gallifreyan_chronicles.platform.Services;
+import uk.nbforge.gallifreyan_chronicles.util.GCLog;
 
 public final class AddonManager {
     public static final String FOLDER_NAME = "gc_addons";
@@ -166,7 +167,7 @@ public final class AddonManager {
                 }
             }
         } catch (IOException | RuntimeException e) {
-            Constants.LOG.warn("Could not read {}, every addon will start as it is on disk", file, e);
+            GCLog.ADDONS.warn("Couldn't read {}, every addon will start as it is on disk", file, e);
         }
     }
 
@@ -186,7 +187,7 @@ public final class AddonManager {
             Files.createDirectories(stateFile().getParent());
             Files.writeString(stateFile(), GSON.toJson(root), StandardCharsets.UTF_8);
         } catch (IOException e) {
-            Constants.LOG.warn("Could not save {}", stateFile(), e);
+            GCLog.ADDONS.warn("Couldn't save {}", stateFile(), e);
         }
     }
 
@@ -221,7 +222,7 @@ public final class AddonManager {
             String found;
             if (target.equals(Constants.MOD_ID)) {
                 found = modVersion();
-                if (!matches(range, found)) {
+                if (outOfRange(range, found)) {
                     return new AddonProblem(AddonProblem.Kind.INCOMPATIBLE_MOD, range + "|" + found);
                 }
                 continue;
@@ -238,7 +239,7 @@ public final class AddonManager {
                 }
                 found = other.version();
             }
-            if (!matches(range, found)) {
+            if (outOfRange(range, found)) {
                 return new AddonProblem(
                         AddonProblem.Kind.WRONG_REQUIREMENT_VERSION, target + "|" + range + "|" + found);
             }
@@ -246,11 +247,11 @@ public final class AddonManager {
         return null;
     }
 
-    private static boolean matches(VersionRange range, String version) {
+    private static boolean outOfRange(VersionRange range, String version) {
         try {
-            return range.matches(Version.parse(version));
+            return !range.matches(Version.parse(version));
         } catch (IllegalArgumentException e) {
-            return range.toString().equals("*");
+            return !range.toString().equals("*");
         }
     }
 
@@ -263,7 +264,7 @@ public final class AddonManager {
 
         addons = List.copyOf(found);
         refreshProblems();
-        Constants.LOG.info("Found {} addon(s)", found.size());
+        GCLog.ADDONS.info("Found {} addon(s)", found.size());
     }
 
     private static void scanFolder(Path folder, boolean modsFolder, List<AddonInfo> found, Set<String> ids) {
@@ -271,7 +272,7 @@ public final class AddonManager {
             Files.createDirectories(folder);
             if (!modsFolder) writeReadme(folder);
         } catch (IOException e) {
-            Constants.LOG.warn("Could not create the folder {}", folder, e);
+            GCLog.ADDONS.warn("Couldn't create the folder {}", folder, e);
             return;
         }
 
@@ -281,7 +282,7 @@ public final class AddonManager {
                             path -> path.getFileName().toString().toLowerCase()))
                     .toList();
         } catch (IOException e) {
-            Constants.LOG.warn("Could not list the folder {}", folder, e);
+            GCLog.ADDONS.warn("Couldn't list the folder {}", folder, e);
             return;
         }
 
@@ -302,12 +303,12 @@ public final class AddonManager {
                 info = describe(entry, modsFolder);
             } catch (IOException | RuntimeException e) {
                 if (modsFolder) continue;
-                Constants.LOG.warn("Addon {} could not be read: {}", fileName, e.getMessage());
+                GCLog.ADDONS.warn("Addon {} could not be read: {}", fileName, e.getMessage());
                 info = broken(entry, String.valueOf(e.getMessage()));
             }
             if (info == null) continue;
             if (!ids.add(info.id())) {
-                Constants.LOG.warn("Skipping {}: another addon already uses the id '{}'", fileName, info.id());
+                GCLog.ADDONS.warn("Skipping {}: another addon already uses the id '{}'", fileName, info.id());
                 continue;
             }
             found.add(info);
@@ -428,7 +429,7 @@ public final class AddonManager {
 
         byte[] icon = read(path, string(json, "icon", "icon.png"));
         if (icon != null && icon.length > MAX_ICON_BYTES) {
-            Constants.LOG.warn("Addon '{}' has an icon over {} KB, ignoring it", id, MAX_ICON_BYTES / 1024);
+            GCLog.ADDONS.warn("Addon '{}' has an icon over {} KB, ignoring it", id, MAX_ICON_BYTES / 1024);
             icon = null;
         }
 
@@ -508,7 +509,7 @@ public final class AddonManager {
 
             Path target = (javaAddon ? modsFolder() : folder()).resolve(name);
             if (Files.exists(target)) {
-                Constants.LOG.warn("An addon called {} is already installed, not overwriting it", name);
+                GCLog.ADDONS.warn("An addon called {} is already installed, not overwriting it", name);
                 continue;
             }
             try {
@@ -517,7 +518,7 @@ public final class AddonManager {
                 else Files.copy(source, target, StandardCopyOption.COPY_ATTRIBUTES);
                 added.add(name);
             } catch (IOException e) {
-                Constants.LOG.warn("Could not install addon {}", name, e);
+                GCLog.ADDONS.warn("Couldn't install addon {}", name, e);
             }
         }
         if (!added.isEmpty()) scan();
@@ -535,8 +536,8 @@ public final class AddonManager {
     }
 
     /**
-     * Open jars cannot be renamed on Windows, so a helper renames them after the game closes.
-     * It might not work, then rename them by hand.
+     * windows wont let u rename open jars so a helper does it after the game closes. might not work, if not rename them
+     * by hand
      */
     private static void applyModFileStates() {
         List<String[]> moves = new ArrayList<>();
@@ -587,8 +588,8 @@ public final class AddonManager {
                         .start();
             }
         } catch (IOException e) {
-            Constants.LOG.warn(
-                    "Could not schedule renaming the Java addon jars; rename them by hand ({} .jar <-> .jar.disabled)",
+            GCLog.ADDONS.warn(
+                    "Couldn't schedule renaming the Java addon jars; rename them by hand ({} .jar <-> .jar.disabled)",
                     moves.size(),
                     e);
         }
@@ -601,7 +602,7 @@ public final class AddonManager {
                     ? "NOT LOADED (" + problem.kind() + (problem.detail().isEmpty() ? "" : ": " + problem.detail())
                             + ")"
                     : isRunning(info.id()) ? "running" : isEnabled(info) ? "enabled" : "disabled";
-            Constants.LOG.info(
+            GCLog.ADDONS.info(
                     "Addon '{}' {} [{}]: {}", info.id(), info.version(), info.hasJava() ? "java" : "data", state);
         }
     }

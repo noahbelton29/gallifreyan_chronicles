@@ -19,7 +19,10 @@ import uk.nbforge.gallifreyan_chronicles.tardis.Tardis;
 import uk.nbforge.gallifreyan_chronicles.tardis.flight.TardisTravel;
 import uk.nbforge.gallifreyan_chronicles.tardis.flight.crash.TardisDamage;
 
-/** setters all go thru the mods own logic so u cant use this to put a tardis in some fucked up state it would never get to normally */
+/**
+ * setters all go thru the mods own logic so u cant use this to put a tardis in some fucked up state it would never get
+ * to normally
+ */
 public final class DataCommands {
     private static final float MAX_FLIGHT_SECONDS = 1_000_000f;
 
@@ -120,9 +123,7 @@ public final class DataCommands {
         });
     }
 
-    /**
-     * data crashed [on|off], goes through TardisDamage so the alarm, smoke and repair gating all still happen.
-     */
+    /** data crashed [on|off], goes thru TardisDamage so the alarm, smoke and repair gating all still happen */
     private static LiteralArgumentBuilder<CommandSourceStack> crashedData() {
         return literal("crashed")
                 .executes(DataCommands::getCrashed)

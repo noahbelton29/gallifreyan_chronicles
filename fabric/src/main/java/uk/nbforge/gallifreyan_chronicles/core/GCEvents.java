@@ -3,10 +3,10 @@ package uk.nbforge.gallifreyan_chronicles.core;
 import net.fabricmc.fabric.api.entity.event.v1.ServerLivingEntityEvents;
 import net.fabricmc.fabric.api.event.player.UseBlockCallback;
 import net.fabricmc.fabric.api.event.player.UseEntityCallback;
-import uk.nbforge.gallifreyan_chronicles.Constants;
 import uk.nbforge.gallifreyan_chronicles.core.block.DoorRoundelInteraction;
 import uk.nbforge.gallifreyan_chronicles.handler.TaraniumLavaDamageHandler;
 import uk.nbforge.gallifreyan_chronicles.tardis.security.TardisTrust;
+import uk.nbforge.gallifreyan_chronicles.util.GCLog;
 
 public class GCEvents {
     public static void registerEvents() {
@@ -15,6 +15,6 @@ public class GCEvents {
                 (player, level, hand, entity, hitResult) -> TardisTrust.interact(player, level, hand, entity));
         UseBlockCallback.EVENT.register(
                 (player, level, hand, hitResult) -> DoorRoundelInteraction.interact(player, level, hand, hitResult));
-        Constants.LOG.info("Registered GC Events");
+        GCLog.CORE.info("Registered GC Events");
     }
 }

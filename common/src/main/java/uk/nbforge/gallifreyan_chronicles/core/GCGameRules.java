@@ -10,7 +10,7 @@ import net.minecraft.world.level.gamerules.GameRule;
 import net.minecraft.world.level.gamerules.GameRuleCategory;
 import net.minecraft.world.level.gamerules.GameRuleType;
 import net.minecraft.world.level.gamerules.GameRuleTypeVisitor;
-import uk.nbforge.gallifreyan_chronicles.Constants;
+import uk.nbforge.gallifreyan_chronicles.util.GCLog;
 import uk.nbforge.gallifreyan_chronicles.util.GCUtil;
 
 public class GCGameRules {
@@ -34,6 +34,6 @@ public class GCGameRules {
     }
 
     public static void registerGameRules() {
-        Constants.LOG.info("Registered GC Game Rules");
+        GCLog.CORE.info("Registered GC Game Rules");
     }
 }

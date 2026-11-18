@@ -41,10 +41,7 @@ public final class TardisDyslexia {
         practise(tardis);
     }
 
-    /**
-     * The chance starts high and drops towards the minimum as it gains experience.
-     * skill goes from 0 to 1.
-     */
+    /** chance starts high and drops towards the minimum as it gets more experience, skill goes 0 to 1 */
     public static float calmChance(float skill) {
         return FLOOR_CHANCE + (NEW_CHANCE - FLOOR_CHANCE) * (1f - skill);
     }

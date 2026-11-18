@@ -58,10 +58,10 @@ public final class FadeTypes {
         return getAll().size();
     }
 
-    public static boolean contains(@Nullable String id) {
-        if (id == null) return false;
+    public static boolean isUnknown(@Nullable String id) {
+        if (id == null) return true;
         String key = normalize(id);
-        return LOADED.containsKey(key) || BUILT_IN.containsKey(key);
+        return !LOADED.containsKey(key) && !BUILT_IN.containsKey(key);
     }
 
     public static FadeType get(@Nullable String id) {

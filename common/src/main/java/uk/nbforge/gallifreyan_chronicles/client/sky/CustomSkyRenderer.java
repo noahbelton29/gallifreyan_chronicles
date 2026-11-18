@@ -33,7 +33,7 @@ import org.joml.Vector3f;
 import org.joml.Vector3fc;
 import org.joml.Vector4f;
 import org.jspecify.annotations.Nullable;
-import uk.nbforge.gallifreyan_chronicles.Constants;
+import uk.nbforge.gallifreyan_chronicles.client.compat.iris.IrisCompat;
 import uk.nbforge.gallifreyan_chronicles.client.util.DetailLevelUtil;
 import uk.nbforge.gallifreyan_chronicles.codec.HexColorCodec;
 import uk.nbforge.gallifreyan_chronicles.compat.portal.TardisPortalBridge;
@@ -45,6 +45,7 @@ import uk.nbforge.gallifreyan_chronicles.sky.data.SkyBody;
 import uk.nbforge.gallifreyan_chronicles.sky.data.SkyOrbit;
 import uk.nbforge.gallifreyan_chronicles.sky.data.SkyStars;
 import uk.nbforge.gallifreyan_chronicles.sky.shader.ShaderSky;
+import uk.nbforge.gallifreyan_chronicles.util.GCLog;
 
 public final class CustomSkyRenderer {
     private static final float BODY_DISTANCE = 100.0f;
@@ -78,7 +79,7 @@ public final class CustomSkyRenderer {
 
         SkyShaderCompat.assignPipelines();
         boolean onCanvas = sky.shaderSky() == ShaderSky.PACK
-                && SkyShaderCompat.isShaderPackInUse()
+                && IrisCompat.shaderPackInUse()
                 && !TardisPortalBridge.isRenderingAnyPortal();
         if (onCanvas) {
             canvasState = state;
@@ -126,9 +127,9 @@ public final class CustomSkyRenderer {
         canvasDepthFar = depthFar;
     }
 
-    /** Mid frame while the camera is still the world one, draw the sky on its own canvas behind the world. */
+    /** mid frame while the camera is still the world one, draws the sky on its own canvas behind the world */
     public static void drawCanvas(RenderTarget main) {
-        if (TardisPortalBridge.isRenderingAnyPortal() || SkyShaderCompat.isRenderingShadowPass()) return;
+        if (TardisPortalBridge.isRenderingAnyPortal() || IrisCompat.renderingShadowPass()) return;
         SkyRenderState state = canvasState;
         GpuBufferSlice fog = canvasFog;
         ClientLevel canvasFor = canvasLevel;
@@ -173,7 +174,7 @@ public final class CustomSkyRenderer {
         canvasWaiting = true;
     }
 
-    /** After the last pass of the shader pack, lay the sky canvas on. */
+    /** after the last shader pack pass, lays the sky canvas on */
     public static void afterShaders(RenderTarget main) {
         if (!canvasWaiting) return;
         canvasWaiting = false;
@@ -263,7 +264,7 @@ public final class CustomSkyRenderer {
     private static void warnMissingBody(SkyBody entry) {
         entry.body().ifPresent(id -> {
             if (MISSING_BODIES.add(id)) {
-                Constants.LOG.warn("Dimension sky references unknown celestial body {}", id);
+                GCLog.CLIENT.warn("Dimension sky references unknown celestial body {}", id);
             }
         });
     }

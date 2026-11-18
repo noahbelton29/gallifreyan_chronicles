@@ -16,8 +16,8 @@ import net.minecraft.client.gui.components.events.GuiEventListener;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.TitleScreen;
 import net.minecraft.network.chat.Component;
-import uk.nbforge.gallifreyan_chronicles.Constants;
 import uk.nbforge.gallifreyan_chronicles.client.gui.title.GCButton;
+import uk.nbforge.gallifreyan_chronicles.util.GCLog;
 
 public final class EssentialMenuCompat {
     private static final String PROXY_CLASS = "gg.essential.gui.proxies.EssentialProxyElement";
@@ -123,8 +123,8 @@ public final class EssentialMenuCompat {
 
         if (!proxies.isEmpty() && !loggedFound) {
             loggedFound = true;
-            Constants.LOG.info(
-                    "[GC] Essential menu: tucking {} Essential buttons away on {}",
+            GCLog.COMPAT.info(
+                    "Essential menu: tucking {} Essential buttons away on {}",
                     proxies.size(),
                     screen.getClass().getSimpleName());
         }
@@ -277,6 +277,6 @@ public final class EssentialMenuCompat {
     private static void logFailure(Exception e) {
         if (loggedFailure) return;
         loggedFailure = true;
-        Constants.LOG.warn("[GC] Essential menu compatibility failed", e);
+        GCLog.COMPAT.warn("Essential menu compatibility failed", e);
     }
 }

@@ -17,9 +17,9 @@ import uk.nbforge.gallifreyan_chronicles.core.data_registry.TardisDoorRegistry;
 import uk.nbforge.gallifreyan_chronicles.tardis.door.TardisDoorVariant;
 
 /**
- * Immersive Portals also carries sounds through portals.
- * The interior door sounds reach 10 blocks so outside you heard them up to 10 blocks away.
- * The main door sound is already played outside by us within the range of the hum, see InteriorDoorBlockEntity playThroughExterior, so do not carry door sounds across.
+ * immersive portals carries sounds thru portals too. interior door sounds reach 10 blocks so outside u heard them up to
+ * 10 blocks away. the main door sound already plays outside within hum range (see InteriorDoorBlockEntity
+ * playThroughExterior) so dont carry door sounds across
  */
 @Pseudo
 @Mixin(targets = "qouteall.imm_ptl.core.teleportation.CrossPortalSound", remap = false)

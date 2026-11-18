@@ -30,13 +30,13 @@ import net.minecraft.client.renderer.rendertype.RenderType;
 import net.minecraft.resources.Identifier;
 import org.joml.Vector4f;
 import org.jspecify.annotations.Nullable;
-import uk.nbforge.gallifreyan_chronicles.Constants;
+import uk.nbforge.gallifreyan_chronicles.client.compat.iris.IrisCompat;
 import uk.nbforge.gallifreyan_chronicles.client.lifecycle.ClientState;
-import uk.nbforge.gallifreyan_chronicles.client.sky.SkyShaderCompat;
 import uk.nbforge.gallifreyan_chronicles.compat.portal.TardisPortalBridge;
+import uk.nbforge.gallifreyan_chronicles.util.GCLog;
 import uk.nbforge.gallifreyan_chronicles.util.GCUtil;
 
-/** The box only hides its own back faces, so water and clouds still draw. */
+/** box only hides its own back faces so water and clouds still draw */
 public final class FadeBoxRenderer {
     private static final String NAME = "gc_fading_box";
     private static final String GLOW_NAME = "gc_fading_glow";
@@ -122,16 +122,14 @@ public final class FadeBoxRenderer {
     }
 
     private static VertexFormat writtenFormat() {
-        if (SkyShaderCompat.isShaderPackInUse()) {
+        if (IrisCompat.shaderPackInUse()) {
             VertexFormat iris = irisEntityFormat();
             if (iris != null) return iris;
         }
         return DefaultVertexFormat.ENTITY;
     }
 
-    /**
-     * The bigger entity format from Iris, looked up by name so the mod works without Iris.
-     */
+    /** iris's bigger entity format, looked up by name so theres no hard dependency on iris */
     private static @Nullable VertexFormat irisEntityFormat() {
         if (!irisFormatLooked) {
             irisFormatLooked = true;
@@ -141,8 +139,8 @@ public final class FadeBoxRenderer {
                         .get(null);
                 if (value instanceof VertexFormat format) irisFormat = format;
             } catch (ReflectiveOperationException | LinkageError e) {
-                Constants.LOG.warn(
-                        "Could not find the Iris entity vertex format, the fading TARDIS may look wrong with shaders",
+                GCLog.CLIENT.warn(
+                        "Couldn't find the Iris entity vertex format, the fading TARDIS may look wrong with shaders",
                         e);
             }
         }
@@ -183,9 +181,8 @@ public final class FadeBoxRenderer {
     private FadeBoxRenderer() {}
 
     /**
-     * How the fading box is drawn.
-     * CANVAS uses its own canvas over the world, same look with and without shaders.
-     * MASK is the old depth mask way, only used for views through a portal.
+     * CANVAS draws on its own canvas over the world, same look with or without shaders. MASK is the old depth mask way,
+     * only used for views thru a portal
      */
     public enum Mode {
         CANVAS,
@@ -223,11 +220,9 @@ public final class FadeBoxRenderer {
                                 .createRenderSetup()));
     }
 
-    /**
-     * Replaces the normal draw, true means we kept it for later.
-     */
+    /** replaces the normal draw, true means it got held for later */
     public static boolean hold(PreparedRenderType type, StagedVertexBuffer.ExecuteInfo info) {
-        if (drawingOurOwn || SkyShaderCompat.isRenderingShadowPass()) return false;
+        if (drawingOurOwn || IrisCompat.renderingShadowPass()) return false;
         if (NAME.equals(type.name())) {
             HELD.add(new Held(type, info));
             return true;
@@ -264,16 +259,14 @@ public final class FadeBoxRenderer {
         if (!HELD_ORBS.isEmpty()) drawOrbs(main, target);
         if (!HELD.isEmpty()) drawBoxes(target);
 
-        if (SkyShaderCompat.isShaderPackInUse()) {
+        if (IrisCompat.shaderPackInUse()) {
             canvasWaiting = true;
             return;
         }
         layCanvas(main);
     }
 
-    /**
-     * After the last pass of the shader pack, the same point vanilla draws mob outlines.
-     */
+    /** after the last shader pack pass, same point vanilla draws mob outlines */
     public static void afterShaders(RenderTarget main) {
         if (!canvasWaiting) return;
         canvasWaiting = false;
@@ -287,9 +280,7 @@ public final class FadeBoxRenderer {
     private static boolean boxesDrawn;
     private static boolean orbsDrawn;
 
-    /**
-     * The box canvas first, then the orbs on top so they are always in front.
-     */
+    /** box canvas first then the orbs on top so theyre always in front */
     private static void layCanvas(RenderTarget main) {
         if (boxesDrawn && canvas != null) composite(main, canvas, COMPOSITE_PIPELINE);
         if (orbsDrawn && orbCanvas != null) composite(main, orbCanvas, ORB_COMPOSITE_PIPELINE);
@@ -297,9 +288,7 @@ public final class FadeBoxRenderer {
         orbsDrawn = false;
     }
 
-    /**
-     * The world depth, so walls, water and clouds in front still hide the box and orb.
-     */
+    /** world depth so walls, water and clouds in front still hide the box and orb */
     private static void copyWorldDepth(RenderTarget main, TextureTarget target) {
         var nearest = RenderSystem.getSamplerCache().getClampToEdge(FilterMode.NEAREST);
         assert target.getDepthTextureView() != null;
@@ -315,7 +304,7 @@ public final class FadeBoxRenderer {
     }
 
     /**
-     * The orbs on their own canvas, tested against the world only before the box goes in so the box can never cover them.
+     * orbs get their own canvas and only test against the world before the box goes in, so the box can never cover them
      */
     private static void drawOrbs(RenderTarget main, TextureTarget depthSource) {
         TextureTarget target = orbCanvasFor(main);
@@ -372,9 +361,7 @@ public final class FadeBoxRenderer {
         boxesDrawn = true;
     }
 
-    /**
-     * Same as the game draw but with our pipeline so the vertex format matches.
-     */
+    /** same as the game draw but with the mod's own pipeline so the vertex format matches */
     private static void draw(Held held, RenderPass pass, RenderPipeline pipeline) {
         PreparedRenderType type = held.type();
         StagedVertexBuffer.ExecuteInfo info = held.info();

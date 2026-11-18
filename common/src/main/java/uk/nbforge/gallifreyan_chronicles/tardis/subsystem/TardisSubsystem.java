@@ -11,7 +11,7 @@ public abstract class TardisSubsystem {
     private final String id;
     private final List<String> oldIds;
 
-    /** oldIds are ids this subsystem used to be saved under, they still load and work in commands. */
+    /** oldIds are ids this subsystem used to be saved under, they still load and work in commands */
     protected TardisSubsystem(String id, String... oldIds) {
         this.id = id;
         this.oldIds = List.of(oldIds);

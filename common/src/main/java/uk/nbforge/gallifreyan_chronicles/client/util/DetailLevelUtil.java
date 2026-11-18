@@ -6,6 +6,6 @@ public final class DetailLevelUtil {
     private DetailLevelUtil() {}
 
     public static boolean lowDetail() {
-        return !RenderCapability.verified();
+        return RenderCapability.unverified();
     }
 }

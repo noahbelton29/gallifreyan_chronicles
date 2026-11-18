@@ -12,11 +12,11 @@ import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.world.phys.Vec3;
 import org.jspecify.annotations.Nullable;
-import uk.nbforge.gallifreyan_chronicles.Constants;
 import uk.nbforge.gallifreyan_chronicles.codec.Vec3Codec;
 import uk.nbforge.gallifreyan_chronicles.core.data_registry.TardisConsoleRegistry;
 import uk.nbforge.gallifreyan_chronicles.core.entity.TardisControlEntity;
 import uk.nbforge.gallifreyan_chronicles.loader.IdentifiableData;
+import uk.nbforge.gallifreyan_chronicles.util.GCLog;
 
 public record TardisConsole(
         String id, List<ControlEntry> controls, String defaultVariant, List<GlowGroup> glowGroups, int sortOrder)
@@ -191,7 +191,7 @@ public record TardisConsole(
             }
             ConsoleHitboxBones.Box box = boxes.get(e.id());
             if (box == null) {
-                Constants.LOG.warn(
+                GCLog.TARDIS.warn(
                         "Console {} control '{}' has no position and no '{}{}' bone",
                         consoleId,
                         e.id(),

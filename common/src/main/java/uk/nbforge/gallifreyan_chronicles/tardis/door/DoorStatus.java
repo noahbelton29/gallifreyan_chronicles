@@ -3,7 +3,7 @@ package uk.nbforge.gallifreyan_chronicles.tardis.door;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 
-/** The door state and when its animation ends. Only the state is saved, a loaded door is never mid animation. */
+/** only the state is saved, a loaded door is never mid animation */
 public record DoorStatus(DoorState state, long animationEndTime) {
     public static final Codec<DoorStatus> CODEC = RecordCodecBuilder.create(inst -> inst.group(Codec.STRING
                     .xmap(DoorState::valueOf, Enum::name)

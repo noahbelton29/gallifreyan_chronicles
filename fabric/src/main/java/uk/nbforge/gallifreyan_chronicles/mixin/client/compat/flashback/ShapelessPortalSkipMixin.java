@@ -9,8 +9,8 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import uk.nbforge.gallifreyan_chronicles.compat.flashback.FlashbackChunks;
 
 /**
- * In a replay, portals that show up with no shape are never added.
- * Removing them after adding made Seamless Portals crash in its cleanup because unitAxis is null.
+ * in a replay shapeless portals never get added. removing them after adding made seamless portals crash in its cleanup
+ * cuz unitAxis is null
  */
 @Mixin(ClientLevel.class)
 public abstract class ShapelessPortalSkipMixin {

@@ -53,11 +53,6 @@ public final class ExteriorDoors {
         return level != null && level.isClientSide();
     }
 
-    private boolean isServerSide() {
-        Level level = exterior.getLevel();
-        return level != null && !level.isClientSide();
-    }
-
     public DoorState getState() {
         return door.get().state();
     }
@@ -116,7 +111,7 @@ public final class ExteriorDoors {
     }
 
     public void snapShut() {
-        if (!isServerSide()) return;
+        if (exterior.getLevel() == null || isClientSide()) return;
         door.set(DoorMotion.snapToState(door.get(), DoorState.CLOSED));
         exterior.sync();
         doorAnimSeq++;

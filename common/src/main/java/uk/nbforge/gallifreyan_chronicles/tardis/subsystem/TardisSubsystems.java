@@ -9,11 +9,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
-/** A subsystem with no saved health is at full health. */
+/** a subsystem with no saved health is at full health */
 public final class TardisSubsystems {
-    /**
-     * Saved as subsystem id to health, unknown ids are dropped when loading.
-     */
+    /** saved as subsystem id to health, unknown ids get dropped when loading */
     public static final Codec<Map<TardisSubsystem, Float>> HEALTH_CODEC = Codec.unboundedMap(
                     Codec.STRING, Codec.FLOAT.xmap(TardisSubsystems::clamp, health -> health))
             .xmap(

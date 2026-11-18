@@ -12,8 +12,8 @@ import qouteall.q_misc_util.dimension.DimIntIdMap;
 import qouteall.q_misc_util.dimension.DimensionIntId;
 
 /**
- * Flashback makes the TARDIS world partway through a replay and Immersive Portals never gave it a number so the replay server crashed.
- * In a replay we give it a number when it is first asked for.
+ * flashback makes the tardis world partway thru a replay and immersive portals never gave it a number so the replay
+ * server crashed. in a replay it gets one the first time its asked for
  */
 @Pseudo
 @Mixin(targets = "qouteall.imm_ptl.core.api.PortalAPI", remap = false)

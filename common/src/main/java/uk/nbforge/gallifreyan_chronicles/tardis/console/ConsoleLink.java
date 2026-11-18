@@ -5,7 +5,6 @@ import java.util.UUID;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.block.state.BlockState;
-import uk.nbforge.gallifreyan_chronicles.Constants;
 import uk.nbforge.gallifreyan_chronicles.core.GCTardisControls;
 import uk.nbforge.gallifreyan_chronicles.core.block.ConsoleBlock;
 import uk.nbforge.gallifreyan_chronicles.core.block.registry.TardisBlocks;
@@ -14,6 +13,7 @@ import uk.nbforge.gallifreyan_chronicles.core.data_registry.TardisConsoleRegistr
 import uk.nbforge.gallifreyan_chronicles.tardis.Tardis;
 import uk.nbforge.gallifreyan_chronicles.tardis.TardisData;
 import uk.nbforge.gallifreyan_chronicles.tardis.door.DoorSync;
+import uk.nbforge.gallifreyan_chronicles.util.GCLog;
 
 public final class ConsoleLink {
     private ConsoleLink() {}
@@ -69,7 +69,7 @@ public final class ConsoleLink {
 
         Tardis tardis = Tardis.ofLevel(level).orElse(null);
         if (tardis == null) {
-            // Placed outside a TARDIS, still give it its control hitboxes, they only animate, see TardisControlEntity.
+            // placed outside a tardis still gets its control hitboxes, they just animate, see TardisControlEntity
             spawnDefaultControls(console);
             console.sync();
             return;
@@ -120,12 +120,12 @@ public final class ConsoleLink {
     public static void spawnDefaultControls(TardisConsoleBlockEntity console) {
         TardisConsole model = console.getConsole();
         if (model == null) {
-            Constants.LOG.debug("spawnDefaultControls: no console model set");
+            GCLog.TARDIS.debug("spawnDefaultControls: no console model set");
             return;
         }
 
         var entries = model.controls();
-        Constants.LOG.debug("spawnDefaultControls: consoleId={}, {} control entries", model.id(), entries.size());
+        GCLog.TARDIS.debug("spawnDefaultControls: consoleId={}, {} control entries", model.id(), entries.size());
 
         for (TardisConsole.ControlEntry entry : entries) {
             console.addControl(entry.id(), entry.offset(), entry.width(), entry.height(), entry.depth());

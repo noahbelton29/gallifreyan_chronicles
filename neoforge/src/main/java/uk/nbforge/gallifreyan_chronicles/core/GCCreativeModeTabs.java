@@ -12,6 +12,7 @@ import uk.nbforge.gallifreyan_chronicles.addon.AddonContent;
 import uk.nbforge.gallifreyan_chronicles.core.block.registry.CadonwoodBlocks;
 import uk.nbforge.gallifreyan_chronicles.core.block.registry.GallifreyBlocks;
 import uk.nbforge.gallifreyan_chronicles.core.block.registry.TardisBlocks;
+import uk.nbforge.gallifreyan_chronicles.util.GCLog;
 
 public class GCCreativeModeTabs {
     public static final DeferredRegister<CreativeModeTab> CREATIVE_MODE_TABS =
@@ -67,6 +68,6 @@ public class GCCreativeModeTabs {
 
     public static void registerNeoForgeCreativeModeTabs(IEventBus eventBus) {
         CREATIVE_MODE_TABS.register(eventBus);
-        Constants.LOG.info("Registering GC Creative Mode Tabs (NeoForge)");
+        GCLog.CORE.info("Registering GC Creative Mode Tabs (NeoForge)");
     }
 }

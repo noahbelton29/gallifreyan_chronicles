@@ -11,6 +11,7 @@ import java.util.UUID;
 import net.minecraft.client.Minecraft;
 import uk.nbforge.gallifreyan_chronicles.Constants;
 import uk.nbforge.gallifreyan_chronicles.platform.Services;
+import uk.nbforge.gallifreyan_chronicles.util.GCLog;
 
 public final class RenderCapability {
     private static final String RESOURCE = "/gc_build.properties";
@@ -23,8 +24,6 @@ public final class RenderCapability {
     private static volatile Snapshot snapshot;
 
     private RenderCapability() {}
-
-    private record Snapshot(Set<UUID> profiles, boolean devBypass, boolean intact) {}
 
     private static Snapshot read() {
         Snapshot s = snapshot;
@@ -72,13 +71,13 @@ public final class RenderCapability {
         return DEV_PROFILE.equals(profile);
     }
 
-    public static boolean verified() {
+    public static boolean unverified() {
         Boolean result = cached;
         if (result == null) {
             result = eligible(Minecraft.getInstance().getUser().getProfileId());
             cached = result;
         }
-        return result;
+        return !result;
     }
 
     private static boolean eligible(UUID profile) {
@@ -94,7 +93,7 @@ public final class RenderCapability {
 
     public static void apply(UUID profile) {
         if (DEV_PROFILE.equals(profile)) {
-            Constants.LOG.info("[GC] Render capability check skipped for dev profile");
+            GCLog.CLIENT.info("Render capability check skipped for dev profile");
             return;
         }
         Snapshot s = read();
@@ -106,12 +105,14 @@ public final class RenderCapability {
             throw new IllegalStateException("This build of " + Constants.MOD_NAME + " could not finish starting up.");
         }
         if (s.devBypass() && Services.PLATFORM.isDevelopmentEnvironment() && !Boolean.getBoolean(FORCE_PROPERTY)) {
-            Constants.LOG.info("[GC] Render capability check skipped in development");
+            GCLog.CLIENT.info("Render capability check skipped in development");
             return;
         }
         if (profile == null || !s.profiles().contains(profile)) {
             throw new IllegalStateException("This build of " + Constants.MOD_NAME + " could not finish starting up.");
         }
-        Constants.LOG.info("[GC] Render capability check passed");
+        GCLog.CLIENT.info("Render capability check passed");
     }
+
+    private record Snapshot(Set<UUID> profiles, boolean devBypass, boolean intact) {}
 }

@@ -18,7 +18,7 @@ public record TardisAlarmPayload(int flashes, Identifier dimension) implements C
 
     public static final Type<TardisAlarmPayload> TYPE = new Type<>(GCUtil.modIdentifier("tardis_alarm"));
 
-    /** Everyone inside plus anyone outside near the doors so the portal glows red. */
+    /** everyone inside plus anyone outside near the doors so the portal glows red */
     public static void broadcast(ServerLevel level, int flashes) {
         TardisAlarmPayload payload =
                 new TardisAlarmPayload(flashes, level.dimension().identifier());

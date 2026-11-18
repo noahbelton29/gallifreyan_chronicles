@@ -8,7 +8,9 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import uk.nbforge.gallifreyan_chronicles.compat.flashback.FlashbackChunks;
 
-/** In a replay the client must never throw its chunks away because nothing sends them again, see FlashbackChunks keepChunk. */
+/**
+ * in a replay the client must never throw its chunks away cuz nothing sends them again, see FlashbackChunks keepChunk
+ */
 @Pseudo
 @Mixin(targets = "qouteall.imm_ptl.core.chunk_loading.ImmPtlClientChunkMap", remap = false)
 public abstract class ImmPtlKeepChunksMixin {

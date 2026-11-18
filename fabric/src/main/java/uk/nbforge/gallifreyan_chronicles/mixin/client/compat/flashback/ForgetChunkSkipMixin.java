@@ -9,9 +9,9 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import uk.nbforge.gallifreyan_chronicles.compat.flashback.FlashbackChunks;
 
 /**
- * The recording has forget chunk packets in it from Immersive Portals.
- * In a replay nothing sends those chunks again and the packet also turns the light off for them so they stop drawing, so in a replay we skip it.
- * thanks for that immersive portals, really helpful.
+ * the recording has forget chunk packets in it from immersive portals. in a replay nothing sends those chunks again and
+ * the packet also turns the light off for them so they stop drawing, so in a replay it gets skipped. thanks for that
+ * immersive portals, really helpful
  */
 @Mixin(ClientPacketListener.class)
 public abstract class ForgetChunkSkipMixin {

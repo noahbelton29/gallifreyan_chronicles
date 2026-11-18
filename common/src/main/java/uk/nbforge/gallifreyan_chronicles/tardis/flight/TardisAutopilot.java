@@ -55,13 +55,12 @@ public final class TardisAutopilot {
         }
 
         int ticks = UNOCCUPIED_TICKS.merge(id, CHECK_TICKS, Integer::sum);
-        if (ticks < UNOCCUPIED_TICKS_BEFORE_LANDING || !tardis.land()) {
-            schedule(server, id);
+        if (ticks >= UNOCCUPIED_TICKS_BEFORE_LANDING && tardis.land()) {
+            FLYING.remove(id);
+            UNOCCUPIED_TICKS.remove(id);
             return;
         }
-
-        FLYING.remove(id);
-        UNOCCUPIED_TICKS.remove(id);
+        schedule(server, id);
     }
 
     private static boolean occupied(Tardis tardis) {

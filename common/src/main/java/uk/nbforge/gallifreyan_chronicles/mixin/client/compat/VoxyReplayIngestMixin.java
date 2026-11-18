@@ -8,9 +8,9 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import uk.nbforge.gallifreyan_chronicles.client.compat.replay.PortalReplay;
 
 /**
- * Voxy learns far terrain from every chunk the game loads.
- * In a replay with Immersive Portals the chunks come in odd ways, from other worlds, kept chunks and snapshot extras, and that messed up the terrain of Voxy.
- * So in those replays Voxy only shows what it already knows and does not learn from the replay.
+ * voxy learns far terrain from every chunk the game loads. in a replay with immersive portals the chunks come in weird
+ * ways (other worlds, kept chunks, snapshot extras) and it fucked up voxy's terrain. so in those replays voxy only
+ * shows what it already knows and doesnt learn from the replay
  */
 @Pseudo
 @Mixin(targets = "me.cortex.voxy.common.world.service.VoxelIngestService", remap = false)

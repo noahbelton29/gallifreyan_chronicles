@@ -32,7 +32,7 @@ public final class TardisTraits {
         return Optional.ofNullable(ALL.get(MindIds.normalize(id)));
     }
 
-    /** Traits that a datapack removed are just skipped. */
+    /** traits a datapack removed just get skipped */
     public static List<TardisTrait> of(List<String> ids) {
         return ids.stream().map(TardisTraits::byId).flatMap(Optional::stream).toList();
     }

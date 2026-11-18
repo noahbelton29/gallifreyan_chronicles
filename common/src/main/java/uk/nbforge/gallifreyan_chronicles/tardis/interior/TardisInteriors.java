@@ -27,7 +27,6 @@ import net.minecraft.world.level.levelgen.structure.templatesystem.StructureTemp
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import org.jspecify.annotations.Nullable;
-import uk.nbforge.gallifreyan_chronicles.Constants;
 import uk.nbforge.gallifreyan_chronicles.compat.portal.TardisPortalBridge;
 import uk.nbforge.gallifreyan_chronicles.core.block.InteriorDoorBlock;
 import uk.nbforge.gallifreyan_chronicles.core.block.registry.TardisBlocks;
@@ -44,6 +43,7 @@ import uk.nbforge.gallifreyan_chronicles.tardis.console.ConsoleLink;
 import uk.nbforge.gallifreyan_chronicles.tardis.console.TardisConsole;
 import uk.nbforge.gallifreyan_chronicles.tardis.door.DoorState;
 import uk.nbforge.gallifreyan_chronicles.tardis.door.DoorSync;
+import uk.nbforge.gallifreyan_chronicles.util.GCLog;
 
 public final class TardisInteriors {
     private static final double ZONE_NEAR = -0.5;
@@ -155,7 +155,7 @@ public final class TardisInteriors {
     public static Arrival arrival(Tardis tardis, ServerLevel interior) {
         BlockPos doorPos = locateInteriorDoor(tardis, interior);
         if (doorPos == null) {
-            Constants.LOG.warn("no interior door found for tardis {}, arriving at interior origin", tardis.id());
+            GCLog.TARDIS.warn("No interior door found for TARDIS {}, arriving at interior origin", tardis.id());
             return new Arrival(Vec3.atBottomCenterOf(ORIGIN.above()), 0.0f);
         }
         BlockState state = interior.getBlockState(doorPos);
@@ -178,7 +178,7 @@ public final class TardisInteriors {
         return findInteriorDoor(tardis, interior);
     }
 
-    /** Use {@link Tardis#interior()}, this is what it reads. */
+    /** use {@link Tardis#interior()}, this is what it reads */
     public static TardisInterior getInteriorDefinition(Tardis tardis) {
         TardisData data = tardis.data();
         String stored = data.getInteriorId();
@@ -199,7 +199,7 @@ public final class TardisInteriors {
             buildInteriorIfMissing(tardis, interior);
             return interior;
         } catch (Exception e) {
-            Constants.LOG.error("failed to prepare tardis interior {}", tardis.id(), e);
+            GCLog.TARDIS.error("Couldn't prepare TARDIS interior {}", tardis.id(), e);
             return null;
         }
     }
@@ -245,7 +245,7 @@ public final class TardisInteriors {
         Optional<StructureTemplate> template =
                 interior.getServer().getStructureTemplateManager().get(templateId);
         if (template.isEmpty()) {
-            Constants.LOG.error("missing interior template {}", templateId);
+            GCLog.TARDIS.error("Missing interior template {}", templateId);
             return false;
         }
 
@@ -274,7 +274,7 @@ public final class TardisInteriors {
             ConsoleLink.spawnDefaultControls(console);
             console.sync();
         } else {
-            Constants.LOG.error("no console block entity at {} in tardis interior", consolePos);
+            GCLog.TARDIS.error("No console block entity at {} in TARDIS interior", consolePos);
         }
 
         data.setInteriorOrigin(origin);
@@ -300,7 +300,7 @@ public final class TardisInteriors {
     }
 
     public static ChangeResult changeInterior(Tardis tardis, String newId) {
-        if (!TardisInteriorRegistry.contains(newId)) return ChangeResult.UNKNOWN_INTERIOR;
+        if (TardisInteriorRegistry.isUnknown(newId)) return ChangeResult.UNKNOWN_INTERIOR;
 
         MinecraftServer server = tardis.server();
         TardisData data = tardis.data();

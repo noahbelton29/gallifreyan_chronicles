@@ -26,10 +26,9 @@ import uk.nbforge.gallifreyan_chronicles.tardis.mind.TardisMinds;
 import uk.nbforge.gallifreyan_chronicles.util.SchedulerUtil;
 
 /**
- * The alarm runs while the cloister bell control is on, so anything that wants the alarm flips that control,
- * and switching the control off silences it.
- * An alarm started by something else turns the control back off by itself after a set number of flashes,
- * when the TARDIS calms down, or when a crashed TARDIS is repaired.
+ * the alarm runs while the cloister bell control is on, so anything that wants the alarm flips that control and
+ * switching it off silences it. an alarm started by something else turns the control back off by itself after a set
+ * number of flashes, when the tardis calms down, or when a crashed tardis is repaired
  */
 public final class TardisAlarm {
     public static final int FLASH_TICKS = 30;
@@ -43,9 +42,7 @@ public final class TardisAlarm {
 
     private static final double LEAK_RANGE = 32.0;
 
-    /**
-     * Why the alarm is ringing, which decides when it stops on its own. Later ones win over earlier ones.
-     */
+    /** why the alarm is ringing, decides when it stops on its own. later ones win over earlier ones */
     private enum Mode {
         TIMED,
         UNTIL_CALM,
@@ -131,8 +128,8 @@ public final class TardisAlarm {
     }
 
     /**
-     * So alarms start again after the server restarts.
-     * A crashed TARDIS rings until repaired; any other alarm was lost with the restart so the control goes back off.
+     * so alarms start again after a restart. a crashed tardis rings until repaired, any other alarm got lost with the
+     * restart so the control goes back off
      */
     public static void resumeCrashAlarms(MinecraftServer server) {
         for (Tardis tardis : Tardis.all(server)) {
@@ -190,7 +187,7 @@ public final class TardisAlarm {
     private static void tick(Tardis tardis, Alarm alarm) {
         if (ACTIVE.get(tardis.id()) != alarm) return;
 
-        if (!tardis.exists()) {
+        if (tardis.isDeleted()) {
             ACTIVE.remove(tardis.id());
             return;
         }
@@ -244,9 +241,7 @@ public final class TardisAlarm {
                 player.getRandom().nextLong()));
     }
 
-    /**
-     * The distance is measured from the exterior block position.
-     */
+    /** distance is from the exterior block position */
     public static List<ServerPlayer> playersOutside(ServerLevel interior) {
         Tardis tardis = Tardis.ofLevel(interior).orElse(null);
         if (tardis == null) return List.of();

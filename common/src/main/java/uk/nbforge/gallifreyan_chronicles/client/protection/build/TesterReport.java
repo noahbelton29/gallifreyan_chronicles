@@ -1,6 +1,7 @@
 package uk.nbforge.gallifreyan_chronicles.client.protection.build;
 
-import uk.nbforge.gallifreyan_chronicles.Constants;
+import uk.nbforge.gallifreyan_chronicles.util.GCLog;
+
 import net.minecraft.client.Minecraft;
 
 import java.io.BufferedReader;
@@ -24,10 +25,10 @@ import java.util.TreeSet;
 import java.util.UUID;
 
 /**
-   Logs who is playing, their account id, their name, the build id and the jar hash, every time someone launches this build.
-   While they play, it also notices if a screen recording or screenshot program is running, without being able to tell if it is actually recording.
-   Everything goes to gc_tester_log.jsonl in the game folder, and if report_url in gc_build.properties is set, each line is sent there too.
-*/
+ * logs who's playing (account id, name, build id, jar hash) every time someone launches this build. also notices if a
+ * screen recorder or screenshot program is running, cant tell if its actually recording tho. all goes to
+ * gc_tester_log.jsonl in the game folder, and if report_url is set in gc_build.properties each line gets sent there too
+ */
 public final class TesterReport {
     private static final String REPORT_URL = "";
     private static final String RESOURCE = "/gc_build.properties";
@@ -52,7 +53,7 @@ public final class TesterReport {
 
     public static void start(UUID account, String name) {
         loadSettings();
-        Constants.LOG.info("[GC] Tester report on, logging to {} (uuid, name, build id, jar hash and running recorders)", LOG_FILE);
+        GCLog.TESTER.info("Tester report on, logging to {} (uuid, name, build id, jar hash and running recorders)", LOG_FILE);
 
         Thread thread = new Thread(() -> run(account, name), "GC Tester Report");
         thread.setDaemon(true);
@@ -116,7 +117,7 @@ public final class TesterReport {
         }
     }
 
-    /** Works out the sha-256 of the mod jar, so you know exactly which file someone has. */
+    /** sha-256 of the mod jar so u know exactly which file someone has */
     private static void readJar() {
         try {
             Path jar = Path.of(TesterReport.class.getProtectionDomain().getCodeSource().getLocation().toURI());
@@ -150,7 +151,7 @@ public final class TesterReport {
                     .build();
             client.send(request, HttpResponse.BodyHandlers.discarding());
         } catch (Exception e) {
-            Constants.LOG.warn("[GC] Couldn't send the tester report: {}", e.toString());
+            GCLog.TESTER.warn("Couldn't send the tester report: {}", e.toString());
         }
     }
 
@@ -160,7 +161,7 @@ public final class TesterReport {
             Files.writeString(file, json + System.lineSeparator(),
                     StandardOpenOption.CREATE, StandardOpenOption.APPEND);
         } catch (Exception e) {
-            Constants.LOG.warn("[GC] Couldn't write the tester log: {}", e.toString());
+            GCLog.TESTER.warn("Couldn't write the tester log: {}", e.toString());
         }
     }
 

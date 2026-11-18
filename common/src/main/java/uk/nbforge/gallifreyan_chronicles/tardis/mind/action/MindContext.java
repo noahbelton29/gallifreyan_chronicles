@@ -10,7 +10,7 @@ import org.jspecify.annotations.Nullable;
 import uk.nbforge.gallifreyan_chronicles.tardis.Tardis;
 import uk.nbforge.gallifreyan_chronicles.tardis.mind.TardisMinds.Refusal;
 
-/** Level, player and pos are only there when the hook has them. */
+/** level, player and pos are only there when the hook has them */
 public final class MindContext {
     public final Tardis tardis;
     public final @Nullable ServerLevel level;
@@ -30,7 +30,7 @@ public final class MindContext {
         this.pos = pos;
     }
 
-    /** The player this is about, the one holding the mallet or the pilot. */
+    /** the player this is about, whoevers holding the mallet or the pilot */
     public @Nullable UUID who() {
         return player != null ? player.getUUID() : pilot;
     }
@@ -45,7 +45,7 @@ public final class MindContext {
         if (outside != null && box != null) run.accept(outside, Vec3.atCenterOf(box));
     }
 
-    /** Runs where this happened, or everywhere if it did not happen anywhere like a refusal. */
+    /** runs where this happened, or everywhere if it didnt happen anywhere, like a refusal */
     public void here(BiConsumer<ServerLevel, Vec3> run) {
         if (level != null && pos != null) run.accept(level, pos);
         else everywhere(run);

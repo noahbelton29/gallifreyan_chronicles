@@ -9,7 +9,7 @@ import java.util.Set;
 import org.jspecify.annotations.Nullable;
 import uk.nbforge.gallifreyan_chronicles.Constants;
 
-/** A type can exist without a control, "noop" is only a type, and an unknown control id gives the noop control. */
+/** a type can exist without a control, "noop" is only a type, and an unknown control id gives the noop control */
 public final class TardisControls {
     private static final Map<String, MapCodec<? extends TardisControl>> TYPES = new LinkedHashMap<>();
     private static final Map<MapCodec<? extends TardisControl>, String> TYPE_IDS = new LinkedHashMap<>();
@@ -23,7 +23,7 @@ public final class TardisControls {
         registerControl(id, control);
     }
 
-    /** Also remembers the codec by the control's class, so {@link #codecFor} can find it from the control. */
+    /** also remembers the codec by the control's class so {@link #codecFor} can find it from the control */
     public static void register(
             String id, Class<?> type, MapCodec<? extends TardisControl> codec, TardisControl control) {
         registerType(id, type, codec);

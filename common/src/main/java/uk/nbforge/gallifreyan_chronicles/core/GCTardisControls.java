@@ -3,7 +3,6 @@ package uk.nbforge.gallifreyan_chronicles.core;
 import com.mojang.serialization.JsonOps;
 import com.mojang.serialization.MapCodec;
 import java.util.function.Function;
-import uk.nbforge.gallifreyan_chronicles.Constants;
 import uk.nbforge.gallifreyan_chronicles.tardis.control.BaseControl;
 import uk.nbforge.gallifreyan_chronicles.tardis.control.ControlAnimations;
 import uk.nbforge.gallifreyan_chronicles.tardis.control.ControlPower;
@@ -25,6 +24,7 @@ import uk.nbforge.gallifreyan_chronicles.tardis.control.impl.PowerControl;
 import uk.nbforge.gallifreyan_chronicles.tardis.control.impl.SpaceTimeThrottleControl;
 import uk.nbforge.gallifreyan_chronicles.tardis.control.impl.TimeRotorHandbrakeControl;
 import uk.nbforge.gallifreyan_chronicles.tardis.flight.TardisDestinations.Axis;
+import uk.nbforge.gallifreyan_chronicles.util.GCLog;
 
 public class GCTardisControls {
     public static final String NOOP = "noop";
@@ -69,7 +69,7 @@ public class GCTardisControls {
 
         verifyCodecs();
         ControlPower.validate();
-        Constants.LOG.info("Registered GC TARDIS Controls");
+        GCLog.CORE.info("Registered GC TARDIS Controls");
     }
 
     private static <T extends BaseControl> void control(
@@ -89,8 +89,8 @@ public class GCTardisControls {
             TardisControl.CODEC
                     .encodeStart(JsonOps.INSTANCE, control)
                     .flatMap(json -> TardisControl.CODEC.parse(JsonOps.INSTANCE, json))
-                    .resultOrPartial(error ->
-                            Constants.LOG.warn("TARDIS control '{}' failed its codec round trip: {}", id, error));
+                    .resultOrPartial(
+                            error -> GCLog.CORE.warn("TARDIS control '{}' failed its codec round trip: {}", id, error));
         }
     }
 }

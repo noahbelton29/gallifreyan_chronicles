@@ -7,8 +7,8 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.TitleScreen;
-import uk.nbforge.gallifreyan_chronicles.Constants;
 import uk.nbforge.gallifreyan_chronicles.client.gui.title.ReplayViewerHook;
+import uk.nbforge.gallifreyan_chronicles.util.GCLog;
 
 public final class FlashbackOptionsButton {
     private static final String PACKAGE = "com.moulberry.flashback";
@@ -39,7 +39,7 @@ public final class FlashbackOptionsButton {
         }
     }
 
-    /** Opens the replay list of Flashback, it uses reflection so a renamed class only logs a warning. */
+    /** opens flashback's replay list, uses reflection so a renamed class only logs a warning */
     private static void open() {
         Minecraft minecraft = Minecraft.getInstance();
         Screen current = lastScreen;
@@ -59,9 +59,9 @@ public final class FlashbackOptionsButton {
                     return;
                 }
             }
-            Constants.LOG.warn("Flashback: no constructor of {} that I know how to call", SELECT_SCREEN);
+            GCLog.REPLAY.warn("Flashback: no constructor of {} that I know how to call", SELECT_SCREEN);
         } catch (ReflectiveOperationException | RuntimeException e) {
-            Constants.LOG.warn("Flashback: could not open the replay list", e);
+            GCLog.REPLAY.warn("Flashback: could not open the replay list", e);
         }
     }
 }

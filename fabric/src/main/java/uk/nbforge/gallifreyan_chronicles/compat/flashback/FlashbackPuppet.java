@@ -19,13 +19,13 @@ import net.minecraft.world.phys.Vec3;
 import qouteall.imm_ptl.core.ClientWorldLoader;
 import qouteall.imm_ptl.core.chunk_loading.ImmPtlClientChunkMap;
 import qouteall.imm_ptl.core.portal.Portal;
-import uk.nbforge.gallifreyan_chronicles.Constants;
+import uk.nbforge.gallifreyan_chronicles.util.GCLog;
 
 /**
- * When the recorded player goes into a TARDIS the replay server does not have that world, so Flashback cannot move them.
- * Instead we read their recorded movement and move a copy, the puppet, in the TARDIS world of the client.
- * Immersive Portals then draws it through the door like in the real game.
- * The real player in the overworld is hidden while the puppet is out.
+ * when the recorded player goes into a tardis the replay server doesnt have that world so flashback cant move them.
+ * instead their recorded movement gets read and moves a copy (the puppet) in the client's tardis world, and immersive
+ * portals draws it thru the door like in the real game. the real player in the overworld is hidden while the puppet's
+ * out
  */
 public final class FlashbackPuppet {
     private static final int PUPPET_ID = Integer.MAX_VALUE - 7;
@@ -39,8 +39,8 @@ public final class FlashbackPuppet {
     private static Object lastLevel;
 
     /**
-     * In a replay the renderer sometimes only built part of the world at the start or after jumping on the timeline, leaving holes.
-     * Rebuilding a moment later once the chunks are in fixes it.
+     * in a replay the renderer sometimes only built part of the world at the start or after jumping on the timeline,
+     * leaving holes. rebuilding a moment later once the chunks are in fixes it
      */
     static void scheduleRebuild() {
         rebuildIn = 40;
@@ -86,7 +86,10 @@ public final class FlashbackPuppet {
         }
     }
 
-    /** Marks every chunk section around the camera to be built again, like F3 plus A but that also restarts the renderer of Voxy and this does not. */
+    /**
+     * marks every chunk section around the camera to rebuild, like F3 + A but that also restarts voxy's renderer and
+     * this doesnt
+     */
     private static void rebuildSections(Minecraft client) {
         ClientLevel level = client.level;
         SectionPos camera = SectionPos.of(client.gameRenderer.mainCamera().position());
@@ -100,7 +103,7 @@ public final class FlashbackPuppet {
                 camera.z() + radius);
     }
 
-    /** A portal into a world with no chunks shows as a black door. */
+    /** a portal into a world with no chunks shows as a black door */
     private static boolean allPortalsLeadSomewhere(Minecraft client) {
         if (client.level == null) return true;
         for (Entity entity : client.level.entitiesForRendering()) {
@@ -143,7 +146,7 @@ public final class FlashbackPuppet {
 
     private FlashbackPuppet() {}
 
-    /** Reads the move entities data of Flashback, the caller resets the buffer after. */
+    /** reads flashback's move entities data, the caller resets the buffer after */
     static void scan(ReplayServer server, RegistryFriendlyByteBuf buf) {
         try {
             int localId = server.getLocalPlayerId();
@@ -162,7 +165,7 @@ public final class FlashbackPuppet {
                 }
             }
         } catch (RuntimeException e) {
-            if (++errors <= 3) Constants.LOG.warn("[replay] couldn't read recorded movement: {}", e.toString());
+            if (++errors <= 3) GCLog.REPLAY.warn("Couldn't read recorded movement: {}", e.toString());
         }
     }
 
@@ -202,7 +205,7 @@ public final class FlashbackPuppet {
         }
     }
 
-    /** Client thread. */
+    /** client thread */
     private static void place(
             ResourceKey<Level> dim,
             GameProfile profile,
@@ -233,7 +236,7 @@ public final class FlashbackPuppet {
         return hidden && entity.getId() == realId && entity != puppet;
     }
 
-    /** Client thread. */
+    /** client thread */
     public static void remove() {
         if (puppet == null) return;
         if (!puppet.isRemoved() && puppet.level() instanceof ClientLevel level) {

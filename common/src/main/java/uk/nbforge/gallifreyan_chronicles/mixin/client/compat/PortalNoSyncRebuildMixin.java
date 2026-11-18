@@ -7,9 +7,9 @@ import org.spongepowered.asm.mixin.Pseudo;
 import org.spongepowered.asm.mixin.injection.At;
 
 /**
- * The first time a portal draws, Immersive Portals made Sodium build every chunk on the main thread in that one frame so the view was not empty, and that is the freeze when a portal shows up.
- * Skip it, the chunks just build in the background instead.
- * this freeze was a nightmare to track down.
+ * first time a portal draws, immersive portals made sodium build every chunk on the main thread in that one frame so
+ * the view wasnt empty, thats the freeze when a portal shows up. skip it, chunks just build in the background instead.
+ * this freeze was a nightmare to track down
  */
 @Pseudo
 @Mixin(targets = "qouteall.imm_ptl.core.compat.sodium_compatibility.SodiumContextRegistry", remap = false)

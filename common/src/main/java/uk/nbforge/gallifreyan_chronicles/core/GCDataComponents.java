@@ -8,8 +8,8 @@ import net.minecraft.core.Registry;
 import net.minecraft.core.UUIDUtil;
 import net.minecraft.core.component.DataComponentType;
 import net.minecraft.core.registries.BuiltInRegistries;
-import uk.nbforge.gallifreyan_chronicles.Constants;
 import uk.nbforge.gallifreyan_chronicles.core.item.tooltip.ItemInfoTooltip;
+import uk.nbforge.gallifreyan_chronicles.util.GCLog;
 import uk.nbforge.gallifreyan_chronicles.util.GCUtil;
 
 public class GCDataComponents {
@@ -70,6 +70,6 @@ public class GCDataComponents {
     }
 
     public static void registerDataComponents() {
-        Constants.LOG.info("Registered GC Data Components");
+        GCLog.CORE.info("Registered GC Data Components");
     }
 }

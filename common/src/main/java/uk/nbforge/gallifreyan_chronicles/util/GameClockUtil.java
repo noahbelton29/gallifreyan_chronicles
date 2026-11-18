@@ -5,8 +5,8 @@ import net.minecraft.world.level.Level;
 import org.jspecify.annotations.Nullable;
 
 /**
- * The game time of the server is the same in every world but on the client only the world you stand in keeps its time up to date.
- * A world you only see through a portal or left a while ago has an old time so fades worked out against it were way off.
+ * server game time is the same in every world but on the client only the world u stand in keeps its time up to date. a
+ * world u only see thru a portal or left a while ago has an old time so fades worked out against it were way off
  */
 public final class GameClockUtil {
     private static volatile @Nullable LongSupplier client;

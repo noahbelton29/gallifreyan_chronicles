@@ -6,7 +6,10 @@ import net.minecraft.world.phys.Vec3;
 import org.jspecify.annotations.Nullable;
 import uk.nbforge.gallifreyan_chronicles.tardis.TardisDimensionUtil;
 
-/** In a Flashback replay the camera is the listener and once it flies through a door it hears the TARDIS world instead of the overworld, the replay side sets the override. */
+/**
+ * in a flashback replay the camera is the listener and once it flies thru a door it hears the tardis world instead of
+ * the overworld, the replay side sets the override
+ */
 public final class SoundListener {
     public interface Override {
         @Nullable

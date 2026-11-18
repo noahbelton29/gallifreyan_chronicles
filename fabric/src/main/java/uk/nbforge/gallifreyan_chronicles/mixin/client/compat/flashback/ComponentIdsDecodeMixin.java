@@ -9,8 +9,8 @@ import org.spongepowered.asm.mixin.injection.At;
 import uk.nbforge.gallifreyan_chronicles.compat.flashback.ReplayComponentIds;
 
 /**
- * Reads item component numbers the way the recording did while a replay reads its packets, see ReplayComponentIds.
- * Ordinal 0 is added components and 2 is removed ones, ordinal 1 is the value of the component.
+ * reads item component numbers the way the recording did while a replay reads its packets, see ReplayComponentIds.
+ * ordinal 0 is added components, 2 is removed ones, 1 is the component's value
  */
 @Mixin(targets = "net.minecraft.core.component.DataComponentPatch$3")
 public abstract class ComponentIdsDecodeMixin {
@@ -43,7 +43,8 @@ public abstract class ComponentIdsDecodeMixin {
     }
 
     private static Object read(StreamCodec<?, ?> codec, Object buf, Operation<Object> original) {
-        if (!ReplayComponentIds.translating()) return original.call(codec, buf);
-        return ReplayComponentIds.byRecordedId(((RegistryFriendlyByteBuf) buf).readVarInt());
+        if (ReplayComponentIds.translating())
+            return ReplayComponentIds.byRecordedId(((RegistryFriendlyByteBuf) buf).readVarInt());
+        return original.call(codec, buf);
     }
 }

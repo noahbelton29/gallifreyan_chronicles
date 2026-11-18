@@ -10,8 +10,8 @@ import qouteall.imm_ptl.core.portal.Portal;
 import uk.nbforge.gallifreyan_chronicles.compat.portal.TardisPortalBridge;
 
 /**
- * Applies the Portal Render Distance and Max Rendered Portals video settings to TARDIS door portals.
- * Immersive Portals decides per frame and per portal whether to skip rendering it and we add our own limits there.
+ * applies the Portal Render Distance and Max Rendered Portals video settings to tardis door portals. immersive portals
+ * decides per frame per portal whether to skip it and the tardis limits get added there
  */
 @Pseudo
 @Mixin(targets = "qouteall.imm_ptl.core.render.renderer.PortalRenderer", remap = false)

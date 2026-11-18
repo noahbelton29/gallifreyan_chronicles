@@ -8,8 +8,8 @@ import org.spongepowered.asm.mixin.Mixin;
 import uk.nbforge.gallifreyan_chronicles.compat.flashback.FlashbackChunks;
 
 /**
- * In a replay entity ids can get mixed up between worlds so entity data can land on the wrong entity and kick you out, in a replay we just skip it.
- * not pretty but it stops the crash.
+ * in a replay entity ids can get mixed up between worlds so entity data lands on the wrong entity and kicks u out, so
+ * in a replay it just gets skipped. not pretty but it stops the crash
  */
 @Mixin(ClientPacketListener.class)
 public abstract class EntityDataSkipMixin {

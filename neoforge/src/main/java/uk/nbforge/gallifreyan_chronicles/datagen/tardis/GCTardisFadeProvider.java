@@ -13,7 +13,7 @@ public class GCTardisFadeProvider extends GCJsonDataProvider {
     protected void addEntries() {
         fade("classicwho");
         pulse("newwho");
-        // name, pulse_ticks, pulse_ramp, pulse_depth, takeoff_delay_ticks, fade_out_ticks, fade_in_ticks.
+        // name, pulse_ticks, pulse_ramp, pulse_depth, takeoff_delay_ticks, fade_out_ticks, fade_in_ticks
         pulse("slow_pulse", 60, 1.5, 0.7, 40, 300, 360);
     }
 

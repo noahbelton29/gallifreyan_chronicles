@@ -3,9 +3,9 @@ package uk.nbforge.gallifreyan_chronicles.core.world.gen;
 import net.fabricmc.fabric.api.biome.v1.BiomeModifications;
 import net.fabricmc.fabric.api.biome.v1.BiomeSelectors;
 import net.minecraft.world.level.levelgen.GenerationStep;
-import uk.nbforge.gallifreyan_chronicles.Constants;
 import uk.nbforge.gallifreyan_chronicles.core.GCBiomes;
 import uk.nbforge.gallifreyan_chronicles.core.world.world_features.GCPlacedFeatures;
+import uk.nbforge.gallifreyan_chronicles.util.GCLog;
 
 public class GCSurfaceGeneration {
     public static void generateSurface() {
@@ -31,6 +31,6 @@ public class GCSurfaceGeneration {
                 GenerationStep.Decoration.TOP_LAYER_MODIFICATION,
                 GCPlacedFeatures.MOON_BOULDER);
 
-        Constants.LOG.info("Registered GC Surface Generation (Fabric)");
+        GCLog.CORE.info("Registered GC Surface Generation (Fabric)");
     }
 }

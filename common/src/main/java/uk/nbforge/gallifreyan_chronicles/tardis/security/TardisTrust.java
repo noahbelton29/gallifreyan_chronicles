@@ -40,24 +40,22 @@ public final class TardisTrust {
     }
 
     private static InteractionResult trust(Tardis tardis, ServerPlayer owner, ServerPlayer target) {
-        if (!tardis.trust(target.getUUID())) {
+        if (tardis.trust(target.getUUID())) {
+            MessageUtil.overlay(owner, "trust_added", target.getDisplayName());
+            MessageUtil.overlay(target, "trust_granted", owner.getDisplayName());
+        } else {
             MessageUtil.overlay(owner, "trust_already", target.getDisplayName());
-            return InteractionResult.SUCCESS;
         }
-
-        MessageUtil.overlay(owner, "trust_added", target.getDisplayName());
-        MessageUtil.overlay(target, "trust_granted", owner.getDisplayName());
         return InteractionResult.SUCCESS;
     }
 
     private static InteractionResult untrust(Tardis tardis, ServerPlayer owner, ServerPlayer target) {
-        if (!tardis.untrust(target.getUUID())) {
+        if (tardis.untrust(target.getUUID())) {
+            MessageUtil.overlay(owner, "trust_removed", target.getDisplayName());
+            MessageUtil.overlay(target, "trust_revoked", owner.getDisplayName());
+        } else {
             MessageUtil.overlay(owner, "trust_not_trusted", target.getDisplayName());
-            return InteractionResult.SUCCESS;
         }
-
-        MessageUtil.overlay(owner, "trust_removed", target.getDisplayName());
-        MessageUtil.overlay(target, "trust_revoked", owner.getDisplayName());
         return InteractionResult.SUCCESS;
     }
 

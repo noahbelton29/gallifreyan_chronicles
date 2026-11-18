@@ -16,7 +16,7 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.ModifyVariable;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
-import uk.nbforge.gallifreyan_chronicles.Constants;
+import uk.nbforge.gallifreyan_chronicles.util.GCLog;
 
 @Mixin(Window.class)
 public abstract class WindowMixin {
@@ -48,7 +48,7 @@ public abstract class WindowMixin {
             at = @At("HEAD"),
             cancellable = true)
     private void gc$customIcon(PackMetadataResources resources, IconSet iconSet, CallbackInfo ci) throws IOException {
-        Constants.LOG.info("WindowMixin setIcon injected");
+        GCLog.CLIENT.info("WindowMixin setIcon injected");
         ClassLoader loader = Window.class.getClassLoader();
         List<IoSupplier<InputStream>> icons = new ArrayList<>();
         for (String name : GC_ICONS) {
@@ -56,7 +56,7 @@ public abstract class WindowMixin {
             if (loader.getResource(path) != null) {
                 icons.add(() -> Objects.requireNonNull(loader.getResourceAsStream(path)));
             } else {
-                Constants.LOG.warn("icon not found: {}", path);
+                GCLog.CLIENT.warn("Icon not found: {}", path);
             }
         }
         if (icons.isEmpty()) return;

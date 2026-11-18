@@ -24,8 +24,8 @@ public class InteriorDoorBlockModel extends GeoModel<InteriorDoorBlockEntity> {
     }
 
     /**
-     * The texture this door is drawn with, its skin with the texture of the roundel block painted on if it has one.
-     * Static so the renderer can ask for it directly when it picks the render type.
+     * the door skin with the roundel block texture painted on if it has one. static so the renderer can grab it
+     * directly when it picks the render type
      */
     public static Identifier textureFor(GeoRenderState renderState) {
         Identifier base = baseTexture(renderState);

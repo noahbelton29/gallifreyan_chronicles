@@ -12,7 +12,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import uk.nbforge.gallifreyan_chronicles.client.renderer.fade.FadeBoxRenderer;
 import uk.nbforge.gallifreyan_chronicles.client.sky.CustomSkyRenderer;
 
-/** Draws fading TARDISes on top once the world, water and clouds are all done. */
+/** draws fading tardises on top once the world, water and clouds are all done */
 @Mixin(LevelRenderer.class)
 public abstract class LevelRendererFadeBoxMixin {
     @Shadow

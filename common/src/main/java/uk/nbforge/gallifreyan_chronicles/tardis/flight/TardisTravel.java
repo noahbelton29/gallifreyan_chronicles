@@ -71,9 +71,7 @@ public final class TardisTravel {
         return partWayTarget(tardis, 0f);
     }
 
-    /**
-     * Where it ends up if it drops out early, atLeast is never less than this far along.
-     */
+    /** where it ends up if it drops out early, atLeast is never less than this far along */
     public static LandingTarget partWayTarget(Tardis tardis, float atLeast) {
         LandingTarget target = tardis.landingTarget().orElse(null);
         BlockPos from = tardis.exteriorPos().orElse(BlockPos.ZERO);

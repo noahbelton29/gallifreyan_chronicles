@@ -3,8 +3,8 @@ package uk.nbforge.gallifreyan_chronicles.client.protection.watermark;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
-import uk.nbforge.gallifreyan_chronicles.Constants;
 import uk.nbforge.gallifreyan_chronicles.platform.Services;
+import uk.nbforge.gallifreyan_chronicles.util.GCLog;
 
 public final class WatermarkBanner {
     private static final int RED = 0xFFFF3030;
@@ -29,11 +29,11 @@ public final class WatermarkBanner {
     }
 
     public static void render(GuiGraphicsExtractor graphics) {
-        if (!WatermarkIdentity.bannerEnabled()) return;
+        if (WatermarkIdentity.bannerHidden()) return;
 
         if (!logged) {
             logged = true;
-            Constants.LOG.debug("[GC] F1 banner is being drawn");
+            GCLog.TESTER.debug("F1 banner is being drawn");
         }
 
         Minecraft minecraft = Minecraft.getInstance();

@@ -2,17 +2,17 @@ package uk.nbforge.gallifreyan_chronicles.addon;
 
 public record AddonProblem(Kind kind, String detail) {
     public enum Kind {
-        /** Cannot read it, the detail is the reason. */
+        /** cant read it, detail is the reason */
         INVALID(false),
-        /** Needs a newer addon api, the detail is the addon api and then ours. */
+        /** needs a newer addon api, detail is their api then the mod's */
         INCOMPATIBLE_API(false),
-        /** Wrong mod version, the detail is the needed range and then your version. */
+        /** wrong mod version, detail is the needed range then ur version */
         INCOMPATIBLE_MOD(false),
-        /** A needed mod or addon is missing, the detail is the name and then the needed range. */
+        /** a needed mod or addon is missing, detail is the name then the needed range */
         MISSING_REQUIREMENT(false),
-        /** A needed mod or addon is the wrong version, the detail is the name, the needed range and what was found. */
+        /** a needed mod or addon is the wrong version, detail is the name, needed range and what was actually found */
         WRONG_REQUIREMENT_VERSION(false),
-        /** Crashed while starting, the detail is the error. */
+        /** crashed while starting, detail is the error */
         FAILED_TO_START(false);
 
         private final boolean canBeSwitchedOn;

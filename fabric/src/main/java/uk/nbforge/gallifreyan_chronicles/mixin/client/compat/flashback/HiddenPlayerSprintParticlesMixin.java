@@ -7,7 +7,10 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import uk.nbforge.gallifreyan_chronicles.compat.flashback.FlashbackChunks;
 
-/** In a replay the recorded player we hid at the TARDIS door kept making sprint particles there, the copy inside makes them instead, see FlashbackPuppet. */
+/**
+ * in a replay the recorded player that got hidden at the tardis door kept making sprint particles there, the copy
+ * inside makes them instead, see FlashbackPuppet
+ */
 @Mixin(Entity.class)
 public abstract class HiddenPlayerSprintParticlesMixin {
     @Inject(method = "canSpawnSprintParticle", at = @At("HEAD"), cancellable = true, require = 0)

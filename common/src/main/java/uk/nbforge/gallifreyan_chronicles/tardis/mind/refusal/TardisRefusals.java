@@ -42,8 +42,8 @@ public final class TardisRefusals {
     private TardisRefusals() {}
 
     /**
-     * Some refusals only give a warning, others throw the lever back and may make the TARDIS attack players nearby.
-     * Returns true if takeoff was refused.
+     * some refusals only warn, others throw the lever back and might make it attack players nearby. true if takeoff was
+     * refused
      */
     public static boolean refuseTakeoff(
             ServerLevel level,

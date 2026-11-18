@@ -50,8 +50,8 @@ final class FlashbackChunksImpl {
     }
 
     /**
-     * Only packets for other worlds.
-     * The ones for the own world of the replay, the overworld chunks while the player was in the TARDIS, must go into the replay server or it never has them and the world is void.
+     * only packets for other worlds. the replay's own world ones (the overworld chunks while the player was in the
+     * tardis) have to go into the replay server or it never has them and the world is void
      */
     static boolean passOn(int dimId, Packet<?> packet) {
         ReplayServer server = Flashback.getReplayServer();

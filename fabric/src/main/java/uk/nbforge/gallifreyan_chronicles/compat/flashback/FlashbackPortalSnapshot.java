@@ -20,11 +20,11 @@ import qouteall.imm_ptl.core.portal.Portal;
 import qouteall.q_misc_util.MiscNetworking;
 import qouteall.q_misc_util.dimension.DimIntIdMap;
 import qouteall.q_misc_util.dimension.DimensionIntId;
-import uk.nbforge.gallifreyan_chronicles.Constants;
+import uk.nbforge.gallifreyan_chronicles.util.GCLog;
 
 /**
- * A Flashback snapshot saves portals as plain entities with no shape and it does not save the dimension list of Immersive Portals.
- * So a recording started after a TARDIS was placed had no working portal, we add both to the snapshot.
+ * flashback snapshots save portals as plain entities with no shape and dont save immersive portals dimension list. so a
+ * recording started after a tardis was placed had no working portal, so both get added to the snapshot
  */
 final class FlashbackPortalSnapshot {
     private static Method saveMethod;
@@ -76,11 +76,11 @@ final class FlashbackPortalSnapshot {
                 }
             }
         } catch (Exception e) {
-            if (++errors <= 3) Constants.LOG.warn("[replay] couldn't save portals in the snapshot: {}", e.toString());
+            if (++errors <= 3) GCLog.REPLAY.warn("Couldn't save portals in the snapshot: {}", e.toString());
         }
     }
 
-    /** Portal addAdditionalSaveData is protected. */
+    /** Portal addAdditionalSaveData is protected */
     private static void save(Portal portal, CompoundTag tag) throws Exception {
         if (saveMethod == null) {
             saveMethod = Portal.class.getDeclaredMethod("addAdditionalSaveData", CompoundTag.class);

@@ -26,10 +26,8 @@ public abstract class DestinationControl extends BaseControl {
     @Override
     protected InteractionResult use(ControlContext ctx, TardisControlEntity entity, @Nullable Player player) {
         Tardis tardis = ctx.tardis().orElse(null);
-        if (tardis == null || !apply(tardis, player)) {
-            MessageUtil.overlay(player, ChatFormatting.RED, "no_destination_to_set");
-            return InteractionResult.FAIL;
-        }
-        return InteractionResult.SUCCESS;
+        if (tardis != null && apply(tardis, player)) return InteractionResult.SUCCESS;
+        MessageUtil.overlay(player, ChatFormatting.RED, "no_destination_to_set");
+        return InteractionResult.FAIL;
     }
 }

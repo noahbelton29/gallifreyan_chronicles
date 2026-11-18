@@ -17,8 +17,8 @@ import uk.nbforge.gallifreyan_chronicles.tardis.Tardis;
 import uk.nbforge.gallifreyan_chronicles.tardis.control.TardisControl;
 
 /**
- * It is a normal mod so mixins work too.
- * We call onInitialize while the game registers things, so the register methods work there.
+ * its a normal mod so mixins work too. onInitialize gets called while the game is registering stuff so the register
+ * methods work in there
  */
 public interface AddonContext {
     String addonId();
@@ -37,10 +37,7 @@ public interface AddonContext {
 
     Identifier id(String path);
 
-    /**
-     * Added items show in the addons tab.
-     * You still need the model, texture and lang.
-     */
+    /** shows up in the addons tab, u still need the model, texture and lang */
     <T extends Item> T registerItem(String name, Function<Item.Properties, T> factory);
 
     Block registerBlock(String name, Function<BlockBehaviour.Properties, Block> factory);
@@ -52,12 +49,12 @@ public interface AddonContext {
 
     Block registerBlockWithoutItem(String name, Function<BlockBehaviour.Properties, Block> factory);
 
-    /** Put the sound itself in sounds.json. */
+    /** the sound itself still goes in sounds.json */
     SoundEvent registerSound(String name);
 
     SoundEvent registerSound(String name, float range);
 
-    /** The id must start with the addon id and an underscore. */
+    /** id has to start with the addon id and an underscore */
     <T extends TardisControl> void registerControl(String id, MapCodec<T> codec, T control);
 
     void onTakeOff(Consumer<Tardis> listener);

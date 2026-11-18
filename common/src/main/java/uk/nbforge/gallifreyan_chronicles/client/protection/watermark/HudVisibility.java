@@ -7,7 +7,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.function.BooleanSupplier;
 import net.minecraft.client.Minecraft;
-import uk.nbforge.gallifreyan_chronicles.Constants;
+import uk.nbforge.gallifreyan_chronicles.util.GCLog;
 
 public final class HudVisibility {
     private static final String[] FIELD_NAMES = {
@@ -29,7 +29,7 @@ public final class HudVisibility {
             try {
                 hidden = resolve();
             } catch (Throwable t) {
-                Constants.LOG.error("[GC] Could not look for the HUD hidden flag", t);
+                GCLog.TESTER.error("Couldn't look for the HUD hidden flag", t);
             }
         }
         if (hidden == null) return false;
@@ -40,7 +40,10 @@ public final class HudVisibility {
         }
     }
 
-    /** Looks for the flag the game uses for the HUD being hidden, its name changes between versions so it tries a list of fields and methods on a few objects and keeps the first one that works. */
+    /**
+     * the hud hidden flag gets renamed between versions so this tries a bunch of fields and methods on a few objects
+     * and keeps whichever works first
+     */
     private static BooleanSupplier resolve() {
         Minecraft minecraft = Minecraft.getInstance();
         List<Object> roots = new ArrayList<>();
@@ -54,8 +57,8 @@ public final class HudVisibility {
                 Field field = findField(root.getClass(), name);
                 if (field != null && field.getType() == boolean.class) {
                     field.setAccessible(true);
-                    Constants.LOG.debug(
-                            "[GC] HUD hidden flag found: {}.{}", root.getClass().getName(), name);
+                    GCLog.TESTER.debug(
+                            "HUD hidden flag found: {}.{}", root.getClass().getName(), name);
                     return () -> {
                         try {
                             return field.getBoolean(Modifier.isStatic(field.getModifiers()) ? null : root);
@@ -72,10 +75,8 @@ public final class HudVisibility {
                     boolean invert = false;
                     for (String inverted : INVERTED) invert |= inverted.equals(name);
                     final boolean flip = invert;
-                    Constants.LOG.debug(
-                            "[GC] HUD hidden flag found: {}.{}()",
-                            root.getClass().getName(),
-                            name);
+                    GCLog.TESTER.debug(
+                            "HUD hidden flag found: {}.{}()", root.getClass().getName(), name);
                     return () -> {
                         try {
                             return flip != (boolean) method.invoke(root);
@@ -99,8 +100,7 @@ public final class HudVisibility {
                     }
                 }
             }
-            Constants.LOG.debug(
-                    "[GC] HUD flag candidates on {}:{}", root.getClass().getName(), sb);
+            GCLog.TESTER.debug("HUD flag candidates on {}:{}", root.getClass().getName(), sb);
         }
         return null;
     }

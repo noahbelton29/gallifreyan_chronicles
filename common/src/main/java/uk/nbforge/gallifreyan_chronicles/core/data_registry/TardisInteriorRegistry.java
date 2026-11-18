@@ -21,8 +21,8 @@ public final class TardisInteriorRegistry {
         return REGISTRY.register(interior);
     }
 
-    public static boolean contains(String id) {
-        return REGISTRY.contains(id);
+    public static boolean isUnknown(String id) {
+        return !REGISTRY.contains(id);
     }
 
     public static Collection<TardisInterior> getAll() {

@@ -4,9 +4,9 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.neoforge.event.entity.player.PlayerEvent;
-import uk.nbforge.gallifreyan_chronicles.Constants;
 import uk.nbforge.gallifreyan_chronicles.core.GCDataComponents;
 import uk.nbforge.gallifreyan_chronicles.core.block.registry.GallifreyBlocks;
+import uk.nbforge.gallifreyan_chronicles.util.GCLog;
 
 public class GCCraftingHandler {
     @SubscribeEvent
@@ -26,7 +26,7 @@ public class GCCraftingHandler {
 
             if (hasGallifreyan) {
                 crafted.set(GCDataComponents.COBBLESTONE_VARIANT, "gallifreyan");
-                Constants.LOG.info("Set gallifreyan variant on stone pickaxe");
+                GCLog.CORE.info("Set gallifreyan variant on stone pickaxe");
             }
         }
     }

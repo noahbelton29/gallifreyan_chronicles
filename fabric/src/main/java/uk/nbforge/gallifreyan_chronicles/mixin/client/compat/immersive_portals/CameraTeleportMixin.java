@@ -9,7 +9,10 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import qouteall.imm_ptl.core.teleportation.TeleportationUtil;
 import uk.nbforge.gallifreyan_chronicles.compat.flashback.FlashbackChunks;
 
-/** Remembers which door the free camera went through, and while keyframes move the camera they handle doors themselves in ReplayKeyframePortal so Immersive Portals does not also teleport it. */
+/**
+ * remembers which door the free camera went thru. while keyframes move the camera they handle doors themselves in
+ * ReplayKeyframePortal so immersive portals doesnt teleport it as well
+ */
 @Pseudo
 @Mixin(targets = "qouteall.imm_ptl.core.teleportation.ClientTeleportationManager", remap = false)
 public abstract class CameraTeleportMixin {

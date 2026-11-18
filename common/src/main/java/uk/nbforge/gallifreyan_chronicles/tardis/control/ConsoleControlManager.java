@@ -11,11 +11,11 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import org.jspecify.annotations.Nullable;
-import uk.nbforge.gallifreyan_chronicles.Constants;
 import uk.nbforge.gallifreyan_chronicles.core.GCTardisControls;
 import uk.nbforge.gallifreyan_chronicles.core.block_entity.TardisConsoleBlockEntity;
 import uk.nbforge.gallifreyan_chronicles.core.entity.TardisControlEntity;
 import uk.nbforge.gallifreyan_chronicles.tardis.console.animation.ConsoleAnimatable;
+import uk.nbforge.gallifreyan_chronicles.util.GCLog;
 
 public class ConsoleControlManager {
     private static final double STRAY_SEARCH_RADIUS = 4.0;
@@ -164,7 +164,7 @@ public class ConsoleControlManager {
 
     public void triggerControl(
             TardisConsoleBlockEntity console, String id, boolean activated, @Nullable Player triggeringPlayer) {
-        Constants.LOG.debug("Triggering control: {} with state: {}", id, activated);
+        GCLog.TARDIS.debug("Triggering control: {} with state: {}", id, activated);
 
         setControlState(id, activated);
         playControlAnimation(id, activated, triggeringPlayer);
@@ -179,7 +179,7 @@ public class ConsoleControlManager {
 
     public void playControlAnimation(String controlId, boolean activated, @Nullable Player triggeringPlayer) {
         String animationName = host.resolveControlAnimation(controlId, activated);
-        Constants.LOG.debug(
+        GCLog.TARDIS.debug(
                 "Playing animation: {} for control: {} (activated: {})", animationName, controlId, activated);
 
         if (animationName != null) {

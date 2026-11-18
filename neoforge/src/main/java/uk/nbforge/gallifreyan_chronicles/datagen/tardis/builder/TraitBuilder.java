@@ -6,10 +6,7 @@ import java.util.Locale;
 import uk.nbforge.gallifreyan_chronicles.datagen.util.GCJson;
 import uk.nbforge.gallifreyan_chronicles.tardis.mind.data.MindEnums.Reveal;
 
-/**
- * Every method is optional.
- * Multipliers called times default to 1 and shifts called by default to 0 so only set what the trait changes.
- */
+/** every method is optional. times multipliers default to 1 and by shifts to 0 so only set what the trait changes */
 public final class TraitBuilder {
     private final JsonObject json;
 

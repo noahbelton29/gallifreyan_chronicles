@@ -7,8 +7,8 @@ import net.minecraft.world.level.storage.ValueOutput;
 import org.jspecify.annotations.Nullable;
 
 /**
- * It stays unset until it is read or written, and only a set value is saved. Loading only replaces it when the key
- * is in the data, so a sync packet without the key leaves the current value alone.
+ * stays unset until its read or written and only a set value gets saved. loading only replaces it when the key is in
+ * the data, so a sync packet without the key leaves the current value alone
  */
 public final class SavedValue<T> {
     private final String key;
@@ -22,7 +22,7 @@ public final class SavedValue<T> {
         this.fallback = fallback;
     }
 
-    /** A value with no default, read it with getOrNull. */
+    /** no default, read it with getOrNull */
     public SavedValue(String name, Codec<T> codec) {
         this(name, codec, null);
     }

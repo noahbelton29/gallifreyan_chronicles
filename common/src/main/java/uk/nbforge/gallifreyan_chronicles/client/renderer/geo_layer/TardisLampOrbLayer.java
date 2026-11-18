@@ -18,10 +18,10 @@ import net.minecraft.resources.Identifier;
 import org.joml.Quaternionf;
 import org.joml.Vector3f;
 import org.jspecify.annotations.NonNull;
+import uk.nbforge.gallifreyan_chronicles.client.compat.iris.IrisCompat;
 import uk.nbforge.gallifreyan_chronicles.client.renderer.GCRenderTypes;
 import uk.nbforge.gallifreyan_chronicles.client.renderer.block.TardisExteriorBlockRenderer;
 import uk.nbforge.gallifreyan_chronicles.client.renderer.fade.FadeBoxRenderer;
-import uk.nbforge.gallifreyan_chronicles.client.sky.SkyShaderCompat;
 import uk.nbforge.gallifreyan_chronicles.client.util.DetailLevelUtil;
 import uk.nbforge.gallifreyan_chronicles.tardis.exterior.TardisExterior;
 import uk.nbforge.gallifreyan_chronicles.util.GCUtil;
@@ -40,7 +40,7 @@ public class TardisLampOrbLayer<T extends GeoAnimatable, O, R extends GeoRenderS
 
     @Override
     public void addPerBoneRender(RenderPassInfo<R> info, @NonNull BiConsumer<GeoBone, PerBoneRender<R>> consumer) {
-        if (!info.willRender() || SkyShaderCompat.isRenderingShadowPass()) return;
+        if (!info.willRender() || IrisCompat.renderingShadowPass()) return;
         R state = info.renderState();
         if (state.getOrDefaultGeckolibData(TardisExteriorBlockRenderer.LAMP_ORB, 0f) <= 0.01f) return;
         info.model().getBone(LAMP_BONE).ifPresent(bone -> consumer.accept(bone, this::submitOrb));
@@ -53,9 +53,9 @@ public class TardisLampOrbLayer<T extends GeoAnimatable, O, R extends GeoRenderS
         draw(state, centre, tasks);
     }
 
-    /** The box is fully see through so GeckoLib skips it, draw the orb where the lamp was last seen. */
+    /** box is fully see through so geckolib skips it, draw the orb where the lamp was last seen */
     public static void drawWithoutBox(GeoRenderState state, PoseStack poseStack, SubmitNodeCollector tasks) {
-        if (SkyShaderCompat.isRenderingShadowPass()) return;
+        if (IrisCompat.renderingShadowPass()) return;
         if (state.getOrDefaultGeckolibData(TardisExteriorBlockRenderer.LAMP_ORB, 0f) <= 0.01f) return;
         Vector3f local = LAMP_SPOTS.get(state.getOrDefaultGeckolibData(TardisExteriorBlockRenderer.EXTERIOR_ID, ""));
         if (local == null) return;

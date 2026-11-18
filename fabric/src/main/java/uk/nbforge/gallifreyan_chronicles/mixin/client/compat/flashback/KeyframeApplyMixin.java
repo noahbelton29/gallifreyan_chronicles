@@ -8,7 +8,7 @@ import org.spongepowered.asm.mixin.Pseudo;
 import org.spongepowered.asm.mixin.injection.At;
 import uk.nbforge.gallifreyan_chronicles.compat.flashback.FlashbackChunks;
 
-/** Keyframe camera positions go through ReplayKeyframePortal so a camera path can fly in and out of doors. */
+/** keyframe camera positions go thru ReplayKeyframePortal so a camera path can fly in and out of doors */
 @Pseudo
 @Mixin(targets = "com.moulberry.flashback.keyframe.handler.MinecraftKeyframeHandler", remap = false)
 public abstract class KeyframeApplyMixin {

@@ -4,8 +4,8 @@ import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 
 /**
- * hits are unforgiven mallet hits and kindness takes them away again.
- * trauma is the scars from this player and they fade slowly on their own.
+ * hits are unforgiven mallet hits and kindness takes them away again. trauma is the scars from this player and it fades
+ * slowly on its own
  */
 public record TardisBond(
         float trust, float fear, long fearTick, int hits, boolean betrayed, float trauma, long traumaTick) {

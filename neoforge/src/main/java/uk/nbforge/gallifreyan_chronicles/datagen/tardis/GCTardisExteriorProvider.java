@@ -21,7 +21,7 @@ public class GCTardisExteriorProvider extends GCJsonDataProvider {
         add(name, GCJson.obj());
     }
 
-    /** waypointStyle is the locator bar icon in assets/waypoint_style, "tardis" when left out. */
+    /** waypointStyle is the locator bar icon in assets/waypoint_style, "tardis" when left out */
     private void exterior(String name, String waypointStyle) {
         add(name, GCJson.obj("waypoint_style", waypointStyle));
     }

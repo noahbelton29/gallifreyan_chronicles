@@ -7,8 +7,8 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Pseudo;
 
 /**
- * Same as EntityDataSkipMixin but on the replay server of Flashback.
- * Entity ids can get mixed up, like the data of a TARDIS key landing on another entity, and that crashed the whole replay so skip that one packet instead.
+ * same as EntityDataSkipMixin but on flashback's replay server. entity ids can get mixed up (like a tardis key's data
+ * landing on another entity) and that crashed the whole replay, so skip that one packet
  */
 @Pseudo
 @Mixin(targets = "com.moulberry.flashback.playback.ReplayGamePacketHandler", remap = false)

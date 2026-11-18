@@ -14,6 +14,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import net.minecraft.resources.Identifier;
 import org.jspecify.annotations.Nullable;
 import uk.nbforge.gallifreyan_chronicles.Constants;
+import uk.nbforge.gallifreyan_chronicles.util.GCLog;
 
 /** in blocks and Blockbench space */
 public record PortalBone(double x, double bottom, double width, double height, double front, double back) {
@@ -58,7 +59,7 @@ public record PortalBone(double x, double bottom, double width, double height, d
                 if (portal != null) return Optional.ofNullable(fromBone(portal, byName, resource));
             }
         } catch (IOException | RuntimeException e) {
-            Constants.LOG.warn("Failed to read the portal bone of {}", resource, e);
+            GCLog.COMPAT.warn("Couldn't read the portal bone of {}", resource, e);
         }
         return Optional.empty();
     }
@@ -66,7 +67,7 @@ public record PortalBone(double x, double bottom, double width, double height, d
     private static @Nullable PortalBone fromBone(JsonObject bone, Map<String, JsonObject> bones, String resource) {
         JsonArray cubes = bone.getAsJsonArray("cubes");
         if (cubes == null || cubes.isEmpty()) {
-            Constants.LOG.warn("Portal bone in {} has no cube", resource);
+            GCLog.COMPAT.warn("Portal bone in {} has no cube", resource);
             return null;
         }
         double[] min = {Double.MAX_VALUE, Double.MAX_VALUE, Double.MAX_VALUE};
@@ -101,7 +102,7 @@ public record PortalBone(double x, double bottom, double width, double height, d
                 max[2] / 16.0);
     }
 
-    /** Only the y spin counts, x and z spins on the portal are ignored. */
+    /** only the y spin counts, x and z spins on the portal get ignored */
     private static double[] turn(double[] p, JsonObject part) {
         JsonArray rotation = part.getAsJsonArray("rotation");
         if (rotation == null || rotation.size() < 3) return p;

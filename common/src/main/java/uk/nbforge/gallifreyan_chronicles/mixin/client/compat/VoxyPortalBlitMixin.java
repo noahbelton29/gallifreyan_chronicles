@@ -11,11 +11,11 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import uk.nbforge.gallifreyan_chronicles.compat.portal.VoxyPortalGuard;
 
 /**
- * Clips the final composite of Voxy to the opening of Immersive Portals.
- * The last step of Voxy copies its far terrain, colour and depth, onto the framebuffer of the game through a scratch framebuffer with no stencil buffer, and it turns the stencil test off first.
- * Inside a portal view the terrain is then written over the whole screen and not just the opening.
- * In a portal view this attaches the stencil buffer for the copy and leaves the stencil test of the portal on so the copy is clipped to the opening like everything else.
- * Outside portal views it does nothing, see VoxyPortalGuard.
+ * clips voxy's final composite to the immersive portals opening. voxy's last step copies its far terrain (colour and
+ * depth) onto the game framebuffer thru a scratch framebuffer with no stencil buffer, and turns the stencil test off
+ * first. so inside a portal view the terrain gets written over the whole screen not just the opening. in a portal view
+ * this attaches the stencil buffer for the copy and leaves the portal's stencil test on so the copy gets clipped like
+ * everything else. does nothing outside portal views, see VoxyPortalGuard
  */
 @Pseudo
 @Mixin(targets = "me.cortex.voxy.client.core.AbstractRenderPipeline", remap = false)

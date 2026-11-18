@@ -18,13 +18,13 @@ public record ConsoleSelection(String consoleId, String variantId) {
         return new ConsoleSelection(console.id(), console.resolvedDefaultVariant());
     }
 
-    /** An unknown variant falls back to the console's default one. */
+    /** unknown variant falls back to the console's default one */
     public static ConsoleSelection of(TardisConsole console, String variantId) {
         String resolved = console.hasVariant(variantId) ? variantId : console.resolvedDefaultVariant();
         return new ConsoleSelection(console.id(), resolved);
     }
 
-    /** Keeps the saved console id even if that console is no longer registered. */
+    /** keeps the saved console id even if that console isnt registered anymore */
     public ConsoleSelection withVariant(String variantId) {
         TardisConsole console = console();
         String resolved = console.hasVariant(variantId) ? variantId : console.resolvedDefaultVariant();

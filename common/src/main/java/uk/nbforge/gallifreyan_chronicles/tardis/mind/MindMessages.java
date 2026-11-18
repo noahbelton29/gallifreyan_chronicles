@@ -9,7 +9,7 @@ import net.minecraft.world.entity.player.Player;
 import uk.nbforge.gallifreyan_chronicles.core.lifecycle.ServerState;
 import uk.nbforge.gallifreyan_chronicles.util.MessageUtil;
 
-/** One every few seconds per player so they do not talk over each other, the important ones can always cut in. */
+/** one every few seconds per player so they dont talk over each other, important ones can always cut in */
 public final class MindMessages {
     private static final long GAP_TICKS = 60L;
     private static final Set<String> IMPORTANT = Set.of(

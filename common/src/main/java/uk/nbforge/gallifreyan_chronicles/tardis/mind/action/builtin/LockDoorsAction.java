@@ -23,7 +23,7 @@ public record LockDoorsAction(boolean onlyOutside) implements MindAction {
         if (!onlyOutside || outside) closeAndLock(context.tardis);
     }
 
-    /** Doors can only lock once they are fully shut so shut them and keep checking. */
+    /** doors can only lock once theyre fully shut so shut them and keep checking */
     public static void closeAndLock(Tardis tardis) {
         if (tardis.isLocked()) return;
         tardis.closeDoors();

@@ -17,7 +17,6 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.AABB;
-import uk.nbforge.gallifreyan_chronicles.Constants;
 import uk.nbforge.gallifreyan_chronicles.core.block.InteriorDoorBlock;
 import uk.nbforge.gallifreyan_chronicles.core.block.registry.CadonwoodBlocks;
 import uk.nbforge.gallifreyan_chronicles.core.block.registry.FloraBlocks;
@@ -27,6 +26,7 @@ import uk.nbforge.gallifreyan_chronicles.core.block.registry.MoonBlocks;
 import uk.nbforge.gallifreyan_chronicles.core.block.registry.RoundelBlocks;
 import uk.nbforge.gallifreyan_chronicles.core.block.registry.TardisBlocks;
 import uk.nbforge.gallifreyan_chronicles.core.item.DoorBlockItem;
+import uk.nbforge.gallifreyan_chronicles.util.GCLog;
 import uk.nbforge.gallifreyan_chronicles.util.GCUtil;
 
 public final class GCBlocks {
@@ -43,7 +43,7 @@ public final class GCBlocks {
         FloraBlocks.init();
         CadonwoodBlocks.init();
         RoundelBlocks.init();
-        Constants.LOG.info("Registered GC Blocks");
+        GCLog.CORE.info("Registered GC Blocks");
     }
 
     public static Block register(String name, Function<BlockBehaviour.Properties, Block> function) {

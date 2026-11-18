@@ -61,7 +61,7 @@ public final class CrashSmoke {
     }
 
     private static void puff(Tardis tardis) {
-        boolean repaired = !tardis.exists() || !TardisDamage.isCrashed(tardis);
+        boolean repaired = tardis.isDeleted() || !TardisDamage.isCrashed(tardis);
         if (repaired) {
             RUNNING.remove(tardis.id());
             BREATHED.remove(tardis.id());
@@ -196,7 +196,7 @@ public final class CrashSmoke {
         return null;
     }
 
-    /** A count of 0 makes the particle move in the given direction. */
+    /** a count of 0 makes the particle move in the given direction */
     private static void send(ServerLevel level, RandomSource random, Vec3 from, Vec3 direction, double speed) {
         SimpleParticleType type =
                 random.nextInt(3) == 0 ? ParticleTypes.LARGE_SMOKE : ParticleTypes.CAMPFIRE_COSY_SMOKE;

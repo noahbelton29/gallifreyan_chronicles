@@ -10,8 +10,8 @@ import uk.nbforge.gallifreyan_chronicles.platform.Services;
 import uk.nbforge.gallifreyan_chronicles.util.GCUtil;
 
 /**
- * A harsh rumble for the whole crash.
- * With stress set it is the ongoing stressed flight rumble instead, with a strength from 0 to 1 where 1 is as hard as a crash.
+ * harsh rumble for the whole crash. with stress set its the ongoing stressed flight rumble instead, strength 0 to 1
+ * where 1 is as hard as a crash
  */
 public record TardisCrashRumblePayload(double x, double y, double z, int ticks, boolean stress, float strength)
         implements CustomPacketPayload {
@@ -21,7 +21,7 @@ public record TardisCrashRumblePayload(double x, double y, double z, int ticks, 
         send(level, new TardisCrashRumblePayload(origin.x, origin.y, origin.z, ticks, false, 1f));
     }
 
-    /** Keeps the stress rumble going, send it about once a second while flying. */
+    /** keeps the stress rumble going, send it about once a second while flying */
     public static void broadcastStress(ServerLevel level, Vec3 origin, float strength) {
         send(level, new TardisCrashRumblePayload(origin.x, origin.y, origin.z, 0, true, strength));
     }

@@ -8,7 +8,7 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import uk.nbforge.gallifreyan_chronicles.compat.flashback.ReplayComponentIds;
 
-/** The replay found the component numbers of the recording, use them and do not pass them on. */
+/** replay found the recording's component numbers, use them and dont pass them on */
 @Pseudo
 @Mixin(targets = "com.moulberry.flashback.playback.ReplayGamePacketHandler", remap = false)
 public abstract class ComponentIdsPayloadMixin {

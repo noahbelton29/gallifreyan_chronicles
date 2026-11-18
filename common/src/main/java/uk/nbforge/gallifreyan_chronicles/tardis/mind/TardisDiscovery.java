@@ -15,7 +15,7 @@ import uk.nbforge.gallifreyan_chronicles.tardis.mind.data.MindEnums.Reveal;
 import uk.nbforge.gallifreyan_chronicles.tardis.mind.disability.TardisDisability;
 import uk.nbforge.gallifreyan_chronicles.util.GCUtil;
 
-/** Discoveries only count when the owner is around to see them. */
+/** discoveries only count when the owner's around to see them */
 public final class TardisDiscovery {
 
     private static final String ROOT = "tardis_mind/root";
@@ -34,8 +34,8 @@ public final class TardisDiscovery {
     }
 
     /**
-     * A TARDIS that normally refuses to fly does not reveal its personality just by taking off.
-     * If it is obedient and stressed enough, taking off can reveal something.
+     * a tardis that normally refuses to fly doesnt give away its personality just by taking off. if its obedient and
+     * stressed enough taking off can reveal something
      */
     private static void onTakeOff(Tardis tardis) {
         if (TardisMinds.mind(tardis).personality().refusesToFly()) return;
@@ -78,9 +78,8 @@ public final class TardisDiscovery {
     }
 
     /**
-     * The owner has to be there to see it, inside the TARDIS or close to the exterior.
-     * Disabilities are different and do not need the owner nearby.
-     * Something that is already discovered is not revealed again.
+     * owner has to be there to see it, inside or close to the exterior. disabilities dont need the owner nearby.
+     * already discovered stuff isnt revealed again
      */
     private static void reveal(Tardis tardis, String key, String id, String kind, String advancement) {
         TardisMind mind = TardisMinds.mind(tardis);

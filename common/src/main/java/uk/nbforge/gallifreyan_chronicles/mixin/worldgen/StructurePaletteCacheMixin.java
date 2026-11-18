@@ -14,9 +14,9 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 /**
- * Vanilla bug MC-271899, structure palettes cache blocks in a plain HashMap.
- * Voxy worldgen builds chunks on its own threads at the same time as the game so two threads write the map at once and it crashes.
- * NeoForge already fixes this and Fabric does not smh.
+ * vanilla bug MC-271899, structure palettes cache blocks in a plain HashMap. voxy worldgen builds chunks on its own
+ * threads at the same time as the game so two threads write the map at once and it crashes. NeoForge already fixes this
+ * and Fabric does not smh
  */
 @Mixin(StructureTemplate.Palette.class)
 public abstract class StructurePaletteCacheMixin {

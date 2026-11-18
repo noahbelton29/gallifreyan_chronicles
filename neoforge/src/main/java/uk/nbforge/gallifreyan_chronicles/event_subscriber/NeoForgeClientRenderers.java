@@ -14,6 +14,7 @@ import uk.nbforge.gallifreyan_chronicles.core.GCEntityTypes;
 import uk.nbforge.gallifreyan_chronicles.core.block_entity.InteriorDoorBlockEntity;
 import uk.nbforge.gallifreyan_chronicles.core.block_entity.TardisConsoleBlockEntity;
 import uk.nbforge.gallifreyan_chronicles.core.block_entity.TardisExteriorBlockEntity;
+import uk.nbforge.gallifreyan_chronicles.util.GCLog;
 
 @EventBusSubscriber(modid = Constants.MOD_ID, value = Dist.CLIENT)
 public class NeoForgeClientRenderers {
@@ -26,6 +27,6 @@ public class NeoForgeClientRenderers {
         event.registerEntityRenderer(GCEntityTypes.TARDIS_CONTROL_ENTITY_TYPE.get(), TardisControlEntityRenderer::new);
         event.registerEntityRenderer(GCEntityTypes.TARDIS_KEY_ENTITY_TYPE.get(), TardisKeyEntityRenderer::new);
 
-        Constants.LOG.info("Registered GC Client Renderers (NeoForge)");
+        GCLog.CORE.info("Registered GC Client Renderers (NeoForge)");
     }
 }

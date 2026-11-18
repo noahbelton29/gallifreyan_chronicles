@@ -6,7 +6,7 @@ import net.minecraft.ChatFormatting;
 import uk.nbforge.gallifreyan_chronicles.datagen.util.GCJson;
 import uk.nbforge.gallifreyan_chronicles.tardis.mind.action.builtin.SparksAction;
 
-/** Statically import this class and pass them to whenUnwilling, whenHit and the others on a personality or trait. */
+/** static import this and pass them to whenUnwilling, whenHit and the rest on a personality or trait */
 public final class MindReactions {
     private MindReactions() {}
 
@@ -90,7 +90,7 @@ public final class MindReactions {
         return action("lock_doors");
     }
 
-    /** no namespace means its one of our sounds */
+    /** no namespace means its one of the mod's sounds */
     public static JsonObject sound(String name, double volume, double pitch) {
         String id = name.contains(":") ? name : uk.nbforge.gallifreyan_chronicles.Constants.MOD_ID + ":" + name;
         return action("sound", "sound", id, "volume", volume, "pitch", pitch);

@@ -29,7 +29,7 @@ public class ExteriorPowerSoundInstance extends ExteriorSoundInstance {
         return doorLoudness(OPEN_VOLUME) * falloff();
     }
 
-    /** The first tick happens after the sound starts so set the muffle right away too. */
+    /** first tick is after the sound starts so set the muffle straight away too */
     public void applyStartMuffle() {
         applyMuffle();
     }

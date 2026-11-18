@@ -4,7 +4,6 @@ import net.fabricmc.fabric.api.entity.event.v1.ServerEntityLevelChangeEvents;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 import net.fabricmc.fabric.api.networking.v1.PayloadTypeRegistry;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayConnectionEvents;
-import uk.nbforge.gallifreyan_chronicles.Constants;
 import uk.nbforge.gallifreyan_chronicles.compat.flashback.ReplayComponentIds;
 import uk.nbforge.gallifreyan_chronicles.core.lifecycle.ServerLifecycleHandler;
 import uk.nbforge.gallifreyan_chronicles.core.sound.timed.TimedSounds;
@@ -20,6 +19,7 @@ import uk.nbforge.gallifreyan_chronicles.network.tardis.TardisExteriorSyncPayloa
 import uk.nbforge.gallifreyan_chronicles.network.tardis.TardisFrightPayload;
 import uk.nbforge.gallifreyan_chronicles.network.tardis.TardisInteriorSyncPayload;
 import uk.nbforge.gallifreyan_chronicles.network.tardis.TardisPayloadCodec;
+import uk.nbforge.gallifreyan_chronicles.util.GCLog;
 
 public final class GCFabricNetworking {
     private GCFabricNetworking() {}
@@ -62,6 +62,6 @@ public final class GCFabricNetworking {
 
         ServerEntityLevelChangeEvents.AFTER_PLAYER_CHANGE_LEVEL.register((player, _, _) -> TimedSounds.resume(player));
 
-        Constants.LOG.info("Registered GC Networking (Fabric)");
+        GCLog.CORE.info("Registered GC Networking (Fabric)");
     }
 }

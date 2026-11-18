@@ -2,10 +2,10 @@ package uk.nbforge.gallifreyan_chronicles.client.compat.soundphysics;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientLevel;
-import uk.nbforge.gallifreyan_chronicles.Constants;
 import uk.nbforge.gallifreyan_chronicles.client.gui.hud.PowerDarkness;
 import uk.nbforge.gallifreyan_chronicles.core.GCDimensions;
 import uk.nbforge.gallifreyan_chronicles.tardis.TardisDimensionUtil;
+import uk.nbforge.gallifreyan_chronicles.util.GCLog;
 
 public final class SoundPhysicsCompat {
     private static volatile boolean loggedActive;
@@ -15,7 +15,7 @@ public final class SoundPhysicsCompat {
     public static void markActive() {
         if (loggedActive) return;
         loggedActive = true;
-        Constants.LOG.info("[GC] Sound Physics compat active in TARDIS interior");
+        GCLog.COMPAT.info("Sound Physics compat active in TARDIS interior");
     }
 
     public static boolean inTardisInterior() {

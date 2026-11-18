@@ -9,9 +9,9 @@ import org.spongepowered.asm.mixin.Pseudo;
 import qouteall.imm_ptl.core.portal.Portal;
 
 /**
- * Replays can give the client broken portals, ones where the other side is a TARDIS dimension that does not exist and ones with no shape, axisW is null.
- * Both crashed the game so we remove those portals.
- * no idea why flashback hands us these but whatever.
+ * replays can hand the client broken portals, ones where the other side is a tardis dimension that doesnt exist and
+ * ones with no shape (axisW is null). both crashed the game so they get removed. no idea why flashback hands these over
+ * but whatever
  */
 @Pseudo
 @Mixin(targets = "qouteall.imm_ptl.core.portal.Portal", remap = false)

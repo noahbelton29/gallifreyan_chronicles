@@ -49,7 +49,7 @@ public final class TardisMoods {
     private static void onLand(Tardis tardis) {
         if (TardisMinds.stress(tardis) < CALM_LANDING_STRESS) {
             for (UUID player : crew(tardis)) {
-                if (!TardisMinds.afraidOf(tardis, player)) {
+                if (TardisMinds.calmAround(tardis, player)) {
                     TardisMinds.addTrust(tardis, player, CALM_LANDING_TRUST);
                 }
             }
@@ -57,9 +57,7 @@ public final class TardisMoods {
         TardisMinds.markLanded(tardis);
     }
 
-    /**
-     * Everyone aboard, or the owner if nobody is in the interior.
-     */
+    /** everyone aboard, or the owner if nobody's in the interior */
     public static List<UUID> crew(Tardis tardis) {
         List<UUID> aboard = tardis.interiorLevel()
                 .map(level ->
@@ -74,9 +72,7 @@ public final class TardisMoods {
         return lastLand != TardisMind.NEVER && now - lastLand < OVERUSE_TICKS;
     }
 
-    /**
-     * An unloaded exterior counts as having no faults.
-     */
+    /** an unloaded exterior counts as having no faults */
     private static boolean hasDamagedSystems(Tardis tardis) {
         TardisExteriorBlockEntity exterior = tardis.exteriorIfLoaded().orElse(null);
         if (exterior == null) return false;

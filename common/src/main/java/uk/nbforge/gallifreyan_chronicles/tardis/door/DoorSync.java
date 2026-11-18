@@ -38,7 +38,7 @@ public final class DoorSync {
         if (doors.isEmpty()) INTERIOR_DOORS.remove(tardisId);
     }
 
-    /** Use {@link Tardis#interiorDoors()}, this is what it reads. */
+    /** use {@link Tardis#interiorDoors()}, this is what it reads */
     public static synchronized List<InteriorDoorBlockEntity> doorsOf(UUID tardisId) {
         Set<InteriorDoorBlockEntity> doors = INTERIOR_DOORS.get(tardisId);
         if (doors == null) return List.of();
@@ -49,7 +49,7 @@ public final class DoorSync {
         return live;
     }
 
-    /** Use {@link Tardis#primaryInteriorDoor()}, this is what it reads. */
+    /** use {@link Tardis#primaryInteriorDoor()}, this is what it reads */
     public static @Nullable InteriorDoorBlockEntity primaryDoor(UUID tardisId) {
         for (InteriorDoorBlockEntity door : doorsOf(tardisId)) {
             if (door.isPrimary()) return door;
@@ -61,7 +61,7 @@ public final class DoorSync {
         applyControl(tardis, GCTardisControls.INTERIOR_DOOR_CONTROL, !state.isClosed(), false);
     }
 
-    /** Quietly keeps the interior door switch of the console matching the real state of the primary door. */
+    /** quietly keeps the console's interior door switch matching the real state of the primary door */
     public static void reconcileInteriorDoorControl(Tardis tardis, DoorState state) {
         applyControl(tardis, GCTardisControls.INTERIOR_DOOR_CONTROL, !state.isClosed(), true);
     }

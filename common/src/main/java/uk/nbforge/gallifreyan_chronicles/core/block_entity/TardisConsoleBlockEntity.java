@@ -305,7 +305,7 @@ public class TardisConsoleBlockEntity extends BlockEntity
     // no model loaded yet counts as yes
     private boolean lacksAnimation(String controlId, String animation) {
         TardisConsole model = getConsole();
-        return model != null && !ConsoleAnimationCheck.exists(model.id(), controlId, animation);
+        return model != null && ConsoleAnimationCheck.missing(model.id(), controlId, animation);
     }
 
     public boolean isInFlight() {

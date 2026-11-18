@@ -55,8 +55,8 @@ public final class TardisCrash {
     private static final float EMERGENCY_TRAUMA = 1f;
 
     /**
-     * A stressed TARDIS losing its grip, very shaky with smoke and the odd spark and then one bump when it lands.
-     * No fire, no damage and no repair needed.
+     * stressed tardis losing its grip, very shaky with smoke and the odd spark then one bump when it lands. no fire, no
+     * damage, no repair needed
      */
     public static void emergency(Tardis tardis, ServerLevel interior, BlockPos consolePos, int landingTicks) {
         CRASHING.add(tardis.id());

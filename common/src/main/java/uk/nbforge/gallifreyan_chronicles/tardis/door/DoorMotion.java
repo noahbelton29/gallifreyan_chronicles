@@ -8,7 +8,7 @@ public final class DoorMotion {
 
     private DoorMotion() {}
 
-    /** next is the new door status, null when the door was mid animation and nothing changed. */
+    /** next is the new door status, null when the door was mid animation and nothing changed */
     public record InteractionResult(
             @Nullable String animationName,
             boolean opening,
@@ -32,7 +32,7 @@ public final class DoorMotion {
         return interact(door, sneaking, now, false);
     }
 
-    /** openAllOnly is for a door with no left and right panels where every click just toggles between closed and fully open. */
+    /** openAllOnly is for doors with no left and right panels where every click just toggles closed and fully open */
     public static InteractionResult interact(DoorStatus door, boolean sneaking, long now, boolean openAllOnly) {
         if (door.isAnimating(now)) {
             return new InteractionResult(null, false, door.state(), null);

@@ -4,11 +4,11 @@ import net.fabricmc.fabric.api.object.builder.v1.block.entity.FabricBlockEntityT
 import net.minecraft.core.Registry;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.world.level.block.entity.BlockEntityType;
-import uk.nbforge.gallifreyan_chronicles.Constants;
 import uk.nbforge.gallifreyan_chronicles.core.block.registry.TardisBlocks;
 import uk.nbforge.gallifreyan_chronicles.core.block_entity.InteriorDoorBlockEntity;
 import uk.nbforge.gallifreyan_chronicles.core.block_entity.TardisConsoleBlockEntity;
 import uk.nbforge.gallifreyan_chronicles.core.block_entity.TardisExteriorBlockEntity;
+import uk.nbforge.gallifreyan_chronicles.util.GCLog;
 import uk.nbforge.gallifreyan_chronicles.util.GCUtil;
 
 public class GCBlockEntities {
@@ -39,6 +39,6 @@ public class GCBlockEntities {
         TardisConsoleBlockEntity.TYPE = () -> TARDIS_CONSOLE_BLOCK_ENTITY_TYPE;
         InteriorDoorBlockEntity.TYPE = () -> INTERIOR_DOOR_BLOCK_ENTITY_TYPE;
 
-        Constants.LOG.info("Registered GC Block Entities (Fabric)");
+        GCLog.CORE.info("Registered GC Block Entities (Fabric)");
     }
 }

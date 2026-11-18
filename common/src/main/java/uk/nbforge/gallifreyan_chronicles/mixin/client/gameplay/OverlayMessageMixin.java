@@ -11,8 +11,8 @@ import uk.nbforge.gallifreyan_chronicles.Constants;
 import uk.nbforge.gallifreyan_chronicles.config.GCConfig;
 
 /**
- * Hides the action bar messages of this mod when the player has turned them off.
- * Messages from vanilla and other mods are left alone, only translation keys in the namespace of this mod are dropped.
+ * hides the mod's action bar messages when the player turned them off. vanilla and other mods are left alone, only
+ * translation keys in the mod's namespace get dropped
  */
 @Mixin(Gui.class)
 public abstract class OverlayMessageMixin {

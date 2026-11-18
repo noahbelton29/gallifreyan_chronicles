@@ -62,8 +62,8 @@ public final class WatermarkRenderer {
     }
 
     /**
-     * Pushes the colour towards black if it is light and white if it is dark so the watermark stays visible, strength is how far it moves.
-     * The 299, 587 and 114 are the usual weights for how bright red, green and blue look.
+     * pushes light colours to black and dark ones to white so the watermark stays visible, strength is how far. 299,
+     * 587 and 114 are the usual rgb brightness weights
      */
     private static int tint(int argb, float strength) {
         int r = (argb >> 16) & 0xFF;

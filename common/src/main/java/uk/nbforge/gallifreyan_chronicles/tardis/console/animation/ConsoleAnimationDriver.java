@@ -10,9 +10,9 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 import org.jspecify.annotations.Nullable;
-import uk.nbforge.gallifreyan_chronicles.Constants;
 import uk.nbforge.gallifreyan_chronicles.network.tardis.TardisConsoleAnimationPayload;
 import uk.nbforge.gallifreyan_chronicles.platform.Services;
+import uk.nbforge.gallifreyan_chronicles.util.GCLog;
 
 public class ConsoleAnimationDriver implements ConsoleAnimatable {
     private static final String ROTOR = "rotor";
@@ -77,7 +77,7 @@ public class ConsoleAnimationDriver implements ConsoleAnimatable {
 
     @Override
     public void applyAnimationLocally(String controllerName, String animationName) {
-        Constants.LOG.debug("Client triggering animation: {} on controller: {}", animationName, controllerName);
+        GCLog.TARDIS.debug("Client triggering animation: {} on controller: {}", animationName, controllerName);
         if (ROTOR.equals(controllerName)) {
             return;
         }
@@ -89,7 +89,7 @@ public class ConsoleAnimationDriver implements ConsoleAnimatable {
             RawAnimation raw = RawAnimation.begin().thenPlay(animationName);
             controller.setAnimation(flip ? raw.thenWait(1) : raw);
         } else {
-            Constants.LOG.warn(
+            GCLog.TARDIS.warn(
                     "No animation controller found for control '{}', is it registered in TardisControls?",
                     controllerName);
         }

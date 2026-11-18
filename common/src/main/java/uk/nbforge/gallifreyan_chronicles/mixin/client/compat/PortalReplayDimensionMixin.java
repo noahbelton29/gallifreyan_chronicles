@@ -11,9 +11,10 @@ import qouteall.imm_ptl.core.network.ImmPtlNetworking;
 import qouteall.imm_ptl.core.portal.Portal;
 
 /**
- * In a replay the TARDIS dimensions do not exist and the portal packet for one throws and disconnects with a network protocol error, so skip just that packet.
- * Also in a replay the entity type inside the portal packet can come out wrong, it said TardisControlEntity, and Immersive Portals then refused the portal.
- * All our portals are the normal portal type so fix the type.
+ * tardis dimensions dont exist in a replay so the portal packet for one throws and disconnects u with a network
+ * protocol error, skip just that packet. also in a replay the entity type in the portal packet can come out wrong (it
+ * said TardisControlEntity) and immersive portals refused the portal. all tardis portals are the normal portal type so
+ * fix the type
  */
 @Pseudo
 @Mixin(targets = "qouteall.imm_ptl.core.network.ImmPtlNetworkingClient", remap = false)

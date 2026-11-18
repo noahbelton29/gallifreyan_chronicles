@@ -1,7 +1,7 @@
 package uk.nbforge.gallifreyan_chronicles.client.sound;
 
 import java.util.concurrent.atomic.AtomicBoolean;
-import uk.nbforge.gallifreyan_chronicles.Constants;
+import uk.nbforge.gallifreyan_chronicles.util.GCLog;
 
 public final class SoundResumeStatus {
     private static final AtomicBoolean ENGINE_HOOKED = new AtomicBoolean();
@@ -15,7 +15,7 @@ public final class SoundResumeStatus {
 
     public static void warnIfEngineUnhooked() {
         if (!ENGINE_HOOKED.get() && WARNED.compareAndSet(false, true)) {
-            Constants.LOG.warn(
+            GCLog.CLIENT.warn(
                     "The sound resume hook never ran; SoundEngineMixin's target lambda likely changed in this Minecraft version, so resumed sounds will restart from the beginning");
         }
     }

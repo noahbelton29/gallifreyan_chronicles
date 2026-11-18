@@ -7,7 +7,10 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Pseudo;
 import uk.nbforge.gallifreyan_chronicles.compat.flashback.FlashbackChunks;
 
-/** Before Flashback moves the recorded entities we look at the data to follow the recorded player into a TARDIS, see FlashbackPuppet. */
+/**
+ * before flashback moves the recorded entities the data gets checked to follow the recorded player into a tardis, see
+ * FlashbackPuppet
+ */
 @Pseudo
 @Mixin(targets = "com.moulberry.flashback.playback.ReplayServer", remap = false)
 public abstract class FollowRecordedPlayerMixin {

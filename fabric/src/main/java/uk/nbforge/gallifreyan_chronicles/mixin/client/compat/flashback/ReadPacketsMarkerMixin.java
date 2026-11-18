@@ -10,7 +10,10 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import uk.nbforge.gallifreyan_chronicles.compat.flashback.ReplayComponentIds;
 
-/** Marks when the replay server of Flashback is reading recorded packets and forgets the component numbers of the recording when the replay closes, see ReplayComponentIds. */
+/**
+ * marks when flashback's replay server is reading recorded packets and forgets the recording's component numbers when
+ * the replay closes, see ReplayComponentIds
+ */
 @Pseudo
 @Mixin(targets = "com.moulberry.flashback.playback.ReplayServer", remap = false)
 public abstract class ReadPacketsMarkerMixin {

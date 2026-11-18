@@ -51,7 +51,7 @@ public class StattenheimRemoteItem extends Item {
             say(player, "stattenheim_lost", ChatFormatting.RED);
             return InteractionResult.FAIL;
         }
-        if (isStranger(tardis, player)) {
+        if (tardis.isStranger(player)) {
             say(player, "stattenheim_not_yours", ChatFormatting.RED);
             return InteractionResult.FAIL;
         }
@@ -71,13 +71,13 @@ public class StattenheimRemoteItem extends Item {
         tardis.data().setLandingTarget(landingTarget);
 
         if (tardis.getControlState(GCTardisControls.SPACE_TIME_THROTTLE)) {
-            if (!tardis.land()) {
-                say(player, "stattenheim_cannot_summon", ChatFormatting.RED);
-                return InteractionResult.FAIL;
+            if (tardis.land()) {
+                player.getCooldowns().addCooldown(stack, SUMMON_COOLDOWN_TICKS);
+                say(player, "stattenheim_summoned", ChatFormatting.GREEN);
+                return InteractionResult.SUCCESS;
             }
-            player.getCooldowns().addCooldown(stack, SUMMON_COOLDOWN_TICKS);
-            say(player, "stattenheim_summoned", ChatFormatting.GREEN);
-            return InteractionResult.SUCCESS;
+            say(player, "stattenheim_cannot_summon", ChatFormatting.RED);
+            return InteractionResult.FAIL;
         }
 
         tardis.closeDoors();
@@ -108,7 +108,7 @@ public class StattenheimRemoteItem extends Item {
             say(player, "stattenheim_cannot_link", ChatFormatting.RED);
             return InteractionResult.FAIL;
         }
-        if (isStranger(tardis, player)) {
+        if (tardis.isStranger(player)) {
             say(player, "stattenheim_not_yours", ChatFormatting.RED);
             return InteractionResult.FAIL;
         }
@@ -127,10 +127,6 @@ public class StattenheimRemoteItem extends Item {
                             .withStyle(ChatFormatting.GREEN));
         }
         return InteractionResult.SUCCESS;
-    }
-
-    private static boolean isStranger(Tardis tardis, Player player) {
-        return !tardis.isOwner(player) && !tardis.isTrusted(player.getUUID());
     }
 
     private static boolean isInsideATardis(ServerLevel level) {

@@ -16,13 +16,13 @@ import net.minecraft.world.level.biome.BiomeManager;
 import net.minecraft.world.level.dimension.LevelStem;
 import net.minecraft.world.level.storage.DerivedLevelData;
 import org.jspecify.annotations.Nullable;
-import uk.nbforge.gallifreyan_chronicles.Constants;
 import uk.nbforge.gallifreyan_chronicles.compat.portal.TardisPortalBridge;
 import uk.nbforge.gallifreyan_chronicles.core.GCDimensions;
 import uk.nbforge.gallifreyan_chronicles.core.block_entity.TardisConsoleBlockEntity;
 import uk.nbforge.gallifreyan_chronicles.core.lifecycle.ServerState;
 import uk.nbforge.gallifreyan_chronicles.mixin.server.MinecraftServerAccessor;
 import uk.nbforge.gallifreyan_chronicles.tardis.interior.TardisInteriors;
+import uk.nbforge.gallifreyan_chronicles.util.GCLog;
 import uk.nbforge.gallifreyan_chronicles.util.GCUtil;
 
 public final class TardisDimensionManager {
@@ -36,7 +36,7 @@ public final class TardisDimensionManager {
         return ResourceKey.create(Registries.DIMENSION, GCUtil.modIdentifier("tardis/" + tardisId));
     }
 
-    /** Use {@link Tardis#interiorLevel()}, this is what it reads. */
+    /** use {@link Tardis#interiorLevel()}, this is what it reads */
     public static @Nullable ServerLevel get(Tardis tardis) {
         return tardis.server().getLevel(levelKey(tardis.id()));
     }
@@ -75,7 +75,7 @@ public final class TardisDimensionManager {
         level.getWorldBorder().setAbsoluteMaxSize(server.getAbsoluteMaxWorldSize());
         server.getPlayerList().addWorldborderListener(level);
 
-        Constants.LOG.info("created tardis dimension {}", key.identifier());
+        GCLog.TARDIS.info("Created TARDIS dimension {}", key.identifier());
         TardisPortalBridge.onDimensionsChanged(server);
         return level;
     }
@@ -87,7 +87,7 @@ public final class TardisDimensionManager {
             try {
                 Tardis.get(server, tardisId).ifPresent(TardisDimensionManager::getOrCreate);
             } catch (Exception e) {
-                Constants.LOG.error("failed to restore tardis dimension for {}", tardisId, e);
+                GCLog.TARDIS.error("Couldn't restore TARDIS dimension for {}", tardisId, e);
             }
         }
     }
@@ -117,7 +117,7 @@ public final class TardisDimensionManager {
                 ServerLevel level = getOrCreate(tardis);
                 teleportPlayerIntoInterior(tardis, player, level);
             } catch (Exception e) {
-                Constants.LOG.error("failed to enter tardis {}", entry.getValue(), e);
+                GCLog.TARDIS.error("Couldn't enter TARDIS {}", entry.getValue(), e);
             }
         }
     }
@@ -155,7 +155,7 @@ public final class TardisDimensionManager {
                     .flatMap(Tardis::console)
                     .ifPresentOrElse(
                             TardisConsoleBlockEntity::respawnControls,
-                            () -> Constants.LOG.warn("no console to place controls on for tardis {}", tardisId));
+                            () -> GCLog.TARDIS.warn("No console to place controls on for TARDIS {}", tardisId));
         }
     }
 }

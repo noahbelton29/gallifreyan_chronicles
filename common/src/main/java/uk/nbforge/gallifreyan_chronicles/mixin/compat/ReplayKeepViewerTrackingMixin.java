@@ -20,9 +20,10 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import qouteall.imm_ptl.core.network.PacketRedirection;
 
 /**
- * Immersive Portals does its own check for who can see an entity and the Flashback replay camera never looks loaded to it, so once a portal showed up it stopped sending entities like the recorded player to the camera and they froze.
- * We never take the replay camera off the watcher list of an entity.
- * ip_updateEntityTrackingStatus is added by Immersive Portals so our priority is above theirs at 1000 to run after it.
+ * immersive portals does its own check for who can see an entity and the flashback replay camera never looks loaded to
+ * it, so once a portal showed up it stopped sending entities (like the recorded player) to the camera and they froze.
+ * the replay camera never gets taken off an entity's watcher list. ip_updateEntityTrackingStatus is added by immersive
+ * portals so this mixin's priority is 1000 to run after it
  */
 @Mixin(targets = "net.minecraft.server.level.ChunkMap$TrackedEntity", priority = 1500)
 public abstract class ReplayKeepViewerTrackingMixin {

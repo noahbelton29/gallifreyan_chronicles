@@ -10,8 +10,8 @@ import uk.nbforge.gallifreyan_chronicles.core.GCTardisControls;
 import uk.nbforge.gallifreyan_chronicles.datagen.util.GCJson;
 
 /**
- * Every method is optional.
- * Control ids come from GCTardisControls so a typo is a compile error and not a control that quietly never spawns.
+ * every method is optional. control ids come from GCTardisControls so a typo is a compile error and not a control that
+ * quietly never spawns
  */
 public final class ConsoleBuilder {
     public static final double INTERIOR_DOOR_COOLDOWN = 3.35;
@@ -79,9 +79,7 @@ public final class ConsoleBuilder {
                 .control(GCTardisControls.CLOISTER_BELL_CONTROL, 0.5);
     }
 
-    /**
-     * Goes right after the door control, needs standardControls first.
-     */
+    /** goes right after the door control, needs standardControls first */
     public void interiorDoorControl() {
         interiorDoorControl(details -> {});
     }
@@ -115,9 +113,7 @@ public final class ConsoleBuilder {
         return this;
     }
 
-    /**
-     * Anything left unset is taken from the console model.
-     */
+    /** anything left unset comes from the console model */
     public static final class Control {
         private final String id;
         private double cooldown;
@@ -130,17 +126,12 @@ public final class ConsoleBuilder {
             this.cooldown = cooldown;
         }
 
-        /**
-         * Where it is, in blocks from the console.
-         */
+        /** in blocks from the console */
         public Control at(double x, double y, double z) {
             this.position = new double[] {x, y, z};
             return this;
         }
 
-        /**
-         * The size of the hitbox, width then height then depth.
-         */
         public Control size(double width, double height, double depth) {
             this.size = new double[] {width, height, depth};
             return this;
@@ -169,9 +160,7 @@ public final class ConsoleBuilder {
             return GCJson.arr(values[0], values[1], values[2]);
         }
 
-        /**
-         * A whole number is written as 1 and not 1.0 to match how the files have always read.
-         */
+        /** whole numbers get written as 1 not 1.0 to match how the files have always looked */
         private static Number number(double value) {
             if (value == Math.rint(value)) return Long.valueOf((long) value);
             return Double.valueOf(value);

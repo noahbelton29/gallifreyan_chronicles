@@ -1,7 +1,6 @@
 package uk.nbforge.gallifreyan_chronicles.network.client;
 
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
-import uk.nbforge.gallifreyan_chronicles.Constants;
 import uk.nbforge.gallifreyan_chronicles.network.DimensionSkySyncPayload;
 import uk.nbforge.gallifreyan_chronicles.network.DiscoveryToastPayload;
 import uk.nbforge.gallifreyan_chronicles.network.ResumeSoundPayload;
@@ -15,6 +14,7 @@ import uk.nbforge.gallifreyan_chronicles.network.tardis.TardisDrumShakePayload;
 import uk.nbforge.gallifreyan_chronicles.network.tardis.TardisExteriorSyncPayload;
 import uk.nbforge.gallifreyan_chronicles.network.tardis.TardisFrightPayload;
 import uk.nbforge.gallifreyan_chronicles.network.tardis.TardisInteriorSyncPayload;
+import uk.nbforge.gallifreyan_chronicles.util.GCLog;
 
 public final class GCFabricClientNetworking {
     private GCFabricClientNetworking() {}
@@ -68,6 +68,6 @@ public final class GCFabricClientNetworking {
         ClientPlayNetworking.registerGlobalReceiver(
                 ResumeSoundPayload.TYPE, (payload, context) -> context.client().execute(payload::apply));
 
-        Constants.LOG.info("Registered GC Client Networking (Fabric)");
+        GCLog.CORE.info("Registered GC Client Networking (Fabric)");
     }
 }

@@ -9,10 +9,10 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import uk.nbforge.gallifreyan_chronicles.compat.flashback.FlashbackChunks;
 
 /**
- * Seamless Portals has its own client chunk store next to the one of Immersive Portals and it throws away chunks far from where it thinks the portal view is.
- * Once the recorded player walked into the TARDIS that moved, the interior chunks got thrown away and the door showed empty sky.
- * In a replay nothing sends them again so keep them.
- * the door was just empty sky for ages before this, so annoying.
+ * seamless portals has its own client chunk store next to immersive portals one and it throws away chunks far from
+ * where it thinks the portal view is. once the recorded player walked into the tardis that moved, the interior chunks
+ * got binned and the door showed empty sky. in a replay nothing sends them again so keep them. the door was just empty
+ * sky for ages before this, so annoying
  */
 @Pseudo
 @Mixin(targets = "com.warwa.seamlessportals.client.SeamlessClientChunkMap", remap = false)

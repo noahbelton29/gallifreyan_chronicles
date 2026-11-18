@@ -182,18 +182,18 @@ public final class TardisDestinations {
     private static List<ServerLevel> landableLevels(MinecraftServer server) {
         List<ServerLevel> levels = new ArrayList<>();
         for (ServerLevel level : server.getAllLevels()) {
-            if (!isTardisInterior(level)) levels.add(level);
+            if (isLandable(level)) levels.add(level);
         }
         levels.sort(Comparator.comparing(
                 (ServerLevel level) -> level.dimension().identifier().toString()));
         return levels;
     }
 
-    private static boolean isTardisInterior(ServerLevel level) {
-        if (Tardis.idOfLevel(level).isPresent()) return true;
-        if (level.dimension().equals(GCDimensions.TARDIS_INTERIOR_LEVEL_KEY)) return true;
+    private static boolean isLandable(ServerLevel level) {
+        if (Tardis.idOfLevel(level).isPresent()) return false;
+        if (level.dimension().equals(GCDimensions.TARDIS_INTERIOR_LEVEL_KEY)) return false;
         Identifier id = level.dimension().identifier();
-        return id.getNamespace().equals(Constants.MOD_ID) && id.getPath().startsWith("tardis");
+        return !id.getNamespace().equals(Constants.MOD_ID) || !id.getPath().startsWith("tardis");
     }
 
     private static int wrapWorld(long value) {

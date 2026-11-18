@@ -10,7 +10,7 @@ import uk.nbforge.gallifreyan_chronicles.client.gui.toast.DiscoveryToast;
 import uk.nbforge.gallifreyan_chronicles.platform.Services;
 import uk.nbforge.gallifreyan_chronicles.util.GCUtil;
 
-/** kind is personality, trait or disability. */
+/** kind is personality, trait or disability */
 public record DiscoveryToastPayload(String kind, String id) implements CustomPacketPayload {
     public static final Type<DiscoveryToastPayload> TYPE = new Type<>(GCUtil.modIdentifier("discovery_toast"));
 

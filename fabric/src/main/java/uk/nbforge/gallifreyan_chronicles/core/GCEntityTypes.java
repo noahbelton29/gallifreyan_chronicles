@@ -3,9 +3,9 @@ package uk.nbforge.gallifreyan_chronicles.core;
 import net.minecraft.core.Registry;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.world.entity.EntityType;
-import uk.nbforge.gallifreyan_chronicles.Constants;
 import uk.nbforge.gallifreyan_chronicles.core.entity.TardisControlEntity;
 import uk.nbforge.gallifreyan_chronicles.core.entity.TardisKeyEntity;
+import uk.nbforge.gallifreyan_chronicles.util.GCLog;
 import uk.nbforge.gallifreyan_chronicles.util.GCUtil;
 
 public class GCEntityTypes {
@@ -23,6 +23,6 @@ public class GCEntityTypes {
                 BuiltInRegistries.ENTITY_TYPE, GCUtil.modIdentifier("tardis_key"), GCEntityTypeBuilders.tardisKey());
         TardisKeyEntity.TYPE = () -> TARDIS_KEY_ENTITY_TYPE;
 
-        Constants.LOG.info("Registered GC Entity Types");
+        GCLog.CORE.info("Registered GC Entity Types");
     }
 }

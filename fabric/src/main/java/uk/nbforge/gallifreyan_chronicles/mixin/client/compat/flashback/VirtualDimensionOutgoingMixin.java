@@ -8,7 +8,10 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import uk.nbforge.gallifreyan_chronicles.compat.flashback.FlashbackChunks;
 
-/** In a replay, do not tell the replay server that the camera went through a door or where it moves while it is in the TARDIS world, see ReplayVirtualDimension. */
+/**
+ * in a replay dont tell the replay server the camera went thru a door or where it moves while its in the tardis world,
+ * see ReplayVirtualDimension
+ */
 @Mixin(ClientCommonPacketListenerImpl.class)
 public abstract class VirtualDimensionOutgoingMixin {
     @Inject(

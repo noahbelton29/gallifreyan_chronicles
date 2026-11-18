@@ -19,8 +19,8 @@ import net.minecraft.client.renderer.texture.DynamicTexture;
 import net.minecraft.resources.Identifier;
 import net.minecraft.server.packs.resources.ResourceManager;
 import org.jspecify.annotations.Nullable;
-import uk.nbforge.gallifreyan_chronicles.Constants;
 import uk.nbforge.gallifreyan_chronicles.core.block.DoorRoundelInteraction;
+import uk.nbforge.gallifreyan_chronicles.util.GCLog;
 import uk.nbforge.gallifreyan_chronicles.util.GCUtil;
 
 public final class DoorRoundelTextures {
@@ -39,8 +39,7 @@ public final class DoorRoundelTextures {
         Identifier cached = CACHE.get(key);
         if (cached != null) return cached;
 
-        // a failed build isn't remembered for good, so fixing the cause needs no restart, but it isn't retried every
-        // frame either
+        // failures expire so fixing the cause doesnt need a restart, but it doesnt retry every frame either
         long now = System.currentTimeMillis();
         Long lastFailure = LAST_FAILURE.get(key);
         if (lastFailure != null && now - lastFailure < RETRY_MS) return baseTexture;
@@ -73,17 +72,16 @@ public final class DoorRoundelTextures {
             List<Leaf> leaves = leaves(JsonParser.parseString(new String(geoIn.readAllBytes(), StandardCharsets.UTF_8))
                     .getAsJsonObject());
             if (leaves.isEmpty()) {
-                Constants.LOG.warn(
+                GCLog.CLIENT.warn(
                         "No door leaves found in model {}, so {} can't be painted on it", model, roundelBlockId);
                 return baseTexture;
             }
 
-            // not in the try header cos the texture manager owns it once registered, only close it if we bail before
-            // that
+            // texture manager owns it once registered so only close it if it bails before that
             NativeImage image = NativeImage.read(baseIn);
             try {
                 paint(image, roundel, wall, leaves);
-                Constants.LOG.info(
+                GCLog.CLIENT.info(
                         "Built door texture for {} (wall block {}) on {}, {} leaves painted",
                         roundelBlockId,
                         wallId,
@@ -102,7 +100,7 @@ public final class DoorRoundelTextures {
                 throw e;
             }
         } catch (Exception e) {
-            Constants.LOG.warn("Could not build a door texture from {} on {}", roundelBlockId, baseTexture, e);
+            GCLog.CLIENT.warn("Couldn't build a door texture from {} on {}", roundelBlockId, baseTexture, e);
             return baseTexture;
         }
     }
@@ -113,13 +111,15 @@ public final class DoorRoundelTextures {
         try (InputStream wallIn = resources.open(wallId)) {
             return NativeImage.read(wallIn);
         } catch (Exception e) {
-            Constants.LOG.warn("Could not read wall block texture {} for door style {}", wallId, roundelBlockId, e);
+            GCLog.CLIENT.warn("Couldn't read wall block texture {} for door style {}", wallId, roundelBlockId, e);
             return null;
         }
     }
 
-    /** the plain block this roundel block is the roundel version of: brachacki_roundel_block_4 -> brachacki_wall_block_4,
-     * oak_half_roundel_block -> oak planks, gray_concrete_roundel_block -> gray concrete */
+    /**
+     * the plain block this roundel block is the roundel version of: brachacki_roundel_block_4 ->
+     * brachacki_wall_block_4, oak_half_roundel_block -> oak planks, gray_concrete_roundel_block -> gray concrete
+     */
     private static Identifier wallTexture(ResourceManager resources, Identifier roundelBlock) {
         for (Identifier candidate : DoorRoundelInteraction.wallBlockCandidates(roundelBlock)) {
             Identifier texture = candidate.withPrefix("textures/block/").withSuffix(".png");
@@ -128,7 +128,9 @@ public final class DoorRoundelTextures {
         return null;
     }
 
-    /** the big, plain cubes: the door leaves. a half turn about the vertical axis doesn't change which faces they are */
+    /**
+     * the big, plain cubes: the door leaves. a half turn about the vertical axis doesn't change which faces they are
+     */
     private static List<Leaf> leaves(JsonObject geo) {
         List<Leaf> result = new ArrayList<>();
         JsonArray geometries = geo.getAsJsonArray("minecraft:geometry");
@@ -162,9 +164,11 @@ public final class DoorRoundelTextures {
         return result;
     }
 
-    /** box uv layout, left to right on the row below the top and bottom faces:
-     * west (d wide), north (w wide), east (d wide), south (w wide), each h tall. top and bottom (w wide, d tall) sit
-     * on the row above, at the north and east columns. */
+    /**
+     * box uv layout, left to right on the row below the top and bottom faces: west (d wide), north (w wide), east (d
+     * wide), south (w wide), each h tall. top and bottom (w wide, d tall) sit on the row above, at the north and east
+     * columns
+     */
     private static void paint(NativeImage image, NativeImage roundel, NativeImage wall, List<Leaf> leaves) {
         for (Leaf leaf : leaves) {
             int w = leaf.width();

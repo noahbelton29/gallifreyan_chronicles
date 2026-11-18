@@ -28,6 +28,7 @@ import uk.nbforge.gallifreyan_chronicles.config.GCConfig;
 import uk.nbforge.gallifreyan_chronicles.core.block.InteriorDoorBlock;
 import uk.nbforge.gallifreyan_chronicles.core.block_entity.InteriorDoorBlockEntity;
 import uk.nbforge.gallifreyan_chronicles.tardis.exterior.TardisExterior;
+import uk.nbforge.gallifreyan_chronicles.util.GCLog;
 
 public class InteriorDoorBlockRenderer
         extends GeoBlockRenderer<@NonNull InteriorDoorBlockEntity, @NonNull TardisExteriorBlockRenderState> {
@@ -140,8 +141,7 @@ public class InteriorDoorBlockRenderer
         Identifier skin = InteriorDoorBlockModel.textureFor(renderState);
         if (!skin.equals(texture) || skin.getPath().startsWith("dynamic/")) {
             if (LOGGED_SKINS.add(skin)) {
-                uk.nbforge.gallifreyan_chronicles.Constants.LOG.info(
-                        "Interior door is drawn with {} (GeckoLib offered {})", skin, texture);
+                GCLog.CLIENT.info("Interior door is drawn with {} (GeckoLib offered {})", skin, texture);
             }
         }
         if (opacity < 1.0f) return RenderTypes.entityTranslucentCull(skin);

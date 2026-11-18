@@ -10,12 +10,12 @@ import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.equipment.ArmorType;
-import uk.nbforge.gallifreyan_chronicles.Constants;
 import uk.nbforge.gallifreyan_chronicles.core.item.MalletItem;
 import uk.nbforge.gallifreyan_chronicles.core.item.MasterTardisKeyItem;
 import uk.nbforge.gallifreyan_chronicles.core.item.PeaceOfferingItem;
 import uk.nbforge.gallifreyan_chronicles.core.item.StattenheimRemoteItem;
 import uk.nbforge.gallifreyan_chronicles.core.item.TardisKeyItem;
+import uk.nbforge.gallifreyan_chronicles.util.GCLog;
 import uk.nbforge.gallifreyan_chronicles.util.GCUtil;
 
 public class GCItems {
@@ -103,6 +103,6 @@ public class GCItems {
     }
 
     public static void registerItems() {
-        Constants.LOG.info("Registered GC Items");
+        GCLog.CORE.info("Registered GC Items");
     }
 }

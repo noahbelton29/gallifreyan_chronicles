@@ -13,8 +13,8 @@ public class GCTardisDoorVariantProvider extends GCJsonDataProvider {
 
     @Override
     protected void addEntries() {
-        // exteriorDoor takes name, block and priority, interiorDoor takes name, exterior and priority. Add a default or
-        // particle property for the rare extras.
+        // exteriorDoor takes name, block and priority, interiorDoor takes name, exterior and priority. add a default or
+        // particle property for the rare extras
         exteriorDoor("first_doctors_doors", "first_doctors_door", 1).addProperty("default", true);
         exteriorDoor("hellbent_doors", "hellbent_door", 5).addProperty("particle", mod("brachacki_wall_block_4"));
         exteriorDoor("second_doctors_doors", "second_doctors_door", 2);

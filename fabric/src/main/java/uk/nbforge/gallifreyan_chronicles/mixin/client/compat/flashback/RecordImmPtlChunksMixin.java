@@ -12,12 +12,12 @@ import org.spongepowered.asm.mixin.Pseudo;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Coerce;
 import qouteall.imm_ptl.core.chunk_loading.ImmPtlClientChunkMap;
-import uk.nbforge.gallifreyan_chronicles.Constants;
+import uk.nbforge.gallifreyan_chronicles.util.GCLog;
 
 /**
- * When you start recording Flashback saves the chunks that are already loaded.
- * It reads them from the vanilla chunk array but Immersive Portals keeps its chunks somewhere else, so that array is empty and the replay had no world.
- * Here we give Flashback the chunks of Immersive Portals instead.
+ * when u start recording flashback saves the chunks that are already loaded. it reads them from the vanilla chunk array
+ * but immersive portals keeps its chunks somewhere else, so that array is empty and the replay had no world. flashback
+ * gets the immersive portals chunks instead
  */
 @Pseudo
 @Mixin(targets = "com.moulberry.flashback.record.Recorder", remap = false)
@@ -47,8 +47,8 @@ public abstract class RecordImmPtlChunksMixin {
                     }
                 if (!solid) air++;
             }
-            Constants.LOG.info(
-                    "[record snapshot] {} chunks, {} all-air, level={}",
+            GCLog.REPLAY.info(
+                    "Record snapshot: {} chunks, {} all-air, level={}",
                     chunks.size(),
                     air,
                     level.dimension().identifier());

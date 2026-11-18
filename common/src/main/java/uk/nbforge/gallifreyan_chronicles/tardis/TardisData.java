@@ -12,7 +12,7 @@ import org.jspecify.annotations.Nullable;
 import uk.nbforge.gallifreyan_chronicles.tardis.flight.LandingTarget;
 import uk.nbforge.gallifreyan_chronicles.tardis.mind.TardisMind;
 
-/** Every setter marks the save as changed. */
+/** every setter marks the save as changed */
 public final class TardisData {
     private final Set<UUID> trusted = new HashSet<>();
     private @Nullable TardisManager manager;
@@ -95,7 +95,8 @@ public final class TardisData {
     }
 
     /**
-     * Ticks it must spend in flight before it can land, overriding the normal distance formula. Null means use the default.
+     * ticks it has to spend in flight before it can land, overrides the normal distance formula. null means use the
+     * default
      */
     public @Nullable Long getFlightDurationOverride() {
         return flightDurationOverride;
@@ -115,9 +116,7 @@ public final class TardisData {
         changed();
     }
 
-    /**
-     * Index into TardisDestinations INCREMENTS, the step the x, y and z controls of the console move the destination by.
-     */
+    /** index into TardisDestinations INCREMENTS, the step the console's x, y and z controls move the destination by */
     public int getCoordIncrementIndex() {
         return coordIncrementIndex;
     }
@@ -136,9 +135,7 @@ public final class TardisData {
         changed();
     }
 
-    /**
-     * The mind, rolled and saved the first time it is asked for.
-     */
+    /** rolled and saved the first time its asked for */
     public TardisMind mind() {
         if (mind == null) {
             mind = TardisMind.roll(id());

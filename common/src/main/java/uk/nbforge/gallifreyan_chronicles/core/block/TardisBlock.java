@@ -27,16 +27,20 @@ import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
-import uk.nbforge.gallifreyan_chronicles.Constants;
 import uk.nbforge.gallifreyan_chronicles.compat.portal.TardisPortalBridge;
 import uk.nbforge.gallifreyan_chronicles.core.GCDataComponents;
 import uk.nbforge.gallifreyan_chronicles.core.block_entity.TardisExteriorBlockEntity;
 import uk.nbforge.gallifreyan_chronicles.core.data_registry.TardisExteriorRegistry;
 import uk.nbforge.gallifreyan_chronicles.core.data_registry.TardisInteriorRegistry;
-import uk.nbforge.gallifreyan_chronicles.tardis.*;
+import uk.nbforge.gallifreyan_chronicles.tardis.Tardis;
+import uk.nbforge.gallifreyan_chronicles.tardis.TardisData;
+import uk.nbforge.gallifreyan_chronicles.tardis.TardisDimensionUtil;
+import uk.nbforge.gallifreyan_chronicles.tardis.TardisIdentity;
+import uk.nbforge.gallifreyan_chronicles.tardis.TardisManager;
 import uk.nbforge.gallifreyan_chronicles.tardis.deletion.TardisDeletion;
 import uk.nbforge.gallifreyan_chronicles.tardis.exterior.ExteriorCollisionUtil;
 import uk.nbforge.gallifreyan_chronicles.tardis.interior.TardisInterior;
+import uk.nbforge.gallifreyan_chronicles.util.GCLog;
 import uk.nbforge.gallifreyan_chronicles.util.MessageUtil;
 import uk.nbforge.gallifreyan_chronicles.util.SchedulerUtil;
 
@@ -56,7 +60,7 @@ public class TardisBlock extends BaseEntityBlock {
 
     private static void applyChosenInterior(
             ServerLevel level, TardisExteriorBlockEntity blockEntity, TardisIdentity record, String chosen) {
-        if (chosen == null || !TardisInteriorRegistry.contains(chosen)) return;
+        if (chosen == null || TardisInteriorRegistry.isUnknown(chosen)) return;
 
         TardisInterior interior = TardisInteriorRegistry.get(chosen);
         Tardis.get(level.getServer(), record.tardisId())
@@ -66,10 +70,10 @@ public class TardisBlock extends BaseEntityBlock {
         applyExteriorFromInterior(blockEntity, chosen);
     }
 
-    /** works on either side cos it only changes the local block entity */
+    /** works on either side cuz it only changes the local block entity */
     private static void applyExteriorFromInterior(
             TardisExteriorBlockEntity blockEntity, @Nullable String chosenInterior) {
-        if (chosenInterior == null || !TardisInteriorRegistry.contains(chosenInterior)) return;
+        if (chosenInterior == null || TardisInteriorRegistry.isUnknown(chosenInterior)) return;
 
         String exteriorId = TardisInteriorRegistry.get(chosenInterior).resolveExteriorId();
         if (TardisExteriorRegistry.contains(exteriorId)) {
@@ -140,7 +144,7 @@ public class TardisBlock extends BaseEntityBlock {
             SchedulerUtil.runLater(
                     server, 1, () -> Tardis.get(server, tardisId).ifPresent(TardisPortalBridge::onExteriorPlaced));
 
-            Constants.LOG.debug(
+            GCLog.CORE.debug(
                     "Registered TARDIS {} for player {}",
                     record.tardisId(),
                     player.getName().getString());

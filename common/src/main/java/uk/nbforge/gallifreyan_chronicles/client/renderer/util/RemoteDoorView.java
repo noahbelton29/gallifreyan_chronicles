@@ -3,7 +3,7 @@ package uk.nbforge.gallifreyan_chronicles.client.renderer.util;
 import net.minecraft.client.Minecraft;
 import net.minecraft.world.level.Level;
 
-/** Client only helper kept in its own class so dedicated servers never load Minecraft through the door block. */
+/** kept in its own class so dedicated servers never load Minecraft thru the door block */
 public final class RemoteDoorView {
     private RemoteDoorView() {}
 

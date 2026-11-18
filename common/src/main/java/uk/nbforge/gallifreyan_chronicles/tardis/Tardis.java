@@ -49,13 +49,13 @@ public final class Tardis {
         return Optional.of(new Tardis(server, tardisId));
     }
 
-    /** The TARDIS whose interior this is, empty on the client and outside interiors. */
+    /** empty on the client and outside interiors */
     public static Optional<Tardis> ofLevel(Level level) {
         if (!(level instanceof ServerLevel serverLevel)) return Optional.empty();
         return idOfLevel(level).flatMap(id -> get(serverLevel.getServer(), id));
     }
 
-    /** The linked TARDIS, or the one whose interior the block is in. Empty on the client. */
+    /** the linked tardis or the one whose interior the block is in, empty on the client */
     public static <T extends BlockEntity & TardisLinkable> Optional<Tardis> of(T blockEntity) {
         if (!(blockEntity.getLevel() instanceof ServerLevel level)) return Optional.empty();
         UUID id =
@@ -76,7 +76,7 @@ public final class Tardis {
                 .toList();
     }
 
-    /** A console with no TARDIS never blocks anyone. */
+    /** a console with no tardis never blocks anyone */
     public static <T extends BlockEntity & TardisLinkable> boolean cannotUseControls(T console, Player player) {
         return of(console).map(tardis -> tardis.cannotUseControls(player)).orElse(false);
     }
@@ -114,8 +114,8 @@ public final class Tardis {
         return data;
     }
 
-    public boolean exists() {
-        return TardisManager.get(server).getTardis(id) != null;
+    public boolean isDeleted() {
+        return TardisManager.get(server).getTardis(id) == null;
     }
 
     private TardisIdentity record() {
@@ -138,9 +138,7 @@ public final class Tardis {
         return Optional.ofNullable(server.getPlayerList().getPlayer(ownerId()));
     }
 
-    /**
-     * The name of the owner, live from the player if they are online and saved for later, otherwise the last saved name.
-     */
+    /** live from the player if theyre online (and saved for later), otherwise the last saved name */
     public Optional<String> ownerName() {
         Optional<ServerPlayer> online = ownerPlayer();
         if (online.isPresent()) {
@@ -192,9 +190,7 @@ public final class Tardis {
         return ConsoleSync.consolesOf(id);
     }
 
-    /**
-     * The console block entity, a live one first and if there is none it loads the chunk at the saved position.
-     */
+    /** a live one first, if theres none it loads the chunk at the saved position */
     public Optional<TardisConsoleBlockEntity> console() {
         TardisConsoleBlockEntity live = ConsoleSync.firstLiveOf(id);
         if (live != null) return Optional.of(live);
@@ -335,11 +331,11 @@ public final class Tardis {
     }
 
     public boolean cannotUseControls(Player player) {
-        return isIsomorphicActive() && !isOwner(player) && !isTrusted(player.getUUID());
+        return isIsomorphicActive() && isStranger(player);
     }
 
-    public boolean isTrusted(UUID playerId) {
-        return data().isTrusted(playerId);
+    public boolean isStranger(Player player) {
+        return !(isOwner(player) || data().isTrusted(player.getUUID()));
     }
 
     public boolean trust(UUID playerId) {

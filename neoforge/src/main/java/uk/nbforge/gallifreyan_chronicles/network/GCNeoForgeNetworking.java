@@ -24,6 +24,7 @@ import uk.nbforge.gallifreyan_chronicles.network.tardis.TardisFrightPayload;
 import uk.nbforge.gallifreyan_chronicles.network.tardis.TardisInteriorSyncPayload;
 import uk.nbforge.gallifreyan_chronicles.network.tardis.TardisPayloadCodec;
 import uk.nbforge.gallifreyan_chronicles.platform.Services;
+import uk.nbforge.gallifreyan_chronicles.util.GCLog;
 
 @EventBusSubscriber(modid = Constants.MOD_ID)
 public final class GCNeoForgeNetworking {
@@ -84,7 +85,7 @@ public final class GCNeoForgeNetworking {
                 ResumeSoundPayload.TYPE,
                 ResumeSoundPayload.STREAM_CODEC,
                 (payload, context) -> context.enqueueWork(payload::apply));
-        Constants.LOG.info("Registered GC Networking");
+        GCLog.CORE.info("Registered GC Networking");
     }
 
     @SubscribeEvent

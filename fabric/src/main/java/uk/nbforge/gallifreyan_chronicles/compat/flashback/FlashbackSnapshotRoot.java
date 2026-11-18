@@ -10,8 +10,8 @@ import qouteall.imm_ptl.core.ClientWorldLoader;
 import uk.nbforge.gallifreyan_chronicles.client.sound.SoundListener;
 
 /**
- * See SnapshotOutsideWorldMixin.
- * Remembers the last world that is not a TARDIS and takes snapshots from there while you are inside one.
+ * see SnapshotOutsideWorldMixin. remembers the last world that isnt a tardis and takes snapshots from there while ur
+ * inside one
  */
 final class FlashbackSnapshotRoot {
     private static @Nullable ResourceKey<Level> lastOutside;

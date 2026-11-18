@@ -11,7 +11,7 @@ import net.minecraft.server.packs.resources.ResourceManager;
 import net.minecraft.server.packs.resources.SimpleJsonResourceReloadListener;
 import net.minecraft.util.profiling.ProfilerFiller;
 import org.jspecify.annotations.NonNull;
-import uk.nbforge.gallifreyan_chronicles.Constants;
+import uk.nbforge.gallifreyan_chronicles.util.GCLog;
 
 public final class GCJsonReloadListener<T extends IdentifiableData<T>> extends SimpleJsonResourceReloadListener<T> {
 
@@ -64,11 +64,11 @@ public final class GCJsonReloadListener<T extends IdentifiableData<T>> extends S
             Identifier fileId = entry.getKey();
             String id = fileId.getNamespace() + ":" + fileId.getPath();
             register.accept(entry.getValue().withId(id));
-            Constants.LOG.debug("Loaded {}: {}", logLabel, id);
+            GCLog.DATA.debug("Loaded {}: {}", logLabel, id);
         }
 
         afterReload.run();
-        Constants.LOG.info("Loaded {} {}(s)", size.getAsInt(), logLabel);
+        GCLog.DATA.info("Loaded {} {}(s)", size.getAsInt(), logLabel);
 
         MinecraftServer server = currentServer;
         if (server != null) {

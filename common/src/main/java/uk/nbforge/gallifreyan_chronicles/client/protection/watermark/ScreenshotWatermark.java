@@ -6,7 +6,7 @@ import java.util.Set;
 import java.util.WeakHashMap;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.User;
-import uk.nbforge.gallifreyan_chronicles.Constants;
+import uk.nbforge.gallifreyan_chronicles.util.GCLog;
 
 public final class ScreenshotWatermark {
     private static final int MIN_SIZE = 256;
@@ -19,8 +19,8 @@ public final class ScreenshotWatermark {
     public static void apply(NativeImage image) {
         if (DONE.contains(image)) return;
         try {
-            Constants.LOG.debug(
-                    "[GC] Screenshot callback: {}x{}, watermark enabled={}",
+            GCLog.TESTER.debug(
+                    "Screenshot callback: {}x{}, watermark enabled={}",
                     image.getWidth(),
                     image.getHeight(),
                     WatermarkIdentity.enabled());
@@ -31,9 +31,9 @@ public final class ScreenshotWatermark {
             String label = WatermarkIdentity.label(user.getName(), user.getProfileId());
             WatermarkRenderer.apply(new NativeImageSurface(image), label, WatermarkIdentity.seed(label));
             DONE.add(image);
-            Constants.LOG.debug("[GC] Watermarked screenshot with build ID {}", WatermarkIdentity.buildId());
+            GCLog.TESTER.debug("Watermarked screenshot with build ID {}", WatermarkIdentity.buildId());
         } catch (Throwable t) {
-            Constants.LOG.error("Failed to watermark screenshot", t);
+            GCLog.TESTER.error("Couldn't watermark screenshot", t);
         }
     }
 

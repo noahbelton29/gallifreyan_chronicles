@@ -75,7 +75,7 @@ public final class TardisMinds {
         TardisEvents.LAND.register(tardis -> runHook(tardis, TardisPersonality::onLand, TardisTrait::onLand));
     }
 
-    /** Only clears temporary state, the saved personality and traits stay. */
+    /** only clears temporary state, saved personality and traits stay */
     public static void resetState() {
         MindMessages.reset();
         LAST_GENTLE_USE.clear();
@@ -90,7 +90,7 @@ public final class TardisMinds {
         TardisFright.reset();
     }
 
-    /** The overworld tick is the clock for every mind timer. */
+    /** overworld tick is the clock for every mind timer */
     public static long now(MinecraftServer server) {
         return server.overworld().getGameTime();
     }
@@ -103,12 +103,12 @@ public final class TardisMinds {
         tardis.data().setMind(mind);
     }
 
-    /** Includes the change over time since it was last updated. */
+    /** includes the change over time since it was last updated */
     public static float stress(Tardis tardis) {
         return mind(tardis).stressAt(now(tardis.server()));
     }
 
-    /** No player means the owner. */
+    /** no player means the owner */
     private static UUID who(Tardis tardis, @Nullable UUID player) {
         return player != null ? player : tardis.ownerId();
     }
@@ -121,13 +121,13 @@ public final class TardisMinds {
         save(tardis, mind(tardis).withBond(who(tardis, player), bond));
     }
 
-    /** Includes the change over time since it was last updated. */
+    /** includes the change over time since it was last updated */
     public static float fear(Tardis tardis, @Nullable UUID player) {
         TardisMind mind = mind(tardis);
         return mind.fearAt(mind.bond(who(tardis, player), tardis.ownerId()), now(tardis.server()));
     }
 
-    /** Also saves the tick so the change over time starts from now. */
+    /** also saves the tick so the change over time starts from now */
     public static void setFear(Tardis tardis, @Nullable UUID player, float value) {
         saveBond(tardis, player, bond(tardis, player).withFear(value, now(tardis.server())));
     }
@@ -144,8 +144,8 @@ public final class TardisMinds {
         return personality.refusesToFly() && fear(tardis, player) >= personality.fearToComply();
     }
 
-    public static boolean afraidOf(Tardis tardis, @Nullable UUID player) {
-        return fear(tardis, player) >= AFRAID_OF;
+    public static boolean calmAround(Tardis tardis, @Nullable UUID player) {
+        return fear(tardis, player) < AFRAID_OF;
     }
 
     public static float trust(Tardis tardis, @Nullable UUID player) {
@@ -156,12 +156,12 @@ public final class TardisMinds {
         saveBond(tardis, player, bond(tardis, player).withTrust(value));
     }
 
-    /** Also saves the tick so the change over time starts from now. */
+    /** also saves the tick so the change over time starts from now */
     public static void setStress(Tardis tardis, float value) {
         save(tardis, mind(tardis).withStress(value, now(tardis.server())));
     }
 
-    /** Traits that do not suit the new personality are dropped. */
+    /** traits that dont suit the new personality get dropped */
     public static void setPersonality(Tardis tardis, TardisPersonality personality) {
         save(tardis, mind(tardis).withPersonality(personality));
     }
@@ -201,8 +201,8 @@ public final class TardisMinds {
     }
 
     /**
-     * Only gains are changed by traits and disabilities, PTSD makes them bigger and high trust in the owner makes them smaller.
-     * Losses are left alone.
+     * only gains get changed by traits and disabilities, PTSD makes them bigger and high trust in the owner makes them
+     * smaller. losses are left alone
      */
     public static void addStress(Tardis tardis, float amount) {
         TardisMind mind = mind(tardis);
@@ -256,10 +256,7 @@ public final class TardisMinds {
         TardisFeedback.trustChanged(tardis, updated.trust() - bond.trust(), TardisFeedback.Cause.ABUSE);
     }
 
-    /**
-     * Only works once per player unless the betrayal is reset.
-     * Returns false if it cannot be betrayed or already was.
-     */
+    /** only works once per player unless the betrayal gets reset. false if it cant be betrayed or already was */
     public static boolean betray(Tardis tardis, UUID player) {
         TardisBond bond = bond(tardis, player);
 
@@ -337,7 +334,7 @@ public final class TardisMinds {
         return tooStressed(tardis, pilot) || distrusts(tardis, pilot);
     }
 
-    /** A higher limit shift means less stress is needed to refuse. */
+    /** higher limit shift means less stress needed to refuse */
     public static boolean tooStressed(Tardis tardis, @Nullable UUID pilot) {
         TardisMind mind = mind(tardis);
         float limit = mind.personality().stressLimit() - limitShift(tardis, mind, pilot);
@@ -345,7 +342,7 @@ public final class TardisMinds {
         return mind.stressAt(now(tardis.server())) >= limit;
     }
 
-    /** A higher limit shift means more trust is needed. */
+    /** higher limit shift means more trust needed */
     public static boolean distrusts(Tardis tardis, @Nullable UUID pilot) {
         TardisMind mind = mind(tardis);
         float limit = mind.personality().trustLimit() + limitShift(tardis, mind, pilot);
@@ -354,8 +351,8 @@ public final class TardisMinds {
     }
 
     /**
-     * Positive makes it more likely to refuse, it lowers the stress limit and raises the trust needed.
-     * Strangers get an extra modifier on top.
+     * positive makes it more likely to refuse, lowers the stress limit and raises the trust needed. strangers get an
+     * extra modifier on top
      */
     private static float limitShift(Tardis tardis, TardisMind mind, @Nullable UUID pilot) {
         TraitModifiers modifiers = mind.modifiers();
@@ -377,8 +374,8 @@ public final class TardisMinds {
     }
 
     /**
-     * If it is willing, the temporary refusal state is cleared.
-     * A scared TARDIS goes along with it but gets more stressed and trusts the pilot less.
+     * if its willing the temporary refusal state gets cleared. a scared tardis goes along with it but gets more
+     * stressed and trusts the pilot less
      */
     public static Refusal refusesTakeoff(Tardis tardis, @Nullable UUID pilot) {
         revealStrangerTraits(tardis, pilot);
@@ -415,7 +412,7 @@ public final class TardisMinds {
         return context.refusal == null ? Refusal.NONE : context.refusal;
     }
 
-    /** Flying when it is happy to go builds a little trust, once a minute per player so the lever cannot be farmed. */
+    /** flying when its happy to builds a little trust, once a minute per player so u cant farm the lever */
     private static void rewardGentleUse(Tardis tardis, @Nullable UUID pilot) {
         UUID player = who(tardis, pilot);
         long now = now(tardis.server());
@@ -426,7 +423,7 @@ public final class TardisMinds {
         addTrust(tardis, player, GENTLE_USE_TRUST);
     }
 
-    /** The personality actions run first, then the actions of each trait. */
+    /** personality actions run first, then each trait's */
     private static void runHook(
             Tardis tardis,
             Function<TardisPersonality, List<MindAction>> personalityHook,

@@ -88,7 +88,7 @@ public final class TardisAlarm {
             return switch (mode) {
                 case TIMED -> flashesLeft <= 0;
                 case UNTIL_CALM -> TardisMindSystem.stress(tardis) < CALM_STRESS;
-                case UNTIL_REPAIRED -> !tardis.data().isCrashed(tardis.id());
+                case UNTIL_REPAIRED -> !tardis.data().isCrashed();
                 case MANUAL -> false;
             };
         }
@@ -152,7 +152,7 @@ public final class TardisAlarm {
      */
     public static void resumeCrashAlarms(MinecraftServer server) {
         for (Tardis tardis : TardisApi.all(server)) {
-            if (tardis.data().isCrashed(tardis.id())) {
+            if (tardis.data().isCrashed()) {
                 untilRepaired(tardis);
                 CrashSmoke.start(tardis);
             } else {

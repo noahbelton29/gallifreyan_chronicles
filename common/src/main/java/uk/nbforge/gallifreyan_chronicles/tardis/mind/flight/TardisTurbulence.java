@@ -84,7 +84,7 @@ public final class TardisTurbulence {
 
     private static void tick(MinecraftServer server, UUID id) {
         Tardis tardis = TardisApi.get(server, id).orElse(null);
-        boolean flying = tardis != null && tardis.data().getFlightStart(id) != null && !TardisCrash.isCrashing(tardis);
+        boolean flying = tardis != null && tardis.data().getFlightStart() != null && !TardisCrash.isCrashing(tardis);
         if (!flying) {
             FLYING.remove(id);
             return;

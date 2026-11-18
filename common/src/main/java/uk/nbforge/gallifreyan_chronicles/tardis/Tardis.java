@@ -46,16 +46,19 @@ public final class Tardis {
         return server;
     }
 
-    public TardisManager data() {
-        return TardisManager.get(server);
+    /** This TARDIS's saved data, throws if the TARDIS has been deleted. */
+    public TardisData data() {
+        TardisData data = TardisManager.get(server).getTardis(id);
+        if (data == null) throw new IllegalStateException("TARDIS " + id + " no longer exists");
+        return data;
     }
 
     public boolean exists() {
-        return data().get(id).isPresent();
+        return TardisManager.get(server).getTardis(id) != null;
     }
 
     private TardisComponent record() {
-        return data().get(id).orElseThrow(() -> new IllegalStateException("TARDIS " + id + " no longer exists"));
+        return data().component();
     }
 
     public UUID ownerId() {
@@ -81,7 +84,7 @@ public final class Tardis {
         Optional<ServerPlayer> online = ownerPlayer();
         if (online.isPresent()) {
             String name = online.get().getGameProfile().name();
-            data().updateOwnerName(id, name);
+            data().updateOwnerName(name);
             return Optional.of(name);
         }
         String saved = record().ownerName();
@@ -89,11 +92,11 @@ public final class Tardis {
     }
 
     public Optional<BlockPos> exteriorPos() {
-        return Optional.ofNullable(data().resolveExteriorBlockPos(id));
+        return Optional.ofNullable(data().resolveExteriorBlockPos());
     }
 
     public ResourceKey<Level> exteriorDimension() {
-        return data().getExteriorDimension(id);
+        return data().getExteriorDimension();
     }
 
     public Optional<ServerLevel> exteriorLevel() {
@@ -126,7 +129,7 @@ public final class Tardis {
     }
 
     public Optional<BlockPos> consolePos() {
-        return Optional.ofNullable(data().getConsoleBlockPos(id));
+        return Optional.ofNullable(data().getConsoleBlockPos());
     }
 
     public List<TardisConsoleBlockEntity> consoles() {
@@ -188,7 +191,7 @@ public final class Tardis {
     }
 
     public Optional<LandingTarget> landingTarget() {
-        return Optional.ofNullable(data().getLandingTarget(id));
+        return Optional.ofNullable(data().getLandingTarget());
     }
 
     public Optional<LandingTarget> destination() {
@@ -275,12 +278,12 @@ public final class Tardis {
     public boolean setDestination(ServerLevel level, BlockPos pos, float yaw) {
         if (TardisApi.idOfLevel(level).isPresent()) return false;
         if (level.isOutsideBuildHeight(pos) || level.isOutsideBuildHeight(pos.above())) return false;
-        data().setLandingTarget(id, new LandingTarget(level.dimension(), pos, yaw));
+        data().setLandingTarget(new LandingTarget(level.dimension(), pos, yaw));
         return true;
     }
 
     public void clearDestination() {
-        data().setLandingTarget(id, null);
+        data().setLandingTarget(null);
     }
 
     public boolean isIsomorphicActive() {
@@ -294,15 +297,15 @@ public final class Tardis {
     }
 
     public boolean isTrusted(UUID playerId) {
-        return data().isTrusted(id, playerId);
+        return data().isTrusted(playerId);
     }
 
     public boolean trust(UUID playerId) {
-        return data().setTrusted(id, playerId, true);
+        return data().setTrusted(playerId, true);
     }
 
     public boolean untrust(UUID playerId) {
-        return data().setTrusted(id, playerId, false);
+        return data().setTrusted(playerId, false);
     }
 
     /**

@@ -68,8 +68,8 @@ public final class SubsystemCommands {
         if (subsystem.isEmpty()) return fail(ctx, "unknown_subsystem", subsystemId);
 
         return withTardis(ctx, (tardis, idText) -> {
-            Optional<TardisExteriorBlockEntity> exterior = findBlockEntity(
-                    ctx, manager(ctx).resolveExteriorBlockPos(tardis.id()), TardisExteriorBlockEntity.class);
+            Optional<TardisExteriorBlockEntity> exterior =
+                    findBlockEntity(ctx, tardis.data().resolveExteriorBlockPos(), TardisExteriorBlockEntity.class);
             return exterior.map(
                             tardisExteriorBlockEntity -> action.run(tardisExteriorBlockEntity, subsystem.get(), idText))
                     .orElseGet(() -> fail(ctx, "no_exterior", idText));

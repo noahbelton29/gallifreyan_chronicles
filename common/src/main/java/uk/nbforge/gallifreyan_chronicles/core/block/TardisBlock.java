@@ -36,6 +36,7 @@ import uk.nbforge.gallifreyan_chronicles.core.dynamic_registries.TardisExteriorR
 import uk.nbforge.gallifreyan_chronicles.core.dynamic_registries.TardisInteriorRegistry;
 import uk.nbforge.gallifreyan_chronicles.ecs.Entity;
 import uk.nbforge.gallifreyan_chronicles.tardis.TardisApi;
+import uk.nbforge.gallifreyan_chronicles.tardis.TardisData;
 import uk.nbforge.gallifreyan_chronicles.tardis.TardisInterior;
 import uk.nbforge.gallifreyan_chronicles.tardis.TardisManager;
 import uk.nbforge.gallifreyan_chronicles.tardis.ecs.component.TardisComponent;
@@ -128,7 +129,8 @@ public class TardisBlock extends BaseEntityBlock {
         if (chosen == null || !TardisInteriorRegistry.contains(chosen)) return;
 
         TardisInterior interior = TardisInteriorRegistry.get(chosen);
-        TardisManager.get(level.getServer()).setInteriorId(record.tardisId(), interior.id());
+        TardisData data = TardisManager.get(level.getServer()).getTardis(record.tardisId());
+        if (data != null) data.setInteriorId(interior.id());
 
         applyExteriorFromInterior(entity, chosen);
     }
@@ -153,7 +155,8 @@ public class TardisBlock extends BaseEntityBlock {
                 && level.getBlockEntity(pos) instanceof TardisExteriorBlockEntity tardis) {
             UUID tardisId = tardis.getTardisId();
             if (tardisId != null) {
-                String interiorId = TardisManager.get(serverLevel.getServer()).getInteriorId(tardisId);
+                TardisData data = TardisManager.get(serverLevel.getServer()).getTardis(tardisId);
+                String interiorId = data == null ? null : data.getInteriorId();
                 if (interiorId != null) stack.set(GCDataComponents.TARDIS_INTERIOR, interiorId);
             }
         }

@@ -38,6 +38,7 @@ import uk.nbforge.gallifreyan_chronicles.core.dynamic_registries.TardisConsoleRe
 import uk.nbforge.gallifreyan_chronicles.core.dynamic_registries.TardisInteriorRegistry;
 import uk.nbforge.gallifreyan_chronicles.core.lifecycle.ServerState;
 import uk.nbforge.gallifreyan_chronicles.tardis.*;
+import uk.nbforge.gallifreyan_chronicles.tardis.TardisData;
 import uk.nbforge.gallifreyan_chronicles.tardis.console.TardisConsole;
 import uk.nbforge.gallifreyan_chronicles.tardis.ecs.component.DoorState;
 
@@ -112,11 +113,11 @@ public final class TardisInteriorSystem {
     }
 
     public static void exitInterior(MinecraftServer server, ServerPlayer player, UUID tardisId) {
-        TardisManager manager = TardisManager.get(server);
-        BlockPos exteriorPos = manager.resolveExteriorBlockPos(tardisId);
+        TardisData data = TardisManager.get(server).getTardis(tardisId);
+        BlockPos exteriorPos = data == null ? null : data.resolveExteriorBlockPos();
         if (exteriorPos == null) return;
 
-        ServerLevel target = server.getLevel(manager.getExteriorDimension(tardisId));
+        ServerLevel target = server.getLevel(data.getExteriorDimension());
         if (target == null) target = server.overworld();
 
         Vec3 spot = Vec3.atBottomCenterOf(exteriorPos).add(0.0, 1.0, 0.0);
@@ -178,12 +179,12 @@ public final class TardisInteriorSystem {
     }
 
     public static TardisInterior getInteriorDefinition(MinecraftServer server, UUID tardisId) {
-        TardisManager manager = TardisManager.get(server);
-        String stored = manager.getInteriorId(tardisId);
+        TardisData data = TardisManager.get(server).getTardis(tardisId);
+        String stored = data == null ? null : data.getInteriorId();
         if (stored != null) return TardisInteriorRegistry.get(stored);
 
         TardisInterior chosen = TardisInteriorRegistry.get(TardisInteriorRegistry.defaultId());
-        manager.setInteriorId(tardisId, chosen.id());
+        if (data != null) data.setInteriorId(chosen.id());
         return chosen;
     }
 
@@ -209,7 +210,8 @@ public final class TardisInteriorSystem {
                 .get(templateId)
                 .map(StructureTemplate::getSize)
                 .orElse(FALLBACK_CLEAR_SIZE);
-        BlockPos stored = TardisManager.get(server).getInteriorOrigin(tardisId);
+        TardisData data = TardisManager.get(server).getTardis(tardisId);
+        BlockPos stored = data == null ? null : data.getInteriorOrigin();
         BlockPos origin = stored != null ? stored : ORIGIN;
         loadInteriorChunks(interior, origin, size);
 
@@ -237,8 +239,8 @@ public final class TardisInteriorSystem {
 
     private static boolean buildInteriorIfMissing(
             ServerLevel interior, UUID tardisId, @Nullable ConsoleCarryover carry) {
-        TardisManager manager = TardisManager.get(interior.getServer());
-        if (manager.getInteriorOrigin(tardisId) != null) return false;
+        TardisData data = TardisManager.get(interior.getServer()).getTardis(tardisId);
+        if (data != null && data.getInteriorOrigin() != null) return false;
 
         Identifier templateId =
                 getInteriorDefinition(interior.getServer(), tardisId).structure();
@@ -277,7 +279,7 @@ public final class TardisInteriorSystem {
             Constants.LOG.error("no console block entity at {} in tardis interior", consolePos);
         }
 
-        manager.setInteriorOrigin(tardisId, origin);
+        if (data != null) data.setInteriorOrigin(origin);
         return true;
     }
 
@@ -306,7 +308,7 @@ public final class TardisInteriorSystem {
     public static ChangeResult changeInterior(MinecraftServer server, UUID tardisId, String newId) {
         if (!TardisInteriorRegistry.contains(newId)) return ChangeResult.UNKNOWN_INTERIOR;
 
-        TardisManager manager = TardisManager.get(server);
+        TardisData data = TardisManager.get(server).getTardis(tardisId);
         TardisInterior oldDef = getInteriorDefinition(server, tardisId);
         TardisInterior newDef = TardisInteriorRegistry.get(newId);
         if (oldDef.id().equals(newDef.id())) return ChangeResult.UNCHANGED;
@@ -315,8 +317,8 @@ public final class TardisInteriorSystem {
                 server.getStructureTemplateManager().get(newDef.structure());
         if (newTemplate.isEmpty()) return ChangeResult.MISSING_TEMPLATE;
 
-        if (manager.getInteriorOrigin(tardisId) == null) {
-            manager.setInteriorId(tardisId, newDef.id());
+        if (data == null || data.getInteriorOrigin() == null) {
+            if (data != null) data.setInteriorId(newDef.id());
             return ChangeResult.CHANGED;
         }
 
@@ -349,8 +351,8 @@ public final class TardisInteriorSystem {
 
         clearArea(level, size);
 
-        manager.clearInteriorOrigin(tardisId);
-        manager.setInteriorId(tardisId, newDef.id());
+        data.setInteriorOrigin(null);
+        data.setInteriorId(newDef.id());
         buildInteriorIfMissing(level, tardisId, carry);
         if (carriedPrimary != null && !carriedPrimary.isClosed()) {
             snapPrimaryDoors(level, tardisId, size, carriedPrimary);
@@ -380,7 +382,8 @@ public final class TardisInteriorSystem {
      * Puts the primary doors of the new interior in the state the old ones were in, snapped and not animated.
      */
     private static void snapPrimaryDoors(ServerLevel interior, UUID tardisId, Vec3i size, DoorState state) {
-        BlockPos stored = TardisManager.get(interior.getServer()).getInteriorOrigin(tardisId);
+        TardisData data = TardisManager.get(interior.getServer()).getTardis(tardisId);
+        BlockPos stored = data == null ? null : data.getInteriorOrigin();
         BlockPos origin = stored != null ? stored : ORIGIN;
         BlockPos max = origin.offset(size.getX() - 1, size.getY() - 1, size.getZ() - 1);
         for (BlockPos p : BlockPos.betweenClosed(origin, max)) {

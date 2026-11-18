@@ -71,7 +71,7 @@ public class StattenheimRemoteItem extends Item {
         float yaw = Mth.wrapDegrees(player.getYRot() + 180);
 
         LandingTarget landingTarget = new LandingTarget(serverLevel.dimension(), target, yaw);
-        tardis.data().setLandingTarget(tardisID, landingTarget);
+        tardis.data().setLandingTarget(landingTarget);
 
         if (tardis.getControlState(GCTardisControls.SPACE_TIME_THROTTLE)) {
             if (!tardis.land()) {

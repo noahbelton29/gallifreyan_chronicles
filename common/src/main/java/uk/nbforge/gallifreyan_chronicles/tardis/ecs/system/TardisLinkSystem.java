@@ -5,6 +5,7 @@ import java.util.UUID;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
 import uk.nbforge.gallifreyan_chronicles.ecs.Entity;
+import uk.nbforge.gallifreyan_chronicles.tardis.TardisData;
 import uk.nbforge.gallifreyan_chronicles.tardis.TardisManager;
 import uk.nbforge.gallifreyan_chronicles.tardis.ecs.TardisComponentTypes;
 import uk.nbforge.gallifreyan_chronicles.tardis.ecs.component.TardisComponent;
@@ -28,10 +29,10 @@ public final class TardisLinkSystem {
 
     public static TardisComponent registerNewTardis(
             Entity entity, ServerLevel level, UUID ownerId, String ownerName, BlockPos pos) {
-        TardisManager manager = TardisManager.get(level.getServer());
-        TardisComponent record = manager.create(ownerId, ownerName);
-        manager.setRegisteredBlockPos(record.tardisId(), pos);
-        manager.setExteriorDimension(record.tardisId(), level.dimension());
+        TardisData data = TardisManager.get(level.getServer()).createTardis(ownerId, ownerName);
+        data.setRegisteredBlockPos(pos);
+        data.setExteriorDimension(level.dimension());
+        TardisComponent record = data.component();
 
         link(entity, record.tardisId());
         return record;

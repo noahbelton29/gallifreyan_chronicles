@@ -209,7 +209,7 @@ public class SpaceTimeThrottleControl extends BaseControl {
         MessageUtil.overlayNearby(level, Vec3.atCenterOf(console.getBlockPos()), ChatFormatting.DARK_RED, message);
         TardisCrash.run(tardis, level, console.getBlockPos(), ticks);
 
-        tardis.data().setLandingTarget(tardis.id(), TardisTravel.crashTarget(tardis));
+        tardis.data().setLandingTarget(TardisTravel.crashTarget(tardis));
         playAt(level, console.getBlockPos(), GCSounds.SLIDER, 1.0f);
         land(level, console, tardis.id());
         console.triggerControl(GCTardisControls.SPACE_TIME_THROTTLE, false, null);
@@ -230,7 +230,7 @@ public class SpaceTimeThrottleControl extends BaseControl {
         MessageUtil.overlayNearby(level, Vec3.atCenterOf(console.getBlockPos()), ChatFormatting.GOLD, message);
         TardisCrash.emergency(tardis, level, console.getBlockPos(), ticks);
 
-        tardis.data().setLandingTarget(tardis.id(), TardisTravel.partWayTarget(tardis, EMERGENCY_DISTANCE));
+        tardis.data().setLandingTarget(TardisTravel.partWayTarget(tardis, EMERGENCY_DISTANCE));
         playAt(level, console.getBlockPos(), GCSounds.SLIDER, 1.0f);
         land(level, console, tardis.id());
         console.triggerControl(GCTardisControls.SPACE_TIME_THROTTLE, false, null);

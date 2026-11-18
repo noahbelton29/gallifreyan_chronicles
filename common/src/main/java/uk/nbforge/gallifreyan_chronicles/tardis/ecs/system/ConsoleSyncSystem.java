@@ -7,6 +7,7 @@ import org.jspecify.annotations.Nullable;
 import uk.nbforge.gallifreyan_chronicles.core.block_entities.TardisConsoleBlockEntity;
 import uk.nbforge.gallifreyan_chronicles.core.lifecycle.ServerState;
 import uk.nbforge.gallifreyan_chronicles.tardis.TardisApi;
+import uk.nbforge.gallifreyan_chronicles.tardis.TardisData;
 import uk.nbforge.gallifreyan_chronicles.tardis.TardisManager;
 
 public final class ConsoleSyncSystem {
@@ -66,11 +67,11 @@ public final class ConsoleSyncSystem {
 
     private static void promoteIfPrimary(TardisConsoleBlockEntity gone, UUID key) {
         if (!(gone.getLevel() instanceof ServerLevel level)) return;
-        TardisManager manager = TardisManager.get(level.getServer());
-        if (!gone.getBlockPos().equals(Objects.requireNonNull(manager.getConsoleBlockPos(key)))) return;
+        TardisData data = TardisManager.get(level.getServer()).getTardis(key);
+        if (data == null || !gone.getBlockPos().equals(data.getConsoleBlockPos())) return;
         List<TardisConsoleBlockEntity> live = consolesOf(key);
         if (!live.isEmpty()) {
-            manager.setConsoleBlockPos(key, live.getFirst().getBlockPos());
+            data.setConsoleBlockPos(live.getFirst().getBlockPos());
         }
     }
 

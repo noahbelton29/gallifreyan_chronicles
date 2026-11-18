@@ -26,6 +26,7 @@ import uk.nbforge.gallifreyan_chronicles.core.dynamic_registries.TardisInteriorR
 import uk.nbforge.gallifreyan_chronicles.core.item.MasterTardisKeyItem;
 import uk.nbforge.gallifreyan_chronicles.core.item.TardisKeyItem;
 import uk.nbforge.gallifreyan_chronicles.core.lifecycle.ServerState;
+import uk.nbforge.gallifreyan_chronicles.tardis.TardisData;
 import uk.nbforge.gallifreyan_chronicles.tardis.TardisManager;
 import uk.nbforge.gallifreyan_chronicles.util.GCUtil;
 
@@ -124,13 +125,14 @@ public final class TardisKeyLocator {
 
     private static @Nullable Tracked resolveOne(
             MinecraftServer server, TardisManager manager, ServerPlayer player, UUID tardisId) {
-        BlockPos pos = manager.resolveExteriorBlockPos(tardisId);
+        TardisData data = manager.getTardis(tardisId);
+        BlockPos pos = data == null ? null : data.resolveExteriorBlockPos();
         if (pos == null) return null;
 
-        ResourceKey<Level> dimension = manager.getExteriorDimension(tardisId);
+        ResourceKey<Level> dimension = data.getExteriorDimension();
         if (!player.level().dimension().equals(dimension)) return null;
 
-        return new Tracked(tardisId, pos.immutable(), dimension, styleFor(manager, server, tardisId, dimension, pos));
+        return new Tracked(tardisId, pos.immutable(), dimension, styleFor(data, server, dimension, pos));
     }
 
     private static boolean holdsMasterKey(ServerPlayer player) {
@@ -144,7 +146,7 @@ public final class TardisKeyLocator {
     }
 
     private static ResourceKey<WaypointStyleAsset> styleFor(
-            TardisManager manager, MinecraftServer server, UUID tardisId, ResourceKey<Level> dimension, BlockPos pos) {
+            TardisData data, MinecraftServer server, ResourceKey<Level> dimension, BlockPos pos) {
         String exteriorId = null;
         ServerLevel level = server.getLevel(dimension);
         if (level != null
@@ -154,8 +156,7 @@ public final class TardisKeyLocator {
             exteriorId = exterior.getExterior().id();
         }
         if (exteriorId == null) {
-            exteriorId =
-                    TardisInteriorRegistry.get(manager.getInteriorId(tardisId)).resolveExteriorId();
+            exteriorId = TardisInteriorRegistry.get(data.getInteriorId()).resolveExteriorId();
         }
         if (exteriorId != null && exteriorId.endsWith("second_doctors_exterior")) return SECOND_DOCTORS_STYLE;
         if (exteriorId != null && exteriorId.endsWith("tuat_exterior")) return TUAT_STYLE;

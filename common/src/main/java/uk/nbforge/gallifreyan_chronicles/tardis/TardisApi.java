@@ -25,7 +25,8 @@ public final class TardisApi {
      */
     public static Optional<Tardis> get(MinecraftServer server, @Nullable UUID tardisId) {
         if (tardisId == null) return Optional.empty();
-        return TardisManager.get(server).get(tardisId).map(record -> new Tardis(server, record.tardisId()));
+        return Optional.ofNullable(TardisManager.get(server).getTardis(tardisId))
+                .map(data -> new Tardis(server, data.id()));
     }
 
     /**
@@ -61,7 +62,7 @@ public final class TardisApi {
     @SuppressWarnings("unused")
     public static List<Tardis> ownedBy(MinecraftServer server, UUID ownerId) {
         return TardisManager.get(server).getByOwner(ownerId).stream()
-                .map(record -> new Tardis(server, record.tardisId()))
+                .map(data -> new Tardis(server, data.id()))
                 .toList();
     }
 

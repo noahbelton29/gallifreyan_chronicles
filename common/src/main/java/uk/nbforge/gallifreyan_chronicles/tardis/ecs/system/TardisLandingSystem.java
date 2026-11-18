@@ -14,7 +14,7 @@ import uk.nbforge.gallifreyan_chronicles.core.block.TardisBlock;
 import uk.nbforge.gallifreyan_chronicles.core.block_entities.TardisExteriorBlockEntity;
 import uk.nbforge.gallifreyan_chronicles.tardis.Tardis;
 import uk.nbforge.gallifreyan_chronicles.tardis.TardisApi;
-import uk.nbforge.gallifreyan_chronicles.tardis.TardisManager;
+import uk.nbforge.gallifreyan_chronicles.tardis.TardisData;
 import uk.nbforge.gallifreyan_chronicles.tardis.flight.LandingTarget;
 import uk.nbforge.gallifreyan_chronicles.tardis.flight.TardisLandingSite;
 
@@ -70,7 +70,7 @@ public final class TardisLandingSystem {
 
         if (newLevel == old.getLevel() && pos.equals(oldPos)) {
             old.setYaw(target.yaw());
-            tardis.data().setLandingTarget(tardisId, null);
+            tardis.data().setLandingTarget(null);
             return;
         }
 
@@ -85,7 +85,7 @@ public final class TardisLandingSystem {
         if (fresh == null) return;
 
         fresh.setYaw(target.yaw());
-        tardis.data().setLandingTarget(tardisId, null);
+        tardis.data().setLandingTarget(null);
     }
 
     public static @Nullable TardisExteriorBlockEntity moveExterior(Tardis tardis, ServerLevel newLevel, BlockPos pos) {
@@ -118,12 +118,11 @@ public final class TardisLandingSystem {
         fresh.copyStateFrom(old);
         fresh.spawnKeyEntity();
 
-        TardisManager manager = tardis.data();
-        UUID id = tardis.id();
-        manager.setRegisteredBlockPos(id, pos);
-        manager.setExteriorDimension(id, newLevel.dimension());
-        if (manager.getExteriorBlockPos(id) != null) {
-            manager.setExteriorBlockPos(id, pos);
+        TardisData data = tardis.data();
+        data.setRegisteredBlockPos(pos);
+        data.setExteriorDimension(newLevel.dimension());
+        if (data.getExteriorBlockPos() != null) {
+            data.setExteriorBlockPos(pos);
         }
         return fresh;
     }

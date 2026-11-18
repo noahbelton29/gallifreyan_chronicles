@@ -20,10 +20,10 @@ public final class TardisTravel {
     private TardisTravel() {}
 
     public static void init() {
-        TardisEvents.TAKE_OFF.register(tardis -> tardis.data().setFlightStart(tardis.id(), now(tardis.server())));
+        TardisEvents.TAKE_OFF.register(tardis -> tardis.data().setFlightStart(now(tardis.server())));
         TardisEvents.LAND.register(tardis -> {
-            tardis.data().setFlightStart(tardis.id(), null);
-            tardis.data().setFlightDurationOverride(tardis.id(), null);
+            tardis.data().setFlightStart(null);
+            tardis.data().setFlightDurationOverride(null);
         });
     }
 
@@ -40,7 +40,7 @@ public final class TardisTravel {
         BlockPos from = tardis.exteriorPos().orElse(null);
         if (target == null || from == null) return 0L;
 
-        Long override = tardis.data().getFlightDurationOverride(tardis.id());
+        Long override = tardis.data().getFlightDurationOverride();
         if (override != null) return Math.clamp(override, MIN_OVERRIDE_TICKS, MAX_OVERRIDE_TICKS);
 
         double blocks = Math.sqrt(from.distSqr(target.pos()));
@@ -53,7 +53,7 @@ public final class TardisTravel {
     }
 
     public static long vortexTicks(Tardis tardis) {
-        Long start = tardis.data().getFlightStart(tardis.id());
+        Long start = tardis.data().getFlightStart();
         if (start == null) return Long.MAX_VALUE / 2;
         return Math.max(0L, now(tardis.server()) - start - FlightTimings.TAKEOFF_TICKS);
     }

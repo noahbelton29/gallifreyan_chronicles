@@ -17,6 +17,7 @@ import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.core.BlockPos;
 import uk.nbforge.gallifreyan_chronicles.core.block_entities.TardisConsoleBlockEntity;
 import uk.nbforge.gallifreyan_chronicles.core.dynamic_registries.TardisConsoleRegistry;
+import uk.nbforge.gallifreyan_chronicles.tardis.TardisData;
 import uk.nbforge.gallifreyan_chronicles.tardis.console.TardisConsole;
 import uk.nbforge.gallifreyan_chronicles.tardis.ecs.system.ConsoleLinkSystem;
 
@@ -64,7 +65,8 @@ public final class ConsoleCommands {
     }
 
     static Optional<TardisConsoleBlockEntity> consoleOf(CommandContext<CommandSourceStack> ctx, UUID tardisId) {
-        BlockPos pos = manager(ctx).getConsoleBlockPos(tardisId);
+        TardisData data = manager(ctx).getTardis(tardisId);
+        BlockPos pos = data == null ? null : data.getConsoleBlockPos();
         return findBlockEntity(ctx, pos, TardisConsoleBlockEntity.class);
     }
 
@@ -130,7 +132,7 @@ public final class ConsoleCommands {
 
     private static int unlink(CommandContext<CommandSourceStack> ctx) throws CommandSyntaxException {
         return withTardis(ctx, (tardis, idText) -> {
-            manager(ctx).unlinkConsole(tardis.id());
+            tardis.data().setConsoleBlockPos(null);
             return success(ctx, true, "unlink_console", idText);
         });
     }

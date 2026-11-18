@@ -95,7 +95,7 @@ public final class TardisDyslexia {
 
         BlockPos muddled = new BlockPos(x, target.pos().getY(), z);
         if (muddled.equals(target.pos())) return false;
-        tardis.data().setLandingTarget(tardis.id(), new LandingTarget(target.dimension(), muddled, target.yaw()));
+        tardis.data().setLandingTarget(new LandingTarget(target.dimension(), muddled, target.yaw()));
         return true;
     }
 

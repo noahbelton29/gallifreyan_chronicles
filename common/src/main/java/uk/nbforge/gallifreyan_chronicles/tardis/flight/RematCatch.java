@@ -15,6 +15,7 @@ import net.minecraft.world.phys.AABB;
 import uk.nbforge.gallifreyan_chronicles.core.block_entities.TardisExteriorBlockEntity;
 import uk.nbforge.gallifreyan_chronicles.network.tardis.RematCatchPayload;
 import uk.nbforge.gallifreyan_chronicles.platform.Services;
+import uk.nbforge.gallifreyan_chronicles.tardis.TardisData;
 import uk.nbforge.gallifreyan_chronicles.tardis.TardisManager;
 import uk.nbforge.gallifreyan_chronicles.tardis.ecs.system.TardisInteriorSystem;
 import uk.nbforge.gallifreyan_chronicles.util.GCSchedulerUtil;
@@ -45,7 +46,8 @@ public final class RematCatch {
         if (interior == null) return;
         TardisInteriorSystem.Arrival arrival = TardisInteriorSystem.arrival(interior, tardisId);
 
-        BlockPos origin = TardisManager.get(server).getInteriorOrigin(tardisId);
+        TardisData data = TardisManager.get(server).getTardis(tardisId);
+        BlockPos origin = data == null ? null : data.getInteriorOrigin();
         if (origin == null) origin = TardisInteriorSystem.ORIGIN;
         Vec3i size = server.getStructureTemplateManager()
                 .get(TardisInteriorSystem.getInteriorDefinition(server, tardisId)

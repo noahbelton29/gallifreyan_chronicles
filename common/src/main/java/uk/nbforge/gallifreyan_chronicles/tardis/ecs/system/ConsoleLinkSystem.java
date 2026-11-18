@@ -13,6 +13,7 @@ import uk.nbforge.gallifreyan_chronicles.core.block_entities.TardisConsoleBlockE
 import uk.nbforge.gallifreyan_chronicles.core.dynamic_registries.TardisConsoleRegistry;
 import uk.nbforge.gallifreyan_chronicles.tardis.Tardis;
 import uk.nbforge.gallifreyan_chronicles.tardis.TardisApi;
+import uk.nbforge.gallifreyan_chronicles.tardis.TardisData;
 import uk.nbforge.gallifreyan_chronicles.tardis.TardisManager;
 import uk.nbforge.gallifreyan_chronicles.tardis.console.TardisConsole;
 
@@ -33,19 +34,22 @@ public final class ConsoleLinkSystem {
             console.linkToTardis(tardisId);
             ConsoleSyncSystem.register(console);
         });
-        TardisManager.get(level.getServer()).setConsoleBlockPos(tardisId, pos);
+        TardisData data = TardisManager.get(level.getServer()).getTardis(tardisId);
+        if (data != null) data.setConsoleBlockPos(pos);
     }
 
     public static void unlink(ServerLevel level, UUID tardisId) {
         TardisApi.get(level.getServer(), tardisId)
                 .flatMap(Tardis::console)
                 .ifPresent(TardisConsoleBlockEntity::unlinkFromTardis);
-        TardisManager.get(level.getServer()).unlinkConsole(tardisId);
+        TardisData data = TardisManager.get(level.getServer()).getTardis(tardisId);
+        if (data != null) data.setConsoleBlockPos(null);
     }
 
     public static void spawnAndLink(ServerLevel level, UUID tardisId, BlockPos exteriorPos) {
-        TardisManager manager = TardisManager.get(level.getServer());
-        if (manager.getConsoleBlockPos(tardisId) != null) {
+        TardisData data = TardisManager.get(level.getServer()).getTardis(tardisId);
+        if (data == null) return;
+        if (data.getConsoleBlockPos() != null) {
             TardisApi.get(level.getServer(), tardisId)
                     .flatMap(Tardis::console)
                     .ifPresent(console -> console.linkToTardis(tardisId));
@@ -61,7 +65,7 @@ public final class ConsoleLinkSystem {
         }
 
         console.linkToTardis(tardisId);
-        manager.setConsoleBlockPos(tardisId, consolePos);
+        data.setConsoleBlockPos(consolePos);
         console.setConsole(TardisConsoleRegistry.get(TardisConsoleRegistry.defaultId()));
 
         spawnDefaultControls(console);
@@ -81,11 +85,11 @@ public final class ConsoleLinkSystem {
         }
         UUID tardisId = tardis.id();
 
-        TardisManager manager = tardis.data();
+        TardisData data = tardis.data();
 
         console.linkToTardis(tardisId);
         ConsoleSyncSystem.register(console);
-        adoptAsPrimaryIfNeeded(level, manager, tardisId, console.getBlockPos());
+        adoptAsPrimaryIfNeeded(level, data, console.getBlockPos());
         spawnDefaultControls(console);
 
         TardisConsoleBlockEntity sibling = null;
@@ -110,15 +114,15 @@ public final class ConsoleLinkSystem {
         console.sync();
     }
 
-    private static void adoptAsPrimaryIfNeeded(ServerLevel level, TardisManager manager, UUID tardisId, BlockPos pos) {
-        BlockPos current = manager.getConsoleBlockPos(tardisId);
+    private static void adoptAsPrimaryIfNeeded(ServerLevel level, TardisData data, BlockPos pos) {
+        BlockPos current = data.getConsoleBlockPos();
         assert current != null;
         if (pos.equals(current)) return;
 
         boolean stale =
                 level.hasChunkAt(current) && !(level.getBlockState(current).getBlock() instanceof ConsoleBlock);
         if (stale) {
-            manager.setConsoleBlockPos(tardisId, pos);
+            data.setConsoleBlockPos(pos);
         }
     }
 

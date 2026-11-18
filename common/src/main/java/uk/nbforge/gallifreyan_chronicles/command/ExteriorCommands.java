@@ -85,7 +85,7 @@ public final class ExteriorCommands {
 
     static int get(CommandContext<CommandSourceStack> ctx) throws CommandSyntaxException {
         return withTardis(ctx, (tardis, idText) -> {
-            BlockPos pos = manager(ctx).resolveExteriorBlockPos(tardis.id());
+            BlockPos pos = tardis.data().resolveExteriorBlockPos();
             String exteriorId =
                     exteriorAt(ctx, pos).map(be -> be.getExterior().id()).orElse("unknown");
             return success(ctx, false, "get_exterior", idText, exteriorId);
@@ -98,7 +98,7 @@ public final class ExteriorCommands {
             if (!TardisExteriorRegistry.contains(exteriorId)) return fail(ctx, "unknown_exterior", exteriorId);
 
             Optional<TardisExteriorBlockEntity> be =
-                    exteriorAt(ctx, manager(ctx).resolveExteriorBlockPos(tardis.id()));
+                    exteriorAt(ctx, tardis.data().resolveExteriorBlockPos());
             if (be.isEmpty()) return fail(ctx, "no_exterior", idText);
 
             TardisExterior exterior = TardisExteriorRegistry.get(exteriorId);
@@ -128,7 +128,7 @@ public final class ExteriorCommands {
     private static int getGlow(CommandContext<CommandSourceStack> ctx) throws CommandSyntaxException {
         return withTardis(ctx, (tardis, idText) -> {
             Optional<TardisExteriorBlockEntity> be =
-                    exteriorAt(ctx, manager(ctx).getRegisteredBlockPos(tardis.id()));
+                    exteriorAt(ctx, tardis.data().getRegisteredBlockPos());
             return be.map(tardisExteriorBlockEntity -> success(
                             ctx, false, "get_glow", idText, String.valueOf(tardisExteriorBlockEntity.isGlowing())))
                     .orElseGet(() -> fail(ctx, "no_exterior", idText));
@@ -139,7 +139,7 @@ public final class ExteriorCommands {
             throws CommandSyntaxException {
         return withTardis(ctx, (tardis, idText) -> {
             Optional<TardisExteriorBlockEntity> be =
-                    exteriorAt(ctx, manager(ctx).getRegisteredBlockPos(tardis.id()));
+                    exteriorAt(ctx, tardis.data().getRegisteredBlockPos());
             if (be.isEmpty()) return fail(ctx, "no_tardis_id", idText);
 
             be.get().setGlowing(glowing);
@@ -150,7 +150,7 @@ public final class ExteriorCommands {
     static int getFade(CommandContext<CommandSourceStack> ctx) throws CommandSyntaxException {
         return withTardis(ctx, (tardis, idText) -> {
             Optional<TardisExteriorBlockEntity> be =
-                    exteriorAt(ctx, manager(ctx).getRegisteredBlockPos(tardis.id()));
+                    exteriorAt(ctx, tardis.data().getRegisteredBlockPos());
             return be.map(tardisExteriorBlockEntity -> success(
                             ctx,
                             false,
@@ -170,7 +170,7 @@ public final class ExteriorCommands {
 
         return withTardis(ctx, (tardis, idText) -> {
             Optional<TardisExteriorBlockEntity> be =
-                    exteriorAt(ctx, manager(ctx).getRegisteredBlockPos(tardis.id()));
+                    exteriorAt(ctx, tardis.data().getRegisteredBlockPos());
             if (be.isEmpty()) return fail(ctx, "no_exterior", idText);
 
             be.get().setFadeType(type);

@@ -2,6 +2,7 @@ package uk.nbforge.gallifreyan_chronicles.core.item;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
@@ -23,6 +24,7 @@ import uk.nbforge.gallifreyan_chronicles.core.block_entities.TardisConsoleBlockE
 import uk.nbforge.gallifreyan_chronicles.core.block_entities.TardisExteriorBlockEntity;
 import uk.nbforge.gallifreyan_chronicles.core.item.tooltip.ItemInfoTooltip;
 import uk.nbforge.gallifreyan_chronicles.tardis.TardisApi;
+import uk.nbforge.gallifreyan_chronicles.tardis.TardisData;
 import uk.nbforge.gallifreyan_chronicles.tardis.TardisManager;
 import uk.nbforge.gallifreyan_chronicles.util.MessageUtil;
 
@@ -81,7 +83,8 @@ public class TardisKeyItem extends Item implements ScrollSelectable {
         if (tardisId == null) return;
         MinecraftServer server = level.getServer();
         List<String> names = new ArrayList<>();
-        for (UUID player : TardisManager.get(server).trustedOf(tardisId)) {
+        TardisData data = TardisManager.get(server).getTardis(tardisId);
+        for (UUID player : data == null ? Set.<UUID>of() : data.trustedPlayers()) {
             names.add(server.services()
                     .nameToIdCache()
                     .get(player)

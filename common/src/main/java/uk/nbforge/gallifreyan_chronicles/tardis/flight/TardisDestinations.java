@@ -20,6 +20,7 @@ import uk.nbforge.gallifreyan_chronicles.core.GCDimensions;
 import uk.nbforge.gallifreyan_chronicles.core.block_entities.TardisExteriorBlockEntity;
 import uk.nbforge.gallifreyan_chronicles.tardis.Tardis;
 import uk.nbforge.gallifreyan_chronicles.tardis.TardisApi;
+import uk.nbforge.gallifreyan_chronicles.tardis.TardisData;
 import uk.nbforge.gallifreyan_chronicles.tardis.TardisManager;
 
 public final class TardisDestinations {
@@ -48,9 +49,10 @@ public final class TardisDestinations {
     private TardisDestinations() {}
 
     public static int increment(MinecraftServer server, UUID tardisId) {
-        int index = TardisManager.get(server).getCoordIncrementIndex(tardisId);
-        int amount = INCREMENTS[Mth.clamp(index, 0, INCREMENTS.length - 1)];
-        return TardisManager.get(server).isCoordIncrementNegative(tardisId) ? -amount : amount;
+        TardisData data = TardisManager.get(server).getTardis(tardisId);
+        if (data == null) return INCREMENTS[0];
+        int amount = INCREMENTS[Mth.clamp(data.getCoordIncrementIndex(), 0, INCREMENTS.length - 1)];
+        return data.isCoordIncrementNegative() ? -amount : amount;
     }
 
     public static @Nullable LandingTarget current(MinecraftServer server, UUID tardisId) {
@@ -67,24 +69,22 @@ public final class TardisDestinations {
     }
 
     public static int toggleNegative(MinecraftServer server, UUID tardisId) {
-        TardisManager manager = TardisManager.get(server);
-        manager.setCoordIncrementNegative(tardisId, !manager.isCoordIncrementNegative(tardisId));
+        TardisData data = TardisManager.get(server).getTardis(tardisId);
+        if (data != null) data.setCoordIncrementNegative(!data.isCoordIncrementNegative());
         return increment(server, tardisId);
     }
 
     public static int cycleIncrement(MinecraftServer server, UUID tardisId) {
-        TardisManager manager = TardisManager.get(server);
-        int next = (manager.getCoordIncrementIndex(tardisId) + 1) % INCREMENTS.length;
-        manager.setCoordIncrementIndex(tardisId, next);
+        TardisData data = TardisManager.get(server).getTardis(tardisId);
+        if (data != null) data.setCoordIncrementIndex((data.getCoordIncrementIndex() + 1) % INCREMENTS.length);
         return increment(server, tardisId);
     }
 
     /** Left click runs the same cycle backwards so you can undo an overshoot without going all the way round. */
     public static int cycleIncrementBack(MinecraftServer server, UUID tardisId) {
-        TardisManager manager = TardisManager.get(server);
+        TardisData data = TardisManager.get(server).getTardis(tardisId);
         int count = INCREMENTS.length;
-        int previous = (manager.getCoordIncrementIndex(tardisId) - 1 + count) % count;
-        manager.setCoordIncrementIndex(tardisId, previous);
+        if (data != null) data.setCoordIncrementIndex((data.getCoordIncrementIndex() - 1 + count) % count);
         return increment(server, tardisId);
     }
 
@@ -108,7 +108,8 @@ public final class TardisDestinations {
         }
 
         LandingTarget updated = new LandingTarget(target.dimension(), new BlockPos(x, y, z), target.yaw());
-        TardisManager.get(server).setLandingTarget(tardisId, updated);
+        TardisData data = TardisManager.get(server).getTardis(tardisId);
+        if (data != null) data.setLandingTarget(updated);
         return updated;
     }
 
@@ -118,7 +119,8 @@ public final class TardisDestinations {
 
         int next = Math.floorMod(facingIndex(target.yaw()) + direction, FACING_YAWS.length);
         LandingTarget updated = new LandingTarget(target.dimension(), target.pos(), FACING_YAWS[next]);
-        TardisManager.get(server).setLandingTarget(tardisId, updated);
+        TardisData data = TardisManager.get(server).getTardis(tardisId);
+        if (data != null) data.setLandingTarget(updated);
         return updated;
     }
 
@@ -170,7 +172,8 @@ public final class TardisDestinations {
         int y = Mth.clamp(pos.getY(), next.getMinY(), next.getMaxY() - 1);
         LandingTarget updated =
                 new LandingTarget(next.dimension(), new BlockPos(pos.getX(), y, pos.getZ()), target.yaw());
-        TardisManager.get(server).setLandingTarget(tardisId, updated);
+        TardisData data = TardisManager.get(server).getTardis(tardisId);
+        if (data != null) data.setLandingTarget(updated);
         return updated;
     }
 

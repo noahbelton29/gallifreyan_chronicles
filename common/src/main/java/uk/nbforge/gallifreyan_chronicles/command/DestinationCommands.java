@@ -102,7 +102,7 @@ public final class DestinationCommands {
             return fail(ctx, "destination_out_of_world");
         }
 
-        manager(ctx).setLandingTarget(tardis.id(), new LandingTarget(level.dimension(), pos, yaw));
+        tardis.data().setLandingTarget(new LandingTarget(level.dimension(), pos, yaw));
         return success(
                 ctx,
                 true,
@@ -116,7 +116,7 @@ public final class DestinationCommands {
     private static int get(CommandContext<CommandSourceStack> ctx) throws CommandSyntaxException {
         return withTardis(ctx, (tardis, idText) -> {
             String id = tardis.id().toString();
-            LandingTarget target = manager(ctx).getLandingTarget(tardis.id());
+            LandingTarget target = tardis.data().getLandingTarget();
             if (target == null) return success(ctx, false, "destination_none", id);
 
             return success(
@@ -132,7 +132,7 @@ public final class DestinationCommands {
 
     private static int clear(CommandContext<CommandSourceStack> ctx) throws CommandSyntaxException {
         return withTardis(ctx, (tardis, idText) -> {
-            manager(ctx).setLandingTarget(tardis.id(), null);
+            tardis.data().setLandingTarget(null);
             return success(ctx, true, "destination_cleared", tardis.id().toString());
         });
     }

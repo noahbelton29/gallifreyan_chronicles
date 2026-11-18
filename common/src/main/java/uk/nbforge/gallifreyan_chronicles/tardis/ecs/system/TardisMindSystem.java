@@ -117,11 +117,11 @@ public final class TardisMindSystem {
     }
 
     public static TardisMind mind(Tardis tardis) {
-        return tardis.data().mind(tardis.id());
+        return tardis.data().mind();
     }
 
     private static void save(Tardis tardis, TardisMind mind) {
-        tardis.data().setMind(tardis.id(), mind);
+        tardis.data().setMind(mind);
     }
 
     /** Includes the change over time since it was last updated. */

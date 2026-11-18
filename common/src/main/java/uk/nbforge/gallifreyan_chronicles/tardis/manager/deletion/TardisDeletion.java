@@ -28,6 +28,7 @@ import uk.nbforge.gallifreyan_chronicles.compat.portal.TardisPortalBridge;
 import uk.nbforge.gallifreyan_chronicles.core.GCBlocks;
 import uk.nbforge.gallifreyan_chronicles.core.lifecycle.ServerState;
 import uk.nbforge.gallifreyan_chronicles.mixin.server.MinecraftServerAccessor;
+import uk.nbforge.gallifreyan_chronicles.tardis.TardisData;
 import uk.nbforge.gallifreyan_chronicles.tardis.TardisDimensionManager;
 import uk.nbforge.gallifreyan_chronicles.tardis.TardisManager;
 
@@ -53,10 +54,11 @@ public final class TardisDeletion {
 
     public static boolean removeCompletely(MinecraftServer server, UUID tardisId) {
         TardisManager manager = TardisManager.get(server);
-        if (manager.get(tardisId).isEmpty()) return false;
-        ServerLevel exteriorLevel = server.getLevel(manager.getExteriorDimension(tardisId));
+        TardisData data = manager.getTardis(tardisId);
+        if (data == null) return false;
+        ServerLevel exteriorLevel = server.getLevel(data.getExteriorDimension());
         if (exteriorLevel == null) exteriorLevel = server.overworld();
-        BlockPos exteriorPos = manager.resolveExteriorBlockPos(tardisId);
+        BlockPos exteriorPos = data.resolveExteriorBlockPos();
         BlockPos exitPos = exteriorPos != null
                 ? exteriorPos
                 : exteriorLevel.getRespawnData().pos();
@@ -126,7 +128,7 @@ public final class TardisDeletion {
             DELETE_EXECUTOR.execute(() -> deleteFolder(dimensionPath));
         }
 
-        TardisManager.get(server).remove(tardisId);
+        TardisManager.get(server).removeTardis(tardisId);
         Constants.LOG.info("[GC] Deleted TARDIS {} and its dimension", tardisId);
     }
 

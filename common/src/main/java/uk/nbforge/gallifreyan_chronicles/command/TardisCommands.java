@@ -9,7 +9,6 @@ import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
-import java.util.UUID;
 import java.util.stream.Collectors;
 import net.minecraft.ChatFormatting;
 import net.minecraft.commands.CommandSourceStack;
@@ -24,6 +23,7 @@ import uk.nbforge.gallifreyan_chronicles.core.dynamic_registries.TardisExteriorR
 import uk.nbforge.gallifreyan_chronicles.core.entity.TardisControlEntity;
 import uk.nbforge.gallifreyan_chronicles.tardis.Tardis;
 import uk.nbforge.gallifreyan_chronicles.tardis.TardisApi;
+import uk.nbforge.gallifreyan_chronicles.tardis.TardisData;
 import uk.nbforge.gallifreyan_chronicles.tardis.TardisDimensionManager;
 import uk.nbforge.gallifreyan_chronicles.tardis.TardisExterior;
 import uk.nbforge.gallifreyan_chronicles.tardis.ecs.system.TardisInteriorSystem;
@@ -147,15 +147,15 @@ public final class TardisCommands {
      * Lists every TARDIS with its exterior and position.
      */
     private static int list(CommandContext<CommandSourceStack> ctx) {
-        Collection<UUID> ids = manager(ctx).getAllIds();
-        if (ids.isEmpty()) {
+        Collection<TardisData> tardises = manager(ctx).getAllTardises();
+        if (tardises.isEmpty()) {
             success(ctx, false, "no_tardises");
             return 0;
         }
 
-        for (UUID id : ids) {
-            BlockPos pos = manager(ctx).resolveExteriorBlockPos(id);
-            success(ctx, false, "list_tardis", id.toString(), exteriorIdAt(ctx, pos), describe(pos));
+        for (TardisData data : tardises) {
+            BlockPos pos = data.resolveExteriorBlockPos();
+            success(ctx, false, "list_tardis", data.id().toString(), exteriorIdAt(ctx, pos), describe(pos));
         }
         return 1;
     }
@@ -165,7 +165,7 @@ public final class TardisCommands {
      */
     private static int info(CommandContext<CommandSourceStack> ctx) throws CommandSyntaxException {
         return withTardis(ctx, (tardis, idText) -> {
-            BlockPos pos = manager(ctx).resolveExteriorBlockPos(tardis.id());
+            BlockPos pos = tardis.data().resolveExteriorBlockPos();
             String owner = tardis.ownerId() != null ? tardis.ownerId().toString() : "None";
 
             success(ctx, false, "debug", idText);

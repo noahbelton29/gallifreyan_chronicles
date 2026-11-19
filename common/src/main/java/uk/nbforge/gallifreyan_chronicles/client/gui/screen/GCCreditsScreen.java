@@ -64,7 +64,7 @@ public class GCCreditsScreen extends Screen {
         this.addTitle("menu.gallifreyan_chronicles.credits.coding", AUTHOR, CODER);
         this.addTitle("menu.gallifreyan_chronicles.credits.models", AUTHOR);
         this.addTitle("menu.gallifreyan_chronicles.credits.textures", AUTHOR);
-        this.addTitle("menu.gallifreyan_chronicles.credits.interiors", "Fredbear1983, TallBus57");
+        this.addTitle("menu.gallifreyan_chronicles.credits.interiors", "Fredbear1983, Tallbus57");
         this.addTitle("menu.gallifreyan_chronicles.credits.title_theme", TITLE_THEME);
 
         this.addSection(Component.translatable("menu.gallifreyan_chronicles.credits.special_thanks"));

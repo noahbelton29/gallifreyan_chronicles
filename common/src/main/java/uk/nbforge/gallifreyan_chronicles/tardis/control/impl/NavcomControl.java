@@ -12,11 +12,10 @@ public class NavcomControl extends Control {
         super(animations, ClickSound.SWITCH);
     }
 
-
     @Override
     public @Nullable Component describeState(boolean activated) {
         return activated
-            ? state("navcom", "enabled", ChatFormatting.GREEN)
-            : state("navcom", "disabled", ChatFormatting.RED);
+                ? state("navcom", "enabled", ChatFormatting.GREEN)
+                : state("navcom", "disabled", ChatFormatting.RED);
     }
 }

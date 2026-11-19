@@ -1,5 +1,8 @@
 package uk.nbforge.gallifreyan_chronicles.datagen.assets.lang;
 
+import java.util.Arrays;
+import java.util.Objects;
+import java.util.stream.Collectors;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.data.PackOutput;
 import net.minecraft.world.item.Item;
@@ -12,10 +15,6 @@ import uk.nbforge.gallifreyan_chronicles.core.GCTardisControls;
 import uk.nbforge.gallifreyan_chronicles.core.block.registry.TardisBlocks;
 import uk.nbforge.gallifreyan_chronicles.tardis.control.TardisControls;
 
-import java.util.Arrays;
-import java.util.Objects;
-import java.util.stream.Collectors;
-
 public class GCLanguageProvider extends LanguageProvider {
     public GCLanguageProvider(PackOutput output) {
         super(output, Constants.MOD_ID, "en_us");
@@ -23,8 +22,8 @@ public class GCLanguageProvider extends LanguageProvider {
 
     private static String titleCase(String path) {
         return Arrays.stream(path.split("_"))
-            .map(word -> Character.toUpperCase(word.charAt(0)) + word.substring(1))
-            .collect(Collectors.joining(" "));
+                .map(word -> Character.toUpperCase(word.charAt(0)) + word.substring(1))
+                .collect(Collectors.joining(" "));
     }
 
     @Override
@@ -46,9 +45,9 @@ public class GCLanguageProvider extends LanguageProvider {
                 add(block, "Second Doctor's Door (Alt)");
             } else {
                 add(
-                    block,
-                    titleCase(BuiltInRegistries.BLOCK.getKey(block).getPath())
-                        .replace("Tuat", "TUAT"));
+                        block,
+                        titleCase(BuiltInRegistries.BLOCK.getKey(block).getPath())
+                                .replace("Tuat", "TUAT"));
             }
         }
 
@@ -85,38 +84,38 @@ public class GCLanguageProvider extends LanguageProvider {
         add("overlay.gallifreyan_chronicles.stattenheim_linked_other", "Remote linked to %s's TARDIS");
         add("overlay.gallifreyan_chronicles.stattenheim_already_linked", "Remote is already linked to this TARDIS");
         add(
-            "overlay.gallifreyan_chronicles.stattenheim_not_linked",
-            "This remote isn't linked. Shift + right-click a TARDIS to link it");
+                "overlay.gallifreyan_chronicles.stattenheim_not_linked",
+                "This remote isn't linked. Shift + right-click a TARDIS to link it");
         add(
-            "overlay.gallifreyan_chronicles.stattenheim_not_yours",
-            "That's someone else's TARDIS. You can't use the remote on it");
+                "overlay.gallifreyan_chronicles.stattenheim_not_yours",
+                "That's someone else's TARDIS. You can't use the remote on it");
         add("overlay.gallifreyan_chronicles.stattenheim_lost", "The TARDIS this remote was linked to can't be found");
         add("overlay.gallifreyan_chronicles.stattenheim_cannot_link", "That TARDIS can't be linked");
         add(
-            "overlay.gallifreyan_chronicles.stattenheim_inside_tardis",
-            "You can't summon a TARDIS inside another TARDIS");
+                "overlay.gallifreyan_chronicles.stattenheim_inside_tardis",
+                "You can't summon a TARDIS inside another TARDIS");
         add("overlay.gallifreyan_chronicles.stattenheim_recharging", "The remote is still recharging");
         add("overlay.gallifreyan_chronicles.stattenheim_cannot_summon", "The TARDIS can't be summoned right now");
         add("overlay.gallifreyan_chronicles.stattenheim_summoned", "The TARDIS answers the call");
         add("tooltip.gallifreyan_chronicles.door.primary", "Primary Door");
         add(
-            "message.gallifreyan_chronicles.tardis_offering_accepted",
-            "The TARDIS hums softly and accepts your offering");
+                "message.gallifreyan_chronicles.tardis_offering_accepted",
+                "The TARDIS hums softly and accepts your offering");
         add(
-            "message.gallifreyan_chronicles.tardis_offering_again",
-            "The TARDIS accepts it, though it's growing wise to bribes");
+                "message.gallifreyan_chronicles.tardis_offering_again",
+                "The TARDIS accepts it, though it's growing wise to bribes");
         add("message.gallifreyan_chronicles.tardis_offering_nervous", "The TARDIS takes it nervously, still flinching");
         add("message.gallifreyan_chronicles.tardis_offering_wait", "The TARDIS is still thinking about the last one");
         add(
-            "message.gallifreyan_chronicles.tardis_offering_content",
-            "The TARDIS is fond of you already. It doesn't need bribing");
+                "message.gallifreyan_chronicles.tardis_offering_content",
+                "The TARDIS is fond of you already. It doesn't need bribing");
         add("message.gallifreyan_chronicles.tardis_uneasy", "The TARDIS hums uneasily as you step inside...");
         add(
-            "message.gallifreyan_chronicles.tardis_afraid",
-            "The hum wavers and the lights stutter. The TARDIS is afraid of you");
+                "message.gallifreyan_chronicles.tardis_afraid",
+                "The hum wavers and the lights stutter. The TARDIS is afraid of you");
         add(
-            "message.gallifreyan_chronicles.tardis_dreads_you",
-            "The TARDIS shudders. Its hum twists and the lights gutter in fear");
+                "message.gallifreyan_chronicles.tardis_dreads_you",
+                "The TARDIS shudders. Its hum twists and the lights gutter in fear");
 
         add("creativetab.gallifreyan_chronicles.tardis", "GC: TARDIS");
         add("tooltip.gallifreyan_chronicles.tardis.schema", "Schema");
@@ -151,11 +150,11 @@ public class GCLanguageProvider extends LanguageProvider {
         add("menu.gallifreyan_chronicles.credits.disclaimer", "Disclaimer");
         add("menu.gallifreyan_chronicles.credits.disclaimer.ownership", "Doctor Who and the TARDIS belong to the BBC.");
         add(
-            "menu.gallifreyan_chronicles.credits.disclaimer.credit",
-            "All credit for the Doctor Who assets goes to the BBC.");
+                "menu.gallifreyan_chronicles.credits.disclaimer.credit",
+                "All credit for the Doctor Who assets goes to the BBC.");
         add(
-            "menu.gallifreyan_chronicles.credits.disclaimer.unofficial",
-            "This is an unofficial fan project, not affiliated with or endorsed by the BBC.");
+                "menu.gallifreyan_chronicles.credits.disclaimer.unofficial",
+                "This is an unofficial fan project, not affiliated with or endorsed by the BBC.");
         add("menu.gallifreyan_chronicles.credits.interiors", "Interior Builds");
         add("menu.gallifreyan_chronicles.credits.models", "Assets and Models");
         add("menu.gallifreyan_chronicles.credits.special_thanks", "Special Thanks");
@@ -180,22 +179,22 @@ public class GCLanguageProvider extends LanguageProvider {
         add("command.gallifreyan_chronicles.invalid_id", "Invalid TARDIS ID: %s");
         add("command.gallifreyan_chronicles.mind_header", "TARDIS %s mind:");
         add(
-            "command.gallifreyan_chronicles.mind_bond",
-            "  %s: trust %s | fear %s (%s) | trauma %s | hits %s | betrayed %s");
+                "command.gallifreyan_chronicles.mind_bond",
+                "  %s: trust %s | fear %s (%s) | trauma %s | hits %s | betrayed %s");
         add("command.gallifreyan_chronicles.mind_no_bonds", "  It doesn't know anyone yet");
         add("command.gallifreyan_chronicles.tp_exterior", "Teleported to the exterior of TARDIS %s");
         add("command.gallifreyan_chronicles.tp_interior", "Teleported inside TARDIS %s");
         add(
-            "command.gallifreyan_chronicles.no_tardis_here",
-            "Look at a TARDIS exterior or console, or stand inside one");
+                "command.gallifreyan_chronicles.no_tardis_here",
+                "Look at a TARDIS exterior or console, or stand inside one");
         add("command.gallifreyan_chronicles.tardis_id", "TARDIS id: %s");
         add("command.gallifreyan_chronicles.click_to_copy", "Click to copy");
         add("command.gallifreyan_chronicles.no_tardis_id", "No TARDIS found with ID: %s");
 
         add("command.gallifreyan_chronicles.unknown_exterior", "Unknown exterior: %s");
         add(
-            "command.gallifreyan_chronicles.remove_tardis",
-            "Removed TARDIS %s, its exterior and its interior dimension");
+                "command.gallifreyan_chronicles.remove_tardis",
+                "Removed TARDIS %s, its exterior and its interior dimension");
         add("command.gallifreyan_chronicles.set_exterior", "Set exterior of TARDIS %s to %s");
         add("command.gallifreyan_chronicles.get_exterior", "Exterior of TARDIS %s: %s");
         add("command.gallifreyan_chronicles.no_exterior", "No exterior found for TARDIS ID: %s");
@@ -223,14 +222,14 @@ public class GCLanguageProvider extends LanguageProvider {
         add("command.gallifreyan_chronicles.no_interior_door", "No interior doors found for TARDIS ID: %s");
         add("command.gallifreyan_chronicles.unknown_door_variant", "Unknown door variant '%s' for door type '%s'");
         add(
-            "command.gallifreyan_chronicles.set_door_variant",
-            "Set door variant of TARDIS %s to %s (%s doors updated)");
+                "command.gallifreyan_chronicles.set_door_variant",
+                "Set door variant of TARDIS %s to %s (%s doors updated)");
 
         add("command.gallifreyan_chronicles.summon_tardis", "Summoned TARDIS %s to %s");
         add("command.gallifreyan_chronicles.summon_blocked", "Something is in the way, move and try again");
         add(
-            "command.gallifreyan_chronicles.summon_inside_tardis",
-            "A TARDIS cannot be summoned inside a TARDIS interior");
+                "command.gallifreyan_chronicles.summon_inside_tardis",
+                "A TARDIS cannot be summoned inside a TARDIS interior");
 
         add("command.gallifreyan_chronicles.set_glow", "Set exterior glow of TARDIS %s to %s");
 
@@ -291,8 +290,8 @@ public class GCLanguageProvider extends LanguageProvider {
         add("command.gallifreyan_chronicles.get_locked", "TARDIS %s locked: %s");
         add("command.gallifreyan_chronicles.set_locked", "Set locked state of TARDIS %s to %s");
         add(
-            "command.gallifreyan_chronicles.set_locked_failed",
-            "Couldn't set locked state of TARDIS %s to %s, the doors aren't fully shut");
+                "command.gallifreyan_chronicles.set_locked_failed",
+                "Couldn't set locked state of TARDIS %s to %s, the doors aren't fully shut");
         add("command.gallifreyan_chronicles.get_cloaked", "TARDIS %s cloaked: %s");
         add("command.gallifreyan_chronicles.set_cloaked", "Set cloak of TARDIS %s to %s");
         add("command.gallifreyan_chronicles.get_yaw", "Yaw of TARDIS %s: %s degrees");
@@ -304,8 +303,8 @@ public class GCLanguageProvider extends LanguageProvider {
         add("command.gallifreyan_chronicles.not_travelling", "TARDIS %s isn't currently travelling");
         add("command.gallifreyan_chronicles.get_flight_remaining", "TARDIS %s has %s seconds left of its flight");
         add(
-            "command.gallifreyan_chronicles.set_flight_remaining",
-            "Skipped ahead, TARDIS %s now has %s seconds left of its flight");
+                "command.gallifreyan_chronicles.set_flight_remaining",
+                "Skipped ahead, TARDIS %s now has %s seconds left of its flight");
 
         add("overlay.gallifreyan_chronicles.destination", "Destination: %s  |  %s");
         add("overlay.gallifreyan_chronicles.destination_dimension", "Dimension: %s  (%s)");
@@ -313,44 +312,44 @@ public class GCLanguageProvider extends LanguageProvider {
         add("overlay.gallifreyan_chronicles.destination_direction", "Facing: %s");
 
         add(
-            "message.gallifreyan_chronicles.tardis_balks.stressed",
-            "The TARDIS is stressed and doesn't want to take off... pull it again to make it");
+                "message.gallifreyan_chronicles.tardis_balks.stressed",
+                "The TARDIS is stressed and doesn't want to take off... pull it again to make it");
         add(
-            "message.gallifreyan_chronicles.tardis_balks.distrust",
-            "The TARDIS doesn't trust you enough to take off... pull it again to make it");
+                "message.gallifreyan_chronicles.tardis_balks.distrust",
+                "The TARDIS doesn't trust you enough to take off... pull it again to make it");
         add(
-            "message.gallifreyan_chronicles.tardis_refuses.stressed",
-            "The TARDIS is too stressed, it's refusing to take off!");
+                "message.gallifreyan_chronicles.tardis_refuses.stressed",
+                "The TARDIS is too stressed, it's refusing to take off!");
         add(
-            "message.gallifreyan_chronicles.tardis_refuses.distrust",
-            "The TARDIS doesn't trust you, it's refusing to take off!");
+                "message.gallifreyan_chronicles.tardis_refuses.distrust",
+                "The TARDIS doesn't trust you, it's refusing to take off!");
         add(
-            "message.gallifreyan_chronicles.tardis_worked_up",
-            "You left it too long, the TARDIS is getting more stressed and really doesn't want to go now...");
+                "message.gallifreyan_chronicles.tardis_worked_up",
+                "You left it too long, the TARDIS is getting more stressed and really doesn't want to go now...");
         add("message.gallifreyan_chronicles.tardis_warning", "The TARDIS is getting angry... stop pushing it");
         add("message.gallifreyan_chronicles.tardis_lashes_out", "The TARDIS lashes out at you!");
         add("message.gallifreyan_chronicles.tardis_furious", "The TARDIS is furious, it's trying to hurt you!");
         add("message.gallifreyan_chronicles.still_travelling", "Still in the vortex, %s seconds until you can land");
         add("message.gallifreyan_chronicles.crash_landing", "Handbrake on in the vortex, the TARDIS is crashing!");
         add(
-            "message.gallifreyan_chronicles.crash_landing_stress",
-            "The TARDIS was barely hanging on... emergency landing!");
+                "message.gallifreyan_chronicles.crash_landing_stress",
+                "The TARDIS was barely hanging on... emergency landing!");
         add("message.gallifreyan_chronicles.smoke_choking", "The smoke is getting thick... you need to get out!");
         add("effect.gallifreyan_chronicles.choking", "Choking");
         add("death.attack.gallifreyan_chronicles.smoke", "%1$s choked on the smoke of a crashed TARDIS");
         add(
-            "death.attack.gallifreyan_chronicles.smoke.player",
-            "%1$s choked on the smoke of a crashed TARDIS while fighting %2$s");
+                "death.attack.gallifreyan_chronicles.smoke.player",
+                "%1$s choked on the smoke of a crashed TARDIS while fighting %2$s");
         add("message.gallifreyan_chronicles.power_locked_crashing", "The TARDIS is crashing, the power won't budge!");
         add(
-            "message.gallifreyan_chronicles.cloister_bell_locked_crashing",
-            "The TARDIS is crashing, the cloister bell won't stop!");
+                "message.gallifreyan_chronicles.cloister_bell_locked_crashing",
+                "The TARDIS is crashing, the cloister bell won't stop!");
         add("message.gallifreyan_chronicles.mallet_shudders", "The TARDIS shudders...");
         add("message.gallifreyan_chronicles.mallet_flinches", "The TARDIS flinches away from you...");
         add("message.gallifreyan_chronicles.mallet_cowers", "The TARDIS cowers...");
         add(
-            "message.gallifreyan_chronicles.tardis_cowed",
-            "The TARDIS doesn't want to go, but it's too scared of you to refuse...");
+                "message.gallifreyan_chronicles.tardis_cowed",
+                "The TARDIS doesn't want to go, but it's too scared of you to refuse...");
         add("message.gallifreyan_chronicles.mallet_fights_back", "The TARDIS lashes back at you!");
         add("message.gallifreyan_chronicles.tardis_offering_afraid", "The TARDIS takes it, trembling");
         add("message.gallifreyan_chronicles.tardis_offering_betrayed", "The TARDIS takes it, but it hasn't forgotten");
@@ -358,30 +357,30 @@ public class GCLanguageProvider extends LanguageProvider {
         add("message.gallifreyan_chronicles.tardis_ptsd_easing", "The TARDIS seems more at peace lately");
         add("message.gallifreyan_chronicles.mallet_not_yours", "This isn't your TARDIS to hit");
         add(
-            "message.gallifreyan_chronicles.tardis_controls_frozen",
-            "The controls won't budge. The TARDIS doesn't trust you");
+                "message.gallifreyan_chronicles.tardis_controls_frozen",
+                "The controls won't budge. The TARDIS doesn't trust you");
         add("message.gallifreyan_chronicles.tardis_control_sticks", "The control sticks... the TARDIS is wary of you");
         add("message.gallifreyan_chronicles.tardis_betrayed", "The TARDIS will never forget this betrayal");
         add("discovery.gallifreyan_chronicles.trait.distrusting", "Distrusting");
         add(
-            "discovery.gallifreyan_chronicles.trait.distrusting.desc",
-            "It doesn't trust you yet. Its controls will stick until you earn its trust, which comes slowly, but once earned it holds on to it. Don't abuse it.");
+                "discovery.gallifreyan_chronicles.trait.distrusting.desc",
+                "It doesn't trust you yet. Its controls will stick until you earn its trust, which comes slowly, but once earned it holds on to it. Don't abuse it.");
         add("message.gallifreyan_chronicles.mallet_seen_flinch", "The TARDIS flinches at the sight of the mallet");
         add("message.gallifreyan_chronicles.mallet_seen_braces", "The TARDIS braces itself and locks up tight");
         add(
-            "message.gallifreyan_chronicles.mallet_seen_threatens",
-            "The TARDIS crackles threateningly. It remembers that mallet");
+                "message.gallifreyan_chronicles.mallet_seen_threatens",
+                "The TARDIS crackles threateningly. It remembers that mallet");
         add("discovery.gallifreyan_chronicles.disability.ptsd", "PTSD");
         add(
-            "discovery.gallifreyan_chronicles.disability.ptsd.desc",
-            "You hurt it too many times. It's always a little scared of you now, it gets stressed easily, and it'll flinch whenever it sees that mallet. Kindness can ease it, but it'll never fully forget.");
+                "discovery.gallifreyan_chronicles.disability.ptsd.desc",
+                "You hurt it too many times. It's always a little scared of you now, it gets stressed easily, and it'll flinch whenever it sees that mallet. Kindness can ease it, but it'll never fully forget.");
         add("advancement.gallifreyan_chronicles.tardis_mind.ptsd.title", "What Have You Done?");
         add(
-            "advancement.gallifreyan_chronicles.tardis_mind.ptsd.description",
-            "Abuse your TARDIS until it develops PTSD");
+                "advancement.gallifreyan_chronicles.tardis_mind.ptsd.description",
+                "Abuse your TARDIS until it develops PTSD");
         add(
-            "message.gallifreyan_chronicles.tardis_terrified",
-            "The TARDIS is frozen in terror. The controls won't budge");
+                "message.gallifreyan_chronicles.tardis_terrified",
+                "The TARDIS is frozen in terror. The controls won't budge");
         add("message.gallifreyan_chronicles.tardis_terror_resists", "It's still frozen... it needs more convincing");
         add("message.gallifreyan_chronicles.tardis_terror_complies", "The TARDIS gives in, trembling");
         add("message.gallifreyan_chronicles.tardis_terror_savage", "The TARDIS fights for its life!");
@@ -390,72 +389,72 @@ public class GCLanguageProvider extends LanguageProvider {
         add("advancement.gallifreyan_chronicles.tardis_mind.root.description", "No two TARDISes are quite the same");
         add("advancement.gallifreyan_chronicles.tardis_mind.personality.title", "A Mind of Its Own");
         add(
-            "advancement.gallifreyan_chronicles.tardis_mind.personality.description",
-            "Discover your TARDIS's personality");
+                "advancement.gallifreyan_chronicles.tardis_mind.personality.description",
+                "Discover your TARDIS's personality");
         add("advancement.gallifreyan_chronicles.tardis_mind.trait.title", "Getting to Know You");
         add("advancement.gallifreyan_chronicles.tardis_mind.trait.description", "Discover one of your TARDIS's traits");
         add("advancement.gallifreyan_chronicles.tardis_mind.dyslexic.title", "Wait, Where Are We?");
         add(
-            "advancement.gallifreyan_chronicles.tardis_mind.dyslexic.description",
-            "Your TARDIS is dyslexic! It mixed up its numbers and took you somewhere else entirely");
+                "advancement.gallifreyan_chronicles.tardis_mind.dyslexic.description",
+                "Your TARDIS is dyslexic! It mixed up its numbers and took you somewhere else entirely");
         add(
-            "discovery.gallifreyan_chronicles.personality.intro",
-            "Every TARDIS has a mind of its own, and yours is starting to show it...");
+                "discovery.gallifreyan_chronicles.personality.intro",
+                "Every TARDIS has a mind of its own, and yours is starting to show it...");
         add("discovery.gallifreyan_chronicles.personality.found", "Personality Discovered!");
         add("discovery.gallifreyan_chronicles.personality.obedient", "Obedient");
         add(
-            "discovery.gallifreyan_chronicles.personality.obedient.desc",
-            "It'll go wherever you ask, whenever you ask. No arguments, no sulking. Treasure it.");
+                "discovery.gallifreyan_chronicles.personality.obedient.desc",
+                "It'll go wherever you ask, whenever you ask. No arguments, no sulking. Treasure it.");
         add("discovery.gallifreyan_chronicles.personality.submissive", "Submissive");
         add(
-            "discovery.gallifreyan_chronicles.personality.submissive.desc",
-            "When it's unhappy it balks at the lever, but push it again and it'll give in. It remembers that you did, though.");
+                "discovery.gallifreyan_chronicles.personality.submissive.desc",
+                "When it's unhappy it balks at the lever, but push it again and it'll give in. It remembers that you did, though.");
         add("discovery.gallifreyan_chronicles.personality.defensive", "Defensive");
         add(
-            "discovery.gallifreyan_chronicles.personality.defensive.desc",
-            "If it's stressed or doesn't trust you, it simply won't fly. Keep it calm and earn its trust.");
+                "discovery.gallifreyan_chronicles.personality.defensive.desc",
+                "If it's stressed or doesn't trust you, it simply won't fly. Keep it calm and earn its trust.");
         add("discovery.gallifreyan_chronicles.personality.aggressive", "Aggressive");
         add(
-            "discovery.gallifreyan_chronicles.personality.aggressive.desc",
-            "Keep forcing it when it doesn't want to go and it will fight back. It can and will hurt you.");
+                "discovery.gallifreyan_chronicles.personality.aggressive.desc",
+                "Keep forcing it when it doesn't want to go and it will fight back. It can and will hurt you.");
         add("discovery.gallifreyan_chronicles.trait.found", "Trait Discovered!");
         add("discovery.gallifreyan_chronicles.trait.skittish", "Skittish");
         add(
-            "discovery.gallifreyan_chronicles.trait.skittish.desc",
-            "It gets stressed quickly, but calms down just as fast.");
+                "discovery.gallifreyan_chronicles.trait.skittish.desc",
+                "It gets stressed quickly, but calms down just as fast.");
         add("discovery.gallifreyan_chronicles.trait.loyal", "Loyal");
         add(
-            "discovery.gallifreyan_chronicles.trait.loyal.desc",
-            "It learns to trust you quickly and doesn't lose faith in you easily.");
+                "discovery.gallifreyan_chronicles.trait.loyal.desc",
+                "It learns to trust you quickly and doesn't lose faith in you easily.");
         add("discovery.gallifreyan_chronicles.trait.stubborn", "Stubborn");
         add(
-            "discovery.gallifreyan_chronicles.trait.stubborn.desc",
-            "It digs its heels in and says no sooner than most TARDISes.");
+                "discovery.gallifreyan_chronicles.trait.stubborn.desc",
+                "It digs its heels in and says no sooner than most TARDISes.");
         add("discovery.gallifreyan_chronicles.trait.forgiving", "Forgiving");
         add(
-            "discovery.gallifreyan_chronicles.trait.forgiving.desc",
-            "Fear and stress fade from it twice as fast as normal.");
+                "discovery.gallifreyan_chronicles.trait.forgiving.desc",
+                "Fear and stress fade from it twice as fast as normal.");
         add("discovery.gallifreyan_chronicles.trait.grudge_holder", "Grudge-holder");
         add(
-            "discovery.gallifreyan_chronicles.trait.grudge_holder.desc",
-            "It doesn't forget. Fear and stress take twice as long to fade.");
+                "discovery.gallifreyan_chronicles.trait.grudge_holder.desc",
+                "It doesn't forget. Fear and stress take twice as long to fade.");
         add("discovery.gallifreyan_chronicles.trait.protective", "Protective");
         add(
-            "discovery.gallifreyan_chronicles.trait.protective.desc",
-            "It braces itself to shield you. Crashes hit the people inside half as hard.");
+                "discovery.gallifreyan_chronicles.trait.protective.desc",
+                "It braces itself to shield you. Crashes hit the people inside half as hard.");
         add("discovery.gallifreyan_chronicles.trait.possessive", "Possessive");
         add(
-            "discovery.gallifreyan_chronicles.trait.possessive.desc",
-            "It really only listens to its owner. Anyone else will find it much harder to fly.");
+                "discovery.gallifreyan_chronicles.trait.possessive.desc",
+                "It really only listens to its owner. Anyone else will find it much harder to fly.");
         add("discovery.gallifreyan_chronicles.trait.welcoming", "Welcoming");
         add(
-            "discovery.gallifreyan_chronicles.trait.welcoming.desc",
-            "It's happy to fly for anyone, not just its owner.");
+                "discovery.gallifreyan_chronicles.trait.welcoming.desc",
+                "It's happy to fly for anyone, not just its owner.");
         add("discovery.gallifreyan_chronicles.disability.found", "Quirk Discovered!");
         add("discovery.gallifreyan_chronicles.disability.dyslexic", "Dyslexic");
         add(
-            "discovery.gallifreyan_chronicles.disability.dyslexic.desc",
-            "It sometimes mixes up its coordinates, especially when stressed. It gets better with practice, but it never fully goes away.");
+                "discovery.gallifreyan_chronicles.disability.dyslexic.desc",
+                "It sometimes mixes up its coordinates, especially when stressed. It gets better with practice, but it never fully goes away.");
         add("sound.gallifreyan_chronicles.first_doctors_hum", "TARDIS hums");
         add("sound.gallifreyan_chronicles.spark", "Sparks crackle");
         add("sound.gallifreyan_chronicles.spark_explosion", "Sparks burst");
@@ -503,39 +502,39 @@ public class GCLanguageProvider extends LanguageProvider {
         add("gc.build.expired.title", "Test build expired");
         add("gc.build.expires_in", "Build expires in %s");
         add(
-            "gc.build.expired.message",
-            "This test build of Gallifreyan Chronicles has expired. Ask for a new build to keep testing.");
+                "gc.build.expired.message",
+                "This test build of Gallifreyan Chronicles has expired. Ask for a new build to keep testing.");
         add("options.gallifreyan_chronicles.tardis_hum", "TARDIS Hum");
         add("options.gallifreyan_chronicles.camera_shake", "TARDIS Camera Shake");
         add("options.gallifreyan_chronicles.flight_messages", "TARDIS Flight Messages");
         add(
-            "options.gallifreyan_chronicles.flight_messages.tooltip",
-            "Show a message above your hotbar when the TARDIS you are inside departs and when it arrives.");
+                "options.gallifreyan_chronicles.flight_messages.tooltip",
+                "Show a message above your hotbar when the TARDIS you are inside departs and when it arrives.");
         add("overlay.gallifreyan_chronicles.flight_departing", "Dematerialising...");
         add("overlay.gallifreyan_chronicles.door_style_set", "Door styled with %s");
         add("overlay.gallifreyan_chronicles.door_style_cleared", "Door style removed");
         add("overlay.gallifreyan_chronicles.door_style_no_match", "This door can't be styled to match %s");
         add(
-            "overlay.gallifreyan_chronicles.door_style_primary",
-            "This door is controlled by the console and can't be restyled");
+                "overlay.gallifreyan_chronicles.door_style_primary",
+                "This door is controlled by the console and can't be restyled");
         add("overlay.gallifreyan_chronicles.flight_arrived", "Arrived in %s at %s");
         add("options.gallifreyan_chronicles.overlay_messages", "TARDIS Action Bar Messages");
         add(
-            "options.gallifreyan_chronicles.overlay_messages.tooltip",
-            "Show the messages above your hotbar when you use TARDIS controls, such as locking the doors or setting a destination.");
+                "options.gallifreyan_chronicles.overlay_messages.tooltip",
+                "Show the messages above your hotbar when you use TARDIS controls, such as locking the doors or setting a destination.");
         add(
-            "options.gallifreyan_chronicles.camera_shake.tooltip",
-            "How strongly the camera shakes during TARDIS takeoff, flight and landing.");
+                "options.gallifreyan_chronicles.camera_shake.tooltip",
+                "How strongly the camera shakes during TARDIS takeoff, flight and landing.");
         add("addons.gallifreyan_chronicles.title", "Addons");
         add(
-            "addons.gallifreyan_chronicles.drop_hint",
-            "Drag addon .zip or .jar files into this window to install them.");
+                "addons.gallifreyan_chronicles.drop_hint",
+                "Drag addon .zip or .jar files into this window to install them.");
         add("addons.gallifreyan_chronicles.empty", "No addons installed yet.");
         add("addons.gallifreyan_chronicles.open_folder", "Open Addons Folder");
         add("addons.gallifreyan_chronicles.installed", "Installed %s addon(s).");
         add(
-            "addons.gallifreyan_chronicles.install_none",
-            "Nothing installed. Drop .zip or .jar files, or folders with an addon.json.");
+                "addons.gallifreyan_chronicles.install_none",
+                "Nothing installed. Drop .zip or .jar files, or folders with an addon.json.");
         add("addons.gallifreyan_chronicles.restart", "Restart the game to apply changes to Java addons.");
         add("addons.gallifreyan_chronicles.restart_tag", "Restart needed");
         add("addons.gallifreyan_chronicles.page", "%s / %s");
@@ -551,14 +550,14 @@ public class GCLanguageProvider extends LanguageProvider {
         add("addons.gallifreyan_chronicles.problem.failed_to_start", "Failed to start: %s");
         add("addons.gallifreyan_chronicles.hint.invalid", "Check the addon.json inside the file.");
         add(
-            "addons.gallifreyan_chronicles.hint.incompatible_api",
-            "Update Gallifreyan Chronicles, or use an older version of this addon.");
+                "addons.gallifreyan_chronicles.hint.incompatible_api",
+                "Update Gallifreyan Chronicles, or use an older version of this addon.");
         add(
-            "addons.gallifreyan_chronicles.hint.incompatible_mod",
-            "Get a version of this addon made for your version of the mod.");
+                "addons.gallifreyan_chronicles.hint.incompatible_mod",
+                "Get a version of this addon made for your version of the mod.");
         add(
-            "addons.gallifreyan_chronicles.hint.missing_requirement",
-            "Install it and switch it on, then it will load.");
+                "addons.gallifreyan_chronicles.hint.missing_requirement",
+                "Install it and switch it on, then it will load.");
         add("addons.gallifreyan_chronicles.hint.wrong_requirement_version", "Update or replace what it needs.");
         add("addons.gallifreyan_chronicles.hint.failed_to_start", "The game log has the full error.");
         add("addons.gallifreyan_chronicles.state.active", "Active");
@@ -578,46 +577,46 @@ public class GCLanguageProvider extends LanguageProvider {
         add("options.gallifreyan_chronicles.version_hud.tooltip", "Show the mod version in the corner of the screen.");
         add("options.gallifreyan_chronicles.immersive_portals", "Immersive Portals");
         add(
-            "options.gallifreyan_chronicles.immersive_portals.tooltip",
-            "Use Immersive Portals for TARDIS doors. When off, doors use the plain teleport instead. Applies to worlds you host.");
+                "options.gallifreyan_chronicles.immersive_portals.tooltip",
+                "Use Immersive Portals for TARDIS doors. When off, doors use the plain teleport instead. Applies to worlds you host.");
         add("options.gallifreyan_chronicles.model_render_distance", "Model Render Distance");
         add(
-            "options.gallifreyan_chronicles.model_render_distance.tooltip",
-            "How far away TARDIS models are rendered, in blocks.");
+                "options.gallifreyan_chronicles.model_render_distance.tooltip",
+                "How far away TARDIS models are rendered, in blocks.");
         add("options.gallifreyan_chronicles.model_render_distance.value", "%s blocks");
         add("options.gallifreyan_chronicles.portal_render_distance", "Portal Render Distance");
         add(
-            "options.gallifreyan_chronicles.portal_render_distance.tooltip",
-            "How far away TARDIS door portals are rendered, in blocks.");
+                "options.gallifreyan_chronicles.portal_render_distance.tooltip",
+                "How far away TARDIS door portals are rendered, in blocks.");
         add("options.gallifreyan_chronicles.max_rendered_portals", "Max Rendered Portals");
         add(
-            "options.gallifreyan_chronicles.max_rendered_portals.tooltip",
-            "The most TARDIS door portals that can be rendered at once.");
+                "options.gallifreyan_chronicles.max_rendered_portals.tooltip",
+                "The most TARDIS door portals that can be rendered at once.");
         add(
-            "command.gallifreyan_chronicles.deletion_mode_on",
-            "TARDIS deletion mode enabled. Breaking a TARDIS will now delete it.");
+                "command.gallifreyan_chronicles.deletion_mode_on",
+                "TARDIS deletion mode enabled. Breaking a TARDIS will now delete it.");
         add("command.gallifreyan_chronicles.deletion_mode_off", "TARDIS deletion mode disabled.");
         add(
-            "message.gallifreyan_chronicles.deletion_mode_required",
-            "%s: enable deletion mode with %s to break this TARDIS.");
+                "message.gallifreyan_chronicles.deletion_mode_required",
+                "%s: enable deletion mode with %s to break this TARDIS.");
         add("options.gallifreyan_chronicles.power_darkness", "TARDIS Power-Off Darkness");
         add(
-            "options.gallifreyan_chronicles.power_darkness.tooltip",
-            "How dark it gets inside a TARDIS when its power is turned off.");
+                "options.gallifreyan_chronicles.power_darkness.tooltip",
+                "How dark it gets inside a TARDIS when its power is turned off.");
         add("options.gallifreyan_chronicles.star_density", "Star Density");
         add("options.gallifreyan_chronicles.star_density.off", "Off");
         add("options.gallifreyan_chronicles.star_density.low", "Low");
         add("options.gallifreyan_chronicles.star_density.normal", "Normal");
         add("options.gallifreyan_chronicles.star_density.high", "High");
         add(
-            "options.gallifreyan_chronicles.star_density.tooltip",
-            "How many stars appear in the skies of other planets.");
+                "options.gallifreyan_chronicles.star_density.tooltip",
+                "How many stars appear in the skies of other planets.");
         add("message.gallifreyan_chronicles.key_linked", "The key is now linked to this TARDIS.");
         add("message.gallifreyan_chronicles.close_doors_to_lock", "Close both doors before locking!");
         add("message.gallifreyan_chronicles.no_destination_to_set", "This console has no TARDIS destination to set!");
         add(
-            "message.gallifreyan_chronicles.navigational_lock_on",
-            "The navigational lock is on, the coordinates can't be changed!");
+                "message.gallifreyan_chronicles.navigational_lock_on",
+                "The navigational lock is on, the coordinates can't be changed!");
         add("message.gallifreyan_chronicles.doors_locked", "The doors are locked!");
         add("message.gallifreyan_chronicles.doors_key_in_lock", "There is a key in the outside lock!");
         add("message.gallifreyan_chronicles.control_names_on", "Control names: on");
@@ -664,8 +663,8 @@ public class GCLanguageProvider extends LanguageProvider {
         add("message.gallifreyan_chronicles.doors_sealed", "The doors are sealed while the TARDIS is travelling!");
         add("message.gallifreyan_chronicles.lock_no_exterior", "The door lock has no linked TARDIS exterior!");
         add(
-            "message.gallifreyan_chronicles.isomorphic_denied",
-            "Isomorphic security: only the owner can use these controls.");
+                "message.gallifreyan_chronicles.isomorphic_denied",
+                "Isomorphic security: only the owner can use these controls.");
 
         add("facing.gallifreyan_chronicles.north", "North");
         add("facing.gallifreyan_chronicles.north_east", "North-East");

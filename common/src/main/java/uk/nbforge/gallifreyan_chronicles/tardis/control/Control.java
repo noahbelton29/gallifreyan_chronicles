@@ -1,6 +1,7 @@
 package uk.nbforge.gallifreyan_chronicles.tardis.control;
 
 import com.mojang.serialization.MapCodec;
+import java.util.function.Function;
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
@@ -17,8 +18,6 @@ import uk.nbforge.gallifreyan_chronicles.tardis.console.ConsoleSounds;
 import uk.nbforge.gallifreyan_chronicles.tardis.door.DoorSync;
 import uk.nbforge.gallifreyan_chronicles.tardis.flight.crash.TardisCrash;
 import uk.nbforge.gallifreyan_chronicles.util.MessageUtil;
-
-import java.util.function.Function;
 
 /**
  * use and changed only ever run on the server with a console
@@ -37,7 +36,7 @@ public abstract class Control implements TardisControl {
     }
 
     public static <T extends Control> MapCodec<T> codec(
-        ControlAnimations defaults, Function<ControlAnimations, T> ctor) {
+            ControlAnimations defaults, Function<ControlAnimations, T> ctor) {
         return ControlAnimations.codec(defaults).xmap(ctor, Control::animations);
     }
 
@@ -54,10 +53,10 @@ public abstract class Control implements TardisControl {
 
     protected static Component state(String label, String value, ChatFormatting colour) {
         return Component.translatable("tooltip.gallifreyan_chronicles.control_state.label." + label)
-            .withStyle(ChatFormatting.GRAY)
-            .append(Component.literal(": ").withStyle(ChatFormatting.GRAY))
-            .append(Component.translatable("tooltip.gallifreyan_chronicles.control_state.value." + value)
-                .withStyle(colour));
+                .withStyle(ChatFormatting.GRAY)
+                .append(Component.literal(": ").withStyle(ChatFormatting.GRAY))
+                .append(Component.translatable("tooltip.gallifreyan_chronicles.control_state.value." + value)
+                        .withStyle(colour));
     }
 
     protected static boolean lockedWhileCrashing(ControlContext ctx, @Nullable Player player, String message) {
@@ -124,8 +123,7 @@ public abstract class Control implements TardisControl {
         if (ctx != null) changed(ctx, activated);
     }
 
-    protected void changed(ControlContext ctx, boolean activated) {
-    }
+    protected void changed(ControlContext ctx, boolean activated) {}
 
     @Override
     public void playClickSound(TardisControlEntity entity) {

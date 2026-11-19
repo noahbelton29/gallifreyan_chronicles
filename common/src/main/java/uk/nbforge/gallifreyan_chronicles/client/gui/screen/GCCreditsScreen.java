@@ -2,6 +2,8 @@ package uk.nbforge.gallifreyan_chronicles.client.gui.screen;
 
 import it.unimi.dsi.fastutil.ints.IntOpenHashSet;
 import it.unimi.dsi.fastutil.ints.IntSet;
+import java.util.ArrayList;
+import java.util.List;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.screens.Screen;
@@ -15,14 +17,11 @@ import net.minecraft.util.ARGB;
 import net.minecraft.util.FormattedCharSequence;
 import uk.nbforge.gallifreyan_chronicles.util.GCUtil;
 
-import java.util.ArrayList;
-import java.util.List;
-
 public class GCCreditsScreen extends Screen {
     private static final Identifier LOGO = GCUtil.modIdentifier("textures/gui/title/logo.png");
     private static final Identifier VIGNETTE = Identifier.withDefaultNamespace("textures/misc/credits_vignette.png");
     private static final Component SECTION_HEADING =
-        Component.literal("============").withStyle(ChatFormatting.WHITE);
+            Component.literal("============").withStyle(ChatFormatting.WHITE);
     private static final String NAME_PREFIX = "           ";
     private static final String AUTHOR = "NoahTNT2009";
     private static final String CODER = "Misper_YT";
@@ -73,9 +72,9 @@ public class GCCreditsScreen extends Screen {
 
         this.addSection(Component.translatable("menu.gallifreyan_chronicles.credits.disclaimer"));
         this.addNotice(
-            "menu.gallifreyan_chronicles.credits.disclaimer.ownership",
-            "menu.gallifreyan_chronicles.credits.disclaimer.credit",
-            "menu.gallifreyan_chronicles.credits.disclaimer.unofficial");
+                "menu.gallifreyan_chronicles.credits.disclaimer.ownership",
+                "menu.gallifreyan_chronicles.credits.disclaimer.credit",
+                "menu.gallifreyan_chronicles.credits.disclaimer.unofficial");
 
         this.totalScrollLength = this.lines.size() * LINE_HEIGHT;
     }
@@ -152,7 +151,7 @@ public class GCCreditsScreen extends Screen {
     public void extractRenderState(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float partialTick) {
         super.extractRenderState(graphics, mouseX, mouseY, partialTick);
         graphics.blit(
-            RenderPipelines.VIGNETTE, VIGNETTE, 0, 0, 0.0f, 0.0f, this.width, this.height, this.width, this.height);
+                RenderPipelines.VIGNETTE, VIGNETTE, 0, 0, 0.0f, 0.0f, this.width, this.height, this.width, this.height);
         this.scroll = Math.max(0.0f, this.scroll + partialTick * this.scrollSpeed);
 
         int columnX = this.width / 2 - COLUMN_HALF_WIDTH;
@@ -163,17 +162,17 @@ public class GCCreditsScreen extends Screen {
         graphics.pose().translate(0.0f, offset);
         graphics.nextStratum();
         graphics.blit(
-            RenderPipelines.GUI_TEXTURED,
-            LOGO,
-            this.width / 2 - LOGO_WIDTH / 2,
-            logoY,
-            0.0f,
-            0.0f,
-            LOGO_WIDTH,
-            LOGO_HEIGHT,
-            LOGO_WIDTH,
-            LOGO_HEIGHT,
-            ARGB.white(1.0f));
+                RenderPipelines.GUI_TEXTURED,
+                LOGO,
+                this.width / 2 - LOGO_WIDTH / 2,
+                logoY,
+                0.0f,
+                0.0f,
+                LOGO_WIDTH,
+                LOGO_HEIGHT,
+                LOGO_WIDTH,
+                LOGO_HEIGHT,
+                ARGB.white(1.0f));
 
         int y = logoY + LINES_OFFSET;
         for (int i = 0; i < this.lines.size(); i++) {
@@ -199,7 +198,7 @@ public class GCCreditsScreen extends Screen {
     @Override
     protected void extractMenuBackground(GuiGraphicsExtractor graphics, int x, int y, int width, int height) {
         Screen.extractMenuBackgroundTexture(
-            graphics, Screen.MENU_BACKGROUND, 0, 0, 0.0f, this.scroll * 0.5f, width, height);
+                graphics, Screen.MENU_BACKGROUND, 0, 0, 0.0f, this.scroll * 0.5f, width, height);
     }
 
     @Override

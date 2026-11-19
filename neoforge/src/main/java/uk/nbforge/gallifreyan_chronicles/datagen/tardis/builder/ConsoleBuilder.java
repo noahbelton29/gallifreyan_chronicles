@@ -3,12 +3,11 @@ package uk.nbforge.gallifreyan_chronicles.datagen.tardis.builder;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
-import uk.nbforge.gallifreyan_chronicles.core.GCTardisControls;
-import uk.nbforge.gallifreyan_chronicles.datagen.util.GCJson;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Consumer;
+import uk.nbforge.gallifreyan_chronicles.core.GCTardisControls;
+import uk.nbforge.gallifreyan_chronicles.datagen.util.GCJson;
 
 /**
  * every method is optional. control ids come from GCTardisControls so a typo is a compile error and not a control that
@@ -46,8 +45,7 @@ public final class ConsoleBuilder {
     }
 
     public ConsoleBuilder control(String id, double cooldownSeconds) {
-        return control(id, cooldownSeconds, details -> {
-        });
+        return control(id, cooldownSeconds, details -> {});
     }
 
     public ConsoleBuilder control(String id, double cooldownSeconds, Consumer<Control> details) {
@@ -65,35 +63,34 @@ public final class ConsoleBuilder {
 
     public ConsoleBuilder standardControls() {
         return control(GCTardisControls.COORDINATE_STEP_CONTROL, 0.75)
-            .control(GCTardisControls.CLOAKING_DEVICE_CONTROL, 1.5)
-            .control(GCTardisControls.DIMENSIONAL_CONTROL, 0.5, Control::noAnimation)
-            .control(GCTardisControls.DOOR_CONTROL, 0.5)
-            .control(GCTardisControls.DOOR_LOCK_CONTROL, 0.5)
-            .control(GCTardisControls.SPACE_TIME_THROTTLE, 1.5)
-            .control(GCTardisControls.TIME_ROTOR_HANDBRAKE, 1.5)
-            .control(GCTardisControls.POWER_CONTROL, 1.5)
-            .control(GCTardisControls.X_INCREMENT, 1)
-            .control(GCTardisControls.Y_INCREMENT, 1)
-            .control(GCTardisControls.Z_INCREMENT, 1)
-            .control(GCTardisControls.ISOMORPHIC_CONTROL, 0.5)
-            .control(GCTardisControls.GYROSCOPIC_STABILIZERS, 0.5)
-            .control(GCTardisControls.DIRECTIONAL_CONTROL, 0.5, Control::noAnimation)
-            .control(GCTardisControls.CLOISTER_BELL_CONTROL, 0.5)
-            .control(GCTardisControls.NAVIGATIONAL_LOCK_CONTROL, 0.5)
-            .control(GCTardisControls.NAVCOM_CONTROL, 0.5);
+                .control(GCTardisControls.CLOAKING_DEVICE_CONTROL, 1.5)
+                .control(GCTardisControls.DIMENSIONAL_CONTROL, 0.5, Control::noAnimation)
+                .control(GCTardisControls.DOOR_CONTROL, 0.5)
+                .control(GCTardisControls.DOOR_LOCK_CONTROL, 0.5)
+                .control(GCTardisControls.SPACE_TIME_THROTTLE, 1.5)
+                .control(GCTardisControls.TIME_ROTOR_HANDBRAKE, 1.5)
+                .control(GCTardisControls.POWER_CONTROL, 1.5)
+                .control(GCTardisControls.X_INCREMENT, 1)
+                .control(GCTardisControls.Y_INCREMENT, 1)
+                .control(GCTardisControls.Z_INCREMENT, 1)
+                .control(GCTardisControls.ISOMORPHIC_CONTROL, 0.5)
+                .control(GCTardisControls.GYROSCOPIC_STABILIZERS, 0.5)
+                .control(GCTardisControls.DIRECTIONAL_CONTROL, 0.5, Control::noAnimation)
+                .control(GCTardisControls.CLOISTER_BELL_CONTROL, 0.5)
+                .control(GCTardisControls.NAVIGATIONAL_LOCK_CONTROL, 0.5)
+                .control(GCTardisControls.NAVCOM_CONTROL, 0.5);
     }
 
     /**
      * goes right after the door control, needs standardControls first
      */
     public void interiorDoorControl() {
-        interiorDoorControl(details -> {
-        });
+        interiorDoorControl(details -> {});
     }
 
     public void interiorDoorControl(Consumer<Control> details) {
         controlAfter(
-            GCTardisControls.DOOR_CONTROL, GCTardisControls.INTERIOR_DOOR_CONTROL, INTERIOR_DOOR_COOLDOWN, details);
+                GCTardisControls.DOOR_CONTROL, GCTardisControls.INTERIOR_DOOR_CONTROL, INTERIOR_DOOR_COOLDOWN, details);
     }
 
     private ConsoleBuilder insert(int index, String id, double cooldownSeconds, Consumer<Control> details) {
@@ -151,12 +148,12 @@ public final class ConsoleBuilder {
          * in blocks from the console
          */
         public Control at(double x, double y, double z) {
-            this.position = new double[]{x, y, z};
+            this.position = new double[] {x, y, z};
             return this;
         }
 
         public Control size(double width, double height, double depth) {
-            this.size = new double[]{width, height, depth};
+            this.size = new double[] {width, height, depth};
             return this;
         }
 

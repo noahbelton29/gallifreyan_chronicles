@@ -16,6 +16,7 @@
   ],
   "client": [
     "client.gameplay.OverlayMessageMixin",
+    "client.gameplay.CoordinateIncrementScrollMixin",
     "client.screen.LogoRendererMixin",
     "client.render.WindowMixin",
     "client.render.LevelRendererRematMixin",

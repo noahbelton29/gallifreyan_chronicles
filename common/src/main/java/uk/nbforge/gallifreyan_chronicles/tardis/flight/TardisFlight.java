@@ -1,12 +1,6 @@
 package uk.nbforge.gallifreyan_chronicles.tardis.flight;
 
-import java.util.HashMap;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
@@ -58,7 +52,9 @@ public final class TardisFlight {
         QUEUED_TAKEOFFS.clear();
     }
 
-    /** false if the tardis refused or the lever got put back */
+    /**
+     * false if the tardis refused or the lever got put back
+     */
     public static boolean leverPulled(
             TardisConsoleBlockEntity console,
             ServerLevel level,
@@ -79,7 +75,9 @@ public final class TardisFlight {
         return true;
     }
 
-    /** false if it refused */
+    /**
+     * false if it refused
+     */
     public static boolean pullThrottle(TardisConsoleBlockEntity console) {
         if (!(console.getLevel() instanceof ServerLevel level)) return false;
         Tardis tardis = Tardis.of(console).orElse(null);
@@ -140,7 +138,9 @@ public final class TardisFlight {
         crashLand(console, "crash_landing");
     }
 
-    /** message is the lang key shown as it falls out of the vortex */
+    /**
+     * message is the lang key shown as it falls out of the vortex
+     */
     public static void crashLand(TardisConsoleBlockEntity console, String message) {
         if (!(console.getLevel() instanceof ServerLevel level)) return;
         Tardis tardis = Tardis.of(console).orElse(null);
@@ -182,7 +182,9 @@ public final class TardisFlight {
         return true;
     }
 
-    /** false if its not taking off */
+    /**
+     * false if its not taking off
+     */
     public static boolean abortTakeoff(TardisConsoleBlockEntity console) {
         if (!(console.getLevel() instanceof ServerLevel level)) return false;
         Optional<Tardis> tardis = Tardis.of(console);
@@ -211,6 +213,8 @@ public final class TardisFlight {
             each.setControlActivated(GCTardisControls.SPACE_TIME_THROTTLE, false);
             each.triggerRotorAnimation("rotor_idle");
         }
+
+        tardis.get().setControlState(GCTardisControls.NAVIGATIONAL_LOCK_CONTROL, false);
 
         SchedulerUtil.runLater(level.getServer(), ABORT_FADE_IN_TICKS, () -> drumIfStillLanded(console));
         return true;
@@ -290,6 +294,7 @@ public final class TardisFlight {
 
         if (tardis != null) {
             TardisLanding.relocate(tardis);
+            tardis.setControlState(GCTardisControls.NAVIGATIONAL_LOCK_CONTROL, false);
             TardisEvents.LAND.fire(tardis);
         }
 

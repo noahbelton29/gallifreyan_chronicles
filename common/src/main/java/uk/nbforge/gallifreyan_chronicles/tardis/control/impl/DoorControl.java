@@ -7,14 +7,14 @@ import net.minecraft.world.entity.player.Player;
 import org.jspecify.annotations.Nullable;
 import uk.nbforge.gallifreyan_chronicles.core.entity.TardisControlEntity;
 import uk.nbforge.gallifreyan_chronicles.tardis.Tardis;
-import uk.nbforge.gallifreyan_chronicles.tardis.control.BaseControl;
 import uk.nbforge.gallifreyan_chronicles.tardis.control.ClickSound;
+import uk.nbforge.gallifreyan_chronicles.tardis.control.Control;
 import uk.nbforge.gallifreyan_chronicles.tardis.control.ControlAnimations;
 import uk.nbforge.gallifreyan_chronicles.tardis.control.ControlContext;
 import uk.nbforge.gallifreyan_chronicles.tardis.door.DoorSync;
 import uk.nbforge.gallifreyan_chronicles.util.MessageUtil;
 
-public class DoorControl extends BaseControl {
+public class DoorControl extends Control {
     public static final ControlAnimations DEFAULT_ANIMATIONS =
             new ControlAnimations("door_control_off", "door_control_on", true);
 

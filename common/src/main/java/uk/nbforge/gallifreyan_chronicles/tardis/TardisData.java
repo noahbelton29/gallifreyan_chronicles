@@ -12,7 +12,9 @@ import org.jspecify.annotations.Nullable;
 import uk.nbforge.gallifreyan_chronicles.tardis.flight.LandingTarget;
 import uk.nbforge.gallifreyan_chronicles.tardis.mind.TardisMind;
 
-/** every setter marks the save as changed */
+/**
+ * every setter marks the save as changed
+ */
 public final class TardisData {
     private final Set<UUID> trusted = new HashSet<>();
     private @Nullable TardisManager manager;
@@ -24,7 +26,8 @@ public final class TardisData {
     private @Nullable Identifier exteriorDimension;
     private @Nullable String interiorId;
     private @Nullable LandingTarget landingTarget;
-    private int coordIncrementIndex;
+    private @Nullable LandingTarget pendingTarget;
+    private int coordIncrement = 1;
     private boolean coordIncrementNegative;
     private @Nullable TardisMind mind;
     private @Nullable Long flightStart;
@@ -68,7 +71,9 @@ public final class TardisData {
         return Set.copyOf(trusted);
     }
 
-    /** true only if it actually changed something */
+    /**
+     * true only if it actually changed something
+     */
     public boolean setTrusted(UUID playerId, boolean isTrusted) {
         boolean didChange = isTrusted ? trusted.add(playerId) : trusted.remove(playerId);
         if (didChange) changed();
@@ -116,13 +121,21 @@ public final class TardisData {
         changed();
     }
 
-    /** index into TardisDestinations INCREMENTS, the step the console's x, y and z controls move the destination by */
-    public int getCoordIncrementIndex() {
-        return coordIncrementIndex;
+    public @Nullable LandingTarget getPendingLandingTarget() {
+        return pendingTarget;
     }
 
-    public void setCoordIncrementIndex(int index) {
-        this.coordIncrementIndex = index;
+    public void setPendingLandingTarget(@Nullable LandingTarget pendingLandingTarget) {
+        this.pendingTarget = pendingLandingTarget;
+        changed();
+    }
+
+    public int getCoordIncrement() {
+        return coordIncrement;
+    }
+
+    public void setCoordIncrement(int amount) {
+        this.coordIncrement = amount;
         changed();
     }
 
@@ -135,7 +148,9 @@ public final class TardisData {
         changed();
     }
 
-    /** rolled and saved the first time its asked for */
+    /**
+     * rolled and saved the first time its asked for
+     */
     public TardisMind mind() {
         if (mind == null) {
             mind = TardisMind.roll(id());

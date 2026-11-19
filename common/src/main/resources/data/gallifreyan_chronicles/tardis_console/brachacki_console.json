@@ -65,6 +65,10 @@
     {
       "cooldown": 0.5,
       "id": "cloister_bell_control"
+    },
+    {
+      "cooldown": 0.5,
+      "id": "navigational_lock_control"
     }
   ],
   "default_variant": "first_doctors_console",

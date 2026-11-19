@@ -1,8 +1,5 @@
 package uk.nbforge.gallifreyan_chronicles.tardis.flight;
 
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.List;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
@@ -19,6 +16,10 @@ import uk.nbforge.gallifreyan_chronicles.core.GCDimensions;
 import uk.nbforge.gallifreyan_chronicles.core.block_entity.TardisExteriorBlockEntity;
 import uk.nbforge.gallifreyan_chronicles.tardis.Tardis;
 import uk.nbforge.gallifreyan_chronicles.tardis.TardisData;
+
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.List;
 
 public final class TardisDestinations {
     public static final int[] INCREMENTS = {1, 10, 100, 1000, 10000};
@@ -37,18 +38,17 @@ public final class TardisDestinations {
         "facing.gallifreyan_chronicles.north_west"
     };
 
-    public enum Axis {
-        X,
-        Y,
-        Z
+    private TardisDestinations() {
     }
-
-    private TardisDestinations() {}
 
     public static int increment(Tardis tardis) {
         TardisData data = tardis.data();
-        int amount = INCREMENTS[Mth.clamp(data.getCoordIncrementIndex(), 0, INCREMENTS.length - 1)];
+        int amount = clampIncrement(data.getCoordIncrement());
         return data.isCoordIncrementNegative() ? -amount : amount;
+    }
+
+    private static int clampIncrement(int amount) {
+        return Mth.clamp(amount, INCREMENTS[0], INCREMENTS[INCREMENTS.length - 1]);
     }
 
     public static @Nullable LandingTarget current(Tardis tardis) {
@@ -62,6 +62,11 @@ public final class TardisDestinations {
         return new LandingTarget(tardis.exteriorDimension(), pos, yaw);
     }
 
+    private static @Nullable LandingTarget editing(Tardis tardis) {
+        LandingTarget pending = tardis.data().getPendingLandingTarget();
+        return pending != null ? pending : current(tardis);
+    }
+
     public static int toggleNegative(Tardis tardis) {
         TardisData data = tardis.data();
         data.setCoordIncrementNegative(!data.isCoordIncrementNegative());
@@ -70,19 +75,48 @@ public final class TardisDestinations {
 
     public static int cycleIncrement(Tardis tardis) {
         TardisData data = tardis.data();
-        data.setCoordIncrementIndex((data.getCoordIncrementIndex() + 1) % INCREMENTS.length);
+        int amount = clampIncrement(data.getCoordIncrement());
+        int next = INCREMENTS[0];
+        for (int preset : INCREMENTS) {
+            if (preset > amount) {
+                next = preset;
+                break;
+            }
+        }
+        data.setCoordIncrement(next);
         return increment(tardis);
     }
 
     public static int cycleIncrementBack(Tardis tardis) {
         TardisData data = tardis.data();
-        int count = INCREMENTS.length;
-        data.setCoordIncrementIndex((data.getCoordIncrementIndex() - 1 + count) % count);
+        int amount = clampIncrement(data.getCoordIncrement());
+        int previous = INCREMENTS[INCREMENTS.length - 1];
+        for (int i = INCREMENTS.length - 1; i >= 0; i--) {
+            if (INCREMENTS[i] < amount) {
+                previous = INCREMENTS[i];
+                break;
+            }
+        }
+        data.setCoordIncrement(previous);
         return increment(tardis);
     }
 
+    public static int scaleIncrement(Tardis tardis, int direction) {
+        TardisData data = tardis.data();
+        int amount = clampIncrement(data.getCoordIncrement());
+        int step = fineStep(direction > 0 ? amount : amount - 1);
+        data.setCoordIncrement(clampIncrement(amount + Integer.signum(direction) * step));
+        return increment(tardis);
+    }
+
+    private static int fineStep(int amount) {
+        int step = 1;
+        while (step * 100 <= amount) step *= 10;
+        return step;
+    }
+
     public static @Nullable LandingTarget step(Tardis tardis, Axis axis) {
-        LandingTarget target = current(tardis);
+        LandingTarget target = editing(tardis);
         if (target == null) return null;
 
         int amount = increment(tardis);
@@ -101,17 +135,17 @@ public final class TardisDestinations {
         }
 
         LandingTarget updated = new LandingTarget(target.dimension(), new BlockPos(x, y, z), target.yaw());
-        tardis.data().setLandingTarget(updated);
+        tardis.data().setPendingLandingTarget(updated);
         return updated;
     }
 
     public static @Nullable LandingTarget rotate(Tardis tardis, int direction) {
-        LandingTarget target = current(tardis);
+        LandingTarget target = editing(tardis);
         if (target == null) return null;
 
         int next = Math.floorMod(facingIndex(target.yaw()) + direction, FACING_YAWS.length);
         LandingTarget updated = new LandingTarget(target.dimension(), target.pos(), FACING_YAWS[next]);
-        tardis.data().setLandingTarget(updated);
+        tardis.data().setPendingLandingTarget(updated);
         return updated;
     }
 
@@ -142,7 +176,7 @@ public final class TardisDestinations {
     }
 
     private static @Nullable LandingTarget stepDimension(Tardis tardis, int direction) {
-        LandingTarget target = current(tardis);
+        LandingTarget target = editing(tardis);
         if (target == null) return null;
 
         List<ServerLevel> levels = landableLevels(tardis.server());
@@ -156,14 +190,14 @@ public final class TardisDestinations {
             }
         }
         int nextIndex =
-                index < 0 ? (direction > 0 ? 0 : levels.size() - 1) : Math.floorMod(index + direction, levels.size());
+            index < 0 ? (direction > 0 ? 0 : levels.size() - 1) : Math.floorMod(index + direction, levels.size());
         ServerLevel next = levels.get(nextIndex);
 
         BlockPos pos = target.pos();
         int y = Mth.clamp(pos.getY(), next.getMinY(), next.getMaxY() - 1);
         LandingTarget updated =
-                new LandingTarget(next.dimension(), new BlockPos(pos.getX(), y, pos.getZ()), target.yaw());
-        tardis.data().setLandingTarget(updated);
+            new LandingTarget(next.dimension(), new BlockPos(pos.getX(), y, pos.getZ()), target.yaw());
+        tardis.data().setPendingLandingTarget(updated);
         return updated;
     }
 
@@ -185,7 +219,7 @@ public final class TardisDestinations {
             if (isLandable(level)) levels.add(level);
         }
         levels.sort(Comparator.comparing(
-                (ServerLevel level) -> level.dimension().identifier().toString()));
+            (ServerLevel level) -> level.dimension().identifier().toString()));
         return levels;
     }
 
@@ -217,36 +251,36 @@ public final class TardisDestinations {
             case Z -> pos.getZ();
         };
         player.sendOverlayMessage(Component.translatable(
-                        "overlay.gallifreyan_chronicles.destination",
-                        Component.literal(axis.name() + " " + value).withStyle(ChatFormatting.WHITE),
-                        dimensionName(target.dimension()))
-                .withStyle(ChatFormatting.GOLD));
+                "overlay.gallifreyan_chronicles.destination",
+                Component.literal(axis.name() + " " + value).withStyle(ChatFormatting.WHITE),
+                dimensionName(target.dimension()))
+            .withStyle(ChatFormatting.GOLD));
     }
 
     public static void showDimension(@Nullable Player player, MinecraftServer server, LandingTarget target) {
         if (player == null) return;
         player.sendOverlayMessage(Component.translatable(
-                        "overlay.gallifreyan_chronicles.destination_dimension",
-                        dimensionName(target.dimension()),
-                        Component.literal(landableIndex(server, target.dimension()) + "/" + landableCount(server))
-                                .withStyle(ChatFormatting.GRAY))
-                .withStyle(ChatFormatting.GOLD));
+                "overlay.gallifreyan_chronicles.destination_dimension",
+                dimensionName(target.dimension()),
+                Component.literal(landableIndex(server, target.dimension()) + "/" + landableCount(server))
+                    .withStyle(ChatFormatting.GRAY))
+            .withStyle(ChatFormatting.GOLD));
     }
 
     public static void showDirection(@Nullable Player player, LandingTarget target) {
         if (player == null) return;
         player.sendOverlayMessage(Component.translatable(
-                        "overlay.gallifreyan_chronicles.destination_direction",
-                        facingName(target.yaw()).copy().withStyle(ChatFormatting.WHITE))
-                .withStyle(ChatFormatting.GOLD));
+                "overlay.gallifreyan_chronicles.destination_direction",
+                facingName(target.yaw()).copy().withStyle(ChatFormatting.WHITE))
+            .withStyle(ChatFormatting.GOLD));
     }
 
     public static void showIncrement(@Nullable Player player, int increment) {
         if (player == null) return;
         player.sendOverlayMessage(Component.translatable(
-                        "overlay.gallifreyan_chronicles.coord_increment",
-                        Component.literal(String.valueOf(increment)).withStyle(ChatFormatting.WHITE))
-                .withStyle(ChatFormatting.GOLD));
+                "overlay.gallifreyan_chronicles.coord_increment",
+                Component.literal(String.valueOf(increment)).withStyle(ChatFormatting.WHITE))
+            .withStyle(ChatFormatting.GOLD));
     }
 
     public static Component dimensionName(ResourceKey<Level> dimension) {
@@ -257,5 +291,11 @@ public final class TardisDestinations {
             name.append(Character.toUpperCase(word.charAt(0))).append(word.substring(1));
         }
         return Component.literal(name.toString()).withStyle(ChatFormatting.AQUA);
+    }
+
+    public enum Axis {
+        X,
+        Y,
+        Z
     }
 }

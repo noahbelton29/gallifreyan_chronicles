@@ -8,14 +8,12 @@ import uk.nbforge.gallifreyan_chronicles.core.GCSounds;
 import uk.nbforge.gallifreyan_chronicles.core.block_entity.TardisConsoleBlockEntity;
 import uk.nbforge.gallifreyan_chronicles.core.entity.TardisControlEntity;
 import uk.nbforge.gallifreyan_chronicles.tardis.console.ConsoleSounds;
-import uk.nbforge.gallifreyan_chronicles.tardis.control.BaseControl;
 import uk.nbforge.gallifreyan_chronicles.tardis.control.ClickSound;
+import uk.nbforge.gallifreyan_chronicles.tardis.control.Control;
 import uk.nbforge.gallifreyan_chronicles.tardis.control.ControlAnimations;
 import uk.nbforge.gallifreyan_chronicles.util.SchedulerUtil;
 
-public class IsomorphicControl extends BaseControl {
-    public static final ControlAnimations DEFAULT_ANIMATIONS =
-            new ControlAnimations("isomorphic_control_on", "isomorphic_control_off", false);
+public class IsomorphicControl extends Control {
     private static final int SECOND_SOUND_DELAY_TICKS = 10;
 
     public IsomorphicControl(ControlAnimations animations) {

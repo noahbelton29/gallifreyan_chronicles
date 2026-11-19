@@ -5,7 +5,7 @@ import java.util.Map;
 import net.minecraft.world.entity.player.Player;
 import org.jspecify.annotations.Nullable;
 import uk.nbforge.gallifreyan_chronicles.tardis.Tardis;
-import uk.nbforge.gallifreyan_chronicles.tardis.control.BaseControl;
+import uk.nbforge.gallifreyan_chronicles.tardis.control.Control;
 import uk.nbforge.gallifreyan_chronicles.tardis.control.ControlAnimations;
 import uk.nbforge.gallifreyan_chronicles.tardis.control.TardisControl;
 import uk.nbforge.gallifreyan_chronicles.tardis.flight.LandingTarget;
@@ -24,8 +24,7 @@ public class AxisIncrementControl extends DestinationControl {
     }
 
     public static ControlAnimations defaultAnimations(Axis axis) {
-        String name = axis.name().toLowerCase() + "_increment";
-        return new ControlAnimations(name, name, false);
+        return ControlAnimations.single(axis.name().toLowerCase() + "_increment");
     }
 
     public static MapCodec<AxisIncrementControl> codec(Axis axis) {
@@ -33,7 +32,7 @@ public class AxisIncrementControl extends DestinationControl {
     }
 
     private static MapCodec<AxisIncrementControl> codecFor(Axis axis) {
-        return BaseControl.codec(defaultAnimations(axis), animations -> new AxisIncrementControl(axis, animations));
+        return Control.codec(defaultAnimations(axis), animations -> new AxisIncrementControl(axis, animations));
     }
 
     // each axis is its own control type, so the codec comes from the axis rather than the class

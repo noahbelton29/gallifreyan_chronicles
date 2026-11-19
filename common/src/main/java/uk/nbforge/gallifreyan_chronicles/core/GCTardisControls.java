@@ -3,26 +3,8 @@ package uk.nbforge.gallifreyan_chronicles.core;
 import com.mojang.serialization.JsonOps;
 import com.mojang.serialization.MapCodec;
 import java.util.function.Function;
-import uk.nbforge.gallifreyan_chronicles.tardis.control.BaseControl;
-import uk.nbforge.gallifreyan_chronicles.tardis.control.ControlAnimations;
-import uk.nbforge.gallifreyan_chronicles.tardis.control.ControlPower;
-import uk.nbforge.gallifreyan_chronicles.tardis.control.NoopControl;
-import uk.nbforge.gallifreyan_chronicles.tardis.control.TardisControl;
-import uk.nbforge.gallifreyan_chronicles.tardis.control.TardisControls;
-import uk.nbforge.gallifreyan_chronicles.tardis.control.impl.AxisIncrementControl;
-import uk.nbforge.gallifreyan_chronicles.tardis.control.impl.CloakingDeviceControl;
-import uk.nbforge.gallifreyan_chronicles.tardis.control.impl.CloisterBellControl;
-import uk.nbforge.gallifreyan_chronicles.tardis.control.impl.CoordinateStepControl;
-import uk.nbforge.gallifreyan_chronicles.tardis.control.impl.DimensionalControl;
-import uk.nbforge.gallifreyan_chronicles.tardis.control.impl.DirectionalControl;
-import uk.nbforge.gallifreyan_chronicles.tardis.control.impl.DoorControl;
-import uk.nbforge.gallifreyan_chronicles.tardis.control.impl.DoorLockControl;
-import uk.nbforge.gallifreyan_chronicles.tardis.control.impl.GyroscopicStabilizersControl;
-import uk.nbforge.gallifreyan_chronicles.tardis.control.impl.InteriorDoorControl;
-import uk.nbforge.gallifreyan_chronicles.tardis.control.impl.IsomorphicControl;
-import uk.nbforge.gallifreyan_chronicles.tardis.control.impl.PowerControl;
-import uk.nbforge.gallifreyan_chronicles.tardis.control.impl.SpaceTimeThrottleControl;
-import uk.nbforge.gallifreyan_chronicles.tardis.control.impl.TimeRotorHandbrakeControl;
+import uk.nbforge.gallifreyan_chronicles.tardis.control.*;
+import uk.nbforge.gallifreyan_chronicles.tardis.control.impl.*;
 import uk.nbforge.gallifreyan_chronicles.tardis.flight.TardisDestinations.Axis;
 import uk.nbforge.gallifreyan_chronicles.util.GCLog;
 
@@ -44,38 +26,47 @@ public class GCTardisControls {
     public static final String INTERIOR_DOOR_CONTROL = "interior_door_control";
     public static final String GYROSCOPIC_STABILIZERS = "gyroscopic_stabilizers";
     public static final String CLOISTER_BELL_CONTROL = "cloister_bell_control";
+    public static final String NAVIGATIONAL_LOCK_CONTROL = "navigational_lock_control";
 
     public static void registerTardisControls() {
         TardisControls.registerType(NOOP, NoopControl.class, MapCodec.unit(NoopControl.INSTANCE));
-        control(SPACE_TIME_THROTTLE, SpaceTimeThrottleControl.DEFAULT_ANIMATIONS, SpaceTimeThrottleControl::new);
-        control(TIME_ROTOR_HANDBRAKE, TimeRotorHandbrakeControl.DEFAULT_ANIMATIONS, TimeRotorHandbrakeControl::new);
-        control(POWER_CONTROL, PowerControl.DEFAULT_ANIMATIONS, PowerControl::new);
+        control(SPACE_TIME_THROTTLE, SpaceTimeThrottleControl::new);
+        control(TIME_ROTOR_HANDBRAKE, TimeRotorHandbrakeControl::new);
+        control(POWER_CONTROL, PowerControl::new);
         control(DOOR_CONTROL, DoorControl.DEFAULT_ANIMATIONS, DoorControl::new);
-        control(DOOR_LOCK_CONTROL, DoorLockControl.DEFAULT_ANIMATIONS, DoorLockControl::new);
+        control(DOOR_LOCK_CONTROL, DoorLockControl::new);
         axisControl(X_INCREMENT, Axis.X);
         axisControl(Y_INCREMENT, Axis.Y);
         axisControl(Z_INCREMENT, Axis.Z);
-        control(COORDINATE_STEP_CONTROL, CoordinateStepControl.DEFAULT_ANIMATIONS, CoordinateStepControl::new);
-        control(DIMENSIONAL_CONTROL, DimensionalControl.DEFAULT_ANIMATIONS, DimensionalControl::new);
-        control(ISOMORPHIC_CONTROL, IsomorphicControl.DEFAULT_ANIMATIONS, IsomorphicControl::new);
-        control(DIRECTIONAL_CONTROL, DirectionalControl.DEFAULT_ANIMATIONS, DirectionalControl::new);
-        control(CLOAKING_DEVICE_CONTROL, CloakingDeviceControl.DEFAULT_ANIMATIONS, CloakingDeviceControl::new);
-        control(INTERIOR_DOOR_CONTROL, InteriorDoorControl.DEFAULT_ANIMATIONS, InteriorDoorControl::new);
+        control(COORDINATE_STEP_CONTROL, ControlAnimations.single(COORDINATE_STEP_CONTROL), CoordinateStepControl::new);
+        control(DIMENSIONAL_CONTROL, ControlAnimations.single(DIMENSIONAL_CONTROL), DimensionalControl::new);
+        control(ISOMORPHIC_CONTROL, IsomorphicControl::new);
+        control(DIRECTIONAL_CONTROL, DirectionalControl::new);
+        control(
+                CLOAKING_DEVICE_CONTROL,
+                ControlAnimations.toggle(CLOAKING_DEVICE_CONTROL, true),
+                CloakingDeviceControl::new);
+        control(INTERIOR_DOOR_CONTROL, InteriorDoorControl::new);
         control(
                 GYROSCOPIC_STABILIZERS,
-                GyroscopicStabilizersControl.DEFAULT_ANIMATIONS,
+                ControlAnimations.toggle(GYROSCOPIC_STABILIZERS, true),
                 GyroscopicStabilizersControl::new);
-        control(CLOISTER_BELL_CONTROL, CloisterBellControl.DEFAULT_ANIMATIONS, CloisterBellControl::new);
+        control(CLOISTER_BELL_CONTROL, CloisterBellControl::new);
+        control(NAVIGATIONAL_LOCK_CONTROL, NavigationalLockControl::new);
 
         verifyCodecs();
         ControlPower.validate();
         GCLog.CORE.info("Registered GC TARDIS Controls");
     }
 
-    private static <T extends BaseControl> void control(
+    private static <T extends Control> void control(String id, Function<ControlAnimations, T> ctor) {
+        control(id, ControlAnimations.toggle(id), ctor);
+    }
+
+    private static <T extends Control> void control(
             String id, ControlAnimations defaults, Function<ControlAnimations, T> ctor) {
         T instance = ctor.apply(defaults);
-        TardisControls.register(id, instance.getClass(), BaseControl.codec(defaults, ctor), instance);
+        TardisControls.register(id, instance.getClass(), Control.codec(defaults, ctor), instance);
     }
 
     private static void axisControl(String id, Axis axis) {

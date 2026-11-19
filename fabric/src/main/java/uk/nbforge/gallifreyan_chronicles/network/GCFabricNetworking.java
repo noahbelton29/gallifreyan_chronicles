@@ -4,10 +4,12 @@ import net.fabricmc.fabric.api.entity.event.v1.ServerEntityLevelChangeEvents;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 import net.fabricmc.fabric.api.networking.v1.PayloadTypeRegistry;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayConnectionEvents;
+import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import uk.nbforge.gallifreyan_chronicles.compat.flashback.ReplayComponentIds;
 import uk.nbforge.gallifreyan_chronicles.core.lifecycle.ServerLifecycleHandler;
 import uk.nbforge.gallifreyan_chronicles.core.sound.timed.TimedSounds;
 import uk.nbforge.gallifreyan_chronicles.loader.GCJsonReloadListener;
+import uk.nbforge.gallifreyan_chronicles.network.tardis.CoordinateIncrementScrollPayload;
 import uk.nbforge.gallifreyan_chronicles.network.tardis.RematCatchPayload;
 import uk.nbforge.gallifreyan_chronicles.network.tardis.TardisAlarmPayload;
 import uk.nbforge.gallifreyan_chronicles.network.tardis.TardisConsoleAnimationPayload;
@@ -48,6 +50,11 @@ public final class GCFabricNetworking {
         PayloadTypeRegistry.clientboundPlay().register(ResumeSoundPayload.TYPE, ResumeSoundPayload.STREAM_CODEC);
         PayloadTypeRegistry.clientboundPlay()
                 .register(ReplayComponentIds.Payload.TYPE, ReplayComponentIds.Payload.STREAM_CODEC);
+
+        PayloadTypeRegistry.serverboundPlay()
+                .register(CoordinateIncrementScrollPayload.TYPE, CoordinateIncrementScrollPayload.STREAM_CODEC);
+        ServerPlayNetworking.registerGlobalReceiver(
+                CoordinateIncrementScrollPayload.TYPE, (payload, context) -> payload.handle(context.player()));
 
         ServerLifecycleEvents.SERVER_STARTED.register(GCJsonReloadListener::setCurrentServer);
         ServerLifecycleEvents.SERVER_STOPPED.register(_ -> ServerLifecycleHandler.onServerStop());

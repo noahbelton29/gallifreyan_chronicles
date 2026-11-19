@@ -614,6 +614,9 @@ public class GCLanguageProvider extends LanguageProvider {
         add("message.gallifreyan_chronicles.key_linked", "The key is now linked to this TARDIS.");
         add("message.gallifreyan_chronicles.close_doors_to_lock", "Close both doors before locking!");
         add("message.gallifreyan_chronicles.no_destination_to_set", "This console has no TARDIS destination to set!");
+        add(
+                "message.gallifreyan_chronicles.navigational_lock_on",
+                "The navigational lock is on, the coordinates can't be changed!");
         add("message.gallifreyan_chronicles.doors_locked", "The doors are locked!");
         add("message.gallifreyan_chronicles.doors_key_in_lock", "There is a key in the outside lock!");
         add("message.gallifreyan_chronicles.control_names_on", "Control names: on");
@@ -636,6 +639,7 @@ public class GCLanguageProvider extends LanguageProvider {
         add("tooltip.gallifreyan_chronicles.control_state.label.throttle", "Throttle");
         add("tooltip.gallifreyan_chronicles.control_state.label.stabilizers", "Stabilizers");
         add("tooltip.gallifreyan_chronicles.control_state.label.cloister_bell", "Cloister Bell");
+        add("tooltip.gallifreyan_chronicles.control_state.label.navigational_lock_control", "Navigational Lock");
         add("tooltip.gallifreyan_chronicles.control_state.value.open", "Open");
         add("tooltip.gallifreyan_chronicles.control_state.value.closed", "Closed");
         add("tooltip.gallifreyan_chronicles.control_state.value.locked", "Locked");

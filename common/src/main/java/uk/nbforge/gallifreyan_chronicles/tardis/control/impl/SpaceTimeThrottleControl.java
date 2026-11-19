@@ -7,15 +7,12 @@ import net.minecraft.world.entity.player.Player;
 import org.jspecify.annotations.Nullable;
 import uk.nbforge.gallifreyan_chronicles.core.block_entity.TardisConsoleBlockEntity;
 import uk.nbforge.gallifreyan_chronicles.core.entity.TardisControlEntity;
-import uk.nbforge.gallifreyan_chronicles.tardis.control.BaseControl;
+import uk.nbforge.gallifreyan_chronicles.tardis.control.Control;
 import uk.nbforge.gallifreyan_chronicles.tardis.control.ControlAnimations;
 import uk.nbforge.gallifreyan_chronicles.tardis.control.ControlContext;
 import uk.nbforge.gallifreyan_chronicles.tardis.flight.TardisFlight;
 
-public class SpaceTimeThrottleControl extends BaseControl {
-    public static final ControlAnimations DEFAULT_ANIMATIONS =
-            new ControlAnimations("space_time_throttle_on", "space_time_throttle_off", false);
-
+public class SpaceTimeThrottleControl extends Control {
     public SpaceTimeThrottleControl(ControlAnimations animations) {
         super(animations);
     }

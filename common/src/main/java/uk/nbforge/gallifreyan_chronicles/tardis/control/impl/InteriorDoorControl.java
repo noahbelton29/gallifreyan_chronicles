@@ -9,16 +9,13 @@ import uk.nbforge.gallifreyan_chronicles.core.GCTardisControls;
 import uk.nbforge.gallifreyan_chronicles.core.block_entity.InteriorDoorBlockEntity;
 import uk.nbforge.gallifreyan_chronicles.core.entity.TardisControlEntity;
 import uk.nbforge.gallifreyan_chronicles.tardis.Tardis;
-import uk.nbforge.gallifreyan_chronicles.tardis.control.BaseControl;
 import uk.nbforge.gallifreyan_chronicles.tardis.control.ClickSound;
+import uk.nbforge.gallifreyan_chronicles.tardis.control.Control;
 import uk.nbforge.gallifreyan_chronicles.tardis.control.ControlAnimations;
 import uk.nbforge.gallifreyan_chronicles.tardis.control.ControlContext;
 import uk.nbforge.gallifreyan_chronicles.util.MessageUtil;
 
-public class InteriorDoorControl extends BaseControl {
-    public static final ControlAnimations DEFAULT_ANIMATIONS =
-            new ControlAnimations("interior_door_control_on", "interior_door_control_off", false);
-
+public class InteriorDoorControl extends Control {
     public InteriorDoorControl(ControlAnimations animations) {
         super(animations, ClickSound.SWITCH);
     }

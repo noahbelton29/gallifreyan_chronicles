@@ -5,6 +5,18 @@ import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 
 public record ControlAnimations(String active, String inactive, boolean snapsWhenInactive) {
+    public static ControlAnimations toggle(String id) {
+        return toggle(id, false);
+    }
+
+    public static ControlAnimations toggle(String id, boolean snapsWhenInactive) {
+        return new ControlAnimations(id + "_on", id + "_off", snapsWhenInactive);
+    }
+
+    public static ControlAnimations single(String id) {
+        return new ControlAnimations(id, id, false);
+    }
+
     public static MapCodec<ControlAnimations> codec(ControlAnimations defaults) {
         return RecordCodecBuilder.mapCodec(inst -> inst.group(
                         Codec.STRING

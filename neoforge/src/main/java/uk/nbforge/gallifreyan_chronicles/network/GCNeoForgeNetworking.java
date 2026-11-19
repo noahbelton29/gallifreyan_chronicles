@@ -12,6 +12,7 @@ import uk.nbforge.gallifreyan_chronicles.Constants;
 import uk.nbforge.gallifreyan_chronicles.core.lifecycle.ServerLifecycleHandler;
 import uk.nbforge.gallifreyan_chronicles.core.sound.timed.TimedSounds;
 import uk.nbforge.gallifreyan_chronicles.loader.GCJsonReloadListener;
+import uk.nbforge.gallifreyan_chronicles.network.tardis.CoordinateIncrementScrollPayload;
 import uk.nbforge.gallifreyan_chronicles.network.tardis.RematCatchPayload;
 import uk.nbforge.gallifreyan_chronicles.network.tardis.TardisAlarmPayload;
 import uk.nbforge.gallifreyan_chronicles.network.tardis.TardisConsoleAnimationPayload;
@@ -85,6 +86,12 @@ public final class GCNeoForgeNetworking {
                 ResumeSoundPayload.TYPE,
                 ResumeSoundPayload.STREAM_CODEC,
                 (payload, context) -> context.enqueueWork(payload::apply));
+        registrar.playToServer(
+                CoordinateIncrementScrollPayload.TYPE,
+                CoordinateIncrementScrollPayload.STREAM_CODEC,
+                (payload, context) -> context.enqueueWork(() -> {
+                    if (context.player() instanceof ServerPlayer player) payload.handle(player);
+                }));
         GCLog.CORE.info("Registered GC Networking");
     }
 

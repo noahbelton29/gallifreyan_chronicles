@@ -9,9 +9,6 @@ import uk.nbforge.gallifreyan_chronicles.tardis.flight.LandingTarget;
 import uk.nbforge.gallifreyan_chronicles.tardis.flight.TardisDestinations;
 
 public class DimensionalControl extends DestinationControl {
-    public static final ControlAnimations DEFAULT_ANIMATIONS =
-            new ControlAnimations("dimensional_control", "dimensional_control", false);
-
     public DimensionalControl(ControlAnimations animations) {
         super(animations, ClickSound.NONE);
     }

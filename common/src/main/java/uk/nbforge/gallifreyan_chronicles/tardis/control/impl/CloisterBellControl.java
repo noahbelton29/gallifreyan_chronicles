@@ -6,16 +6,13 @@ import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
 import org.jspecify.annotations.Nullable;
 import uk.nbforge.gallifreyan_chronicles.core.entity.TardisControlEntity;
-import uk.nbforge.gallifreyan_chronicles.tardis.control.BaseControl;
 import uk.nbforge.gallifreyan_chronicles.tardis.control.ClickSound;
+import uk.nbforge.gallifreyan_chronicles.tardis.control.Control;
 import uk.nbforge.gallifreyan_chronicles.tardis.control.ControlAnimations;
 import uk.nbforge.gallifreyan_chronicles.tardis.control.ControlContext;
 import uk.nbforge.gallifreyan_chronicles.tardis.mind.mood.TardisAlarm;
 
-public class CloisterBellControl extends BaseControl {
-    public static final ControlAnimations DEFAULT_ANIMATIONS =
-            new ControlAnimations("cloister_bell_control_on", "cloister_bell_control_off", false);
-
+public class CloisterBellControl extends Control {
     public CloisterBellControl(ControlAnimations animations) {
         super(animations, ClickSound.SWITCH);
     }

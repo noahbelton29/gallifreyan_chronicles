@@ -19,23 +19,67 @@ import uk.nbforge.gallifreyan_chronicles.tardis.door.DoorSync;
 import uk.nbforge.gallifreyan_chronicles.tardis.flight.crash.TardisCrash;
 import uk.nbforge.gallifreyan_chronicles.util.MessageUtil;
 
-/** use and changed only ever run on the server with a console */
-public abstract class BaseControl implements TardisControl {
+/**
+ * use and changed only ever run on the server with a console
+ */
+public abstract class Control implements TardisControl {
     private final ControlAnimations animations;
     private final ClickSound clickSound;
 
-    protected BaseControl(ControlAnimations animations, ClickSound clickSound) {
+    protected Control(ControlAnimations animations, ClickSound clickSound) {
         this.animations = animations;
         this.clickSound = clickSound;
     }
 
-    protected BaseControl(ControlAnimations animations) {
+    protected Control(ControlAnimations animations) {
         this(animations, ClickSound.SLIDER);
     }
 
-    public static <T extends BaseControl> MapCodec<T> codec(
+    public static <T extends Control> MapCodec<T> codec(
             ControlAnimations defaults, Function<ControlAnimations, T> ctor) {
-        return ControlAnimations.codec(defaults).xmap(ctor, BaseControl::animations);
+        return ControlAnimations.codec(defaults).xmap(ctor, Control::animations);
+    }
+
+    protected static void playSound(TardisControlEntity entity, SoundEvent sound, float offPitch) {
+        TardisConsoleBlockEntity console = entity.getConsole();
+        boolean on = console != null && console.getControlState(entity.getControlId());
+        float pitch = on ? 1.0f : offPitch;
+        if (entity.level() instanceof ServerLevel serverLevel) {
+            ConsoleSounds.at(serverLevel, entity.blockPosition(), sound, pitch);
+        } else {
+            entity.level().playSound(null, entity.blockPosition(), sound, SoundSource.BLOCKS, 1.0f, pitch);
+        }
+    }
+
+    protected static Component state(String label, String value, ChatFormatting colour) {
+        return Component.translatable("tooltip.gallifreyan_chronicles.control_state.label." + label)
+                .withStyle(ChatFormatting.GRAY)
+                .append(Component.literal(": ").withStyle(ChatFormatting.GRAY))
+                .append(Component.translatable("tooltip.gallifreyan_chronicles.control_state.value." + value)
+                        .withStyle(colour));
+    }
+
+    protected static boolean lockedWhileCrashing(ControlContext ctx, @Nullable Player player, String message) {
+        if (!ctx.tardis().map(TardisCrash::isCrashing).orElse(false)) return false;
+        MessageUtil.overlay(player, ChatFormatting.RED, message);
+        return true;
+    }
+
+    protected static boolean doorsBlocked(Tardis tardis, @Nullable Player player) {
+        if (tardis.isLocked()) {
+            MessageUtil.overlay(player, ChatFormatting.RED, "doors_locked");
+            return true;
+        }
+        if (tardis.exterior().map(exterior -> exterior.lock().hasKeyRendered()).orElse(false)) {
+            MessageUtil.overlay(player, ChatFormatting.RED, "doors_key_in_lock");
+            return true;
+        }
+        if (tardis.areDoorsSealedForTravel()) {
+            DoorSync.announceSealed(tardis);
+            MessageUtil.overlay(player, ChatFormatting.RED, "doors_sealed");
+            return true;
+        }
+        return false;
     }
 
     public ControlAnimations animations() {
@@ -85,47 +129,5 @@ public abstract class BaseControl implements TardisControl {
     public void playClickSound(TardisControlEntity entity) {
         SoundEvent sound = clickSound.sound();
         if (sound != null) playSound(entity, sound, clickSound.offPitch());
-    }
-
-    protected static void playSound(TardisControlEntity entity, SoundEvent sound, float offPitch) {
-        TardisConsoleBlockEntity console = entity.getConsole();
-        boolean on = console != null && console.getControlState(entity.getControlId());
-        float pitch = on ? 1.0f : offPitch;
-        if (entity.level() instanceof ServerLevel serverLevel) {
-            ConsoleSounds.at(serverLevel, entity.blockPosition(), sound, pitch);
-        } else {
-            entity.level().playSound(null, entity.blockPosition(), sound, SoundSource.BLOCKS, 1.0f, pitch);
-        }
-    }
-
-    protected static Component state(String label, String value, ChatFormatting colour) {
-        return Component.translatable("tooltip.gallifreyan_chronicles.control_state.label." + label)
-                .withStyle(ChatFormatting.GRAY)
-                .append(Component.literal(": ").withStyle(ChatFormatting.GRAY))
-                .append(Component.translatable("tooltip.gallifreyan_chronicles.control_state.value." + value)
-                        .withStyle(colour));
-    }
-
-    protected static boolean lockedWhileCrashing(ControlContext ctx, @Nullable Player player, String message) {
-        if (!ctx.tardis().map(TardisCrash::isCrashing).orElse(false)) return false;
-        MessageUtil.overlay(player, ChatFormatting.RED, message);
-        return true;
-    }
-
-    protected static boolean doorsBlocked(Tardis tardis, @Nullable Player player) {
-        if (tardis.isLocked()) {
-            MessageUtil.overlay(player, ChatFormatting.RED, "doors_locked");
-            return true;
-        }
-        if (tardis.exterior().map(exterior -> exterior.lock().hasKeyRendered()).orElse(false)) {
-            MessageUtil.overlay(player, ChatFormatting.RED, "doors_key_in_lock");
-            return true;
-        }
-        if (tardis.areDoorsSealedForTravel()) {
-            DoorSync.announceSealed(tardis);
-            MessageUtil.overlay(player, ChatFormatting.RED, "doors_sealed");
-            return true;
-        }
-        return false;
     }
 }

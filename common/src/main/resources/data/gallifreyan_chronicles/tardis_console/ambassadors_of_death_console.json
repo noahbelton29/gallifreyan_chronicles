@@ -91,6 +91,10 @@
     {
       "cooldown": 0.5,
       "id": "cloister_bell_control"
+    },
+    {
+      "cooldown": 0.5,
+      "id": "navigational_lock_control"
     }
   ],
   "glow_groups": [

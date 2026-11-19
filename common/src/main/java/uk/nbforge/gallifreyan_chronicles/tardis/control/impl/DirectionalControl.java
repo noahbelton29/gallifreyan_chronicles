@@ -8,9 +8,6 @@ import uk.nbforge.gallifreyan_chronicles.tardis.flight.LandingTarget;
 import uk.nbforge.gallifreyan_chronicles.tardis.flight.TardisDestinations;
 
 public class DirectionalControl extends DestinationControl {
-    public static final ControlAnimations DEFAULT_ANIMATIONS =
-            new ControlAnimations("directional_control_on", "directional_control_off", false);
-
     public DirectionalControl(ControlAnimations animations) {
         super(animations);
     }

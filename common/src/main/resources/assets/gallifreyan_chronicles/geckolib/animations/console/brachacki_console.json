@@ -400,12 +400,8 @@
 			"bones": {
 				"cloaking_device_control": {
 					"rotation": {
-						"0.0": {
-							"vector": [0, 0, 0]
-						},
-						"0.25": {
-							"vector": [100, 0, 0]
-						}
+						"0.0": [0, 0, 0],
+						"0.25": [100, 0, 0]
 					}
 				}
 			}
@@ -416,12 +412,8 @@
 			"bones": {
 				"cloaking_device_control": {
 					"rotation": {
-						"0.0": {
-							"vector": [100, 0, 0]
-						},
-						"0.25": {
-							"vector": [0, 0, 0]
-						}
+						"0.0": [100, 0, 0],
+						"0.25": [0, 0, 0]
 					}
 				}
 			}
@@ -582,6 +574,30 @@
 						"0.25": {
 							"vector": [0, 0, 0]
 						}
+					}
+				}
+			}
+		},
+		"navigational_lock_control_on": {
+			"loop": "hold_on_last_frame",
+			"animation_length": 0.25,
+			"bones": {
+				"navigational_lock_control": {
+					"rotation": {
+						"0.0": [0, 0, 0],
+						"0.25": [77.5, 0, 0]
+					}
+				}
+			}
+		},
+		"navigational_lock_control_off": {
+			"loop": "hold_on_last_frame",
+			"animation_length": 0.25,
+			"bones": {
+				"navigational_lock_control": {
+					"rotation": {
+						"0.0": [77.5, 0, 0],
+						"0.25": [0, 0, 0]
 					}
 				}
 			}

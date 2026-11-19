@@ -11,15 +11,12 @@ import uk.nbforge.gallifreyan_chronicles.core.GCTardisControls;
 import uk.nbforge.gallifreyan_chronicles.core.entity.TardisControlEntity;
 import uk.nbforge.gallifreyan_chronicles.tardis.Tardis;
 import uk.nbforge.gallifreyan_chronicles.tardis.console.ConsoleSounds;
-import uk.nbforge.gallifreyan_chronicles.tardis.control.BaseControl;
 import uk.nbforge.gallifreyan_chronicles.tardis.control.ClickSound;
+import uk.nbforge.gallifreyan_chronicles.tardis.control.Control;
 import uk.nbforge.gallifreyan_chronicles.tardis.control.ControlAnimations;
 import uk.nbforge.gallifreyan_chronicles.tardis.control.ControlContext;
 
-public class CloakingDeviceControl extends BaseControl {
-    public static final ControlAnimations DEFAULT_ANIMATIONS =
-            new ControlAnimations("cloaking_device_control_on", "cloaking_device_control_off", true);
-
+public class CloakingDeviceControl extends Control {
     public CloakingDeviceControl(ControlAnimations animations) {
         super(animations, ClickSound.LEVER);
     }

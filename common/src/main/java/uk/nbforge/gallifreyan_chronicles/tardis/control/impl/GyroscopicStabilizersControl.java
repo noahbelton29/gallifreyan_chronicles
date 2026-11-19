@@ -8,15 +8,12 @@ import org.jspecify.annotations.Nullable;
 import uk.nbforge.gallifreyan_chronicles.core.GCSounds;
 import uk.nbforge.gallifreyan_chronicles.core.GCTardisControls;
 import uk.nbforge.gallifreyan_chronicles.core.entity.TardisControlEntity;
-import uk.nbforge.gallifreyan_chronicles.tardis.control.BaseControl;
 import uk.nbforge.gallifreyan_chronicles.tardis.control.ClickSound;
+import uk.nbforge.gallifreyan_chronicles.tardis.control.Control;
 import uk.nbforge.gallifreyan_chronicles.tardis.control.ControlAnimations;
 import uk.nbforge.gallifreyan_chronicles.tardis.control.ControlContext;
 
-public class GyroscopicStabilizersControl extends BaseControl {
-    public static final ControlAnimations DEFAULT_ANIMATIONS =
-            new ControlAnimations("gyroscopic_stabilizers_on", "gyroscopic_stabilizers_off", true);
-
+public class GyroscopicStabilizersControl extends Control {
     public GyroscopicStabilizersControl(ControlAnimations animations) {
         super(animations, ClickSound.SWITCH);
     }

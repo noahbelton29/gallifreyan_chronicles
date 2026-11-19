@@ -32,11 +32,7 @@ import uk.nbforge.gallifreyan_chronicles.core.GCDataComponents;
 import uk.nbforge.gallifreyan_chronicles.core.block_entity.TardisExteriorBlockEntity;
 import uk.nbforge.gallifreyan_chronicles.core.data_registry.TardisExteriorRegistry;
 import uk.nbforge.gallifreyan_chronicles.core.data_registry.TardisInteriorRegistry;
-import uk.nbforge.gallifreyan_chronicles.tardis.Tardis;
-import uk.nbforge.gallifreyan_chronicles.tardis.TardisData;
-import uk.nbforge.gallifreyan_chronicles.tardis.TardisDimensionUtil;
-import uk.nbforge.gallifreyan_chronicles.tardis.TardisIdentity;
-import uk.nbforge.gallifreyan_chronicles.tardis.TardisManager;
+import uk.nbforge.gallifreyan_chronicles.tardis.*;
 import uk.nbforge.gallifreyan_chronicles.tardis.deletion.TardisDeletion;
 import uk.nbforge.gallifreyan_chronicles.tardis.exterior.ExteriorCollisionUtil;
 import uk.nbforge.gallifreyan_chronicles.tardis.interior.TardisInterior;
@@ -49,7 +45,7 @@ public class TardisBlock extends BaseEntityBlock {
     public static final IntegerProperty LIGHT = IntegerProperty.create("light", 0, MAX_LIGHT);
     public static final BooleanProperty GLOWING = BooleanProperty.create("glowing");
     public static final BooleanProperty IN_FLIGHT = BooleanProperty.create("in_flight");
-    private static final VoxelShape TALL_SHAPE = Block.box(0, 0, 0, 16, 32, 16);
+    private static final VoxelShape SHAPE = Block.box(0, 0, 0, 16, 32, 16);
 
     public TardisBlock(Properties properties) {
         super(properties);
@@ -70,7 +66,9 @@ public class TardisBlock extends BaseEntityBlock {
         applyExteriorFromInterior(blockEntity, chosen);
     }
 
-    /** works on either side cuz it only changes the local block entity */
+    /**
+     * works on either side cuz it only changes the local block entity
+     */
     private static void applyExteriorFromInterior(
             TardisExteriorBlockEntity blockEntity, @Nullable String chosenInterior) {
         if (chosenInterior == null || TardisInteriorRegistry.isUnknown(chosenInterior)) return;
@@ -228,7 +226,7 @@ public class TardisBlock extends BaseEntityBlock {
                 && tardis.travel().isFullyInvisible()) {
             return Shapes.empty();
         }
-        return TALL_SHAPE;
+        return SHAPE;
     }
 
     @Override

@@ -10,11 +10,13 @@ import uk.nbforge.gallifreyan_chronicles.tardis.control.ControlContext;
 import uk.nbforge.gallifreyan_chronicles.tardis.flight.TardisDestinations;
 
 public class CoordinateStepControl extends DestinationControl {
-    public static final ControlAnimations DEFAULT_ANIMATIONS =
-            new ControlAnimations("coordinate_step_control", "coordinate_step_control", false);
-
     public CoordinateStepControl(ControlAnimations animations) {
         super(animations, ClickSound.NONE);
+    }
+
+    @Override
+    protected boolean blockedByNavigationalLock() {
+        return false;
     }
 
     @Override

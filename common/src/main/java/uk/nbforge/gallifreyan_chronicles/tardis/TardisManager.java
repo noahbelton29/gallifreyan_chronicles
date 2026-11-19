@@ -46,7 +46,10 @@ public class TardisManager extends SavedData {
                     LandingTarget.CODEC
                             .optionalFieldOf("landing_target")
                             .forGetter(t -> Optional.ofNullable(t.getLandingTarget())),
-                    Codec.INT.optionalFieldOf("coord_increment", 0).forGetter(TardisData::getCoordIncrementIndex),
+                    LandingTarget.CODEC
+                            .optionalFieldOf("pending_target")
+                            .forGetter(t -> Optional.ofNullable(t.getPendingLandingTarget())),
+                    Codec.INT.optionalFieldOf("coord_increment_amount", 1).forGetter(TardisData::getCoordIncrement),
                     Codec.BOOL
                             .optionalFieldOf("coord_increment_negative", false)
                             .forGetter(TardisData::isCoordIncrementNegative),
@@ -70,6 +73,7 @@ public class TardisManager extends SavedData {
                             exteriorDimension,
                             interiorId,
                             landingTarget,
+                            pendingTarget,
                             coordIncrement,
                             coordIncrementNegative,
                             trusted,
@@ -87,7 +91,8 @@ public class TardisManager extends SavedData {
                                 .orElse(null));
                         t.setInteriorId(interiorId.orElse(null));
                         t.setLandingTarget(landingTarget.orElse(null));
-                        t.setCoordIncrementIndex(coordIncrement);
+                        t.setPendingLandingTarget(pendingTarget.orElse(null));
+                        t.setCoordIncrement(coordIncrement);
                         t.setCoordIncrementNegative(coordIncrementNegative);
                         trusted.forEach(player -> t.setTrusted(player, true));
                         mind.ifPresent(t::setMind);

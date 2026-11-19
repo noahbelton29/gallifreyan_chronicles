@@ -76,10 +76,13 @@ public final class ConsoleBuilder {
                 .control(GCTardisControls.ISOMORPHIC_CONTROL, 0.5)
                 .control(GCTardisControls.GYROSCOPIC_STABILIZERS, 0.5)
                 .control(GCTardisControls.DIRECTIONAL_CONTROL, 0.5, Control::noAnimation)
-                .control(GCTardisControls.CLOISTER_BELL_CONTROL, 0.5);
+                .control(GCTardisControls.CLOISTER_BELL_CONTROL, 0.5)
+                .control(GCTardisControls.NAVIGATIONAL_LOCK_CONTROL, 0.5);
     }
 
-    /** goes right after the door control, needs standardControls first */
+    /**
+     * goes right after the door control, needs standardControls first
+     */
     public void interiorDoorControl() {
         interiorDoorControl(details -> {});
     }
@@ -113,7 +116,9 @@ public final class ConsoleBuilder {
         return this;
     }
 
-    /** anything left unset comes from the console model */
+    /**
+     * anything left unset comes from the console model
+     */
     public static final class Control {
         private final String id;
         private double cooldown;
@@ -126,7 +131,21 @@ public final class ConsoleBuilder {
             this.cooldown = cooldown;
         }
 
-        /** in blocks from the console */
+        private static JsonArray triple(double[] values) {
+            return GCJson.arr(values[0], values[1], values[2]);
+        }
+
+        /**
+         * whole numbers get written as 1 not 1.0 to match how the files have always looked
+         */
+        private static Number number(double value) {
+            if (value == Math.rint(value)) return Long.valueOf((long) value);
+            return Double.valueOf(value);
+        }
+
+        /**
+         * in blocks from the console
+         */
         public Control at(double x, double y, double z) {
             this.position = new double[] {x, y, z};
             return this;
@@ -154,16 +173,6 @@ public final class ConsoleBuilder {
             out.add("cooldown", new JsonPrimitive(number(cooldown)));
             if (animated != null) out.addProperty("animation", animated);
             return out;
-        }
-
-        private static JsonArray triple(double[] values) {
-            return GCJson.arr(values[0], values[1], values[2]);
-        }
-
-        /** whole numbers get written as 1 not 1.0 to match how the files have always looked */
-        private static Number number(double value) {
-            if (value == Math.rint(value)) return Long.valueOf((long) value);
-            return Double.valueOf(value);
         }
     }
 }

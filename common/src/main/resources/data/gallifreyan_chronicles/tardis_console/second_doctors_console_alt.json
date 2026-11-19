@@ -79,6 +79,10 @@
     {
       "cooldown": 0.5,
       "id": "navigational_lock_control"
+    },
+    {
+      "cooldown": 0.5,
+      "id": "navcom"
     }
   ],
   "default_variant": "second_doctors_console_alt",

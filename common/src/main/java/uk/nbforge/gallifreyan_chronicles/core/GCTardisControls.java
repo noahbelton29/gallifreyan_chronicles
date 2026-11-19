@@ -2,11 +2,12 @@ package uk.nbforge.gallifreyan_chronicles.core;
 
 import com.mojang.serialization.JsonOps;
 import com.mojang.serialization.MapCodec;
-import java.util.function.Function;
 import uk.nbforge.gallifreyan_chronicles.tardis.control.*;
 import uk.nbforge.gallifreyan_chronicles.tardis.control.impl.*;
 import uk.nbforge.gallifreyan_chronicles.tardis.flight.TardisDestinations.Axis;
 import uk.nbforge.gallifreyan_chronicles.util.GCLog;
+
+import java.util.function.Function;
 
 public class GCTardisControls {
     public static final String NOOP = "noop";
@@ -27,6 +28,7 @@ public class GCTardisControls {
     public static final String GYROSCOPIC_STABILIZERS = "gyroscopic_stabilizers";
     public static final String CLOISTER_BELL_CONTROL = "cloister_bell_control";
     public static final String NAVIGATIONAL_LOCK_CONTROL = "navigational_lock_control";
+    public static final String NAVCOM_CONTROL = "navcom";
 
     public static void registerTardisControls() {
         TardisControls.registerType(NOOP, NoopControl.class, MapCodec.unit(NoopControl.INSTANCE));
@@ -43,16 +45,17 @@ public class GCTardisControls {
         control(ISOMORPHIC_CONTROL, IsomorphicControl::new);
         control(DIRECTIONAL_CONTROL, DirectionalControl::new);
         control(
-                CLOAKING_DEVICE_CONTROL,
-                ControlAnimations.toggle(CLOAKING_DEVICE_CONTROL, true),
-                CloakingDeviceControl::new);
+            CLOAKING_DEVICE_CONTROL,
+            ControlAnimations.toggle(CLOAKING_DEVICE_CONTROL, true),
+            CloakingDeviceControl::new);
         control(INTERIOR_DOOR_CONTROL, InteriorDoorControl::new);
         control(
-                GYROSCOPIC_STABILIZERS,
-                ControlAnimations.toggle(GYROSCOPIC_STABILIZERS, true),
-                GyroscopicStabilizersControl::new);
+            GYROSCOPIC_STABILIZERS,
+            ControlAnimations.toggle(GYROSCOPIC_STABILIZERS, true),
+            GyroscopicStabilizersControl::new);
         control(CLOISTER_BELL_CONTROL, CloisterBellControl::new);
         control(NAVIGATIONAL_LOCK_CONTROL, NavigationalLockControl::new);
+        control(NAVCOM_CONTROL, NavcomControl::new);
 
         verifyCodecs();
         ControlPower.validate();
@@ -64,7 +67,7 @@ public class GCTardisControls {
     }
 
     private static <T extends Control> void control(
-            String id, ControlAnimations defaults, Function<ControlAnimations, T> ctor) {
+        String id, ControlAnimations defaults, Function<ControlAnimations, T> ctor) {
         T instance = ctor.apply(defaults);
         TardisControls.register(id, instance.getClass(), Control.codec(defaults, ctor), instance);
     }
@@ -78,10 +81,10 @@ public class GCTardisControls {
         for (String id : TardisControls.ids()) {
             TardisControl control = TardisControls.get(id);
             TardisControl.CODEC
-                    .encodeStart(JsonOps.INSTANCE, control)
-                    .flatMap(json -> TardisControl.CODEC.parse(JsonOps.INSTANCE, json))
-                    .resultOrPartial(
-                            error -> GCLog.CORE.warn("TARDIS control '{}' failed its codec round trip: {}", id, error));
+                .encodeStart(JsonOps.INSTANCE, control)
+                .flatMap(json -> TardisControl.CODEC.parse(JsonOps.INSTANCE, json))
+                .resultOrPartial(
+                    error -> GCLog.CORE.warn("TARDIS control '{}' failed its codec round trip: {}", id, error));
         }
     }
 }

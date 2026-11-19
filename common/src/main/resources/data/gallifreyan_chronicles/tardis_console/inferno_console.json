@@ -95,6 +95,10 @@
     {
       "cooldown": 0.5,
       "id": "navigational_lock_control"
+    },
+    {
+      "cooldown": 0.5,
+      "id": "navcom"
     }
   ],
   "glow_groups": [

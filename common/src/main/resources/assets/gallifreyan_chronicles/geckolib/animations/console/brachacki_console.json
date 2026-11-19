@@ -590,6 +590,30 @@
 				}
 			}
 		},
+		"navcom_on": {
+			"loop": "hold_on_last_frame",
+			"animation_length": 0.25,
+			"bones": {
+				"navcom": {
+					"rotation": {
+						"0.0": [0, 0, 0],
+						"0.25": [77.5, 0, 0]
+					}
+				}
+			}
+		},
+		"navcom_off": {
+			"loop": "hold_on_last_frame",
+			"animation_length": 0.25,
+			"bones": {
+				"navcom": {
+					"rotation": {
+						"0.0": [77.5, 0, 0],
+						"0.25": [0, 0, 0]
+					}
+				}
+			}
+		},
 		"navigational_lock_control_off": {
 			"loop": "hold_on_last_frame",
 			"animation_length": 0.25,
